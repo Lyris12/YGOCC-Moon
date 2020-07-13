@@ -1,4 +1,4 @@
-﻿expansions/cards-new.cdb	ac784a960b9340da95bd60b0e8b43d13
+﻿expansions/cards-new.cdb	c0541ee0f6faa2fc2ba6c0b61a4258c2
 expansions/lflist.conf	35938db40e6c8e7bb8bdf58df55480ac
 expansions/strings.conf	8da0db295b4db4229c34cf9a0ccc5017
 expansions/pics/100000710.jpg	5f925a97b1c60d7d69acb8f229938263
@@ -5909,10 +5909,10 @@ expansions/script/c16000007.lua	0c2bba47871d750d5b2f480095eea5f6
 expansions/script/c16000009.lua	15756b535499456be586bf290df66c6e
 expansions/script/c16000013.lua	b2cd2bb493ae72ae1b382e1755048541
 expansions/script/c16000021.lua	0746ffdb149947dd6dfcda08d52fd8cd
-expansions/script/c16000022.lua	5ec4828fff3d48633222c343db3d58ca
+expansions/script/c16000022.lua	7374582d2cfe0d9582635ea604c27a8b
 expansions/script/c160000230.lua	92b67125bbd4fe53a57ffaef474c8833
 expansions/script/c160000245.lua	7ec769abd7c8f58ec032892689f22661
-expansions/script/c16000025.lua	d0d2ed75c618cdaf000e17b2c568f355
+expansions/script/c16000025.lua	931c53e1489a0af9a3c3e159cf7714f9
 expansions/script/c16000026.lua	f0938595b5004e209063f02ae59ff3c4
 expansions/script/c16000027.lua	e5b8ff69d493957075dad968d69f08d8
 expansions/script/c16000028.lua	198af7264b72fa86d5dd9ecf408c4903
@@ -7058,8 +7058,8 @@ expansions/script/c28915343.lua	4deca686960da8f465678d9134edee54
 expansions/script/c28915344.lua	aefd51494b20325b1c03afafd187d8b5
 expansions/script/c28915345.lua	dc823c0bbefa5792dcdb715bf200a957
 expansions/script/c28915346.lua	9947e6043d53053c777fbf12f58c2a43
-expansions/script/c28915347.lua	015f69b51a37ff235ea10638f5e7fd42
-expansions/script/c28915348.lua	fe78ce9af9e4f11b324b9b767562d8a3
+expansions/script/c28915347.lua	bc84adfce2e73231de0ec847dd5e960f
+expansions/script/c28915348.lua	d7abf96aeaabc919a0a8f506b1d78ef1
 expansions/script/c28915508.lua	dbef822f905304085d95166752f13c0b
 expansions/script/c28916160.lua	a5582b93e3e8497b8b87ccad4d2f0b6e
 expansions/script/c28916161.lua	3bf3c8d476cb4c6e77420b8375f601d5
@@ -9112,6 +9112,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	11d685237623e4c0a988836ea0e4d48e
+update/filelist.txt	ad25b7f0bfd54ee2d654c3f920a8c139
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	9ef84cf6cdb89d0ec8e8d5179c17f2e7
+update/version.txt	beefeed9dad09278076682c42b0e5dea
