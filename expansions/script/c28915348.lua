@@ -86,7 +86,7 @@ function ref.get_zone(c,lc,tp)
 		if seq<4 and lc:IsLinkMarker(LINK_MARKER_LEFT) then zone=bit.replace(zone,0x1,seq+1) end
 		if seq>0 and seq<5 and lc:IsLinkMarker(LINK_MARKER_RIGHT) then zone=bit.replace(zone,0x1,seq-1) end
 	end
-	local column=c:GetColumnZone(LOCATION_MZONE,0,0,tp)
+	local column=c:GetColumnZone(LOCATION_MZONE)
 	zone=bit.bor(zone,column)
 	return zone
 end

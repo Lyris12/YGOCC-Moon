@@ -3,39 +3,45 @@
 local cid,id=GetID()
 function cid.initial_effect(c)
 	c:EnableReviveLimit()
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_MONSTER_SSET)
+	e1:SetValue(TYPE_TRAP)
+	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
-	e2:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
-	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetType(EFFECT_TYPE_ACTIVATE)
 	e2:SetCode(EVENT_FREE_CHAIN)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetCountLimit(1,id)
-	e2:SetTarget(cid.tg)
+	e2:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
+	e2:SetTarget(cid.target)
 	e2:SetOperation(cid.activate)
 	c:RegisterEffect(e2)
-	local e3=e2:Clone()
-	e3:SetRange(LOCATION_HAND)
-	e3:SetCondition(function(e,tp) return not Duel.IsExistingMatchingCard(cid.cfilter,tp,LOCATION_MZONE,0,1,nil) end)
-	e3:SetCost(cid.cost)
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetCode(EFFECT_RITUAL_LEVEL)
+	e3:SetRange(LOCATION_SZONE)
+	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e3:SetValue(cid.rlevel)
 	c:RegisterEffect(e3)
 end
-function cid.cfilter(c)
-	return c:GetSequence()<5
+function cid.rlevel(e,c)
+	local lv=e:GetHandler():GetLevel()
+	if c:IsSetCard(0xf7a) and not c:IsCode(id) then
+		local clv=c:GetLevel()
+		return lv*(0x1<<16)+clv
+	else return lv end
 end
-function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	if chk==0 then return c:IsDiscardable() end
-	Duel.SendtoGrave(c,REASON_COST+REASON_DISCARD)
+function cid.filter(c)
+	return c:GetType()&0x82==0x82 and (c:IsFaceup() and c:IsLocation(LOCATION_REMOVED) or c:IsSetCard(0xf7a)) and c:IsAbleToHand()
 end
-function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_DECK+LOCATION_REMOVED,LOCATION_REMOVED,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK+LOCATION_REMOVED)
 end
 function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_DECK+LOCATION_REMOVED,LOCATION_REMOVED,1,1,nil)
-	Duel.SendtoHand(g,tp,REASON_EFFECT)
-	Duel.ConfirmCards(1-tp,g)
-end
-function cid.filter(c)
-	return c:IsType(TYPE_SPELL) and ((c:IsFaceup() and c:IsLocation(LOCATION_REMOVED) and c:IsType(TYPE_RITUAL)) or (c:IsSetCard(0xf7a) and c:GetActivateEffect():IsHasCategory(CATEGORY_SPECIAL_SUMMON))) and c:IsAbleToHand()
+	if g:GetCount()>0 then
+		Duel.SendtoHand(g,tp,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,g)
+	end
 end

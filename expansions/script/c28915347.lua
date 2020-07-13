@@ -88,7 +88,7 @@ function ref.acttg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	end
 	if (bit.band(val,ref.var2)==ref.var2) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-		local cg=Duel.SelectMatchingCard(tp,ref.rmfilter,tp,LOCATION_REMOVED,LOCATION_REMOVED,1,1,nil)
+		local cg=Duel.SelectMatchingCard(tp,ref.retfilter,tp,LOCATION_REMOVED,LOCATION_REMOVED,1,1,nil)
 		Duel.SendtoGrave(cg,REASON_COST)
 		local g2=Duel.SelectTarget(tp,ref.atkfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 		cat=cat+CATEGORY_ATKCHANGE
