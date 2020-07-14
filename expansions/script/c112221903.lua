@@ -99,11 +99,14 @@ function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 		c:RegisterEffect(e1)
 	end
 end
+function cid.qfilter(c)
+	return c:IsFaceup() and c:IsCode(id-3) and not c:IsStatus(STATUS_BATTLE_DESTROYED)
+end
 function cid.equip(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_CARD,0,id)
 	local c=e:GetHandler()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	local tc=Duel.SelectMatchingCard(tp,aux.AND(Card.IsFaceup,Card.IsCode),tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil,id-3):GetFirst()
+	local tc=Duel.SelectMatchingCard(tp,cid.qfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil):GetFirst()
 	if not Duel.Equip(tp,c,tc) then return end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
