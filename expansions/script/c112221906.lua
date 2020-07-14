@@ -27,6 +27,7 @@ function cid.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1)
+	e3:SetDescription(1104)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e3:SetCategory(CATEGORY_TOHAND)
 	e3:SetTarget(cid.thtg)
@@ -95,11 +96,10 @@ function cid.tg(e,c)
 	return c==e:GetHandler():GetEquipTarget() and c:IsCode(id-6)
 end
 function cid.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_ONFIELD+LOCATION_GRAVE+LOCATION_REMOVED) and chkc:IsAbleToHand()
-		and (c:IsFaceup() or not c:IsLocation(LOCATION_REMOVED)) end
-	if chk==0 then return Duel.IsExistingTarget(aux.AND(Card.IsAbleToHand,aux.OR(Card.IsFaceup,aux.NOT(Card.IsLocation))),tp,LOCATION_ONFIELD+LOCATION_GRAVE+LOCATION_REMOVED,LOCATION_ONFIELD+LOCATION_GRAVE+LOCATION_REMOVED,1,nil,LOCATION_REMOVED) end
+	if chkc then return chkc:IsLocation(LOCATION_ONFIELD) and chkc:IsAbleToHand() end
+	if chk==0 then return Duel.IsExistingTarget(aux.AND(Card.IsAbleToHand,aux.OR(Card.IsFaceup,aux.NOT(Card.IsLocation))),tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil,LOCATION_REMOVED) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,Duel.SelectTarget(tp,aux.AND(Card.IsAbleToHand,aux.OR(Card.IsFaceup,aux.NOT(Card.IsLocation))),tp,LOCATION_ONFIELD+LOCATION_GRAVE+LOCATION_REMOVED,LOCATION_ONFIELD+LOCATION_GRAVE+LOCATION_REMOVED,1,1,nil,LOCATION_REMOVED),1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,Duel.SelectTarget(tp,aux.AND(Card.IsAbleToHand,aux.OR(Card.IsFaceup,aux.NOT(Card.IsLocation))),tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil,LOCATION_REMOVED),1,0,0)
 end
 function cid.thop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
