@@ -4,12 +4,29 @@ function cid.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCountLimit(1,id+EFFECT_COUNT_CODE_OATH)
+	e1:SetCountLimit(1,id)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCategory(CATEGORY_REMOVE)
+	e1:SetCost(cid.cost(1000))
 	e1:SetTarget(cid.target)
 	e1:SetOperation(cid.activate)
 	c:RegisterEffect(e1)
+	local e2=Effect.CreateEffect(c)
+	e2:SetCountLimit(1,id+1000)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e2:SetCode(EVENT_REMOVE)
+	e2:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
+	e2:SetCondition(function(e) local re=e:GetHandler():GetReasonEffect() return re and re:GetHandler():IsSetCard(0xc97) and e:GetHandler():IsReason(REASON_EFFECT) end)
+	e2:SetCost(cid.cost(500))
+	e2:SetTarget(cid.thtg)
+	e2:SetOperation(cid.thop)
+	c:RegisterEffect(e2)
+end
+function cid.cost(v)
+	return  function(e,tp,eg,ep,ev,re,r,rp,chk)
+				if chk==0 then return true end
+				Duel.Damage(tp,v,REASON_COST)
+			end
 end
 function cid.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0xc97) and c:IsAbleToRemove()
@@ -31,4 +48,11 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 	if #g>0 then
 		Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
 	end
+end
+function cid.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():IsSSetable() end
+end
+function cid.thop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if c:IsRelateToEffect(e) then Duel.SSet(tp,c) end
 end

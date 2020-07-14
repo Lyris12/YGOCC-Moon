@@ -92,7 +92,7 @@ function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
-	local e3=Effect.CreateEffect(c)
+	local e3=Effect.CreateEffect(e:GetHandler())
 	e3:SetType(EFFECT_TYPE_FIELD)
 	e3:SetCode(id+100)
 	e3:SetTargetRange(LOCATION_ONFIELD,0)

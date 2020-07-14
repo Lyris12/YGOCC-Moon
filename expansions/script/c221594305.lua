@@ -7,17 +7,20 @@ function cid.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_CHAINING)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCountLimit(1)
+	e2:SetCountLimit(1,id)
 	e2:SetCondition(cid.discon)
+	e2:SetCost(cid.discost)
 	e2:SetTarget(cid.distg)
 	e2:SetOperation(cid.disop)
 	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetCode(EVENT_REMOVE)
-	e3:SetCountLimit(1,id)
+	e3:SetCountLimit(1,id+1000)
 	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e3:SetCondition(function(e,tp,eg,ep,ev,re,r,rp) return re and re:GetHandler():IsSetCard(0xc97) and e:GetHandler():IsReason(REASON_EFFECT) end)
+	e3:SetCost(cid.cost)
 	e3:SetTarget(cid.target)
 	e3:SetOperation(cid.operation)
 	c:RegisterEffect(e3)
@@ -30,6 +33,10 @@ function cid.discon(e,tp,eg,ep,ev,re,r,rp)
 	local tg=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
 	return tg and tg:IsExists(cid.cfilter,1,nil,tp)
 end
+function cid.discost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.Damage(tp,500,REASON_COST)
+end
 function cid.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local rc=re:GetHandler()
 	if chk==0 then return not rc:IsStatus(STATUS_DISABLED) end
@@ -39,10 +46,19 @@ function cid.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 end
 function cid.disop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.NegateEffect(ev)
 	local rc=re:GetHandler()
-	if Duel.NegateEffect(ev) and rc:IsRelateToEffect(re) then
+	if rc:IsRelateToEffect(re) then
 		Duel.Remove(rc,POS_FACEUP,REASON_EFFECT)
 	end
+end
+function cid.filter(c)
+	return c:IsSetCard(0xc97) and c:IsType(TYPE_MONSTER) and c:IsAbleToRemoveAsCost() and not c:IsCode(id)
+end
+function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_GRAVE,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+	Duel.Remove(Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_GRAVE,0,1,1,nil),POS_FACEUP,REASON_COST)
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

@@ -16,9 +16,9 @@ function cid.initial_effect(c)
 	e3:SetCode(EVENT_REMOVE)
 	e3:SetCountLimit(1,id*10+1)
 	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
-	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e3:SetCategory(CATEGORY_TOHAND)
 	e3:SetLabelObject(e2)
-	e3:SetCondition(function(e,tp,eg,ep,ev,re,r,rp) return e2 and re~=e2 or re~=e:GetLabelObject() end)
+	e3:SetCondition(function(e,tp,eg,ep,ev,re,r,rp) return re and re:GetHandler():IsSetCard(0xc97) and e:GetHandler():IsReason(REASON_EFFECT) end)
 	e3:SetTarget(cid.target)
 	e3:SetOperation(cid.operation)
 	c:RegisterEffect(e3)
@@ -40,13 +40,13 @@ function cid.thop(e,tp,eg,ep,ev,re,r,rp)
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
+	if chk==0 then return c:IsAbleToHand() end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,c,1,0,0)
 end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) then
-		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP_DEFENSE)
+	if c:IsRelateToEffect(e) and Duel.SendtoHand(c,nil,REASON_EFFECT)>0 then
+		Duel.BreakEffect()
+		Duel.Damage(tp,500,REASON_EFFECT)
 	end
 end

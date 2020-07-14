@@ -12,9 +12,10 @@ function cid.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetCountLimit(1,id+1000)
 	e2:SetCategory(CATEGORY_TOHAND)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e2:SetCode(EVENT_REMOVE)
-	e2:SetProperty(EFFECT_FLAG_DELAY)
+	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
+	e2:SetCondition(function(e,tp,eg,ep,ev,re) return re and re:GetHandler():IsSetCard(0xc97) and e:GetHandler():IsReason(REASON_EFFECT) end)
 	e2:SetTarget(cid.thtg)
 	e2:SetOperation(cid.thop)
 	c:RegisterEffect(e2)
@@ -28,14 +29,13 @@ function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil)
-	if g:GetCount()>0 then
-		Duel.SendtoHand(g,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,g)
-	end
+	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(cid.filter),tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil)
+	if Duel.SendtoHand(g,nil,REASON_EFFECT)==0 then return end
+	Duel.ConfirmCards(1-tp,g)
+	if g:GetFirst():IsLocation(LOCATION_HAND) then Duel.Damage(tp,500,REASON_EFFECT) end
 end
 function cid.cfilter(c)
-	return (c:IsSetCard(0x3c97) or c:IsSetCard(0xac97)) and c:IsAbleToHand() and not c:IsCode(id)
+	return c:IsFaceup() and c:IsSetCard(0xc97) and c:IsAbleToHand() and not c:IsCode(id)
 end
 function cid.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cid.cfilter,tp,LOCATION_REMOVED,0,1,nil) end
@@ -44,8 +44,10 @@ end
 function cid.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,cid.cfilter,tp,LOCATION_REMOVED,0,1,1,nil)
-	if g:GetCount()>0 then
-		Duel.SendtoHand(g,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,g)
+	if Duel.SendtoHand(g,nil,REASON_EFFECT)==0 then return end
+	Duel.ConfirmCards(1-tp,g)
+	if g:GetFirst():IsLocation(LOCATION_HAND) then
+		Duel.BreakEffect()
+		Duel.Damage(tp,500,REASON_EFFECT)
 	end
 end
