@@ -40,6 +40,13 @@ function cid.initial_effect(c)
 	e4:SetTarget(cid.tg)
 	e4:SetLabelObject(e3)
 	c:RegisterEffect(e4)
+	local qe=e3:Clone()
+	qe:SetType(EFFECT_TYPE_QUICK_O)
+	qe:SetCode(EVENT_FREE_CHAIN)
+	qe:SetCondition(function(e) return e:GetHandler():IsHasEffect(id+103) end)
+	local e5=e4:Clone()
+	e5:SetLabel(qe)
+	c:RegisterEffect(e5)
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -103,7 +110,7 @@ function cid.eqop(e,tp,eg,ep,ev,re,r,rp)
 				ec:RegisterEffect(e1)
 			end
 		else break end
-		if not Duel.SelectYesNo(tp,210) then break end
+		if Duel.GetLocationCount(tp,LOCATION_SZONE)==0 or not Duel.SelectYesNo(tp,210) then break end
 	end
 	Duel.EquipComplete()
 end
