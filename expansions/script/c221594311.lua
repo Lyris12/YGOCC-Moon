@@ -53,16 +53,17 @@ function cid.rmtarget(e,c)
 	return c:IsSetCard(0xc97) and c:GetOwner()==e:GetHandlerPlayer()
 end
 function cid.repfilter(c,e,val)
-	return c:IsFaceup() and c:IsSetCard(0xc97) and not c:IsImmuneToEffect(e) and c:IsAttackAbove(val)
+	return c:IsFaceup() and c:IsSetCard(0xc97) and c:IsAttackAbove(val)
 end
 function cid.rev(e,re,dam,r,rp,rc)
 	local g=Duel.GetMatchingGroup(cid.repfilter,tp,LOCATION_MZONE,0,1,nil,e,dam)
 	local rec=rc
 	if not rec and re then rec=re:GetHandler() end
 	if not rec:IsSetCard(0xc97) or rec:GetOwner()~=e:GetHandlerPlayer()
-		or r&REASON_COST+REASON_EFFECT==0 or #g==0 or not Duel.SelectYesNo(tp,1113) or Duel.GetFlagEffect(tp,id)>1 then return dam end
+		or r&REASON_COST+REASON_EFFECT==0 or g:FilterCount(aux.NOT(Card.IsImmuneToEffect),nil,e)==0
+		or Duel.GetFlagEffect(tp,id)>1 or not Duel.SelectYesNo(tp,1113) then return dam end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	local tg=g:Select(tp,1,1,nil)
+	local tg=g:FilterSelect(tp,aux.NOT(Card.IsImmuneToEffect),1,1,nil,e)
 	Duel.HintSelection(tg)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_SINGLE)
