@@ -6,9 +6,7 @@ function cid.initial_effect(c)
 	e1:SetDescription(1056)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_HAND)
-	e1:SetCountLimit(1,id)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON)
-	e1:SetCost(cid.cost)
 	e1:SetTarget(cid.ftg)
 	e1:SetOperation(cid.fop)
 	c:RegisterEffect(e1)
@@ -18,11 +16,17 @@ function cid.initial_effect(c)
 	e2:SetTarget(cid.stg)
 	e2:SetOperation(cid.sop)
 	c:RegisterEffect(e2)
-end
-function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	if chk==0 then return not c:IsPublic() and c:GetFlagEffect(id)==0 end
-	c:RegisterFlagEffect(id,RESET_CHAIN,0,1)
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e3:SetCode(EVENT_REMOVE)
+	e3:SetCountLimit(1,id)
+	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
+	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e3:SetCondition(function(e,tp,eg,ep,ev,re,r,rp) return re and re:GetHandler():IsSetCard(0xc97) and e:GetHandler():IsReason(REASON_EFFECT) end)
+	e3:SetCost(cid.cost)
+	e3:SetTarget(cid.tg)
+	e3:SetOperation(cid.op)
+	c:RegisterEffect(e3)
 end
 function cid.filter0(c)
 	return c:IsLocation(LOCATION_HAND) and c:IsAbleToRemove()
@@ -31,7 +35,7 @@ function cid.filter1(c,e)
 	return c:IsLocation(LOCATION_HAND) and c:IsAbleToRemove() and not c:IsImmuneToEffect(e)
 end
 function cid.filter2(c,e,tp,m,f,chkf)
-	return c:IsType(TYPE_FUSION) and c:IsSetCard(0xc97) and (not f or f(c))
+	return c:IsType(TYPE_FUSION) and c:IsSetCard(0x6c97) and (not f or f(c))
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false) and c:CheckFusionMaterial(m,e:GetHandler(),chkf)
 end
 function cid.filter3(c)
@@ -93,39 +97,61 @@ function cid.fop(e,tp,eg,ep,ev,re,r,rp)
 		tc:CompleteProcedure()
 	end
 end
-function cid.sfilter0(rg,c,lv)
-	return rg:CheckWithSumEqual(Card.GetLevel,lv,#rg,#rg) and rg:IsExists(function(tc) return tc:IsAttribute(ATTRIBUTE_DARK) and tc:IsNotTuner(c) end,1,nil)
+function cid.cfilter(c)
+	if not c:IsSetCard(0xc97) or not c:IsType(TYPE_MONSTER) then return false end
+	if c:IsLocation(LOCATION_HAND) then return c:IsDiscardable(REASON_EFFECT)
+	else return c:IsAbleToRemove() end
 end
-function cid.sfilter1(c,e,tp)
-	local lv=c:GetLevel()-e:GetHandler():GetLevel()
-	local rg=Duel.GetMatchingGroup(cid.sfilter2,tp,LOCATION_HAND+LOCATION_GRAVE,0,nil)
-	aux.GCheckAdditional=function(g) return g:GetSum(Card.GetLevel)<=lv end
-	local res=c:IsType(TYPE_SYNCHRO) and lv>0 and c:IsSetCard(0xc97) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_SYNCHRO,tp,false,false)
-		and rg:CheckSubGroup(cid.sfilter0,1,lv,c,lv)
-	aux.GCheckAdditional=nil
-	return res
-end
-function cid.sfilter2(c)
-	return c:GetLevel()>0 and not c:IsType(TYPE_TUNER) and c:IsAbleToRemove()
+function cid.spfilter(c,e,tp,t)
+	if not c:IsSetCard(0x6c97) then return false end
+	if not t then t={
+		[TYPE_SYNCHRO]=SUMMON_TYPE_SYNCHRO,
+		[TYPE_BIGBANG]=SUMMON_TYPE_BIGBANG,
+		[TYPE_EVOLUTE]=SUMMON_TYPE_EVOLUTE,
+	} end
+	local st=t[c:GetType()&TYPE_EXTRA]
+	return st~=nil and c:IsCanBeSpecialSummoned(e,st,tp,false,false)
 end
 function cid.stg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCountFromEx(tp)>0 and e:GetHandler():IsAbleToRemove()
-		and Duel.IsExistingMatchingCard(cid.sfilter1,tp,LOCATION_EXTRA,0,1,nil,e,tp) end
+	local c=e:GetHandler()
+	if chk==0 then return c:IsDiscardable(REASON_EFFECT) and Duel.GetLocationCountFromEx(tp)>0
+		and Duel.IsExistingMatchingCard(cid.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
 function cid.sop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsAbleToRemove() then return end
+	local mg=Duel.GetMatchingGroup(cid.cfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,c)
+	if not c:IsRelateToEffect(e) or #mg<2 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
+	local g=mg:Select(tp,2,2,nil)+c
+	local t={
+		[TYPE_SYNCHRO]=SUMMON_TYPE_SYNCHRO,
+		[TYPE_BIGBANG]=SUMMON_TYPE_BIGBANG,
+		[TYPE_EVOLUTE]=SUMMON_TYPE_EVOLUTE,
+	}
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g1=Duel.SelectMatchingCard(tp,cid.sfilter1,tp,LOCATION_EXTRA,0,1,1,nil,e,tp)
-	if #g1==0 then return end
-	local lv=g1:GetFirst():GetLevel()-c:GetLevel()
-	local rg=Duel.GetMatchingGroup(cid.sfilter2,tp,LOCATION_HAND+LOCATION_GRAVE,0,nil)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g2=rg:SelectWithSumEqual(tp,Card.GetLevel,lv,1,63)+c
-	g1:GetFirst():SetMaterial(g2)
-	Duel.Remove(g2,POS_FACEUP,REASON_EFFECT+REASON_MATERIAL+REASON_SYNCHRO)
-	Duel.BreakEffect()
-	Duel.SpecialSummon(g1,SUMMON_TYPE_SYNCHRO,tp,tp,false,false,POS_FACEUP)
-	g1:GetFirst():CompleteProcedure()
+	local sc=Duel.SelectMatchingCard(tp,cid.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,t):GetFirst()
+	if sc then
+		sc:SetMaterial(g)
+		Duel.Remove(g:Filter(Card.IsLocation,nil,LOCATION_GRAVE),POS_FACEUP,REASON_EFFECT)
+		Duel.SendtoGrave(g:Filter(Card.IsLocation,nil,LOCATION_HAND),REASON_EFFECT+REASON_DISCARD)
+		Duel.BreakEffect()
+		Duel.SpecialSummon(sc,t[sc:GetType()&TYPE_EXTRA],tp,tp,false,false,POS_FACEUP)
+	end
+end
+function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.Damage(tp,1000,REASON_COST)
+end
+function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return c:IsAbleToHand() end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,c,1,0,0)
+end
+function cid.op(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if c:IsRelateToEffect(e) then
+		Duel.SendtoHand(c,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,c)
+	end
 end
