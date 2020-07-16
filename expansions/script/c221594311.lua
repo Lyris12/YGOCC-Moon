@@ -63,7 +63,7 @@ function cid.rev(e,re,dam,r,rp,rc)
 	Duel.DisableActionCheck(true)
 	if rec:IsSetCard(0xc97) and rec:GetOwner()==e:GetHandlerPlayer()
 		and r&REASON_COST+REASON_EFFECT>0 and g:FilterCount(aux.NOT(Card.IsImmuneToEffect),nil,e)>0
-		and Duel.GetFlagEffect(tp,id)<2 then
+		and Duel.GetFlagEffect(tp,id)<2 and Duel.SelectYesNo(tp,1113) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 		local tg=g:FilterSelect(tp,aux.NOT(Card.IsImmuneToEffect),1,1,nil,e)
 		Duel.HintSelection(tg)
