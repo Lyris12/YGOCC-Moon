@@ -59,11 +59,16 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e5)
 end
 function cid.con(e,tp)
-	return Duel.GetFieldCard(tp,LOCATION_PZONE,1-e:GetHandler():GetSequence()):IsCode(id+1)
+	local tc=Duel.GetFieldCard(tp,LOCATION_PZONE,1-e:GetHandler():GetSequence())
+	return tc and tc:IsCode(id+1)
 end
 function cid.splimit(e,re,tp)
 	local rc=re:GetHandler()
 	return re:GetActiveType()&TYPE_PENDULUM+TYPE_MONSTER==TYPE_PENDULUM+TYPE_MONSTER and rc:IsLocation(LOCATION_PZONE)
+end
+function cid.hspcon(e,c)
+	if c==nil then return true end
+	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 end
 function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -114,7 +119,7 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	if c:IsForbidden() then return end
 	local b1=Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,1)
 	if b1 and Duel.SelectOption(tp,1160,1105)==0 then
-		Duel.MoveToField(c,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
+		Duel.MoveToField(c,tp,tp,LOCATION_PZONE,POS_FACEUP,true)
 	else
 		Duel.SelectOption(tp,1105)
 		Duel.SendtoExtraP(c,nil,REASON_EFFECT)

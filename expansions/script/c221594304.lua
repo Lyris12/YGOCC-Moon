@@ -19,6 +19,7 @@ function cid.initial_effect(c)
 	e3:SetCategory(CATEGORY_TOHAND+CATEGORY_DAMAGE)
 	e3:SetLabelObject(e2)
 	e3:SetCondition(function(e,tp,eg,ep,ev,re,r,rp) return re and re:GetHandler():IsSetCard(0xc97) and e:GetHandler():IsReason(REASON_EFFECT) end)
+	e3:SetCost(cid.cost)
 	e3:SetTarget(cid.target)
 	e3:SetOperation(cid.operation)
 	c:RegisterEffect(e3)
@@ -37,6 +38,14 @@ function cid.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
 	end
+end
+function cid.cfilter(c)
+	return c:IsAbleToRemoveAsCost() and c:IsSetCard(0xac97) and c:IsType(TYPE_SPELL+TYPE_TRAP)
+end
+function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(cid.cfilter,tp,LOCATION_GRAVE,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+	Duel.Remove(Duel.SelectMatchingCard(tp,cid.cfilter,tp,LOCATION_GRAVE,0,1,1,nil),POS_FACEUP,REASON_COST)
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

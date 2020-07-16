@@ -22,7 +22,7 @@ function cid.initial_effect(c)
 	e6:SetRange(LOCATION_PZONE)
 	e6:SetCountLimit(1)
 	e6:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e6:SetCondition(function(e,tp) return Duel.GetFieldCard(tp,LOCATION_PZONE,1-e:GetHandler():GetSequence()):IsCode(id-1) end)
+	e6:SetCondition(cid.con)
 	e6:SetCost(cid.cost)
 	e6:SetTarget(cid.sptg)
 	e6:SetOperation(cid.spop)
@@ -50,7 +50,7 @@ function cid.initial_effect(c)
 	e5:SetCode(EVENT_REMOVE)
 	e5:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
 	e5:SetCategory(CATEGORY_TOEXTRA)
-	e3:SetCondition(function(e,tp,eg,ep,ev,re,r,rp) return re and re:GetHandler():IsSetCard(0xc97) and e:GetHandler():IsReason(REASON_EFFECT) end)
+	e5:SetCondition(function(e,tp,eg,ep,ev,re,r,rp) return re and re:GetHandler():IsSetCard(0xc97) and e:GetHandler():IsReason(REASON_EFFECT) end)
 	e5:SetTarget(cid.target)
 	e5:SetOperation(cid.operation)
 	c:RegisterEffect(e5)
@@ -63,6 +63,10 @@ end
 function cid.hspcon(e,c)
 	if c==nil then return true end
 	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
+end
+function cid.con(e,tp)
+	local tc=Duel.GetFieldCard(tp,LOCATION_PZONE,1-e:GetHandler():GetSequence())
+	return tc and tc:IsCode(id-1)
 end
 function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -114,7 +118,7 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	if c:IsForbidden() then return end
 	local b1=Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,1)
 	if b1 and Duel.SelectOption(tp,1160,1105)==0 then
-		Duel.MoveToField(c,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
+		Duel.MoveToField(c,tp,tp,LOCATION_PZONE,POS_FACEUP,true)
 	else
 		Duel.SelectOption(tp,1105)
 		Duel.SendtoExtraP(c,nil,REASON_EFFECT)

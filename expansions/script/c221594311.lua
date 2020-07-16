@@ -59,21 +59,26 @@ function cid.rev(e,re,dam,r,rp,rc)
 	local g=Duel.GetMatchingGroup(cid.repfilter,tp,LOCATION_MZONE,0,1,nil,e,dam)
 	local rec=rc
 	if not rec and re then rec=re:GetHandler() end
-	if not rec:IsSetCard(0xc97) or rec:GetOwner()~=e:GetHandlerPlayer()
-		or r&REASON_COST+REASON_EFFECT==0 or g:FilterCount(aux.NOT(Card.IsImmuneToEffect),nil,e)==0
-		or Duel.GetFlagEffect(tp,id)>1 or not Duel.SelectYesNo(tp,1113) then return dam end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	local tg=g:FilterSelect(tp,aux.NOT(Card.IsImmuneToEffect),1,1,nil,e)
-	Duel.HintSelection(tg)
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e1:SetCode(EFFECT_UPDATE_ATTACK)
-	e1:SetValue(-dam)
-	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-	tg:GetFirst():RegisterEffect(e1)
-	Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
-	return 0
+	local val=dam
+	Duel.DisableActionCheck(true)
+	if rec:IsSetCard(0xc97) and rec:GetOwner()==e:GetHandlerPlayer()
+		and r&REASON_COST+REASON_EFFECT>0 and g:FilterCount(aux.NOT(Card.IsImmuneToEffect),nil,e)>0
+		and Duel.GetFlagEffect(tp,id)<2 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
+		local tg=g:FilterSelect(tp,aux.NOT(Card.IsImmuneToEffect),1,1,nil,e)
+		Duel.HintSelection(tg)
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e1:SetCode(EFFECT_UPDATE_ATTACK)
+		e1:SetValue(-dam)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+		tg:GetFirst():RegisterEffect(e1)
+		Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
+		val=0
+	end
+	Duel.DisableActionCheck(false)
+	return val
 end
 function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
