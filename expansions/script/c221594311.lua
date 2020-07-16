@@ -11,7 +11,7 @@ function cid.initial_effect(c)
 	e2:SetRange(LOCATION_FZONE)
 	e2:SetProperty(EFFECT_FLAG_DELAY)
 	e2:SetCategory(CATEGORY_REMOVE)
-	e2:SetCondition(function(e,tp) return Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsSetCard),tp,LOCATION_MZONE,0,1,nil,0x6c97,0x9c97) end)
+	e2:SetCondition(function(e,tp,eg) return Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsSetCard),tp,LOCATION_MZONE,0,1,nil,0x6c97,0x9c97) and eg:IsExists(Card.IsSetCard,1,nil,0xc97) end)
 	e2:SetTarget(cid.rmtg)
 	e2:SetOperation(cid.rmop)
 	c:RegisterEffect(e2)
@@ -51,7 +51,7 @@ function cid.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function cid.rmop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	Duel.Remove(Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_GRAVE,0,1,1,nil),POS_FACEUP,REASON_EFFECT)
+	Duel.Remove(Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_GRAVE,0,1,2,nil),POS_FACEUP,REASON_EFFECT)
 end
 function cid.repfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0xc97)
@@ -65,11 +65,8 @@ function cid.rev(e,re,dam,r,rp,rc)
 	if not rec and re then rec=re:GetHandler() end
 	local val=dam
 	Duel.DisableActionCheck(true)
-	if rec:IsSetCard(0xc97)
-		and rec:GetOwner()==e:GetHandlerPlayer()
-		and r&REASON_COST+REASON_EFFECT>0
-		and g:FilterCount(cid.repcfilter,nil,e,dam)==#g
-		and Duel.GetFlagEffect(tp,id)<2 then
+	if rec:IsSetCard(0xc97) and rec:GetOwner()==e:GetHandlerPlayer() and r&REASON_COST+REASON_EFFECT>0 and #g>0
+		and g:FilterCount(cid.repcfilter,nil,e,dam)==#g and Duel.GetFlagEffect(tp,id)<2 then
 		local tg=g:Filter(cid.repcfilter,nil,e,dam)
 		Duel.HintSelection(tg)
 		for tc in aux.Next(tg) do

@@ -59,8 +59,7 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e5)
 end
 function cid.con(e)
-	local tc=Duel.GetFieldCard(e:GetHandlerPlayer(),LOCATION_PZONE,1-e:GetHandler():GetSequence())
-	return tc and tc:IsCode(id+1)
+	return Duel.IsExistingMatchingCard(Card.IsCode,e:GetHandlerPlayer(),LOCATION_PZONE,0,1,e:GetHandler(),id+1)
 end
 function cid.splimit(e,re,tp)
 	local rc=re:GetHandler()
@@ -88,7 +87,7 @@ function cid.rtop(e,tp,eg,ep,ev,re,r,rp)
 	local tg=Duel.SelectMatchingCard(tp,Card.IsAbleToDeck,tp,LOCATION_REMOVED,0,1,3,nil)
 	if Duel.SendtoDeck(tg,nil,2,REASON_EFFECT)==0
 		or tg:IsExists(aux.NOT(Card.IsLocation),1,nil,LOCATION_DECK+LOCATION_EXTRA) then return end
-	Duel.ShuffleDeck(tp)
+	if tg:IsExists(Card.IsLocation,1,nil,LOCATION_EXTRA) then Duel.ShuffleDeck(tp) end
 	if Duel.Draw(tp,2,REASON_EFFECT)==0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(cid.filter1),tp,LOCATION_GRAVE+LOCATION_HAND,0,1,1,nil)

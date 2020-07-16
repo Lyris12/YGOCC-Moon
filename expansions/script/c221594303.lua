@@ -22,7 +22,7 @@ function cid.initial_effect(c)
 	e6:SetRange(LOCATION_PZONE)
 	e6:SetCountLimit(1)
 	e6:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e6:SetCondition(cid.con)
+	e6:SetCondition(function(e) return Duel.IsExistingMatchingCard(Card.IsCode,e:GetHandlerPlayer(),LOCATION_PZONE,0,1,e:GetHandler(),id-1) end)
 	e6:SetCost(cid.cost)
 	e6:SetTarget(cid.sptg)
 	e6:SetOperation(cid.spop)
@@ -63,10 +63,6 @@ end
 function cid.hspcon(e,c)
 	if c==nil then return true end
 	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
-end
-function cid.con(e,tp)
-	local tc=Duel.GetFieldCard(tp,LOCATION_PZONE,1-e:GetHandler():GetSequence())
-	return tc and tc:IsCode(id-1)
 end
 function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
