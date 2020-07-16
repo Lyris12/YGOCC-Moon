@@ -179,7 +179,7 @@ function Auxiliary.BigbangCheckGoal(tp,sg,bc,ct,...)
 		if not sg:IsExists(funs[i][1],funs[i][2],nil) then return false end
 		min=min+funs[i][2]
 	end
-	return ct>=min and Duel.GetLocationCountFromEx(tp,tp,sg,bc)>0 and sg:GetSum(Card.GetBigbangAttack)>=bc:GetAttack() and sg:GetSum(Card.GetBigbangDefense)>=bc:GetDefense()
+	return ct>=min and Duel.GetLocationCountFromEx(tp,tp,sg,bc)>0 and sg:CheckWithSumGreater(Card.GetBigbangAttack,bc:GetAttack()) and sg:CheckWithSumGreater(Card.GetBigbangDefense,bc:GetDefense())
 		and not sg:IsExists(Auxiliary.BigbangUncompatibilityFilter,1,nil,sg,bc,tp)
 end
 function Auxiliary.BigbangUncompatibilityFilter(c,sg,lc,tp)

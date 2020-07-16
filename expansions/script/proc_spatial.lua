@@ -311,7 +311,7 @@ function Auxiliary.SptCheckGoal(tp,sg,sptc,ct,sptcheck,...)
 		if not sg:IsExists(funs[i][1],funs[i][2],nil) then return false end
 		min=min+funs[i][2]
 	end
-	return ct>=min and sg:GetSum(Auxiliary.SpatialValue)>sptc:GetDimensionNo()
+	return ct>=min and sg:CheckWithSumGreater(Auxiliary.SpatialValue,sptc:GetDimensionNo()+1)
 		and sg:IsExists(Auxiliary.SptMatCheck,1,nil,sg,sptc)
 		and (not sptcheck or sptcheck(sg,sptc,tp)) and Duel.GetLocationCountFromEx(tp,tp,sg,sptc)>0
 		and not sg:IsExists(Auxiliary.SpaceUncompatibilityFilter,1,nil,sg,sptc,tp)

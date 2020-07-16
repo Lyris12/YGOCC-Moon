@@ -1,8 +1,8 @@
 --created by Walrus, coded by Lyris
 local cid,id=GetID()
 function cid.initial_effect(c)
-	local e1=aux.AddRitualProcUltimate(c,cid.mfilter,Card.GetLevel,"Greater",LOCATION_HAND+LOCATION_GRAVE,aux.FilterBoolFunction(aux.AND(Card.IsFaceup,Card.IsSetCard),0xc97))
-	e1:SetOperation(cid.RitualUltimateOperation(cid.mfilter,Card.GetLevel,"Greater",LOCATION_HAND+LOCATION_GRAVE,aux.FilterBoolFunction(aux.AND(Card.IsFaceup,Card.IsSetCard),0xc97)))
+	local e1=aux.AddRitualProcUltimate(c,aux.FilterBoolFunction(Card.IsSetCard,0xc97),Card.GetLevel,"Greater",LOCATION_HAND+LOCATION_GRAVE,aux.FilterBoolFunction(aux.AND(Card.IsFaceup,Card.IsSetCard),0xc97),cid.mfilter)
+	e1:SetOperation(cid.RitualUltimateOperation(aux.FilterBoolFunction(Card.IsSetCard,0xc97),Card.GetLevel,"Greater",LOCATION_HAND+LOCATION_GRAVE,aux.FilterBoolFunction(aux.AND(Card.IsFaceup,Card.IsSetCard),0xc97),cid.mfilter))
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_REMOVE)
