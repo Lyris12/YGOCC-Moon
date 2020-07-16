@@ -58,13 +58,13 @@ function cid.initial_effect(c)
 	e5:SetOperation(cid.operation)
 	c:RegisterEffect(e5)
 end
-function cid.con(e,tp)
-	local tc=Duel.GetFieldCard(tp,LOCATION_PZONE,1-e:GetHandler():GetSequence())
+function cid.con(e)
+	local tc=Duel.GetFieldCard(e:GetHandlerPlayer(),LOCATION_PZONE,1-e:GetHandler():GetSequence())
 	return tc and tc:IsCode(id+1)
 end
 function cid.splimit(e,re,tp)
 	local rc=re:GetHandler()
-	return re:GetActiveType()&TYPE_PENDULUM+TYPE_MONSTER==TYPE_PENDULUM+TYPE_MONSTER and rc:IsLocation(LOCATION_PZONE)
+	return re:IsActiveType(TYPE_PENDULUM) and rc:IsLocation(LOCATION_PZONE)
 end
 function cid.hspcon(e,c)
 	if c==nil then return true end
