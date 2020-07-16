@@ -6,22 +6,15 @@ function cid.initial_effect(c)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_IGNORE_RANGE+EFFECT_FLAG_IGNORE_IMMUNE)
-	e2:SetCode(EFFECT_TO_GRAVE_REDIRECT)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e2:SetCode(EVENT_TO_GRAVE)
 	e2:SetRange(LOCATION_FZONE)
-	e2:SetTarget(cid.rmtarget)
-	e2:SetTargetRange(0xff,0xff)
-	e2:SetValue(LOCATION_REMOVED)
+	e2:SetProperty(EFFECT_FLAG_DELAY)
+	e2:SetCategory(CATEGORY_REMOVE)
+	e2:SetCondition(function(e,tp) return Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsSetCard),tp,LOCATION_MZONE,0,1,nil,0x6c97,0x9c97) end)
+	e2:SetTarget(cid.rmtg)
+	e2:SetOperation(cid.rmop)
 	c:RegisterEffect(e2)
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_FIELD)
-	e3:SetCode(81674782)
-	e3:SetRange(LOCATION_SZONE)
-	e3:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
-	e3:SetTargetRange(0xff,0xff)
-	e3:SetTarget(aux.TargetBoolFunction(aux.NOT(Card.IsPublic)))
-	c:RegisterEffect(e3)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE)
 	e4:SetCode(EFFECT_IMMUNE_EFFECT)
@@ -49,11 +42,22 @@ function cid.initial_effect(c)
 	e6:SetOperation(cid.operation)
 	c:RegisterEffect(e6)
 end
-function cid.rmtarget(e,c)
-	return c:IsSetCard(0xc97) and c:GetOwner()==e:GetHandlerPlayer()
+function cid.filter(c)
+	return c:IsSetCard(0xc97) and c:IsAbleToRemove()
 end
-function cid.repfilter(c,e,val)
-	return c:IsFaceup() and c:IsSetCard(0xc97) and c:IsAttackAbove(val)
+function cid.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_GRAVE,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,tp,LOCATION_GRAVE)
+end
+function cid.rmop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+	Duel.Remove(Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_GRAVE,0,1,1,nil),POS_FACEUP,REASON_EFFECT)
+end
+function cid.repfilter(c)
+	return c:IsFaceup() and c:IsSetCard(0xc97)
+end
+function cid.repcfilter(c,e,val)
+	return c:IsDefenseAbove(val) and not c:IsImmuneToEffect(e)
 end
 function cid.rev(e,re,dam,r,rp,rc)
 	local g=Duel.GetMatchingGroup(cid.repfilter,tp,LOCATION_MZONE,0,1,nil,e,dam)
@@ -61,19 +65,22 @@ function cid.rev(e,re,dam,r,rp,rc)
 	if not rec and re then rec=re:GetHandler() end
 	local val=dam
 	Duel.DisableActionCheck(true)
-	if rec:IsSetCard(0xc97) and rec:GetOwner()==e:GetHandlerPlayer()
-		and r&REASON_COST+REASON_EFFECT>0 and g:FilterCount(aux.NOT(Card.IsImmuneToEffect),nil,e)>0
-		and Duel.GetFlagEffect(tp,id)<2 and Duel.SelectYesNo(tp,1113) then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-		local tg=g:FilterSelect(tp,aux.NOT(Card.IsImmuneToEffect),1,1,nil,e)
+	if rec:IsSetCard(0xc97)
+		and rec:GetOwner()==e:GetHandlerPlayer()
+		and r&REASON_COST+REASON_EFFECT>0
+		and g:FilterCount(cid.repcfilter,nil,e,dam)==#g
+		and Duel.GetFlagEffect(tp,id)<2 then
+		local tg=g:Filter(cid.repcfilter,nil,e,dam)
 		Duel.HintSelection(tg)
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e1:SetCode(EFFECT_UPDATE_ATTACK)
-		e1:SetValue(-dam)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-		tg:GetFirst():RegisterEffect(e1)
+		for tc in aux.Next(tg) do
+			local e1=Effect.CreateEffect(e:GetHandler())
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+			e1:SetCode(EFFECT_UPDATE_DEFENSE)
+			e1:SetValue(-dam)
+			e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+			tc:RegisterEffect(e1)
+		end
 		Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
 		val=0
 	end
