@@ -139,7 +139,7 @@ end
 Duel.SSet=function(sp,cc,tp,confirm)
 	if not tp then tp=sp end
 	if Auxiliary.GetValueType(cc)=="Card" then
-		if cc then
+		if Auxiliary.Spatials[cc] then
 			Duel.MoveToField(cc,sp,tp,LOCATION_SZONE,POS_FACEDOWN,true)
 			return
 		end
