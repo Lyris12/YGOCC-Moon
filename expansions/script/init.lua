@@ -70,6 +70,7 @@ dofile("expansions/script/proc_chroma.lua") --Chromas
 dofile("expansions/script/proc_perdition.lua") --Perditions
 dofile("expansions/script/proc_impure.lua") --Impures
 dofile("expansions/script/proc_runic.lua") --Runic
+dofile("expansions/script/tables.lua")	--Special Tables
 
 Card.IsReason=function(c,rs)
 	local cusrs=rs>>32
@@ -645,4 +646,120 @@ function Card.RemoveOverlayCard(c,p,minct,maxct,r)
 	else
 		return oremove(c,p,minct,maxct,r)
 	end
+end
+
+--Glitchy's custom auxs and functions
+--DO NOT USE THESE UNLESS YOU KNOW WHAT YOU'RE DOING
+
+if not glitchy_effect_table then glitchy_effect_table={} end
+if not glitchy_archetype_table then glitchy_archetype_table={} end
+
+GLCATEGORY_ED_DRAW=0x8000
+GLCATEGORY_ACTIVATE_LMARKER=0x10000
+GLCATEGORY_DEACTIVATE_LMARKER=0x20000
+
+EFFECT_CANNOT_ACTIVATE_LMARKER=8000
+EFFECT_CANNOT_DEACTIVATE_LMARKER=8001
+
+EVENT_ACTIVATE_LINK_MARKER=9000
+EVENT_DEACTIVATE_LINK_MARKER=9000
+
+Auxiliary.GLSpecialInfos={}
+function Auxiliary.GLSetSpecialInfo(e,category,g,ct,p,loc)
+	if not g then
+		Auxiliary.GLSpecialInfos[e]={category,nil,ct,p,loc}
+	else
+		Auxiliary.GLSpecialInfos[e]={category,g,ct,0,0}
+	end
+end
+
+function Effect.SetGlitchyCategory(e,category)
+	if not glitchy_effect_table[e] then glitchy_effect_table[e]={0} end
+	glitchy_effect_table[1]=category
+end
+	
+
+function Card.GLIsAbleToDrawFromExtra(c,p)
+	return not Duel.IsPlayerAffectedByEffect(p,EFFECT_CANNOT_DRAW) and not c:IsHasEffect(EFFECT_CANNOT_TO_HAND)
+end
+function Card.GLGetLinkMarkerCount(c)
+	local list={LINK_MARKER_BOTTOM_LEFT,LINK_MARKER_LEFT,LINK_MARKER_TOP_LEFT,LINK_MARKER_TOP_RIGHT,LINK_MARKER_BOTTOM_RIGHT,LINK_MARKER_BOTTOM}
+	local ct=0
+	for i=1,8 do
+		if c:IsLinkMarker(list[i]) then
+			ct=ct+1
+		end
+	end
+	return ct
+end
+function Card.GLIsCanActivateLinkMarkers(c,val,...)
+	local f={...}
+	if not f[1] and c:GetLinkMarker()==8 then return false end
+	local maxval=0
+	local egroup={c:IsHasEffect(EFFECT_CANNOT_ACTIVATE_LMARKER)}
+	for _,ce in ipairs(egroup) do
+		if type(ce:GetValue())=="number" and ce:GetValue()>maxval then
+			maxval=ce:GetValue()
+		end
+	end
+	return c:GLGetLinkMarkerCount()<=8-val and (not c:IsHasEffect(EFFECT_CANNOT_ACTIVATE_LMARKER) or val<=maxval)
+end
+
+function Card.GLIsCanDeactivateLinkMarkers(c,val,...)
+	local f={...}
+	if not f[1] and c:GetLinkMarker()==0 then return false end
+	local maxval=0
+	local egroup={c:IsHasEffect(EFFECT_CANNOT_ACTIVATE_LMARKER)}
+	for _,ce in ipairs(egroup) do
+		if type(ce:GetValue())=="number" and ce:GetValue()>maxval then
+			maxval=ce:GetValue()
+		end
+	end
+	return c:GLGetLinkMarkerCount()>=val and (not c:IsHasEffect(EFFECT_CANNOT_DEACTIVATE_LMARKER) or val<=maxval)
+end
+
+function Card.GLGetSetCard(c)
+	local val={}
+	local setcode=0
+	
+	local egroup={c:IsHasEffect(EFFECT_ADD_SETCODE)}
+	for _,ce in ipairs(egroup) do
+		setcode=setcode|ce:GetValue()
+	end
+	local egroup2={c:IsHasEffect(EFFECT_CHANGE_SETCODE)}
+	for _,ce in ipairs(egroup2) do
+		setcode=setcode|ce:GetValue()
+	end
+	
+	if glitchy_archetype_table[c]~=nil and c:GetFlagEffect(777)<=0 then
+		setcode=glitchy_archetype_table[c]
+	else
+		for i=1,#ARCHETYPES do
+			if c:IsSetCard(i) then
+				table.insert(val,ARCHETYPES[i])
+			end
+		end
+		for i=1,#CUSTOM_ARCHETYPES do
+			if c:IsSetCard(i) then
+				table.insert(val,CUSTOM_ARCHETYPES[i])
+			end
+		end
+		if #val>0 then
+			for i=1,#val do
+				setcode=setcode|val[i]
+			end
+		end
+		glitchy_archetype_table[c]=setcode
+		c:RegisterFlagEffect(777,0,EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_UNCOPYABLE,1)
+	end
+	return setcode
+end
+
+
+function Card.GLGetLevel(c)
+	if c:IsType(TYPE_XYZ) then return c:GetRank()
+	elseif c:IsType(TYPE_LINK) then return c:GetLink()
+	elseif c:IsType(TYPE_EVOLUTE) then return c:GetStage()
+	elseif c:IsType(TYPE_TIMELEAP) then return c:GetFuture()
+	else return c:GetLevel() end
 end
