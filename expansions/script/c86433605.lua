@@ -85,8 +85,7 @@ function c86433605.spop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=g:GetFirst()
 	if tc then
 		if Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)~=0 then
-			local og=Duel.GetOperatedGroup():GetFirst()
-			if og:IsPosition(POS_FACEUP_ATTACK) then
+			if tc:IsPosition(POS_FACEUP_ATTACK) then
 				local e0x=Effect.CreateEffect(c)
 				e0x:SetType(EFFECT_TYPE_SINGLE)
 				e0x:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
@@ -94,12 +93,12 @@ function c86433605.spop(e,tp,eg,ep,ev,re,r,rp)
 				e0x:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
 				e0x:SetValue(1)
 				e0x:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,2)
-				og:RegisterEffect(e0x)
+				tc:RegisterEffect(e0x)
 				local e0y=e0x:Clone()
 				e0y:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
-				og:RegisterEffect(e0y)
-				og:RegisterFlagEffect(0,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,EFFECT_FLAG_CLIENT_HINT,2,0,aux.Stringid(86433605,2))
-			elseif og:IsPosition(POS_FACEUP_DEFENSE) then
+				tc:RegisterEffect(e0y)
+				tc:RegisterFlagEffect(0,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,EFFECT_FLAG_CLIENT_HINT,2,0,aux.Stringid(86433605,2))
+			elseif tc:IsPosition(POS_FACEUP_DEFENSE) then
 				local e0x=Effect.CreateEffect(c)
 				e0x:SetType(EFFECT_TYPE_SINGLE)
 				e0x:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
@@ -107,12 +106,12 @@ function c86433605.spop(e,tp,eg,ep,ev,re,r,rp)
 				e0x:SetRange(LOCATION_MZONE)
 				e0x:SetValue(aux.imval1)
 				e0x:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,2)
-				og:RegisterEffect(e0x)
+				tc:RegisterEffect(e0x)
 				local e0y=e0x:Clone()
 				e0y:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
 				e0y:SetValue(aux.tgoval)
-				og:RegisterEffect(e0y)
-				og:RegisterFlagEffect(0,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,EFFECT_FLAG_CLIENT_HINT,2,0,aux.Stringid(86433605,3))
+				tc:RegisterEffect(e0y)
+				tc:RegisterFlagEffect(0,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,EFFECT_FLAG_CLIENT_HINT,2,0,aux.Stringid(86433605,3))
 			end
 		end
 	end

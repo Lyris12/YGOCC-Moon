@@ -49,6 +49,7 @@ function cid.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,2))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_DAMAGE)
+	e2:SetProperty(EFFECT_FLAG_BOTH_SIDE)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1,id+200)
@@ -179,19 +180,20 @@ function cid.spscost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD)
 end
 function cid.spsfilter(c,e,tp)
-	return c:IsCanBeSpecialSummoned(e,0,tp,false,false)	and (c:IsType(TYPE_TOON) or (c:IsRace(RACE_CYBERSE) and c:IsLevelBelow(4)))
+	return (c:IsCanBeSpecialSummoned(e,0,tp,false,false) and c:IsType(TYPE_TOON))
+		or (c:IsLocation(LOCATION_HAND) and c:IsCanBeSpecialSummoned(e,0,tp,true,false))
 end
 function cid.spstg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(cid.spsfilter,tp,LOCATION_DECK,0,1,nil,e,tp)
+		and Duel.IsExistingMatchingCard(cid.spsfilter,tp,LOCATION_DECK+LOCATION_HAND,0,1,nil,e,tp)
 	end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK+LOCATION_HAND)
 end
 function cid.spsop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local tc=Duel.SelectMatchingCard(tp,cid.spsfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp):GetFirst()
+	local tc=Duel.SelectMatchingCard(tp,cid.spsfilter,tp,LOCATION_DECK+LOCATION_HAND,0,1,1,nil,e,tp):GetFirst()
 	if tc then
 		local check=false
 		if Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP) then
@@ -227,9 +229,10 @@ function cid.spsop(e,tp,eg,ep,ev,re,r,rp)
 		end
 		Duel.SpecialSummonComplete()
 		if check then
-			local atk=tc:GetTextAttack()
-			if atk<0 then atk=0 end
-			Duel.Damage(tp,atk,REASON_EFFECT)
+			local val=math.max(tc:GetTextAttack(),tc:GetTextDefense())
+			if val>0 then
+				Duel.Damage(tp,val,REASON_EFFECT)
+			end
 		end
 	end
 end

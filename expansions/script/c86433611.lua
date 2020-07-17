@@ -46,9 +46,14 @@ end
 function c86433611.counterfilter(c)
 	return not c:IsSummonType(SUMMON_TYPE_LINK)
 end
+function c86433611.efilter(c)
+	return c:IsFaceup() and not c:IsRace(RACE_CYBERSE)
+end
 --Activate
 function c86433611.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c86433611.confilter,tp,LOCATION_ONFIELD,0,1,nil)
+		and Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsType),tp,LOCATION_MZONE,0,1,nil,TYPE_MONSTER)
+		and not Duel.IsExistingMatchingCard(c86433611.efilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function c86433611.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return not Duel.IsPlayerAffectedByEffect(tp,59822133)
