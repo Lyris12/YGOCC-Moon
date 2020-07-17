@@ -27,7 +27,7 @@ function cid.cfilter(c,xc)
 	return c:GetOverlayTarget():IsSetCard(0x2ead)
 end
 function cid.condition(e,tp,eg,ep,ev,re,r,rp)
-	return not re or not re:GetHandler():IsCode(id) and eg:IsExists(cid.cfilter,1,nil)
+	return (not re or not re:GetHandler():IsCode(id)) and eg:IsExists(cid.cfilter,1,nil)
 end
 function cid.xfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0xead) and c:IsType(TYPE_XYZ)
@@ -57,6 +57,7 @@ function cid.filter(c,tp)
 end
 function cid.lgtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and cid.filter(chkc,tp) end
+	if chk==0 then return Duel.IsExistingTarget(cid.filter,tp,LOCATION_GRAVE,0,1,nil,tp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,Duel.SelectTarget(tp,cid.filter,tp,LOCATION_GRAVE,0,1,nil,tp),0,0,0)
 end

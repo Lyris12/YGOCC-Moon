@@ -16,6 +16,7 @@ function cid.initial_effect(c)
 	e2:SetTargetRange(LOCATION_HAND+LOCATION_MZONE,0)
 	e2:SetCode(EFFECT_EXTRA_SUMMON_COUNT)
 	e2:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0xead))
+	e2:SetOperation(cid.operation)
 	c:RegisterEffect(e2)
 	--rankup
 	local e3=Effect.CreateEffect(c)

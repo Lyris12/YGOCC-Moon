@@ -11,7 +11,7 @@ local id,cid=getID()
 function cid.initial_effect(c)
 	--time leap procedure
 	aux.AddOrigTimeleapType(c,false)
-	aux.AddTimeleapProc(c,8,cid.sumcon,cid.tlfilter,cid.customop)
+	aux.AddTimeleapProc(c,8,cid.sumcon,cid.tlfilter,Duel.SendToDeck,nil,2,REASON_MATERIAL)
 	c:EnableReviveLimit()
 	--Toadally Gaiaemperor.
 	local e1=Effect.CreateEffect(c)
@@ -25,7 +25,7 @@ function cid.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-    e2:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e2:SetCountLimit(1,20181417)
 	e2:SetCondition(cid.actcon)
 	e2:SetTarget(cid.acttg)
@@ -43,11 +43,8 @@ function cid.initial_effect(c)
 	e3:SetTarget(cid.damtg)
 	e3:SetOperation(cid.damop)
 	c:RegisterEffect(e3)
-	end
-	function cid.customop
-	 Duel.SendToDeck(g,nil,REASON_MATERIAL+0x10000000000)
-	 end
-	function cid.sumcon(e,c)
+end
+function cid.sumcon(e,c)
 	if c==nil then return true end
 	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0 and
 		Duel.GetMatchingGroupCount(Card.IsSetCard,c:GetControler(),LOCATION_GRAVE,0,nil,0x9b5)>=5
