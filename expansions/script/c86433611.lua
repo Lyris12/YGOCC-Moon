@@ -30,11 +30,11 @@ function c86433611.confilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x86f)
 end
 function c86433611.filter(c,e,tp)
-	return c:IsSetCard(0x86f) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE)
+	return c:IsSetCard(0x86f) and c:IsLevelBelow(4) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE)
 		and Duel.IsExistingMatchingCard(c86433611.filter2,tp,LOCATION_DECK,0,1,c,e,tp,c:GetCode())
 end
 function c86433611.filter2(c,e,tp,code)
-	return c:IsSetCard(0x86f) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE)
+	return c:IsSetCard(0x86f) and c:IsLevelBelow(4) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE)
 		and not c:IsCode(code)
 end
 function c86433611.desfilter(c,fid)
