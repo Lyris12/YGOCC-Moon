@@ -1,4 +1,4 @@
---created & coded by Lyris
+--created & coded by Lyris, art from Aldnoah Zero Episode 22
 --フュージョン・ブーマー
 local cid,id=GetID()
 function cid.initial_effect(c)
