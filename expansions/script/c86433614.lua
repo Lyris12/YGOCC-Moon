@@ -11,7 +11,7 @@ local id,cid=getID()
 function cid.initial_effect(c)
 	--link summon
 	c:EnableReviveLimit()
-	aux.AddLinkProcedure(c,cid.matfilter,2)
+	aux.AddLinkProcedure(c,cid.matfilter,1)
 	--protection
 	local e0x=Effect.CreateEffect(c)
 	e0x:SetType(EFFECT_TYPE_SINGLE)
