@@ -44,7 +44,7 @@ function cid.initial_effect(c)
 	qe:SetCode(EVENT_FREE_CHAIN)
 	qe:SetCondition(function(e) return e:GetHandler():IsHasEffect(id+113) end)
 	local e5=e4:Clone()
-	e5:SetLabel(qe)
+	e5:SetLabelObject(qe)
 	c:RegisterEffect(e5)
 end
 function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -77,7 +77,7 @@ function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if e:GetHandler():IsLocation(LOCATION_GRAVE) then
 		Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,e:GetHandler(),1,0,0)
 	end
-	if e:GetHandler():IsHasEffect(id+13) then Duel.SetChainLimit(function(e,rpr) return rpr==tp end) end
+	if e:GetHandler():IsHasEffect(id+13) then Duel.SetChainLimit(function(e,rpr,p) return rpr==p end) end
 end
 function cid.spfilter(c,e,tp)
 	return c:IsFaceup() and c:IsCode(id-1) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

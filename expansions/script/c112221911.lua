@@ -12,7 +12,6 @@ function cid.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetCondition(function(e,tp) return e:GetHandler():IsSummonType(SUMMON_TYPE_XYZ) and not Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsCode),tp,LOCATION_ONFIELD,0,1,nil,id-11) end)
-	e1:SetTarget(cid.target)
 	e1:SetOperation(cid.operation)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
@@ -47,10 +46,6 @@ function cid.initial_effect(c)
 	local e5=e4:Clone()
 	e5:SetLabel(qe)
 	c:RegisterEffect(e5)
-end
-function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	if e:GetHandler():IsHasEffect(id+3) then Duel.SetChainLimit(function(e,rpr) return rpr==tp end) end
 end
 function cid.spfilter(c,e,tp)
 	return c:IsCode(id-11) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
