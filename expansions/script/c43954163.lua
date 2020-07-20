@@ -1,5 +1,5 @@
 --Felgrandrise Vier
---Scripted by: XGlitchy30
+--Scripted by: XGlitchy30 & Lyris
 local function getID()
 	local str=string.match(debug.getinfo(2,'S')['source'],"c%d+%.lua")
 	str=string.sub(str,1,string.len(str)-4)
@@ -31,7 +31,7 @@ function cid.initial_effect(c)
 	e2:SetTarget(cid.sptg)
 	e2:SetOperation(cid.spop)
 	c:RegisterEffect(e2)
-	Duel.AddCustomActivityCounter(id,ACTIVITY_SPSUMMON,cid.splimit)
+	Duel.AddCustomActivityCounter(id,ACTIVITY_SPSUMMON,cid.spfilter)
 	--equip
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,2))
