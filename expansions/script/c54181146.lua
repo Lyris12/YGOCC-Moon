@@ -22,7 +22,7 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function cid.cfilter(c,tp)
-	return c:IsType(TYPE_MONSTER) and c:IsRace(RACE_REPTILE) and (c:IsLocation(LOCATION_GRAVE) or c:IsFaceup()) and Duel.GetMZoneCount(tp,c)>0 and c:IsAbleToRemoveAsCost()
+	return c:IsType(TYPE_MONSTER) and c:IsRace(RACE_REPTILE) and c:IsSetCard(0xe80) and (c:IsLocation(LOCATION_GRAVE) or c:IsFaceup()) and Duel.GetMZoneCount(tp,c)>0 and c:IsAbleToRemoveAsCost()
 end
 function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cid.cfilter,tp,LOCATION_GRAVE+LOCATION_MZONE,0,1,nil,tp) end

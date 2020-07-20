@@ -25,7 +25,7 @@ function c53313918.initial_effect(c)
 	e2:SetTarget(c53313918.tg2)
 	e2:SetOperation(c53313918.op2)
 	c:RegisterEffect(e2)
-	aux.EnablePandemoniumAttribute(c,e1,e2,TYPE_EFFECT+TYPE_TUNER)
+	aux.EnablePandemoniumAttribute(c,e1,e2,true,TYPE_EFFECT+TYPE_TUNER)
 	--M: When this card is Pandemonium summoned from your hand: You can Special Summon 1 level 4 or lower Pandemonium monster from your Deck, Extra Deck or GY.
 	local e3=Effect.CreateEffect(c)
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
