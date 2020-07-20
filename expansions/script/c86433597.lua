@@ -129,7 +129,7 @@ function c86433597.allowextragemini(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetFlagEffect(86433590)<=0
 end
 function c86433597.matval(e,c,mg)
-	return c:IsType(TYPE_LINK)
+	return true
 end
 --Ability Gain
 function c86433597.lkcon(e,tp,eg,ep,ev,re,r,rp)
@@ -391,7 +391,7 @@ function c86433597.spsumop(e,tp,eg,ep,ev,re,r,rp)
 end
 --link
 function c86433597.lkfilter(c,e,tp)
-	return c:IsType(TYPE_LINK) and c:IsSpecialSummonable(SUMMON_TYPE_LINK) and c:IsCanBeSpecialSummoned(e,0,1-tp,true,true)
+	return c:IsType(TYPE_LINK) and c:IsCanBeSpecialSummoned(e,0,1-tp,true,true) and c:IsSpecialSummonable(SUMMON_TYPE_LINK)
 end
 function c86433597.linktg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -403,10 +403,9 @@ function c86433597.linktg(e,tp,eg,ep,ev,re,r,rp,chk)
 		g:Merge(g2)
 		local e0=Effect.CreateEffect(c)
 		e0:SetType(EFFECT_TYPE_FIELD)
-		e0:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_IGNORE_IMMUNE)
+		e0:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_PLAYER_TARGET)
 		e0:SetRange(LOCATION_MZONE)
 		e0:SetCode(EFFECT_MUST_BE_LMATERIAL)
-		e0:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 		e0:SetTargetRange(1,1)
 		c:RegisterEffect(e0)
 		local e0x=Effect.CreateEffect(c)
@@ -427,8 +426,8 @@ function c86433597.linktg(e,tp,eg,ep,ev,re,r,rp,chk)
 			table.insert(el,e1)
 		end
 		local res=Duel.IsExistingMatchingCard(c86433597.lkfilter,tp,0,LOCATION_EXTRA,1,nil,e,tp)
-		for _,e in ipairs(el) do
-			e:Reset()
+		for i=1,#el do
+			el[i]:Reset()
 		end
 		return res
 	end
@@ -443,15 +442,14 @@ function c86433597.linkop(e,tp,eg,ep,ev,re,r,rp)
 	g:Merge(g2)
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_FIELD)
-	e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_IGNORE_IMMUNE)
+	e0:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_PLAYER_TARGET)
 	e0:SetRange(LOCATION_MZONE)
 	e0:SetCode(EFFECT_MUST_BE_LMATERIAL)
-	e0:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e0:SetTargetRange(1,1)
 	c:RegisterEffect(e0)
 	local e0x=Effect.CreateEffect(c)
 	e0x:SetType(EFFECT_TYPE_SINGLE)
-	e0x:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_IGNORE_IMMUNE)
+	e0x:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_CANNOT_DISABLE)
 	e0x:SetCode(EFFECT_EXTRA_LINK_MATERIAL)
 	e0x:SetRange(LOCATION_MZONE)
 	e0x:SetValue(c86433597.matval)
@@ -468,15 +466,28 @@ function c86433597.linkop(e,tp,eg,ep,ev,re,r,rp)
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local xg=Duel.SelectMatchingCard(1-tp,c86433597.lkfilter,tp,0,LOCATION_EXTRA,1,1,nil,e,tp)
-	local tc=xg:GetFirst()
-	if tc then
-		Duel.SpecialSummonRule(1-tp,tc,SUMMON_TYPE_LINK)
-	end
-	for _,e in ipairs(el) do
-		e:Reset()
+	local tc0=xg:GetFirst()
+	if tc0 then
+		table.insert(el,tc0)
+		local res=Effect.CreateEffect(c)
+		res:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		res:SetCode(EVENT_SPSUMMON)
+		res:SetCondition(c86433597.rcallcon(el))
+		res:SetOperation(c86433597.resetcall(el))
+		Duel.RegisterEffect(res,0)
+		Duel.SpecialSummonRule(1-tp,tc0,SUMMON_TYPE_LINK)
 	end
 end
-function c86433597.resetconcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetLabelObject()
-	return not c:IsOnField() or (c:IsOnField() and (not c:IsFaceup() or c:GetFieldID()~=e:GetLabel()))
+function c86433597.rcallcon(el)
+	return function(e,tp,eg,ep,ev,re,r,rp)
+				return eg:IsContains(el[#el])
+			end
+end
+function c86433597.resetcall(el)
+	return	function(e,tp,eg,ep,ev,re,r,rp)
+				for i=1,#el-1 do
+					el[i]:Reset()
+				end
+				e:Reset()
+			end
 end

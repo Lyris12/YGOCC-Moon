@@ -41,7 +41,7 @@ function cid.counterfilter(c)
 	return not c:IsType(TYPE_LINK) or not c:IsSetCard(0x86f)
 end
 function cid.matfilter(c)
-	return c:IsLinkRace(RACE_CYBERSE)
+	return c:IsLinkSetCard(0x86f)
 end
 function cid.spcheck(c)
 	return c:IsType(TYPE_LINK) and c:IsSummonType(SUMMON_TYPE_LINK)

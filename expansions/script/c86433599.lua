@@ -3,7 +3,7 @@
 function c86433599.initial_effect(c)
 	--link summon
 	c:EnableReviveLimit()
-	aux.AddLinkProcedure(c,c86433599.matfilter,2,2)
+	aux.AddLinkProcedure(c,c86433599.matfilter,2)
 	--cannot be target
 	local e0x=Effect.CreateEffect(c)
 	e0x:SetType(EFFECT_TYPE_SINGLE)

@@ -11,7 +11,7 @@ local id,cid=getID()
 function cid.initial_effect(c)
 	--link summon
 	c:EnableReviveLimit()
-	aux.AddLinkProcedure(c,cid.matfilter,2,2)
+	aux.AddLinkProcedure(c,cid.matfilter,2)
 	--protection
 	local e0x=Effect.CreateEffect(c)
 	e0x:SetType(EFFECT_TYPE_SINGLE)
@@ -195,8 +195,9 @@ function cid.spsop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local tc=Duel.SelectMatchingCard(tp,cid.spsfilter,tp,LOCATION_DECK+LOCATION_HAND,0,1,1,nil,e,tp):GetFirst()
 	if tc then
+		local ign=(tc:IsLocation(LOCATION_HAND)) and true or false
 		local check=false
-		if Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP) then
+		if Duel.SpecialSummonStep(tc,0,tp,tp,ign,false,POS_FACEUP) then
 			if not tc:IsType(TYPE_TOON) then
 				check=true
 				local fid=c:GetFieldID()
