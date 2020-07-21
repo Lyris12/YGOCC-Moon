@@ -161,7 +161,7 @@ function c86433608.effectgain(e,tp,eg,ep,ev,re,r,rp)
 				else
 					if ce:GetOwner()==tc then
 						local con=ce:GetCondition()
-						local _l,ctl,flagl=rele:GetCountLimit()
+						local _l,ctl,flagl=ce:GetCountLimit()
 						local e1=ce:Clone()
 						if con then
 							e1:SetCondition(aux.ModifyCon(con,c86433608.disabled))
