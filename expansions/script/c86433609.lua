@@ -23,14 +23,15 @@ function c86433609.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 --resets
-function c86433609.resetcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetLabelObject():GetLabelObject()
-	return not c:IsLocation(LOCATION_EXTRA) or not c:IsControler(e:GetLabel())
-end
 function c86433609.reseteff(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetLabelObject()
-	c:Reset()
-	e:Reset()
+	local ce=e:GetLabelObject()
+	if ce then
+		local c=ce:GetLabelObject()
+		if not c:IsLocation(LOCATION_EXTRA) or not c:IsControler(e:GetLabel()) then
+			ce:Reset()
+			e:Reset()
+		end
+	end
 end
 --filters
 function c86433609.cfilter1(c,tp)
@@ -87,9 +88,10 @@ function c86433609.activate(e,tp,eg,ep,ev,re,r,rp)
 		reset:SetCode(EVENT_ADJUST)
 		reset:SetLabel(1-tp)
 		reset:SetLabelObject(e1)
-		reset:SetCountLimit(1)
-		reset:SetCondition(c86433609.resetcon)
+		--reset:SetCountLimit(1)
+		--reset:SetCondition(c86433609.resetcon)
 		reset:SetOperation(c86433609.reseteff)
+		reset:SetReset(RESET_PHASE+PHASE_END)
 		Duel.RegisterEffect(reset,tp)
 		local reset2=reset:Clone()
 		reset2:SetLabelObject(e2)
@@ -138,7 +140,7 @@ function c86433609.lkop(e,tp,eg,ep,ev,re,r,rp)
 				e1:Reset()
 			end
 		end
-		if Duel.SendtoDeck(g,1-tp,nil,REASON_EFFECT) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(c86433609.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp) then
+		if Duel.SendtoDeck(g,1-tp,2,REASON_EFFECT)>0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(c86433609.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp) then
 			if not Duel.SelectYesNo(tp,aux.Stringid(86433609,2)) then return end
 			Duel.BreakEffect()
 			local sg=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(c86433609.spfilter),tp,LOCATION_GRAVE,0,1,1,nil,e,tp)

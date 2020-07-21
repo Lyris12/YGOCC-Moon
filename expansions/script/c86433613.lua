@@ -130,7 +130,7 @@ function cid.tmop(e,tp,eg,ep,ev,re,r,rp)
 	sg:KeepAlive()
 	for sp=0,1 do
 		local g=Duel.GetMatchingGroup(Card.GLIsAbleToDrawFromExtra,sp,LOCATION_EXTRA,0,nil,sp):RandomSelect(sp,1)
-		-- if g:GetFirst():IsLocation(LOCATION_EXTRA) then
+		if g:GetFirst():IsLocation(LOCATION_EXTRA) then
 			-- local p,loc,alt=0,0,0
 			-- if Duel.GetLocationCount(sp,LOCATION_MZONE)>0 then p=sp loc=LOCATION_MZONE
 			-- elseif Duel.GetLocationCount(sp,LOCATION_SZONE)>0 then p=sp loc=LOCATION_SZONE
@@ -151,7 +151,7 @@ function cid.tmop(e,tp,eg,ep,ev,re,r,rp)
 				-- Duel.MoveToField(g:GetFirst(),sp,p,loc,POS_FACEDOWN_ATTACK,false)
 				-- e1:Reset()
 			-- end
-		-- end
+		end
 		sg:AddCard(g:GetFirst())
 	end
 	if #sg>0 then
@@ -167,6 +167,7 @@ function cid.tmop(e,tp,eg,ep,ev,re,r,rp)
 			else
 				Duel.SendtoHand(tc,nil,REASON_EFFECT+REASON_DRAW)
 			end
+			Duel.ShuffleExtra(tc:GetControler())
 			tc=sg:GetNext()
 		end
 	end

@@ -159,14 +159,23 @@ function c86433608.effectgain(e,tp,eg,ep,ev,re,r,rp)
 				if not ce or ce==nil or type(ce)~="userdata" or ce:GetType()==nil then
 					table.remove(egroup,i)
 				else
-					if not ce:IsHasProperty(EFFECT_FLAG_UNCOPYABLE) then
+					if ce:GetOwner()==tc then
 						local con=ce:GetCondition()
+						local _l,ctl,flagl=rele:GetCountLimit()
 						local e1=ce:Clone()
 						if con then
 							e1:SetCondition(aux.ModifyCon(con,c86433608.disabled))
 						else
 							e1:SetCondition(c86433608.disabled)
 						end
+						if ctl then
+							if flagl then
+								e1:SetCountLimit(ctl,flagl+1000)
+							else
+								e1:SetCountLimit(ctl)
+							end
+						end
+							
 						e:GetHandler():RegisterEffect(e1)
 						local reset=Effect.CreateEffect(e:GetHandler())
 						reset:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
