@@ -51,7 +51,7 @@ function cid.filter1(c,e,tp)
 end
 function cid.filter2(c,e,tp,mc,rk)
 	if c:GetOriginalCode()==6165656 and mc:GetCode()~=48995978 then return false end
-	return (c:IsRank(rk+1) or c:IsRank(rk+2)) and c:IsType(TYPE_XYZ) and (c:IsSetCard(0xead)
+	return (c:IsRank(rk+1) or c:IsRank(rk+2)) and c:IsType(TYPE_XYZ) and c:IsSetCard(0xead)
 		and mc:IsCanBeXyzMaterial(c) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
 end
 function cid.spfilter(c,e,tp)

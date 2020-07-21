@@ -30,7 +30,7 @@ function cid.levelchk(c,rk,g)
 	return c:GetLevel()<=rk and (not g or not g:IsContains(c))
 end
 function cid.scfilter(c)
-	return (c:IsSetCard(0x1ead) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
+	return c:IsSetCard(0x1ead) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end 
 --Activate
 function cid.sctg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
