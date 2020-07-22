@@ -1,6 +1,6 @@
-﻿expansions/cards-new.cdb	8917862360cc8f5cda9e15ad1cd069d9
+﻿expansions/cards-new.cdb	969a6c1cae18baf5dc7fa733a22cd646
 expansions/lflist.conf	35938db40e6c8e7bb8bdf58df55480ac
-expansions/strings.conf	31f56514ab0d1b15ced307533a62d9de
+expansions/strings.conf	255b9898d81498adb94a123fc030029a
 expansions/pics/100000710.jpg	5f925a97b1c60d7d69acb8f229938263
 expansions/pics/100000711.jpg	2e99619bb8c3574fcc9df5cd346b01f2
 expansions/pics/100000712.jpg	2b5b5aa0ad7a65eb926531aee1aa734f
@@ -955,6 +955,7 @@ expansions/pics/11111016.jpg	d147583293097ec3788fdf8875bf010b
 expansions/pics/11111017.jpg	b87daa80f640d934ab525d0a8ef30833
 expansions/pics/11111018.jpg	8bfd9d234f9fc2ea7f16a2de8d180a79
 expansions/pics/11111019.jpg	3a012801975379f3fb500d7da0b5cbb7
+expansions/pics/11111020.png	2ee87219fcc82d0bbbce7806f12e1328
 expansions/pics/11111111.png	db78f91b1d4311812edbf805a09d8c13
 expansions/pics/11113135.jpg	cdd47d5e8c54a3771367e8ac0882103e
 expansions/pics/111218300.jpg	93c132f05d9f58864a7eb009b675c0b7
@@ -5633,6 +5634,7 @@ expansions/script/c11111016.lua	b9721d17751eb2f7ff4380f8efba5492
 expansions/script/c11111017.lua	bee6a4179ca9a1636cfe17bde5d8e261
 expansions/script/c11111018.lua	64d352fee76f10a3124703a14bd7a311
 expansions/script/c11111019.lua	e0eac6260e445562c3baab0a8b6ce66e
+expansions/script/c11111020.lua	6603591d98caff6540b79e6808e7ecfe
 expansions/script/c111218300.lua	90a8aeefe076fd69cb3de73bd0f2b730
 expansions/script/c111218301.lua	d59e82d44d34dc0dc20c5541340b6d27
 expansions/script/c111218302.lua	555bbaa0718331f254b0d89b5c48c257
@@ -9207,6 +9209,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	1e7dfbbc956f936fa01ac795fc4b1c12
+update/filelist.txt	6745e4ae1e9beb984735aa6c7bc68248
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	600648282b09bc76f3e382819e58865a
+update/version.txt	987d1530ce8a5f0c92355bdaf13ef41f
