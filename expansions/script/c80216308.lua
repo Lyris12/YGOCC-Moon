@@ -10,7 +10,6 @@ function cid.initial_effect(c)
 	e1:SetCode(EVENT_XYZATTACH)
 	e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
 	e1:SetRange(LOCATION_HAND+LOCATION_GRAVE)
-	e1:SetCountLimit(1,id)
 	e1:SetCondition(cid.spcon)
 	e1:SetTarget(cid.sptg)
 	e1:SetOperation(cid.spop)
@@ -61,13 +60,14 @@ end
 --spsummon
 function cid.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return not eg:IsContains(e:GetHandler()) and ev>0 and eg:IsExists(cid.spcfilter,1,nil,tp)
+		and Duel.GetFlagEffect(tp,id)==0
 end
 function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE) 
-	end
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
+	Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
 end
 function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

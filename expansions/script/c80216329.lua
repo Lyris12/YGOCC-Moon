@@ -52,12 +52,15 @@ function cid.discost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=e:GetHandler():GetLinkedGroup()
 	if chk==0 then return g:IsExists(cid.cfilter,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVEXYZ)
-	g:FilterSelect(tp,cid.cfilter,2,2,nil,tp):GetFirst():RemoveOverlayCard(tp,1,1,REASON_COST)
+	g:FilterSelect(tp,cid.cfilter,1,1,nil,tp):GetFirst():RemoveOverlayCard(tp,2,2,REASON_COST)
 end
 function cid.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
 end
 function cid.disop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then Duel.Overlay(Duel.SelectMatchingCard(tp,aux.AND(Card.IsFaceup,Card.IsType),tp,LOCATION_MZONE,0,1,1,nil,TYPE_XYZ):GetFirst(),eg) end
+	if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then
+		re:GetHandler():CancelToGrave()
+		Duel.Overlay(Duel.SelectMatchingCard(tp,aux.AND(Card.IsFaceup,Card.IsType),tp,LOCATION_MZONE,0,1,1,nil,TYPE_XYZ):GetFirst(),eg)
+	end
 end

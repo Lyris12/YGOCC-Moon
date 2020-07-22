@@ -9,8 +9,9 @@ function cid.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetCountLimit(2)
-	e1:SetCategory(CATEGORY_DESTROY)
+	e1:SetCountLimit(1,id)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetCategory(CATEGORY_TODECK)
 	e1:SetCondition(cid.con(0x1cfd))
 	e1:SetCost(cid.cost)
 	e1:SetTarget(cid.target)
@@ -38,13 +39,13 @@ function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST)
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	local g=Duel.GetFieldGroup(tp,0,LOCATION_ONFIELD)
-	if chk==0 then return #g>0 end
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
+	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToDeck,tp,0,LOCATION_ONFIELD,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,Duel.SelectTarget(tp,Card.IsAbleToDeck,tp,0,LOCATION_ONFIELD,1,1,nil),1,0,0)
 end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	Duel.Destroy(Duel.GetFieldGroup(tp,0,LOCATION_ONFIELD):Select(tp,1,1,nil),REASON_EFFECT)
+	local tc=Duel.GetFirstTarget()
+	if tc:IsRelateToEffect(e) then Duel.SendtoDeck(tc,nil,2,REASON_EFFECT) end
 end
 function cid.tglimit(e,c)
 	return c==e:GetHandler()

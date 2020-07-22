@@ -2,7 +2,7 @@
 local cid,id=GetID()
 function cid.initial_effect(c)
 	c:EnableReviveLimit()
-	aux.AddLinkProcedure(c,aux.FilterBoolFunction(Card.IsType,TYPE_EFFECT),2,2,function(g) return g:IsExists(Card.IsSetCard,1,nil,0xead) end)
+	aux.AddLinkProcedure(c,aux.FilterBoolFunction(Card.IsLinkType,TYPE_EFFECT),2,2,function(g) return g:IsExists(Card.IsLinkSetCard,1,nil,0xead) end)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_XYZATTACH)
@@ -27,7 +27,10 @@ function cid.cfilter(c,xc)
 	return c:GetOverlayTarget():IsSetCard(0x2ead)
 end
 function cid.condition(e,tp,eg,ep,ev,re,r,rp)
-	return not Duel.CheckEvent(EVENT_CUSTOM+id) and eg:IsExists(cid.cfilter,1,nil)
+	local c=e:GetHandler()
+	local res=eg:IsExists(cid.cfilter,1,nil) and c:GetFlagEffect(id)==0
+	c:ResetFlagEffect(id)
+	return res
 end
 function cid.xfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0xead) and c:IsType(TYPE_XYZ)
@@ -49,7 +52,7 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	if not sg:GetFirst():IsAbleToGrave() or b2 and not Duel.SelectYesNo(tp,1191) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 		Duel.Overlay(Duel.SelectMatchingCard(p,cid.xfilter,p,LOCATION_MZONE,0,1,1,nil):GetFirst(),sg)
-		Duel.RaiseEvent(sg,EVENT_CUSTOM+id,e,0,0,tp,1)
+		e:GetHandler():RegisterFlagEffect(id,0,0,1)
 	else Duel.SendtoGrave(sg,REASON_EFFECT) end
 end
 function cid.filter(c,tp)
@@ -68,6 +71,6 @@ function cid.lgop(e,tp,eg,ep,ev,re,r,rp)
 	if #g>0 and (not tc:IsAbleToHand() or not Duel.SelectYesNo(tp,1152)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 		Duel.Overlay(g:Select(tp,1,1,nil):GetFirst(),Group.FromCards(tc))
-		Duel.RaiseEvent(tc,EVENT_CUSTOM+id,e,0,0,tp,1)
+		e:GetHandler():RegisterFlagEffect(id,0,0,1)
 	else Duel.SendtoHand(tc,nil,REASON_EFFECT) end
 end
