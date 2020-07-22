@@ -43,9 +43,9 @@ function cid.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local a=Duel.GetAttacker()
 	local d=Duel.GetAttackTarget()
 	if chkc then return cid.filter(chkc,e) end
-	if chk==0 then return Duel.IsExistingTarget(cid.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,e) end
+	if chk==0 then return Duel.IsExistingTarget(cid.filter,tp,LOCATION_MZONE,0,1,nil,e) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATTACK)
-	Duel.SelectTarget(tp,cid.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil,e)
+	Duel.SelectTarget(tp,cid.filter,tp,LOCATION_MZONE,0,1,1,nil,e)
 end
 function cid.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
