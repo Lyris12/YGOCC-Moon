@@ -18,6 +18,9 @@ end
 function cid.ovfilter(c)
 	return c:IsFaceup() and c:IsRank(4) and c:IsSetCard(0x2c74)
 end
+function cid.spfilter(c,e,tp)
+	return c:IsSetCard(0x1c74) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(cid.spfilter,tp,LOCATION_OVERLAY,0,1,nil,e,tp) end

@@ -30,14 +30,14 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(aux.AND(Card.IsFaceup,Card.IsType),tp,LOCATION_MZONE,0,nil,TYPE_XYZ)
 	if not c:IsRelateToEffect(e) or #g==0 then return end
 	Duel.Overlay(g:Select(tp,1,1,nil):GetFirst(),c)
-	if c:IsLocation(LOCATION_OVERLAY) then
-		local tc=c:GetOverlayTarget()
+	local tc=c:GetOverlayTarget()
+	if tc then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CANNOT_DISABLE)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
-		e1:SetValue(function(e,c) return Duel.GetOverlayGroup(e:GetHandlerPlayer(),1,0):Filter(Card.IsSetCard,nil,0xc74):GetClassCount(Card.GetCode)*400 end)
+		e1:SetValue(function(ef,tc) return Duel.GetOverlayGroup(ef:GetHandlerPlayer(),1,0):Filter(Card.IsSetCard,nil,0xc74):GetClassCount(Card.GetCode)*400 end)
 		tc:RegisterEffect(e1)
 		local e2=e1:Clone()
 		e2:SetCode(EFFECT_UPDATE_DEFENSE)
