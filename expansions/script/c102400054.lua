@@ -11,7 +11,7 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function cid.filter(c,tp)
-	return c:IsSetCard(0xc74) and c:IsType(TYPE_MONSTER) and c:IsAbleToDeck() or c:IsCanOverlay(tp)
+	return c:IsSetCard(0xc74) and c:IsType(TYPE_MONSTER) and (c:IsAbleToDeck() or c:IsCanOverlay(tp))
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and cid.filter(chkc,tp) end
@@ -39,7 +39,7 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 		local xg=tg:Filter(Card.IsRelateToEffect,nil,e)
 		for i=1,#xg do
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-			local xc=Duel.SelectMatchingCard(tp,cid.xfilter,tp,LOCATION_MZONE,0,1,nil):GetFirst()
+			local xc=Duel.SelectMatchingCard(tp,cid.xfilter,tp,LOCATION_MZONE,0,1,1,nil):GetFirst()
 			if xc then
 				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
 				local oc=xg:Select(tp,1,1,nil)
