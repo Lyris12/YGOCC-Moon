@@ -18,10 +18,10 @@ function cid.initial_effect(c)
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and chkc:IsType(TYPE_XYZ)
-		and (chkc:IsFaceup() or chkc:GetOverlayCount()>0) end
+		and chkc:IsFaceup() end
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	Duel.SelectTarget(tp,Card.IsType,tp,LOCATION_MZONE,0,1,nil,TYPE_XYZ)
+	Duel.SelectTarget(tp,aux.AND(Card.IsType,Card.IsFaceup),tp,LOCATION_MZONE,0,1,nil,TYPE_XYZ)
 end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
