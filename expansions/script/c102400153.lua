@@ -24,6 +24,10 @@ function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_OVERLAY)
 end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.GetMatchingGroup(cid.spfilter,tp,LOCATION_OVERLAY,0,nil,e,tp)
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 or #g==0 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	if Duel.SpecialSummon(g:SelectSubGroup(tp,aux.drccheck,false,1))<2 then return end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
@@ -38,10 +42,6 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	e2:SetOperation(cid.checkop)
 	e2:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e2,tp)
-	local g=Duel.GetMatchingGroup(cid.spfilter,tp,LOCATION_OVERLAY,0,nil,e,tp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 or #g==0 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	Duel.SpecialSummon(g:SelectSubGroup(tp,aux.drccheck,false,1))
 end
 function cid.splimit(e,c,sump,sumtype,sumpos,targetp,se)
 	return c:IsLocation(LOCATION_EXTRA) and aux.ExtraDeckSummonCountLimit[sump]<=0 and not c:IsSetCard(0x2c74)

@@ -1,3 +1,4 @@
+--created & coded by Lyris, art from Cardfight!! Vanguard's "Hades Ringmaster"
 local cid,id=GetID()
 function cid.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
