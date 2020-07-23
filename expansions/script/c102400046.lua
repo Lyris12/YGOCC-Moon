@@ -6,7 +6,7 @@ function cid.initial_effect(c)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e1:SetCondition(function(e) return e:GetHandler():GetSummonLocation()==LOCATION_OVERLAY end)
+	e1:SetCondition(function(e) return e:GetHandler():GetSummonLocation()==LOCATION_OVERLAY and e:GetHandler():GetPreviousControler()==e:GetHandler():GetSummonPlayer() end)
 	e1:SetTarget(cid.target)
 	e1:SetOperation(cid.operation)
 	c:RegisterEffect(e1)
@@ -16,13 +16,13 @@ function cid.filter(c,e,tp)
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0
-		and Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_OVERLAY,0,1,nil,e,tp) end
+		and Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_OVERLAY,LOCATION_OVERLAY,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_OVERLAY)
 end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_OVERLAY,0,1,1,nil,e,tp)
+	local g=Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_OVERLAY,LOCATION_OVERLAY,1,1,nil,e,tp)
 	if #g==0 then return end
 	local tc=g:GetFirst():GetOverlayTarget()
 	if Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)>0 and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0 then
