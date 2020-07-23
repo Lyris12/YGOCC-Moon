@@ -96,7 +96,7 @@ function cid.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		local chkf=tp
 		local mg1=Duel.GetFusionMaterial(tp)
-		local mg2=Duel.GetMatchingGroup(cid.filter1,tp,0,LOCATION_MZONE,nil)
+		local mg2=Duel.GetMatchingGroup(cid.filter1,tp,0,LOCATION_MZONE,nil,e)
 		if mg2:GetCount()>0 then
 			mg1:Merge(mg2)
 			Auxiliary.FCheckAdditional=cid.fcheck
@@ -122,7 +122,7 @@ function cid.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local chkf=tp
 	local mg1=Duel.GetFusionMaterial(tp):Filter(cid.filter0,nil,e)
 	local exmat=false
-	local mg2=Duel.GetMatchingGroup(cid.filter1,tp,0,LOCATION_MZONE,nil):Filter(cid.filter0,nil,e)
+	local mg2=Duel.GetMatchingGroup(cid.filter1,tp,0,LOCATION_MZONE,nil,e):Filter(cid.filter0,nil,e)
 	if mg2:GetCount()>0 then
 		mg1:Merge(mg2)
 		exmat=true
