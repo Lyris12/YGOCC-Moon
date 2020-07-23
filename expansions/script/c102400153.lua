@@ -2,7 +2,8 @@ local cid,id=GetID()
 function cid.initial_effect(c)
 	aux.AddXyzProcedureLevelFree(c,aux.FilterBoolFunction(Card.IsXyzLevel,c,5),aux.drccheck,3,3,cid.ovfilter,aux.Stringid(id,0))
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetType(EFFECT_TYPE_QUICK_O)
+	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -23,14 +24,15 @@ function cid.spfilter(c,e,tp)
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(cid.spfilter,tp,LOCATION_OVERLAY,0,1,nil,e,tp) end
+		and Duel.GetOverlayGroup(tp,1,0):IsExists(cid.spfilter,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_OVERLAY)
 end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(cid.spfilter,tp,LOCATION_OVERLAY,0,nil,e,tp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 or #g==0 then return end
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	local g=Duel.GetOverlayGroup(tp,1,0):Filter(cid.spfilter,nil,e,tp)
+	if ft<=0 or #g==0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	if Duel.SpecialSummon(g:SelectSubGroup(tp,aux.drccheck,false,1))<2 then return end
+	if Duel.SpecialSummon(g:SelectSubGroup(tp,aux.drccheck,false,1,ft),0,tp,tp,false,false,POS_FACEUP)<2 then return end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)

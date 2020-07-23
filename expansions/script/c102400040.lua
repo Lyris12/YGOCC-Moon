@@ -29,7 +29,7 @@ function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 	if c:IsRelateToEffect(e) then Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP) end
 end
 function cid.filter(c,e,tp)
-	return c:IsSetCard(0xead) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0xc74) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function cid.xfilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_XYZ) and c:IsSetCard(0x2c74)
@@ -40,10 +40,14 @@ function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,0,tp,LOCATION_HAND+LOCATION_DECK)
 end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) or Duel.GetLocationCount(tp,LOCATION_MZONE)<2 then return end
 	local c=e:GetHandler()
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
+	local xc=Duel.SelectMatchingCard(tp,cid.xfilter,tp,LOCATION_MZONE,0,1,1,nil):GetFirst()
+	if not xc then return end
+	Duel.Overlay(xc,c)
+	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) or Duel.GetLocationCount(tp,LOCATION_MZONE)<2 then return end
 	local g=Duel.GetMatchingGroup(cid.filter,tp,LOCATION_HAND+LOCATION_DECK,0,nil,e,tp)
-	if g:GetClassCount(Card.GetCode)>1 then
+	if g:GetClassCount(Card.GetCode)>1 and Duel.SelectYesNo(tp,1152) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local sg=g:SelectSubGroup(tp,aux.dncheck,false,2,2)
 		for tc in aux.Next(sg) do

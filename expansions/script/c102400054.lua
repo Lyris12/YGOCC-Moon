@@ -15,7 +15,7 @@ function cid.filter(c,tp)
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and cid.filter(chkc,tp) end
-	if chk==0 then return Duel.IsPlayerCanDraw(tp,2)
+	if chk==0 then return Duel.IsPlayerCanDraw(tp,2) and Duel.IsExistingMatchingCard(cid.xfilter,tp,LOCATION_MZONE,0,1,nil)
 		and Duel.IsExistingTarget(cid.filter,tp,LOCATION_GRAVE,0,5,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g=Duel.SelectTarget(tp,cid.filter,tp,LOCATION_GRAVE,0,5,5,nil,tp)
@@ -45,7 +45,7 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 				local oc=xg:Select(tp,1,1,nil)
 				Duel.Overlay(xc,oc)
 				xg:Sub(oc)
-			end
+			else break end
 		end
 	end
 end

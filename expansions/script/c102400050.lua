@@ -26,7 +26,7 @@ end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	local g=Duel.GetDecktopGroup(tp,1)
-	if tc:IsRelateToEffect(e) and #g>0 then
+	if tc and tc:IsRelateToEffect(e) and #g>0 then
 		Duel.DisableShuffleCheck()
 		Duel.Overlay(tc,g)
 		local oc=g:GetFirst()

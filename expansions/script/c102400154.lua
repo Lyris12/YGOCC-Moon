@@ -13,7 +13,8 @@ function cid.initial_effect(c)
 	e1:SetOperation(cid.activate)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_IGNITION)
+	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1,id)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -53,7 +54,7 @@ end
 function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ct=-e:GetLabel()
 	if chk==0 then e:SetLabel(0) return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>1 and Duel.GetLocationCount(tp,LOCATION_MZONE)>ct and Duel.IsExistingMatchingCard(cid.xfilter,tp,LOCATION_MZONE,0,1,nil)
-		and Duel.IsExistingMatchingCard(cid.spfilter,tp,LOCATION_OVERLAY,0,1,nil,e,tp) end
+		and Duel.GetOverlayGroup(tp,1,0):IsExists(cid.spfilter,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_OVERLAY)
 end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
@@ -65,7 +66,7 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Overlay(tc,g)
 	if g:IsExists(aux.NOT(Card.IsLocation),1,nil,LOCATION_OVERLAY) or Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local sc=Duel.SelectMatchingCard(tp,cid.spfilter,tp,LOCATION_OVERLAY,0,1,1,nil,e,tp):GetFirst()
+	local sc=Duel.GetOverlayGroup(tp,1,0):FilterSelect(tp,cid.spfilter,1,1,nil,e,tp):GetFirst()
 	if sc and Duel.SpecialSummonStep(sc,0,tp,tp,false,false,POS_FACEUP) then
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)

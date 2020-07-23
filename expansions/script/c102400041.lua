@@ -46,7 +46,7 @@ end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsCanOverlay() and Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
 		and Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsType),tp,LOCATION_MZONE,0,1,nil,TYPE_XYZ)
-		and Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_OVERLAY,0,1,nil,e,tp) end
+		and Duel.GetOverlayGroup(tp,1,0):IsExists(cid.filter,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_OVERLAY)
 end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
@@ -58,7 +58,7 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Overlay(tc,c)
 	if not c:IsLocation(LOCATION_OVERLAY) or Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_OVERLAY,0,1,1,nil,e,tp)
+	local g=Duel.GetOverlayGroup(tp,1,0):FilterSelect(tp,cid.filter,1,1,nil,e,tp)
 	if #g>0 then
 		Duel.BreakEffect()
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
