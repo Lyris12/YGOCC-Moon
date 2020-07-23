@@ -55,8 +55,8 @@ function cid.initial_effect(c)
 	e3:SetOperation(cid.operation)
 	c:RegisterEffect(e3)
 end
-function cid.mfilter(c)
-	return c:IsLevel(4) and c:IsRace(RACE_FIEND) and c:IsAttribute(ATTRIBUTE_DARK)
+function cid.mfilter(c,xc)
+	return c:IsXyzLevel(xc,4) and c:IsRace(RACE_FIEND) and c:IsAttribute(ATTRIBUTE_DARK)
 end
 function cid.disable(e,c)
 	return (c:IsType(TYPE_EFFECT) or bit.band(c:GetOriginalType(),TYPE_EFFECT)==TYPE_EFFECT) and c:IsType(TYPE_XYZ)

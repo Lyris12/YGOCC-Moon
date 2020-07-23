@@ -51,7 +51,7 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e5)
 	end
 	function cid.mfilter(c,xyzc)
-	return c:GetLevel()==4 
+	return c:IsXyzLevel(xyzc,4) 
 end
 function cid.xyzcheck(g)
 	local sg=g:Filter(function(c) return c:GetLevel()==4 end,nil)

@@ -1,6 +1,6 @@
 local cid,id=GetID()
 function cid.initial_effect(c)
-	aux.AddXyzProcedureLevelFree(c,aux.FilterBoolFunction(Card.IsXyzLevel,5),aux.drccheck,3,3,cid.ovfilter,aux.Stringid(id,0))
+	aux.AddXyzProcedureLevelFree(c,aux.FilterBoolFunction(Card.IsXyzLevel,c,5),aux.drccheck,3,3,cid.ovfilter,aux.Stringid(id,0))
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
