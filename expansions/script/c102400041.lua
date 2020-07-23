@@ -1,63 +1,65 @@
---created & coded by Lyris, art from Shadowverse's "Cat Cannoneer"
---滅却獣ネコ
+--created & coded by Lyris, art from Cardfight!! Vanguard's "Midnight Bunny"
 local cid,id=GetID()
 function cid.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_FIELD)
-	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e3:SetCode(EFFECT_CANNOT_ACTIVATE)
-	e3:SetRange(LOCATION_MZONE)
-	e3:SetTargetRange(0,1)
-	e3:SetValue(1)
-	e3:SetCondition(cid.actcon)
-	c:RegisterEffect(e3)
+	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetRange(LOCATION_HAND)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetCondition(cid.spcon)
+	e1:SetTarget(cid.sptg)
+	e1:SetOperation(cid.spop)
+	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e2:SetCode(EVENT_DESTROYED)
-	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e2:SetCode(EVENT_BATTLE_DAMAGE)
+	e2:SetCondition(function(e,tp,eg,ep) return ep~=tp and eg:GetFirst():IsSetCard(0xc74) end)
 	e2:SetTarget(cid.target)
-	e2:SetOperation(cid.activate)
+	e2:SetOperation(cid.operation)
 	c:RegisterEffect(e2)
+	local e3=e2:Clone()
+	e3:SetCode(EVENT_BATTLE_DESTROYING)
+	e3:SetCondition(function(e,tp,eg) local tc=eg:GetFirst() return tc:IsRelateToBattle() and tc:IsSetCard(0xc74) end)
+	c:RegisterEffect(e3)
 end
-function cid.actcon(e)
-	return Duel.GetAttacker()==e:GetHandler()
+function cid.spcon(e,tp)
+	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)>0
+		and not Duel.IsExistingMatchingCard(cid.cfilter,tp,LOCATION_MZONE,0,1,nil)
+end
+function cid.cfilter(c)
+	return c:IsFacedown() or not c:IsSetCard(0xc74)
+end
+function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
+end
+function cid.spop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if c:IsRelateToEffect(e) then Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP) end
 end
 function cid.filter(c,e,tp)
-	return c:IsSetCard(0x5cd) and c:IsCanBeEffectTarget(e)
+	return c:IsSetCard(0xc74) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsCode(id)
 end
-function cid.xyzfilter(c,mg)
-	return c:IsXyzSummonable(mg,2,2)
+function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():IsCanOverlay() and Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
+		and Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsType),tp,LOCATION_MZONE,0,1,nil,TYPE_XYZ)
+		and Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_OVERLAY,0,1,nil,e,tp) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_OVERLAY)
 end
-function cid.mfilter1(c,mg,exg)
-	return mg:IsExists(cid.mfilter2,1,c,c,exg)
-end
-function cid.mfilter2(c,mc,exg)
-	return exg:IsExists(Card.IsXyzSummonable,1,nil,Group.FromCards(c,mc))
-end
-function cid.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return false end
-	local mg=Duel.GetMatchingGroup(cid.filter,tp,LOCATION_GRAVE,0,nil,e,tp)
-	local exg=Duel.GetMatchingGroup(cid.xyzfilter,tp,LOCATION_EXTRA,0,nil,mg)
-	if chk==0 then return Duel.GetLocationCountFromEx(tp)>0
-		and mg:IsExists(cid.mfilter1,1,nil,mg,exg) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
-	local sg1=mg:FilterSelect(tp,cid.mfilter1,1,1,nil,mg,exg)
-	local tc1=sg1:GetFirst()
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
-	local sg2=mg:FilterSelect(tp,cid.mfilter2,1,1,tc1,tc1,exg)
-	sg1:Merge(sg2)
-	Duel.SetTargetCard(sg1)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
-end
-function cid.activate(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
-	if g:GetCount()<2 then return end
-	if Duel.GetLocationCountFromEx(tp)<=0 then return end
-	local xyzg=Duel.GetMatchingGroup(cid.xyzfilter,tp,LOCATION_EXTRA,0,nil,g)
-	if xyzg:GetCount()>0 then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local xyz=xyzg:Select(tp,1,1,nil):GetFirst()
-		Duel.XyzSummon(tp,xyz,g)
+function cid.operation(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
+	local tc=Duel.SelectMatchingCard(tp,aux.AND(Card.IsFaceup,Card.IsType),tp,LOCATION_MZONE,0,1,1,nil,TYPE_XYZ):GetFirst()
+	if not tc then return end
+	Duel.Overlay(tc,c)
+	if not c:IsLocation(LOCATION_OVERLAY) or Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local g=Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_OVERLAY,0,1,1,nil,e,tp)
+	if #g>0 then
+		Duel.BreakEffect()
+		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
 end

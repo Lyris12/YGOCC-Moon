@@ -1,65 +1,71 @@
---created & coded by Lyris, art from Shadowverse's "Spinaria, Keeper of Enigmas"
---滅却謎スフィネ
+--created & coded by Lyris, art from Cardfight!! Vanguard's "Mistress Hurricane"
 local cid,id=GetID()
 function cid.initial_effect(c)
 	c:EnableReviveLimit()
-	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_LIGHT),4,2)
+	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0xc74),5,3,cid.ovfilter,aux.Stringid(id,0))
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e1:SetValue(1)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e1:SetProperty(EFFECT_FLAG_DELAY)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetDescription(aux.Stringid(id,1))
+	e1:SetCondition(function(e) return e:GetHandler():IsSummonType(SUMMON_TYPE_XYZ) end)
+	e1:SetTarget(cid.sptg)
+	e1:SetOperation(cid.spop)
 	c:RegisterEffect(e1)
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_IGNITION)
-	e4:SetRange(LOCATION_MZONE)
-	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e4:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e4:SetCost(cid.cost)
-	e4:SetTarget(cid.sptg)
-	e4:SetOperation(cid.spop)
-	c:RegisterEffect(e4)
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e2:SetCode(EVENT_PHASE+PHASE_STANDBY)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCountLimit(1)
-	e2:SetCategory(CATEGORY_DESTROY)
-	e2:SetCondition(function(e,tp) return Duel.GetTurnPlayer()==tp end)
-	e2:SetTarget(cid.target)
-	e2:SetOperation(cid.activate)
+	e2:SetCode(EFFECT_UPDATE_ATTACK)
+	e2:SetValue(function(e,c) return Duel.GetOverlayGroup(e:GetHandlerPlayer(),1,0):FilterCount(Card.IsSetCard,nil,0xc74)*100 end)
 	c:RegisterEffect(e2)
+	local e3=Effect.CreateEffect(c)
+	e3:SetCategory(CATEGORY_ATKCHANGE)
+	e3:SetType(EFFECT_TYPE_QUICK_O)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetCode(EVENT_PRE_DAMAGE_CALCULATE)
+	e3:SetCondition(cid.atkcon)
+	e3:SetCost(cid.atkcost)
+	e3:SetOperation(cid.atkop)
+	c:RegisterEffect(e3)
 end
-function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
-	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
+function cid.ovfilter(c)
+	return c:IsFaceup() and c:IsRank(4) and c:IsSetCard(0x2c74)
 end
 function cid.filter(c,e,tp)
-	return c:IsSetCard(0x5cd) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsCode(id)
+	return c:IsSetCard(0x1c74) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and chkc:IsControler(tp) and cid.filter(chkc,e,tp) end
+function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingTarget(cid.filter,tp,LOCATION_REMOVED,0,1,nil,e,tp) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,Duel.SelectTarget(tp,cid.filter,tp,LOCATION_REMOVED,0,1,1,nil,e,tp),1,0,0)
+		and e:GetHandler():GetOverlayGroup():IsExists(cid.filter,1,nil,e,tp) end
 end
 function cid.spop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) then
-		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
+	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	Duel.SpecialSummon(c:GetOverlayGroup():FilterSelect(tp,cid.filter,1,1,nil,e,tp),0,tp,tp,false,false,POS_FACEUP)
+end
+function cid.atkcon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local ac,bc=Duel.GetBattleMonster(tp)
+	return (ac==c or bc==c) and bc and bc:IsPosition(POS_ATTACK) and bc:IsDefenseAbove(0)
+end
+function cid.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return c:GetFlagEffect(id)==0 end
+	c:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_DAMAGE_CAL,0,1)
+end
+function cid.atkop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local a=Duel.GetAttacker()
+	local d=Duel.GetAttackTarget()
+	if a:IsRelateToBattle() and d and d:IsRelateToBattle() then
+		local ed=Effect.CreateEffect(c)
+		ed:SetType(EFFECT_TYPE_SINGLE)
+		ed:SetCode(EFFECT_SET_BATTLE_ATTACK)
+		ed:SetReset(RESET_PHASE+PHASE_DAMAGE)
+		ed:SetValue(d:GetDefense())
+		d:RegisterEffect(ed,true)
 	end
-end
-function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	local g=Duel.GetFieldGroup(tp,0,LOCATION_MZONE)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
-end
-function cid.activate(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroupCount(aux.AND(Card.IsSetCard,Card.IsFaceup),tp,LOCATION_MZONE,0,1,nil,0x5cd)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local sg=Duel.SelectMatchingCard(tp,nil,tp,0,LOCATION_MZONE,1,#g,nil)
-	Duel.HintSelection(sg)
-	Duel.Destroy(sg,REASON_EFFECT)
 end

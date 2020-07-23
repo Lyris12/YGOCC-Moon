@@ -1,50 +1,48 @@
---created & coded by Lyris, art from Shadowverse's "Shion, Mercurial Aegis"
---滅却遺物キバ
+--created & coded by Lyris, art from Cardfight!! Vanguard V's "Masked Magician, Harri"
 local cid,id=GetID()
 function cid.initial_effect(c)
 	c:EnableReviveLimit()
-	aux.AddLinkProcedure(c,nil,2,2,cid.lcheck)
+	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0xc74),4,2,nil,nil,99)
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
+	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
+	e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e1:SetValue(1)
+	e1:SetCountLimit(1)
+	e1:SetOperation(cid.matop)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetCode(EFFECT_UPDATE_ATTACK)
+	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetTargetRange(LOCATION_MZONE,0)
-	e2:SetTarget(aux.TargetBoolFunction(Card.IsRace,RACE_MACHINE))
-	e2:SetValue(200)
+	e2:SetCountLimit(1)
+	e2:SetCost(function(e) e:SetLabel(100) return true end)
+	e2:SetTarget(cid.target)
+	e2:SetOperation(cid.operation)
 	c:RegisterEffect(e2)
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_FIELD)
-	e3:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
-	e3:SetRange(LOCATION_MZONE)
-	e3:SetTargetRange(LOCATION_MZONE,0)
-	e3:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x5cd))
-	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e3:SetCondition(function(e) return e:GetHandler():IsSummonType(SUMMON_TYPE_LINK) end)
-	e3:SetValue(1)
-	c:RegisterEffect(e3)
-	local e4=e3:Clone()
-	e4:SetCode(EFFECT_UPDATE_ATTACK)
-	e4:SetValue(300)
-	c:RegisterEffect(e4)
-	local e0=Effect.CreateEffect(c)
-	e0:SetType(EFFECT_TYPE_FIELD)
-	e0:SetCode(EFFECT_CHANGE_DAMAGE)
-	e0:SetRange(LOCATION_MZONE)
-	e0:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e0:SetTargetRange(1,0)
-	e0:SetValue(cid.damval)
-	c:RegisterEffect(e0)
 end
-function cid.lcheck(g,lc)
-	return g:IsExists(Card.IsLinkSetCard,1,nil,0x5cd)
+function cid.matop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local g=Duel.GetDecktopGroup(tp,1)
+	if c:IsRelateToEffect(e) and #g>0 then
+		Duel.DisableShuffleCheck()
+		Duel.Overlay(c,g)
+	end
 end
-function cid.damval(e,re,val,r,rp,rc)
-	if val>=400 then return 0 else return val end
+function cid.filter(c,tp)
+	return c:IsLevelAbove(1) and c:IsCanOverlay(tp)
+end
+function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then
+		if e:GetLabel()~=100 then return false end
+		e:SetLabel(0)
+		return c:CheckRemoveOverlayCard(tp,2,REASON_COST) and Duel.IsExistingMatchingCard(cid.filter,tp,0,LOCATION_MZONE,1,nil,tp)
+	end
+	e:SetLabel(c:RemoveOverlayCard(tp,2,Duel.GetMatchingGroupCount(cid.filter,tp,0,LOCATION_MZONE,nil,tp)+1,REASON_COST))
+end
+function cid.operation(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local ct=e:GetLabel()-1
+	if not c:IsRelateToEffect(e) then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
+	Duel.Overlay(c,Duel.SelectMatchingCard(tp,cid.filter,tp,0,LOCATION_MZONE,ct,ct,nil,tp))
 end

@@ -1,76 +1,38 @@
---created & coded by Lyris, art from Shadowverse's "Acceleratium"
---滅却スペースシップ
+--created & coded by Lyris, art from Cardfight!! Vanguard's "Dynamite Juggler"
 local cid,id=GetID()
 function cid.initial_effect(c)
-	local e0=Effect.CreateEffect(c)
-	e0:SetType(EFFECT_TYPE_ACTIVATE)
-	e0:SetCode(EVENT_FREE_CHAIN)
-	e0:SetCategory(CATEGORY_DESTROY)
-	c:RegisterEffect(e0)
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetCode(EFFECT_UPDATE_ATTACK)
-	e2:SetRange(LOCATION_FZONE)
-	e2:SetTargetRange(LOCATION_MZONE,0)
-	e2:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x5cd))
-	e2:SetValue(500)
-	c:RegisterEffect(e2)
-	local e3=e2:Clone()
-	e3:SetCode(EFFECT_UPDATE_DEFENSE)
-	c:RegisterEffect(e3)
-	local e5=Effect.CreateEffect(c)
-	e5:SetCategory(CATEGORY_DESTROY)
-	e5:SetType(EFFECT_TYPE_IGNITION)
-	e5:SetRange(LOCATION_FZONE)
-	e5:SetCountLimit(1)
-	e5:SetTarget(cid.destg)
-	e5:SetOperation(cid.desop)
-	c:RegisterEffect(e5)
+	local e1=Effect.CreateEffect(c)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_DESTROY)
+	e1:SetType(EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_QUICK_O)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCountLimit(1)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetDescription(1124)
+	e1:SetCondition(function(e) return e:GetHandler():IsSetCard(0x2c74) end)
+	e1:SetTarget(cid.sptg)
+	e1:SetOperation(cid.spop)
+	c:RegisterEffect(e1)
 end
-function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	local g=Duel.GetMatchingGroup(nil,tp,LOCATION_ONFIELD,0,e:GetHandler())
-	if chk==0 then return #g>0 end
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
+function cid.filter(c,e,tp)
+	return c:IsSetCard(0x1c74) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function cid.activate(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
+function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and c:GetOverlayGroup():IsExists(cid.filter,1,nil,e,tp)
+		and Duel.IsExistingTarget(nil,tp,0,LOCATION_ONFIELD,1,nil) end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_OVERLAY)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectMatchingCard(tp,nil,tp,LOCATION_ONFIELD,0,1,1,e:GetHandler())
-	Duel.Destroy(g,REASON_EFFECT)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,Duel.SelectTarget(tp,nil,tp,0,LOCATION_ONFIELD,1,1,nil),1,0,0)
 end
-function cid.filter(c,tp)
-	return c:IsType(TYPE_MONSTER) and Duel.IsExistingMatchingCard(nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,c)
-end
-function cid.destg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_HAND+LOCATION_ONFIELD,0,1,e:GetHandler(),tp) end
-	local g=Duel.GetMatchingGroup(cid.filter,tp,LOCATION_HAND+LOCATION_ONFIELD,0,e:GetHandler(),tp)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
-end
-function cid.desop(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	Duel.Destroy(Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_HAND+LOCATION_ONFIELD,0,1,1,aux.ExceptThisCard(e),tp),REASON_EFFECT)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local dg=Duel.SelectMatchingCard(tp,cid.thfilter,tp,LOCATION_DECK,0,1,1,nil)
-	Duel.HintSelection(dg)
-	if #dg>0 then
+function cid.spop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+	local c=e:GetHandler()
+	local tc=Duel.GetFirstTarget()
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	if Duel.SpecialSummon(c:GetOverlayGroup():FilterSelect(tp,cid.filter,1,1,nil,e,tp),0,tp,tp,false,false,POS_FACEUP)>0 and tc:IsRelateToEffect(e) then
 		Duel.BreakEffect()
-		if Duel.Destroy(dg,nil,REASON_EFFECT)==0 then return end
-		local p=dg:GetFirst():GetPreviousControler()
-		local sg=Duel.GetMatchingGroup(aux.AND(Card.IsFaceup,Card.IsSetCard),tp,LOCATION_ONFIELD,0,nil,0x5cd)
-		for tc in aux.Next(sg) do
-			local e2=Effect.CreateEffect(e:GetHandler())
-			e2:SetType(EFFECT_TYPE_SINGLE)
-			e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-			e2:SetRange(tc:GetLocation()&LOCATION_ONFIELD)
-			e2:SetCode(EFFECT_IMMUNE_EFFECT)
-			e2:SetLabel(p)
-			e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-			e2:SetValue(cid.efilter)
-			tc:RegisterEffect(e2)
-		end
+		Duel.Destroy(tc,REASON_EFFECT)
 	end
-end
-function cid.efilter(e,te)
-	return te:GetHandlerPlayer()~=e:GetLabel() and te:GetOwner()~=e:GetOwner()
 end

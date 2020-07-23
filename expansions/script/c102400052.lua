@@ -1,39 +1,45 @@
---created & coded by Lyris, art from Shadowverse's "Biofabrication"
---滅却リペアリング
+--created & coded by Lyris, art from Cardfight!! Vanguard's "Skull Juggler"
 local cid,id=GetID()
 function cid.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCountLimit(1,id+EFFECT_COUNT_CODE_OATH)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e1:SetCode(EVENT_SUMMON_SUCCESS)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e1:SetCategory(CATEGORY_DESTROY)
-	e1:SetTarget(cid.drawtarget)
-	e1:SetOperation(cid.drawop)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetTarget(cid.target)
+	e1:SetOperation(cid.operation)
 	c:RegisterEffect(e1)
+	local e2=e1:Clone()
+	e2:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
+	c:RegisterEffect(e2)
+	local e3=e1:Clone()
+	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
+	c:RegisterEffect(e3)
 end
-function cid.todeckfilter(c,e)
-	return c:IsSetCard(0x5cd) and c:IsAbleToDeck() and not c:IsCode(id) and c:IsCanBeEffectTarget(e)
+function cid.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and chkc:IsFaceup()
+		and chkc:IsType(TYPE_XYZ) end
+	if chk==0 then return true end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
+	Duel.SelectTarget(tp,aux.AND(Card.IsFaceup,Card.IsType),tp,LOCATION_MZONE,0,1,nil,TYPE_XYZ)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_GRAVE)
 end
-function cid.drawtarget(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return false end
-	local g=Duel.GetMatchingGroup(cid.todeckfilter,tp,LOCATION_GRAVE,0,1,nil,e)
-	if chk==0 then return Duel.IsPlayerCanDraw(tp,2) and g:GetClassCount(Card.GetCode)>1
-		and Duel.IsExistingTarget(nil,tp,LOCATION_REMOVED,0,3,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local sg=g:SelectSubGroup(tp,aux.dncheck,false,2,2)
-	Duel.SetTargetCard(sg+Duel.SelectMatchingCard(tp,Card.IsCanBeEffectTarget,tp,LOCATION_REMOVED,0,3,3,nil,e))
-	Duel.SetOperationInfo(0,CATEGORY_TODECK,sg,2,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,2)
+function cid.filter(c,e,tp)
+	return c:IsSetCard(0x1c74) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE) and not c:IsCode(id)
 end
-function cid.drawop(e,tp,eg,ep,ev,re,r,rp)
-	local tg=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	if not tg or tg:FilterCount(Card.IsRelateToEffect,nil,e)==0 then return end
-	Duel.SendtoDeck(tg,nil,0,REASON_EFFECT)
-	local g=Duel.GetOperatedGroup()
-	if g:IsExists(Card.IsLocation,1,nil,LOCATION_DECK) then Duel.ShuffleDeck(tp) end
-	if g:FilterCount(Card.IsLocation,nil,LOCATION_DECK+LOCATION_EXTRA)>0 then
-		Duel.BreakEffect()
-		Duel.Draw(tp,2,REASON_EFFECT)
+function cid.operation(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.GetFirstTarget()
+	local g=Duel.GetDecktopGroup(tp,1)
+	if tc:IsRelateToEffect(e) and #g>0 then
+		Duel.DisableShuffleCheck()
+		Duel.Overlay(tc,g)
+		if not g:GetFirst():IsLocation(LOCATION_OVERLAY)
+			or Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+		local sg=Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
+		if #sg>0 then
+			Duel.BreakEffect()
+			Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP_DEFENSE)
+		end
 	end
 end

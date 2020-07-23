@@ -1,81 +1,65 @@
---created & coded by Lyris, art from Shadowverse's "Mechagun Wielder"
---滅却砲兵ブラスター
+--created & coded by Lyris, art from Cardfight!! Vanguard's "Mirror Demon"
 local cid,id=GetID()
 function cid.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
-	e1:SetCategory(CATEGORY_DESTROY)
-	e1:SetTarget(cid.destg)
-	e1:SetOperation(cid.desop)
+	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetRange(LOCATION_HAND)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetCondition(cid.spcon)
+	e1:SetTarget(cid.sptg)
+	e1:SetOperation(cid.spop)
 	c:RegisterEffect(e1)
-	local e2=e1:Clone()
-	e2:SetCode(EVENT_SUMMON_SUCCESS)
+	local e2=Effect.CreateEffect(c)
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e2:SetCode(EVENT_BATTLE_DAMAGE)
+	e2:SetCondition(function(e,tp,eg,ep) return ep~=tp end)
+	e2:SetTarget(cid.target)
+	e2:SetOperation(cid.operation)
 	c:RegisterEffect(e2)
-	local e3=e1:Clone()
-	e3:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
+	local e3=e2:Clone()
+	e3:SetCode(EVENT_BATTLE_DESTROYING)
+	e3:SetCondition(function(e) return e:GetHandler():IsRelateToBattle() end)
 	c:RegisterEffect(e3)
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e4:SetCode(EVENT_DESTROYED)
-	e4:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
-	e4:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e4:SetTarget(cid.sptg)
-	e4:SetOperation(cid.spop)
-	c:RegisterEffect(e4)
 end
-function cid.destg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_REMOVED,0)>0 end
-	local ct={}
-	for i=3,1,-1 do
-		if Duel.GetFieldCard(tp,LOCATION_REMOVED,i) then
-			table.insert(ct,i)
-		end
-	end
-	if #ct==1 then
-		Duel.AnnounceNumber(tp,1)
-		e:SetLabel(1)
-	else
-		Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,0))
-		e:SetLabel(Duel.AnnounceNumber(tp,table.unpack(ct)))
-	end
-	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,e:GetLabel(),tp,LOCATION_REMOVED)
+function cid.spcon(e,tp)
+	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)>0
+		and not Duel.IsExistingMatchingCard(cid.cfilter,tp,LOCATION_MZONE,0,1,nil)
 end
-function cid.desop(e,tp,eg,ep,ev,re,r,rp)
-	local ct=e:GetLabel()
-	local g=Duel.GetFieldGroup(tp,LOCATION_REMOVED,0):Filter(aux.NOT(Card.IsImmuneToEffect),nil,e)
-	if #g<ct then return end
-	Duel.SendtoGrave(g:RandomSelect(tp,ct),REASON_EFFECT+REASON_RETURN)
-	local sg=Duel.GetOperatedGroup()
-	if #sg~=ct then return end
-	local dt=sg:FilterCount(Card.IsSetCard,nil,0x5cd)
-	local dg=Duel.GetFieldGroup(tp,LOCATION_ONFIELD,LOCATION_ONFIELD)
-	if #dg>0 and Duel.SelectYesNo(tp,1124) then
-		local rg=dg:Select(tp,1,dt,nil)
-		Duel.HintSelection(rg)
-		Duel.Destroy(rg,REASON_EFFECT)
-	end
-end
-function cid.filter(c,e,tp)
-	return c:IsSetCard(0x5cd) and not c:IsCode(id) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+function cid.cfilter(c)
+	return c:IsFacedown() or not c:IsSetCard(0xc74)
 end
 function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_DECK,0,1,nil,e,tp) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
 end
 function cid.spop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+	local c=e:GetHandler()
+	if c:IsRelateToEffect(e) then Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP) end
+end
+function cid.filter(c,e,tp)
+	return c:IsSetCard(0xc74) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsCode(id)
+end
+function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():IsCanOverlay() and Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
+		and Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsType),tp,LOCATION_MZONE,0,1,nil,TYPE_XYZ)
+		and Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_OVERLAY,0,1,nil,e,tp) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_OVERLAY)
+end
+function cid.operation(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
+	local tc=Duel.SelectMatchingCard(tp,aux.AND(Card.IsFaceup,Card.IsType),tp,LOCATION_MZONE,0,1,1,nil,TYPE_XYZ):GetFirst()
+	if not tc then return end
+	Duel.Overlay(tc,c)
+	if not c:IsLocation(LOCATION_OVERLAY) or Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
-	if Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)>0 then
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
-		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD)
-		e1:SetValue(LOCATION_REMOVED)
-		g:GetFirst():RegisterEffect(e1)
+	local g=Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_OVERLAY,0,1,1,nil,e,tp)
+	if #g>0 then
+		Duel.BreakEffect()
+		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
 end

@@ -1,5 +1,4 @@
---created & coded by Lyris, art from Shadowverse's "Deus Ex Machinia"
---滅却姫ドゥ
+
 local cid,id=GetID()
 function cid.initial_effect(c)
 	c:EnableReviveLimit()

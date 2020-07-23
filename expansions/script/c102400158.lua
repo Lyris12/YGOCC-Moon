@@ -1,5 +1,4 @@
---created & coded by Lyris, art from Shadowverse's "Lishenna, Omen of Destruction"
---滅却舞者リシェンナ
+
 local cid,id=GetID()
 function cid.initial_effect(c)
 	c:EnableReviveLimit()

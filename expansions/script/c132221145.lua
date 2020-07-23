@@ -14,23 +14,18 @@ end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CARDTYPE)
-	Duel.SetTargetParam(Duel.SelectOption(tp,1057,1056,1063,1073,1074,1076,aux.Stringid(id,0),aux.Stringid(id,1),aux.Stringid(id,2),aux.Stringid(id,3),aux.Stringid(id,4)))
+	Duel.SetTargetParam(Duel.SelectOption(tp,aux.Stringid(id,0),aux.Stringid(id,1),aux.Stringid(id,2),aux.Stringid(id,3),aux.Stringid(id,4),aux.Stringid(id,5)))
 end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local opt=Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)
 	local ct=nil
-	if opt==0 then ct=TYPE_RITUAL end
-	if opt==1 then ct=TYPE_FUSION end
-	if opt==2 then ct=TYPE_SYNCHRO end
-	if opt==3 then ct=TYPE_XYZ end
-	if opt==4 then ct=TYPE_PENDULUM end
-	if opt==5 then ct=TYPE_LINK end
-	if opt==6 then ct=TYPE_EVOLUTE end
-	if opt==7 then ct=TYPE_BIGBANG end
-	if opt==8 then ct=TYPE_TIMELEAP end
-	if opt==9 then ct=TYPE_SPATIAL end
-	if opt==10 then ct=TYPE_PANDEMONIUM end
+	if opt==1 then ct=TYPE_EVOLUTE end
+	if opt==2 then ct=TYPE_BIGBANG end
+	if opt==3 then ct=TYPE_TIMELEAP end
+	if opt==4 then ct=TYPE_SPATIAL end
+	if opt==5 then ct=TYPE_PANDEMONIUM end
+	if opt==6 then ct=TYPE_RELAY end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
