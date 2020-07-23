@@ -2,7 +2,7 @@
 local cid,id=GetID()
 function cid.initial_effect(c)
 	c:EnableReviveLimit()
-	aux.AddXyzProcedureLevelFree(c,aux.FilterBoolFunction(Card.IsLevel,4),aux.drccheck,2,2)
+	aux.AddXyzProcedureLevelFree(c,aux.FilterBoolFunction(Card.IsXyzLevel,4),aux.drccheck,2,2)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
