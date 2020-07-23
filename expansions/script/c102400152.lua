@@ -8,6 +8,14 @@ function cid.initial_effect(c)
 	e1:SetTarget(cid.target)
 	e1:SetOperation(cid.activate)
 	c:RegisterEffect(e1)
+	local e2=Effect.CreateEffect(c)
+	e2:SetCategory(CATEGORY_DISABLE)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e2:SetCode(EVENT_CHAIN_SOLVING)
+	e2:SetRange(LOCATION_GRAVE)
+	e2:SetCondition(cid.negcon)
+	e2:SetOperation(cid.negop)
+	c:RegisterEffect(e2)
 end
 function cid.filter(c,e,tp)
 	return c:IsSetCard(0x1c74) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE)
@@ -33,5 +41,22 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 	if #ag>0 then
 		Duel.BreakEffect()
 		Duel.Overlay(tc,ag)
+	end
+end
+function cid.tfilter(c,tp)
+	return c:IsFaceup() and c:IsSetCard(0xc74) and c:IsControler(tp) and c:IsLocation(LOCATION_MZONE)
+end
+function cid.negcon(e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
+	return e:GetHandler():GetFlagEffect(id)==0 and re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) 
+		and g and g:IsExists(cid.tfilter,1,e:GetHandler(),tp) and Duel.IsChainDisablable(ev)
+end
+function cid.negop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.SelectEffectYesNo(tp,e:GetHandler()) then
+		e:GetHandler():RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD,0,1)
+		if Duel.NegateEffect(ev) then
+			Duel.BreakEffect()
+			Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_EFFECT)
+		end
 	end
 end

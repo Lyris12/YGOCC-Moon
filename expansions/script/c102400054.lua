@@ -9,6 +9,14 @@ function cid.initial_effect(c)
 	e1:SetTarget(cid.target)
 	e1:SetOperation(cid.activate)
 	c:RegisterEffect(e1)
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e2:SetCode(EFFECT_DESTROY_REPLACE)
+	e2:SetRange(LOCATION_GRAVE)
+	e2:SetTarget(cid.reptg)
+	e2:SetValue(cid.repval)
+	e2:SetOperation(cid.repop)
+	c:RegisterEffect(e2)
 end
 function cid.filter(c,tp)
 	return c:IsSetCard(0xc74) and c:IsType(TYPE_MONSTER) and (c:IsAbleToDeck() or c:IsCanOverlay(tp))
@@ -48,4 +56,18 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 			else break end
 		end
 	end
+end
+function cid.repfilter(c,tp)
+	return c:IsFaceup() and c:IsSetCard(0xc74) and c:IsLocation(LOCATION_MZONE)
+		and c:IsControler(tp) and not c:IsReason(REASON_REPLACE)
+end
+function cid.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():IsAbleToRemove() and eg:IsExists(cid.repfilter,1,nil,tp) end
+	return Duel.SelectEffectYesNo(tp,e:GetHandler(),96)
+end
+function cid.repval(e,c)
+	return cid.repfilter(c,e:GetHandlerPlayer())
+end
+function cid.repop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_EFFECT)
 end
