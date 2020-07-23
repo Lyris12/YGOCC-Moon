@@ -20,6 +20,15 @@ function cid.initial_effect(c)
 	e3:SetTarget(cid.target)
 	e3:SetOperation(cid.operation)
 	c:RegisterEffect(e3)
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetCode(EVENT_FREE_CHAIN)
+	e2:SetRange(LOCATION_HAND)
+	e2:SetCountLimit(1,id)
+	e2:SetCategory(CATEGORY_DRAW)
+	e2:SetTarget(cid.drtg)
+	e2:SetOperation(cid.drop)
+	c:RegisterEffect(e2)
 end
 function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -52,4 +61,21 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.BreakEffect()
 		Duel.Draw(tp,2,REASON_EFFECT)
 	end
+end
+function cid.cfilter(c)
+	return c:IsSetCard(0xc74) and c:IsDiscardable(REASON_EFFECT) and not c:IsCode(id)
+end
+function cid.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return c:IsDiscardable(REASON_EFFECT) and Duel.IsPlayerCanDraw(tp,2)
+		and Duel.IsExistingMatchingCard(cid.cfilter,tp,LOCATION_HAND,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,2)
+end
+function cid.drop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) or not c:IsDiscardable(REASON_EFFECT) then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DISCARD)
+	if Duel.SendtoGrave(Duel.SelectMatchingCard(tp,cid.cfilter,tp,LOCATION_HAND,0,1,1,nil)+c,REASON_EFFECT+REASON_DISCARD)<2 then return end
+	Duel.BreakEffect()
+	Duel.Draw(tp,2,REASON_EFFECT)
 end

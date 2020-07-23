@@ -58,6 +58,7 @@ function cid.op(e,tp,eg,ep,ev,re,r,rp)
 		e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e5:SetCode(EFFECT_SEND_REPLACE)
 		e5:SetTarget(cid.reptg)
+		e5:SetOperation(function(e,tp,eg,ep,ev,re,r,rp) Duel.Destroy(eg:Filter(cid.repfilter,nil),r,tc:GetDestination()) end)
 		e5:SetValue(cid.repval)
 		e5:SetReset(RESET_PHASE+PHASE_END)
 		Duel.RegisterEffect(e5,tp)
@@ -68,12 +69,6 @@ function cid.repfilter(c)
 end
 function cid.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return eg:IsExists(cid.repfilter,1,nil) end
-	local g=eg:Filter(cid.repfilter,nil)
-	local tc=g:GetFirst()
-	while tc do
-		Duel.Destroy(g,r,tc:GetDestination())
-		tc=g:GetNext()
-	end
 	return true
 end
 function cid.repval(e,c)
