@@ -17,6 +17,7 @@ function c11111009.afilter(c)
 end
 function c11111009.spfilter(c,e,tp)
 	return c:IsSetCard(0x223) and c:IsType(TYPE_MONSTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+		and Duel.GetLocationCountFromEx(tp,tp,nil,c)>0
 end
 function c11111009.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c11111009.afilter,tp,LOCATION_GRAVE,0,2,nil) end
@@ -25,13 +26,10 @@ function c11111009.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
 function c11111009.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCountFromEx(tp)>0
-		and Duel.IsExistingMatchingCard(c11111009.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp)
-	end
+	if chk==0 then return Duel.IsExistingMatchingCard(c11111009.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
 function c11111009.spop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCountFromEx(tp)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,c11111009.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp)
 	local sc=g:GetFirst()
