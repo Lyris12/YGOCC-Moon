@@ -1,4 +1,4 @@
-﻿expansions/cards-new.cdb	e7e2654f4957a1c159901c930aa0ace8
+﻿expansions/cards-new.cdb	b78385767ac800f0c4d6d6ea88ce0340
 expansions/lflist.conf	35938db40e6c8e7bb8bdf58df55480ac
 expansions/strings.conf	255b9898d81498adb94a123fc030029a
 expansions/pics/100000710.jpg	5f925a97b1c60d7d69acb8f229938263
@@ -7961,7 +7961,7 @@ expansions/script/c47000041.lua	521b624eadeb8706a8df6b69032929b4
 expansions/script/c47000050.lua	37d5f9a0bbd7a42e0cbfde454bddae6f
 expansions/script/c47000054.lua	5b6dfbc15875f89512221618a2cb317a
 expansions/script/c47000063.lua	c6407388793cf12020176c30445a3dcf
-expansions/script/c48022718.lua	99f608f8e4f683c82cb95d34f3ba0195
+expansions/script/c48022718.lua	7b73fd700701f59dca807150d9af002f
 expansions/script/c49451958.lua	48ee8d7ae448e3349d303c36c37351e4
 expansions/script/c49451959.lua	dec6e2af74b5457258504fb7b2af7885
 expansions/script/c50030993.lua	bb3eb11ee81607cad771da0c3f9a0e60
@@ -8191,7 +8191,7 @@ expansions/script/c5555.lua	17cb30d6585de66e8e6841f6ccecebbd
 expansions/script/c56642461.lua	70c2236db8196f32517ba3be4b654c53
 expansions/script/c56642462.lua	636161abd9ce5045a01a1287716f4f07
 expansions/script/c56642465.lua	4b5cde403b2fd1daa7073c50f020d17b
-expansions/script/c57093524.lua	83f50689c87b7c56ecb097ee0d28757b
+expansions/script/c57093524.lua	30d4400b890cc4f9ab68939d7d512ed9
 expansions/script/c57460650.lua	980488b8f1337ef4219ebc66cf9d6d33
 expansions/script/c57460651.lua	b2b10830f923219ce114811a65e513ce
 expansions/script/c57460652.lua	131f95f7bc4b2463826f7d2aabc088b3
@@ -9165,6 +9165,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	264325aed0f232daabfc3bcda963ef1a
+update/filelist.txt	84ef412449aeb80dc31354fc4be79f01
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	078be6e1bf1a26179948597ebc2c787b
+update/version.txt	4858f60b0c4141f2712ec84db593365d
