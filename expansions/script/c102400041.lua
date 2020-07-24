@@ -12,9 +12,10 @@ function cid.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e2:SetCode(EVENT_BATTLE_DAMAGE)
+	e2:SetCode(EVENT_DESTROYED)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCondition(function(e,tp,eg,ep) return ep~=tp and eg:GetFirst():IsSetCard(0xc74) end)
+	e2:SetProperty(EFFECT_FLAG_DELAY)
+	e2:SetCondition(cid.condition)
 	e2:SetTarget(cid.target)
 	e2:SetOperation(cid.operation)
 	c:RegisterEffect(e2)
@@ -39,6 +40,15 @@ end
 function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) then Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP) end
+end
+function cid.dfilter(c)
+	return c:IsReason(REASON_EFFECT) and c:IsPreviousLocation(LOCATION_ONFIELD)
+end
+function cid.condition(e,tp,eg,ep,ev,re,r,rp)
+	if not re then return false end
+	local rc=re:GetHandler()
+	return rc:IsControler(tp) and rc:IsSetCard(0xc74)
+		and eg:IsExists(cid.dfilter,1,nil)
 end
 function cid.filter(c,e,tp)
 	return c:IsSetCard(0xc74) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsCode(id)

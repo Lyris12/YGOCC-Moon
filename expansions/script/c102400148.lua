@@ -20,6 +20,16 @@ function cid.initial_effect(c)
 	e1:SetTarget(cid.target)
 	e1:SetOperation(cid.operation)
 	c:RegisterEffect(e1)
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_QUICK_O)
+	e3:SetCode(EVENT_FREE_CHAIN)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetProperty(EFFECT_FLAG_DAMAGE_CAL)
+	e3:SetHintTiming(TIMING_DAMAGE_CAL)
+	e3:SetCondition(function() return not Duel.IsDamageCalculated() and Duel.GetCurrentPhase()==PHASE_DAMAGE_CAL end)
+	e3:SetTarget(cid.tg)
+	e3:SetOperation(cid.op)
+	c:RegisterEffect(e3)
 end
 function cid.cfilter(c,tp)
 	return c:IsType(TYPE_XYZ) and c:IsCanOverlay(tp) and Duel.GetMZoneCount(tp,c)>0
@@ -43,4 +53,14 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.BreakEffect()
 		Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
 	end
+end
+function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	local bc=c:GetBattleTarget()
+	if chk==0 then return bc and bc:IsFaceup() and bc:GetAttack()<c:GetBaseAttack() end
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,Duel.GetFieldGroup(tp,0,LOCATION_MZONE),1,0,0)
+end
+function cid.op(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+	Duel.Destroy(Duel.GetFieldGroup(tp,0,LOCATION_MZONE):Select(tp,1,1,nil),REASON_EFFECT)
 end

@@ -6,7 +6,7 @@ function cid.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e1:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
+	e1:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND+CATEGORY_DESTROY)
 	e1:SetDescription(1109)
 	e1:SetCondition(function(e) return e:GetHandler():IsSummonType(SUMMON_TYPE_XYZ) end)
 	e1:SetTarget(cid.target)
@@ -34,8 +34,14 @@ end
 function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_DECK,0,1,1,nil)
-	Duel.SendtoHand(g,nil,REASON_EFFECT)
-	Duel.ConfirmCards(1-tp,g)
+	if Duel.SendtoHand(g,nil,REASON_EFFECT)>0 and g:GetFirst():IsLocation(LOCATION_HAND) then
+		Duel.ConfirmCards(1-tp,g)
+		Duel.ShuffleHand(tp)
+		local g=Duel.GetMatchingGroup(Card.IsType,tp,0,LOCATION_ONFIELD,nil,TYPE_SPELL+TYPE_TRAP)
+		if #g==0 or not Duel.SelectYesNo(tp,1100) then return end
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+		Duel.Destroy(g:Select(tp,1,1,nil),REASON_EFFECT)
+	end
 end
 function cid.cfilter(c,tp)
 	return c:IsSetCard(0xc74) and Duel.GetMZoneCount(tp,c)>0
