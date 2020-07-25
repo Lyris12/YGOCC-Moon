@@ -44,7 +44,7 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	if #tg==0 then Duel.ShuffleDeck(tp) end
 end
 function cid.con(e,tp,eg)
-	return #eg==1 and eg:GetFirst():IsPreviousLocation(LOCATION_GRAVE)
+	return eg:IsExists(Card.IsPreviousLocation,1,nil,LOCATION_GRAVE)
 end
 function cid.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsAbleToDeck() end
