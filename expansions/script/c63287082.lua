@@ -33,9 +33,11 @@ end
 function cid.mfilter(c,tp)
 	return c:IsRace(RACE_PLANT) and c:IsPreviousLocation(LOCATION_MZONE) and c:GetPreviousControler()==tp
 end
+function cid.cfilter(c,tp)
+	return c:IsSummonType(SUMMON_TYPE_SYNCHRO) and c:GetMaterial():IsExists(cid.mfilter,1,nil,tp)
+end
 function cid.condition(e,tp,eg,ep,ev,re,r,rp,chk)
-	local tc=eg:GetFirst()
-	return #eg==1 and tc:IsSummonType(SUMMON_TYPE_SYNCHRO) and tc:GetMaterial():IsExists(cid.mfilter,1,nil,tp)
+	return eg:IsExists(cid.cfilter,1,nil,tp)
 end
 function cid.filter(c,e,tp)
 	local seq=c:GetSequence()

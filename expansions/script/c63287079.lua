@@ -42,24 +42,25 @@ end
 function cid.filter(c,e,tp,lv)
 	return c:IsSetCard(0x32) and c:IsLevelAbove(lv) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
+function cid.efilter(c,tp)
+	return c:IsSetCard(0x32) and c:IsType(TYPE_MONSTER) and c:IsControler(tp)
+end
 function cid.spcon(e,tp,eg,ep,ev,re,r,rp)
-	if e:GetHandler():GetFlagEffect(id)==0 then return false end
-	local tc=eg:GetFirst()
-	e:SetLabelObject(tc)
-	return #eg==1 and tc:IsSetCard(0x32) and tc:IsType(TYPE_MONSTER) and tc:IsControler(tp)
+	return e:GetHandler():GetFlagEffect(id)>0 and eg:FilterCount(cid.efilter,nil,tp)>0
 end
 function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetLabelObject()
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_GRAVE,0,1,c,e,tp,c:GetLevel()) end
+	if chk==0 then
+		local c,lv=eg:Filter(cid.efilter,nil,tp):GetMaxGroup(Card.GetLevel)
+		return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_GRAVE,0,1,c,e,tp,lv)
+	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_GRAVE)
 end
 function cid.spop(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-	local lc=e:GetLabelObject()
+	local lc,lv=eg:Filter(cid.efilter,nil,tp):GetMaxGroup(Card.GetLevel)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local tc=Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_GRAVE,0,1,1,lc,e,tp,lc:GetLevel()):GetFirst()
+	local tc=Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_GRAVE,0,1,1,lc,e,tp,lv):GetFirst()
 	if tc and Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP) then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
