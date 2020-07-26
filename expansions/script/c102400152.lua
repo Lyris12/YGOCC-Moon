@@ -10,11 +10,13 @@ function cid.initial_effect(c)
 	e1:SetOperation(cid.activate)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
-	e2:SetCategory(CATEGORY_DISABLE)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e2:SetCode(EVENT_CHAIN_SOLVING)
-	e2:SetRange(LOCATION_GRAVE)
+	e2:SetDescription(1131)
+	e2:SetCategory(CATEGORY_NEGATE)
+	e2:SetType(EFFECT_TYPE_ACTIVATE)
+	e2:SetCode(EVENT_CHAINING)
+	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e2:SetCondition(cid.negcon)
+	e2:SetTarget(cid.negtg)
 	e2:SetOperation(cid.negop)
 	c:RegisterEffect(e2)
 end
@@ -49,15 +51,23 @@ function cid.tfilter(c,tp)
 end
 function cid.negcon(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
-	return e:GetHandler():GetFlagEffect(id)==0 and re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) 
-		and g and g:IsExists(cid.tfilter,1,e:GetHandler(),tp) and Duel.IsChainDisablable(ev)
+	return re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) and g and g:IsExists(cid.tfilter,1,e:GetHandler(),tp)
+		and Duel.IsChainNegatable(ev)
+end
+function cid.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
+end
+function cid.xfilter(c)
+	return c:IsFaceup() and c:IsType(TYPE_XYZ) and c:IsSetCard(0xc74)
 end
 function cid.negop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.SelectEffectYesNo(tp,e:GetHandler()) then
-		e:GetHandler():RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD,0,1)
-		if Duel.NegateEffect(ev) then
-			Duel.BreakEffect()
-			Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_EFFECT)
-		end
-	end
+	local rc=re:GetHandler()
+	local g=Duel.GetMatchingGroup(cid.xfilter,tp,LOCATION_MZONE,0,nil)
+	if not Duel.NegateActivation(ev) or not rc:IsRelateToEffect(re) or not rc:IsCanOverlay(tp) or #g==0
+		or not Duel.SelectYesNo(tp,aux.Stringid(id,0)) then return end
+	rc:CancelToGrave()
+	Duel.BreakEffect()
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
+	Duel.Overlay(g:Select(tp,1,1,nil):GetFirst(),rc)
 end

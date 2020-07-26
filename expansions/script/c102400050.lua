@@ -21,7 +21,7 @@ function cid.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		and chkc:IsFaceup() end
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	Duel.SelectTarget(tp,aux.AND(Card.IsType,Card.IsFaceup),tp,LOCATION_MZONE,0,1,nil,TYPE_XYZ)
+	Duel.SelectTarget(tp,aux.AND(Card.IsType,Card.IsFaceup),tp,LOCATION_MZONE,0,1,1,nil,TYPE_XYZ)
 end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
