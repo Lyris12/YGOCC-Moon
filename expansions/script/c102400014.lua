@@ -75,7 +75,7 @@ function cid.desop(e,tp,eg,ep,ev,re,r,rp)
 		local sg=g:GetFirst()
 		if Duel.SendtoGrave(g,REASON_EFFECT)~=0 and sg:IsLocation(LOCATION_GRAVE) then
 			local tc=Duel.GetFirstTarget()
-			if tc:IsFaceup() and tc:IsRelateToEffect(e) then
+			if tc:IsFaceup() and tc:IsRelateToEffect(e) and tc:IsSetCard(0xda6) then
 				local c=e:GetHandler()
 				local e1=Effect.CreateEffect(c)
 				e1:SetType(EFFECT_TYPE_SINGLE)

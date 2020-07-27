@@ -2,6 +2,47 @@
 --襲雷竜－銀河
 local cid,id=GetID()
 function cid.initial_effect(c)
+	local f1,f2,f3,f4,f5=Duel.SendtoGrave,Duel.SendtoHand,Duel.SendtoDeck,Duel.SendtoExtraP,Duel.Remove
+	Duel.SendtoGrave=function(tg,r)
+		local g=Group.CreateGroup()+tg
+		for tc in aux.Next(g) do
+			local r=r
+			if tc:IsHasEffect(id) then r=r|REASON_DESTROY end
+			f1(tc,r)
+		end
+	end
+	Duel.SendtoHand=function(tg,tp,r)
+		local g=Group.CreateGroup()+tg
+		for tc in aux.Next(g) do
+			local r=r
+			if tc:IsHasEffect(id) then r=r|REASON_DESTROY end
+			f2(tc,tp,r)
+		end
+	end
+	Duel.SendtoDeck=function(tg,tp,seq,r)
+		local g=Group.CreateGroup()+tg
+		for tc in aux.Next(g) do
+			local r=r
+			if tc:IsHasEffect(id) then r=r|REASON_DESTROY end
+			f3(tc,tp,seq,r)
+		end
+	end
+	Duel.SendtoExtraP=function(tg,tp,r)
+		local g=Group.CreateGroup()+tg
+		for tc in aux.Next(g) do
+			local r=r
+			if tc:IsHasEffect(id) then r=r|REASON_DESTROY end
+			f4(tc,tp,r)
+		end
+	end
+	Duel.Remove=function(tg,pos,r)
+		local g=Group.CreateGroup()+tg
+		for tc in aux.Next(g) do
+			local r=r
+			if tc:IsHasEffect(id) then r=r|REASON_DESTROY end
+			f5(tc,pos,r)
+		end
+	end
 	aux.EnablePendulumAttribute(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -55,22 +96,11 @@ function cid.op(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
 		local e5=Effect.CreateEffect(c)
-		e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e5:SetCode(EFFECT_SEND_REPLACE)
-		e5:SetTarget(cid.reptg)
-		e5:SetOperation(function(e,tp,eg,ep,ev,re,r,rp) Duel.Destroy(eg:Filter(cid.repfilter,nil),r,tc:GetDestination()) end)
-		e5:SetValue(cid.repval)
+		e5:SetType(EFFECT_TYPE_FIELD)
+		e5:SetCode(id)
+		e5:SetTargetRange(LOCATION_MZONE,0)
+		e5:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x7c4))
 		e5:SetReset(RESET_PHASE+PHASE_END)
 		Duel.RegisterEffect(e5,tp)
 	end
-end
-function cid.repfilter(c)
-	return c:IsSetCard(0x7c4) and c:IsLocation(LOCATION_MZONE) and not c:IsReason(REASON_DESTROY)
-end
-function cid.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return eg:IsExists(cid.repfilter,1,nil) end
-	return true
-end
-function cid.repval(e,c)
-	return cid.repfilter(c)
 end

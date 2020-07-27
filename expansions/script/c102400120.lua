@@ -37,17 +37,17 @@ function cid.desop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Destroy(e:GetHandler(),REASON_EFFECT)
 	end
 end
-function cid.filter(c)
-	return c:IsSetCard(0x7c4) and c:IsFaceup()
+function cid.filter(c,tp)
+	return c:IsSetCard(0x7c4) and c:IsFaceup() and Duel.GetMZoneCount(tp,c)>0
 end
 function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and cid.filter(chkc) end
 	local c=e:GetHandler()
 	if chk==0 then return c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 		and Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
-		and Duel.IsExistingTarget(cid.filter,tp,LOCATION_MZONE,0,1,nil) end
+		and Duel.IsExistingTarget(cid.filter,tp,LOCATION_MZONE,0,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectTarget(tp,cid.filter,tp,LOCATION_MZONE,0,1,1,nil)
+	local g=Duel.SelectTarget(tp,cid.filter,tp,LOCATION_MZONE,0,1,1,nil,tp)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
 end
