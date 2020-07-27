@@ -13,10 +13,13 @@ function cid.initial_effect(c)
 	e1:SetOperation(cid.spop)
 	c:RegisterEffect(e1)
 end
+function cid.filter(c,e,tp)
+	return c:IsCode(id) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+end
 function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0
-		and c:GetOverlayGroup():IsExists(Card.IsCanBeSpecialSummoned,1,nil,e,0,tp,false,false) end
+		and c:GetOverlayGroup():IsExists(cid.filter,1,nil,e,tp) end
 	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_OVERLAY)
 end
@@ -24,7 +27,7 @@ function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local c=e:GetHandler()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	if Duel.SpecialSummon(c:GetOverlayGroup():FilterSelect(tp,Card.IsCanBeSpecialSummoned,1,1,nil,e,0,tp,false,false),0,tp,tp,false,false,POS_FACEUP)>0 and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0 then
+	if Duel.SpecialSummon(c:GetOverlayGroup():FilterSelect(tp,cid.filter,1,1,nil,e,tp),0,tp,tp,false,false,POS_FACEUP)>0 and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0 then
 		Duel.DisableShuffleCheck()
 		Duel.Overlay(c,Duel.GetDecktopGroup(tp,1))
 	end
