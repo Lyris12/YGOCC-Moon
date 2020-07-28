@@ -45,17 +45,19 @@ function c16599462.cfilter(c,tp)
 	return c:IsSetCard(0x1559) and c:IsType(TYPE_MONSTER) and c:GetLevel()>0
 		and Duel.IsExistingTarget(c16599462.lvexc,tp,LOCATION_MZONE,0,1,c,c:GetLevel())
 		and (c:IsLocation(LOCATION_DECK+LOCATION_GRAVE) or (c:IsLocation(LOCATION_MZONE) and c:IsFaceup()))
+		and c:IsAbleToRemoveAsCost()
 end
 function c16599462.cfilter2(c,e,tp)
 	return c:IsSetCard(0x1559) and c:IsType(TYPE_MONSTER) and c:GetLevel()>0
 		and Duel.IsExistingMatchingCard(c16599462.spfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil,e,tp,c:GetLevel())
 		and (c:IsLocation(LOCATION_DECK+LOCATION_GRAVE) or (c:IsLocation(LOCATION_MZONE) and c:IsFaceup()))
+		and c:IsAbleToRemoveAsCost()
 end
 function c16599462.spfilter(c,e,tp,lv)
 	return c:IsRace(RACE_FAIRY) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and c:GetLevel()~=lv
 end
 function c16599462.lvexc(c,lv)
-	return c:IsFaceup() and c:GetLevel()~=lv
+	return c:IsFaceup() and c:GetLevel()>0 and c:GetLevel()~=lv
 end
 function c16599462.tdfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x1559) and c:IsType(TYPE_MONSTER) and c:IsAbleToDeck()

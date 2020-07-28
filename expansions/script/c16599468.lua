@@ -138,7 +138,7 @@ function c16599468.regop(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return (c:GetDestination()==LOCATION_GRAVE or c:GetDestination()==LOCATION_REMOVED or c:GetDestination()==LOCATION_HAND or c:GetDestination()==LOCATION_EXTRA or c:GetDestination()==LOCATION_DECK) 
 		and Duel.IsExistingMatchingCard(c16599468.replacer,tp,LOCATION_DECK,0,1,e:GetHandler()) 
-		and c:IsSummonType(SUMMON_TYPE_SYNCHRO) and c:GetFlagEffect(16599468)<3 and c:IsReason(REASON_BATTLE+REASON_EFFECT)
+		and c:IsSummonType(SUMMON_TYPE_SYNCHRO) and c:GetFlagEffect(16599468)<1 and c:IsReason(REASON_BATTLE+REASON_EFFECT)
 	end
 	if Duel.SelectYesNo(tp,aux.Stringid(16599468,0)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
