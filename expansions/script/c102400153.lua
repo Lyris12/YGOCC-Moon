@@ -34,6 +34,7 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	if ft<=0 or #g==0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	if Duel.SpecialSummon(g:SelectSubGroup(tp,aux.drccheck,false,1,ft),0,tp,tp,false,false,POS_FACEUP)<2 then return end
+	local c=e:GetHandler()
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)

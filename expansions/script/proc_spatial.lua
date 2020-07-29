@@ -176,7 +176,7 @@ function Card.SwitchSpace(c)
 	Auxiliary.Spatials[c]=nil
 	local mt=_G["c" .. c:GetOriginalCode()]
 	local ospc=mt.spt_other_space
-	if not ospc then ospc=Duel.ReadCard(c:GetOriginalCode(),CARDDATA_ALIAS) end
+	if not ospc or ospc==c:GetOriginalCode() then ospc=Duel.ReadCard(c:GetOriginalCode(),CARDDATA_ALIAS) end
 	if ospc==0 then return false end
 	c:SetEntityCode(ospc,true)
 	c:ReplaceEffect(ospc,0,0)

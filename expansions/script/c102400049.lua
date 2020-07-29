@@ -60,6 +60,7 @@ function cid.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local a=Duel.GetAttacker()
 	local d=Duel.GetAttackTarget()
+	if d==c then d,a=a,d end
 	if a:IsRelateToBattle() and d and d:IsRelateToBattle() then
 		local ed=Effect.CreateEffect(c)
 		ed:SetType(EFFECT_TYPE_SINGLE)
