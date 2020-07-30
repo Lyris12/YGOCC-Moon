@@ -54,14 +54,15 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e5)
 end
 function cid.matcheck(e,c)
-	local tc=c:GetMaterial():Filter(Card.IsCode,nil,id-12):GetFirst()
-	e:SetLabelObject(tc)
+	local g=c:GetMaterial():Filter(Card.IsCode,nil,id-12):GetFirst():GetEquipGroup()
+	g:KeepAlive()
+	e:SetLabelObject(g)
 end
-function cid.filter(c,tc)
-	return c:IsSetCard(0xcda) and c:GetPreviousEquipTarget()==tc
+function cid.filter(c)
+	return c:IsSetCard(0xcda) and c:GetPreviousEquipTarget():IsCode(id-12)
 end
 function cid.regtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local g=Duel.GetMatchingGroup(cid.filter,tp,0xf3,0xf3,nil,e:GetLabelObject():GetLabelObject())
+	local g=e:GetLabelObject():GetLabelObject():Filter(cid.filter,nil)
 	local qg=g:Clone()
 	if chk==0 then return true end
 	Duel.SetTargetCard(qg)

@@ -1,14 +1,12 @@
+--created by LeonDuvall, coded by Lyris
 local cid,id=GetID()
---Epochborn Field of Dreams
 function cid.initial_effect(c)
-	--When this card is activated, you can: Immediately after this effect resolves, Time Leap Summon an "Epochborn" monster, ignoring the Time Leap Limit. You can only use this effect of "Epochborn Field of Dreams" once per turn.
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetOperation(cid.operation)
 	c:RegisterEffect(e1)
-	--If you control 2+ "Epochborn Paragon" monsters with different names, This card cannot be targeted or destroyed by card effects.
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
@@ -21,7 +19,6 @@ function cid.initial_effect(c)
 	local e3=e2:Clone()
 	e3:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
 	c:RegisterEffect(e3)
-	--If you control 3+ "Epochborn Paragon" monsters with different names, "Epochborn Paragon" monsters you control are unaffetced by card effects that do not target, also they cannot be Tributed.
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_FIELD)
 	e4:SetCode(EFFECT_UNRELEASABLE_SUM)
@@ -39,7 +36,6 @@ function cid.initial_effect(c)
 	e6:SetCode(EFFECT_IMMUNE_EFFECT)
 	e6:SetValue(aux.TargetBoolFunction(Effect.IsHasProperty,EFFECT_FLAG_CARD_TARGET))
 	c:RegisterEffect(e6)
-	--If you control 4+ "Epochborn Paragon" monsters with different names, "Epochborn" monsters you control gain 500 ATK and DEF.
 	local e7=Effect.CreateEffect(c)
 	e7:SetType(EFFECT_TYPE_FIELD)
 	e7:SetCode(EFFECT_UPDATE_ATTACK)
@@ -73,8 +69,7 @@ function cid.spfilter(c,e,tp)
 end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) or Duel.GetFlagEffect(tp,id)>0 or Duel.GetLocationCount(tp,LOCATION_MZONE)<=-1
-		or not Duel.SelectEffectYesNo(tp,c) then return end
+	if not c:IsRelateToEffect(e) or Duel.GetFlagEffect(tp,id)>0 or Duel.GetLocationCount(tp,LOCATION_MZONE)<=-1 then return end
 	local ef=Effect.CreateEffect(c)
 	ef:SetType(EFFECT_TYPE_FIELD)
 	ef:SetCode(EFFECT_EXTRA_TIMELEAP_SUMMON)
@@ -84,12 +79,12 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	ef:SetTarget(aux.TRUE)
 	Duel.RegisterEffect(ef,tp)
 	local g=Duel.GetMatchingGroup(cid.spfilter,tp,LOCATION_EXTRA,0,nil,e,tp)
-	if #g>0 then
+	if #g>0 and Duel.SelectEffectYesNo(tp,c) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local sc=g:Select(tp,1,1,nil):GetFirst()
 		Duel.SpecialSummonRule(tp,sc)
 		Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
-	end
+	else ef:Reset() end
 end
 function cid.con(e,tp)
 	return Duel.GetMatchingGroup(aux.AND(Card.IsFaceup,Card.IsSetCard),tp,LOCATION_MZONE,0,nil,0x1cfd):GetClassCount(Card.GetCode)>e:GetLabel()
