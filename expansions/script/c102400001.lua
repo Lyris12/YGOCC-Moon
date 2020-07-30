@@ -18,34 +18,31 @@ function cid.filter2(c,g,tp)
 	return g:IsExists(cid.filter1,1,c,tp,c)
 end
 function cid.filter1(c,tp,tc)
-	local code=tc:GetCode()
-	return c:IsCode(code) and Duel.IsExistingMatchingCard(cid.filter3,tp,LOCATION_DECK,0,1,Group.FromCards(c,tc),code)
+	return Duel.IsExistingMatchingCard(cid.filter3,tp,LOCATION_DECK,0,1,Group.FromCards(c,tc),tc:GetCode(),c:GetCode())
 end
-function cid.filter3(c,code)
-	return c:IsCode(code) and c:IsAbleToHand()
+function cid.filter3(c,code1,code2)
+	return c:IsCode(code1) and c:IsCode(code2) and c:IsAbleToHand()
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(cid.filter,tp,LOCATION_DECK,0,nil)
 	if chk==0 then return g:IsExists(cid.filter2,1,nil,g,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
-function cid.cfilter(c)
-	return c:IsLocation(LOCATION_GRAVE)
-end
 function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(cid.filter,tp,LOCATION_DECK,0,nil)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local tg=g:FilterSelect(tp,cid.filter2,1,1,nil,g,tp)
 	local tc=tg:GetFirst()
-	tg:Merge(g:Filter(Card.IsCode,tc,tc:GetCode()))
-	if #tg~=2 or Duel.SendtoGrave(tg,REASON_COST)==0 or g:FilterCount(Card.IsLocation,nil,LOCATION_GRAVE)~=2 then return end
-	local code=g:GetFirst():GetCode()
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+	local sc=g:FilterSelect(tp,cid.filter1,1,1,tg,tp,tc):GetFirst()
+	tg:AddCard(sc)
+	if #tg~=2 or Duel.SendtoGrave(tg,REASON_COST)==0 or tg:FilterCount(Card.IsLocation,nil,LOCATION_GRAVE)~=2 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local tg=Duel.SelectMatchingCard(tp,cid.filter3,tp,LOCATION_DECK,0,1,1,nil,code)
-	if tg:GetCount()>0 then
+	local sg=Duel.SelectMatchingCard(tp,cid.filter3,tp,LOCATION_DECK,0,1,1,nil,tc:GetCode(),sc:GetCode())
+	if #sg>0 then
 		Duel.BreakEffect()
-		Duel.SendtoHand(tg,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,g)
+		Duel.SendtoHand(sg,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,sg)
 		local tc=g:GetFirst()
 		if tc:IsLocation(LOCATION_HAND) then
 			local e1=Effect.CreateEffect(e:GetHandler())
@@ -54,7 +51,7 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 			e1:SetCode(EFFECT_CANNOT_ACTIVATE)
 			e1:SetTargetRange(1,0)
 			e1:SetValue(cid.aclimit)
-			e1:SetLabel(tc:GetCode())
+			e1:SetLabel(sg:GetFirst():GetCode())
 			e1:SetReset(RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN,2)
 			Duel.RegisterEffect(e1,tp)
 		end
