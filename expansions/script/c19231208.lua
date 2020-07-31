@@ -32,7 +32,7 @@ function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 		and Duel.IsExistingMatchingCard(Card.IsSetCard,tp,LOCATION_DECK,0,1,nil,0xa44) end
 	Duel.SetOperationInfo(0,CATEGORY_DICE,nil,0,tp,1)
 end
-function cid.cfilter(c,e,tp)
+function cid.spfilter(c,e,tp)
 	return c:IsSetCard(0xa44) and (Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false) or c:IsAbleToHand())
 end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
@@ -42,7 +42,7 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local g=Duel.GetDecktopGroup(tp,dc)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local sg=g:FilterSelect(tp,cid.cfilter,1,1,nil):GetFirst()
+	local sg=g:FilterSelect(tp,cid.spfilter,1,1,nil):GetFirst()
 	if sg then
 		local b1,b2=Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and sg:IsCanBeSpecialSummoned(e,0,tp,false,false),sg:IsAbleToHand()
 		if b2 and (not b1 or Duel.SelectOption(tp,1190,1152)==0) then

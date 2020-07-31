@@ -37,8 +37,7 @@ function cid.filter(c,e,tp)
 	return c:IsType(TYPE_PENDULUM) and c:IsSetCard(0xa44) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsType,Card.IsAbleToGrave),tp,LOCATION_EXTRA,0,1,nil,TYPE_PENDULUM) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_HAND,0,1,nil,e,tp) end
+	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_COIN,nil,0,tp,1)
 end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
