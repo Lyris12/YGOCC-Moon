@@ -26,8 +26,8 @@ function cid.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetRange(LOCATION_ONFIELD)
 	e1:SetCode(EVENT_TOSS_DICE_NEGATE)
-	e1:SetCondition(cid.coincon)
-	e1:SetOperation(cid.coinop)
+	e1:SetCondition(cid.dicecon)
+	e1:SetOperation(cid.diceop)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e2:SetRange(LOCATION_ONFIELD)
@@ -70,11 +70,11 @@ function cid.coinop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.TossCoin(tp,ev)
 	end
 end
-function cid.coincon(e,tp,eg,ep,ev,re,r,rp)
+function cid.dicecon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return re:GetHandler()==c and c:GetFlagEffect(id)==0
 end
-function cid.coinop(e,tp,eg,ep,ev,re,r,rp)
+function cid.diceop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:GetFlagEffect(id)==0 and Duel.SelectEffectYesNo(tp,c) then
 		Duel.Hint(HINT_CARD,0,id)
