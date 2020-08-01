@@ -42,7 +42,7 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local g=Duel.GetDecktopGroup(tp,dc)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local sg=g:FilterSelect(tp,cid.spfilter,1,1,nil):GetFirst()
+	local sg=g:FilterSelect(tp,cid.spfilter,1,1,nil,e,tp):GetFirst()
 	if sg then
 		local b1,b2=Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and sg:IsCanBeSpecialSummoned(e,0,tp,false,false),sg:IsAbleToHand()
 		if b2 and (not b1 or Duel.SelectOption(tp,1190,1152)==0) then

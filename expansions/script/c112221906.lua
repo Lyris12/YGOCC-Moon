@@ -42,7 +42,7 @@ function cid.initial_effect(c)
 	local qe=e3:Clone()
 	qe:SetType(EFFECT_TYPE_QUICK_O)
 	qe:SetCode(EVENT_FREE_CHAIN)
-	qe:SetCondition(function(e) return e:GetHandler():IsHasEffect(id+108) end)
+	qe:SetCondition(function(e,tp) return Duel.IsPlayerAffectedByEffect(tp,id+108) end)
 	local e5=e4:Clone()
 	e5:SetLabelObject(qe)
 	c:RegisterEffect(e5)
@@ -88,7 +88,7 @@ function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 		or Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local tc=Duel.SelectMatchingCard(tp,cid.spfilter,tp,LOCATION_HAND,0,1,1,nil,e,tp):GetFirst()
-	if tc and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP_ATTACK)~=0 then
+	if tc and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)~=0 then
 		if not Duel.Equip(tp,c,tc) then return end
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
