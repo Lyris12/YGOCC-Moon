@@ -20,12 +20,12 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local opt=Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)
 	local ct=nil
-	if opt==1 then ct=TYPE_EVOLUTE end
-	if opt==2 then ct=TYPE_BIGBANG end
-	if opt==3 then ct=TYPE_TIMELEAP end
-	if opt==4 then ct=TYPE_SPATIAL end
-	if opt==5 then ct=TYPE_PANDEMONIUM end
-	if opt==6 then ct=TYPE_RELAY end
+	if opt==0 then ct=TYPE_EVOLUTE end
+	if opt==1 then ct=TYPE_BIGBANG end
+	if opt==2 then ct=TYPE_TIMELEAP end
+	if opt==3 then ct=TYPE_SPATIAL end
+	if opt==4 then ct=TYPE_PANDEMONIUM end
+	if opt==5 then ct=TYPE_RELAY end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)

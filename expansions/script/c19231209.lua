@@ -43,6 +43,7 @@ end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	local op=Duel.TossDice(tp,1)
 	if op<3 then
+		local c=e:GetHandler()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DISABLE)
 		local g=Duel.SelectMatchingCard(tp,aux.disfilter1,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
 		Duel.HintSelection(g)
@@ -96,5 +97,5 @@ end
 function cid.op(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
-	Duel.Overlay(e:GetHandler(),Duel.SelectMatchingCard(aux.AND(cid.filter,aux.NOT(Card.IsImmuneToEffect)),tp,LOCATION_EXTRA,0,1,1,nil,e))
+	Duel.Overlay(e:GetHandler(),Duel.SelectMatchingCard(tp,aux.AND(cid.filter,aux.NOT(Card.IsImmuneToEffect)),tp,LOCATION_EXTRA,0,1,1,nil,e))
 end

@@ -40,11 +40,8 @@ function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local tc=g:GetFirst()
 	if tc:IsSetCard(0x308) then
 		e:SetLabel(1)
-		Duel.SendtoGrave(g,REASON_COST)
-	else
-		e:SetLabel(0)
-		Duel.SendtoGrave(g,REASON_COST)
-	end
+	else e:SetLabel(0) end
+	Duel.DiscardDeck(tp,1,REASON_COST)
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(aux.NOT(Card.IsPosition),tp,0,LOCATION_MZONE,nil,POS_FACEDOWN_DEFENSE)
