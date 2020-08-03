@@ -51,7 +51,7 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp,chk)
 	elseif tg then Duel.SendtoDeck(tg,nil,2,REASON_EFFECT) end
 end
 function cid.cfilter(c,tp)
-	return c:IsCode(id-4) and c:IsPreviousLocation(LOCATION_ONFIELD) and c:GetPreviousControler()==tp and c:IsReason(REASON_EFFECT)
+	return c:GetPreviousCodeOnField()==id-4 and c:IsPreviousLocation(LOCATION_ONFIELD) and c:GetPreviousControler()==tp and c:IsReason(REASON_EFFECT)
 end
 function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

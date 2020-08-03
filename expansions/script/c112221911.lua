@@ -27,9 +27,9 @@ function cid.initial_effect(c)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_MZONE)
-	e3:SetCountLimit(1)
 	e3:SetDescription(1068)
 	e3:SetCategory(CATEGORY_EQUIP)
+	e3:SetLabelObject(c)
 	e3:SetTarget(cid.eqtg)
 	e3:SetOperation(cid.eqop)
 	local e4=Effect.CreateEffect(c)
@@ -83,8 +83,11 @@ function cid.eqfilter(c,tp)
 	return c:IsSetCard(0xcda) and c:CheckUniqueOnField(tp) and not c:IsForbidden()
 end
 function cid.eqtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetLabelObject()
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
-		and Duel.IsExistingMatchingCard(cid.eqfilter,tp,LOCATION_GRAVE+LOCATION_HAND,0,1,nil,tp) end
+		and Duel.IsExistingMatchingCard(cid.eqfilter,tp,LOCATION_GRAVE+LOCATION_HAND,0,1,nil,tp)
+		and c:GetFlagEffect(id)==0 end
+	c:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,nil,1,tp,LOCATION_GRAVE+LOCATION_HAND)
 end
 function cid.eqop(e,tp,eg,ep,ev,re,r,rp)

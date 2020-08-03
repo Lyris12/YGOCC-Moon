@@ -26,16 +26,16 @@ function cid.initial_effect(c)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_MZONE)
-	e3:SetCountLimit(1)
 	e3:SetDescription(1104)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e3:SetCategory(CATEGORY_TOHAND)
+	e3:SetLabelObject(c)
 	e3:SetTarget(cid.thtg)
 	e3:SetOperation(cid.thop)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_GRANT)
 	e4:SetRange(LOCATION_SZONE)
-	e4:SetTargetRange(LOCATION_MZONE,0)
+	e4:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
 	e4:SetTarget(cid.tg)
 	e4:SetLabelObject(e3)
 	c:RegisterEffect(e4)
@@ -68,7 +68,7 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp,chk)
 	elseif tg then Duel.SendtoDeck(tg,nil,2,REASON_EFFECT) end
 end
 function cid.cfilter(c,tp)
-	return c:IsCode(id-6) and c:IsPreviousLocation(LOCATION_ONFIELD) and c:GetPreviousControler()==tp
+	return c:GetPreviousCodeOnField()==id-6 and c:IsPreviousLocation(LOCATION_ONFIELD) and c:GetPreviousControler()==tp
 end
 function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -103,10 +103,13 @@ function cid.tg(e,c)
 	return c==e:GetHandler():GetEquipTarget() and c:IsCode(id-6)
 end
 function cid.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_ONFIELD) and chkc:IsAbleToHand() end
-	if chk==0 then return Duel.IsExistingTarget(aux.AND(Card.IsAbleToHand,aux.OR(Card.IsFaceup,aux.NOT(Card.IsLocation))),tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil,LOCATION_REMOVED) end
+	if chkc then return chkc:IsOnField() and chkc:IsAbleToHand() end
+	local c=e:GetLabelObject()
+	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToHand,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
+		and c:GetFlagEffect(id)==0 end
+	c:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,Duel.SelectTarget(tp,aux.AND(Card.IsAbleToHand,aux.OR(Card.IsFaceup,aux.NOT(Card.IsLocation))),tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil,LOCATION_REMOVED),1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,Duel.SelectTarget(tp,Card.IsAbleToHand,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil),1,0,0)
 end
 function cid.thop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
