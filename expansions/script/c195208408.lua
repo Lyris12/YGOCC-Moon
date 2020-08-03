@@ -11,22 +11,19 @@ function cid.initial_effect(c)
 	e0:SetOperation(cid.op)
 	c:RegisterEffect(e0)
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_CANNOT_DIRECT_ATTACK)
+	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
+	e1:SetCode(EVENT_BATTLE_DAMAGE)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e1:SetCondition(cid.hdcon)
+	e1:SetTarget(cid.hdtg)
+	e1:SetOperation(cid.hdop)
 	c:RegisterEffect(e1)
 end
-function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckLPCost(tp,1000) and not Duel.IsExistingMatchingCard(Card.IsDirectAttacked,tp,LOCATION_MZONE,0,1,nil) end
+	function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.CheckLPCost(tp,1000) end
 	Duel.PayLPCost(tp,1000)
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_OATH)
-	e1:SetTargetRange(LOCATION_MZONE,0)
-	e1:SetCode(EFFECT_CANNOT_DIRECT_ATTACK)
-	e1:SetReset(RESET_PHASE+PHASE_END)
-	Duel.RegisterEffect(e1,tp)
 end
-function cid.op(e,tp,eg,ep,ev,re,r,rp)
+	function cid.op(e,tp,eg,ep,ev,re,r,rp)
 	local tg=Duel.GetMatchingGroup(aux.AND(Card.IsFaceup,Card.IsSetCard),tp,LOCATION_MZONE,0,nil,0x83e)
 	for tc in aux.Next(tg) do
 		local e1=Effect.CreateEffect(e:GetHandler())
@@ -39,5 +36,24 @@ function cid.op(e,tp,eg,ep,ev,re,r,rp)
 		local e2=e1:Clone()
 		e2:SetCode(EFFECT_UPDATE_DEFENSE)
 		tc:RegisterEffect(e2)
+	end
+end
+	function cid.hdcon(e,tp,eg,ep,ev,re,r,rp)
+	return ep~=tp and e:GetHandler()==Duel.GetAttacker()
+end
+	function cid.hdtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,1-tp,1)
+	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
+end
+	function cid.srfilter(c)
+	return c:IsSetCard(0x83e) and c:IsType(TYPE_FIELD) and c:IsAbleToHand()
+end
+	function cid.hdop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local g=Duel.SelectMatchingCard(tp,s.srfilter,tp,LOCATION_DECK,0,1,1,nil)
+	if g:GetCount()>0 then
+		Duel.SendtoHand(g,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,g)
 	end
 end

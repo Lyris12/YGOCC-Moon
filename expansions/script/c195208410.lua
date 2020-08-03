@@ -11,13 +11,11 @@ function cid.initial_effect(c)
 	e4:SetValue(1)
 	c:RegisterEffect(e4)
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
+	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1,id)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCategory(CATEGORY_DISABLE+CATEGORY_ATKCHANGE+CATEGORY_DEFCHANGE)
-	e1:SetCondition(function(e,tp) return Duel.GetTurnPlayer()==tp end)
 	e1:SetTarget(cid.tg)
 	e1:SetOperation(cid.op)
 	c:RegisterEffect(e1)
@@ -33,14 +31,14 @@ function cid.initial_effect(c)
 	e2:SetOperation(cid.spop)
 	c:RegisterEffect(e2)
 end
-function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and aux.disfilter1(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(aux.disfilter1,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	local g=Duel.SelectTarget(tp,aux.disfilter1,tp,LOCATION_MZONE,LOCATION_MZONE,1,3,nil)
+	local g=Duel.SelectTarget(tp,aux.disfilter1,tp,LOCATION_MZONE,LOCATION_MZONE,1,2,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DISABLE,g,#g,0,0)
 end
-function cid.op(e,tp,eg,ep,ev,re,r,rp)
+	function cid.op(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(aux.AND(Card.IsRelateToEffect,aux.disfilter1),nil,e)
 	for tc in aux.Next(g) do
 		local e1=Effect.CreateEffect(e:GetHandler())
@@ -71,21 +69,21 @@ function cid.op(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e4,true)
 	end
 end
-function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToRemoveAsCost,tp,LOCATION_HAND,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	Duel.Remove(Duel.SelectMatchingCard(tp,Card.IsAbleToRemoveAsCost,tp,LOCATION_HAND,0,1,1,nil),POS_FACEUP,REASON_COST)
 end
-function cid.filter(c,e,tp)
+	function cid.filter(c,e,tp)
 	return c:IsLevelBelow(4) and c:IsSetCard(0x83e) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return not Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT)
 		and Duel.GetLocationCount(tp,LOCATION_MZONE)>1
 		and Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_GRAVE,0,2,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,tp,LOCATION_GRAVE)
 end
-function cid.spop(e,tp,eg,ep,ev,re,r,rp)
+	function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then return end
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<2 then return end
 	local g=Duel.GetMatchingGroup(cid.filter,tp,LOCATION_GRAVE,0,nil,e,tp)

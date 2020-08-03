@@ -1,4 +1,4 @@
---created by Seth, coded by Lyris
+--created by Seth, coded by Lyris & Rawstone
 local cid,id=GetID()
 function cid.initial_effect(c)
 	c:EnableReviveLimit()
@@ -22,28 +22,28 @@ function cid.initial_effect(c)
 	e1:SetOperation(cid.rmop)
 	c:RegisterEffect(e1)
 end
-function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+	function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
 function cid.op(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,aux.AND(Card.IsAbleToHand,Card.IsCode),tp,LOCATION_DECK,0,1,1,nil,24094653)
+	local g=Duel.SelectMatchingCard(tp,aux.AND(Card.IsAbleToHand,Card.IsCode),tp,LOCATION_DECK,0,1,1,nil,195208427)
 	if #g>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
 	end
 end
-function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(aux.AND(Card.IsAbleToRemoveAsCost,Card.IsSetCard),tp,LOCATION_GRAVE,0,1,nil,0x83e) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	Duel.Remove(Duel.SelectMatchingCard(tp,aux.AND(Card.IsAbleToRemoveAsCost,Card.IsSetCard),tp,LOCATION_GRAVE,0,1,1,nil,0x83e),POS_FACEUP,REASON_COST)
 end
-function cid.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	function cid.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToRemove,tp,0,LOCATION_GRAVE,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,1-tp,LOCATION_GRAVE)
 end
-function cid.rmop(e,tp,eg,ep,ev,re,r,rp)
+	function cid.rmop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(Card.IsAbleToRemove),tp,0,LOCATION_GRAVE,1,1,nil)
 	if #g>0 then

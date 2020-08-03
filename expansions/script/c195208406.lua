@@ -1,8 +1,8 @@
---created by Seth, coded by Lyris
+--created by Seth, coded by Lyris & Rawstone
 local cid,id=GetID()
 function cid.initial_effect(c)
 	c:EnableReviveLimit()
-	aux.AddFusionProcCode2(c,id+4,id-3,false,false)
+	aux.AddFusionProcCode2(c,cid.matfilter1,cid.matfilter2,true)
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE)
 	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
@@ -27,44 +27,55 @@ function cid.initial_effect(c)
 	e3:SetCode(EFFECT_SET_DEFENSE)
 	c:RegisterEffect(e3)
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_CANNOT_DIRECT_ATTACK)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e1:SetCode(EFFECT_CANNOT_ACTIVATE)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetTargetRange(0,1)
+	e1:SetValue(1)
+	e1:SetCondition(cid.actcon)
 	c:RegisterEffect(e1)
 	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_IGNITION)
-	e5:SetRange(LOCATION_MZONE)
-	e5:SetCountLimit(1)
-	e5:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e5:SetCost(cid.cost)
-	e5:SetTarget(cid.tg)
-	e5:SetOperation(cid.op)
+	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e5:SetCode(EVENT_BATTLE_DESTROYING)
+	e5:SetCountLimit(1,id)
+	e5:SetCondition(aux.bdcon)
+	e5:SetCost(cid.drcost)
+	e5:SetTarget(cid.destg)
+	e5:SetOperation(cid.desop)
 	c:RegisterEffect(e5)
 end
-function cid.value(e,c)
-		return Duel.GetMatchingGroupCount(cid.atkfilter,c:GetControler(),LOCATION_REMOVED,0,nil,TYPE_MONSTER+TYPE_SPELL+TYPE_TRAP)*300
+	function cid.value(e,c)
+	return Duel.GetMatchingGroupCount(cid.atkfilter,c:GetControler(),LOCATION_REMOVED,0,nil,TYPE_MONSTER+TYPE_SPELL+TYPE_TRAP)*300
 end
-function cid.atkfilter(c)
+	function cid.atkfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x83e)
 end
-function cid.cfilter(c)
+	function cid.cfilter(c)
 	return c:IsSetCard(0x83e) and c:IsAbleToRemoveAsCost()
 end
-function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(cid.cfilter,tp,LOCATION_DECK,0,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=Duel.SelectMatchingCard(tp,cid.cfilter,tp,LOCATION_DECK,0,1,1,nil)
-	Duel.Remove(g,POS_FACEUP,REASON_COST)
+	function cid.actcon(e)
+	return Duel.GetAttacker()==e:GetHandler()
 end
-function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(aux.AND(aux.FilterBoolFunction(Card.IsSetCard,0x83e),Card.IsCanBeSpecialSummoned),tp,LOCATION_GRAVE,0,1,nil,e,0,tp,false,false) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_GRAVE)
+	function cid.cfilter2(c)
+	return c:IsLocation(LOCATION_REMOVED) and c:IsFaceup() and c:IsType(TYPE_MONSTER) and c:IsSetCard(0x83e) and c:IsAbleToDeckAsCost()
 end
-function cid.op(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,aux.AND(aux.FilterBoolFunction(Card.IsSetCard,0x83e),Card.IsCanBeSpecialSummoned),tp,LOCATION_GRAVE,0,1,1,nil,e,0,tp,false,false)
-	if #g>0 then
-		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+	function cid.drcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(cid.cfilter2,tp,LOCATION_REMOVED,0,3,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+end
+	function cid.destg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+end
+	function cid.desop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if c:IsChainAttackable() then
+			Duel.ChainAttack()
 	end
+end
+	function cid.matfilter1(c)
+	return c:IsFusionType(TYPE_SYNCHRO) and c:IsFusionSetCard(0x83e)
+end
+	function cid.matfilter2(c)
+	return c:IsFusionType(TYPE_FUSION) and c:IsFusionSetCard(0x83e)
 end

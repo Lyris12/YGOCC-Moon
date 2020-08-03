@@ -1,4 +1,4 @@
---created by Seth, coded by Lyris
+--created by Seth, coded by Lyris & Rawstone
 local cid,id=GetID()
 function cid.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
@@ -37,47 +37,47 @@ function cid.initial_effect(c)
 	e4:SetOperation(cid.thop)
 	c:RegisterEffect(e4)
 end
-function cid.hspcon(e,c)
+	function cid.hspcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
 	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsSetCard),tp,LOCATION_MZONE,0,1,c,0x83e)
 end
-function cid.costfilter(c)
+	function cid.costfilter(c)
 	return c:IsSetCard(0x83e) and c:IsAbleToRemoveAsCost()
 end
-function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cid.costfilter,tp,LOCATION_DECK,0,1,nil) end
 	Duel.Remove(Duel.SelectMatchingCard(tp,cid.costfilter,tp,LOCATION_DECK,0,1,1,nil),POS_FACEUP,REASON_COST)
 end
-function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsPlayerCanSpecialSummonMonster(tp,id+1,0x83e,0x5011,0,0,1,RACE_BEAST,ATTRIBUTE_EARTH) end
+		and Duel.IsPlayerCanSpecialSummonMonster(tp,195208416,0x83e,0x5011,0,0,1,RACE_BEAST,ATTRIBUTE_EARTH) end
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,0)
 end
-function cid.operation(e,tp,eg,ep,ev,re,r,rp)
+	function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0
-		or not Duel.IsPlayerCanSpecialSummonMonster(tp,id+1,0x83e,0x5011,0,0,1,RACE_BEAST,ATTRIBUTE_EARTH) then return end
+		or not Duel.IsPlayerCanSpecialSummonMonster(tp,c195208416,0x83e,0x5011,0,0,1,RACE_BEAST,ATTRIBUTE_EARTH) then return end
 	Duel.SpecialSummon(Duel.CreateToken(tp,id+1),0,tp,tp,false,false,POS_FACEUP)
 end
-function cid.filter(c,tp)
+	function cid.filter(c,tp)
 	return c:IsFaceup() and c:IsType(TYPE_MONSTER) and c:IsSetCard(0x83e) and c:IsPreviousLocation(LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE)
 end
-function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+	function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(1000)
 	Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,1000)
 end
-function cid.op(e,tp,eg,ep,ev,re,r,rp)
+	function cid.op(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	Duel.Recover(p,d,REASON_EFFECT)
 end
-function cid.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	function cid.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(aux.AND(Card.IsSetCard,Card.IsAbleToDeck,Card.IsFaceup),tp,LOCATION_REMOVED,0,1,nil,0x83e) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_REMOVED)
 end
-function cid.thop(e,tp,eg,ep,ev,re,r,rp)
+	function cid.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g=Duel.SelectMatchingCard(tp,aux.AND(Card.IsSetCard,Card.IsAbleToDeck,Card.IsFaceup),tp,LOCATION_REMOVED,0,1,1,nil,0x83e)
 	if #g>0 then Duel.SendtoDeck(g,nil,2,REASON_EFFECT) end

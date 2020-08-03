@@ -1,4 +1,4 @@
---created by Seth, coded by Lyris
+--created by Seth, coded by Lyris & Rawstone
 local cid,id=GetID()
 function cid.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
@@ -28,19 +28,19 @@ function cid.initial_effect(c)
 	e4:SetOperation(cid.thop)
 	c:RegisterEffect(e4)
 end
-function cid.hspcon(e,c)
+	function cid.hspcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
 	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsSetCard),tp,LOCATION_MZONE,0,1,c,0x83e)
 end
-function cid.cfilter(c,e,tp)
+	function cid.cfilter(c,e,tp)
 	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x83e) and c:IsAbleToRemoveAsCost()
 		and Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_DECK,0,1,nil,e,tp,c:GetAttack())
 end
-function cid.filter(c,e,tp,atk)
+	function cid.filter(c,e,tp,atk)
 	return c:IsSetCard(0x83e) and c:IsAttackBelow(atk) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+	function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		if e:GetLabel()~=100 then return false end
 		e:SetLabel(0)
@@ -52,7 +52,7 @@ function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Remove(tc,POS_FACEUP,REASON_COST)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end
-function cid.op(e,tp,eg,ep,ev,re,r,rp)
+	function cid.op(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local tc=Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_DECK,0,1,1,nil,e,tp,e:GetLabel()):GetFirst()
@@ -62,18 +62,26 @@ function cid.op(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EFFECT_CANNOT_ATTACK)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e1)
-		aux.CannotBeEDMaterial(tc,nil,nil,true,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+		local e2=Effect.CreateEffect(c)
+		e2:SetType(EFFECT_TYPE_SINGLE)
+		e2:SetCode(EFFECT_DISABLE)
+		e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+		tc:RegisterEffect(e2)
+		aux.CannotBeEDMaterial(tc,s.filtor,nil,true,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 	end
 	Duel.SpecialSummonComplete()
 end
-function cid.thfilter(c)
+	function s.filtor(c)
+	return c:IsSetCard(0x83e)
+end
+	function cid.thfilter(c)
 	return c:IsType(TYPE_TUNER) and c:IsSetCard(0x83e) and c:IsAbleToHand()
 end
-function cid.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	function cid.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cid.thfilter,tp,LOCATION_DECK,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
-function cid.thop(e,tp,eg,ep,ev,re,r,rp)
+	function cid.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,cid.thfilter,tp,LOCATION_DECK,0,1,1,nil)
 	if #g>0 then
