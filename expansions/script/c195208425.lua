@@ -69,6 +69,7 @@ end
 			e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 			e1:SetRange(LOCATION_MZONE)
 			e1:SetCode(EFFECT_IMMUNE_EFFECT)
+			e1:SetCondition(s.tgcon)
 			e1:SetValue(s.efilter)
 			c:RegisterEffect(e1)
 	end
@@ -141,10 +142,7 @@ end
 		Duel.SendtoGrave(g,REASON_EFFECT)
 	end
 end
-	function s.efilter(e,te)
-	if not te:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return true end
+	function s.efilter(e,re)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	return not g:IsContains(c)
+	return not g and not g:IsContains(e:GetHandler())
 end
-
-

@@ -16,7 +16,7 @@ end
 	function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return c:IsAbleToRemoveAsCost() end
-	Duel.Remove(c,REASON_COST)
+	Duel.Remove(c,POS_FACEUP,REASON_COST)
 end
 	function s.thfilter1(c)
 	return c:IsCode(195208413) and c:IsAbleToHand()
