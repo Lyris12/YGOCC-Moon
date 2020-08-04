@@ -351,7 +351,7 @@ function Auxiliary.EvoluteRecursiveFilter(c,tp,sg,mg,ec,ct,minc,maxc,gcheck,...)
 		end
 	end
 	if max>99 then max=99 end
-	local res=chk and (not gcheck or gcheck(c,tp,sg,ec,ct,minc,max)) and ((Auxiliary.EvoluteCheckGoal(tp,sg,ec,minc,ct,...) or (ct<max and mg:IsExists(Auxiliary.EvoluteRecursiveFilter,1,sg,tp,sg,mg,ec,ct,minc,max,gcheck,...))))
+	local res=chk and (not gcheck or gcheck(c,tp,sg,ec,ct,minc,max)) and (Auxiliary.EvoluteCheckGoal(tp,sg,ec,minc,ct,...) or (ct<max and mg:IsExists(Auxiliary.EvoluteRecursiveFilter,1,sg,tp,sg,mg,ec,ct,minc,max,gcheck,...)))
 	sg:RemoveCard(c)
 	if not (c.EvoFakeMaterial and c.EvoFakeMaterial()) then ct=ct-1 end
 	return res

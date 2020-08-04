@@ -30,6 +30,7 @@ function cid.filter(c)
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_DECK,0,1,nil) end
+	Duel.Hint(HINT_OPSELECTED,0,e:GetDescription())
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
 function cid.activate(e,tp,eg,ep,ev,re,r,rp)
@@ -41,7 +42,9 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 		local g=Duel.GetMatchingGroup(Card.IsType,tp,0,LOCATION_ONFIELD,nil,TYPE_SPELL+TYPE_TRAP)
 		if #g==0 or not Duel.SelectYesNo(tp,1100) then return end
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-		Duel.Destroy(g:Select(tp,1,1,nil),REASON_EFFECT)
+		local sg=g:Select(tp,1,1,nil)
+		Duel.HintSelection(sg)
+		Duel.Destroy(sg,REASON_EFFECT)
 	end
 end
 function cid.cfilter(c,tp)
@@ -50,6 +53,7 @@ end
 function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(1)
 	if chk==0 then return Duel.CheckReleaseGroupEx(tp,cid.cfilter,1,e:GetHandler(),tp) end
+	Duel.Hint(HINT_OPSELECTED,0,e:GetDescription())
 	Duel.Release(Duel.SelectReleaseGroupEx(tp,cid.cfilter,1,1,e:GetHandler()),REASON_COST)
 end
 function cid.xfilter(c)

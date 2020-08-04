@@ -26,6 +26,7 @@ end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.GetOverlayGroup(tp,1,0):IsExists(cid.spfilter,1,nil,e,tp) end
+	Duel.Hint(HINT_OPSELECTED,0,e:GetDescription())
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_OVERLAY)
 end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)

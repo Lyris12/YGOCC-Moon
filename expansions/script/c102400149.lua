@@ -50,9 +50,10 @@ function cid.filter(c,tp)
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return Duel.IsPlayerCanDraw(tp,2)
+	if chk==0 then return Duel.IsPlayerCanDraw(tp,2) and c:GetFlagEffect(id)==0
 		and Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_HAND,0,1,nil) end
 	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
+	c:RegisterFlagEffect(id,RESET_CHAIN,0,1)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,2)
 end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)

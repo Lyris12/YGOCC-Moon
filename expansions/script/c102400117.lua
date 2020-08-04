@@ -4,44 +4,59 @@ local cid,id=GetID()
 function cid.initial_effect(c)
 	local f1,f2,f3,f4,f5=Duel.SendtoGrave,Duel.SendtoHand,Duel.SendtoDeck,Duel.SendtoExtraP,Duel.Remove
 	Duel.SendtoGrave=function(tg,r)
+		local ct=0
 		local g=Group.CreateGroup()+tg
 		for tc in aux.Next(g) do
-			local r=r
-			if tc:IsHasEffect(id) then r=r|REASON_DESTROY end
-			f1(tc,r)
+			if tc:IsHasEffect(id) then ct=ct+Duel.Destroy(tc,r)
+			else ct=ct+f1(tc,r|REASON_DESTROY) end
 		end
+		return ct
 	end
 	Duel.SendtoHand=function(tg,tp,r)
+		local ct=0
 		local g=Group.CreateGroup()+tg
 		for tc in aux.Next(g) do
-			local r=r
-			if tc:IsHasEffect(id) then r=r|REASON_DESTROY end
-			f2(tc,tp,r)
+			if tc:IsHasEffect(id) then
+				if tp==tc:GetControler() then ct=ct+Duel.Destroy(tc,r,LOCATION_HAND)
+				else ct=ct+f2(tc,tp,r|REASON_DESTROY)
+			end
+			else ct=ct+f2(tc,tp,r) end
 		end
+		return ct
 	end
 	Duel.SendtoDeck=function(tg,tp,seq,r)
+		local ct=0
 		local g=Group.CreateGroup()+tg
 		for tc in aux.Next(g) do
-			local r=r
-			if tc:IsHasEffect(id) then r=r|REASON_DESTROY end
-			f3(tc,tp,seq,r)
+			if tc:IsHasEffect(id) then
+				if tp~=1-tc:GetControler() then ct=ct+Duel.Destroy(tc,r,LOCATION_DECK+seq<<16)
+				else ct=ct+f3(tc,tp,seq,r|REASON_DESTROY) end
+			else ct=ct+f3(tc,tp,seq,r) end
 		end
-	end
-	Duel.SendtoExtraP=function(tg,tp,r)
-		local g=Group.CreateGroup()+tg
-		for tc in aux.Next(g) do
-			local r=r
-			if tc:IsHasEffect(id) then r=r|REASON_DESTROY end
-			f4(tc,tp,r)
-		end
+		return ct
 	end
 	Duel.Remove=function(tg,pos,r)
+		local ct=0
 		local g=Group.CreateGroup()+tg
 		for tc in aux.Next(g) do
-			local r=r
-			if tc:IsHasEffect(id) then r=r|REASON_DESTROY end
-			f5(tc,pos,r)
+			if tc:IsHasEffect(id) then
+				if pos&POS_FACEUP>0 then ct=ct+Duel.Destroy(tc,r,LOCATION_REMOVED)
+				else ct=ct+f5(tc,pos,r|REASON_DESTROY)
+			end
+			else ct=ct+f5(tc,pos,r) end
 		end
+		return ct
+	end
+	Duel.SendtoExtraP=function(tg,tp,r)
+		local ct=0
+		local g=Group.CreateGroup()+tg
+		for tc in aux.Next(g) do
+			if tc:IsHasEffect(id) then
+				if tp~=1-tc:GetControler() then ct=ct+Duel.Destroy(tc,r,LOCATION_EXTRA)
+				else ct=ct+f4(tc,tp,r|REASON_DESTROY) end
+			else ct=ct+f4(tc,tp,r) end
+		end
+		return ct
 	end
 	aux.EnablePendulumAttribute(c)
 	local e2=Effect.CreateEffect(c)
