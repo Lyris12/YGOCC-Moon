@@ -32,27 +32,3 @@ end
 		Duel.ConfirmCards(1-tp,tg)
 	end
 end
-	function s.cfilter(c)
-	return c:IsSetCard(0x83e) and not c:IsPublic()
-end
-	function s.costo(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_HAND,0,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
-	local g=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_HAND,0,1,1,nil)
-	Duel.ConfirmCards(1-tp,g)
-	Duel.ShuffleHand(tp)
-end
-	function s.torgo(e,tp,eg,ep,ev,re,r,rp,chk)
-	local ft=Duel.GetLocationCount(tp,LOCATION_ONFIELD,PLAYER_NONE,0)+Duel.GetLocationCount(1-tp,LOCATION_ONFIELD,PLAYER_NONE,0)
-	if Duel.CheckLocation(tp,LOCATION_ONFIELD,11) and Duel.CheckLocation(1-tp,LOCATION_MZONE,6) then ft=ft+1 end
-	if Duel.CheckLocation(tp,LOCATION_MZONE,6) and Duel.CheckLocation(1-tp,LOCATION_MZONE,5) then ft=ft+1 end
-	if chk==0 then return ft>0 end
-	local seq=Duel.SelectDisableField(tp,1,LOCATION_MZONE,LOCATION_MZONE,0)
-	e:SetLabel(seq)
-	Duel.Hint(HINT_ZONE,tp,seq)
-
-
-
-
-
-if chk==0 then return true end

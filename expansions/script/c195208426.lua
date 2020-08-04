@@ -16,7 +16,7 @@ end
 	return true
 end
 	function s.cfilter(c,e,tp)
-	return c:IsSetCard(0x83e) and c:IsLocation(LOCATION_GRAVE) and c:IsAbleToRemoveAsCost() and Duel.GetMZoneCount(tp,c)>0
+	return c:IsSetCard(0x83e) and c:IsType(TYPE_MONSTER) and c:IsLocation(LOCATION_GRAVE) and c:IsAbleToRemoveAsCost() and Duel.GetMZoneCount(tp,c)>0
 		and Duel.IsExistingMatchingCard(s.filter1,tp,LOCATION_GRAVE,0,1,nil,e,tp,c:GetCode())
 end
 	function s.filter1(c,e,tp,code)

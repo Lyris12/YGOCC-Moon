@@ -47,7 +47,7 @@ end
 	Duel.SpecialSummonComplete()
 end
 	function cid.cfilter(c,e,tp)
-	return c:IsFaceup() and c:IsSetCard(0x83e) and c:IsAbleToDeck()
+	return c:IsFaceup() and c:IsSetCard(0x83e) and c:IsAbleToDeck() and c:IsType(TYPE_MONSTER)
 		and Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_REMOVED,0,1,c,e,tp)
 end
 	function cid.filter(c,e,tp)
