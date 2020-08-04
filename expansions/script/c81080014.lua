@@ -23,8 +23,8 @@ function cid.initial_effect(c)
 	e3:SetCategory(CATEGORY_ATKCHANGE)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_GRAVE)
-	e3:SetCountLimit(1,id)
 	e3:SetCost(aux.bfgcost)
+	e3:SetTarget(cid.sptg)
 	e3:SetOperation(cid.spop)
 	c:RegisterEffect(e3)
 end
@@ -53,6 +53,10 @@ function cid.ctop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 --Reduce ATK/DEF
+function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() end
+	if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,0,LOCATION_MZONE,1,nil) end
+end
 function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,0,LOCATION_MZONE,nil)
 	local tc=g:GetFirst()
@@ -60,8 +64,8 @@ function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
-		e1:SetValue(-50*Duel.GetCounter(tp,1,0,0x81081))
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+		e1:SetValue(-100*Duel.GetCounter(tp,1,0,0x81081))
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,2)
 		tc:RegisterEffect(e1)
 		local e2=e1:Clone()
 		e2:SetCode(EFFECT_UPDATE_DEFENSE)

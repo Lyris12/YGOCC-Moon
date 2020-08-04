@@ -40,7 +40,7 @@ function cid.cfilter(c)
 end
 --ATK Down
 function cid.ccost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsCanRemoveCounter(tp,1,0,0x81081,1,REASON_COST) end
+	if chk==0 then return Duel.IsCanRemoveCounter(tp,1,0,0x81081,1,REASON_COST) or Duel.IsExistingTarget(cid.filter,tp,LOCATION_MZONE,0,1,nil) end
 	local ct={}
 	local countmax=Duel.GetCounter(tp,1,0,0x81081)
 	e:SetLabel(0)

@@ -24,7 +24,7 @@ function cid.initial_effect(c)
 	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e4:SetRange(LOCATION_GRAVE)
 	e4:SetCost(aux.bfgcost)
-	e4:SetCountLimit(1,id)
+	e4:SetCountLimit(1,id+100)
 	e4:SetTarget(cid.drtg)
 	e4:SetOperation(cid.drop)
 	c:RegisterEffect(e4)
@@ -69,7 +69,7 @@ end
 function cid.drop(e,tp,eg,ep,ev,re,r,rp)
 	local tg=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
 	if tg:GetCount()<=0 then return end
-	Duel.SendtoDeck(tg,nil,0,REASON_EFFECT)
+	Duel.SendtoDeck(tg,nil,2,REASON_EFFECT)
 	local g=Duel.GetOperatedGroup()
 	local ct=g:GetCount()
 	if Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_ONFIELD,0,1,e:GetHandler()) then

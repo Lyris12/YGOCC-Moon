@@ -19,7 +19,7 @@ end
 	Duel.Remove(c,POS_FACEUP,REASON_COST)
 end
 	function s.thfilter1(c)
-	return c:IsCode(195208413) and c:IsAbleToHand()
+	return c:IsCode(195208413,195208428) and c:IsAbleToHand()
 end
 	function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter1,tp,LOCATION_DECK,0,1,nil) end

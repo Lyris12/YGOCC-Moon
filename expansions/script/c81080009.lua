@@ -11,7 +11,7 @@ function cid.initial_effect(c)
 	--link summon
 	c:EnableReviveLimit()
 	aux.AddLinkProcedure(c,nil,2,2)
-	--atkup
+	--Material check
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE)
 	e0:SetCode(EFFECT_MATERIAL_CHECK)
@@ -45,11 +45,11 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e2)
 	--disable
 	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e3:SetCode(EVENT_CHAIN_SOLVING)
+	e3:SetType(EFFECT_TYPE_FIELD)
+	e3:SetCode(EFFECT_DISABLE)
 	e3:SetRange(LOCATION_MZONE)
-	e3:SetCondition(cid.discon)
-	e3:SetOperation(cid.disop)
+	e3:SetTargetRange(0,LOCATION_ONFIELD)
+	e3:SetTarget(cid.discon)
 	c:RegisterEffect(e3)
 end
 function cid.matfilter(c)
@@ -92,10 +92,6 @@ function cid.ctop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 --Disable
-function cid.discon(e,tp,eg,ep,ev,re,r,rp)
-	if e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) then return false end
-	return rp==1-tp and re:IsActiveType(TYPE_MONSTER+TYPE_SPELL+TYPE_TRAP) and re:GetHandler():GetCounter(0x81081)>0
-end
-function cid.disop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.NegateEffect(ev)
+function cid.discon(e,c)
+	return c:GetCounter(0x81081)>0
 end
