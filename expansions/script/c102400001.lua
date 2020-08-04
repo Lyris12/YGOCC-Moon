@@ -50,13 +50,15 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 			e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 			e1:SetCode(EFFECT_CANNOT_ACTIVATE)
 			e1:SetTargetRange(1,0)
-			e1:SetValue(cid.aclimit)
-			e1:SetLabel(sg:GetFirst():GetCode())
+			e1:SetValue(cid.aclimit(tc:GetCode(),sc:GetCode(),sg:GetFirst():GetCode()))
 			e1:SetReset(RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN,2)
 			Duel.RegisterEffect(e1,tp)
 		end
 	end
 end
-function cid.aclimit(e,re,tp)
-	return re:GetHandler():IsCode(e:GetLabel()) and not re:GetHandler():IsImmuneToEffect(e)
+function cid.aclimit(...)
+	local codes={...}
+	return  function(e,re,tp)
+				return re:GetHandler():IsCode(table.unpack(codes)) and not re:GetHandler():IsImmuneToEffect(e)
+			end
 end
