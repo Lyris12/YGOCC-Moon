@@ -28,7 +28,7 @@ end
 end
 function cid.op(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,aux.AND(Card.IsAbleToHand,Card.IsCode),tp,LOCATION_DECK,0,1,1,nil,195208427)
+	local g=Duel.SelectMatchingCard(tp,aux.AND(Card.IsAbleToHand,Card.IsCode),tp,LOCATION_DECK,0,1,1,nil,id+7)
 	if #g>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)

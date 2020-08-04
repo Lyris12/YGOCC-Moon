@@ -12,7 +12,7 @@ function cid.initial_effect(c)
 end
 function cid.filter(c,tp)
 	local re=c:GetReasonEffect()
-	if not re or (aux.GetValueType(re)=="function" and re(re,c)) then return false end
+	if not re then return false end
 	local rc,rp=re:GetHandler(),re:GetHandlerPlayer()
 	return c:IsFaceup() and c:IsSetCard(0x83e) and rc:IsSetCard(0x83e) and rp==tp and c:IsAbleToHand()
 end

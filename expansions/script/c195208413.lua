@@ -1,12 +1,11 @@
---False Reality Nightmare
+--created by Seth, coded by Lyris
+local cid,id=GetID()
 local s,id=GetID()
 function s.initial_effect(c)
-		--Activate
 		local e0=Effect.CreateEffect(c)
 		e0:SetType(EFFECT_TYPE_ACTIVATE)
 		e0:SetCode(EVENT_FREE_CHAIN)
 		c:RegisterEffect(e0)
-		--boosts
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_FIELD)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
@@ -26,7 +25,6 @@ function s.initial_effect(c)
 		e3:SetTarget(s.thtg)
 		e3:SetOperation(s.ope)
 		c:RegisterEffect(e3)
-		--indes
 		local e4=Effect.CreateEffect(c)
 		e4:SetType(EFFECT_TYPE_FIELD)
 		e4:SetCode(EFFECT_INDESTRUCTABLE_COUNT)

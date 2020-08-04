@@ -8,7 +8,7 @@ function cid.initial_effect(c)
 	e1:SetRange(LOCATION_GRAVE+LOCATION_HAND)
 	e1:SetCountLimit(1,id)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e1:SetCondition(function(e,tp) return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)>0 and not Duel.IsExistingMatchingCard(cid.cfilter,tp,LOCATION_MZONE,0,1,nil) end)
+	e1:SetCondition(function(e,tp) local g=Duel.GetFieldGroup(tp,LOCATION_MZONE,0) return #g>0 and g:FilterCount(cid.cfilter,nil)==#g end)
 	e1:SetTarget(cid.sptg)
 	e1:SetOperation(cid.spop)
 	c:RegisterEffect(e1)
@@ -23,7 +23,7 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function cid.cfilter(c)
-	return c:IsFacedown() or not (c:IsSetCard(0xcda) or c:IsCode(id-7))
+	return c:IsFaceup() and (c:IsSetCard(0xcda) or c:IsCode(id-7))
 end
 function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

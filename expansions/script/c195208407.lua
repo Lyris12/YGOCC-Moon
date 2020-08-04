@@ -33,8 +33,7 @@ function cid.rmop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function cid.drcon(e,tp)
-	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0,nil)<Duel.GetFieldGroupCount(tp,0,LOCATION_MZONE,nil)
+	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)<Duel.GetFieldGroupCount(tp,0,LOCATION_MZONE)
 end
 function cid.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x83e) and c:IsType(TYPE_MONSTER)
