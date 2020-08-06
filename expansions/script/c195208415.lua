@@ -51,13 +51,13 @@ end
 end
 	function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsPlayerCanSpecialSummonMonster(tp,id+1,0x83e,0x5011,0,0,1,RACE_BEAST,ATTRIBUTE_EARTH) end
+		and Duel.IsPlayerCanSpecialSummonMonster(tp,195208416,0x83e,0x5011,0,0,1,RACE_BEAST,ATTRIBUTE_EARTH) end
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,0)
 end
 	function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0
-		or not Duel.IsPlayerCanSpecialSummonMonster(tp,id+1,0x83e,0x5011,0,0,1,RACE_BEAST,ATTRIBUTE_EARTH) then return end
+		or not Duel.IsPlayerCanSpecialSummonMonster(tp,c195208416,0x83e,0x5011,0,0,1,RACE_BEAST,ATTRIBUTE_EARTH) then return end
 	Duel.SpecialSummon(Duel.CreateToken(tp,id+1),0,tp,tp,false,false,POS_FACEUP)
 end
 	function cid.filter(c,tp)

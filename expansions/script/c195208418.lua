@@ -45,4 +45,5 @@ end
 		e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e2)
 	end
+	Duel.SpecialSummonComplete()
 end

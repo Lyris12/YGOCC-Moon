@@ -22,7 +22,7 @@ end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.GetOverlayGroup(tp,1,1):Select(tp,cid.filter,1,1,nil,e,tp)
+	local g=Duel.GetOverlayGroup(tp,1,1):FilterSelect(tp,cid.filter,1,1,nil,e,tp)
 	if #g==0 then return end
 	local tc=g:GetFirst():GetOverlayTarget()
 	if Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)>0 and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0 then

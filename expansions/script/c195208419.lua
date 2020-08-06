@@ -20,13 +20,14 @@ function cid.initial_effect(c)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetCode(EVENT_FREE_CHAIN)
+	e2:SetCountLimit(1,id)
 	e2:SetCondition(cid.cond)
 	e2:SetTarget(cid.tg)
 	e2:SetOperation(cid.op)
 	c:RegisterEffect(e2)
 end
 	function cid.cfilter(c,tp)
-	return c:IsSetCard(0x83e) and c:IsType(TYPE_MONSTER)
+	return c:IsSetCard(0x83e) and c:IsType(TYPE_MONSTER) and c:IsFaceup() and not c:IsPreviousLocation(0x80+LOCATION_SZONE) and not c:IsType(TYPE_TOKEN)
 end
 	function cid.cond(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2
@@ -36,8 +37,7 @@ end
 end
 	function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(e:GetHandler():GetCounter(0x83e))
-	if chk==0 then return c:GetFlagEffect(4280258)==0 and Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_EXTRA,0,1,nil,e,tp,e:GetHandler():GetCounter(0x83e)) end
-	c:RegisterFlagEffect(195208419,RESET_CHAIN,0,1)
+	if chk==0 then return Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_EXTRA,0,1,nil,e,tp,e:GetHandler():GetCounter(0x83e)) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,e:GetHandler(),1,tp,LOCATION_SZONE)
 end
