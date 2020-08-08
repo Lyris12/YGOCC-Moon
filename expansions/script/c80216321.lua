@@ -87,7 +87,7 @@ function cid.athop(e,tp,eg,ep,ev,re,r,rp)
 			local xtc=xtd:Select(tp,ct,ct,nil)
 			if #xtc==ct then
 				Duel.BreakEffect()
-				Duel.SendtoDeck(xtc,nil,0,REASON_EFFECT)
+				Duel.SendtoDeck(xtc,nil,2,REASON_EFFECT)
 				local gd=Duel.GetOperatedGroup()
 				for p=0,1 do
 					if gd:IsExists(cid.checkshf,1,nil,p) then Duel.ShuffleDeck(p) end
@@ -123,6 +123,7 @@ function cid.xyzop(e,tp,eg,ep,ev,re,r,rp)
 	end
 	local td=Duel.GetDecktopGroup(tp,1)
 	local check=0
+	Duel.DisableShuffleCheck()
 	Duel.Overlay(e:GetHandler(),td)
 	if td:IsExists(Card.IsLocation,1,nil,LOCATION_OVERLAY) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)

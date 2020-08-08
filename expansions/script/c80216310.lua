@@ -53,6 +53,7 @@ function cid.effectop(e,tp,eg,ep,ev,re,r,rp)
 	if #g>0 then
 		Duel.HintSelection(g)
 		local td=Duel.GetDecktopGroup(tp,1)
+		Duel.DisableShuffleCheck()
 		Duel.Overlay(g:GetFirst(),td)
 		Duel.BreakEffect()
 		if g:GetFirst():IsFaceup() and g:GetFirst():GetOverlayCount()>=6 then

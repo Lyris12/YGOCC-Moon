@@ -76,6 +76,7 @@ function cid.xyzop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=g:GetFirst()
 	if tc then
 		local td=Duel.GetDecktopGroup(tp,1)
+		Duel.DisableShuffleCheck()
 		Duel.Overlay(tc,td)
 	end
 end

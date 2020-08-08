@@ -10,7 +10,7 @@ local id,cid=getID()
 function cid.initial_effect(c)
 	--link summon
 	c:EnableReviveLimit()
-	aux.AddLinkProcedure(c,nil,2,2)
+	aux.AddLinkProcedure(c,cid.lfilter,2,2)
 	--recycle banished cards
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
@@ -42,6 +42,9 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 --Filters
+function cid.lfilter(c)
+	return (c:IsCode(21770262) or c:IsCode(21770263) or c:IsCode(21770264)) or (c:IsSetCard(0x8108) and c:IsType(TYPE_MONSTER))
+end
 function cid.tdfilter(c)
 	return c:IsSetCard(0x8108) and c:IsAbleToDeck()
 end
@@ -61,17 +64,16 @@ function cid.drtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g=Duel.SelectTarget(tp,cid.tdfilter,tp,LOCATION_REMOVED,0,1,3,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,g:GetCount(),0,0)
-	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,g:GetCount())
+	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end
 function cid.drop(e,tp,eg,ep,ev,re,r,rp)
 	local tg=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
 	if tg:GetCount()<=0 then return end
 	Duel.SendtoDeck(tg,nil,0,REASON_EFFECT)
 	local g=Duel.GetOperatedGroup()
-	local ct=g:GetCount()
 	Duel.ShuffleDeck(tp)
 	Duel.BreakEffect()
-	Duel.Draw(tp,ct,REASON_EFFECT)
+	Duel.Draw(tp,1,REASON_EFFECT)
 end
 --Destroy
 function cid.descost2(e,tp,eg,ep,ev,re,r,rp,chk)
