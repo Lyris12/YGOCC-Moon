@@ -20,11 +20,11 @@ function cid.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCode(EFFECT_SET_ATTACK)
+	e2:SetCode(EFFECT_UPDATE_ATTACK)
 	e2:SetValue(cid.value)
 	c:RegisterEffect(e2)
 	local e3=e2:Clone()
-	e3:SetCode(EFFECT_SET_DEFENSE)
+	e3:SetCode(EFFECT_UPDATE_DEFENSE)
 	c:RegisterEffect(e3)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
@@ -46,10 +46,10 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e5)
 end
 	function cid.value(e,c)
-	return Duel.GetMatchingGroupCount(cid.atkfilter,c:GetControler(),LOCATION_REMOVED,0,nil,TYPE_MONSTER+TYPE_SPELL+TYPE_TRAP)*300
+	return Duel.GetMatchingGroupCount(cid.atkfilter,0,LOCATION_REMOVED,0,nil)*300
 end
 	function cid.atkfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x83e)
+	return c:IsSetCard(0x83e) and c:IsFaceup()
 end
 	function cid.cfilter(c)
 	return c:IsSetCard(0x83e) and c:IsAbleToRemoveAsCost()

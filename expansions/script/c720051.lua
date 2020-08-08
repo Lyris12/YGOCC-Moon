@@ -38,18 +38,12 @@ end
 	Duel.ConfirmDecktop(tp,1)
 	local g=Duel.GetDecktopGroup(tp,1)
 	local tc=g:GetFirst()
-		if tc:IsType(TYPE_SPELL) and tc:IsType(TYPE_FIELD) then
-			Duel.DisableShuffleCheck()
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
-			Duel.MoveToField(tc,tp,tp,LOCATION_FZONE,POS_FACEUP,true)
-			local te=tc:GetActivateEffect()
-		elseif tc:IsType(TYPE_SPELL) and tc:IsType(TYPE_CONTINUOUS) then
-			Duel.DisableShuffleCheck()
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
-			Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
-			local te=tc:GetActivateEffect()
-		else
-			Duel.DisableShuffleCheck()
-			Duel.SendtoDeck(tc,nil,0,REASON_EFFECT+REASON_REVEAL)
+		if tc:IsType(TYPE_SPELL) and tc:IsType(TYPE_FIELD+TYPE_CONTINUOUS) then
+		Duel.DisableShuffleCheck()
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+		Duel.SendtoHand(tc,nil,REASON_EFFECT)
+	else
+		Duel.DisableShuffleCheck()
+		Duel.SendtoDeck(tc,nil,0,REASON_EFFECT+REASON_REVEAL)
 	end
 end
