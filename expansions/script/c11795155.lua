@@ -31,7 +31,8 @@ function cid.initial_effect(c)
 	e4:SetRange(LOCATION_FZONE)
 	e4:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e4:SetTargetRange(1,0)
-	e4:SetCondition(cid.indcon)
+	e4:SetValue(1)
+	e4:SetCondition(cid.damcon)
 	c:RegisterEffect(e4)
 	--special summon
 	local e5=Effect.CreateEffect(c)
@@ -53,8 +54,8 @@ end
 function cid.cfilter1(c)
 	return c:IsFaceup() and c:IsSetCard(0x684) and c:IsLinkState()
 end
-function cid.indcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(cid.cfilter1,tp,LOCATION_MZONE,0,1,nil)
+function cid.damcon(e)
+	return Duel.IsExistingMatchingCard(cid.cfilter1,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
 end
 function cid.target(e,c)
 	return c:IsSetCard(0x684) and c:IsLinkState()

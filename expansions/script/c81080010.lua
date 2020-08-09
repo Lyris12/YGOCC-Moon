@@ -61,7 +61,7 @@ function cid.tgcon(e,c)
 end
 --ATK Boost
 function cid.ccost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsCanRemoveCounter(tp,1,0,0x81081,1,REASON_COST) end
+	--if chk==0 then return Duel.IsCanRemoveCounter(tp,1,0,0x81081,1,REASON_COST) end
 	local ct={}
 	local countmax=Duel.GetCounter(tp,1,0,0x81081)
 	e:SetLabel(0)
