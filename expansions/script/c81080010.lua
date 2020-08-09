@@ -61,16 +61,16 @@ function cid.tgcon(e,c)
 end
 --ATK Boost
 function cid.ccost(e,tp,eg,ep,ev,re,r,rp,chk)
-	--if chk==0 then return Duel.IsCanRemoveCounter(tp,1,0,0x81081,1,REASON_COST) end
+	if chk==0 then return true end
 	local ct={}
 	local countmax=Duel.GetCounter(tp,1,0,0x81081)
 	e:SetLabel(0)
 	if Duel.SelectYesNo(tp,aux.Stringid(id,0)) then 
-		for i=countmax,1,-1 do
+		if countmax>0 then for i=countmax,1,-1 do
 			if Duel.IsCanRemoveCounter(tp,1,0,0x81081,i,REASON_COST)  then
 				table.insert(ct,i)
 			end
-		end
+		end end
 		if #ct==1 then 
 			Duel.RemoveCounter(tp,1,0,0x81081,1,REASON_COST)
 			e:SetLabel(1)
