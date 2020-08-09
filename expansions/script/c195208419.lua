@@ -7,13 +7,11 @@ function cid.initial_effect(c)
 	e0:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e0)
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e1:SetCode(EVENT_LEAVE_FIELD)
+	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetRange(LOCATION_SZONE)
 	e1:SetCode(EVENT_REMOVE)
 	e1:SetCategory(CATEGORY_COUNTER)
-	e1:SetCondition(function(e,tp,eg) return eg:IsExists(cid.cfilter,1,nil,1-tp) end)
-	e1:SetOperation(function(e) local tc=e:GetHandler() if tc:IsRelateToEffect(e) then tc:AddCounter(0x83e,1) end end)
+	e1:SetOperation(cid.ope)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
@@ -26,8 +24,13 @@ function cid.initial_effect(c)
 	e2:SetOperation(cid.op)
 	c:RegisterEffect(e2)
 end
-	function cid.cfilter(c,tp)
+	function cid.cfilter(c)
 	return c:IsSetCard(0x83e) and c:IsType(TYPE_MONSTER) and c:IsFaceup() and not c:IsPreviousLocation(0x80+LOCATION_SZONE) and not c:IsType(TYPE_TOKEN)
+end
+	function cid.ope(e,tp,eg,ep,ev,re,r,rp)
+	if eg:IsExists(cid.cfilter,1,nil,tp) then
+		e:GetHandler():AddCounter(0x83e,1)
+	end
 end
 	function cid.cond(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2

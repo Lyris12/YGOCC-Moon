@@ -50,7 +50,7 @@ end
 			e1:SetOperation(s.atkop)
 			c:RegisterEffect(e1)
 	end
-	if ct>7 then
+	if ct>=7 then
 			local e1=Effect.CreateEffect(c)
 			e1:SetDescription(aux.Stringid(id,2))
 			e1:SetCategory(CATEGORY_TOGRAVE)
@@ -63,13 +63,12 @@ end
 			e1:SetOperation(s.desop)
 			c:RegisterEffect(e1)
 	end
-	if ct>10 then
+	if ct>=10 then
 			local e1=Effect.CreateEffect(c)
 			e1:SetType(EFFECT_TYPE_SINGLE)
 			e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 			e1:SetRange(LOCATION_MZONE)
 			e1:SetCode(EFFECT_IMMUNE_EFFECT)
-			e1:SetCondition(s.tgcon)
 			e1:SetValue(s.efilter)
 			c:RegisterEffect(e1)
 	end
@@ -142,7 +141,9 @@ end
 		Duel.SendtoGrave(g,REASON_EFFECT)
 	end
 end
-	function s.efilter(e,re)
+	function s.efilter(e,te)
+	local c=e:GetHandler()
+	if not te:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return true end
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	return not g and not g:IsContains(e:GetHandler())
+	return not g:IsContains(c)
 end
