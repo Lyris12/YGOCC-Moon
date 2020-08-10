@@ -430,7 +430,7 @@ function Auxiliary.PandOperation(e,tp,eg,ep,ev,re,r,rp,c,sg,og)
 		PANDEMONIUM_CHECKLIST=PANDEMONIUM_CHECKLIST|(0x1<<tp)
 	end
 	sg:Merge(g)
-	if sg:GetCount()>0 then
+	if #sg>0 then
 		Duel.HintSelection(Group.FromCards(c))
 		local e0=Effect.CreateEffect(c)
 		e0:SetType(EFFECT_TYPE_FIELD)
@@ -537,7 +537,7 @@ function Auxiliary.PandEnableFUInED(tc,reason,tpe)
 				if pcall(Group.GetFirst,tc) then
 					local tg=tc:Clone()
 					for cc in aux.Next(tg) do
-						Card.SetCardData(cc,CARDDATA_TYPE,TYPE_MONSTER+tpe+TYPE_PENDULUM)
+						cc:SetCardData(CARDDATA_TYPE,TYPE_MONSTER+tpe+TYPE_PENDULUM)
 						if not cc:IsOnField() or cc:GetDestination()==0 then
 							if (cc:GetFlagEffect(706)>0 or cc:GetFlagEffect(726)>0) then
 								cc:RegisterFlagEffect(716,RESET_EVENT+RESETS_STANDARD-RESET_TODECK,EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE,1)
@@ -546,7 +546,7 @@ function Auxiliary.PandEnableFUInED(tc,reason,tpe)
 						end
 					end
 				else
-					Card.SetCardData(tc,CARDDATA_TYPE,TYPE_MONSTER+tpe+TYPE_PENDULUM)
+					tc:SetCardData(CARDDATA_TYPE,TYPE_MONSTER+tpe+TYPE_PENDULUM)
 					if not tc:IsOnField() or tc:GetDestination()==0 then
 						if (tc:GetFlagEffect(706)>0 or tc:GetFlagEffect(726)>0) then
 							tc:RegisterFlagEffect(716,RESET_EVENT+RESETS_STANDARD-RESET_TODECK,EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE,1)
@@ -819,7 +819,7 @@ function Auxiliary.PandAct(tc,...)
 					if not tc:IsLocation(LOCATION_SZONE) then
 						local edcheck=0
 						if tc:IsLocation(LOCATION_EXTRA) then edcheck=TYPE_PENDULUM end
-						Card.SetCardData(tc,CARDDATA_TYPE,TYPE_MONSTER+TYPE_EFFECT+edcheck+aux.GetOriginalPandemoniumType(tc))
+						tc:SetCardData(CARDDATA_TYPE,TYPE_MONSTER+TYPE_EFFECT+edcheck+aux.GetOriginalPandemoniumType(tc))
 						return
 					end
 				end

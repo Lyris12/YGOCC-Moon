@@ -398,7 +398,7 @@ function Auxiliary.EvoluteTarget(outdate1,outdate2,minc,maxc,gcheck,...)
 				local sg=Group.CreateGroup()
 				sg:Merge(bg)
 				local finish=false
-				while not (sg:GetCount()>=maxc) do
+				while not (#sg>=maxc) do
 					finish=Auxiliary.EvoluteCheckGoal(tp,sg,c,minc,#sg,table.unpack(funs))
 					local cg=mg:Filter(Auxiliary.EvoluteRecursiveFilter,sg,tp,sg,mg,c,#sg,minc,maxc,gcheck,table.unpack(funs))
 					if #cg==0 then break end
@@ -409,7 +409,7 @@ function Auxiliary.EvoluteTarget(outdate1,outdate2,minc,maxc,gcheck,...)
 					if not bg:IsContains(tc) then
 						if not sg:IsContains(tc) then
 							sg:AddCard(tc)
-							if (sg:GetCount()>=maxc) then finish=true end
+							if (#sg>=maxc) then finish=true end
 						else
 							sg:RemoveCard(tc)
 						end

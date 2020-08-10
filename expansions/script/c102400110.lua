@@ -68,7 +68,7 @@ end
 function cid.op(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) and e:IsHasType(EFFECT_TYPE_FIELD) then return end
 	local g=Duel.GetMatchingGroup(cid.filter,tp,LOCATION_EXTRA,0,nil)
-	if g:GetCount()<2 then return end
+	if #g<2 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local sg=g:Select(tp,2,2,nil)
 	local ct=Duel.Destroy(sg,nil,0,REASON_EFFECT)

@@ -104,7 +104,7 @@ function cid.pfop(e,tp,eg,ep,ev,re,r,rp)
 		local mf=ce:GetValue()
 		sg2=Duel.GetMatchingGroup(cid.pffilter2,tp,LOCATION_EXTRA,0,nil,e,tp,mg2,mf,c,chkf)
 	end
-	if sg1:GetCount()>0 or (sg2~=nil and sg2:GetCount()>0) then
+	if #sg1>0 or (sg2~=nil and #sg2>0) then
 		local sg=sg1:Clone()
 		if sg2 then sg:Merge(sg2) end
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
@@ -130,14 +130,14 @@ end
 function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	local dg=Duel.GetMatchingGroup(cid.dfilter,tp,LOCATION_HAND,0,nil)
-	if chk==0 then return c:IsDestructable() and dg:GetCount()>0 end
+	if chk==0 then return c:IsDestructable() and #dg>0 end
 	local g=Duel.GetMatchingGroup(Card.IsAttackPos,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
-	Duel.GetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount()+2,tp,LOCATION_HAND)
+	Duel.GetOperationInfo(0,CATEGORY_DESTROY,g,#g+2,tp,LOCATION_HAND)
 end
 function cid.op(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local g=Duel.GetMatchingGroup(cid.dfilter,tp,LOCATION_HAND,0,nil)
-	if not c:IsDestructable() or g:GetCount()==0 then return end
+	if not c:IsDestructable() or #g==0 then return end
 	local dg=Duel.GetMatchingGroup(Card.IsAttackPos,tp,LOCATION_MZONE,LOCATION_MZONE,nil)+g:Select(tp,1,1,c)+c
 	Duel.Destroy(dg,REASON_EFFECT)
 end

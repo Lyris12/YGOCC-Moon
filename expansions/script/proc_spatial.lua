@@ -21,8 +21,8 @@ table.insert(aux.CannotBeEDMatCodes,EFFECT_CANNOT_BE_SPACE_MATERIAL)
 TYPE_EXTRA						=TYPE_EXTRA|TYPE_SPATIAL
 
 --overwrite functions
-local get_rank, get_orig_rank, prev_rank_field, is_rank, is_rank_below, is_rank_above, get_type, get_orig_type, get_prev_type_field, change_position, special_summon, special_summon_step, move_to_field, send_to_deck, spell_set, send_to_hand = 
-	Card.GetRank, Card.GetOriginalRank, Card.GetPreviousRankOnField, Card.IsRank, Card.IsRankBelow, Card.IsRankAbove, Card.GetType, Card.GetOriginalType, Card.GetPreviousTypeOnField, Duel.ChangePosition, Duel.SpecialSummon, Duel.SpecialSummonStep, Duel.MoveToField, Duel.SendtoDeck, Duel.SSet, Duel.SendtoHand
+local get_rank, get_orig_rank, prev_rank_field, is_rank, is_rank_below, is_rank_above, get_type, get_orig_type, get_prev_type_field, change_position = 
+	Card.GetRank, Card.GetOriginalRank, Card.GetPreviousRankOnField, Card.IsRank, Card.IsRankBelow, Card.IsRankAbove, Card.GetType, Card.GetOriginalType, Card.GetPreviousTypeOnField, Duel.ChangePosition
 
 Card.GetRank=function(c)
 	if Auxiliary.Spatials[c] then return 0 end
@@ -96,78 +96,6 @@ Duel.ChangePosition=function(cc, au, ad, du, dd)
 		end
 	end
 	return change_position(cc,au,ad,du,dd)+ct
-end
-Duel.SpecialSummon=function(cc, st, sp, tp, nocheck, nolimit, pos, zone)
-	if not zone then zone=0xff end
-	local ct=0
-	local cc=Group.CreateGroup()+cc
-	local tg=cc:Clone()
-	for c in aux.Next(tg) do
-		if (c:IsLocation(LOCATION_EXTRA) or pos&POS_FACEDOWN>0) and c:SwitchSpace() then
-			if special_summon_step(c,st,sp,tp,nocheck,nolimit,pos>>(c:IsLocation(LOCATION_EXTRA) and 0 or 1),zone) then ct=ct+1 end
-			cc:RemoveCard(c)
-		end
-	end
-	ct=ct+special_summon(cc,st,sp,tp,nocheck,nolimit,pos,zone)
-	Duel.SpecialSummonComplete()
-	return ct
-end
-Duel.SpecialSummonStep=function(c, st, sp, tp, nocheck, nolimit, pos, zone)
-	if not zone then zone=0xff end
-	if (c:IsLocation(LOCATION_EXTRA) or pos&POS_FACEDOWN>0) and c:SwitchSpace() then
-		return special_summon_step(c,st,sp,tp,nocheck,nolimit,pos>>(c:IsLocation(LOCATION_EXTRA) and 0 or 1),zone)
-	end
-	return special_summon_step(c,st,sp,tp,nocheck,nolimit,pos,zone)
-end
-Duel.MoveToField=function(c,sp,tp,dest,pos,enabled)
-	if (c:IsLocation(LOCATION_EXTRA) or pos&POS_FACEDOWN>0) and c:SwitchSpace() then
-		return move_to_field(c,sp,tp,dest,pos>>(c:IsLocation(LOCATION_EXTRA) and 0 or 1),enabled)
-	end
-	return move_to_field(c,sp,tp,dest,pos,enabled)
-end
-Duel.SendtoDeck=function(cc,tp,seq,r)
-	local ct=0
-	local cc=Group.CreateGroup()+cc
-	local tg=cc:Clone()
-	for c in aux.Next(tg) do if c:SwitchSpace() then
-		ct=ct+Duel.SendtoExtraP(c,tp,r)
-		cc:RemoveCard(c)
-	end end
-	ct=ct+send_to_deck(cc,tp,seq,r)
-	return ct
-end
-Duel.SSet=function(sp,cc,tp,confirm)
-	if not tp then tp=sp end
-	if Auxiliary.GetValueType(cc)=="Card" then
-		if Auxiliary.Spatials[cc] then
-			Duel.MoveToField(cc,sp,tp,LOCATION_SZONE,POS_FACEDOWN,true)
-			return
-		end
-	else
-		local ct=0
-		local cc=Group.CreateGroup()+cc
-		local tg=cc:Clone()
-		for c in aux.Next(tg) do
-			if Auxiliary.Spatials[c] and Duel.MoveToField(c,sp,tp,LOCATION_SZONE,POS_FACEDOWN,true) then
-				ct=ct+1
-				cc:RemoveCard(c)
-			end
-		end
-		ct=ct+spell_set(sp,cc,tp,confirm)
-		return ct
-	end
-	return spell_set(sp,cc,tp,confirm)
-end
-Duel.SendtoHand=function(cc,tp,r)
-	local ct=0
-	local cc=Group.CreateGroup()+cc
-	local tg=cc:Clone()
-	for c in aux.Next(tg) do if c:SwitchSpace() then
-		ct=ct+Duel.SendtoExtraP(c,tp,r)
-		cc:RemoveCard(c)
-	end end
-	ct=ct+send_to_hand(cc,tp,r)
-	return ct
 end
 
 --Custom Functions
@@ -367,7 +295,7 @@ function Auxiliary.SpatialCondition(sptcheck,...)
 				local djn=c:GetDimensionNo()
 				local mg=Duel.GetMatchingGroup(Card.IsCanBeSpaceMaterial,tp,LOCATION_MZONE,0,nil,c)
 				local mg2=Duel.GetMatchingGroup(Auxiliary.SpaceExtraFilter,tp,0xff,0xff,nil,c,tp,table.unpack(funs))
-				if mg2:GetCount()>0 then mg:Merge(mg2) end
+				if #mg2>0 then mg:Merge(mg2) end
 				local fg=aux.GetMustMaterialGroup(tp,EFFECT_MUST_BE_SPACE_MATERIAL)
 				if fg:IsExists(aux.MustMaterialCounterFilter,1,nil,mg) then return false end
 				Duel.SetSelectedCard(fg)
@@ -382,7 +310,7 @@ function Auxiliary.SpatialTarget(sptcheck,...)
 	return  function(e,tp,eg,ep,ev,re,r,rp,chk,c)
 				local mg=Duel.GetMatchingGroup(Card.IsCanBeSpaceMaterial,tp,LOCATION_MZONE,0,nil,c)
 				local mg2=Duel.GetMatchingGroup(Auxiliary.SpaceExtraFilter,tp,0xff,0xff,nil,c,tp,table.unpack(funs))
-				if mg2:GetCount()>0 then mg:Merge(mg2) end
+				if #mg2>0 then mg:Merge(mg2) end
 				local ogmg=mg:Clone()
 				local bg=Group.CreateGroup()
 				local ce={Duel.IsPlayerAffectedByEffect(tp,EFFECT_MUST_BE_SPACE_MATERIAL)}
@@ -398,7 +326,7 @@ function Auxiliary.SpatialTarget(sptcheck,...)
 				sg:Merge(bg)
 				local finish=false
 				local djn=c:GetDimensionNo()
-				while sg:GetCount()<max do
+				while #sg<max do
 					finish=Auxiliary.SptCheckGoal(tp,sg,c,#sg,sptcheck,table.unpack(funs))
 					local cg=mg:Filter(Auxiliary.SptCheckRecursive,sg,tp,sg,mg,c,#sg,djn,sptcheck,table.unpack(funs))
 					if #cg==0 then break end
@@ -409,7 +337,7 @@ function Auxiliary.SpatialTarget(sptcheck,...)
 					if not bg:IsContains(tc) then
 						if not sg:IsContains(tc) then
 							sg:AddCard(tc)
-							if (sg:GetCount()>=max) then finish=true end
+							if (#sg>=max) then finish=true end
 						else
 							sg:RemoveCard(tc)
 						end

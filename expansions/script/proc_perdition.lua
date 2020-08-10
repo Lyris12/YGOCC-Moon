@@ -162,7 +162,7 @@ function Auxiliary.PerditionCondition(...)
 				local tp=c:GetControler()
 				local mg=Duel.GetMatchingGroup(Card.IsCanBePerditionMaterial,tp,LOCATION_MZONE,0,nil,c)
 				local mg2=Duel.GetMatchingGroup(Auxiliary.PerditionExtraFilter,tp,0xff,0xff,nil,c,tp,table.unpack(funs))
-				if mg2:GetCount()>0 then mg:Merge(mg2) end
+				if #mg2>0 then mg:Merge(mg2) end
 				local fg=aux.GetMustMaterialGroup(tp,EFFECT_MUST_BE_PERDITION_MATERIAL)
 				if fg:IsExists(aux.MustMaterialCounterFilter,1,nil,mg) then return false end
 				Duel.SetSelectedCard(fg)
@@ -177,7 +177,7 @@ function Auxiliary.PerditionTarget(...)
 	return  function(e,tp,eg,ep,ev,re,r,rp,chk,c)
 				local mg=Duel.GetMatchingGroup(Card.IsCanBePerditionMaterial,tp,LOCATION_MZONE,0,nil,c)
 				local mg2=Duel.GetMatchingGroup(Auxiliary.PerditionExtraFilter,tp,0xff,0xff,nil,c,tp,table.unpack(funs))
-				if mg2:GetCount()>0 then mg:Merge(mg2) end
+				if #mg2>0 then mg:Merge(mg2) end
 				local bg=Group.CreateGroup()
 				local ce={Duel.IsPlayerAffectedByEffect(tp,EFFECT_MUST_BE_PERDITION_MATERIAL)}
 				for _,te in ipairs(ce) do
@@ -191,7 +191,7 @@ function Auxiliary.PerditionTarget(...)
 				local sg=Group.CreateGroup()
 				sg:Merge(bg)
 				local finish=false
-				while not (sg:GetCount()>=max) do
+				while not (#sg>=max) do
 					finish=Auxiliary.PerditionCheckGoal(tp,sg,c,#sg,table.unpack(funs))
 					local cg=mg:Filter(Auxiliary.PerditionRecursiveFilter,sg,tp,sg,mg,c,#sg,table.unpack(funs))
 					if #cg==0 then break end
@@ -202,7 +202,7 @@ function Auxiliary.PerditionTarget(...)
 					if not bg:IsContains(tc) then
 						if not sg:IsContains(tc) then
 							sg:AddCard(tc)
-							if (sg:GetCount()>=max) then finish=true end
+							if (#sg>=max) then finish=true end
 						else
 							sg:RemoveCard(tc)
 						end

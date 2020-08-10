@@ -46,14 +46,14 @@ function cid.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if dir then max=2 end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectTarget(tp,cid.filter,tp,0,LOCATION_ONFIELD,1,max,nil)
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,g:GetCount(),0,0)
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,#g,0,0)
 end
 function cid.desfilter(c,e,tp)
 	return c:IsRelateToEffect(e) and c:IsControler(tp)
 end
 function cid.desop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	if not g or g:GetCount()==0 then return end
+	if not g or #g==0 then return end
 	local rg=g:Filter(cid.desfilter,nil,e,1-tp)
 	Duel.Remove(rg,POS_FACEUP,REASON_EFFECT)
 end

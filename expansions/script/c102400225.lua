@@ -28,7 +28,7 @@ end
 function cid.condition(e,tp,eg,ep,ev,re,r,rp)
 	if not Duel.IsChainNegatable(ev) then return false end
 	local ex,tg,tc=Duel.GetOperationInfo(ev,CATEGORY_DESTROY)
-	return ex and tg~=nil and tc+tg:FilterCount(cid.filter,nil,tp)-tg:GetCount()>1
+	return ex and tg~=nil and tc+tg:FilterCount(cid.filter,nil,tp)-#tg>1
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

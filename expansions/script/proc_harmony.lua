@@ -187,7 +187,7 @@ function Auxiliary.HarmonyCondition(...)
 				local tp=c:GetControler()
 				local mg=Duel.GetMatchingGroup(Card.IsCanBeHarmonizedMaterial,tp,LOCATION_REMOVED,0,nil,c)
 				local mg2=Duel.GetMatchingGroup(Auxiliary.HarmonizedExtraFilter,tp,0xff,0xff,nil,c,tp,table.unpack(funs))
-				if mg2:GetCount()>0 then mg:Merge(mg2) end
+				if #mg2>0 then mg:Merge(mg2) end
 				local fg=aux.GetMustMaterialGroup(tp,EFFECT_MUST_BE_HARMONIZED_MATERIAL)
 				if fg:IsExists(aux.MustMaterialCounterFilter,1,nil,mg) then return false end
 				Duel.SetSelectedCard(fg)
@@ -202,7 +202,7 @@ function Auxiliary.HarmonyTarget(...)
 	return  function(e,tp,eg,ep,ev,re,r,rp,chk,c)
 				local mg=Duel.GetMatchingGroup(Card.IsCanBeHarmonizedMaterial,tp,LOCATION_REMOVED,0,nil,c)
 				local mg2=Duel.GetMatchingGroup(Auxiliary.HarmonizedExtraFilter,tp,0xff,0xff,nil,c,tp,table.unpack(funs))
-				if mg2:GetCount()>0 then mg:Merge(mg2) end
+				if #mg2>0 then mg:Merge(mg2) end
 				local bg=Group.CreateGroup()
 				local ce={Duel.IsPlayerAffectedByEffect(tp,EFFECT_MUST_BE_HARMONIZED_MATERIAL)}
 				for _,te in ipairs(ce) do
@@ -216,7 +216,7 @@ function Auxiliary.HarmonyTarget(...)
 				local sg=Group.CreateGroup()
 				sg:Merge(bg)
 				local finish=false
-				while not (sg:GetCount()>=max) do
+				while not (#sg>=max) do
 					finish=Auxiliary.HCheckGoal(tp,sg,c,#sg,table.unpack(funs))
 					local cg=mg:Filter(Auxiliary.HCheckRecursive,sg,tp,sg,mg,c,#sg,table.unpack(funs))
 					if #cg==0 then break end
@@ -227,7 +227,7 @@ function Auxiliary.HarmonyTarget(...)
 					if not bg:IsContains(tc) then
 						if not sg:IsContains(tc) then
 							sg:AddCard(tc)
-							if (sg:GetCount()>=max) then finish=true end
+							if (#sg>=max) then finish=true end
 						else
 							sg:RemoveCard(tc)
 						end
@@ -285,7 +285,7 @@ function Auxiliary.HCheckReg(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local p=1-c:GetOwner()
 	local g=Duel.GetMatchingGroup(Auxiliary.HCards,p,0x70,0,nil)
-	if g:GetCount()==0 then
+	if #g==0 then
 		local ge7=Effect.CreateEffect(c)
 		ge7:SetType(EFFECT_TYPE_SINGLE)
 		ge7:SetRange(LOCATION_MZONE)

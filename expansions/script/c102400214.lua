@@ -29,7 +29,7 @@ end
 function cid.condition(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetCurrentPhase()~=PHASE_BATTLE or Duel.GetTurnPlayer()~=tp then return false end
 	local g=Duel.GetFieldGroup(tp,LOCATION_MZONE,0)
-	return #g>1 and g:FilterCount(cid.cfilter,e:GetHandler())==g:GetCount()-1
+	return #g>1 and g:FilterCount(cid.cfilter,e:GetHandler())==#g-1
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and chkc:IsAbleToRemove() end

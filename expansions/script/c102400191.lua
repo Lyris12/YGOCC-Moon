@@ -8,31 +8,27 @@ function cid.initial_effect(c)
 	e1:SetCode(EFFECT_MONSTER_SSET)
 	e1:SetValue(TYPE_TRAP)
 	c:RegisterEffect(e1)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	e1:SetCode(EVENT_SSET)
+	e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+	e1:SetOperation(function(e) e:GetHandler():SetCardData(CARDDATA_TYPE,TYPE_TRAP) end)
+	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_ACTIVATE)
-	e2:SetCode(EVENT_FREE_CHAIN)
-	e2:SetCategory(CATEGORY_REMOVE+CATEGORY_TOGRAVE)
-	e2:SetTarget(cid.target)
-	e2:SetOperation(cid.activate)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	e2:SetCode(EVENT_LEAVE_FIELD)
+	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SET_AVAILABLE)
+	e2:SetOperation(function(e)
+		local c=e:GetHandler()
+		if c:GetOriginalType()==TYPE_TRAP then
+			c:AddMonsterAttribute(TYPE_MONSTER+TYPE_RITUAL+TYPE_EFFECT)
+			c:SetCardData(CARDDATA_TYPE,TYPE_MONSTER+TYPE_RITUAL+TYPE_EFFECT)
+		end
+	end)
 	c:RegisterEffect(e2)
-end
-function cid.filter1(c)
-	return c:IsAttribute(ATTRIBUTE_DARK) and c:IsAbleToRemove()
-end
-function cid.filter2(c)
-	return c:IsFaceup() and c:IsSetCard(0xf7a)
-end
-function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	local g1=Duel.GetMatchingGroup(cid.filter1,tp,LOCATION_GRAVE,LOCATION_GRAVE,nil)
-	local g2=Duel.GetMatchingGroup(cid.filter2,tp,LOCATION_REMOVED,LOCATION_REMOVED,nil)
-	if chk==0 then return #g1>0 and #g2>0 end
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g1,g1:GetCount(),0,0)
-	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g2,g2:GetCount(),0,0)
-end
-function cid.activate(e,tp,eg,ep,ev,re,r,rp)
-	local g1=Duel.GetMatchingGroup(cid.filter1,tp,LOCATION_GRAVE,LOCATION_GRAVE,nil)
-	local g2=Duel.GetMatchingGroup(cid.filter2,tp,LOCATION_REMOVED,LOCATION_REMOVED,nil)
-	if Duel.Remove(g1,POS_FACEUP,REASON_EFFECT)>0 then
-		Duel.SendtoGrave(g2,REASON_EFFECT+REASON_RETURN)
-	end
+	local e3=e2:Clone()
+	e3:SetRange(LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED+LOCATION_HAND+LOCATION_EXTRA+LOCATION_OVERLAY+LOCATION_MZONE)
+	e3:SetCode(EVENT_ADJUST)
+	e3:SetCode(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	c:RegisterEffect(e3)
 end

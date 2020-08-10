@@ -151,7 +151,7 @@ function Auxiliary.AnnoteeTarget(minc,maxc,alterf,...)
 					e:SetLabel(1)
 					alterf(e,tp,sg,1)
 				else
-					while not (sg:GetCount()>=maxc) do
+					while not (#sg>=maxc) do
 						finish=Auxiliary.AnCheckGoal(tp,sg,c,minc,#sg,table.unpack(funs))
 						local cg=mg:Filter(Auxiliary.AnCheckRecursive,sg,tp,sg,mg,c,#sg,minc,maxc,nil,table.unpack(funs))
 						if #cg==0 then break end
@@ -162,7 +162,7 @@ function Auxiliary.AnnoteeTarget(minc,maxc,alterf,...)
 						if not bg:IsContains(tc) then
 							if not sg:IsContains(tc) then
 								sg:AddCard(tc)
-								if (sg:GetCount()>=maxc) then finish=true end
+								if (#sg>=maxc) then finish=true end
 							else
 								sg:RemoveCard(tc)
 							end

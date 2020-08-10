@@ -46,7 +46,7 @@ end
 function cid.negtg(e,tp,eg,ep,ev,re,r,rp)
 	if chk==0 then return true end
 	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,0,LOCATION_ONFIELD,nil)
-	Duel.SetOperationInfo(0,CATEGORY_DISABLE,g,g:GetCount(),0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DISABLE,g,#g,0,0)
 end
 function cid.filter(c)
 	return c:IsAttackPos() and c:IsCanChangePosition()
@@ -69,7 +69,7 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 		if not tc:IsDisabled() then ct=ct+1 end
 	end
 	local tg=g:Filter(cid.filter,nil)
-	if ct>0 and tg:GetCount()>0 and Duel.SelectEffectYesNo(tp,c,aux.Stringid(id,0)) then
+	if ct>0 and #tg>0 and Duel.SelectEffectYesNo(tp,c,aux.Stringid(id,0)) then
 		Duel.BreakEffect()
 		Duel.ChangePosition(tg,POS_FACEUP_DEFENSE,POS_FACEDOWN_DEFENSE,0,0)
 	end

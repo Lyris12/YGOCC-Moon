@@ -49,7 +49,7 @@ function cid.atop(e,tp,eg,ep,ev,re,r,rp)
 	if not c:IsRelateToEffect(e) or not tc:IsRelateToEffect(e) then return end
 	local p=e:GetLabel()
 	local g=Duel.GetDecktopGroup(p,1)
-	if g:GetCount()==0 then return end
+	if #g==0 then return end
 	Duel.DisableShuffleCheck()
 	Duel.Overlay(tc,g)
 	local ap=1<<p

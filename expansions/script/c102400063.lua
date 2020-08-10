@@ -41,7 +41,7 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,0,nil)
 	local dam=Duel.Damage(tp,tc:GetBaseAttack(),REASON_EFFECT)
-	if dam>0 and g:GetCount()>0 then
+	if dam>0 and #g>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 		local ac=g:Select(tp,1,1,nil):GetFirst()
 		local e1=Effect.CreateEffect(e:GetHandler())

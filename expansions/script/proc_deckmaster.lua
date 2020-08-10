@@ -200,7 +200,7 @@ function Auxiliary.DMFirstAct(typ)
 		if Duel.GetFlagEffect(tp,3337)>0 or e:GetHandler():GetFlagEffect(3338)>0 or not Duel.CheckLocation(tp,LOCATION_SZONE,2) or Duel.IsExistingMatchingCard(Card.IsType,tp,LOCATION_ONFIELD,0,1,e:GetHandler(),TYPE_DECKMASTER) then return end
 		if not Duel.SelectYesNo(tp,aux.Stringid(39759362,2)) then
 			local exc=Duel.GetMatchingGroup(Card.IsType,tp,LOCATION_EXTRA,0,nil,TYPE_DECKMASTER)
-			Debug.Message(tostring(exc:GetCount()))
+			Debug.Message(tostring(#exc))
 			for i0 in aux.Next(exc) do
 				i0:RegisterFlagEffect(3338,RESET_EVENT+EVENT_CUSTOM+3338,EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SET_AVAILABLE,1)
 			end
@@ -209,7 +209,7 @@ function Auxiliary.DMFirstAct(typ)
 		local group=Group.CreateGroup()
 		group:KeepAlive()
 		local g=Duel.GetMatchingGroup(Card.IsType,tp,LOCATION_EXTRA,0,nil,TYPE_DECKMASTER)
-		if g:GetCount()>0 then
+		if #g>0 then
 			for i in aux.Next(g) do
 				if i:GetOriginalCode()==e:GetHandler():GetOriginalCode() then
 					if i:GetFlagEffect(3343)==0 then
@@ -219,7 +219,7 @@ function Auxiliary.DMFirstAct(typ)
 				group:AddCard(i)
 			end
 		end
-		if group:GetCount()>0 then
+		if #group>0 then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 			local tc=group:Select(tp,1,1,nil):GetFirst()
 			if tc:IsLocation(LOCATION_EXTRA) then
@@ -234,7 +234,7 @@ function Auxiliary.DMFirstAct(typ)
 				m.DMCost(e,tp,eg,ep,ev,re,r,rp)
 			else
 				local g2=Duel.GetMatchingGroup(Auxiliary.ActGroupFilter,tp,LOCATION_EXTRA,0,e:GetHandler(),e:GetHandler():GetOriginalCode())
-				if g2:GetCount()>0 then
+				if #g2>0 then
 					for i2 in aux.Next(g2) do
 						if i2:GetFlagEffect(3338)~=0 then
 							i2:ResetFlagEffect(3338)
@@ -328,7 +328,7 @@ function Auxiliary.AltMasterSummonOp(typ)
 			c:RegisterFlagEffect(3339,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SET_AVAILABLE,1)
 			c:SetFlagEffectLabel(3339,101)
 			local g2=Duel.GetMatchingGroup(Card.IsType,tp,LOCATION_EXTRA,0,nil,TYPE_DECKMASTER)
-			if g2:GetCount()>0 then
+			if #g2>0 then
 				for i in aux.Next(g2) do
 					if i:GetOriginalCode()==e:GetHandler():GetOriginalCode() then
 						if i:GetFlagEffect(3338)==0 then

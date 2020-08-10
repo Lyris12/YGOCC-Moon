@@ -52,7 +52,7 @@ function cid.postg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if Duel.IsPlayerAffectedByEffect(tp,id) then ct=1 end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectTarget(tp,cid.filter,tp,LOCATION_GRAVE,0,1,ct,nil,e,tp)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,g:GetCount(),0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,#g,0,0)
 end
 function cid.afilter(c)
 	return c:IsSetCard(0xbb2) and c:IsType(TYPE_MONSTER) and not c:IsCode(id)
@@ -62,8 +62,8 @@ function cid.posop(e,tp,eg,ep,ev,re,r,rp)
 	if ft<=0 then return end
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	local sg=g:Filter(Card.IsRelateToEffect,nil,e):Filter(aux.OR(cid.filter,aux.NOT(aux.FilterBoolFunction(Card.IsCanBeSpecialSummoned,e,0,tp,false,false))),nil,e,tp)
-	if sg:GetCount()==0 or (sg:GetCount()>1 and Duel.IsPlayerAffectedByEffect(tp,id)) then return end
-	if ft>=g:GetCount() then
+	if #sg==0 or (#sg>1 and Duel.IsPlayerAffectedByEffect(tp,id)) then return end
+	if ft>=#g then
 		Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
 	else
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
@@ -73,9 +73,10 @@ function cid.posop(e,tp,eg,ep,ev,re,r,rp)
 	local dg=Duel.GetOperatedGroup()
 	local mg=Duel.GetMatchingGroup(cid.afilter,tp,LOCATION_GRAVE,0,nil)
 	local ec=nil
-	if mg:GetCount()>=sg:GetCount() and Duel.SelectEffectYesNo(tp,e:GetHandler(),aux.Stringid(id,0)) then
+	if #mg>=#sg and Duel.SelectEffectYesNo(tp,e:GetHandler(),aux.Stringid(id,0)) then
 		Duel.BreakEffect()
 		for c in aux.Next(dg) do
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
 			local tc=mg:Select(tp,1,1,ec)
 			Duel.Overlay(c,tc)
 			ec=tc

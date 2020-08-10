@@ -157,7 +157,7 @@ Duel.Overlay=function(xyz,mat)
 	local og,oct
 	if xyz:IsLocation(LOCATION_MZONE) then
 		og=xyz:GetOverlayGroup()
-		oct=og:GetCount()
+		oct=#og
 	end
 	duel_overlay(xyz,mat)
 	if oct and xyz:GetOverlayCount()>oct then
@@ -187,7 +187,7 @@ Duel.SelectTarget=function(actp,func,self,loc1,loc2,cmin,cmax,exc,...)
 				res:ResetFlagEffect(39759371)
 			end
 		end
-		local rct=rg:GetCount()
+		local rct=#rg
 		local rlist={}
 		local rlct=0
 		for rnum=1,rct do
@@ -238,30 +238,23 @@ end
 Duel.Remove=function(cc,pos,r)
 	local cc=Group.CreateGroup()+cc
 	local tg=cc:Clone()
-	local ct=0
 	for c in aux.Next(tg) do
-		if pos&POS_FACEDOWN~=0 then
-			if r&REASON_EFFECT~=0 then
-				local ef={c:IsHasEffect(EFFECT_CANNOT_BANISH_FD_EFFECT)}
-				for _,te1 in ipairs(ef) do
-					local cf=te1:GetValue()
-					local typ=aux.GetValueType(cf)
-					if typ=="function" then
-						if cf(te1,c:GetReasonEffect(),c:GetReasonPlayer()) then 
-							cc=cc-c 
-						end
-					elseif cf>0 then 
+		if pos&POS_FACEDOWN~=0 and r&REASON_EFFECT~=0 then
+			local ef={c:IsHasEffect(EFFECT_CANNOT_BANISH_FD_EFFECT)}
+			for _,te1 in ipairs(ef) do
+				local cf=te1:GetValue()
+				local typ=aux.GetValueType(cf)
+				if typ=="function" then
+					if cf(te1,c:GetReasonEffect(),c:GetReasonPlayer()) then 
 						cc=cc-c 
 					end
+				elseif cf>0 then 
+					cc=cc-c 
 				end
-			end
-			if c:SwitchSpace() then
-				ct=ct+duel_banish(c,POS_FACEUP,r)
-				cc=cc-c
 			end
 		end
 	end
-	return duel_banish(cc,pos,r)+ct
+	return duel_banish(cc,pos,r)
 end
 Card.CheckRemoveOverlayCard=function(c,tp,ct,r)
 	if Duel.IsPlayerAffectedByEffect(tp,25149863) and bit.band(r,REASON_COST)~=0 then
@@ -440,7 +433,7 @@ function Auxiliary.PerformFusionSummon(f,e,tp,mg1,gc)
 		local mf=ce:GetValue()
 		sg2=Duel.GetMatchingGroup(f,tp,LOCATION_EXTRA,0,nil,e,tp,mg2,mf,chkf)
 	end
-	if sg1:GetCount()>0 or (sg2~=nil and sg2:GetCount()>0) then
+	if #sg1>0 or (sg2~=nil and #sg2>0) then
 		local sg=sg1:Clone()
 		if sg2 then sg:Merge(sg2) end
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)

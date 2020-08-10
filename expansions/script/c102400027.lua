@@ -23,7 +23,7 @@ end
 function cid.mcheck(sg)
 	local sg=sg:Clone()
 	local vg=sg:Filter(function(c) return c:IsSetCard(0x85a,0x85b) end,nil)
-	if vg:GetCount()==sg:GetCount() then return true end
+	if #vg==#sg then return true end
 	sg:Sub(vg)
 	return vg:GetFirst():GetAttack()>sg:GetFirst():GetAttack()
 end
@@ -32,10 +32,10 @@ function cid.cfilter(c)
 end
 function cid.condition(e,tp,eg,ep,ev,re,r,rp)
 	local g=eg:Filter(Card.IsType,nil,TYPE_MONSTER)
-	if g:GetCount()==0 then return false end
+	if #g==0 then return false end
 	local tc=g:GetFirst()
 	e:SetLabel(tc:GetLevel())
-	return g:GetCount()==1 and cid.cfilter(tc)
+	return #g==1 and cid.cfilter(tc)
 end
 function cid.filter2(c)
 	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x285b) and c:IsAbleToRemove()

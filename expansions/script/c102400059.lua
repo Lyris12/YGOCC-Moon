@@ -47,7 +47,7 @@ function cid.spfilter(c,e,tp,tc,n)
 		g:AddCard(tk)
 	end
 	aux.FCheckAdditional=function(tp,sg,fc)
-		return sg:GetCount()==n or fc:IsCode(CARD_CYBER_DRAGON)
+		return #sg==n or fc:IsCode(CARD_CYBER_DRAGON)
 	end
 	local res=c:CheckFusionMaterial(g,nil,tp)
 	aux.FCheckAdditional=nil

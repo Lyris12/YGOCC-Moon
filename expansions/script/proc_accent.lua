@@ -317,9 +317,9 @@ function Auxiliary.AOperationMixRep(insf,sub,fun1,minc,maxc,...)
 				local mg=eg:Filter(Auxiliary.AConditionFilterMix,c,c,sub,fun1,table.unpack(funs))
 				local sg=Group.CreateGroup()
 				if gc then sg:AddCard(gc) end
-				while sg:GetCount()<maxc+#funs do
+				while #sg<maxc+#funs do
 					local cg=mg:Filter(Auxiliary.ASelectMixRep,sg,tp,mg,sg,c,sub,chkf,fun1,minc,maxc,table.unpack(funs))
-					if cg:GetCount()==0 then break end
+					if #cg==0 then break end
 					local finish=Auxiliary.ACheckMixRepGoal(tp,sg,c,sub,chkf,fun1,minc,maxc,table.unpack(funs))
 					local cancel_group=sg:Clone()
 					if gc then cancel_group:RemoveCard(gc) end
@@ -341,7 +341,7 @@ function Auxiliary.ACheckMixRep(sg,g,fc,sub,chkf,fun1,minc,maxc,fun2,...)
 	else
 		local ct1=sg:FilterCount(fun1,g,fc,sub,mg,sg)
 		local ct2=sg:FilterCount(fun1,g,fc,false,mg,sg)
-		return ct1==sg:GetCount()-g:GetCount() and ct1-ct2<=1
+		return ct1==#sg-#g and ct1-ct2<=1
 	end
 end
 function Auxiliary.ACheckMixRepFilter(c,sg,g,fc,sub,chkf,fun1,minc,maxc,fun2,...)
@@ -356,7 +356,7 @@ function Auxiliary.ACheckMixRepFilter(c,sg,g,fc,sub,chkf,fun1,minc,maxc,fun2,...
 end
 function Auxiliary.ACheckMixRepGoal(tp,sg,fc,sub,chkf,fun1,minc,maxc,...)
 	if not Auxiliary.MustMaterialCheck(sg,tp,EFFECT_MUST_BE_AMATERIAL) then return false end
-	if sg:GetCount()<minc+#{...} or sg:GetCount()>maxc+#{...} then return false end
+	if #sg<minc+#{...} or #sg>maxc+#{...} then return false end
 	local g=Group.CreateGroup()
 	return Auxiliary.ACheckMixRep(sg,g,fc,sub,chkf,fun1,minc,maxc,...) and (chkf==PLAYER_NONE or Duel.GetLocationCountFromEx(tp,tp,sg,fc)>0)
 		and (not Auxiliary.ACheckAdditional or Auxiliary.ACheckAdditional(tp,sg,fc))
@@ -385,7 +385,7 @@ function Auxiliary.ACheckMixRepTemplate(c,cond,tp,mg,sg,g,fc,sub,chkf,fun1,minc,
 	return false
 end
 function Auxiliary.ACheckMixRepSelectedCond(tp,mg,sg,g,...)
-	if g:GetCount()<sg:GetCount() then
+	if #g<#sg then
 		return sg:IsExists(Auxiliary.ACheckMixRepSelected,1,g,tp,mg,sg,g,...)
 	else
 		return Auxiliary.ACheckSelectMixRep(tp,mg,sg,g,...)

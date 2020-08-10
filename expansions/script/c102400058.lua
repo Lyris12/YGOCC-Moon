@@ -94,7 +94,7 @@ end
 function cid.condition(e,tp,eg,ep,ev,re,r,rp)
 	local g=eg:Filter(cid.cfilter,nil)
 	e:SetLabelObject(g:GetFirst())
-	return g:GetCount()==1
+	return #g==1
 end
 function cid.filter(c,ec,tp)
 	return c:IsRace(RACE_DRAGON) and not c:IsForbidden()
@@ -118,7 +118,7 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 	local tg=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e):Filter(Card.IsRace,nil,RACE_DRAGON):Filter(aux.NOT(Card.IsForbidden),nil)
 	for ec in aux.Next(tg) do
-		if tg:GetCount()==1 then break end
+		if #tg==1 then break end
 		tg:RemoveCard(ec)
 	end
 	local c=e:GetLabelObject()

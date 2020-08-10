@@ -46,8 +46,8 @@ function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 		end
 	end
 	Duel.SetTargetCard(dg)
-	Duel.SetOperationInfo(0,CATEGORY_NEGATE,ng,ng:GetCount(),0,0)
-	Duel.SetOperationInfo(0,CATEGORY_TODECK,dg,dg:GetCount(),0,0)
+	Duel.SetOperationInfo(0,CATEGORY_NEGATE,ng,#ng,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,dg,#dg,0,0)
 end
 function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 	local dg=Group.CreateGroup()

@@ -51,7 +51,7 @@ function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,4))
 	local g1=Duel.SelectTarget(tp,cid.filter,tp,LOCATION_REMOVED,0,1,2,nil)
-	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g1,g1:GetCount(),0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g1,#g1,0,0)
 end
 function cid.op(e,tp,eg,ep,ev,re,r,rp)
 	local tg=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
@@ -59,9 +59,9 @@ function cid.op(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SendtoGrave(tg,REASON_EFFECT+REASON_RETURN)
 	local g=Duel.GetOperatedGroup()
 	if not g then g=tg:Filter(Card.IsLocation,nil,LOCATION_GRAVE) end
-	local ct=g:GetCount()
+	local ct=#g
 	local dg=Duel.GetMatchingGroup(Card.IsAbleToRemove,tp,0,LOCATION_SZONE,nil)
-	if ct>0 and dg:GetCount()>0 then
+	if ct>0 and #dg>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 		local rg=dg:Select(tp,1,ct,nil)
 		Duel.HintSelection(rg)

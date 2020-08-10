@@ -26,7 +26,7 @@ function cid.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
-	if g:GetCount()==2 then
+	if #g==2 then
 		Duel.SendtoHand(g,REASON_EFFECT)
 	end
 end

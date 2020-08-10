@@ -39,7 +39,7 @@ function cid.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.ShuffleDeck(tp)
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,4))
 	local g=Duel.SelectTarget(tp,cid.filter,tp,LOCATION_REMOVED,0,3,3,nil)
-	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g,g:GetCount(),0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g,#g,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,2)
 end
 function cid.op(e,tp,eg,ep,ev,re,r,rp)
@@ -48,7 +48,7 @@ function cid.op(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SendtoGrave(tg,REASON_EFFECT+REASON_RETURN)
 	local g=Duel.GetOperatedGroup()
 	local ct=g:FilterCount(Card.IsLocation,nil,LOCATION_GRAVE)
-	if ct==g:GetCount() then
+	if ct==#g then
 		Duel.BreakEffect()
 		Duel.Draw(tp,1,REASON_EFFECT)
 	end

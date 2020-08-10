@@ -47,7 +47,7 @@ function cid.spcon(e,c)
 	local tp=c:GetControler()
 	local rg=Duel.GetReleaseGroup(tp):Filter(Card.IsSetCard,nil,0xda6)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	return ft>-2 and rg:GetCount()>1 and rg:IsExists(cid.spfilter,1,nil,rg,ft,tp)
+	return ft>-2 and #rg>1 and rg:IsExists(cid.spfilter,1,nil,rg,ft,tp)
 end
 function cid.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	local rg=Duel.GetReleaseGroup(tp):Filter(Card.IsSetCard,nil,0xda6)
@@ -72,14 +72,14 @@ end
 function cid.sgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	local g=Duel.GetFieldGroup(tp,0,LOCATION_SZONE)
-	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g,g:GetCount(),0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g,#g,0,0)
 end
 function cid.sgop(e,tp,eg,ep,ev,re,r,rp)
 	local dir=Duel.GetAttackTarget()==nil
 	local g=Duel.GetFieldGroup(tp,0,LOCATION_SZONE)
 	local ct=Duel.SendtoGrave(g,REASON_EFFECT)
 	local sg=Duel.GetOperatedGroup():Filter(Card.IsLocation,nil,LOCATION_GRAVE)
-	if ct>0 and g:GetCount()>0 and dir then
+	if ct>0 and #g>0 and dir then
 		Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
 	end
 end

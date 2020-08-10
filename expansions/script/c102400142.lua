@@ -48,7 +48,7 @@ end
 function cid.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	local g=Duel.GetMatchingGroup(aux.TRUE,tp,LOCATION_MZONE,0,nil)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,0,0)
 end
 function cid.desop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(aux.TRUE,tp,LOCATION_MZONE,0,nil)
@@ -65,7 +65,7 @@ function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(aux.AND(cid.cfilter,aux.FilterBoolFunction(Card.IsDestructable)),tp,LOCATION_MZONE+LOCATION_HAND,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectMatchingCard(tp,aux.AND(cid.cfilter,aux.FilterBoolFunction(Card.IsDestructable)),tp,LOCATION_MZONE+LOCATION_HAND,0,1,1,nil)
-	if g:GetCount()==0 then return false end
+	if #g==0 then return false end
 	Duel.Destroy(g,REASON_EFFECT)
 	return true
 end
@@ -86,7 +86,7 @@ function cid.op1(e,tp,eg,ep,ev,re,r,rp)
 	if not tc then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,cid.filter2,tp,LOCATION_DECK,0,1,1,nil,tc:GetCode())
-	if g:GetCount()>0 then
+	if #g>0 then
 		Duel.BreakEffect()
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
@@ -101,7 +101,7 @@ function cid.op2(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) or not cid.cost(e,tp,eg,ep,ev,re,r,rp,1) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectMatchingCard(tp,Card.IsType,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil,TYPE_SPELL+TYPE_TRAP)
-	if g:GetCount()>0 then
+	if #g>0 then
 		Duel.BreakEffect()
 		Duel.HintSelection(g)
 		Duel.Destroy(g,REASON_EFFECT)
@@ -116,7 +116,7 @@ function cid.op3(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) or not cid.cost(e,tp,eg,ep,ev,re,r,rp,1) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g=Duel.SelectMatchingCard(tp,aux.AND(cid.cfilter,aux.FilterBoolFunction(Card.IsAbleToDeck)),tp,LOCATION_REMOVED,0,1,1,nil)
-	if g:GetCount()>0 then
+	if #g>0 then
 		Duel.BreakEffect()
 		Duel.SendtoDeck(g,nil,2,REASON_EFFECT)
 	end

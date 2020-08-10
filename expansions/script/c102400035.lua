@@ -13,7 +13,7 @@ function cid.initial_effect(c)
 end
 function cid.cfilter(c)
 	local g=Duel.GetDecktopGroup(tp,c:GetLevel())
-	return c:IsSetCard(0x85a) and c:IsLevelAbove(1) and g:FilterCount(Card.IsAbleToRemove,nil)==g:GetCount()
+	return c:IsSetCard(0x85a) and c:IsLevelAbove(1) and g:FilterCount(Card.IsAbleToRemove,nil)==#g
 end
 function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckReleaseGroup(tp,cid.cfilter,1,nil) end
@@ -24,16 +24,16 @@ function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	local rg=Duel.GetDecktopGroup(tp,e:GetLabel())
-	if rg:GetCount()>rg:FilterCount(Card.IsAbleToRemove,nil) then return end
+	if #rg>rg:FilterCount(Card.IsAbleToRemove,nil) then return end
 	Duel.ConfirmDecktop(tp,e:GetLabel())
 	local g=Duel.GetDecktopGroup(tp,e:GetLabel())
 	local sg=g:Filter(Card.IsSetCard,nil,0x285b)
-	if sg:GetCount()>0 then
+	if #sg>0 then
 		Duel.DisableShuffleCheck()
 		Duel.Remove(sg,POS_FACEUP,REASON_EFFECT+REASON_REVEAL)
 	end
-	Duel.SortDecktop(tp,tp,e:GetLabel()-sg:GetCount())
-	for i=1,e:GetLabel()-sg:GetCount() do
+	Duel.SortDecktop(tp,tp,e:GetLabel()-#sg)
+	for i=1,e:GetLabel()-#sg do
 		local mg=Duel.GetDecktopGroup(tp,1)
 		Duel.MoveSequence(mg:GetFirst(),1)
 	end

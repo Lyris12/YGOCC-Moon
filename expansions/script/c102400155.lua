@@ -57,7 +57,7 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 		if tc2 then
 			Duel.BreakEffect()
 			local xmg=tc1:GetOverlayGroup()
-			if xmg:GetCount()~=0 then
+			if #xmg~=0 then
 				Duel.Overlay(tc2,xmg)
 			end
 			tc2:SetMaterial(g1)

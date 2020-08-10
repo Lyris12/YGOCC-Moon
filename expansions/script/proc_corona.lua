@@ -129,7 +129,7 @@ function Auxiliary.CoronaOp(tp,val,r)
 			cg:AddCard(cc)
 		end
 	end
-	local ct=tc.material_count - cg:GetCount()
+	local ct=tc.material_count - #cg
 	if ct>0 then
 		local sg=Duel.SelectMatchingCard(tp,nil,tp,LOCATION_GRAVE,0,ct,ct,nil)
 		cg:Merge(sg)

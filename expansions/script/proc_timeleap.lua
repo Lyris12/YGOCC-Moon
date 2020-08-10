@@ -189,7 +189,7 @@ function Auxiliary.TimeleapCondition(sumcon,filter,...)
 				end
 				local mg=Duel.GetMatchingGroup(Card.IsCanBeTimeleapMaterial,tp,LOCATION_MZONE,0,nil,c)
 				local mg2=Duel.GetMatchingGroup(Auxiliary.TimeleapExtraFilter,tp,0xff,0xff,nil,f,c,tp,table.unpack(funs))
-				if mg2:GetCount()>0 then mg:Merge(mg2) end
+				if #mg2>0 then mg:Merge(mg2) end
 				local fg=aux.GetMustMaterialGroup(tp,EFFECT_MUST_BE_TIMELEAP_MATERIAL)
 				if fg:IsExists(aux.MustMaterialCounterFilter,1,nil,mg) then return false end
 				Duel.SetSelectedCard(fg)
@@ -284,7 +284,7 @@ function Auxiliary.TimeleapTarget(filter,...)
 	return  function(e,tp,eg,ep,ev,re,r,rp,chk,c)
 				local mg=Duel.GetMatchingGroup(Card.IsCanBeTimeleapMaterial,tp,LOCATION_MZONE,0,nil,c)
 				local mg2=Duel.GetMatchingGroup(Auxiliary.TimeleapExtraFilter,tp,0xff,0xff,nil,f,c,tp,table.unpack(funs))
-				if mg2:GetCount()>0 then mg:Merge(mg2) end
+				if #mg2>0 then mg:Merge(mg2) end
 				local eset={Duel.IsPlayerAffectedByEffect(tp,EFFECT_EXTRA_TIMELEAP_SUMMON)}
 				local exsumcheck
 				local bg=Group.CreateGroup()
@@ -315,7 +315,7 @@ function Auxiliary.TimeleapTarget(filter,...)
 						exsumcheck=eset[op]
 					end
 				end
-				while not (sg:GetCount()>=max) do
+				while not (#sg>=max) do
 					finish=Auxiliary.TimeleapCheckGoal(tp,sg,c,#sg,table.unpack(funs))
 					local cg=mg:Filter(Auxiliary.TimeleapMaterialFilter,sg,filter,e,tp,sg,mg,c,#sg,table.unpack(funs))
 					if #cg==0 then break end
@@ -326,7 +326,7 @@ function Auxiliary.TimeleapTarget(filter,...)
 					if not bg:IsContains(tc) then
 						if not sg:IsContains(tc) then
 							sg:AddCard(tc)
-							if (sg:GetCount()>=max) then finish=true end
+							if (#sg>=max) then finish=true end
 						else
 							sg:RemoveCard(tc)
 						end

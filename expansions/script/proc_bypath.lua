@@ -253,7 +253,7 @@ function Auxiliary.BypathCondition(altcheck,...)
 				local tp=c:GetControler()
 				local g=Duel.GetFieldGroup(tp,LOCATION_ONFIELD,LOCATION_ONFIELD)
 				local mg2=Duel.GetMatchingGroup(Auxiliary.BypathExtraFilter,tp,0xff,0xff,nil,c,tp,table.unpack(funs))
-				if mg2:GetCount()>0 then g:Merge(mg2) end
+				if #mg2>0 then g:Merge(mg2) end
 				local fg=aux.GetMustMaterialGroup(tp,EFFECT_MUST_BE_BYPATH_MATERIAL)
 				if fg:IsExists(aux.MustMaterialCounterFilter,1,nil,mg) then return false end
 				Duel.SetSelectedCard(fg)
@@ -270,7 +270,7 @@ function Auxiliary.BypathTarget(altcheck,...)
 				while #t>0 do table.remove(t) end
 				local mg=Duel.GetFieldGroup(tp,LOCATION_ONFIELD,LOCATION_ONFIELD)
 				local mg2=Duel.GetMatchingGroup(Auxiliary.BypathExtraFilter,tp,0xff,0xff,nil,c,tp,table.unpack(funs))
-				if mg2:GetCount()>0 then mg:Merge(mg2) end
+				if #mg2>0 then mg:Merge(mg2) end
 				local bg=Group.CreateGroup()
 				local ce={Duel.IsPlayerAffectedByEffect(tp,EFFECT_MUST_BE_BYPATH_MATERIAL)}
 				for _,te in ipairs(ce) do
@@ -284,7 +284,7 @@ function Auxiliary.BypathTarget(altcheck,...)
 				local sg=Group.CreateGroup()
 				sg:Merge(bg)
 				local finish=false
-				while not (sg:GetCount()>=max) do
+				while not (#sg>=max) do
 					finish=Auxiliary.ByCheckGoal(tp,sg,c,#sg,altcheck,table.unpack(funs))
 					local cg=mg:Filter(Auxiliary.ByCheckRecursive,sg,tp,sg,mg,c,#sg,altcheck,table.unpack(funs))
 					if #cg==0 then break end
@@ -297,7 +297,7 @@ function Auxiliary.BypathTarget(altcheck,...)
 					if not sg:IsContains(tc) then
 						sg:AddCard(tc)
 						t[tc]=seq
-						if (sg:GetCount()>=max) then finish=true end
+						if (#sg>=max) then finish=true end
 					else
 						sg:RemoveCard(tc)
 						t[tc]=nil

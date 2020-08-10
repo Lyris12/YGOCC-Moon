@@ -188,7 +188,7 @@ function Auxiliary.PolarityTarget(f1,f2)
 				while true do
 					local tg=g2:Sub(sg2)
 					local mg=g:Filter(Auxiliary.SelectUnselectLoop,sg,sg,tg,e,tp,1,99,Auxiliary.PolarCheckRecursive2(sg1,c,stability))
-					if mg:GetCount()<=0 then break end
+					if #mg<=0 then break end
 					Duel.Hint(HINT_SELECTMSG,tp,0)
 					local tc=mg:SelectUnselect(sg,tp,true,true)
 					if not tc then break end

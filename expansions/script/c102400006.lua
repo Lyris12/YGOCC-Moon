@@ -61,7 +61,7 @@ function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local g2=Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil,e,tp)
-		if g2:GetCount()>0 then
+		if #g2>0 then
 			Duel.BreakEffect() 
 			Duel.SpecialSummon(g2,0,tp,tp,false,false,POS_FACEUP)
 		end

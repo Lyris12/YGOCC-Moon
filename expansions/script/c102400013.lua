@@ -71,7 +71,7 @@ function cid.thop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.SendtoHand(g,nil,REASON_EFFECT)>0 then
 		Duel.ConfirmCards(1-tp,g)
 		local mg=Duel.GetMatchingGroup(cid.filter2,tp,LOCATION_DECK,0,nil)
-		if dir and mg:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
+		if dir and #mg>0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
 			Duel.BreakEffect()
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 			local sg=mg:Select(tp,1,1,nil)

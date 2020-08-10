@@ -70,7 +70,7 @@ function cid.thop(e,tp,eg,ep,ev,re,r,rp)
 	local ct=Duel.SendtoHand(sg,nil,REASON_EFFECT)
 	Duel.ShuffleHand(1-tp)
 	local mg=Duel.GetMatchingGroup(tp,Card.IsAbleToHand,tp,0,LOCATION_MZONE,1,1,nil)
-	if dir and mg:GetCount()>0 and Duel.SelectEffectYesNo(tp,e:GetHandler(),aux.Stringid(id,0)) then
+	if dir and #mg>0 and Duel.SelectEffectYesNo(tp,e:GetHandler(),aux.Stringid(id,0)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 		local g=mg:Select(tp,1,1,nil)
 		Duel.HintSelection(g)

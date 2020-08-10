@@ -36,7 +36,7 @@ end
 function cid.mcheck(sg)
 	local sg=sg:Clone()
 	local vg=sg:Filter(Card.IsSetCard,nil,0x285b)
-	if vg:GetCount()==sg:GetCount() then return true end
+	if #vg==#sg then return true end
 	sg:Sub(vg)
 	return vg:GetFirst():GetAttack()>sg:GetFirst():GetAttack()
 end

@@ -50,7 +50,7 @@ function cid.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	if dir then
 		local sg=Duel.GetMatchingGroup(aux.TRUE,tp,0,LOCATION_MZONE,nil)
-		Duel.SetOperationInfo(0,CATEGORY_DESTROY,sg,sg:GetCount(),0,0)
+		Duel.SetOperationInfo(0,CATEGORY_DESTROY,sg,#sg,0,0)
 	end
 end
 function cid.desop(e,tp,eg,ep,ev,re,r,rp)
