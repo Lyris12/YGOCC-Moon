@@ -33,6 +33,7 @@ function s.initial_effect(c)
 		e3:SetRange(LOCATION_MZONE)
 		e3:SetCountLimit(1,id+200)
 		e3:SetCondition(s.discon)
+		e3:SetCost(s.cost)
 		e3:SetTarget(s.distg)
 		e3:SetOperation(s.disop)
 		c:RegisterEffect(e3)
@@ -75,12 +76,18 @@ end
 	local tg=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
 	return tg and tg:IsContains(c) and Duel.IsChainDisablable(ev)
 end
+	function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_GRAVE,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+	local g=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_GRAVE,0,1,1,nil)
+	Duel.Remove(g,POS_FACEUP,REASON_COST)
+end
 	function s.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_DISABLE,eg,1,0,0)
 end
 	function s.disop(e,tp,eg,ep,ev,re,r,rp,chk)
-	Duel.NegateEffect(ev)
+	Duel.NegateActivation(ev)
 end
 	function s.cond(e,tp,eg,ep,ev,re,r,rp)
 	local ph=Duel.GetCurrentPhase()
