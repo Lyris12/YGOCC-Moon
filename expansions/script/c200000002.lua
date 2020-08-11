@@ -42,28 +42,28 @@ function cid.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
 end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
-	c=e:GetHandler()
+	local c=e:GetHandler()
 	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
-	if Duel.MoveToField(c,tp,tp,LOCATION_SZONE,POS_FACEUP,true) then
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetCode(EFFECT_CHANGE_TYPE)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e1:SetReset(RESET_EVENT+0x1fc0000)
-	e1:SetValue(TYPE_TRAP+TYPE_CONTINUOUS)
-	c:RegisterEffect(e1)
-	 if Duel.IsExistingMatchingCard(aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil,e,tp) and 
-	Duel.SelectYesNo(tp,aux.Stringid(4777,0))
-		then
+	if c:IsRelateToEffect(e) and Duel.MoveToField(c,tp,tp,LOCATION_SZONE,POS_FACEUP,true) then
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetCode(EFFECT_CHANGE_TYPE)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e1:SetReset(RESET_EVENT+0x1fc0000)
+		e1:SetValue(TYPE_TRAP+TYPE_CONTINUOUS)
+		c:RegisterEffect(e1)
+		if Duel.IsExistingMatchingCard(aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil,e,tp) and 
+			Duel.SelectYesNo(tp,aux.Stringid(4777,0))
+			then
 			local g=Duel.SelectMatchingCard(tp,aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
 			local tc=g:GetFirst()
 				if g:GetCount()>0 then
 				Duel.HintSelection(g)
 				Duel.SendtoDeck(g,nil,2,REASON_EFFECT)
 			end
+		end
 	end
-	end
-	end
+end
 --special summon
 function cid.spfilter(c)
 	return c:IsSetCard(0x700) and c:IsAbleToGraveAsCost() and (not c:IsLocation(LOCATION_MZONE) or c:IsFaceup())
