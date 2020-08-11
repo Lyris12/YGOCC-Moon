@@ -6,32 +6,30 @@ function cm.initial_effect(c)
 --xyz summon
 	aux.AddXyzProcedure(c,cm.mfilter,4,2,cm.ovfilter,aux.Stringid(m,0),2,cm.xyzop)
 	c:EnableReviveLimit()
+	--special summon
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
+	e1:SetDescription(aux.Stringid(m,0))
+	e1:SetType(EFFECT_TYPE_QUICK_O)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_MAIN_END)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetProperty(EFFECT_FLAG_DELAY)
-	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e1:SetCondition(cm.spcon)
-	e1:SetCondition(cm.drcon1)
-	e1:SetOperation(cm.damop1)
+	e1:SetCountLimit(1)
+	e1:SetCondition(cm.atccon)
+	e1:SetTarget(cm.target)
+	e1:SetOperation(cm.operation)
 	c:RegisterEffect(e1)
-	--sp_summon effect
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e2:SetCondition(cm.regcon)
-	e2:SetOperation(cm.regop)
-	c:RegisterEffect(e2)
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e3:SetCode(EVENT_CHAIN_SOLVED)
-	e3:SetRange(LOCATION_MZONE)
-	e3:SetCondition(cm.spcon)
-	e3:SetCondition(cm.damcon)
-	e3:SetOperation(cm.damop2)
-	c:RegisterEffect(e3)
+	if not cm.global_check then
+		cm.global_check=true
+		local ge1=Effect.CreateEffect(c)
+		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge1:SetCode(EVENT_SUMMON_SUCCESS)
+		ge1:SetOperation(cm.checkop)
+		Duel.RegisterEffect(ge1,0)
+		local ge2=ge1:Clone()
+		ge2:SetCode(EVENT_SPSUMMON_SUCCESS)
+		Duel.RegisterEffect(ge2,0)
+	end
 	--spsummon
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(m,1))
@@ -44,20 +42,23 @@ function cm.initial_effect(c)
 	e4:SetOperation(cm.spop)
 	c:RegisterEffect(e4)
 end
+
+function cm.checkop(e,tp,eg,ep,ev,re,r,rp)
+	local tc=eg:GetFirst()
+	while tc do
+		Duel.RegisterFlagEffect(tc:GetSummonPlayer(),m,RESET_PHASE+PHASE_END,0,1)
+		tc=eg:GetNext()
+	end
+end
+
+function cm.atccon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetFlagEffect(1-tp,m)>=5 and (Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2)
+end
+
 function cm.mfilter(c)
 	return c:IsSetCard(0xffd)
 end
-function cm.filter(c,sp)
-	return c:GetSummonPlayer()==sp
-end
-function cm.drcon1(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(cm.filter,1,nil,1-tp) 
-		and (not re:IsHasType(EFFECT_TYPE_ACTIONS) or re:IsHasType(EFFECT_TYPE_CONTINUOUS))
-end
-function cm.regcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(cm.filter,1,nil,1-tp) 
-		and re:IsHasType(EFFECT_TYPE_ACTIONS) and not re:IsHasType(EFFECT_TYPE_CONTINUOUS)
-end
+
 function cm.ovfilter(c)
 	return c:IsFaceup()
 		and ((c:IsType(TYPE_XYZ) and c:GetOverlayGroup():IsExists(Card.IsCode,1,nil,88880005))
@@ -67,63 +68,32 @@ function cm.xyzop(e,tp,chk,mc)
 	if chk==0 then return mc:CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	mc:RemoveOverlayCard(tp,1,1,REASON_COST)
 end
-function cm.regop(e,tp,eg,ep,ev,re,r,rp)
-	e:GetHandler():RegisterFlagEffect(m,RESET_EVENT+0x1fc0000+RESET_CHAIN,0,1)
+
+
+function cm.filter(c)
+	return c:IsCanOverlay()
 end
-function cm.damcon(e,tp,eg,ep,ev,re,r,rp)
+
+function cm.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and cm.filter(chkc) and chkc~=e:GetHandler() end
+	if chk==0 then return e:GetHandler():IsType(TYPE_XYZ)
+		and Duel.IsExistingTarget(cm.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,e:GetHandler()) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
+	Duel.SelectTarget(tp,cm.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,e:GetHandler())
+end
+
+function cm.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:GetOverlayCount()>0 and ep~=tp and c:GetFlagEffect(m)~=0
-end
-
-function cm.damop1(e,tp,eg,ep,ev,re,r,rp)
-	local totalatk=0
-	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
-	local tc=g:GetFirst()
-	while tc do
-		local a1=tc:GetAttack()
-		local ATK=Effect.CreateEffect(e:GetHandler())
-		ATK:SetType(EFFECT_TYPE_SINGLE)
-		ATK:SetCode(EFFECT_UPDATE_ATTACK)
-		ATK:SetValue(-200)
-		ATK:SetReset(RESET_EVENT+RESETS_STANDARD) 
-		tc:RegisterEffect(ATK)
-		local a2=tc:GetAttack()
-			if a1>a2 then
-			totalatk=totalatk+a1-a2
-			end
-		tc=g:GetNext()
-	end
-	if totalatk>0 then
-		local lp=math.floor(totalatk/2)
-		Duel.Recover(tp,lp,REASON_EFFECT)
+	local tc=Duel.GetFirstTarget()
+	if c:IsRelateToEffect(e) and tc:IsRelateToEffect(e) and not tc:IsImmuneToEffect(e) then
+		local og=tc:GetOverlayGroup()
+		if og:GetCount()>0 then
+			Duel.SendtoGrave(og,REASON_RULE)
+		end
+		Duel.Overlay(c,Group.FromCards(tc))
 	end
 end
 
-function cm.damop2(e,tp,eg,ep,ev,re,r,rp)
-	local n=Duel.GetFlagEffect(tp,m)
-	Duel.ResetFlagEffect(tp,m)
-	local totalatk=0
-	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
-	local tc=g:GetFirst()
-	while tc do
-		local a1=tc:GetAttack()
-		local ATK=Effect.CreateEffect(e:GetHandler())
-		ATK:SetType(EFFECT_TYPE_SINGLE)
-		ATK:SetCode(EFFECT_UPDATE_ATTACK)
-		ATK:SetValue(-200)
-		ATK:SetReset(RESET_EVENT+RESETS_STANDARD) 
-		tc:RegisterEffect(ATK)
-		local a2=tc:GetAttack()
-			if a1>a2 then
-			totalatk=totalatk+a1-a2
-			end
-		tc=g:GetNext()
-	end
-	if totalatk>0 then
-		local lp=math.floor(totalatk/2)
-		Duel.Recover(tp,lp,REASON_EFFECT)
-	end
-end
 
 function cm.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetOverlayCount()>0

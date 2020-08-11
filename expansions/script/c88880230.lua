@@ -7,7 +7,6 @@ function cm.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCountLimit(88881230)
 	e1:SetTarget(cm.target)
 	e1:SetOperation(cm.activate)
 	c:RegisterEffect(e1)
@@ -16,7 +15,7 @@ function cm.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetProperty(EFFECT_FLAG_DELAY)
 	e2:SetCode(EVENT_TO_GRAVE)
-	e2:SetCountLimit(88882230)
+	e2:SetCountLimit(1,88882230)
 	e2:SetCondition(cm.setcon)
 	e2:SetTarget(cm.settg)
 	e2:SetOperation(cm.setop)
@@ -49,14 +48,14 @@ function cm.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_INDESTRUCTABLE_COUNT)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e1:SetCountLimit(1)
+		e1:SetCountLimit(2)
 		e1:SetValue(cm.indval)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e1)
 	end
 end
 function cm.indval(e,re,r,rp)
-	return bit.band(r,REASON_BATTLE)~=0
+	return bit.band(r,REASON_BATTLE+REASON_EFFECT)~=0
 end
 
 function cm.rmcon(e,tp,eg,ep,ev,re,r,rp)

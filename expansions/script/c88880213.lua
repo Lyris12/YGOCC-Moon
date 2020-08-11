@@ -39,11 +39,18 @@ function cm.linkfilter(c,tp)
 	return c:IsFaceup()
 		and ((c:IsType(TYPE_XYZ) and c:IsSetCard(0xffd)and c:GetOverlayGroup():GetCount()>0))
 end
-function cm.linkcon(e,c)
+
+function cm.cfilter(c,tp)
+	return c:IsFaceup() and (c:IsType(TYPE_XYZ) and c:IsSetCard(0xffd))
+end
+
+function cm.linkcon(e,c,tp,eg,ep,ev,re,r,rp)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	return Duel.IsExistingMatchingCard(cm.linkfilter,tp,LOCATION_MZONE,0,1,nil,tp)
+	local g=Duel.GetFieldGroup(tp,LOCATION_MZONE,0)
+	return Duel.IsExistingMatchingCard(cm.linkfilter,tp,LOCATION_MZONE,0,1,nil,tp) and g:FilterCount(cm.cfilter,nil)==1
 end
+
 function cm.linkop(e,tp,eg,ep,ev,re,r,rp,c)
 	local g1=Duel.SelectMatchingCard(tp,cm.linkfilter,tp,LOCATION_MZONE,0,1,1,nil,tp)
 	c:SetMaterial(g1)
@@ -59,7 +66,7 @@ function cm.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
 function cm.thfilter(c)
-	return c:IsSetCard(0xffd) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
+	return c:IsSetCard(0xffd) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToHand()
 end
 function cm.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cm.thfilter,tp,LOCATION_DECK,0,1,nil) end

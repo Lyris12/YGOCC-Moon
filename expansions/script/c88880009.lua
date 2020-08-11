@@ -16,6 +16,7 @@ function cid.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,2))
 	e1:SetType(EFFECT_TYPE_QUICK_O)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(2)
@@ -24,6 +25,18 @@ function cid.initial_effect(c)
 	e1:SetTarget(cid.target)
 	e1:SetOperation(cid.operation)
 	c:RegisterEffect(e1)
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetCode(EFFECT_UPDATE_ATTACK)
+	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetValue(cid.atkval)
+	c:RegisterEffect(e2)
+end
+
+
+function cid.atkval(e,c)
+	return c:GetOverlayCount()*150
 end
 
 --filters
@@ -74,42 +87,8 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if c:IsFaceup() and c:IsRelateToEffect(e) and tc:IsRelateToEffect(e) then
 		Duel.Overlay(c,Group.FromCards(tc))
-		local c=e:GetHandler()
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_FIELD)
-		e1:SetCode(EFFECT_DISABLE)
-		e1:SetTargetRange(0,0xff)
-		e1:SetTarget(cid.distg)
-		e1:SetLabelObject(tc)
-		e1:SetReset(RESET_PHASE+PHASE_END,1)
-		Duel.RegisterEffect(e1,tp)
-		local e2=Effect.CreateEffect(c)
-		e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e2:SetCode(EVENT_CHAIN_SOLVING)
-		e2:SetCondition(cid.discon)
-		e2:SetOperation(cid.disop)
-		e2:SetLabelObject(tc)
-		e2:SetReset(RESET_PHASE+PHASE_END,1)
-		Duel.RegisterEffect(e2,tp)
+		Duel.BreakEffect()
+		Duel.Damage(1-tp,400,REASON_EFFECT)
 	end
-end
-function cid.distg(e,c)
-	local tc=e:GetLabelObject()
-	return c:IsOriginalCodeRule(tc:GetOriginalCodeRule())
-end
-function cid.discon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetOverlayGroup():IsExists(cid.fixdisable,1,nil,re) and re:GetHandler():GetFlagEffect(id)<=0
-		and not re:GetHandler():IsControler(tp)
-end
-function cid.disop(e,tp,eg,ep,ev,re,r,rp)
-	local rx=re:GetHandler()
-	if not e:GetHandler():GetOverlayGroup():IsExists(cid.fixdisable,1,nil,re) or rx:GetFlagEffect(id)>0 or rx:IsControler(tp) then return end
-	Duel.NegateEffect(ev)
-end
-function cid.fixfilter(c,e)
-	return e:GetHandler():GetOverlayGroup():IsContains(c)
-end
-function cid.fixdisable(c,re)
-	return c:IsCode(re:GetHandler():GetCode())
 end
 --====================================================================================================================
