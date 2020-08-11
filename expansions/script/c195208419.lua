@@ -36,7 +36,7 @@ end
 	return Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2
 end
 	function cid.filter(c,e,tp,lv)
-	return c:IsLevelBelow(lv) and c:IsSetCard(0x83e) and c:IsType(TYPE_MONSTER) and c:IsCanBeSpecialSummoned(e,0,tp,true,false) and Duel.GetLocationCountFromEx(tp)>0
+	return c:IsLevelBelow(lv) and c:IsSetCard(0x83e) and c:IsType(TYPE_MONSTER) and c:IsCanBeSpecialSummoned(e,0,tp,true,false) and Duel.GetLocationCountFromEx(tp,tp,nil,c)>0
 end
 	function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(e:GetHandler():GetCounter(0x83e))
