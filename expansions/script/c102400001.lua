@@ -43,14 +43,14 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.BreakEffect()
 		Duel.SendtoHand(sg,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,sg)
-		local tc=g:GetFirst()
-		if tc:IsLocation(LOCATION_HAND) then
+		local uc=sg:GetFirst()
+		if uc:IsLocation(LOCATION_HAND) then
 			local e1=Effect.CreateEffect(e:GetHandler())
 			e1:SetType(EFFECT_TYPE_FIELD)
 			e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 			e1:SetCode(EFFECT_CANNOT_ACTIVATE)
 			e1:SetTargetRange(1,0)
-			e1:SetValue(cid.aclimit(tc:GetCode(),sc:GetCode(),sg:GetFirst():GetCode()))
+			e1:SetValue(cid.aclimit(tc:GetCode(),sc:GetCode(),uc:GetCode()))
 			e1:SetReset(RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN,2)
 			Duel.RegisterEffect(e1,tp)
 		end
