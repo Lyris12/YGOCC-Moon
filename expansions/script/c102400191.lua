@@ -3,11 +3,11 @@
 local cid,id=GetID()
 function cid.initial_effect(c)
 	c:EnableReviveLimit()
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_MONSTER_SSET)
-	e1:SetValue(TYPE_TRAP)
-	c:RegisterEffect(e1)
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_SINGLE)
+	e0:SetCode(EFFECT_MONSTER_SSET)
+	e0:SetValue(TYPE_TRAP)
+	c:RegisterEffect(e0)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_SSET)
@@ -31,4 +31,48 @@ function cid.initial_effect(c)
 	e3:SetCode(EVENT_ADJUST)
 	e3:SetCode(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	c:RegisterEffect(e3)
+	local f=Card.GetRitualLevel
+	Card.GetRitualLevel=function(c,rc)
+		if c:IsLocation(LOCATION_SZONE) then return c:GetOriginalLevel()+f(c,rc)&0xf0000 end
+		return f(c,rc)
+	end
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e4:SetCode(EVENT_LEAVE_FIELD)
+	e4:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
+	e4:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e4:SetCondition(cid.condition)
+	e4:SetTarget(cid.target)
+	e4:SetOperation(cid.operation)
+	c:RegisterEffect(e4)
+end
+function cid.condition(e)
+	local c=e:GetHandler()
+	return c:IsPreviousPosition(POS_FACEDOWN) or c:IsSummonType(SUMMON_TYPE_RITUAL)
+end
+function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(aux.RitualUltimateFilter,tp,LOCATION_HAND+LOCATION_DECK,0,1,nil,aux.FilterBoolFunction(Card.IsSetCard,0xf7a),e,tp,Duel.GetRitualMaterial(tp),Duel.GetMatchingGroup(function(tc) return tc:GetOriginalLevel()>0 end,tp,LOCATION_SZONE,0,nil),Card.GetLevel,"Greater",true) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_DECK)
+end
+function cid.operation(e,tp,eg,ep,ev,re,r,rp)
+	local mg=Duel.GetRitualMaterial(tp)
+	local exg=Duel.GetMatchingGroup(function(tc) return tc:GetOriginalLevel()>0 end,tp,LOCATION_SZONE,0,nil)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local tg=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(aux.RitualUltimateFilter),tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil,aux.FilterBoolFunction(Card.IsSetCard,0xf7a),e,tp,mg,exg,Card.GetLevel,"Greater")
+	local tc=tg:GetFirst()
+	if tc then
+		mg=mg:Filter(Card.IsCanBeRitualMaterial,tc,tc)+exg
+		if tc.mat_filter then mg=mg:Filter(tc.mat_filter,tc,tp)
+		else mg:RemoveCard(tc) end
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
+		local lv=tc:GetLevel()
+		aux.GCheckAdditional=aux.RitualCheckAdditional(tc,lv,"Greater")
+		local mat=mg:SelectSubGroup(tp,aux.RitualCheck,false,1,lv,tp,tc,lv,"Greater")
+		aux.GCheckAdditional=nil
+		tc:SetMaterial(mat)
+		Duel.ReleaseRitualMaterial(mat)
+		Duel.BreakEffect()
+		Duel.SpecialSummon(tc,SUMMON_TYPE_RITUAL,tp,tp,false,true,POS_FACEUP)
+		tc:CompleteProcedure()
+	end
 end

@@ -9,7 +9,12 @@ function cid.initial_effect(c)
 	end
 	local e1=aux.AddRitualProcGreater2(c,aux.FilterBoolFunction(Card.IsSetCard,0xf7a),LOCATION_HAND+LOCATION_GRAVE)
 	e1:SetCountLimit(1,id)
+	e1:SetTarget(cid.target)
 	e1:SetOperation(cid.activate)
+end
+function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(aux.RitualUltimateFilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil,aux.FilterBoolFunction(Card.IsSetCard,0xf7a),e,tp,Duel.GetRitualMaterial(tp),Duel.GetMatchingGroup(function(tc) return tc:GetOriginalLevel()>0 end,tp,LOCATION_SZONE,0,nil),Card.GetLevel,"Greater",true) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_GRAVE)
 end
 function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 	local mg=Duel.GetRitualMaterial(tp)
