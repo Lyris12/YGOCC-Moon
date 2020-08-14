@@ -100,7 +100,7 @@ end
 function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) and Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP) then
-		local e0=Effect.CreateEffect(c)
+		local e0=Effect.CreateEffect(e:GetHandler())
 		e0:SetType(EFFECT_TYPE_SINGLE)
 		e0:SetCode(EFFECT_UPDATE_ATTACK)
 		e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
@@ -115,7 +115,7 @@ function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetOperation(function() Duel.Remove(e1:GetHandler(),POS_FACEDOWN,e1:GetLabel()) end)
 		e1:SetReset(RESET_EVENT+RESETS_REDIRECT)
 		e1:SetValue(LOCATION_REMOVED)
-		g:GetFirst():RegisterEffect(e1)
+		tc:RegisterEffect(e1)
 	end
 	Duel.SpecialSummonComplete()
 end
