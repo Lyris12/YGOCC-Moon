@@ -98,7 +98,7 @@ function cid.desop(e,tp,eg,ep,ev,re,r,rp)
 	if tc and tc:IsLocation(LOCATION_MZONE) then
 		if Duel.Destroy(tc,REASON_EFFECT)>0 and Duel.IsExistingMatchingCard(cid.thfilter,tp,LOCATION_DECK,0,1,nil) then
 			local g=Duel.SelectMatchingCard(tp,cid.thfilter,tp,LOCATION_DECK,0,1,1,nil)
-			if g:GetCount()>0 then
+			if #g>0 then
 				Duel.SendtoHand(g,nil,REASON_EFFECT)
 				Duel.ConfirmCards(1-tp,g)
 			end

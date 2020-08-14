@@ -41,7 +41,7 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 		local g1=Duel.SelectMatchingCard(tp,cid.thfilter,tp,LOCATION_DECK+LOCATION_REMOVED,0,1,1,nil):GetFirst()
 		local g2=Duel.SelectMatchingCard(tp,cid.thfilter2,tp,LOCATION_DECK+LOCATION_REMOVED,0,1,1,nil,g1:GetCode()):GetFirst()
 		local g=Group.FromCards(g1,g2)
-		if g:GetCount()>0 then
+		if #g>0 then
 			Duel.SendtoHand(g,nil,REASON_EFFECT)
 			Duel.ConfirmCards(1-tp,g)
 		end

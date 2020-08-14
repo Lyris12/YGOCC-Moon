@@ -73,7 +73,7 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 			Duel.SendtoGrave(tc,REASON_EFFECT)
 			tg:RemoveCard(tc)
 			local hc=tg:GetFirst()
-			if hc:IsAbleToHand() then
+			if hc and hc:IsAbleToHand() then
 				Duel.SendtoHand(hc,nil,REASON_EFFECT)
 				Duel.ConfirmCards(1-tp,tg)
 				Duel.ShuffleHand(tp)

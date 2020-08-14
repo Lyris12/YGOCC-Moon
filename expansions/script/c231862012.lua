@@ -68,7 +68,7 @@ function cid.rccon(e,tp,eg,ep,ev,re,r,rp)
 end
 function cid.rcop(e,tp,eg,ep,ev,re,r,rp)
 	local hg=Duel.GetFieldGroup(1-tp,LOCATION_HAND,0)
-	if Duel.IsChainDisablable(0) and hg:GetCount()>0
+	if Duel.IsChainDisablable(0) and #hg>0
 		and Duel.SelectYesNo(1-tp,aux.Stringid(math.floor(id/100),2)) then
 		Duel.DiscardHand(1-tp,Card.IsDiscardable,1,1,REASON_EFFECT+REASON_DISCARD,nil)
 		Duel.NegateEffect(0)

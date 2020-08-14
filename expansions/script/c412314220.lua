@@ -27,18 +27,18 @@ end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
 	local g=Duel.GetMatchingGroup(cid.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
-	if g:GetCount()>=2 then
-		Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,1,PLAYER_ALL,math.floor(g:GetCount()/2))
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,0,0)
+	if #g>=2 then
+		Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,1,PLAYER_ALL,math.floor(#g/2))
 	end
 end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(cid.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
 	Duel.Destroy(g,REASON_EFFECT)
 	local og=Duel.GetOperatedGroup()
-	if og:GetCount()>=2 then
+	if #og>=2 then
 		Duel.BreakEffect()
-		local ct=math.floor(og:GetCount()/2)
+		local ct=math.floor(#og/2)
 		local ct2=ct
 		local ct3,ct4=Duel.GetMatchingGroupCount(Card.IsDiscardable,tp,LOCATION_HAND,0,nil,REASON_EFFECT),Duel.GetMatchingGroupCount(Card.IsDiscardable,1-tp,LOCATION_HAND,0,nil,REASON_EFFECT)
 		if ct3<ct then ct=ct3 end

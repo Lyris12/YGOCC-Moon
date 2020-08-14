@@ -64,7 +64,7 @@ function cid.op(e,tp,eg,ep,ev,re,r,rp)
 	local sel=e:GetLabel()
 	if sel==1 then
 		local g=Duel.GetMatchingGroup(cid.desfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
-		if g:GetCount()>0 then
+		if #g>0 then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 			local dg=g:Select(tp,1,1,nil)
 			Duel.HintSelection(dg)
@@ -73,7 +73,7 @@ function cid.op(e,tp,eg,ep,ev,re,r,rp)
 	else
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 		local g=Duel.SelectMatchingCard(tp,cid.schfilter,tp,LOCATION_DECK,0,1,1,nil)
-		if g:GetCount()>0 then
+		if #g>0 then
 			Duel.SendtoHand(g,nil,REASON_EFFECT)
 			Duel.ConfirmCards(1-tp,g)
 		end
@@ -86,7 +86,7 @@ end
 function cid.schop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,cid.schfilter1,tp,LOCATION_DECK,0,1,1,nil,0)
-	if g:GetCount()>0 then
+	if #g>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
 	end

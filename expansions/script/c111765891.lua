@@ -43,10 +43,10 @@ function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 then
 		local g2=Duel.GetMatchingGroup(cid.thfilter,tp,LOCATION_DECK,0,nil)
-		if Duel.GetMatchingGroupCount(Card.IsCode,tp,LOCATION_MZONE,0,nil,id//100)>0 and g2:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(id//100,1)) then
+		if Duel.GetMatchingGroupCount(Card.IsCode,tp,LOCATION_MZONE,0,nil,id//100)>0 and #g2>0 and Duel.SelectYesNo(tp,aux.Stringid(id//100,1)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 		local g2=Duel.SelectMatchingCard(tp,cid.thfilter,tp,LOCATION_DECK,0,1,1,nil)
-		if g2:GetCount()>0 then
+		if #g2>0 then
 			Duel.SendtoHand(g2,tp,REASON_EFFECT)
 			Duel.ConfirmCards(1-tp,g2)
 		 end

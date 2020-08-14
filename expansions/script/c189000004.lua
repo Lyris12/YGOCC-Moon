@@ -96,14 +96,14 @@ function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		g:Remove(Card.IsCode,nil,g1:GetFirst():GetCode())
 		mg=mg+g1
 		ft=ft-1
-	until ft==0 or g:GetCount()==0 or not Duel.SelectYesNo(tp,aux.Stringid(id,0))
+	until ft==0 or #g==0 or not Duel.SelectYesNo(tp,aux.Stringid(id,0))
 	Duel.SetTargetCard(mg)
-	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,mg,mg:GetCount(),0,0)
+	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,mg,#mg,0,0)
 end
 function cid.op(e,tp,eg,ep,ev,re,r,rp)
 	local ft=Duel.GetLocationCount(tp,LOCATION_SZONE)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
-	if ft<g:GetCount() then return end
+	if ft<#g then return end
 	local c=e:GetHandler()
 	if c:IsFacedown() or not c:IsRelateToEffect(e) then return end
 	local tc=g:GetFirst()

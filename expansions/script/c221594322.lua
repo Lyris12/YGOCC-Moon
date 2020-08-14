@@ -5,17 +5,18 @@ function cid.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCountLimit(1,id)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e1:SetCategory(CATEGORY_REMOVE)
+	e1:SetCategory(CATEGORY_DAMAGE)
+	e1:SetCost(cid.cost(0x6c97,0x9c97))
 	e1:SetTarget(cid.rmtg)
 	e1:SetOperation(cid.rmop)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_REMOVE)
-	e2:SetProperty(EFFECT_FLAG_DELAY)
+	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e2:SetCountLimit(1,id+100)
-	e2:SetCost(cid.cost)
+	e2:SetCondition(function(e,tp,eg,ep,ev,re,r,rp) return re and re:GetHandler():IsSetCard(0xc97) and e:GetHandler():IsReason(REASON_EFFECT) end)
+	e2:SetCost(cid.cost(0xc97))
 	e2:SetTarget(cid.settg)
 	e2:SetOperation(cid.setop)
 	c:RegisterEffect(e2)
@@ -24,33 +25,54 @@ function cid.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x6c97,0x9c97) and c:IsAbleToRemove()
 end
 function cid.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and cid.filter(chkc) end
-	if chk==0 then return Duel.IsPlayerCanRemove(tp) and Duel.GetFieldGroupCount(tp,0,LOCATION_EXTRA)>0
-		and Duel.IsExistingTarget(cid.filter,tp,LOCATION_MZONE,0,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,Duel.SelectTarget(tp,cid.filter,tp,LOCATION_MZONE,0,1,1,nil),1,0,0)
+	if chk==0 then return Duel.GetMatchingGroupCount(Card.IsFacedown,tp,0,LOCATION_EXTRA,nil)>0 end
 end
 function cid.rmop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFirstTarget()
-	local tg=Duel.GetFieldGroup(tp,0,LOCATION_EXTRA):Filter(Card.IsAbleToRemove,nil)
-	if not tc:IsRelateToEffect(e) or Duel.Remove(tc,POS_FACEDOWN,REASON_EFFECT)==0
-		or not tc:IsLocation(LOCATION_REMOVED) or #tg==0 then return end
+	local tc=Duel.GetMatchingGroup(Card.IsFacedown,tp,0,LOCATION_EXTRA,nil):RandomSelect(1-tp,1):GetFirst()
+	if not tc then return end
+	local atk=tc:GetTextAttack()//2
+	if atk<1 then return end
 	Duel.BreakEffect()
-	Duel.Remove(tg:RandomSelect(tp,1),POS_FACEDOWN,REASON_EFFECT)
+	Duel.Damage(tp,atk,REASON_EFFECT)
+	local c=e:GetHandler()
+	local code={tc:GetOriginalCodeRule()}
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e1:SetCode(EFFECT_CANNOT_ACTIVATE)
+	e1:SetTargetRange(0,1)
+	e1:SetValue(function(ef,ref) return re:GetHandler():IsCode(table.unpack(code)) and re:IsActiveType(TYPE_MONSTER) end)
+	e1:SetReset(RESET_PHASE+PHASE_END)
+	Duel.RegisterEffect(e1,tp)
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetCode(EFFECT_CANNOT_SUMMON)
+	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e2:SetTargetRange(0,1)
+	e1:SetTarget(aux.TargetBoolFunction(Card.IsCode,table.unpack(code)))
+	e2:SetReset(RESET_PHASE+PHASE_END)
+	Duel.RegisterEffect(e2,tp)
+	local e3=e2:Clone()
+	e3:SetCode(EFFECT_CANNOT_FLIP_SUMMON)
+	Duel.RegisterEffect(e3,tp)
+	local e4=e2:Clone()
+	e4:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+	Duel.RegisterEffect(e4,tp)
 end
-function cid.cfilter(c)
-	return c:IsSetCard(0xc97) and c:IsAbleToRemoveAsCost()
+function cid.cfilter(c,sets)
+	return c:IsSetCard(table.unpack(sets)) and c:IsAbleToRemoveAsCost()
 end
-function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(cid.cfilter,tp,LOCATION_GRAVE+LOCATION_ONFIELD,0,1,nil) end
-	Duel.Remove(Duel.SelectMatchingCard(tp,cid.cfilter,tp,LOCATION_GRAVE+LOCATION_ONFIELD,0,1,1,nil),POS_FACEUP,REASON_COST)
+function cid.cost(...)
+	local sets={...}
+	return  function(e,tp,eg,ep,ev,re,r,rp,chk)
+			if chk==0 then return Duel.IsExistingMatchingCard(cid.cfilter,tp,LOCATION_GRAVE+LOCATION_ONFIELD,0,1,nil,sets) end
+			Duel.Remove(Duel.SelectMatchingCard(tp,cid.cfilter,tp,LOCATION_GRAVE+LOCATION_ONFIELD,0,1,1,nil,sets),POS_FACEUP,REASON_COST)
+		end
 end
 function cid.settg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsSSetable() end
 end
 function cid.setop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) then
-		Duel.SSet(tp,c)
-	end
+	if c:IsRelateToEffect(e) then Duel.SSet(tp,c) end
 end

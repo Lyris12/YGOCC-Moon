@@ -20,7 +20,7 @@ function cid.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		local mg=e:GetHandler():GetMaterial()
 		if mg==nil then return end
-		local ct=mg:GetCount()
+		local ct=#mg
 		if ct~=mg:FilterCount(Card.IsSetCard,nil,0x617) then return end
 		return Duel.IsExistingMatchingCard(Card.IsAbleToHand,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,ct,nil)
 	end

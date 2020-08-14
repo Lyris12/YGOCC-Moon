@@ -43,8 +43,8 @@ function cid.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingTarget(cid.rmfilter,tp,0,LOCATION_ONFIELD,1,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectTarget(tp,cid.rmfilter,tp,0,LOCATION_ONFIELD,1,2,e:GetHandler())
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,g:GetCount(),0,0)
-	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,tp,g:GetCount()*200)
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,#g,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,tp,#g*200)
 end
 function cid.ctfilter2(c)
 	return c:IsLocation(LOCATION_REMOVED) and c:IsType(TYPE_TRAP) and not c:IsReason(REASON_REDIRECT)

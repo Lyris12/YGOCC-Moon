@@ -105,7 +105,7 @@ function cid.thop(e,tp,eg,ep,ev,re,r,rp)
 	if _replace_count>_replace_max or not e:GetHandler():IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(cid.thfilter),tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,1,nil)
-	if g:GetCount()>0 then
+	if #g>0 then
 		Duel.HintSelection(g)
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 	end
@@ -128,7 +128,7 @@ function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 	if not c:IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_MZONE)<1 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,cid.penfilter,tp,LOCATION_PZONE,0,1,1,nil,e,tp)
-	if g:GetCount()>0 and Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)>0 then
+	if #g>0 and Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)>0 then
 		Duel.MoveToField(c,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
 	end
 end
@@ -186,8 +186,8 @@ function cid.postg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g2=Duel.SelectTarget(tp,aux.NecroValleyFilter(cid.tdfilter),tp,LOCATION_GRAVE,0,1,1,nil)
 	e:SetCategory(CATEGORY_POSITION+CATEGORY_TODECK)
-	Duel.SetOperationInfo(0,CATEGORY_POSITION,g1,g1:GetCount(),0,0)
-	Duel.SetOperationInfo(0,CATEGORY_TODECK,g2,g2:GetCount(),0,0)
+	Duel.SetOperationInfo(0,CATEGORY_POSITION,g1,#g1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,g2,#g2,0,0)
 end
 function cid.posop(e,tp,eg,ep,ev,re,r,rp)
 	local ex,g1=Duel.GetOperationInfo(0,CATEGORY_POSITION)

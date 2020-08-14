@@ -80,8 +80,8 @@ function cid.spfilter3(c,e,tp,lv,sg)
 end
 function cid.spcost3(e,tp,eg,ep,ev,re,r,rp,chk)
 	local rg=(Duel.GetReleaseGroup(tp)+Duel.GetReleaseGroup(1-tp)):Filter(cid.costfilter,nil)
-	if chk==0 then return rg:CheckSubGroup(cid.fgoal,2,rg:GetCount(),e,tp) end
-	local g=rg:SelectSubGroup(tp,cid.fgoal,false,2,rg:GetCount(),e,tp)
+	if chk==0 then return rg:CheckSubGroup(cid.fgoal,2,#rg,e,tp) end
+	local g=rg:SelectSubGroup(tp,cid.fgoal,false,2,#rg,e,tp)
 	local lv=g:GetSum(Card.GetLevel)
 	e:SetLabel(lv)
 	Duel.Release(g,REASON_COST)

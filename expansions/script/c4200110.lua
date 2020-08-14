@@ -73,7 +73,7 @@ function cid.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return Duel.IsExistingMatchingCard(cid.filter,tp,0,LOCATION_MZONE,1,nil,c:GetAttack()) end
 	local g=Duel.GetMatchingGroup(cid.desfilter,tp,0,LOCATION_MZONE,nil,c:GetAttack())
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,0,0)
 	end
 function cid.desop(e,tp,eg,ep,ev,re,r,rp)
 local c=e:GetHandler()
@@ -126,7 +126,7 @@ function cid.negop(e,tp,eg,ep,ev,re,r,rp)
 	end
 	if ifclause and c:IsRelateToEffect(e) and tc:IsRelateToEffect(e) and not tc:IsImmuneToEffect(e) then
 		local og=tc:GetOverlayGroup()
-		if og:GetCount()>0 then
+		if #og>0 then
 			Duel.SendtoGrave(og,REASON_RULE)
 		end
 		Duel.Overlay(c,Group.FromCards(tc))

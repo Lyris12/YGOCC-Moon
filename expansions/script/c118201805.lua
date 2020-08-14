@@ -52,7 +52,7 @@ end
 function cid.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,cid.thfilter,tp,LOCATION_DECK,0,1,1,nil)
-	if g:GetCount()>0 then
+	if #g>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
 	end
@@ -88,13 +88,13 @@ function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 		e:SetLabel(e:GetLabel()+ATTRIBUTE_WATER)
 		e:SetCategory(e:GetCategory()+CATEGORY_TODECK)
 		local dg=Duel.GetMatchingGroup(Card.IsAbleToDeck,tp,0,LOCATION_ONFIELD,nil)
-		Duel.SetOperationInfo(0,CATEGORY_TODECK,dg,dg:GetCount(),0,0)
+		Duel.SetOperationInfo(0,CATEGORY_TODECK,dg,#dg,0,0)
 	end
 	if bit.band(attr,ATTRIBUTE_EARTH)>0 then
 		e:SetLabel(e:GetLabel()+ATTRIBUTE_EARTH)
 		e:SetCategory(e:GetCategory()+CATEGORY_POSITION+CATEGORY_DEFCHANGE)
 		local dg=Duel.GetMatchingGroup(cid.posfilter,tp,0,LOCATION_MZONE,nil)
-		Duel.SetOperationInfo(0,CATEGORY_POSITION,dg,dg:GetCount(),0,0)
+		Duel.SetOperationInfo(0,CATEGORY_POSITION,dg,#dg,0,0)
 	end
 	if bit.band(attr,ATTRIBUTE_WIND)>0 then
 		e:SetLabel(e:GetLabel()+ATTRIBUTE_WIND)
@@ -111,7 +111,7 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 	if bit.band(opt,ATTRIBUTE_WATER)>0 then
 		local ct=Duel.GetMatchingGroup(Card.IsAbleToDeck,tp,0,LOCATION_ONFIELD,nil)
-		if ct:GetCount()>0 then
+		if #ct>0 then
 			Duel.SendtoDeck(ct,nil,2,REASON_EFFECT)
 			for p=0,1 do
 				if ct:IsExists(cid.checkshf,1,nil,p) then
@@ -122,7 +122,7 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 	if bit.band(opt,ATTRIBUTE_EARTH)>0 then
 		local ct=Duel.GetMatchingGroup(cid.posfilter,tp,0,LOCATION_MZONE,nil)
-		if ct:GetCount()>0 then
+		if #ct>0 then
 			Duel.ChangePosition(ct,POS_FACEUP_DEFENSE,POS_FACEUP_DEFENSE,POS_FACEUP_DEFENSE,POS_FACEUP_DEFENSE)
 			local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,0,LOCATION_MZONE,nil)
 			local tc=g:GetFirst()

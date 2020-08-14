@@ -120,7 +120,7 @@ function cid.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function cid.atkop(e,tp,eg,ep,ev,re,r,rp)
     local tg=Duel.GetMatchingGroup(cid.atkfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
-    if Duel.Damage(tp,500,REASON_EFFECT)~=0 and Duel.GetLP(tp)>0 and tg:GetCount()>0 then
+    if Duel.Damage(tp,500,REASON_EFFECT)~=0 and Duel.GetLP(tp)>0 and #tg>0 then
         local sc=tg:GetFirst()
         while sc do
             local e1=Effect.CreateEffect(e:GetHandler())

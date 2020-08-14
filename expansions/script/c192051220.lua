@@ -90,11 +90,11 @@ end
 function cid.desop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectMatchingCard(tp,Card.IsDestructable,tp,LOCATION_MZONE,0,1,1,e:GetHandler())
-	if g:GetCount()>0 then
+	if #g>0 then
 		Duel.HintSelection(g)
 		if Duel.Destroy(g,REASON_EFFECT)==0 then return end
 		local mg=Duel.GetMatchingGroup(cid.filter,tp,0,LOCATION_GRAVE,nil,e,tp)
-		if mg:GetCount()>0 and Duel.SelectYesNo(1-tp,aux.Stringid(id,0)) then
+		if #mg>0 and Duel.SelectYesNo(1-tp,aux.Stringid(id,0)) then
 			Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_SPSUMMON)
 			local sg=mg:Select(1-tp,1,1,nil)
 			Duel.BreakEffect()

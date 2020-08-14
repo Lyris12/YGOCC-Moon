@@ -37,7 +37,7 @@ function cid.cfilter(c)
 end
 function cid.condition(e,tp,eg,ep,ev,re,r,rp)
 	e:SetLabelObject(eg:GetFirst())
-	return eg:GetCount()==1 and eg:GetFirst():IsSummonType(SUMMON_TYPE_XYZ) and eg:GetFirst():IsControler(tp) and cid.cfilter(eg:GetFirst())
+	return #eg==1 and eg:GetFirst():IsSummonType(SUMMON_TYPE_XYZ) and eg:GetFirst():IsControler(tp) and cid.cfilter(eg:GetFirst())
 end
 function cid.eqtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0

@@ -112,7 +112,7 @@ function cid.ope(e,tp,eg)
 	op=0
 	local lv=0
 	tmp=eg:GetFirst()
-	for i=1,eg:GetCount() do lv=lv+tmp:GetLevel() tmp=eg:GetNext() end
+	for i=1,#eg do lv=lv+tmp:GetLevel() tmp=eg:GetNext() end
 	if eg:CheckWithSumEqual(Card.GetLevel,6,2,2)
 	and Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_HAND+LOCATION_DECK,0,1,nil,e,tp,6)
 	then op=op+1 end

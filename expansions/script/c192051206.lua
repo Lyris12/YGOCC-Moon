@@ -56,7 +56,7 @@ function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local sg=Duel.SelectMatchingCard(tp,cid.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
 	local sc=sg:GetFirst()
-	if sg:GetCount()>0 and Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)>0 and e:GetHandler():IsRelateToEffect(e) then
+	if #sg>0 and Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)>0 and e:GetHandler():IsRelateToEffect(e) then
 		sg:AddCard(e:GetHandler())
 		Duel.BreakEffect()
 		local mg=Duel.GetMatchingGroup(function(c,lc,g)
@@ -64,7 +64,7 @@ function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 		end,tp,LOCATION_MZONE,0,nil,c,sg)
 		lv=0
 		tc=sg:GetFirst()
-		for i=1,sg:GetCount() do lv=lv+tc:GetLevel() tc=sg:GetNext() end
+		for i=1,#sg do lv=lv+tc:GetLevel() tc=sg:GetNext() end
 		if other>0 and mg:CheckWithSumEqual(Card.GetLevel,9-lv,1,1) then
 			fc=Duel.SelectMatchingCard(tp,cid.exfilter2,tp,LOCATION_EXTRA,0,1,1,nil,e,tp):GetFirst()
 		else

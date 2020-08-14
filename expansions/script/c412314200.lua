@@ -93,7 +93,7 @@ function cid.spact(e,tp,eg,ep,ev,re,r,rp)
 	if cid[tp]>1 and Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) or Duel.GetLocationCount(tp,LOCATION_MZONE)<cid[tp] then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.GetMatchingGroup(Card.IsSetCard,tp,LOCATION_HAND,0,nil,0x613):FilterSelect(tp,Card.IsCanBeSpecialSummoned,cid[tp],cid[tp],nil,e,0,tp,false,false)
-	if g:GetCount()>0 then
+	if #g>0 then
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
 end

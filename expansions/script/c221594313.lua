@@ -1,12 +1,11 @@
 --created by Walrus, coded by Lyris
 local cid,id=GetID()
 function cid.initial_effect(c)
-	c:SetUniqueOnField(c,1,0,id)
+	c:SetUniqueOnField(1,0,id)
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_EQUIP)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCountLimit(1,id+EFFECT_COUNT_CODE_OATH)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetTarget(cid.target)
 	e1:SetOperation(cid.operation)
@@ -15,47 +14,42 @@ function cid.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_EQUIP_LIMIT)
 	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e2:SetValue(cid.eqlimit)
+	e2:SetValue(aux.TRUE)
 	c:RegisterEffect(e2)
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_EQUIP)
-	e4:SetCode(EFFECT_SET_ATTACK)
-	e4:SetValue(0)
-	c:RegisterEffect(e4)
 	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_EQUIP)
-	e3:SetCode(EFFECT_SET_DEFENSE)
-	e3:SetValue(0)
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
+	e3:SetCode(EVENT_PHASE+PHASE_STANDBY)
+	e3:SetRange(LOCATION_SZONE)
+	e3:SetCountLimit(1)
+	e3:SetProperty(CATEGORY_DAMAGE)
+	e3:SetTarget(cid.damtg)
+	e3:SetOperation(cid.damop)
 	c:RegisterEffect(e3)
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
+	e4:SetCode(EVENT_PHASE+PHASE_END)
+	e4:SetRange(LOCATION_SZONE)
+	e4:SetCountLimit(1)
+	e4:SetCategory(CATEGORY_DAMAGE+CATEGORY_DESTROY)
+	e4:SetCondition(function(e,tp) return Duel.GetTurnPlayer()==tp end)
+	e4:SetOperation(cid.mtop)
+	c:RegisterEffect(e4)
 	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_FIELD)
-	e5:SetCode(EFFECT_CANNOT_SELECT_BATTLE_TARGET)
-	e5:SetRange(LOCATION_SZONE)
-	e5:SetTargetRange(LOCATION_MZONE,0)
-	e5:SetValue(cid.atktg)
+	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e5:SetCode(EVENT_REMOVE)
+	e5:SetCountLimit(1,id)
+	e5:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
+	e5:SetCategory(CATEGORY_EQUIP)
+	e5:SetCondition(function(e,tp,eg,ep,ev,re) return re and re:GetHandler():IsSetCard(0xc97) and e:GetHandler():IsReason(REASON_EFFECT) and e:GetHandler():CheckUniqueOnField(tp) end)
+	e5:SetTarget(cid.tg)
+	e5:SetOperation(cid.op)
 	c:RegisterEffect(e5)
-	local e6=Effect.CreateEffect(c)
-	e6:SetType(EFFECT_TYPE_EQUIP)
-	e6:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-	e6:SetValue(1)
-	c:RegisterEffect(e6)
-	local e7=Effect.CreateEffect(c)
-	e7:SetType(EFFECT_TYPE_FIELD)
-	e7:SetRange(LOCATION_SZONE)
-	e7:SetCode(EFFECT_CHANGE_DAMAGE)
-	e7:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e7:SetTargetRange(0,1)
-	e7:SetValue(cid.rev)
-	c:RegisterEffect(e7)
-end
-function cid.eqlimit(e,c)
-	return c:IsControler(1-e:GetHandlerPlayer())
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() end
-	if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,0,LOCATION_MZONE,1,nil) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() end
+	if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
-	Duel.SelectTarget(tp,Card.IsFaceup,tp,0,LOCATION_MZONE,1,1,nil)
+	Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,e:GetHandler(),1,0,0)
 end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
@@ -65,16 +59,40 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Equip(tp,c,tc)
 	end
 end
-function cid.atktg(e,c)
-	return c~=e:GetHandler():GetEquipTarget()
-end
-function cid.rev(e,re,dam,r,rp,rc)
+function cid.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
 	local ec=e:GetHandler():GetEquipTarget()
-	if r&REASON_BATTLE==0 or not ec
-		or not (Duel.GetAttacker()==ec or Duel.GetAttackTarget()==ec) then return dam end
-	local co=coroutine.create(Duel.Recover)
-	Duel.DisableActionCheck(true)
-	local _,_,rec=coroutine.resume(co,e:GetHandlerPlayer(),dam,REASON_EFFECT),coroutine.resume(co)
-	Duel.DisableActionCheck(false)
-	return rec>0 and 0 or dam
+	if ec then
+		e:SetLabelObject(tc)
+		tc:CreateEffectRelation(e)
+		Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,PLAYER_ALL,ec:GetAttack()//2)
+	end
+end
+function cid.damop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local tc=e:GetLabelObject()
+	if c:IsRelateToEffect(e) and tc:IsRelateToEffect(e) then
+		local atk=tc:GetAttack()//2
+		Duel.Damage(1-tp,atk,REASON_EFFECT,true)
+		Duel.Damage(tp,atk,REASON_EFFECT,true)
+		Duel.RDComplete()
+	end
+end
+function cid.mtop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) then return end
+	if Duel.SelectYesNo(tp,1122) and Duel.Damage(tp,1000,REASON_EFFECT)>0 then return end
+	Duel.Destroy(c,REASON_EFFECT)
+end
+function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
+		and Duel.IsExistingMatchingCard(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_EQUIP,e:GetHandler(),1,0,0)
+end
+function cid.op(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
+	local tc=Duel.SelectMatchingCard(tp,Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil):GetFirst()
+	if tc then Duel.Equip(tp,c,tc) end
 end

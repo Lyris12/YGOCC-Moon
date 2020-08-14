@@ -37,12 +37,12 @@ function cid.matfilter(c)
 	return (c:IsSetCard(0xe80) or c:IsCode(CARD_EVIL_DRAGON_ANANTA)) and c:IsRace(RACE_REPTILE)
 end
 function cid.cfilter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsRace(RACE_REPTILE) and c:IsAbleToRemoveAsCost()
+	return c:IsType(TYPE_MONSTER) and c:IsRace(RACE_REPTILE) and c:IsAbleToRemoveAsCost() and (c:IsFaceup() or c:IsLocation(LOCATION_GRAVE))
 end
 function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(aux.AND(cid.cfilter,aux.OR(Card.IsFaceup,Card.IsLocation)),tp,LOCATION_GRAVE+LOCATION_MZONE,0,1,nil,LOCATION_GRAVE) end
+	if chk==0 then return Duel.IsExistingMatchingCard(cid.cfilter,tp,LOCATION_GRAVE+LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	Duel.Remove(Duel.SelectMatchingCard(tp,aux.AND(cid.cfilter,aux.OR(Card.IsFaceup,Card.IsLocation)),tp,LOCATION_GRAVE+LOCATION_MZONE,0,1,1,nil,LOCATION_GRAVE),POS_FACEUP,REASON_COST)
+	Duel.Remove(Duel.SelectMatchingCard(tp,cid.cfilter,tp,LOCATION_GRAVE+LOCATION_MZONE,0,1,1,nil),POS_FACEUP,REASON_COST)
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and chkc:IsFaceup() end
@@ -69,7 +69,7 @@ function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingTarget(cid.filter,tp,LOCATION_REMOVED,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectTarget(tp,cid.filter,tp,LOCATION_REMOVED,0,1,5,nil)
-	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g,g:GetCount(),0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g,#g,0,0)
 end
 function cid.op(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SendtoGrave(Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e),REASON_EFFECT+REASON_RETURN)

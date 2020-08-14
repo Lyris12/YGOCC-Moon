@@ -69,7 +69,7 @@ function cid.tg1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return mc>0 and Duel.IsExistingTarget(aux.TRUE,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
 	local g=Duel.SelectTarget(tp,aux.TRUE,tp,LOCATION_GRAVE,0,1,mc,nil)
-	Duel.SetOperationInfo(0,CATEGORY_EQUIP,g,g:GetCount(),0,0)
+	Duel.SetOperationInfo(0,CATEGORY_EQUIP,g,#g,0,0)
 end
 function cid.op1(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
@@ -138,13 +138,13 @@ function cid.discon(e,tp,eg,ep,ev,re,r,rp)
 	return ((ex1 and tg1~=nil) or (ex2 and tg2~=nil) or (ex3 and tg3~=nil)
 			or (ex4 and tg4~=nil) or (ex5 and tg5~=nil) or (ex6 and tg6~=nil)
 			or (ex7 and tg7~=nil))
-		and (tc1+tg1:FilterCount(cid.cfilter,nil,tp)-tg1:GetCount()>0
-			or tc2+tg2:FilterCount(cid.cfilter,nil,tp)-tg2:GetCount()>0
-			or tc3+tg3:FilterCount(cid.cfilter,nil,tp)-tg3:GetCount()>0
-			or tc4+tg4:FilterCount(cid.cfilter,nil,tp)-tg4:GetCount()>0
-			or tc5+tg5:FilterCount(cid.cfilter,nil,tp)-tg5:GetCount()>0
-			or tc6+tg6:FilterCount(cid.cfilter,nil,tp)-tg6:GetCount()>0
-			or tc7+tg7:FilterCount(cid.cfilter,nil,tp)-tg7:GetCount()>0)
+		and (tc1+tg1:FilterCount(cid.cfilter,nil,tp)-#tg1>0
+			or tc2+tg2:FilterCount(cid.cfilter,nil,tp)-#tg2>0
+			or tc3+tg3:FilterCount(cid.cfilter,nil,tp)-#tg3>0
+			or tc4+tg4:FilterCount(cid.cfilter,nil,tp)-#tg4>0
+			or tc5+tg5:FilterCount(cid.cfilter,nil,tp)-#tg5>0
+			or tc6+tg6:FilterCount(cid.cfilter,nil,tp)-#tg6>0
+			or tc7+tg7:FilterCount(cid.cfilter,nil,tp)-#tg7>0)
 end
 function cid.distg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return e:GetHandler():GetEquipCount()>0 end

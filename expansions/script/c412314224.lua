@@ -65,7 +65,7 @@ function cid.eqfilter(c)
 end
 function cid.eqcon(e,tp,eg,ep,ev,re,r,rp)
 	local g=c:GetEquipGroup():Filter(cid.eqfilter,nil)
-	return g:GetCount()<3
+	return #g<3
 end
 function cid.cfilter(c,g,tp)
 	return g:IsContains(c) and c:IsFaceup() and c:IsSetCard(0x613) and (c:IsControler(tp) or c:IsAbleToChangeControler())

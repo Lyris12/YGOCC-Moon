@@ -53,7 +53,7 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function cid.lcheck(g)
-	return g:GetClassCount(Card.GetLinkAttribute)==g:GetCount() and g:GetClassCount(Card.GetLinkRace)==g:GetCount()
+	return g:GetClassCount(Card.GetLinkAttribute)==#g and g:GetClassCount(Card.GetLinkRace)==#g
 end
 function cid.sscon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_LINK)
@@ -73,7 +73,7 @@ function cid.ssop(e,tp,eg,ep,ev,re,r,rp)
 	if zone~=0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local g=Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_DECK,0,1,1,nil,e,tp,zone)
-		if g:GetCount()>0 then
+		if #g>0 then
 			Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP,zone)
 		end
 	end
@@ -97,7 +97,7 @@ function cid.synop(e,tp,eg,ep,ev,re,r,rp)
 	if zone~=0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local g=Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp,zone)
-		if g:GetCount()>0 then
+		if #g>0 then
 			Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP,zone)
 		end
 	end

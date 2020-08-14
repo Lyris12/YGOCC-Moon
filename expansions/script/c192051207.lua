@@ -52,7 +52,7 @@ function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 	local sg=Duel.SelectMatchingCard(tp,cid.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
 	local sc=sg:GetFirst()
 	local other=Duel.GetMatchingGroupCount(cid.f,tp,LOCATION_MZONE,0,nil,Group.FromCards(c,sc))
-	if sg:GetCount()>0 and Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)>0 and c:IsRelateToEffect(e) then
+	if #sg>0 and Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)>0 and c:IsRelateToEffect(e) then
 		Duel.BreakEffect()
 		if other>0 then
 			fc=Duel.SelectMatchingCard(tp,cid.exfilter2,tp,LOCATION_EXTRA,0,1,1,nil,e,tp):GetFirst()

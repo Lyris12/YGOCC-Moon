@@ -21,7 +21,7 @@ function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(cid.filter,tp,LOCATION_SZONE,0,nil)
-	if g:GetCount()>0 then
+	if #g>0 then
 		Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_TOGRAVE)
 		local sg=g:Select(1-tp,1,1,nil)
 		Duel.SendtoGrave(sg,REASON_EFFECT)

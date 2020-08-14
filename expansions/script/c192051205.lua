@@ -54,11 +54,11 @@ function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,cid.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
-	if g:GetCount()>0 and Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)>0 then
+	if #g>0 and Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)>0 then
 		local tc=g:GetFirst()
 		sg=Duel.GetMatchingGroup(cid.ritfilter,tp,LOCATION_HAND+LOCATION_DECK,0,nil)
-		if sg:GetCount()<=0 then return end
-		if sg:GetCount()>1 then sg=sg:Select(tp,1,1,nil) end
+		if #sg<=0 then return end
+		if #sg>1 then sg=sg:Select(tp,1,1,nil) end
 		Duel.MoveToField(sg:GetFirst(),tp,tp,LOCATION_SZONE,POS_FACEUP,true)
 		sg:GetFirst():CancelToGrave(false)
 		_G["c"..tostring(id+21)].ope(e,tp,Group.FromCards(c,tc))

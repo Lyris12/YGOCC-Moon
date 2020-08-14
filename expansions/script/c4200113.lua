@@ -55,7 +55,7 @@ function cid.gytg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 	local g=Duel.SelectTarget(tp,aux.AND(Card.IsFaceup,Card.IsAbleToGrave),tp,0,LOCATION_ONFIELD,1,1,nil)
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,g:GetCount(),0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,#g,0,0)
 end
 function cid.gyop(e,tp,eg,ep,ev,re,r,rp)
 	local tg=Duel.GetFirstTarget()

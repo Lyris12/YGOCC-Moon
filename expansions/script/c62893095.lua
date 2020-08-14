@@ -16,7 +16,7 @@ end
 function cid.condition(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) or not Duel.IsChainNegatable(ev) or re:IsHasType(EFFECT_TYPE_ACTIVATE) then return false end
 	local ex,tg,tc=Duel.GetOperationInfo(ev,CATEGORY_DESTROY)
-	return ex and tg~=nil and tc+tg:FilterCount(cid.cfilter,nil,tp)-tg:GetCount()>0
+	return ex and tg~=nil and tc+tg:FilterCount(cid.cfilter,nil,tp)-#tg>0
 end
 function cid.sfilter(c,e,tp)
 	return c:IsCode(52401237) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_BIGBANG,tp,false,false) and Duel.GetLocationCountFromEx(tp,tp,nil,c)>0

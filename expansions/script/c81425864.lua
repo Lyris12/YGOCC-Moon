@@ -65,7 +65,7 @@ function cid.eqlimit(e,c)
 end
 function cid.eqcon(e,tp,eg,ep,ev,re,r,rp)
 	local g=e:GetHandler():GetEquipGroup():Filter(cid.eqfilter,nil)
-	return g:GetCount()==0
+	return #g==0
 end
 function cid.eqfilter(c)
 	return c:GetFlagEffect(id)~=0

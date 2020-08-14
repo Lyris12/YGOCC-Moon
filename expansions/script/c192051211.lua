@@ -43,7 +43,7 @@ function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e2,true)
 		Duel.SpecialSummonComplete()
 		local sg=Duel.GetMatchingGroup(cid.tgfilter,tp,LOCATION_DECK,0,nil)
-		if sg:GetCount()>0 then
+		if #sg>0 then
 			Duel.BreakEffect()
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 			local tg=sg:Select(tp,1,1,nil)

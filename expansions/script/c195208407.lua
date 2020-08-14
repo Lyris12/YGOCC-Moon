@@ -17,7 +17,7 @@ function cid.initial_effect(c)
 	e1:SetCategory(CATEGORY_DRAW)
 	e1:SetCondition(cid.drcon)
 	e1:SetTarget(cid.tg)
-	e1:SetOperation(cid.op)
+	e1:SetOperation(cid.activate)
 	c:RegisterEffect(e1)
 end
 function cid.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)

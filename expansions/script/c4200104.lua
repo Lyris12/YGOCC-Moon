@@ -44,7 +44,7 @@ function cid.setop(e,tp,eg,ep,ev,re,r,rp)
 	local ifclause=false
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,cid.setfilter,tp,LOCATION_DECK,0,1,1,nil)
-	if g:GetCount()>0 then
+	if #g>0 then
 		if Duel.SSet(tp,g)>0 and Duel.IsExistingMatchingCard(cid.sparkfilter,tp,LOCATION_GRAVE,0,1,nil) then
 			ifclause=true
 		end

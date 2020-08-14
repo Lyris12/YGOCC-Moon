@@ -88,7 +88,7 @@ function cid.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return eg:IsExists(cid.repfilter,1,nil,tp)
 		and Duel.IsExistingMatchingCard(cid.cfilter,tp,LOCATION_MZONE,0,1,nil) end
 	e:SetLabelObject(eg)
-	return eg:GetCount()>0 and Duel.GetLocationCount(tp,LOCATION_SZONE)>eg:GetCount()-1
+	return #eg>0 and Duel.GetLocationCount(tp,LOCATION_SZONE)>#eg-1
 		and Duel.SelectEffectYesNo(tp,e:GetHandler(),96)
 end
 function cid.repval(e,c)

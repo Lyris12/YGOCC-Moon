@@ -69,7 +69,7 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 			g:RemoveCard(sc:GetFirst())
 			gt=gt+1
 		end
-		while sg:GetCount()<2 do
+		while #sg<2 do
 			Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(504,0))
 			sc=Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_REMOVED,0,1,1,sg)
 			sg:AddCard(sc:GetFirst())
@@ -81,10 +81,10 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 		else return false
 		end
 	end
-	if sg and sg:GetCount()>0 then
+	if sg and #sg>0 then
 		if Duel.SendtoGrave(sg,REASON_EFFECT+REASON_RETURN)==2 then
 			local g=Duel.GetMatchingGroup(cid.filter2,tp,LOCATION_GRAVE,0,nil)
-			local ct=math.floor(g:GetCount()/2)
+			local ct=math.floor(#g/2)
 			if ct<1 then return end
 			Duel.BreakEffect()
 			Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(507,0))
@@ -109,14 +109,14 @@ function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 		local g=Duel.SelectMatchingCard(tp,cid.c1,tp,LOCATION_GRAVE,0,3,3,nil)
 	else
 		g=Group.CreateGroup()
-		while (g:GetCount()+ct)<=3 do
+		while (#g+ct)<=3 do
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 			local cg=Duel.SelectMatchingCard(tp,cid.ban,tp,LOCATION_GRAVE,0,1,1,nil):GetFirst()
 			g:AddCard(cg)
 		end
-		if g:GetCount()<3 then
+		if #g<3 then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-			local sg=Duel.SelectMatchingCard(tp,cid.c1,tp,LOCATION_GRAVE,0,3-g:GetCount(),3-g:GetCount(),g)
+			local sg=Duel.SelectMatchingCard(tp,cid.c1,tp,LOCATION_GRAVE,0,3-#g,3-#g,g)
 			g:Merge(sg)
 		end
 	end
@@ -145,7 +145,7 @@ function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,cid.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
-	if g and g:GetCount()>0 then
+	if g and #g>0 then
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
@@ -162,8 +162,8 @@ end
 function cid.spop1(e,tp,eg,ep,ev,re,r,rp)
 	local g=e:GetLabelObject()
 	local tg=g:Filter(cid.spfilter1,nil,e:GetHandler(),e,tp)
-	if tg:GetCount()<3 then return end
-	if tg:GetCount()>3 then
+	if #tg<3 then return end
+	if #tg>3 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local tg=tg:Select(tp,3,3,nil)
 	end

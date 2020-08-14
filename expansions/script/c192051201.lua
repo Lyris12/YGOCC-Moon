@@ -24,7 +24,7 @@ function cid.initial_effect(c)
 end
 function cid.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
-	return eg:GetCount()==1 and re and re:GetHandler():IsType(TYPE_SPELL+TYPE_TRAP) and tc==e:GetHandler() and tc:IsPreviousLocation(LOCATION_DECK)
+	return #eg==1 and re and re:GetHandler():IsType(TYPE_SPELL+TYPE_TRAP) and tc==e:GetHandler() and tc:IsPreviousLocation(LOCATION_DECK)
 end
 function cid.spfilter(c,e,tp)
 	return c:GetLevel()==3 and c:IsSetCard(0x617) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
@@ -38,7 +38,7 @@ function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,cid.spfilter,tp,LOCATION_GRAVE,0,1,1,c,e,tp)
-	if g:GetCount()>0 then
+	if #g>0 then
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
@@ -56,7 +56,7 @@ function cid.tgop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_DECK,0,1,1,nil)
-	if g:GetCount()>0 then
+	if #g>0 then
 		Duel.SendtoGrave(g,REASON_EFFECT)
 	end
 end

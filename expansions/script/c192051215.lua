@@ -59,7 +59,7 @@ end
 function cid.tgop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,2))
 	local sg=Duel.SelectMatchingCard(tp,Card.IsFaceup,tp,LOCATION_REMOVED,0,3,3,nil)
-	if sg:GetCount()>0 then
+	if #sg>0 then
 		Duel.SendtoGrave(sg,REASON_EFFECT+REASON_RETURN,tp)
 	end
 end

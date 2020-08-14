@@ -74,7 +74,7 @@ function cid.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local exc=nil
 	if e:IsHasType(EFFECT_TYPE_ACTIVATE) then exc=e:GetHandler() end
 	local g=Duel.GetMatchingGroup(aux.TRUE,tp,0,LOCATION_ONFIELD,exc)
-	if chk==0 then return g:GetCount()>0 end
+	if chk==0 then return #g>0 end
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,0,0)
 end
 function cid.rmop(e,tp,eg,ep,ev,re,r,rp)
@@ -82,7 +82,7 @@ function cid.rmop(e,tp,eg,ep,ev,re,r,rp)
 	if e:IsHasType(EFFECT_TYPE_ACTIVATE) then exc=e:GetHandler() end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectMatchingCard(tp,aux.TRUE,tp,0,LOCATION_ONFIELD,1,1,exc)
-	if g:GetCount()>0 then
+	if #g>0 then
 		Duel.HintSelection(g)
 		Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
 	end
