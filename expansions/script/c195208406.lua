@@ -46,7 +46,7 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e5)
 end
 	function cid.value(e,c)
-	return Duel.GetMatchingGroupCount(cid.atkfilter,0,LOCATION_REMOVED,0,nil)*300
+	return Duel.GetMatchingGroupCount(cid.atkfilter,c:GetControler(),LOCATION_REMOVED,0,nil)*300
 end
 	function cid.atkfilter(c)
 	return c:IsSetCard(0x83e) and c:IsFaceup()
