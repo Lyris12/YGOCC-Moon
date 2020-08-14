@@ -89,21 +89,21 @@ function cid.discon(e,tp,eg,ep,ev,re,r,rp)
 	local ex5,tg5,tc5=Duel.GetOperationInfo(ev,CATEGORY_TOEXTRA)
 	local ex6,tg6,tc6=Duel.GetOperationInfo(ev,CATEGORY_TOGRAVE)
 	local ex7,tg7,tc7=Duel.GetOperationInfo(ev,CATEGORY_REMOVE)
-	local ct1=tc1+tg1:FilterCount(cid.cfilter,nil,tp)-#tg1
-	local ct2=tc2+tg2:FilterCount(cid.cfilter,nil,tp)-#tg2
-	local ct3=tc3+tg3:FilterCount(cid.cfilter,nil,tp)-#tg3
-	local ct4=tc4+tg4:FilterCount(cid.cfilter,nil,tp)-#tg4
-	local ct5=tc5+tg5:FilterCount(cid.cfilter,nil,tp)-#tg5
-	local ct6=tc6+tg6:FilterCount(cid.cfilter,nil,tp)-#tg6
-	local ct7=tc7+tg7:FilterCount(cid.cfilter,nil,tp)-#tg7
+	local ct1=ex1 and tg1~=nil and tc1+tg1:FilterCount(cid.cfilter,nil,tp)-#tg1 or 0
+	local ct2=ex2 and tg2~=nil and tc2+tg2:FilterCount(cid.cfilter,nil,tp)-#tg2 or 0
+	local ct3=ex3 and tg3~=nil and tc3+tg3:FilterCount(cid.cfilter,nil,tp)-#tg3 or 0
+	local ct4=ex4 and tg4~=nil and tc4+tg4:FilterCount(cid.cfilter,nil,tp)-#tg4 or 0
+	local ct5=ex5 and tg5~=nil and tc5+tg5:FilterCount(cid.cfilter,nil,tp)-#tg5 or 0
+	local ct6=ex6 and tg6~=nil and tc6+tg6:FilterCount(cid.cfilter,nil,tp)-#tg6 or 0
+	local ct7=ex7 and tg7~=nil and tc7+tg7:FilterCount(cid.cfilter,nil,tp)-#tg7 or 0
 	local ct=0
-	if ex1 and tg1~=nil and ct1>0 then ct=ct+ct1 end
-	if ex2 and tg2~=nil and ct2>0 then ct=ct+ct2 end
-	if ex3 and tg3~=nil and ct3>0 then ct=ct+ct3 end
-	if ex4 and tg4~=nil and ct4>0 then ct=ct+ct4 end
-	if ex5 and tg5~=nil and ct5>0 then ct=ct+ct5 end
-	if ex6 and tg6~=nil and ct6>0 then ct=ct+ct6 end
-	if ex7 and tg7~=nil and ct7>0 then ct=ct+ct7 end
+	if ct1>0 then ct=ct+ct1 end
+	if ct2>0 then ct=ct+ct2 end
+	if ct3>0 then ct=ct+ct3 end
+	if ct4>0 then ct=ct+ct4 end
+	if ct5>0 then ct=ct+ct5 end
+	if ct6>0 then ct=ct+ct6 end
+	if ct7>0 then ct=ct+ct7 end
 	e:SetLabel(ct)
 	return ct>0
 end
