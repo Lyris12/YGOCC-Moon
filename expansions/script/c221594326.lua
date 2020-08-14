@@ -61,9 +61,9 @@ end
 function cid.condition(f)
 	return  function(e,tp,eg,ep,ev,re,r,rp)
 				local typ=0
-				for tc in aux.Next(eg) do typ=typ|tc:GetType()&TYPE_EXTRA+TYPE_RITUAL end
+				for tc in aux.Next(eg) do if tc:GetSummonPlayer()~=tp then typ=typ|tc:GetType()&TYPE_EXTRA+TYPE_RITUAL end end
 				e:SetLabel(typ)
-				return eg:IsExists(f,1,nil)
+				return typ>0 and eg:IsExists(f,1,nil)
 			end
 end
 function cid.sfilter(c)

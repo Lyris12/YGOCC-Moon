@@ -130,19 +130,20 @@ function cid.rgfilter(c)
 end
 function cid.rgop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	Duel.Remove(Duel.GetMatchingGroup(cid.rgfilter,tp,LOCATION_GRAVE,0,nil):SelectSubGroup(tp,aux.dncheck,false,3,3),POS_FACEUP,REASON_EFFECT)
+	local g=Duel.GetMatchingGroup(cid.rgfilter,tp,LOCATION_GRAVE,0,nil):SelectSubGroup(tp,aux.dncheck,false,3,3)
+	if g then Duel.Remove(g,POS_FACEUP,REASON_EFFECT) end
 end
 function cid.repcfilter(c,e,val)
-	return c:IsAttackAbove(val//2) and not c:IsImmuneToEffect(e)
+	return c:IsAttackAbove(val) and not c:IsImmuneToEffect(e)
 end
 function cid.rev(e,re,dam,r,rp,rc)
-	local g=Duel.GetMatchingGroup(aux.AND(Card.IsFaceup,Card.IsSummonType),tp,0,LOCATION_MZONE,1,nil,SUMMON_TYPE_SPECIAL)
-	local tg=g:Filter(cid.repcfilter,nil,e,dam)
+	local g=Duel.GetMatchingGroup(aux.AND(Card.IsFaceup,Card.IsSummonType),tp,0,LOCATION_MZONE,nil,SUMMON_TYPE_SPECIAL)
+	local tg=g:Filter(cid.repcfilter,nil,e,dam//2)
 	local rec=rc
 	if not rec and re then rec=re:GetHandler() end
 	local val=dam
 	Duel.DisableActionCheck(true)
-	if r&REASON_EFFECT>0 and #g>0 and #tg==#g then
+	if r&REASON_EFFECT>0 and #g>0 and #tg>0 then
 		for tc in aux.Next(tg) do
 			local e1=Effect.CreateEffect(e:GetHandler())
 			e1:SetType(EFFECT_TYPE_SINGLE)

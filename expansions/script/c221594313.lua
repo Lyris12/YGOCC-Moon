@@ -63,8 +63,8 @@ function cid.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	local ec=e:GetHandler():GetEquipTarget()
 	if ec then
-		e:SetLabelObject(tc)
-		tc:CreateEffectRelation(e)
+		e:SetLabelObject(ec)
+		ec:CreateEffectRelation(e)
 		Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,PLAYER_ALL,ec:GetAttack()//2)
 	end
 end
