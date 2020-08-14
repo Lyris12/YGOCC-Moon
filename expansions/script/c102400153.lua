@@ -1,3 +1,4 @@
+--created & coded by Lyris, art from Cardfight!! Vanguard's "Silver Thorn Dragon Tamer, Luqiuier"
 local cid,id=GetID()
 function cid.initial_effect(c)
 	aux.AddXyzProcedureLevelFree(c,aux.FilterBoolFunction(Card.IsXyzLevel,c,5),aux.drccheck,3,3,cid.ovfilter,aux.Stringid(id,0))
