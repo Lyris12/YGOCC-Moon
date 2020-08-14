@@ -62,7 +62,7 @@ function cid.disable(e,c)
 	return (c:IsType(TYPE_EFFECT) or bit.band(c:GetOriginalType(),TYPE_EFFECT)==TYPE_EFFECT) and c:IsType(TYPE_BIGBANG)
 end
 function cid.cfilter(c)
-	return c:IsSetCard(0xc97) and c:IsAbleToRemoveAsCost()
+	return c:IsSetCard(0xc97) and c:IsType(TYPE_MONSTER) and c:IsAbleToRemoveAsCost()
 end
 function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(0)
