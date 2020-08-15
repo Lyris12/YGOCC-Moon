@@ -25,7 +25,8 @@ function cid.drawop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,aux.AND(Card.IsFacedown,Card.IsAbleToGrave),tp,LOCATION_ONFIELD,0,1,1,nil)
 	if Duel.SendtoGrave(g,REASON_EFFECT)==0 then return end
 	Duel.AdjustInstantly(e:GetHandler())
-	if g:GetFirst():GetOriginalType()&TYPE_MONSTER==0 or not c:IsSetCard(0xf7a) then return end
+	local c=g:GetFirst()
+	if c:GetOriginalType()&TYPE_MONSTER==0 or not c:IsSetCard(0xf7a) then return end
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	Duel.BreakEffect()
 	Duel.Draw(p,d,REASON_EFFECT)

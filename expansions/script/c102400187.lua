@@ -8,12 +8,15 @@ function cid.initial_effect(c)
 	e1:SetCode(EFFECT_MONSTER_SSET)
 	e1:SetValue(TYPE_TRAP)
 	c:RegisterEffect(e1)
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e1:SetCode(EVENT_SSET)
-	e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
-	e1:SetOperation(function(e) e:GetHandler():SetCardData(CARDDATA_TYPE,TYPE_TRAP) end)
-	c:RegisterEffect(e1)
+	if not cid.global_check then
+		cid.global_check=true
+		local ge1=Effect.CreateEffect(c)
+		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge1:SetCode(EVENT_SSET)
+		ge1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		ge1:SetOperation(function(e,tp,eg) for tc in aux.Next(eg:Filter(Card.IsOriginalCodeRule,nil,id)) do tc:SetCardData(CARDDATA_TYPE,TYPE_TRAP) end end)
+		Duel.RegisterEffect(ge1,0)
+	end
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e2:SetCode(EVENT_LEAVE_FIELD)
@@ -51,18 +54,18 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e5)
 end
 function cid.cfilter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xf7a) and c:IsAbleToRemove() and not c:IsCode(id)
+	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xf7a) and c:IsAbleToDeck() and not c:IsCode(id)
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cid.cfilter,tp,LOCATION_GRAVE,0,1,nil)
 		and Duel.IsExistingMatchingCard(nil,tp,0,LOCATION_ONFIELD,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,tp,LOCATION_GRAVE)
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,1,tp,LOCATION_GRAVE)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,Duel.GetFieldGroup(tp,0,LOCATION_ONFIELD),1,0,0)
 end
 function cid.activate(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=Duel.SelectMatchingCard(tp,cid.cfilter,tp,0,LOCATION_GRAVE,1,1,nil)
-	if #g>0 and Duel.Remove(g,POS_FACEUP,REASON_EFFECT)~=0 then
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+	local g=Duel.SelectMatchingCard(tp,cid.cfilter,tp,LOCATION_GRAVE,0,1,1,nil)
+	if #g>0 and Duel.SendtoDeck(g,nil,2,REASON_EFFECT)~=0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 		local tg=Duel.GetFieldGroup(tp,0,LOCATION_ONFIELD):Select(tp,1,1,nil)
 		if #tg>0 then

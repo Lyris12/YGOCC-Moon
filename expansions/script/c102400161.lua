@@ -1,4 +1,4 @@
---created & coded by Lyris
+--created & coded by Lyris, art by Dino-master of DeviantArt
 --銀河眼の固体光子竜
 local cid,id=GetID()
 function cid.initial_effect(c)
