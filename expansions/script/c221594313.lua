@@ -63,15 +63,14 @@ function cid.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	local ec=e:GetHandler():GetEquipTarget()
 	if ec then
-		e:SetLabelObject(ec)
 		ec:CreateEffectRelation(e)
 		Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,PLAYER_ALL,ec:GetAttack()//2)
 	end
 end
 function cid.damop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local tc=e:GetLabelObject()
-	if c:IsRelateToEffect(e) and tc:IsRelateToEffect(e) then
+	local tc=e:GetHandler():GetEquipTarget()
+	if c:IsRelateToEffect(e) and tc and tc:IsRelateToEffect(e) then
 		local atk=tc:GetAttack()//2
 		Duel.Damage(1-tp,atk,REASON_EFFECT,true)
 		Duel.Damage(tp,atk,REASON_EFFECT,true)
