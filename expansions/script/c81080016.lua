@@ -46,7 +46,7 @@ function cid.lfilter(c)
 	return (c:IsCode(21770262) or c:IsCode(21770263) or c:IsCode(21770264)) or (c:IsSetCard(0x8108) and c:IsType(TYPE_MONSTER))
 end
 function cid.tdfilter(c)
-	return c:IsSetCard(0x8108) and c:IsAbleToDeck()
+	return c:IsSetCard(0x8108) and c:IsFaceup() and c:IsAbleToDeck() 
 end
 function cid.dfilter(c)
 	return (c:IsCode(21770262) or c:IsCode(21770263) or c:IsCode(21770264))
