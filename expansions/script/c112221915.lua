@@ -11,7 +11,7 @@ function cid.initial_effect(c)
 	e1:SetCountLimit(1,id)
 	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e1:SetRange(LOCATION_HAND)
-	e1:SetCondition(function(tp,ep) return Duel.IsExistingMatchingCard(cid.nfilter,tp,LOCATION_MZONE,0,1,nil) and tp~=ep and Duel.GetCurrentChain()==0 end)
+	e1:SetCondition(cid.negcon)
 	e1:SetCost(cid.cost)
 	e1:SetTarget(cid.distg)
 	e1:SetOperation(cid.disop)
@@ -46,6 +46,9 @@ end
 function cid.nfilter(c)
 	return c:IsCode(id-15)
 end
+function cid.negcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsExistingMatchingCard(cid.nfilter,tp,LOCATION_MZONE,0,1,nil) and tp~=ep and Duel.IsChainNegatable(ev)
+end
 --Alvis Leaves the Field
 function cid.eqtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(cid.eqfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil,tp) and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) and not Duel.IsExistingMatchingCard(cid.nfilter,tp,LOCATION_MZONE,0,1,nil) end
@@ -64,7 +67,7 @@ function cid.eqop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0
 		or Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
-	if tc:IsRelateToEffect(e) then Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP) end
+	if tc:IsRelateToEffect(e) then Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP) end
 	local sc=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(cid.eqfilter),tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil,tp):GetFirst()
 	if not sc then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
@@ -90,5 +93,7 @@ function cid.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
 end
 function cid.disop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.NegateActivation(ev)
+	if Duel.NegateActivation(ev) and re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:GetHandler():IsRelateToEffect(re) then
+		Duel.SendtoGrave(eg,REASON_EFFECT)
+	end
 end
