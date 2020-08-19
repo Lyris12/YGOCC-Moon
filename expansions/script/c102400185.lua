@@ -2,7 +2,6 @@
 --フェイツ・ドゥオガイ
 local cid,id=GetID()
 function cid.initial_effect(c)
-	c:EnableReviveLimit()
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_MONSTER_SSET)
@@ -51,7 +50,7 @@ function cid.initial_effect(c)
 end
 function cid.rlevel(e,c)
 	local lv=e:GetHandler():GetLevel()
-	if c:IsSetCard(0xf7a) and not c:IsCode(id) then
+	if c:IsSetCard(0xf7a) then
 		local clv=c:GetLevel()
 		return lv*(0x1<<16)+clv
 	else return lv end
