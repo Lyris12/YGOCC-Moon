@@ -48,11 +48,11 @@ function cid.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
 	return Duel.CheckReleaseGroup(tp,cid.spfilter,1,nil)
-		and Duel.IsExistingMatchingCard(cid.cfilter,tp,LOCATION_GRAVE,0,5,nil)
+		and Duel.IsExistingMatchingCard(cid.cfilter,tp,LOCATION_GRAVE,0,3,nil)
 end
 function cid.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local dg=Duel.SelectMatchingCard(tp,cid.cfilter,tp,LOCATION_GRAVE,0,5,5,nil)
+	local dg=Duel.SelectMatchingCard(tp,cid.cfilter,tp,LOCATION_GRAVE,0,3,3,nil)
 	local g=Duel.SelectReleaseGroup(tp,cid.spfilter,1,1,nil)
 	Duel.SendtoDeck(dg,nil,2,REASON_COST)
 	Duel.Release(g,REASON_COST)

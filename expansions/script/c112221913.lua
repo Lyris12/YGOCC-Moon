@@ -110,7 +110,7 @@ function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_HAND,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_HAND)
-	if e:GetHandler():IsHasEffect(id+1) then Duel.SetChainLimit(function(e,rpr,p) return rpr==p end) end
+	if Duel.IsPlayerAffectedByEffect(tp,id+1) then Duel.SetChainLimit(function(e,rpr,p) return rpr==p end) end
 end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end

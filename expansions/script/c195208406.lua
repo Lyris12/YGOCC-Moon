@@ -46,10 +46,10 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e5)
 end
 	function cid.value(e,c)
-	return Duel.GetMatchingGroupCount(cid.atkfilter,0,LOCATION_REMOVED,0,nil)*300
+	return Duel.GetMatchingGroupCount(cid.atkfilter,e:GetHandlerPlayer(),LOCATION_REMOVED,0,nil)*300
 end
 	function cid.atkfilter(c)
-	return c:IsSetCard(0x83e) and c:IsFaceup()
+	return c:IsFaceup() and c:IsSetCard(0x83e)
 end
 	function cid.cfilter(c)
 	return c:IsSetCard(0x83e) and c:IsAbleToRemoveAsCost()
@@ -61,10 +61,9 @@ end
 	return c:IsLocation(LOCATION_REMOVED) and c:IsFaceup() and c:IsType(TYPE_MONSTER) and c:IsSetCard(0x83e) and c:IsAbleToDeckAsCost()
 end
 	function cid.drcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(cid.cfilter2,tp,LOCATION_REMOVED,0,3,e:GetHandler()) end   
+	if chk==0 then return Duel.IsExistingMatchingCard(cid.cfilter2,tp,LOCATION_REMOVED,0,3,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g=Duel.SelectMatchingCard(tp,cid.cfilter2,tp,LOCATION_REMOVED,0,3,3,e:GetHandler())
-	Duel.SendtoDeck(g,nil,2,REASON_COST)
+	Duel.SendtoDeck(Duel.SelectMatchingCard(tp,cid.cfilter2,tp,LOCATION_REMOVED,0,3,3,e:GetHandler()),nil,2,REASON_COST)
 end
 	function cid.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

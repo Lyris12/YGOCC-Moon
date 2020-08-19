@@ -60,7 +60,7 @@ function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if e:GetHandler():IsLocation(LOCATION_GRAVE) then
 		Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,e:GetHandler(),1,0,0)
 	end
-	if e:GetHandler():IsHasEffect(id+9) then Duel.SetChainLimit(function(e,rpr,p) return rpr==p end) end
+	if Duel.IsPlayerAffectedByEffect(tp,id+9) then Duel.SetChainLimit(function(e,rpr,p) return rpr==p end) end
 end
 function cid.spfilter(c,e,tp)
 	return c:IsCode(id-5) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
