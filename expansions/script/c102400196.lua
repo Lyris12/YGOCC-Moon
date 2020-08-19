@@ -50,15 +50,15 @@ function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		local mg=Duel.GetRitualMaterial(tp):Filter(Card.IsSetCard,nil,0xf7a)
 		local exg=Duel.GetMatchingGroup(cid.gfilter,tp,LOCATION_SZONE,0,nil)
-		return Duel.IsExistingMatchingCard(cid.RitualUltimateFilter,tp,LOCATION_HAND+LOCATION_SZONE,0,1,nil,e,tp,mg,exg)
+		return Duel.IsExistingMatchingCard(cid.RitualUltimateFilter,tp,LOCATION_DECK+LOCATION_SZONE,0,1,nil,e,tp,mg,exg)
 	end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_SZONE)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK+LOCATION_SZONE)
 end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	local mg=Duel.GetRitualMaterial(tp):Filter(Card.IsSetCard,nil,0xf7a)
 	local exg=Duel.GetMatchingGroup(cid.gfilter,tp,LOCATION_SZONE,0,nil)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local tg=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(cid.RitualUltimateFilter),tp,LOCATION_HAND+LOCATION_SZONE,0,1,1,nil,e,tp,mg,exg)
+	local tg=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(cid.RitualUltimateFilter),tp,LOCATION_DECK+LOCATION_SZONE,0,1,1,nil,e,tp,mg,exg)
 	local tc=tg:GetFirst()
 	if tc then
 		mg=mg:Filter(Card.IsCanBeRitualMaterial,tc,tc)
@@ -80,12 +80,6 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ReleaseRitualMaterial(mat)
 		Duel.BreakEffect()
 		if trap then Duel.ConfirmCards(1-tp,tc) end
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_REMOVE_TYPE)
-		e1:SetValue(TYPE_EFFECT)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD)
-		tc:RegisterEffect(e1)
 		Duel.SpecialSummon(tc,SUMMON_TYPE_RITUAL,tp,tp,trap,true,POS_FACEUP)
 		tc:CompleteProcedure()
 	end

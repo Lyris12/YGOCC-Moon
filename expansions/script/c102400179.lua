@@ -71,12 +71,6 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ReleaseRitualMaterial(mat)
 		Duel.BreakEffect()
 		if trap then Duel.ConfirmCards(1-tp,tc) end
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_REMOVE_TYPE)
-		e1:SetValue(TYPE_EFFECT)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD)
-		tc:RegisterEffect(e1)
 		Duel.SpecialSummon(tc,SUMMON_TYPE_RITUAL,tp,tp,trap,true,POS_FACEUP)
 		tc:CompleteProcedure()
 	end
