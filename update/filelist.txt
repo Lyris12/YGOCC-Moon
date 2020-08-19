@@ -1,4 +1,4 @@
-﻿expansions/cards-new.cdb	afad6b82e7f508617f564e3f45087d8b
+﻿expansions/cards-new.cdb	ab551afb255c7ce7e6f6c2242926b4e8
 expansions/lflist.conf	082af94816b40691f95650dfb82eccc7
 expansions/strings.conf	81b2be790a47ef679d694cee04b05fa2
 expansions/pics/100000710.jpg	5f925a97b1c60d7d69acb8f229938263
@@ -659,7 +659,7 @@ expansions/pics/102400155.png	811fbd76145c3c8b66fb7334b312c979
 expansions/pics/102400156.png	78161657b339a5ad222cbbfe8e86daae
 expansions/pics/102400157.png	065370a31e65a51102ceffe2596d267e
 expansions/pics/102400158.png	ad7777819d840936d3de48656ac0713a
-expansions/pics/102400159.png	954801c57462feb778a270f2181a40e9
+expansions/pics/102400159.png	df8b14427152fa2a3f9ba8f1abcd359c
 expansions/pics/102400160.png	b3018eef0911837c73286648f0c928c3
 expansions/pics/102400161.png	e2fbbb753a53f74567100375303095fa
 expansions/pics/102400162.png	ef3b394ce9dfb438d1c76ae2d0f13646
@@ -5342,7 +5342,7 @@ expansions/script/c102400082.lua	de451fca7df286dbf3400ca5ccab6064
 expansions/script/c102400083.lua	d980ad3b9d00cb29f3c41fa665399415
 expansions/script/c102400084.lua	982156945b0bc891f6d1e5e1e10a43b5
 expansions/script/c102400085.lua	3854e224fdf370e901ffa8968a190585
-expansions/script/c102400086.lua	b21fe00c0387ce4134d2ce70d54969d6
+expansions/script/c102400086.lua	e2a069efa728d00ffd5a94c389ff447b
 expansions/script/c102400087.lua	749dd3cd12987b7ae866d7db4ce1d6b8
 expansions/script/c102400088.lua	9de547db8ec801ac74a2f796a5cf426a
 expansions/script/c102400089.lua	a501827641ba7e7d061865ce3c59949a
@@ -9283,6 +9283,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	5cbeb9fb378f9aa37d28818f0c9b0943
+update/filelist.txt	fe10705bd70489a2f8455232546af0bf
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	cc540df2607bbb791f777ff49851c6d5
+update/version.txt	037a01d2e7b4280d8f5114fb4cfbc5fe
