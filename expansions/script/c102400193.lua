@@ -46,6 +46,16 @@ function cid.initial_effect(c)
 	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e3:SetValue(cid.rlevel)
 	c:RegisterEffect(e3)
+	local e4=e2:Clone()
+	e4:SetType(EFFECT_TYPE_IGNITION)
+	e4:SetRange(LOCATION_HAND)
+	e4:SetCost(cid.cost)
+	c:RegisterEffect(e4)
+end
+function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return c:IsDiscardable() end
+	Duel.SendtoGrave(c,REASON_COST+REASON_DISCARD)
 end
 function cid.rlevel(e,c)
 	local lv=e:GetHandler():GetLevel()
