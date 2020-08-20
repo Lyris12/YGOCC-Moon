@@ -66,7 +66,7 @@ end
 			flag=flag|Duel.SelectDisableField(tp,1,LOCATION_ONFIELD,LOCATION_ONFIELD,flag)
 		else
 			local tc=Duel.GetFieldGroup(tp,LOCATION_ONFIELD,LOCATION_ONFIELD):FilterSelect(tp,s.cfilter,1,1,nil,~flag):GetFirst()
-			flag=flag|2^(tc:GetSequence()+(tc:IsLocation(LOCATION_SZONE) and 8 or 0)+(tc:IsControler(1) and 16 or 0))
+			flag=flag|2^(tc:GetSequence()+(tc:IsLocation(LOCATION_SZONE) and 8 or 0)+(tc:IsControler(1-tp) and 16 or 0))
 		end
 		if i==0 and not Duel.SelectYesNo(tp,210) then break end
 	end
@@ -77,8 +77,8 @@ end
 	e1:SetCondition(function(e,tp,eg) return eg:IsExists(s.cfilter,1,nil,flag) end)
 	e1:SetOperation(function(e,tp,eg)
 		Duel.Hint(HINT_CARD,0,id)
-		if eg:IsExists(s.pfilter,1,nil,0) then Duel.Damage(0,500,REASON_EFFECT,true) end
-		if eg:IsExists(s.pfilter,1,nil,1) then Duel.Damage(1,500,REASON_EFFECT,true) end
+		if eg:IsExists(s.pfilter,1,nil,tp) then Duel.Damage(tp,500,REASON_EFFECT,true) end
+		if eg:IsExists(s.pfilter,1,nil,1-tp) then Duel.Damage(1-tp,500,REASON_EFFECT,true) end
 		Duel.RDComplete()
 	end)
 	e1:SetReset(RESET_PHASE+PHASE_END)
@@ -98,7 +98,7 @@ end
 	local e6=e1:Clone()
 	e6:SetCode(EVENT_CHAINING)
 	e6:SetCondition(function(e,tp,eg,ep,ev,re)
-		return re:IsHasType(EFFECT_TYPE_ACTIVATE) and bit.extract(flag,re:GetActivateSequence()+8)~=0
+		return re:IsHasType(EFFECT_TYPE_ACTIVATE) and bit.extract(flag,re:GetActivateSequence()+8+(re:GetHandler():IsControler(1-tp) and 16 or 0))~=0
 	end)
 	Duel.RegisterEffect(e6,tp)
 end
