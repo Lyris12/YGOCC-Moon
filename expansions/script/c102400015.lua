@@ -62,14 +62,13 @@ function cid.eqfilter(c,tp)
 end
 function cid.eqtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
-		and Duel.IsExistingTarget(cid.eqfilter,tp,0,LOCATION_REMOVED,1,nil,tp) end
+		and Duel.IsExistingTarget(cid.eqfilter,tp,0,LOCATION_GRAVE+LOCATION_REMOVED,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
-	Duel.SetOperationInfo(0,CATEGORY_EQUIP,Duel.SelectTarget(tp,cid.eqfilter,tp,0,LOCATION_REMOVED,1,1,nil,tp),1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_EQUIP,Duel.SelectTarget(tp,cid.eqfilter,tp,0,LOCATION_GRAVE+LOCATION_REMOVED,1,1,nil,tp),1,0,0)
 end
 function cid.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
-	if c:IsFacedown() or not c:IsRelateToEffect(e) then return end
+	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 or c:IsFacedown() or not c:IsRelateToEffect(e) then return end
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) then
 		if not Duel.Equip(tp,tc,c,true) then return end

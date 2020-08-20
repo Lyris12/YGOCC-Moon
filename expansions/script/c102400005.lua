@@ -51,8 +51,6 @@ function cid.diratk(ec)
 end
 function cid.descon(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
-	local d=Duel.GetAttackTarget()
-	if d and d:IsControler(tp) then a,d=d,a end
 	return a:IsSetCard(0xda6) and a~=e:GetHandler()
 end
 function cid.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

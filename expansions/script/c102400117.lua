@@ -6,10 +6,8 @@ function cid.initial_effect(c)
 	Duel.SendtoGrave=function(tg,r)
 		local ct=0
 		local g=Group.CreateGroup()+tg
-		for tc in aux.Next(g) do
-			if tc:IsHasEffect(id) then ct=ct+Duel.Destroy(tc,r)
-			else ct=ct+f1(tc,r|REASON_DESTROY) end
-		end
+		for tc in aux.Next(g) do if tc:IsHasEffect(id) then ct=ct+Duel.Destroy(tc,r)
+		else ct=ct+f1(tc,r) end end
 		return ct
 	end
 	Duel.SendtoHand=function(tg,tp,r)
