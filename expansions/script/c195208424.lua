@@ -62,7 +62,7 @@ end
 	Duel.BreakEffect()
 	local flag=0
 	for i=0,1 do
-		if Duel.SelectOption(tp,aux.Stringid(id//10-2,0),aux.Stringid(id//10-2,1))==0 then
+		if not Duel.SelectYesNo(tp,aux.Stringid(id//10-2,0)) then
 			flag=flag|Duel.SelectDisableField(tp,1,LOCATION_ONFIELD,LOCATION_ONFIELD,flag)
 		else
 			local tc=Duel.GetFieldGroup(tp,LOCATION_ONFIELD,LOCATION_ONFIELD):FilterSelect(tp,s.cfilter,1,1,nil,~flag):GetFirst()
@@ -70,6 +70,7 @@ end
 		end
 		if i==0 and not Duel.SelectYesNo(tp,210) then break end
 	end
+	Duel.Hint(HINT_ZONE,tp,flag)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
