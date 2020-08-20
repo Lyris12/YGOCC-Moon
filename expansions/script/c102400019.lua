@@ -13,6 +13,7 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e3)
 	local e4=e3:Clone()
 	e4:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
+	e4:SetValue(aux.indoval)
 	c:RegisterEffect(e4)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
@@ -44,7 +45,5 @@ function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and c:IsFaceup() then
-		c:CopyEffect(e:GetLabel(),RESET_EVENT+RESETS_STANDARD,1)
-	end
+	if c:IsRelateToEffect(e) and c:IsFaceup() then c:CopyEffect(e:GetLabel(),RESET_EVENT+RESETS_STANDARD,1) end
 end

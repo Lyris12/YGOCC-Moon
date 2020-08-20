@@ -1,4 +1,4 @@
---created & coded by Lyris
+--created & coded by Lyris, art from Yu-Gi-Oh! Duel Monsters Episode 156
 --インライトメント・アルティマ ケースト
 local cid,id=GetID()
 function cid.initial_effect(c)

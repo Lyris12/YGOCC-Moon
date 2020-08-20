@@ -1,4 +1,4 @@
---created & coded by Lyris
+--created & coded by Lyris, art from Yu-Gi-Oh! Duel Monsters Episode 174
 --インライトメント・アルティマ エルマ
 local cid,id=GetID()
 function cid.initial_effect(c)
