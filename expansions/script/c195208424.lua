@@ -98,7 +98,7 @@ end
 	local e6=e1:Clone()
 	e6:SetCode(EVENT_CHAINING)
 	e6:SetCondition(function(e,tp,eg,ep,ev,re)
-		return re:IsHasType(EFFECT_TYPE_ACTIVATE) and bit.extract(flag,re:GetActivateSequence()+8+(re:GetHandler():IsControler(1-tp) and 16 or 0))~=0
+		return bit.extract(flag,re:GetActivateSequence()+8+(re:GetHandler():IsControler(1-tp) and 16 or 0))~=0
 	end)
 	Duel.RegisterEffect(e6,tp)
 end

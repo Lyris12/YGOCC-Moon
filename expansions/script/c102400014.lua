@@ -46,7 +46,7 @@ end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp,chk)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	Duel.SpecialSummon(Duel.SelectMatchingCard(cid.filter,tp,LOCATION_HAND+LOCATION_GRAVE,0,nil,e,tp),0,tp,tp,false,false,POS_FACEUP)
+	Duel.SpecialSummon(Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil,e,tp),0,tp,tp,false,false,POS_FACEUP)
 end
 function cid.descon(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()

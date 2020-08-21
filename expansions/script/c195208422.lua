@@ -68,12 +68,20 @@ end
 		e2:SetCode(EFFECT_DISABLE)
 		e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e2)
-		aux.CannotBeEDMaterial(tc,cid.filtor,nil,true,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+		for _,val in ipairs(Auxiliary.CannotBeEDMatCodes) do
+			local restrict = Effect.CreateEffect(e:GetHandler())
+			restrict:SetType(EFFECT_TYPE_SINGLE)
+			restrict:SetCode(val)
+			restrict:SetValue(cid.filtor)
+			restrict:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+			tc:RegisterEffect(restrict)
+		end
 	end
 	Duel.SpecialSummonComplete()
 end
-	function cid.filtor(c)
-	return c:IsSetCard(0x83e)
+	function cid.filtor(e,c)
+	if c==nil then return false end
+	return not c:IsSetCard(0x83e)
 end
 	function cid.thfilter(c)
 	return c:IsType(TYPE_TUNER) and c:IsSetCard(0x83e) and c:IsAbleToHand()
