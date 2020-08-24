@@ -65,7 +65,7 @@ end
 		if not Duel.SelectYesNo(tp,aux.Stringid(id//10-2,0)) then
 			flag=flag|Duel.SelectDisableField(tp,1,LOCATION_ONFIELD,LOCATION_ONFIELD,flag)
 		else
-			local tc=Duel.GetFieldGroup(tp,LOCATION_ONFIELD,LOCATION_ONFIELD):FilterSelect(tp,s.cfilter,1,1,nil,~flag):GetFirst()
+			local tc=Duel.GetFieldGroup(tp,LOCATION_ONFIELD,LOCATION_ONFIELD):FilterSelect(tp,s.cfilter,1,1,nil,~flag,tp):GetFirst()
 			flag=flag|2^(tc:GetSequence()+(tc:IsLocation(LOCATION_SZONE) and 8 or 0)+(tc:IsControler(1-tp) and 16 or 0))
 		end
 		if i==0 and not Duel.SelectYesNo(tp,210) then break end
@@ -74,8 +74,9 @@ end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
-	e1:SetCondition(function(e,tp,eg) return eg:IsExists(s.cfilter,1,nil,flag) end)
+	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetOperation(function(e,tp,eg)
+		if not eg:IsExists(s.cfilter,1,nil,flag,tp) then return end
 		Duel.Hint(HINT_CARD,0,id)
 		if eg:IsExists(s.pfilter,1,nil,tp) then Duel.Damage(tp,500,REASON_EFFECT,true) end
 		if eg:IsExists(s.pfilter,1,nil,1-tp) then Duel.Damage(1-tp,500,REASON_EFFECT,true) end
@@ -102,16 +103,16 @@ end
 	end)
 	Duel.RegisterEffect(e6,tp)
 end
-	function s.cfilter(c,zone)
+	function s.cfilter(c,zone,tp)
 	local seq=c:GetSequence()
-	if c:IsLocation(LOCATION_ONFIELD) then if c:IsControler(1) then seq=seq+16 end
+	if c:IsLocation(LOCATION_ONFIELD) then if c:IsControler(1-tp) then seq=seq+16 end
 	else
 		seq=c:GetPreviousSequence()
-		if c:GetPreviousControler()==1 then seq=seq+16 end
+		if c:GetPreviousControler()==1-tp then seq=seq+16 end
 	end
 	if c:IsLocation(LOCATION_SZONE) then seq=seq+8 end
 	return bit.extract(zone,seq)~=0
 end
 	function s.pfilter(c,p)
-	return c:GetPreviousControler()==p or c:IsControler(p)
+	return c:IsOnField() and c:IsControler(p) or not c:IsOnField() and c:GetPreviousControler()==p
 end
