@@ -31,7 +31,7 @@ function cod.initial_effect(c)
 	--Equip Limit
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE)
-	e4:SetCode(EFFECT_EQUIP_LIMIT)
+	e4:SetCode(EFFECT_UNION_LIMIT)
 	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e4:SetValue(cod.eqlimit)
 	c:RegisterEffect(e4)
