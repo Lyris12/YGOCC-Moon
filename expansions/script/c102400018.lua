@@ -22,7 +22,7 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function cid.filter0(c)
-	return c:IsType(TYPE_MONSTER) and c:IsCanBeFusionMaterial() and c:IsAbleToRemove()
+	return c:IsType(TYPE_MONSTER) and c:IsCanBeFusionMaterial() and c:IsAbleToGrave()
 end
 function cid.filter1(c,e)
 	return not c:IsImmuneToEffect(e)
@@ -36,7 +36,7 @@ function cid.fustg(e,tp,eg,ep,ev,re,r,rp,chk)
 		local chkf=tp
 		local mg1=Duel.GetFusionMaterial(tp)
 		if Duel.IsExistingMatchingCard(Card.IsSummonType,tp,0,LOCATION_MZONE,1,nil,SUMMON_TYPE_SPECIAL) then
-			local mg2=Duel.GetMatchingGroup(cid.filter0,tp,LOCATION_GRAVE,0,nil)
+			local mg2=Duel.GetMatchingGroup(cid.filter0,tp,LOCATION_DECK,0,nil)
 			mg1:Merge(mg2)
 		end
 		local res=Duel.IsExistingMatchingCard(cid.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,mg1,nil,chkf)
@@ -57,7 +57,7 @@ function cid.fusop(e,tp,eg,ep,ev,re,r,rp)
 	local chkf=tp
 	local mg1=Duel.GetFusionMaterial(tp):Filter(cid.filter1,nil,e)
 	if Duel.IsExistingMatchingCard(Card.IsSummonType,tp,0,LOCATION_MZONE,1,nil,SUMMON_TYPE_SPECIAL) then
-		local mg2=Duel.GetMatchingGroup(cid.filter0,tp,LOCATION_GRAVE,0,nil)
+		local mg2=Duel.GetMatchingGroup(cid.filter0,tp,LOCATION_DECK,0,nil)
 		mg1:Merge(mg2)
 	end
 	local sg1=Duel.GetMatchingGroup(cid.filter2,tp,LOCATION_EXTRA,0,nil,e,tp,mg1,nil,chkf)
@@ -79,8 +79,7 @@ function cid.fusop(e,tp,eg,ep,ev,re,r,rp)
 		if sg1:IsContains(tc) and (sg2==nil or not sg2:IsContains(tc) or not Duel.SelectYesNo(tp,ce:GetDescription())) then
 			local mat1=Duel.SelectFusionMaterial(tp,tc,mg1,nil,chkf)
 			tc:SetMaterial(mat1)
-			Duel.Remove(mat1:Filter(Card.IsLocation,nil,LOCATION_GRAVE),POS_FACEUP,REASON_EFFECT)
-			Duel.SendtoGrave(mat1:Filter(aux.NOT(Card.IsLocation),nil,LOCATION_GRAVE),REASON_EFFECT+REASON_MATERIAL+REASON_FUSION)
+			Duel.SendtoGrave(mat1,REASON_EFFECT+REASON_MATERIAL+REASON_FUSION)
 			Duel.BreakEffect()
 			Duel.SpecialSummon(tc,SUMMON_TYPE_FUSION,tp,tp,false,false,POS_FACEUP)
 		else
@@ -91,11 +90,8 @@ function cid.fusop(e,tp,eg,ep,ev,re,r,rp)
 		tc:CompleteProcedure()
 	end
 end
-function cid.cfilter(c)
-	return c:IsFaceup() and c:IsCode(CARD_INLIGHTENED_PSYCHIC_HELMET)
-end
 function cid.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCurrentPhase()==PHASE_MAIN1 and not Duel.CheckPhaseActivity() and Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0
+	return Duel.GetCurrentPhase()==PHASE_MAIN1 and not Duel.CheckPhaseActivity()
 end
 function cid.filter(c,e,tp)
 	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xda6) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
@@ -106,6 +102,7 @@ function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	Duel.SpecialSummon(Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_DECK,0,1,1,nil,e,tp),0,tp,tp,false,false,POS_FACEUP)
 end
