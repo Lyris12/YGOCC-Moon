@@ -1,99 +1,75 @@
 --created & coded by Lyris
---フェイツ出会い
+--F・HEROの出会い
 local cid,id=GetID()
 function cid.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_REMOVE)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCountLimit(1,id)
-	e1:SetTarget(cid.target)
-	e1:SetOperation(cid.activate)
+	e1:SetCost(cid.reg)
 	c:RegisterEffect(e1)
 end
-function cid.spfilter(c,e,tp,mc1,mc2)
-	local trap=c:IsType(TYPE_TRAP)
-	return c:IsSetCard(0xf7a) and (trap or c:GetType()&0x81==0x81) and (not c.mat_filter or c.mat_filter(mc,tp))
-		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,trap,true)
-		and mc1:IsCanBeRitualMaterial(c) and mc2:IsCanBeRitualMaterial(c)
+function cid.reg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	local c=e:GetHandler()
+	c:SetTurnCounter(0)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e1:SetCode(EVENT_PHASE_START+PHASE_STANDBY)
+	e1:SetCountLimit(1)
+	e1:SetProperty(EFFECT_FLAG_OATH)
+	e1:SetOperation(cid.ctop)
+	Duel.RegisterEffect(e1,tp) 
 end
-function cid.rfilter(c,mc1,mc2)
-	local mlv1,mlv2=mc1:GetRitualLevel(c),mc2:GetRitualLevel(c)
-	if mlv1==mc1:GetLevel() and mlv2==mc2:GetLevel() then return false end
-	local lv=c:IsType(TYPE_TRAP) and c:GetOriginalLevel() or c:GetLevel()
-	return lv==bit.band(mlv1+mlv2,0xffff) or lv==bit.rshift(mlv1+mlv2,16)
+function cid.filter1(c,e)
+	return c:IsFaceup() and c:IsCanBeFusionMaterial() and not c:IsImmuneToEffect(e)
 end
-function cid.filter(c,e,tp,mg)
-	return mg:IsExists(cid.filter2,1,nil,e,tp,c)
+function cid.filter2(c,m)
+	return c:IsFusionSummonableCard() and c:CheckFusionMaterial(m)
 end
-function cid.filter2(c,e,tp,mc)
-	if (c:IsLevelAbove(1) and mc:IsLevelAbove(1)) or not (c:IsLevelAbove(1) and mc:IsLevelAbove(1)) then return false end
-	local i1,i2
-	if c:GetLevel()>0 then i1,i2=c:GetLevel(),Duel.ReadCard(mc,CARDDATA_LEVEL)
-	else i1,i2=Duel.ReadCard(c,CARDDATA_LEVEL),mc:GetLevel() end
-	if c:IsType(TYPE_EVOLUTE) then i1=1 end
-	if mc:IsType(TYPE_EVOLUTE) then i2=1 end
-	local sg=Duel.GetMatchingGroup(cid.spfilter,tp,LOCATION_HAND,0,c,e,tp,c,mc)
-	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if c:IsLocation(LOCATION_MZONE) then ft=ft+1 end
-	if Duel.IsPlayerAffectedByEffect(tp,id) then ft=1 end
-	return sg:IsExists(cid.rfilter,1,nil,c,mc) or sg:CheckWithSumGreater(Card.GetLevel,i1+i2,1,ft)
+function cid.filter3(c,e)
+	return c:IsFaceup() and c:IsCanBeFusionMaterial() and not c:IsImmuneToEffect(e)
 end
-function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then
-		local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-		if ft<=0 then return false end
-		local mg=Duel.GetMatchingGroup(Card.IsAbleToRemove,tp,LOCATION_EXTRA,0,nil)
-		return mg:IsExists(cid.filter,1,nil,e,tp,mg)
+function cid.procfilter(c,code,e,tp)
+	return c:IsCode(code) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false) and Duel.GetLocationCountFromEx(tp,tp,nil,c)>0
+end
+function cid.ctop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local ct=c:GetTurnCounter()
+	if ct>=2 then
+		c:SetTurnCounter(0)
+		e:Reset()
+		return
 	end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
-end
-function cid.lvfun(c)
-	if c:IsType(TYPE_TRAP) then return c:GetOriginalLevel()
-	else return c:GetLevel() end
-end
-function cid.activate(e,tp,eg,ep,ev,re,r,rp)
-	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if ft<=0 then return end
-	local mg=Duel.GetMatchingGroup(Card.IsAbleToRemove,tp,LOCATION_EXTRA,0,nil)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local mat=mg:FilterSelect(tp,cid.filter,1,1,nil,e,tp,mg)
-	local mc=mat:GetFirst()
-	if not mc then return end
-	local mc2=mg:FilterSelect(tp,cid.filter2,1,1,nil,e,tp,mc):GetFirst()
-	local sg=Duel.GetMatchingGroup(cid.spfilter,tp,LOCATION_HAND,0,mc,e,tp,mc,mc2)
-	if mc:IsLocation(LOCATION_MZONE) then ft=ft+1 end
-	if Duel.IsPlayerAffectedByEffect(tp,id) then ft=1 end
-	local b1=sg:IsExists(cid.rfilter,1,nil,mc,mc2)
-	local i1,i2
-	if mc:GetLevel()>0 then i1,i2=mc:GetLevel(),Duel.ReadCard(mc2,CARDDATA_LEVEL)
-	else i1,i2=Duel.ReadCard(mc,CARDDATA_LEVEL),mc2:GetLevel() end
-	local b2=sg:CheckWithSumGreater(cid.lvfun,i1+i2,1,ft)
-	if b1 and (not b2 or Duel.SelectYesNo(tp,aux.Stringid(id,0))) then
+	if Duel.GetTurnPlayer()~=tp then return end
+	ct=ct+1
+	c:SetTurnCounter(ct)
+	if ct==1 then
+		local mg=Duel.GetFusionMaterial(tp)+Duel.GetMatchingGroup(cid.filter1,tp,0,LOCATION_MZONE,nil,e)
+		local sg=Duel.GetMatchingGroup(cid.filter2,tp,LOCATION_EXTRA,0,nil,mg)
+		if #sg>0 then
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
+			local tg=sg:Select(tp,1,1,nil)
+			local tc=tg:GetFirst()
+			Duel.ConfirmCards(1-tp,tc)
+			local code=tc:GetCode()
+			local mat=Duel.SelectFusionMaterial(tp,tc,mg)
+			mat:KeepAlive()
+			Duel.SendtoGrave(mat,REASON_EFFECT)
+			e:SetLabel(code)
+			e:SetLabelObject(mat)
+			Duel.ShuffleExtra(tp)
+		end
+	elseif ct==2 then
+		if not aux.MustMaterialCheck(nil,tp,EFFECT_MUST_BE_FMATERIAL) then return end
+		local code=e:GetLabel()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local tg=sg:FilterSelect(tp,cid.rfilter,1,1,nil,mc,mc2)
-		local tc=tg:GetFirst()
-		tc:SetMaterial(mat)
-		Duel.Remove(mat,POS_FACEUP,REASON_EFFECT+REASON_MATERIAL+REASON_RITUAL)
-		Duel.BreakEffect()
-		Duel.SpecialSummon(tc,SUMMON_TYPE_RITUAL,tp,tp,tc:IsType(TYPE_TRAP),true,POS_FACEUP)
+		local g=Duel.SelectMatchingCard(tp,cid.procfilter,tp,LOCATION_EXTRA,0,1,1,nil,code,e,tp)
+		local tc=g:GetFirst()
+		if not tc then return end
+		tc:SetStatus(STATUS_FUTURE_FUSION,true)
+		tc:SetMaterial(e:GetLabelObject())
+		Duel.SpecialSummon(tc,SUMMON_TYPE_FUSION,tp,tp,false,false,POS_FACEUP)
 		tc:CompleteProcedure()
-	else
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local tg=sg:SelectWithSumGreater(tp,cid.lvfun,i1+i2,1,ft)
-		local tc=tg:GetFirst()
-		while tc do
-			tc:SetMaterial(mat)
-			tc=tg:GetNext()
-		end
-		Duel.Remove(mat,POS_FACEUP,REASON_EFFECT+REASON_MATERIAL+REASON_RITUAL)
-		Duel.BreakEffect()
-		local fg=tg:Filter(Card.IsFacedown,nil)
-		if #fg>0 then Duel.ConfirmCards(1-tp,fg) end
-		for tc in aux.Next(tg) do
-			Duel.SpecialSummonStep(tc,SUMMON_TYPE_RITUAL,tp,tp,tc:IsType(TYPE_TRAP),true,POS_FACEUP)
-			tc:CompleteProcedure()
-		end
-		Duel.SpecialSummonComplete()
 	end
 end

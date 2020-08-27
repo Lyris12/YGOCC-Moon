@@ -1,97 +1,74 @@
 --created & coded by Lyris, art from Yu-Gi-Oh! Duel Monsters GX Episode 101
---フェイツ儀式
+--F・HEROの儀式
 local cid,id=GetID()
 function cid.initial_effect(c)
-	local f=Card.GetRitualLevel
-	Card.GetRitualLevel=function(c,rc)
-		if c:IsLocation(LOCATION_SZONE) then return c:GetOriginalLevel()+f(c,rc)&0xf0000 end
-		return f(c,rc)
-	end
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCountLimit(1,id)
+	e1:SetCountLimit(1,id+EFFECT_COUNT_CODE_OATH)
 	e1:SetTarget(cid.target)
-	e1:SetOperation(cid.operation)
-	c:RegisterEffect(e1)
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_IGNITION)
-	e1:SetRange(LOCATION_GRAVE)
-	e1:SetCategory(CATEGORY_TODECK)
-	e1:SetCondition(aux.exccon)
-	e1:SetCost(aux.bfgcost)
-	e1:SetTarget(cid.tg)
-	e1:SetOperation(cid.op)
+	e1:SetOperation(cid.activate)
 	c:RegisterEffect(e1)
 end
-function cid.RitualUltimateFilter(c,e,tp,m1,m2)
-	local trap=c:IsType(TYPE_TRAP)
-	if (not trap and c:GetType()&0x81~=0x81) or not c:IsSetCard(0xf7a) or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,trap,true) then return false end
-	local mg=m1:Filter(Card.IsCanBeRitualMaterial,c,c)
-	if m2 then
-		mg:Merge(m2)
-	end
-	if c.mat_filter then
-		mg=mg:Filter(c.mat_filter,c,tp)
-	else
-		mg:RemoveCard(c)
-	end
-	local lv=trap and c:GetOriginalLevel() or c:GetLevel()
-	aux.GCheckAdditional=aux.RitualCheckAdditional(c,lv,"Greater")
-	local res=mg:CheckSubGroup(aux.RitualCheck,1,lv,tp,c,lv,"Greater")
-	aux.GCheckAdditional=nil
-	return res
+function cid.filter0(c)
+	return c:IsType(TYPE_MONSTER) and c:IsCanBeFusionMaterial() and c:IsAbleToGrave()
 end
-function cid.gfilter(c)
-	return c:IsSetCard(0xf7a) and c:GetOriginalLevel()>0
+function cid.filter1(c,e)
+	return not c:IsImmuneToEffect(e) and c:IsOnField()
+end
+function cid.filter2(c,e,tp,m,f,chkf)
+	return c:IsType(TYPE_FUSION) and c:IsSetCard(0xf7a) and (not f or f(c))
+		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false) and c:CheckFusionMaterial(m,nil,chkf)
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
-		local mg=Duel.GetRitualMaterial(tp):Filter(Card.IsSetCard,nil,0xf7a)
-		local exg=Duel.GetMatchingGroup(cid.gfilter,tp,LOCATION_SZONE,0,nil)
-		return Duel.IsExistingMatchingCard(cid.RitualUltimateFilter,tp,LOCATION_DECK+LOCATION_SZONE,0,1,nil,e,tp,mg,exg)
+		local chkf=tp
+		local mg1=Duel.GetFusionMaterial(tp):Filter(Card.IsOnField,nil)+Duel.GetMatchingGroup(cid.filter0,tp,LOCATION_DECK,0,nil)
+		local res=Duel.IsExistingMatchingCard(cid.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,mg1,nil,chkf)
+		if not res then
+			local ce=Duel.GetChainMaterial(tp)
+			if ce~=nil then
+				local fgroup=ce:GetTarget()
+				local mg2=fgroup(ce,e,tp)
+				local mf=ce:GetValue()
+				res=Duel.IsExistingMatchingCard(cid.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,mg2,mf,chkf)
+			end
+		end
+		return res
 	end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK+LOCATION_SZONE)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
-function cid.operation(e,tp,eg,ep,ev,re,r,rp)
-	local mg=Duel.GetRitualMaterial(tp):Filter(Card.IsSetCard,nil,0xf7a)
-	local exg=Duel.GetMatchingGroup(cid.gfilter,tp,LOCATION_SZONE,0,nil)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local tg=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(cid.RitualUltimateFilter),tp,LOCATION_DECK+LOCATION_SZONE,0,1,1,nil,e,tp,mg,exg)
-	local tc=tg:GetFirst()
-	if tc then
-		mg=mg:Filter(Card.IsCanBeRitualMaterial,tc,tc)
-		if exg then
-			mg:Merge(exg)
-		end
-		if tc.mat_filter then
-			mg=mg:Filter(tc.mat_filter,tc,tp)
+function cid.activate(e,tp,eg,ep,ev,re,r,rp)
+	local chkf=tp
+	local mg1=Duel.GetFusionMaterial(tp):Filter(cid.filter1,nil,e)+Duel.GetMatchingGroup(cid.filter0,tp,LOCATION_DECK,0,nil)
+	local sg1=Duel.GetMatchingGroup(cid.filter2,tp,LOCATION_EXTRA,0,nil,e,tp,mg1,nil,chkf)
+	local mg2=nil
+	local sg2=nil
+	local ce=Duel.GetChainMaterial(tp)
+	if ce~=nil then
+		local fgroup=ce:GetTarget()
+		mg2=fgroup(ce,e,tp)
+		local mf=ce:GetValue()
+		sg2=Duel.GetMatchingGroup(cid.filter2,tp,LOCATION_EXTRA,0,nil,e,tp,mg2,mf,chkf)
+	end
+	if #sg1>0 or (sg2~=nil and #sg2>0) then
+		local sg=sg1:Clone()
+		if sg2 then sg:Merge(sg2) end
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+		local tg=sg:Select(tp,1,1,nil)
+		local tc=tg:GetFirst()
+		if sg1:IsContains(tc) and (sg2==nil or not sg2:IsContains(tc) or not Duel.SelectYesNo(tp,ce:GetDescription())) then
+			local mat1=Duel.SelectFusionMaterial(tp,tc,mg1,nil,chkf)
+			tc:SetMaterial(mat1)
+			Duel.SendtoGrave(mat1,REASON_EFFECT+REASON_MATERIAL+REASON_FUSION)
+			Duel.BreakEffect()
+			Duel.SpecialSummon(tc,SUMMON_TYPE_FUSION,tp,tp,false,false,POS_FACEUP)
 		else
-			mg:RemoveCard(tc)
+			local mat2=Duel.SelectFusionMaterial(tp,tc,mg2,nil,chkf)
+			local fop=ce:GetOperation()
+			fop(ce,e,tp,tc,mat2)
 		end
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-		local trap=tc:IsType(TYPE_TRAP)
-		local lv=trap and tc:GetOriginalLevel() or tc:GetLevel()
-		aux.GCheckAdditional=aux.RitualCheckAdditional(tc,lv,"Greater")
-		local mat=mg:SelectSubGroup(tp,aux.RitualCheck,false,1,lv,tp,tc,lv,"Greater")
-		aux.GCheckAdditional=nil
-		tc:SetMaterial(mat)
-		Duel.ReleaseRitualMaterial(mat)
-		Duel.BreakEffect()
-		if trap then Duel.ConfirmCards(1-tp,tc) end
-		Duel.SpecialSummon(tc,SUMMON_TYPE_RITUAL,tp,tp,trap,true,POS_FACEUP)
 		tc:CompleteProcedure()
 	end
-end
-function cid.filter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xf7a) and c:IsAbleToDeck()
-end
-function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_GRAVE,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,1,tp,LOCATION_GRAVE)
-end
-function cid.op(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	Duel.SendtoDeck(Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_GRAVE,0,1,3,nil),nil,2,REASON_EFFECT)
 end

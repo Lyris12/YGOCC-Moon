@@ -1,69 +1,52 @@
 --created & coded by Lyris
---フェイツ・プロヒビトガル
+--F・HEROプロヒビトガル
 local cid,id=GetID()
 function cid.initial_effect(c)
-	c:EnableReviveLimit()
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_MONSTER_SSET)
-	e1:SetValue(TYPE_TRAP)
-	c:RegisterEffect(e1)
-	if not cid.global_check then
-		cid.global_check=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_SSET)
-		ge1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		ge1:SetOperation(function(e,tp,eg) for tc in aux.Next(eg:Filter(Card.IsOriginalCodeRule,nil,id)) do tc:SetCardData(CARDDATA_TYPE,TYPE_TRAP) end end)
-		Duel.RegisterEffect(ge1,0)
-	end
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e2:SetCode(EVENT_LEAVE_FIELD)
-	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SET_AVAILABLE)
-	e2:SetOperation(function(e)
-		local c=e:GetHandler()
-		if c:GetOriginalType()==TYPE_TRAP then
-			c:AddMonsterAttribute(TYPE_MONSTER+TYPE_RITUAL+TYPE_EFFECT)
-			c:SetCardData(CARDDATA_TYPE,TYPE_MONSTER+TYPE_RITUAL+TYPE_EFFECT)
-		end
-	end)
-	c:RegisterEffect(e2)
-	local e3=e2:Clone()
-	e3:SetRange(LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED+LOCATION_HAND+LOCATION_EXTRA+LOCATION_OVERLAY+LOCATION_MZONE)
-	e3:SetCode(EVENT_ADJUST)
-	e3:SetCode(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	c:RegisterEffect(e3)
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_ACTIVATE)
-	e2:SetCode(EVENT_FREE_CHAIN)
-	e2:SetCategory(CATEGORY_TODECK)
-	e2:SetTarget(cid.target)
-	e2:SetOperation(cid.activate)
-	c:RegisterEffect(e2)
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e1:SetCode(EVENT_TO_GRAVE)
-	e1:SetCondition(cid.con)
-	e1:SetOperation(cid.hdop)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e1:SetCode(EVENT_BE_MATERIAL)
+	e1:SetCountLimit(1,id)
+	e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
+	e1:SetCondition(function(e,tp,eg,ep,ev,re,r) return r==REASON_FUSION end)
+	e1:SetCategory(CATEGORY_TODECK)
+	e1:SetTarget(cid.target)
+	e1:SetOperation(cid.activate)
 	c:RegisterEffect(e1)
 end
-function cid.cpfilter(c)
-	return c:IsSetCard(0xf7a) and c:IsType(TYPE_MONSTER) and c:IsAbleToDeck() and not c:IsCode(id) and c:CheckActivateEffect(false,true,false)~=nil
+function cid.cpfilter(c,e,tp,eg,ep,ev,re,r,rp)
+	if not c:IsSetCard(0xf7a) or not c:IsType(TYPE_MONSTER) or not c:IsAbleToDeck()
+		or c:IsCode(id) then return false end
+	for _,ef in pairs(global_card_effect_table[c]) do
+		local con=ef:GetCondition()
+		local tg=ef:GetTarget()
+		if ef:GetCode()==EVENT_BE_MATERIAL and (not con or con(e,tp,eg,ep,ev,re,REASON_FUSION,rp)) and (not tg or tg(e,tp,eg,ep,ev,re,r,rp,0)) then return true end
+	end
+	return false
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chk==0 then return Duel.IsExistingMatchingCard(cid.cpfilter,tp,LOCATION_GRAVE,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(cid.cpfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp,eg,ep,ev,re,r,rp) end
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,1,tp,LOCATION_GRAVE)
 end
 function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g=Duel.SelectMatchingCard(tp,cid.cpfilter,tp,LOCATION_GRAVE,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,cid.cpfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp,eg,ep,ev,re,r,rp)
+	Duel.HintSelection(g)
 	if #g==0 or Duel.SendtoDeck(g,nil,2,REASON_EFFECT)==0 then return end
+	local tc=g:GetFirst()
 	Duel.ShuffleDeck(tp)
 	Duel.BreakEffect()
-	local te,ceg,cep,cev,cre,cr,crp=g:GetFirst():CheckActivateEffect(false,true,true)
+	local t={}
+	local ops={}
+	for _,ef in pairs(global_card_effect_table[tc]) do
+		local tg=ef:GetTarget()
+		if ef:IsHasCategory(CATEGORY_FUSION_SUMMON) and (not tg or tg(e,tp,eg,ep,ev,re,r,rp,0)) then
+			table.insert(t,ef)
+			table.insert(ops,ef:GetDescription())
+		end
+	end
+	local te=t[Duel.SelectOption(tp,table.unpack(ops))]
 	Duel.ClearTargetCard()
-	g:GetFirst():CreateEffectRelation(e)
+	tc:CreateEffectRelation(e)
 	local tg=te:GetTarget()
 	if tg then tg(e,tp,ceg,cep,cev,cre,cr,crp,1) end
 	local op=te:GetOperation()

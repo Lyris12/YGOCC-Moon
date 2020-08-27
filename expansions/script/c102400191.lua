@@ -1,81 +1,36 @@
 --created & coded by Lyris, art by Nardack
---フェイツ・カオス・ゴッデス
+--F・HEROカオス・ゴッデス
 local cid,id=GetID()
 function cid.initial_effect(c)
 	c:EnableReviveLimit()
-	local e0=Effect.CreateEffect(c)
-	e0:SetType(EFFECT_TYPE_SINGLE)
-	e0:SetCode(EFFECT_MONSTER_SSET)
-	e0:SetValue(TYPE_TRAP)
-	c:RegisterEffect(e0)
-	if not cid.global_check then
-		cid.global_check=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_SSET)
-		ge1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		ge1:SetOperation(function(e,tp,eg) for tc in aux.Next(eg:Filter(Card.IsOriginalCodeRule,nil,id)) do tc:SetCardData(CARDDATA_TYPE,TYPE_TRAP) end end)
-		Duel.RegisterEffect(ge1,0)
-	end
+	aux.AddFusionProcMixRep(c,false,true,cid.mfilter0,0,63,cid.mfilter1,cid.mfilter2)
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e2:SetCode(EVENT_LEAVE_FIELD)
-	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SET_AVAILABLE)
-	e2:SetOperation(function(e)
-		local c=e:GetHandler()
-		if c:GetOriginalType()==TYPE_TRAP then
-			c:AddMonsterAttribute(TYPE_MONSTER+TYPE_RITUAL+TYPE_EFFECT)
-			c:SetCardData(CARDDATA_TYPE,TYPE_MONSTER+TYPE_RITUAL+TYPE_EFFECT)
-		end
-	end)
+	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetCode(EVENT_FREE_CHAIN)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e2:SetCategory(CATEGORY_REMOVE)
+	e2:SetTarget(cid.target)
+	e2:SetOperation(cid.activate)
 	c:RegisterEffect(e2)
-	local e3=e2:Clone()
-	e3:SetRange(LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED+LOCATION_HAND+LOCATION_EXTRA+LOCATION_OVERLAY+LOCATION_MZONE)
-	e3:SetCode(EVENT_ADJUST)
-	e3:SetCode(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	c:RegisterEffect(e3)
-	local f=Card.GetRitualLevel
-	Card.GetRitualLevel=function(c,rc)
-		if c:IsLocation(LOCATION_SZONE) then return c:GetOriginalLevel()+f(c,rc)&0xf0000 end
-		return f(c,rc)
-	end
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e4:SetCode(EVENT_LEAVE_FIELD)
-	e4:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
-	e4:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e4:SetCondition(cid.condition)
-	e4:SetTarget(cid.target)
-	e4:SetOperation(cid.operation)
-	c:RegisterEffect(e4)
 end
-function cid.condition(e)
-	local c=e:GetHandler()
-	return c:IsPreviousPosition(POS_FACEDOWN) or c:IsSummonType(SUMMON_TYPE_RITUAL)
+function cid.mfilter0(c,fc,sub,mg,sg)
+	return (c:IsFusionSetCard(0xf7a) or c:GetLevel()==0) and (not sg or sg:FilterCount(aux.TRUE,c)==0 or sg:Filter(Card.IsLevelAbove,c,1):CheckWithSumGreater(Card.GetLevel,fc:GetLevel()-c:GetLevel()))
 end
-function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(aux.RitualUltimateFilter,tp,LOCATION_HAND+LOCATION_DECK,0,1,nil,aux.FilterBoolFunction(Card.IsSetCard,0xf7a),e,tp,Duel.GetRitualMaterial(tp),Duel.GetMatchingGroup(function(tc) return tc:GetOriginalLevel()>0 end,tp,LOCATION_SZONE,0,nil),Card.GetLevel,"Greater",true) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_DECK)
+function cid.mfilter1(c,fc,sub,mg,sg)
+	return c:IsFusionSetCard(0xf7a) and (not sg or sg:FilterCount(aux.TRUE,c)==0 or sg:Filter(Card.IsLevelAbove,c,1):CheckWithSumGreater(Card.GetLevel,fc:GetLevel()-c:GetLevel()))
 end
-function cid.operation(e,tp,eg,ep,ev,re,r,rp)
-	local mg=Duel.GetRitualMaterial(tp)
-	local exg=Duel.GetMatchingGroup(function(tc) return tc:GetOriginalLevel()>0 end,tp,LOCATION_SZONE,0,nil)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local tg=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(aux.RitualUltimateFilter),tp,LOCATION_HAND+LOCATION_DECK,0,1,1,nil,aux.FilterBoolFunction(Card.IsSetCard,0xf7a),e,tp,mg,exg,Card.GetLevel,"Greater")
-	local tc=tg:GetFirst()
-	if tc then
-		mg=mg:Filter(Card.IsCanBeRitualMaterial,tc,tc)+exg
-		if tc.mat_filter then mg=mg:Filter(tc.mat_filter,tc,tp)
-		else mg:RemoveCard(tc) end
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-		local lv=tc:GetLevel()
-		aux.GCheckAdditional=aux.RitualCheckAdditional(tc,lv,"Greater")
-		local mat=mg:SelectSubGroup(tp,aux.RitualCheck,false,1,lv,tp,tc,lv,"Greater")
-		aux.GCheckAdditional=nil
-		tc:SetMaterial(mat)
-		Duel.ReleaseRitualMaterial(mat)
-		Duel.BreakEffect()
-		Duel.SpecialSummon(tc,SUMMON_TYPE_RITUAL,tp,tp,false,true,POS_FACEUP)
-		tc:CompleteProcedure()
-	end
+function cid.mfilter2(c,fc,sub,mg,sg)
+	return c:GetLevel()==0
+end
+function cid.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(1-tp) and chkc:IsAbleToRemove() end
+	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToRemove,tp,0,LOCATION_GRAVE,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+	local g=Duel.SelectTarget(tp,Card.IsAbleToRemove,tp,0,LOCATION_GRAVE,1,e:GetHandler():GetMaterialCount(),nil)
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,#g,0,0)
+end
+function cid.activate(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Remove(Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e),POS_FACEUP,REASON_EFFECT)
 end

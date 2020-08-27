@@ -1,89 +1,62 @@
 --created & coded by Lyris
---フェイツ・イリュージョンガイ
+--F・HEROイリュージョンガイ
 local cid,id=GetID()
 function cid.initial_effect(c)
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_MONSTER_SSET)
-	e1:SetValue(TYPE_TRAP)
-	c:RegisterEffect(e1)
-	if not cid.global_check then
-		cid.global_check=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_SSET)
-		ge1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		ge1:SetOperation(function(e,tp,eg) for tc in aux.Next(eg:Filter(Card.IsOriginalCodeRule,nil,id)) do tc:SetCardData(CARDDATA_TYPE,TYPE_TRAP) end end)
-		Duel.RegisterEffect(ge1,0)
-	end
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e2:SetCode(EVENT_LEAVE_FIELD)
-	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SET_AVAILABLE)
-	e2:SetOperation(function(e)
-		local c=e:GetHandler()
-		if c:GetOriginalType()==TYPE_TRAP then
-			c:AddMonsterAttribute(TYPE_MONSTER+TYPE_RITUAL+TYPE_EFFECT)
-			c:SetCardData(CARDDATA_TYPE,TYPE_MONSTER+TYPE_RITUAL+TYPE_EFFECT)
-		end
-	end)
+	e2:SetCode(EVENT_SUMMON_SUCCESS)
+	e2:SetOperation(cid.reg)
 	c:RegisterEffect(e2)
 	local e3=e2:Clone()
-	e3:SetRange(LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED+LOCATION_HAND+LOCATION_EXTRA+LOCATION_OVERLAY+LOCATION_MZONE)
-	e3:SetCode(EVENT_ADJUST)
-	e3:SetCode(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	c:RegisterEffect(e3)
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_ACTIVATE)
-	e2:SetCode(EVENT_FREE_CHAIN)
-	e2:SetTarget(cid.target)
-	e2:SetOperation(cid.activate)
-	c:RegisterEffect(e2)
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetCode(EFFECT_RITUAL_LEVEL)
-	e3:SetRange(LOCATION_SZONE)
-	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e3:SetValue(cid.rlevel)
+	e3:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
 	c:RegisterEffect(e3)
 	local e4=e2:Clone()
-	e4:SetType(EFFECT_TYPE_IGNITION)
-	e4:SetRange(LOCATION_HAND)
-	e4:SetCost(cid.cost)
+	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e4)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e1:SetCode(EVENT_BE_MATERIAL)
+	e1:SetCountLimit(1,id)
+	e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
+	e1:SetCondition(function(e,tp,eg,ep,ev,re,r) return r==REASON_FUSION end)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetTarget(cid.tg)
+	e1:SetOperation(cid.op)
+	c:RegisterEffect(e1)
 end
-function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	if chk==0 then return c:IsDiscardable() end
-	Duel.SendtoGrave(c,REASON_COST+REASON_DISCARD)
+function cid.reg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local e2=Effect.CreateEffect(e:GetHandler())
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e2:SetCode(EVENT_CHAINING)
+	e2:SetOperation(function(e,tp,eg,ep,ev,re) if re:GetHandler():IsSetCard(0xf7a) and ep==tp then Duel.SetChainLimit(function(e,p,rp) return rp==p end) end end)
+	e2:SetReset(RESET_PHASE+PHASE_END)
+	Duel.RegisterEffect(e2,tp)
 end
-function cid.rlevel(e,c)
-	local lv=e:GetHandler():GetLevel()
-	if c:IsSetCard(0xf7a) then
-		local clv=c:GetLevel()
-		return lv*(0x1<<16)+clv
-	else return lv end
+function cid.sfilter(c,e,tp)
+	return c:IsSetCard(0xf7a) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function cid.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0xf7a)
+function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsExistingMatchingCard(cid.sfilter,tp,LOCATION_HAND,0,1,nil,e,tp) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
 end
-function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_MZONE,0,1,nil) end
-end
-function cid.activate(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(cid.filter,tp,LOCATION_MZONE,0,nil)
-	local c=e:GetHandler()
-	for tc in aux.Next(g) do
-		local e1=Effect.CreateEffect(c)
+function cid.op(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local tc=Duel.SelectMatchingCard(tp,cid.sfilter,tp,LOCATION_HAND,0,1,1,nil,e,tp):GetFirst()
+	if tc and Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP) then
+		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CANNOT_DISABLE)
+		e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 		e1:SetRange(LOCATION_MZONE)
-		e1:SetValue(cid.efilter)
 		e1:SetCode(EFFECT_IMMUNE_EFFECT)
+		e1:SetValue(cid.efilter)
+		e1:SetOwnerPlayer(tp)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-		nc:RegisterEffect(e1)
+		tc:RegisterEffect(e1,true)
 	end
+	Duel.SpecialSummonComplete()
 end
-function cid.efilter(e,te)
-	return e:GetOwnerPlayer()~=te:GetOwnerPlayer()
+function cid.efilter(e,re)
+	return e:GetOwnerPlayer()~=re:GetOwnerPlayer() and re:IsActiveType(TYPE_MONSTER)
 end

@@ -1,114 +1,63 @@
 --created & coded by Lyris, art from Cardfight!! Vanguard's "Dancing Princess of the Night Sky"
---フェイツ・トワイライトガル
+--F・HEROトワイライトガル
 local cid,id=GetID()
 function cid.initial_effect(c)
 	c:EnableReviveLimit()
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_MONSTER_SSET)
-	e1:SetValue(TYPE_TRAP)
-	c:RegisterEffect(e1)
-	if not cid.global_check then
-		cid.global_check=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_SSET)
-		ge1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		ge1:SetOperation(function(e,tp,eg) for tc in aux.Next(eg:Filter(Card.IsOriginalCodeRule,nil,id)) do tc:SetCardData(CARDDATA_TYPE,TYPE_TRAP) end end)
-		Duel.RegisterEffect(ge1,0)
-	end
+	aux.AddFusionProcFun2(c,cid.mfilter1,cid.mfilter2,true)
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e2:SetCode(EVENT_LEAVE_FIELD)
-	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SET_AVAILABLE)
-	e2:SetOperation(function(e)
-		local c=e:GetHandler()
-		if c:GetOriginalType()==TYPE_TRAP then
-			c:AddMonsterAttribute(TYPE_MONSTER+TYPE_RITUAL+TYPE_EFFECT)
-			c:SetCardData(CARDDATA_TYPE,TYPE_MONSTER+TYPE_RITUAL+TYPE_EFFECT)
-		end
-	end)
-	c:RegisterEffect(e2)
-	local e3=e2:Clone()
-	e3:SetRange(LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED+LOCATION_HAND+LOCATION_EXTRA+LOCATION_OVERLAY+LOCATION_MZONE)
-	e3:SetCode(EVENT_ADJUST)
-	e3:SetCode(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	c:RegisterEffect(e3)
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_ACTIVATE)
+	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetTarget(cid.target)
 	e2:SetOperation(cid.activate)
 	c:RegisterEffect(e2)
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e3:SetCode(EVENT_TO_GRAVE)
-	e3:SetOperation(cid.regop)
-	c:RegisterEffect(e3)
-	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(id,1))
-	e4:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
-	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e4:SetCode(EVENT_PHASE+PHASE_STANDBY)
-	e4:SetRange(LOCATION_GRAVE)
-	e4:SetCondition(cid.thcon)
-	e4:SetTarget(cid.thtg)
-	e4:SetOperation(cid.thop)
-	c:RegisterEffect(e4)
 end
-function cid.filter(c)
-	return c:IsLevelBelow(4) and c:IsSetCard(0xf7a) and c:IsSSetable(true)
+function cid.mfilter1(c,fc,sub,mg,sg)
+	return c:IsFusionSetCard(0xf7a) and (not sg or sg:FilterCount(aux.TRUE,c)==0 or sg:Filter(Card.IsLevelAbove,c,1):CheckWithSumGreater(Card.GetLevel,fc:GetLevel()-c:GetLevel()))
 end
-function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
-		and Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_DECK,0,1,nil) end
+function cid.mfilter2(c,fc,sub,mg,sg)
+	return c:IsFusionAttribute(ATTRIBUTE_LIGHT) and (not sg or sg:FilterCount(aux.TRUE,c)==0 or sg:Filter(Card.IsLevelAbove,c,1):CheckWithSumGreater(Card.GetLevel,fc:GetLevel()-c:GetLevel()))
+end
+function cid.filter(c,e,tp)
+	return c:IsAttribute(ATTRIBUTE_DARK+ATTRIBUTE_LIGHT) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+end
+function cid.cfilter(c,tp)
+	return c:IsSetCard(0xf7a) and c:IsReleasableByEffect() and Duel.GetMZoneCount(tp,c)>0
+end
+function cid.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and cid.filter(chkc,e,tp) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
+		and Duel.CheckReleaseGroup(tp,cid.cfilter,1,nil,tp)
+		and Duel.IsExistingTarget(cid.filter,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,nil,e,tp) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,Duel.SelectTarget(tp,cid.filter,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,1,nil,e,tp),1,0,0)
 end
 function cid.activate(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
-	local c=e:GetHandler()
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
-	local g=Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_DECK,0,1,1,nil)
-	local tc=g:GetFirst()
-	if tc then
-		Duel.SSet(tp,tc)
-		Duel.ConfirmCards(1-tp,tc)
-		local e1=Effect.CreateEffect(c)
+	local tc=Duel.GetFirstTarget()
+	if Duel.Release(Duel.SelectReleaseGroup(tp,cid.cfilter,1,1,nil,tp),REASON_EFFECT)==0 or not tc:IsRelateToEffect(e) then return end
+	if Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP) then
+		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
-		e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+		e1:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD)
+		e1:SetValue(LOCATION_REMOVED)
 		tc:RegisterEffect(e1)
+		local e2=Effect.CreateEffect(e:GetHandler())
+		e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+		e2:SetRange(LOCATION_MZONE)
+		e2:SetCode(EVENT_PHASE+PHASE_END)
+		e2:SetOperation(cid.rmop)
+		e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+		e2:SetCountLimit(1)
+		tc:RegisterEffect(e2,true)
 	end
+	Duel.SpecialSummonComplete()
 end
-function cid.regop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local ct,l=1,0
-	if Duel.GetCurrentPhase()==PHASE_STANDBY then ct,l=2,Duel.GetTurnCount() end
-	c:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_STANDBY,0,ct,l)
-end
-function cid.thcon(e,tp,eg,ep,ev,re,r,rp)
-	local tid=e:GetHandler():GetFlagEffectLabel(id)
-	return tid and tid~=Duel.GetTurnCount()
-end
-function cid.rfilter(c,e,tp)
-	if bit.band(c:GetType(),0x81)~=0x81 or not c:IsSetCard(0x3a) 
-		or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,true,false) then return false end
-	return c:GetLevel()<=Duel.GetFieldGroupCount(tp,0,LOCATION_ONFIELD)
-end
-function cid.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(cid.rfilter,tp,0x1a,0,1,nil,e,tp) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,0x1a)
-end
-function cid.thop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local tg=Duel.SelectMatchingCard(tp,cid.rfilter,tp,0x1a,0,1,1,nil,e,tp)
-	local tc=tg:GetFirst()
-	if tc then
-		tc:SetMaterial(nil)
-		Duel.SpecialSummon(tc,SUMMON_TYPE_RITUAL,tp,tp,true,false,POS_FACEUP)
-		tc:CompleteProcedure()
-	end
+function cid.rmop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_EFFECT)
 end
