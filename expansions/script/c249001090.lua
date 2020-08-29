@@ -26,6 +26,18 @@ function c249001090.initial_effect(c)
 	local e4=e2:Clone()
 	e4:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
 	c:RegisterEffect(e4)
+	--special summon
+	local e5=Effect.CreateEffect(c)
+	e5:SetDescription(2)
+	e5:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e5:SetType(EFFECT_TYPE_QUICK_O)
+	e5:SetCode(EVENT_FREE_CHAIN)
+	e5:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e5:SetCountLimit(1,249001090)
+	e5:SetRange(LOCATION_HAND)
+	e5:SetTarget(c249001090.sptg2)
+	e5:SetOperation(c249001090.spop2)
+	c:RegisterEffect(e5)
 end
 function c249001090.spcon(e,c)
 	if c==nil then return true end
@@ -48,4 +60,22 @@ function c249001090.operation(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.IsExistingMatchingCard(c249001090.filter,tp,LOCATION_MZONE,0,1,e:GetHandler()) then return end
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	Duel.Draw(p,d,REASON_EFFECT)
+end
+function c249001090.spfilter(c,e)
+	return c:IsFaceup() and c:IsSetCard(0xC048) and not c:IsImmuneToEffect(e)
+end
+function c249001090.sptg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsOnField() and chkc:IsControler(tp) and c249001090.spfilter(chkc,e) end
+	if chk==0 then return Duel.IsExistingTarget(c249001090.spfilter,tp,LOCATION_ONFIELD,0,1,nil,e) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
+	local g=Duel.SelectTarget(tp,c249001090.spfilter,tp,LOCATION_ONFIELD,0,1,1,nil,e)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
+	
+end
+function c249001090.spop2(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.GetFirstTarget()
+	if tc:IsFacedown() or not tc:IsRelateToEffect(e) then return end
+	if Duel.SendtoHand(tc,nil,REASON_EFFECT) == 0 then return end
+	Duel.SpecialSummon(e:GetHandler(),0,tp,tp,false,false,POS_FACEUP_DEFENSE)
 end

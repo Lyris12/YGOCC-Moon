@@ -7,10 +7,22 @@ function c249001084.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetCode(EVENT_TO_GRAVE)
-	e1:SetCountLimit(1,249001084)
+	e1:SetCountLimit(1,2490010841)
 	e1:SetTarget(c249001084.target)
 	e1:SetOperation(c249001084.operation)
 	c:RegisterEffect(e1)
+	--special summon
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(2)
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetCode(EVENT_FREE_CHAIN)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e2:SetCountLimit(1,2490010842)
+	e2:SetRange(LOCATION_HAND)
+	e2:SetTarget(c249001084.sptg)
+	e2:SetOperation(c249001084.spop)
+	c:RegisterEffect(e2)
 end
 function c249001084.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -41,4 +53,22 @@ function c249001084.operation(e,tp,eg,ep,ev,re,r,rp)
 end
 function c249001084.aclimit(e,re,tp)
 	return re:GetHandler():IsCode(e:GetLabel())
+end
+function c249001084.spfilter(c,e)
+	return c:IsFaceup() and c:IsSetCard(0xC048) and not c:IsImmuneToEffect(e)
+end
+function c249001084.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsOnField() and chkc:IsControler(tp) and c249001084.spfilter(chkc,e) end
+	if chk==0 then return Duel.IsExistingTarget(c249001084.spfilter,tp,LOCATION_ONFIELD,0,1,nil,e) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
+	local g=Duel.SelectTarget(tp,c249001084.spfilter,tp,LOCATION_ONFIELD,0,1,1,nil,e)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
+	
+end
+function c249001084.spop(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.GetFirstTarget()
+	if tc:IsFacedown() or not tc:IsRelateToEffect(e) then return end
+	if Duel.SendtoHand(tc,nil,REASON_EFFECT) == 0 then return end
+	Duel.SpecialSummon(e:GetHandler(),0,tp,tp,false,false,POS_FACEUP_DEFENSE)
 end
