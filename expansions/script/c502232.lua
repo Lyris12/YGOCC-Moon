@@ -105,11 +105,10 @@ end
 end
 	function s.actcon(e)
 	local c=e:GetHandler()
-	return s.eqcon2(e) and Duel.GetAttacker()==c or Duel.GetAttackTarget()==c
+	return s.eqcon2(e) and (e:GetHandler()==Duel.GetAttacker() and Duel.GetAttackTarget()~=nil) or e:GetHandler()==Duel.GetAttackTarget()
 end
 	function s.discon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return s.eqcon2(e) and Duel.GetAttacker()==c or Duel.GetAttackTarget()==c
+	return s.eqcon2(e) and (e:GetHandler()==Duel.GetAttacker() and Duel.GetAttackTarget()~=nil) or e:GetHandler()==Duel.GetAttackTarget()
 end
 	function s.disfilter(c)
 	return aux.disfilter1(c) and c:IsType(TYPE_MONSTER)
@@ -117,7 +116,7 @@ end
 	function s.disop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
-	local g=Duel.GetMatchingGroup(s.disfilter,tp,0,LOCATION_ONFIELD,c)
+	local g=Duel.GetMatchingGroup(s.disfilter,tp,0,LOCATION_ONFIELD+LOCATION_DECK+LOCATION_HAND+LOCATION_GRAVE+LOCATION_REMOVED+LOCATION_EXTRA+LOCATION_OVERLAY+LOCATION_FZONE+LOCATION_PZONE,c)
 	local tc=g:GetFirst()
 	while tc do
 		local e1=Effect.CreateEffect(c)
@@ -130,13 +129,6 @@ end
 		e2:SetCode(EFFECT_DISABLE_EFFECT)
 		e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_DAMAGE)
 		tc:RegisterEffect(e2)
-		if tc:IsType(TYPE_TRAPMONSTER) then
-			local e3=Effect.CreateEffect(c)
-			e3:SetType(EFFECT_TYPE_SINGLE)
-			e3:SetCode(EFFECT_DISABLE_TRAPMONSTER)
-			e3:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_DAMAGE)
-			tc:RegisterEffect(e3)
-		end
 		tc=g:GetNext()
 	end
 end
@@ -147,14 +139,15 @@ end
 	if a~=c then d=a end
 	return c:IsRelateToBattle() and c:IsFaceup()
 end
+	function s.filter(c)
+	return c:IsType(TYPE_MONSTER)
+end
 	function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	local g=Duel.GetMatchingGroup(aux.TRUE,tp,0,LOCATION_MZONE,nil)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,0,LOCATION_ONFIELD,1,nil) end
+	local sg=Duel.GetMatchingGroup(s.filter,tp,0,LOCATION_ONFIELD,nil)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,sg,sg:GetCount(),0,0)
 end
 	function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(aux.TRUE,tp,0,LOCATION_MZONE,nil)
 	Duel.Destroy(g,REASON_EFFECT)
 end
-
-

@@ -62,6 +62,9 @@ end
 	function s.filter(c)
 	return c:IsSetCard(0xb23) and (c:IsLocation(LOCATION_HAND) or c:IsFaceup()) and c:IsAbleToGraveAsCost()
 end
+	function s.filter2(c)
+	return (c:IsLocation(LOCATION_HAND) or c:IsFaceup())
+end
 	function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_ONFIELD+LOCATION_HAND,0,1,c) end
@@ -70,14 +73,14 @@ end
 	Duel.SendtoGrave(g,REASON_COST)
 end
 	function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFieldGroupCount(tp,0,LOCATION_ONFIELD+LOCATION_HAND)>0 end
+	if chk==0 then return Duel.GetMatchingGroupCount(s.filter2,1-tp,LOCATION_ONFIELD+LOCATION_HAND,0,nil)>=1 end
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,1,0,LOCATION_ONFIELD+LOCATION_HAND)
 end
 	function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	if not Duel.IsExistingMatchingCard(s.filtor2,tp,LOCATION_MZONE,0,1,nil) then return end
 	if not Duel.IsExistingMatchingCard(s.filtor,tp,LOCATION_SZONE,0,1,nil) then return end
 	if not e:GetHandler():IsRelateToEffect(e) then return end
-	local g=Duel.GetMatchingGroup(Card.IsAbleToDeck,1-tp,LOCATION_ONFIELD+LOCATION_HAND,0,nil)
+	local g=Duel.GetMatchingGroup(s.filter2,1-tp,LOCATION_ONFIELD+LOCATION_HAND,0,nil)
 	if g:GetCount()>0 then
 		Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_TODECK)
 		local sg=g:Select(1-tp,1,1,nil)
