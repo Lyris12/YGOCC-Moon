@@ -33,7 +33,7 @@ function cid.thfilter1(c)
 	return c:IsCode(id) and c:IsAbleToHand()
 end
 function cid.thfilter2(c)
-	return c:IsSetCard(0x4578) and not c:IsCode(id) and c:IsAbleToHand()
+	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x4578) and not c:IsCode(id) and c:IsAbleToHand()
 end
 function cid.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cid.thfilter,tp,LOCATION_DECK,0,1,nil) end
