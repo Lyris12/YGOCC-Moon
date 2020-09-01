@@ -8,6 +8,14 @@ local function getID()
 end
 local id,ref=getID()
 function ref.initial_effect(c)
+	local magick=Effect.CreateEffect(c)
+	magick:SetDescription(aux.Stringid(id,0))
+	magick:SetCategory(CATEGORY_DRAW)
+	magick:SetType(EFFECT_TYPE_TRIGGER_O)
+	magick:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_PLAYER_TARGET)
+	magick:SetTarget(ref.drtg)
+	magick:SetOperation(ref.drop)
+	aux.AddMagickProcCustom(c,ref.magcon,magick,aux.TRUE,1)
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
@@ -19,13 +27,28 @@ function ref.initial_effect(c)
 	e1:SetOperation(ref.actop)
 	c:RegisterEffect(e1)
 end
+function ref.magcon(e,tp,eg,ep,ev,re,r,rp)
+	return re:GetHandler():IsType(TYPE_MONSTER)
+end
+function ref.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
+	Duel.SetTargetPlayer(tp)
+	Duel.SetTargetParam(1)
+	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,1,tp,0)
+end
+function ref.drop(e,tp,eg,ep,ev,re,r,rp)
+	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PLAYER)
+	Duel.Draw(p,d,REASON_EFFECT)
+end
+
 function ref.xyzfilter(c,e,tp)
 	return c:IsFaceup() and c:IsType(TYPE_XYZ)
 		and Duel.IsExistingMatchingCard(ref.ssfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,c)
 		and aux.MustMaterialCheck(c,tp,EFFECT_MUST_BE_XMATERIAL)
 end
 function ref.ssfilter(c,e,tp,mc)
-	return c:IsType(TYPE_XYZ) and c:IsRace(mc:GetRace()) and mc:IsCanBeXyzMaterial(c)
+	return c:IsType(TYPE_XYZ) and c:IsSetCard(0x1048,0x1073)
+		and c:IsRace(mc:GetRace()) and mc:IsCanBeXyzMaterial(c)
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
 		and Duel.GetLocationCountFromEx(mc:GetControler(),tp,mc,c)>0
 end

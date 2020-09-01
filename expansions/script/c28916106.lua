@@ -1,0 +1,56 @@
+--Player Token
+local function getID()
+	local str=string.match(debug.getinfo(2,'S')['source'],"c%d+%.lua")
+	str=string.sub(str,1,string.len(str)-4)
+	local cod=_G[str]
+	local id=tonumber(string.sub(str,2))
+	return id,cod
+end
+local id,ref=getID()
+function ref.initial_effect(c)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_SINGLE_RANGE)
+	e1:SetRange(LOCATION_EXTRA)
+	e1:SetCode(EFFECT_IMMUNE_EFFECT)
+	e1:SetCondition(ref.skillcon)
+	e1:SetValue(ref.skill_efilter)
+	c:RegisterEffect(e1)
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e2:SetCode(EFFECT_SPSUMMON_CONDITION)
+	e2:SetValue(0)
+	c:RegisterEffect(e2)
+	local e3=e1:Clone()
+	e3:SetCode(EFFECT_CANNOT_USE_AS_COST)
+	e3:SetValue(1)
+	c:RegisterEffect(e3)
+	local e4=e1:Clone()
+	e4:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
+	e4:SetValue(1)
+	c:RegisterEffect(e4)
+	--[[
+	local e5=e1:Clone()
+	e5:SetCode(EFFECT_CANNOT_TO_GRAVE)
+	e5:SetValue(1)
+	c:RegisterEffect(e5)
+	local e6=e1:Clone()
+	e6:SetCode(EFFECT_CANNOT_REMOVE)
+	c:RegisterEffect(e6)
+	local e7=e1:Clone()
+	e7:SetCode(EFFECT_CANNOT_TO_HAND)
+	e7:SetValue(1)
+	c:RegisterEffect(e7)
+	local e8=e1:Clone()
+	e8:SetCode(EFFECT_INDESTRUCTABLE)
+	e8:SetValue(1)
+	c:RegisterEffect(e8)
+	]]
+end
+function ref.skillcon(e)
+	return e:GetHandler():IsFaceup() and e:GetHandler():GetFlagEffect(id)>0
+end
+function ref.skill_efilter(e,te)
+	return te:GetOwner()~=e:GetOwner()
+end

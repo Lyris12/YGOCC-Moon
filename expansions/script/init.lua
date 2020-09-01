@@ -1,36 +1,36 @@
 --Not yet finalized values
 --Custom constants
-EFFECT_DEFAULT_CALL					=31993443
-EFFECT_EXTRA_GEMINI					=86433590
-EFFECT_AVAILABLE_LMULTIPLE			=86433612
-EFFECT_MULTIPLE_LMATERIAL			=86433613
+EFFECT_DEFAULT_CALL				 =31993443
+EFFECT_EXTRA_GEMINI				 =86433590
+EFFECT_AVAILABLE_LMULTIPLE		  =86433612
+EFFECT_MULTIPLE_LMATERIAL		   =86433613
 EFFECT_RANDOM_TARGET				=39759371
-EFFECT_CANNOT_BANISH_FD_EFFECT		=856
-TYPE_CUSTOM							=0
+EFFECT_CANNOT_BANISH_FD_EFFECT	  =856
+TYPE_CUSTOM						 =0
 
 CTYPE_CUSTOM						=0
 
-EVENT_XYZATTACH						=EVENT_CUSTOM+9966607
-EVENT_LP_CHANGE						=EVENT_CUSTOM+68007397
+EVENT_XYZATTACH					 =EVENT_CUSTOM+9966607
+EVENT_LP_CHANGE					 =EVENT_CUSTOM+68007397
 
 EFFECT_COUNT_SECOND_HOPT			=10000000
 
 --Commonly used cards
 CARD_BLUEEYES_SPIRIT				=59822133
-CARD_CYBER_DRAGON					=70095154
-CARD_PYRO_CLOCK						=1082946
-CARD_INLIGHTENED_PSYCHIC_HELMET		=102400006
-CARD_NEBULA_TOKEN					=218201917
-CARD_DRAGON_EGG_TOKEN				=20157305
-CARD_BLACK_GARDEN					=71645242
-CARD_EVIL_DRAGON_ANANTA				=8400623
+CARD_CYBER_DRAGON				   =70095154
+CARD_PYRO_CLOCK					 =1082946
+CARD_INLIGHTENED_PSYCHIC_HELMET	 =102400006
+CARD_NEBULA_TOKEN				   =218201917
+CARD_DRAGON_EGG_TOKEN			   =20157305
+CARD_BLACK_GARDEN				   =71645242
+CARD_EVIL_DRAGON_ANANTA			 =8400623
 
 --Custom Type Tables
 Auxiliary.Customs={} --check if card uses custom type, indexing card
 Auxiliary.CannotBeEDMatCodes = {}
 
 --overwrite constants
-TYPE_EXTRA							=TYPE_FUSION+TYPE_SYNCHRO+TYPE_XYZ+TYPE_LINK
+TYPE_EXTRA						  =TYPE_FUSION+TYPE_SYNCHRO+TYPE_XYZ+TYPE_LINK
 
 --Custom Functions
 function Card.IsCustomType(c,tpe,scard,sumtype,p)
@@ -70,7 +70,8 @@ dofile("expansions/script/proc_chroma.lua") --Chromas
 dofile("expansions/script/proc_perdition.lua") --Perditions
 dofile("expansions/script/proc_impure.lua") --Impures
 dofile("expansions/script/proc_runic.lua") --Runic
-dofile("expansions/script/tables.lua")	--Special Tables
+dofile("expansions/script/proc_magick.lua") --Magick
+dofile("expansions/script/tables.lua") --Special Tables
 
 Card.IsReason=function(c,rs)
 	local cusrs=rs>>32
