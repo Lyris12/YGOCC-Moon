@@ -1,4 +1,4 @@
-﻿expansions/cards-new.cdb	2e2b487fff6bdc6cc8b7257e0dbe5a56
+﻿expansions/cards-new.cdb	fae0f58e15c4821a3c3f2dbf9d47f0c3
 expansions/lflist.conf	082af94816b40691f95650dfb82eccc7
 expansions/strings.conf	81b2be790a47ef679d694cee04b05fa2
 expansions/pics/100000710.jpg	5f925a97b1c60d7d69acb8f229938263
@@ -690,7 +690,7 @@ expansions/pics/102400186.png	d8da551f1df6aecae401a71383db4f50
 expansions/pics/102400187.png	c9dd1e79c79d5efa2ee468ceb2f5a150
 expansions/pics/102400188.png	7945ae2bb8e8beb558cbf423630ec1f6
 expansions/pics/102400189.png	85ed74bcabdc37196beb017728fef434
-expansions/pics/102400190.png	8f01c86aad1b5bdd91d08f978b0552b9
+expansions/pics/102400190.png	c3ac23532034bc947f430f530958afa8
 expansions/pics/102400191.png	4b6c92d151e155c668e97ead6ccab20b
 expansions/pics/102400192.png	7d839ce89d13196a2a77645bed45a1fd
 expansions/pics/102400193.png	12b86167183af9ae31c84abc504d1a5a
@@ -5468,7 +5468,7 @@ expansions/script/c102400186.lua	1e8d1cd2ea30962c33d8f65f7b851c07
 expansions/script/c102400187.lua	48d804597cb83d4483e01d36034d5d09
 expansions/script/c102400188.lua	f8ea60607c18035bcfcffbad604111f7
 expansions/script/c102400189.lua	afeb4f6b4d3d0863c9b929833ef1f369
-expansions/script/c102400190.lua	3f452454be66d62ec0eee1daa1aa032c
+expansions/script/c102400190.lua	7cd1b6d263c7537c1bd9964d737a5226
 expansions/script/c102400191.lua	ccc813a75f2fdbb3916eee24cba12f76
 expansions/script/c102400192.lua	b113f3112653cdff7bd431c0076a5bf9
 expansions/script/c102400193.lua	c9f6eac2a008517dc0bf79ad2ba8269e
@@ -9351,6 +9351,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	233297a56a41f46f6abe8a3768036bf3
+update/filelist.txt	d542094c39d8558b18b18f706a45ae94
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	64c4e73964e15d5d05968733794e0453
+update/version.txt	555a21ecae17ca0da723286bde0d596c

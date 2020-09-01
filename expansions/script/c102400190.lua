@@ -3,7 +3,7 @@
 local cid,id=GetID()
 function cid.initial_effect(c)
 	c:EnableReviveLimit()
-	aux.AddFusionProcFun2(c,cid.mfilter(0xf7a),cid.mfilter(0x8),true)
+	aux.AddFusionProcFun2(c,cid.mfilter1,cid.mfilter2,true)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)
@@ -25,10 +25,11 @@ function cid.initial_effect(c)
 	e1:SetOperation(cid.damop)
 	c:RegisterEffect(e1)
 end
-function cid.mfilter(set)
-	return  function(c,fc,sub,mg,sg)
-				return c:IsFusionSetCard(set) and (not sg or sg:FilterCount(aux.TRUE,c)==0 or sg:Filter(Card.IsLevelAbove,c,1):CheckWithSumGreater(Card.GetLevel,fc:GetLevel()-c:GetLevel()))
-			end
+function cid.mfilter1(c,fc,sub,mg,sg)
+	return c:IsFusionSetCard(0xf7a) and (not sg or sg:FilterCount(aux.TRUE,c)==0 or sg:Filter(Card.IsLevelAbove,c,1):CheckWithSumGreater(Card.GetLevel,fc:GetLevel()-c:GetLevel()))
+end
+function cid.mfilter2(c,fc,sub,mg,sg)
+	return c:IsAttackAbove(1900) and (not sg or sg:FilterCount(aux.TRUE,c)==0 or sg:Filter(Card.IsLevelAbove,c,1):CheckWithSumGreater(Card.GetLevel,fc:GetLevel()-c:GetLevel()))
 end
 function cid.filter(c,e,tp,eg,ep,ev,re,r,rp)
 	if not c:IsSetCard(0xf7a) or not c:IsType(TYPE_SPELL) or not c:IsAbleToDeck() then return false end
