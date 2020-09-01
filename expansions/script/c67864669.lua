@@ -49,33 +49,31 @@ function c67864669.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function c67864669.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_DECK) and chkc:IsControler(tp) and c67864669.eqfilter(chkc,tp) end
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>(e:GetHandler():IsLocation(LOCATION_SZONE) and 0 or 1)
-		and Duel.IsExistingTarget(c67864669.eqfilter,tp,LOCATION_DECK,0,1,nil,tp) end
-	Duel.SetOperationInfo(0,CATEGORY_EQUIP,g,1,0,0)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
+		and Duel.IsExistingMatchingCard(c67864669.eqfilter,tp,LOCATION_DECK,0,1,nil,tp) end
+	Duel.SetOperationInfo(0,CATEGORY_EQUIP,nil,1,tp,LOCATION_DECK)
 end
 function c67864669.operation(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_SZONE)>0 then
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
-	local g=Duel.SelectMatchingCard(tp,c67864669.eqfilter,tp,LOCATION_DECK,0,1,1,nil,tp)
-	local tc=g:GetFirst()
-	if g:GetCount()>0 then
-		if aux.CheckUnionEquip(tc,e:GetHandler()) and Duel.Equip(tp,tc,e:GetHandler()) then
-   		 	aux.SetUnionState(tc)
-			end
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
+		local g=Duel.SelectMatchingCard(tp,c67864669.eqfilter,tp,LOCATION_DECK,0,1,1,nil,tp)
+		local tc=g:GetFirst()
+		if tc and aux.CheckUnionEquip(tc,e:GetHandler()) and Duel.Equip(tp,tc,e:GetHandler()) then
+			aux.SetUnionState(tc)
 		end
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)	
-	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-	e1:SetReset(RESET_PHASE+PHASE_END)
-	e1:SetTargetRange(1,0)
-	e1:SetTarget(c67864669.splimit)
-	Duel.RegisterEffect(e1,tp)
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_FIELD)
+		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)   
+		e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+		e1:SetReset(RESET_PHASE+PHASE_END)
+		e1:SetTargetRange(1,0)
+		e1:SetTarget(c67864669.splimit)
+		Duel.RegisterEffect(e1,tp)
 	end
 end
 function c67864669.splimit(e,c,sump,sumtype,sumpos,targetp,se)
 	return not c:IsSetCard(0x2a6)
-end	
+end 
 --Special Summon
 function c67864669.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local lg=e:GetHandler():GetLinkedGroup()
