@@ -1,10 +1,8 @@
+--created by ZEN, coded by ZEN & Lyris
 local cid,id=GetID()
---Patmos, The True Administral
 function cid.initial_effect(c)
-	--Link Procedure
 	aux.AddLinkProcedure(c,nil,2,3,cid.lcheck)
 	c:EnableReviveLimit()
-	--1st Effect
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_UPDATE_ATTACK)
@@ -16,10 +14,77 @@ function cid.initial_effect(c)
 	local e2=e1:Clone()
 	e2:SetCode(EFFECT_UPDATE_DEFENSE)
 	c:RegisterEffect(e2)
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_QUICK_O)
+	e3:SetCode(EVENT_FREE_CHAIN)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetCountLimit(1)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e3:SetCategory(CATEGORY_ATKCHANGE)
+	e3:SetDescription(1113)
+	e3:SetTarget(cid.target)
+	e3:SetOperation(cid.operation)
+	c:RegisterEffect(e3)
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e4:SetCode(EVENT_CUSTOM+id)
+	e4:SetRange(LOCATION_MZONE)
+	e4:SetCountLimit(1,id)
+	e4:SetCategory(CATEGORY_DRAW)
+	e4:SetDescription(1108)
+	e4:SetCondition(function(e,tp,eg,ep) return ep==tp end)
+	e4:SetTarget(cid.drtg)
+	e4:SetOperation(cid.drop)
+	c:RegisterEffect(e4)
 end
 function cid.lcheck(g)
 	return g:IsExists(Card.IsLinkSetCard,1,nil,0xd7c)
 end
 function cid.stattg(e,c)
 	return c:IsSetCard(0xd7c) and c:GetSequence()<5
+end
+function cid.filter(c)
+	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xd7c) and not c:IsForbidden()
+end
+function cid.target(e,tp,eg,ep,ev,re,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and cid.filter(chkc) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
+		and Duel.IsExistingTarget(cid.filter,tp,LOCATION_GRAVE,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
+	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,Duel.SelectTarget(tp,cid.filter,tp,LOCATION_GRAVE,0,1,1,nil),1,0,0)
+end
+function cid.operation(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
+	local tc=Duel.GetFirstTarget()
+	if not tc:IsRelateToEffect(e) or not Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true) then return end
+	local c=e:GetHandler()
+	local e1=Effect.CreateEffect(c)
+	e1:SetCode(EFFECT_CHANGE_TYPE)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET)
+	e1:SetValue(TYPE_SPELL+TYPE_CONTINUOUS)
+	tc:RegisterEffect(e1)
+	Duel.RaiseEvent(tc,EVENT_CUSTOM+id,e,r,tp,tp,0)
+	if c:IsRelateToEffect(e) and c:IsFaceup() then
+		local e2=Effect.CreateEffect(c)
+		e2:SetType(EFFECT_TYPE_SINGLE)
+		e2:SetCode(EFFECT_UPDATE_ATTACK)
+		e2:SetValue(function(e,tc) return Duel.GetMatchingGroupCount(cid.sfilter,tp,LOCATION_SZONE,LOCATION_SZONE,nil)*400 end)
+		e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_DISABLE+RESET_PHASE+PHASE_END)
+		c:RegisterEffect(e2)
+	end
+end
+function cid.sfilter(c)
+	return c:GetSequence()<5
+end
+function cid.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
+	Duel.SetTargetPlayer(tp)
+	Duel.SetTargetParam(1)
+	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
+end
+function cid.drop(e,tp,eg,ep,ev,re,r,rp)
+	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
+	Duel.Draw(p,d,REASON_EFFECT)
 end
