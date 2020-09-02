@@ -43,10 +43,11 @@ function c249001099.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
 function c249001099.operation(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFirstMatchingCard(c249001099.filter,tp,LOCATION_DECK,0,nil)
-	if tc then
-		Duel.SendtoHand(tc,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,tc)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local g=Duel.SelectMatchingCard(tp,c249001099.filter,tp,LOCATION_DECK,0,1,1,nil)
+	if g:GetCount()>0 then
+		Duel.SendtoHand(g,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,g)
 	end
 end
 function c249001099.spcon(e,tp,eg,ep,ev,re,r,rp)
