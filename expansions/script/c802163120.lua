@@ -1,5 +1,6 @@
 --created by Eaden, coded by Lyris
 local cid,id=GetID()
+id=id//10
 function cid.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)

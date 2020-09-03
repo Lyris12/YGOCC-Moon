@@ -38,7 +38,7 @@ function cid.scop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT+0x1fc0000)
 		e1:SetValue(TYPE_SPELL+TYPE_CONTINUOUS)
 		c:RegisterEffect(e1)
-		Duel.RaiseEvent(tc,EVENT_CUSTOM+id+1,e,r,tp,tp,0)
+		Duel.RaiseEvent(c,EVENT_CUSTOM+id+1,e,r,tp,tp,0)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 		local g=Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_DECK,0,1,1,nil)
 		if #g>0 then

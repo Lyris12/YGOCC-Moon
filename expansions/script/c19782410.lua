@@ -48,7 +48,7 @@ end
 function cid.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	if not aux.exccon(e) then return false end
 	if Duel.CheckEvent(EVENT_CHAIN_SOLVED) then return rp~=tp
-	else return eg:IsExists(function(c) return c:GetSummonPlayer()~=tp end,1,nil) end
+	else return eg and eg:IsExists(function(c) return c:GetSummonPlayer()~=tp end,1,nil) end
 end
 function cid.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() end

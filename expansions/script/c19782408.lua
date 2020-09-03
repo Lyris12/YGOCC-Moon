@@ -46,7 +46,7 @@ end
 function cid.filter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xd7c) and not c:IsForbidden()
 end
-function cid.target(e,tp,eg,ep,ev,re,rp,chk,chkc)
+function cid.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and cid.filter(chkc) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
 		and Duel.IsExistingTarget(cid.filter,tp,LOCATION_GRAVE,0,1,nil) end
