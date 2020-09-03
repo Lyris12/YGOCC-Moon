@@ -17,6 +17,8 @@ EFFECT_MULTI_MAGICK_MATERIAL = 504
 REASON_MAGICK = 0x400000000
 EVENT_MAGICK = EVENT_CUSTOM+36
 EVENT_PERFORM_MAGICK = EVENT_CUSTOM+37
+EVENT_ACTIVATE_MAGICK_EFFECT = EVENT_CUSTOM+38
+
 CATEGORY_MAGICK = 0x400000000
 
 CARD_MAGICK_TOKEN = 28916106
@@ -29,6 +31,8 @@ Auxiliary.PerformedMagicks[0]={}
 Auxiliary.PerformedMagicks[1]={}
 Auxiliary.MagickPlayers={}
 Auxiliary.RegisteredMagicks={}
+Auxiliary.NormalMagicks={}
+Auxiliary.MagickListeners={}
 
 function Auxiliary.AddOrigMagickType(c)
 	table.insert(Auxiliary.Magicks,c)
@@ -57,6 +61,10 @@ function Auxiliary.AddMagickProcChain(c,count,cost,effect,...)
 end
 function Auxiliary.AddMagickProcLocation(c,location,cost,effect,...)
 	Auxiliary.AddMagickProcCustom(c,function(e,tp,eg,ep,ev,re,r,rp) return re:GetActivateLocation()==location end,cost,effect,...)
+end
+function Auxiliary.AddMagickProcMagick(c,cost,effect,...)
+	Auxiliary.MagickListeners[c]=true
+	Auxiliary.AddMagickProcCustom(c,function(e,tp,eg,ep,ev,re,r,rp) return false end,cost,effect,...)
 end
 function Auxiliary.AddMagickProcCustom(c,magick_con,magick_cost,magick_effect,...)
 	if c:IsStatus(STATUS_COPYING_EFFECT) then return end
@@ -119,7 +127,7 @@ function Auxiliary.AddMagickProcCustom(c,magick_con,magick_cost,magick_effect,..
 		ge3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		ge3:SetCode(EVENT_PHASE_START+PHASE_DRAW)
 		ge3:SetOperation(function() Auxiliary.PerformedMagicks[0]={} Auxiliary.PerformedMagicks[1]={} end)
-		Duel.RegisterEffect(ge3,0)	
+		Duel.RegisterEffect(ge3,0)  
 	end
 end
 function Auxiliary.MagickCondition(e,tp,eg,ep,ev,re,r,rp)
@@ -186,9 +194,9 @@ end
 function Auxiliary.PerformMagickEffect(sc,token,effect,e,tp,eg,ep,ev,re,r,rp)
 	if (effect:GetCondition() and not effect:GetCondition(e,tp,eg,ep,ev,re,r,rp)) then return false end
 	local magick_effect=effect:Clone()
+	magick_effect:SetProperty(EFFECT_FLAG_CLIENT_HINT+effect:GetProperty())
 	magick_effect:SetRange(LOCATION_EXTRA)
 	magick_effect:SetType(EFFECT_TYPE_FIELD+effect:GetType())
-	magick_effect:SetCategory(CATEGORY_MAGICK+effect:GetCategory())
 	magick_effect:SetCode(EVENT_MAGICK)
 	if effect:GetTarget() then magick_effect:SetTarget(Auxiliary.CreateMagickTarget(effect:GetTarget())) end
 	magick_effect:SetOperation(Auxiliary.CreateMagickOperation(effect:GetOperation()))
@@ -229,7 +237,7 @@ function Auxiliary.CreateMagickTarget(f)
 		local c=e:GetHandler()
 		if c then
 			c:ReleaseEffectRelation(e)
-			Duel.Exile(c,REASON_RULE)
+			--Duel.Exile(c,REASON_RULE)
 		end
 	end
 end
@@ -263,7 +271,9 @@ function Card.HasPerformer(c,tp)
 	return Duel.IsExistingMatchingCard(Card.IsPerforming,tp,LOCATION_ONFIELD+LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil,c)
 end
 function Auxiliary.MagickSummonFilter(c,e,tp,matg)
-	return c:IsType(TYPE_MAGICK) and c:HasPerformer(tp) and c:IsCanBePerformed(tp)
+	return c:IsType(TYPE_MAGICK)
+		and (c:HasPerformer(tp) or (Auxiliary.MagickListeners[c]~=nil and Duel.CheckEvent(EVENT_MAGICK)))
+		and c:IsCanBePerformed(tp)
 		and ((c:IsType(TYPE_MONSTER) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_MAGICK,tp,false,false))
 		or c:IsSSetable())
 		and matg:IsExists(Auxiliary.MagickRecursiveFilter,1,nil,tp,Group.CreateGroup(),matg,c,0,table.unpack(c.magick_materials))
@@ -313,9 +323,9 @@ function Auxiliary.MagickCheckGoal(tp,sg,bc,ct,...)
 	if bc:IsType(TYPE_MONSTER) then
 		if bc:IsLocation(LOCATION_EXTRA) then return Duel.GetLocationCountFromEx(tp,tp,sg,bc)>0
 		else return Duel.GetLocationCount(tp,LOCATION_MZONE)>(0-#sg:Filter(Card.IsLocation,nil,LOCATION_MZONE)) end
-	else
+	elseif not bc:IsType(TYPE_FIELD) then
 		return Duel.GetLocationCount(tp,LOCATION_SZONE)>(0-#sg:Filter(Card.IsLocation,nil,LOCATION_SZONE))
-	end
+	else return true end
 end
 function Group.GetMagickMaterialCount(g,sc,ct)
 	local _r = ct
@@ -355,7 +365,8 @@ function Auxiliary.SelectMagickMaterial(c,e,tp)
 		local cg=mg:Filter(Auxiliary.MagickRecursiveFilter,sg,tp,sg,mg,c,#sg,table.unpack(funs))
 		if #cg==0 then break end
 		local cancel=not finish
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+		--Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+		Duel.Hint(HINT_NUMBER,tp,ct)
 		local tc=cg:SelectUnselect(sg,tp,finish,cancel,min,max)
 		if tc then
 			if not bg:IsContains(tc) then
@@ -370,11 +381,29 @@ function Auxiliary.SelectMagickMaterial(c,e,tp)
 			elseif #bg>0 and ct<=#bg then
 				return Group.CreateGroup()
 			end
-		elseif ct<=#bg then break end
+		elseif finish or ct<=#bg then break end
 	end
 	return sg
 end
-
+function Auxiliary.EnableNormalMagick(c)
+	Auxiliary.NormalMagicks[c]=true
+	if not normal_magick_global then
+		normal_magick_global=true
+		local e0=Effect.GlobalEffect()
+		e0:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e0:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE)
+		e0:SetCode(EVENT_PREDRAW)
+		e0:SetCountLimit(1,TYPE_MAGICK+EFFECT_COUNT_CODE_DUEL)
+		e0:SetOperation(Auxiliary.NormalMagickOverwrite)
+		Duel.RegisterEffect(e0,0)
+	end
+end
+function Auxiliary.NormalMagickOverwrite()
+	local g=Duel.GetMatchingGroup(function(c) return Auxiliary.NormalMagicks[c]~=nil end,0,0x5f,0x5f,nil)
+	g:ForEach(function(c) pcall(Card.SetCardData,c,CARDDATA_TYPE,TYPE_MONSTER+TYPE_NORMAL) end)
+	Duel.ShuffleDeck(0)
+	Duel.ShuffleDeck(1)
+end
 
 --overwrite functions
 local get_type, get_orig_type, get_prev_type_field = 

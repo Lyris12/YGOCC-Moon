@@ -6,7 +6,7 @@ function cid.initial_effect(c)
 	aux.AddLinkProcedure(c,aux.FilterBoolFunction(Card.IsLinkType,TYPE_EFFECT),2,2,function(g) return g:IsExists(Card.IsLinkSetCard,1,nil,0xead) end)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e1:SetCode(EVENT_XYZATTACH)
+	e1:SetCode(EVENT_CUSTOM+id)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetCategory(CATEGORY_DRAW+CATEGORY_TOGRAVE)
@@ -14,6 +14,14 @@ function cid.initial_effect(c)
 	e1:SetTarget(cid.target)
 	e1:SetOperation(cid.operation)
 	c:RegisterEffect(e1)
+	if not cid.global_check then
+		cid.global_check=true
+		local ge1=Effect.CreateEffect(c)
+		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge1:SetCode(EVENT_XYZATTACH)
+		ge1:SetOperation(cid.checkop)
+		Duel.RegisterEffect(ge1,0)
+	end
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_TO_GRAVE)
@@ -24,12 +32,26 @@ function cid.initial_effect(c)
 	e2:SetOperation(cid.lgop)
 	c:RegisterEffect(e2)
 end
-function cid.cfilter(c,xc)
+function cid.checkop(e,tp,eg,ep,ev,re,r,rp)
+	local chd=Duel.GetCurrentChain()
+	local eid=Duel.GetFlagEffectLabel(tp,id+1)
+	local i=Duel.GetChainInfo(chd,CHAININFO_CHAIN_ID)
+	if chd>0 and (not eid or eid~=i) then
+		local v=eg:FilterCount(cid.cfilter,nil)
+		local e1=Effect.CreateEffect(e:GetOwner())
+		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e1:SetCode(EVENT_CHAIN_SOLVED)
+		e1:SetOperation(function(e,tp,efg,ep,ev,re,r,rp) Duel.RaiseEvent(eg,EVENT_CUSTOM+id,re,r,rp,ep,v) end)
+		Duel.RegisterEffect(e1,tp)
+		Duel.RegisterFlagEffect(tp,id+1,RESET_CHAIN,0,1,i)
+	end
+end
+function cid.cfilter(c)
 	return c:GetOverlayTarget():IsSetCard(0x2ead)
 end
 function cid.condition(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return eg:IsExists(cid.cfilter,1,nil) and Duel.GetFlagEffect(tp,id)==0
+	return ev>0 and Duel.GetFlagEffect(tp,id)==0
 end
 function cid.xfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0xead) and c:IsType(TYPE_XYZ)

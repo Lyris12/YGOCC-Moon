@@ -108,7 +108,7 @@ end
 	return s.eqcon2(e) and (e:GetHandler()==Duel.GetAttacker() and Duel.GetAttackTarget()~=nil) or e:GetHandler()==Duel.GetAttackTarget()
 end
 	function s.discon(e,tp,eg,ep,ev,re,r,rp)
-	return s.eqcon2(e) and (e:GetHandler()==Duel.GetAttacker() and Duel.GetAttackTarget()~=nil) or e:GetHandler()==Duel.GetAttackTarget()
+	return s.eqcon2(e)
 end
 	function s.disfilter(c)
 	return aux.disfilter1(c) and c:IsType(TYPE_MONSTER)
@@ -116,7 +116,7 @@ end
 	function s.disop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
-	local g=Duel.GetMatchingGroup(s.disfilter,tp,0,LOCATION_ONFIELD+LOCATION_DECK+LOCATION_HAND+LOCATION_GRAVE+LOCATION_REMOVED+LOCATION_EXTRA+LOCATION_OVERLAY+LOCATION_FZONE+LOCATION_PZONE,c)
+	local g=Duel.GetMatchingGroup(s.disfilter,tp,0,LOCATION_ONFIELD,c)
 	local tc=g:GetFirst()
 	while tc do
 		local e1=Effect.CreateEffect(c)
@@ -139,12 +139,12 @@ end
 	if a~=c then d=a end
 	return c:IsRelateToBattle() and c:IsFaceup()
 end
-	function s.filter(c)
+	function s.filter2(c)
 	return c:IsType(TYPE_MONSTER)
 end
 	function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,0,LOCATION_ONFIELD,1,nil) end
-	local sg=Duel.GetMatchingGroup(s.filter,tp,0,LOCATION_ONFIELD,nil)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.filter2,tp,0,LOCATION_ONFIELD,1,nil) end
+	local sg=Duel.GetMatchingGroup(s.filter2,tp,0,LOCATION_ONFIELD,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,sg,sg:GetCount(),0,0)
 end
 	function s.desop(e,tp,eg,ep,ev,re,r,rp)

@@ -39,6 +39,14 @@ function ref.initial_effect(c)
 	e2:SetTarget(ref.thtg)
 	e2:SetOperation(ref.thop)
 	c:RegisterEffect(e2)
+	--Name
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetCode(EFFECT_CHANGE_CODE)
+	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e3:SetRange(LOCATION_MZONE+LOCATION_GRAVE)
+	e3:SetValue(28916108)
+	c:RegisterEffect(e3)
 end
 function ref.lcheck(g)
 	return g:GetClassCount(Card.GetLinkRace)==g:GetCount()
@@ -67,7 +75,7 @@ function ref.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentChain()>=3
 end
 function ref.spfilter(c,e,tp,zone)
-	return c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,tp,zone) and not c:IsRace(RACE_DRAGON)
+	return c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,tp,zone) --and not c:IsRace(RACE_PLANT)
 end
 function ref.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local zone=bit.band(e:GetHandler():GetLinkedZone(tp),0x1f)
