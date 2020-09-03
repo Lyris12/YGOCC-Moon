@@ -36,7 +36,7 @@ function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RegisterEffect(e2,tp)
 end
 function cid.filter1(c)
-	return c:IsSetCard(0xd7c) and c:IsAbleToHand()
+	return c:IsSetCard(0xd7c) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>(e:GetHandler():IsLocation(LOCATION_HAND) and 3 or 2)
