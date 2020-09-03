@@ -105,10 +105,10 @@ end
 end
 	function s.actcon(e)
 	local c=e:GetHandler()
-	return s.eqcon2(e) and (e:GetHandler()==Duel.GetAttacker() and Duel.GetAttackTarget()~=nil) or e:GetHandler()==Duel.GetAttackTarget()
+	return s.eqcon2(e)
 end
 	function s.discon(e,tp,eg,ep,ev,re,r,rp)
-	return s.eqcon2(e)
+	return s.eqcon2(e) and (e:GetHandler()==Duel.GetAttacker() and Duel.GetAttackTarget()~=nil) or e:GetHandler()==Duel.GetAttackTarget()
 end
 	function s.disfilter(c)
 	return aux.disfilter1(c) and c:IsType(TYPE_MONSTER)
