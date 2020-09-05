@@ -1,13 +1,14 @@
 --Neo-Tempester Dragon Knight
 function c249001098.initial_effect(c)
---special summon
+	--special summon
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(25206027,0))
+	e1:SetDescription(2)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
-	e1:SetRange(LOCATION_HAND)
+	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetCode(EVENT_TO_GRAVE)
+	e1:SetRange(LOCATION_HAND)
+	e1:SetCountLimit(1,249001098)
 	e1:SetCondition(c249001098.spcon)
 	e1:SetTarget(c249001098.sptg)
 	e1:SetOperation(c249001098.spop)
@@ -23,11 +24,11 @@ function c249001098.initial_effect(c)
 	e2:SetOperation(c249001098.operation)
 	c:RegisterEffect(e2)	
 end
-function c249001098.spfilter(c,tp)
-	return c:IsReason(REASON_DESTROY) and c:IsPreviousLocation(LOCATION_MZONE) and c:GetPreviousControler()==tp and c:IsType(TYPE_MONSTER)
+function c249001098.cfilter(c,tp)
+	return c:IsSetCard(0x228) and c:IsType(TYPE_MONSTER) and not c:IsCode(249001098) and c:IsControler(tp)
 end
 function c249001098.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c249001098.spfilter,1,nil,tp)
+	return eg:IsExists(c249001098.cfilter,1,nil,tp)
 end
 function c249001098.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
@@ -36,8 +37,9 @@ function c249001098.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c249001098.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) then return end
-	Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+	if c:IsRelateToEffect(e) then
+		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+	end
 end
 function c249001098.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0 end
