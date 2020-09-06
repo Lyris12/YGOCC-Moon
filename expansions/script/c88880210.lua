@@ -39,20 +39,26 @@ function cm.initial_effect(c)
 end
 
 --filters
-
-function c88880210.mfilter(c)
+function cm.cfilter(c)
 	return c:IsSetCard(0xffd)
 end
-function c88880210.ovfilter(c)
-	return c:IsFaceup()
-		and ((c:IsType(TYPE_XYZ) and c:GetOverlayGroup():IsExists(Card.IsCode,1,nil,88880005))
-		or (c:IsCode(88880006) and c:GetOverlayGroup():GetCount()>0))
-end
-function c88880210.xyzop(e,tp,chk,mc)
-	if chk==0 then return mc:CheckRemoveOverlayCard(tp,1,REASON_COST) end
-	mc:RemoveOverlayCard(tp,1,1,REASON_COST)
+function cm.ovfilter(c)
+	return c:IsFaceup() and c:IsSetCard(0xffd)
 end
 
+function cm.mfilter(c)
+	return c:IsSetCard(0xffd)
+end
+
+function cm.xyzop(e,tp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(cm.cfilter,tp,LOCATION_HAND,0,1,nil)
+	and Duel.GetFlagEffect(tp,m)==0 end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
+	local g=Duel.SelectMatchingCard(tp,cm.cfilter,tp,LOCATION_HAND,0,1,1,nil)
+	if g:GetCount()>=0 then
+		Duel.Overlay(e:GetHandler(),g)
+	end
+end
 function cm.xyzfilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_XYZ) and c:GetOverlayCount()>0
 end

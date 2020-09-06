@@ -9,7 +9,6 @@ function cm.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetHintTiming(0,TIMING_END_PHASE)
-	e1:SetCountLimit(1,88881120)
 	e1:SetCost(cm.descost)
 	e1:SetTarget(cm.destg)
 	e1:SetOperation(cm.desop)
@@ -19,7 +18,7 @@ function cm.initial_effect(c)
 	e3:SetCategory(CATEGORY_TOHAND)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_GRAVE)
-	e3:SetCountLimit(1,88883120)
+	e3:SetCountLimit(1,m)
 	e3:SetCost(cm.thcost)
 	e3:SetTarget(cm.thtg)
 	e3:SetOperation(cm.thop)
@@ -45,6 +44,8 @@ function cm.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 		else return false end
 	end
 	local rt=Duel.GetTargetCount(aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
+	local max=2
+	if rt>max then rt=2 end
 	local ct=0
 	local min=1
 	while ct<rt do

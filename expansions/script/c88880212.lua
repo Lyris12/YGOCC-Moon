@@ -70,8 +70,9 @@ function cm.disop(e,tp,eg,ep,ev,re,r,rp)
 	if og:GetCount()>0 then
 		Duel.SendtoGrave(og,REASON_RULE)
 	end
-	if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) and Duel.Overlay(c,eg) then
-		re:CancelToGrave()
+	if Duel.NegateActivation(ev) and c:IsRelateToEffect(e) and rc:IsRelateToEffect(re) and c:IsType(TYPE_XYZ) then
+		rc:CancelToGrave()
+		Duel.Overlay(c,Group.FromCards(rc))
 	end
 end
 

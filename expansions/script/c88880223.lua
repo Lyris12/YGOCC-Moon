@@ -7,23 +7,38 @@ function cm.initial_effect(c)
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCondition(cm.actcon)
 	e1:SetCountLimit(1,m)
-	e1:SetOperation(c88880223.activate)
+	e1:SetOperation(cm.activate)
 	c:RegisterEffect(e1)
+	local e2=Effect.CreateEffect(c)
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:SetType(EFFECT_TYPE_ACTIVATE+EFFECT_FLAG_CARD_TARGET)
+	e2:SetCode(EVENT_FREE_CHAIN)
+	e2:SetCountLimit(1,m)
+	e2:SetTarget(cm.sptg)
+	e2:SetOperation(cm.spop)
+	c:RegisterEffect(e2)
 	--To Hand
-	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(m,0))
-	e4:SetType(EFFECT_TYPE_IGNITION)
-	e4:SetRange(LOCATION_SZONE)
-	e4:SetCountLimit(1)
-	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e4:SetTarget(cm.target)
-	e4:SetCost(cm.cost)
-	e4:SetOperation(cm.operation)
-	c:RegisterEffect(e4)
+	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(m,0))
+	e3:SetCategory(CATEGORY_TOHAND)
+	e3:SetType(EFFECT_TYPE_IGNITION)
+	e3:SetRange(LOCATION_GRAVE)
+	e3:SetCountLimit(1,m)
+	e3:SetCost(cm.thcost)
+	e3:SetTarget(cm.thtg)
+	e3:SetOperation(cm.thop)
+	c:RegisterEffect(e3)
 end
 
+function cm.actcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0
+end
 
+function cm.thfilter(c,tp)
+	return c:IsType(TYPE_MONSTER)
+end
 
 function cm.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)>0 then return 
@@ -35,34 +50,69 @@ function cm.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(1-tp,g)
 	end
 end
+
+
+function cm.filter1(c,e,tp)
+	return c:IsFaceup() and c:IsType(TYPE_XYZ)
+		and Duel.IsExistingMatchingCard(cm.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,c,c:GetCode())
+		and aux.MustMaterialCheck(c,tp,EFFECT_MUST_BE_XMATERIAL)
+end
+
+function cm.filter2(c,e,tp,mc,code)
+	return c:IsType(TYPE_XYZ) and c:IsSetCard(0xffd) and not c:IsCode(code) and mc:IsCanBeXyzMaterial(c)
+		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false) and Duel.GetLocationCountFromEx(tp,tp,mc,c)>0
+end
+
+function cm.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and cm.filter1(chkc,e,tp) end
+	if chk==0 then return Duel.IsExistingTarget(cm.filter1,tp,LOCATION_MZONE,0,1,nil,e,tp) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
+	Duel.SelectTarget(tp,cm.filter1,tp,LOCATION_MZONE,0,1,1,nil,e,tp)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
+end
+
+function cm.spop(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.GetFirstTarget()
+	if not aux.MustMaterialCheck(tc,tp,EFFECT_MUST_BE_XMATERIAL) then return end
+	if tc:IsFacedown() or not tc:IsRelateToEffect(e) or tc:IsControler(1-tp) or tc:IsImmuneToEffect(e) then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local g=Duel.SelectMatchingCard(tp,cm.filter2,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,tc,tc:GetCode())
+	local sc=g:GetFirst()
+	if sc then
+		local mg=tc:GetOverlayGroup()
+		if mg:GetCount()~=0 then
+			Duel.Overlay(sc,mg)
+		end
+		sc:SetMaterial(Group.FromCards(tc))
+		Duel.Overlay(sc,Group.FromCards(tc))
+		Duel.SpecialSummon(sc,SUMMON_TYPE_XYZ,tp,tp,false,false,POS_FACEUP)
+		sc:CompleteProcedure()
+		if sc:IsType(TYPE_XYZ) then 
+			local c=e:GetHandler()
+			c:CancelToGrave()
+			Duel.Overlay(sc,Group.FromCards(c))
+		end
+	end
+end
+
 function cm.thfilter(c)
 	return c:IsSetCard(0xffd) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
-function cm.filter(c)
-	return c:IsFaceup() and c:IsType(TYPE_XYZ)
-end
-function cm.filter3(c)
-	return c:IsSetCard(0xffd) and c:IsType(TYPE_MONSTER)
-end
-function cm.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and cm.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(cm.filter,tp,LOCATION_MZONE,0,1,nil)
-		and Duel.IsExistingMatchingCard(cm.filter3,tp,LOCATION_DECK,0,1,nil,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	Duel.SelectTarget(tp,cm.filter,tp,LOCATION_MZONE,0,1,1,nil)
-end
-function cm.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+
+function cm.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckRemoveOverlayCard(tp,1,0,1,REASON_COST) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DEATTACHFROM)
 	local sg=Duel.SelectMatchingCard(tp,Card.CheckRemoveOverlayCard,tp,LOCATION_MZONE,0,1,1,nil,tp,1,REASON_COST)
 	sg:GetFirst():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
-function cm.operation(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
-	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and not tc:IsImmuneToEffect(e) then end
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
-		local g=Duel.SelectMatchingCard(tp,cm.filter3,tp,LOCATION_DECK,0,1,1,nil,nil)
-		if g:GetCount()>0 then end
-			Duel.Overlay(tc,g)
-		end
+
+function cm.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():IsAbleToHand() end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,e:GetHandler(),1,0,0)
+end
+
+function cm.thop(e,tp,eg,ep,ev,re,r,rp)
+	if e:GetHandler():IsRelateToEffect(e) then
+		Duel.SendtoHand(e:GetHandler(),nil,REASON_EFFECT)
+	end
+end

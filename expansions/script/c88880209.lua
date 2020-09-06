@@ -6,85 +6,53 @@ function cm.initial_effect(c)
 	aux.AddXyzProcedure(c,cm.mfilter,4,2,cm.ovfilter,aux.Stringid(m,0),2,cm.xyzop)
 	c:EnableReviveLimit()
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(m,1))
-	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e2:SetType(EFFECT_TYPE_QUICK_O)
-	e2:SetCode(EVENT_FREE_CHAIN)
-	e2:SetRange(LOCATION_REMOVED)
-	e2:SetCountLimit(1,88881209)
-	e2:SetCost(cm.rmcost)
-	e2:SetCondition(cm.spcon)
-	e2:SetTarget(cm.sptg2)
-	e2:SetOperation(cm.spop2)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetCode(EVENT_CHAIN_SOLVING)
+	e2:SetCondition(cm.discon)
+	e2:SetOperation(cm.disop)
 	c:RegisterEffect(e2)
-	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(m,2))
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
-	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e3:SetCountLimit(1,m)
-	e3:SetCondition(cm.xyzcon)
-	e3:SetTarget(cm.xyztg)
-	e3:SetOperation(cm.xyzop2)
-	c:RegisterEffect(e3)
-	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(m,0))
-	e1:SetCategory(CATEGORY_REMOVE)
-	e1:SetType(EFFECT_TYPE_QUICK_O)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCost(cm.cost)
-	e1:SetTarget(cm.target)
-	e1:SetOperation(cm.operation)
-	c:RegisterEffect(e1)
-end
-function cm.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	if chk==0 then return c:CheckRemoveOverlayCard(tp,1,REASON_COST) and c:GetFlagEffect(m)==0 end
-	c:RemoveOverlayCard(tp,1,1,REASON_COST)
-	c:RegisterFlagEffect(m,RESET_CHAIN,0,1)
-end
-function cm.rmcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	if chk==0 then return c:GetFlagEffect(c)==0 end
-	c:RegisterFlagEffect(c,RESET_CHAIN,0,1)
-end
-function cm.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2
-end
-function cm.sptg2(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
-end
-function cm.spop2(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) then return end
-	Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_SINGLE)
+	e4:SetCode(EFFECT_IMMUNE_EFFECT)
+	e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e4:SetRange(LOCATION_MZONE)
+	e4:SetValue(cm.efilter)
+	c:RegisterEffect(e4)
 end
 
-function cm.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0xffd) and c:IsCode(m)
+function cm.discon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsChainNegatable(ev) and e:GetHandler():GetOverlayCount()>2
 end
-function cm.mfilter(c)
-	return c:IsSetCard(0xffd)
+
+function cm.disop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if not Duel.SelectEffectYesNo(tp,e:GetHandler()) then return end
+	e:GetHandler():RegisterFlagEffect(m,RESET_EVENT+RESETS_STANDARD,0,1)
+	if not Duel.NegateEffect(ev) then return end
+	local og=c:GetOverlayGroup()
+	if og:GetCount()==0 then return end
+	Duel.SendtoGrave(og,REASON_EFFECT)
+	Duel.BreakEffect()
 end
-function cm.cfilter(c)
-	return c:IsSetCard(0xffd)
+
+function cm.efilter(e,re,rp)
+	if not re:IsActiveType(TYPE_SPELL+TYPE_TRAP+TYPE_MONSTER) then return false end
+	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return true end
+	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
+	return not g:IsContains(e:GetHandler())
 end
+
 function cm.ovfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0xffd) and not c:IsType(TYPE_XYZ)
+	return c:IsFaceup()
+		and ((c:IsType(TYPE_XYZ) and c:GetOverlayGroup():IsExists(Card.IsCode,1,nil,88880005))
+		or (c:IsCode(88880006) and c:GetOverlayGroup():GetCount()>0))
 end
-function cm.xyzop(e,tp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(cm.cfilter,tp,LOCATION_HAND,0,1,nil)
-	and Duel.GetFlagEffect(tp,m)==0 end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
-	local g=Duel.SelectMatchingCard(tp,cm.cfilter,tp,LOCATION_HAND,0,1,1,nil)
-	if g:GetCount()>=0 then
-		Duel.Overlay(e:GetHandler(),g)
-	end
+function cm.xyzop(e,tp,chk,mc)
+	if chk==0 then return mc:CheckRemoveOverlayCard(tp,1,REASON_COST) end
+	mc:RemoveOverlayCard(tp,1,1,REASON_COST)
 end
+
 function cm.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return e:GetHandler():IsAbleToRemove() end
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,0,0)
