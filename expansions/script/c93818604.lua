@@ -71,7 +71,7 @@ function cid.rctg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function cid.rcop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if not e:GetHandler():IsRelateToEffect(e) or not tc:IsRelateToEffect(e) or tc-:IsFacedown() then return end
+	if not e:GetHandler():IsRelateToEffect(e) or not tc:IsRelateToEffect(e) or tc:IsFacedown() then return end
 	Duel.Recover(Duel.GetChainInfo(CHAININFO_TARGET_PLAYER),tc:GetAttack(),REASON_EFFECT)
 end
 function cid.scfilter(c)
