@@ -6,9 +6,10 @@ function c111765877.initial_effect(c)
 	--immune
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_IMMUNE_EFFECT)
+	e1:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
+	e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+	e1:SetTargetRange(LOCATION_MZONE,0)
 	e1:SetTarget(c111765877.etarget)
 	e1:SetCondition(c111765877.econdition)
 	c:RegisterEffect(e1)
@@ -77,7 +78,7 @@ end
 --float
 function c111765877.thcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsSummonType(SUMMON_TYPE_LINK)
+	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsType(TYPE_LINK)
 end
 function c111765877.spfilter(c,e,tp)
 	return c:IsSetCard(0x736) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsCode(111765877)

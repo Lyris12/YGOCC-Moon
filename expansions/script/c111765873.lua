@@ -1,4 +1,4 @@
---Sunken Variamori
+--Rotten Variamori
 function c111765873.initial_effect(c)
  --banishing
 	local e1=Effect.CreateEffect(c)
@@ -7,6 +7,7 @@ function c111765873.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCode(EVENT_TO_GRAVE)
 	e1:SetProperty(EFFECT_FLAG_DELAY)
+	e1:SetCountLimit(2,111765873)
 	e1:SetCondition(c111765873.dkcon)
 	e1:SetTarget(c111765873.dktg)
 	e1:SetOperation(c111765873.dkop)
@@ -17,6 +18,7 @@ function c111765873.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_SUMMON_SUCCESS)
 	e2:SetTarget(c111765873.settg)
+	e2:SetCountLimit(2,111765973)
 	e2:SetOperation(c111765873.setop)
 	c:RegisterEffect(e2)
 	local e3=e2:Clone()
@@ -30,11 +32,11 @@ function c111765873.dkcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c111765873.dktg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,3,tp-1,LOCATION_DECK)
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,2,tp-1,LOCATION_DECK)
 end
 function c111765873.dkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local g1=Duel.GetDecktopGroup(1-tp,3)
+	local g1=Duel.GetDecktopGroup(1-tp,2)
 	Duel.DisableShuffleCheck()
 	Duel.Remove(g1,POS_FACEDOWN,REASON_EFFECT)
 end

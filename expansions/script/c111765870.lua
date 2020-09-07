@@ -10,6 +10,7 @@ function c111765870.initial_effect(c)
 	e1:SetCondition(c111765870.dkcon)
 	e1:SetTarget(c111765870.dktg)
 	e1:SetOperation(c111765870.dkop)
+	e1:SetCountLimit(2,111765870)
 	c:RegisterEffect(e1)
 --spsummon
 	local e2=Effect.CreateEffect(c)
@@ -27,11 +28,11 @@ function c111765870.dkcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c111765870.dktg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,3,tp-1,LOCATION_DECK)
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,2,tp-1,LOCATION_DECK)
 end
 function c111765870.dkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local g1=Duel.GetDecktopGroup(1-tp,3)
+	local g1=Duel.GetDecktopGroup(1-tp,2)
 	Duel.DisableShuffleCheck()
 	Duel.Remove(g1,POS_FACEDOWN,REASON_EFFECT)
 end
