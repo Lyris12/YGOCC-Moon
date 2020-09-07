@@ -1,5 +1,5 @@
 --created & coded by Lyris
---F・HERO希望のダスクガイ
+--フェイト・ヒーロー希望のダスクガイ
 local cid,id=GetID()
 function cid.initial_effect(c)
 	c:EnableReviveLimit()

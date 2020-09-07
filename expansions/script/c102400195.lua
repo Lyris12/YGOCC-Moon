@@ -1,5 +1,5 @@
 --created & coded by Lyris
---F・HERO絶望のライトガイ
+--フェイト・ヒーロー絶望のライトガイ
 local cid,id=GetID()
 function cid.initial_effect(c)
 	c:EnableReviveLimit()

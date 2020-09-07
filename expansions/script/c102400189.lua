@@ -1,5 +1,5 @@
 --created & coded by Lyris, art from Cardfight!! Vanguard's "Dancing Princess of the Night Sky"
---F・HEROトワイライトガル
+--フェイト・ヒーロートワイライトガル
 local cid,id=GetID()
 function cid.initial_effect(c)
 	c:EnableReviveLimit()

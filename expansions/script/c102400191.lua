@@ -1,5 +1,5 @@
 --created & coded by Lyris, art by Nardack
---F・HEROカオス・ゴッデス
+--フェイト・ヒーローカオス・ゴッデス
 local cid,id=GetID()
 function cid.initial_effect(c)
 	c:EnableReviveLimit()

@@ -1,5 +1,5 @@
 --created & coded by Lyris
---F・HEROダイハーガル
+--フェイト・ヒーローダイハーガル
 local cid,id=GetID()
 function cid.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
@@ -22,6 +22,8 @@ function cid.initial_effect(c)
 	e1:SetCountLimit(1,id)
 	e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
 	e1:SetCondition(function(e,tp,eg,ep,ev,re,r) return r==REASON_FUSION end)
+	e1:SetTarget(cid.settg)
+	e1:SetOperation(cid.setop)
 	c:RegisterEffect(e1)
 end
 function cid.filter(c)

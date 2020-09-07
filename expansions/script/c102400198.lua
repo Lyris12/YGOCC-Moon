@@ -1,5 +1,5 @@
 --created & coded by Lyris, art by flightless-angel
---F・HEROの施し
+--フェイト・ヒーローの施し
 local cid,id=GetID()
 function cid.initial_effect(c)
 	local e1=Effect.CreateEffect(c)

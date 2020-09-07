@@ -1,5 +1,5 @@
 --created & coded by Lyris, art from Yu-Gi-Oh! Duel Monsters GX Episode 101
---F・HEROの儀式
+--フェイト・ヒーローの儀式
 local cid,id=GetID()
 function cid.initial_effect(c)
 	local e1=Effect.CreateEffect(c)

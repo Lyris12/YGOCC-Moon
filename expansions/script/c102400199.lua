@@ -1,5 +1,5 @@
 --created & coded by Lyris
---F・HEROの出会い
+--フェイト・ヒーローの出会い
 local cid,id=GetID()
 function cid.initial_effect(c)
 	local e1=Effect.CreateEffect(c)

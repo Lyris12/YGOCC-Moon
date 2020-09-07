@@ -1,5 +1,5 @@
 --created & coded by Lyris
---F・HEROブルーＬｉｇｈｔ－９
+--フェイト・ヒーローブルーＬｉｇｈｔ－９
 local cid,id=GetID()
 function cid.initial_effect(c)
 	c:EnableReviveLimit()
