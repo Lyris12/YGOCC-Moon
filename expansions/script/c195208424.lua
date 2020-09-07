@@ -99,7 +99,10 @@ end
 	local e6=e1:Clone()
 	e6:SetCode(EVENT_CHAINING)
 	e6:SetCondition(function(e,tp,eg,ep,ev,re)
-		return bit.extract(flag,re:GetActivateSequence()+8+(re:GetHandler():IsControler(1-tp) and 16 or 0))~=0
+		local rc=re:GetHandler()
+		local seq=re:GetActivateSequence()
+		if re:GetActivateLocation()==LOCATION_PZONE then seq=seq*4 end
+		return bit.extract(flag,seq+(rc:IsLocation(LOCATION_SZONE) and 8 or 0)+(rc:IsControler(1-tp) and 16 or 0))~=0
 	end)
 	Duel.RegisterEffect(e6,tp)
 end

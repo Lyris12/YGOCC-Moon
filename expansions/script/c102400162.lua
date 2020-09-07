@@ -103,8 +103,10 @@ function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end
 function cid.op(e,tp,eg,ep,ev,re,r,rp)
+	local mg=Duel.GetMatchingGroup(cid.filter,tp,LOCATION_GRAVE+LOCATION_EXTRA,0,nil)
+	if #mg<3 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g=Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_GRAVE+LOCATION_EXTRA,0,3,3,nil)
+	local g=mg:Select(tp,3,3,nil)
 	Duel.HintSelection(g)
 	Duel.SendtoDeck(g,nil,2,REASON_EFFECT)
 	if g:IsExists(Card.IsLocation,1,nil,LOCATION_DECK) then Duel.ShuffleDeck(tp) end

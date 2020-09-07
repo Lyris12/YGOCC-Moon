@@ -2,23 +2,31 @@
 --襲雷竜－銀河
 local cid,id=GetID()
 function cid.initial_effect(c)
-	local f1,f2,f3,f4,f5=Duel.SendtoGrave,Duel.SendtoHand,Duel.SendtoDeck,Duel.SendtoExtraP,Duel.Remove
+	local f1,f2,f3,f4,f5,f6=Duel.SendtoGrave,Duel.SendtoHand,Duel.SendtoDeck,Duel.SendtoExtraP,Duel.Remove,Duel.GetOperatedGroup
+	local og=Group.CreateGroup()
+	og:KeepAlive()
 	Duel.SendtoGrave=function(tg,r)
 		local ct=0
 		local g=Group.CreateGroup()+tg
-		for tc in aux.Next(g) do if tc:IsHasEffect(id) then ct=ct+Duel.Destroy(tc,r)
-		else ct=ct+f1(tc,r) end end
+		for tc in aux.Next(g) do
+			local ot=0
+			if tc:IsHasEffect(id) then
+				ot=Duel.Destroy(tc,r)
+			else ot=f1(tc,r) end
+			if ot>0 then ct=ct+ot og:AddCard(tc) end
+		end
 		return ct
 	end
 	Duel.SendtoHand=function(tg,tp,r)
 		local ct=0
 		local g=Group.CreateGroup()+tg
 		for tc in aux.Next(g) do
+			local ot=0
 			if tc:IsHasEffect(id) then
-				if tp==tc:GetControler() then ct=ct+Duel.Destroy(tc,r,LOCATION_HAND)
-				else ct=ct+f2(tc,tp,r|REASON_DESTROY)
-			end
-			else ct=ct+f2(tc,tp,r) end
+				if tp==tc:GetControler() then ot=Duel.Destroy(tc,r,LOCATION_HAND)
+				else ot=f2(tc,tp,r|REASON_DESTROY) end
+			else ot=f2(tc,tp,r) end
+			if ot>0 then ct=ct+ot og:AddCard(tc) end
 		end
 		return ct
 	end
@@ -26,10 +34,12 @@ function cid.initial_effect(c)
 		local ct=0
 		local g=Group.CreateGroup()+tg
 		for tc in aux.Next(g) do
+			local ot=0
 			if tc:IsHasEffect(id) then
-				if tp~=1-tc:GetControler() then ct=ct+Duel.Destroy(tc,r,LOCATION_DECK+seq<<16)
-				else ct=ct+f3(tc,tp,seq,r|REASON_DESTROY) end
-			else ct=ct+f3(tc,tp,seq,r) end
+				if tp~=1-tc:GetControler() then ot=Duel.Destroy(tc,r,LOCATION_DECK+seq<<16)
+				else ot=f3(tc,tp,seq,r|REASON_DESTROY) end
+			else ot=f3(tc,tp,seq,r) end
+			if ot>0 then ct=ct+ot og:AddCard(tc) end
 		end
 		return ct
 	end
@@ -37,11 +47,13 @@ function cid.initial_effect(c)
 		local ct=0
 		local g=Group.CreateGroup()+tg
 		for tc in aux.Next(g) do
+			local ot=0
 			if tc:IsHasEffect(id) then
-				if pos&POS_FACEUP>0 then ct=ct+Duel.Destroy(tc,r,LOCATION_REMOVED)
-				else ct=ct+f5(tc,pos,r|REASON_DESTROY)
+				if pos&POS_FACEUP>0 then ot=Duel.Destroy(tc,r,LOCATION_REMOVED)
+				else ot=f5(tc,pos,r|REASON_DESTROY)
 			end
-			else ct=ct+f5(tc,pos,r) end
+			else ot=f5(tc,pos,r) end
+			if ot>0 then ct=ct+ot og:AddCard(tc) end
 		end
 		return ct
 	end
@@ -49,12 +61,26 @@ function cid.initial_effect(c)
 		local ct=0
 		local g=Group.CreateGroup()+tg
 		for tc in aux.Next(g) do
+			local ot=0
 			if tc:IsHasEffect(id) then
-				if tp~=1-tc:GetControler() then ct=ct+Duel.Destroy(tc,r,LOCATION_EXTRA)
-				else ct=ct+f4(tc,tp,r|REASON_DESTROY) end
-			else ct=ct+f4(tc,tp,r) end
+				if tp~=1-tc:GetControler() then ot=Duel.Destroy(tc,r,LOCATION_EXTRA)
+				else ot=f4(tc,tp,r|REASON_DESTROY) end
+			else ot=f4(tc,tp,r) end
+			if ot>0 then ct=ct+ot og:AddCard(tc) end
 		end
 		return ct
+	end
+	Duel.GetOperatedGroup=function()
+		local g=f6()+og
+		og:Clear()
+		return g
+	end
+	if not cid.global_check then
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e1:SetCode(EVENT_CHAIN_SOLVED)
+		e1:SetOperation(function() og:Clear() end)
+		Duel.RegisterEffect(e1,0)
 	end
 	aux.EnablePendulumAttribute(c)
 	local e2=Effect.CreateEffect(c)
