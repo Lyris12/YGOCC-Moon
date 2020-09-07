@@ -14,14 +14,14 @@ function c67864671.initial_effect(c)
 end
 function c67864671.tgfilter(c,e,tp,chk)
 	return (not c:GetEquipGroup() or not c:GetEquipGroup():IsExists(function(cc) return cc:GetOriginalType()&TYPE_UNION~=0 end,1,nil)) and c:IsSetCard(0x2a6)
-		and c:IsLocation(LOCATION_MZONE) and c:IsFaceup() and c:IsControler(tp) and c:IsCanBeEffectTarget(e)
-		and (chk or Duel.IsExistingMatchingCard(c67864671.cfilter,tp,LOCATION_DECK,0,1,nil,c))
+		and c:IsFaceup() and c:IsCanBeEffectTarget(e)
+		and (chk or Duel.IsExistingMatchingCard(c67864671.cfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil,c))
 end
 function c67864671.cfilter(c,ec)
-	return c:IsType(TYPE_UNION) and c:IsSetCard(0x52a6) and c:CheckEquipTarget(ec) and aux.CheckUnionEquip(c,ec) and not c:IsCode(ec:GetCode())
+	return c:IsType(TYPE_UNION) and c:IsSetCard(0x52a6) and aux.CheckUnionEquip(c,ec) and aux.CheckUnionEquip(c,ec) and not c:IsCode(ec:GetCode())
 end
 function c67864671.eqtg(e,eg,tp,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return c67864671.tgfilter(chkc,e,tp,true) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c67864671.tgfilter(chkc,e,tp,true) end
 	local g=Duel.GetMatchingGroup(c67864671.tgfilter,tp,LOCATION_MZONE,0,nil,e,tp,false)
 	if chk==0 then return g:GetCount()>0 and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 end
 	if g:GetCount()==1 then
@@ -44,7 +44,7 @@ function c67864671.eqop(e,eg,tp,ep,ev,re,r,rp)
 		end
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_FIELD)
-		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)	
+		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)   
 		e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 		e1:SetReset(RESET_PHASE+PHASE_END)
 		e1:SetTargetRange(1,0)
@@ -54,4 +54,4 @@ function c67864671.eqop(e,eg,tp,ep,ev,re,r,rp)
 end
 function c67864671.splimit(e,c,sump,sumtype,sumpos,targetp,se)
 	return not c:IsSetCard(0x2a6)
-end	
+end 
