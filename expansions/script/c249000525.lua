@@ -22,6 +22,15 @@ function c249000525.initial_effect(c)
 	e2:SetTarget(c249000525.sptg)
 	e2:SetOperation(c249000525.spop)
 	c:RegisterEffect(e2)
+	--special summon
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_FIELD)
+	e3:SetCode(EFFECT_SPSUMMON_PROC)
+	e3:SetProperty(EFFECT_FLAG_UNCOPYABLE)
+	e3:SetRange(LOCATION_HAND)
+	e3:SetCondition(c249000525.spcon2)
+	e3:SetOperation(c249000525.spop2)
+	c:RegisterEffect(e3)
 end
 c249000525.used_table={}
 c249000525.used_table[0]={}
@@ -100,4 +109,15 @@ function c249000525.spop(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e2)
 	end
 	Duel.SpecialSummonComplete()
+end
+function c249000525.spcon2(e,c)
+	if c==nil then return true end
+	local tp=c:GetControler()
+	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsExistingMatchingCard(aux.TRUE,tp,LOCATION_HAND,0,1,c)
+end
+function c249000525.spop2(e,tp,eg,ep,ev,re,r,rp,c)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DISCARD)
+	local g=Duel.SelectMatchingCard(tp,aux.TRUE,tp,LOCATION_HAND,0,1,1,c)
+	Duel.SendtoGrave(g,REASON_COST+REASON_DISCARD)
 end
