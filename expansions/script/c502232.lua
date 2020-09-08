@@ -37,8 +37,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 	--disable
 	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e4:SetRange(LOCATION_MZONE)
+	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e4:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e4:SetCondition(s.discon)
 	e4:SetOperation(s.disop)
@@ -105,10 +104,11 @@ end
 end
 	function s.actcon(e)
 	local c=e:GetHandler()
-	return s.eqcon2(e)
+	return (Duel.GetAttacker()==c or Duel.GetAttackTarget()==c) and s.eqcon2(e)
 end
 	function s.discon(e,tp,eg,ep,ev,re,r,rp)
-	return s.eqcon2(e) and (e:GetHandler()==Duel.GetAttacker() and Duel.GetAttackTarget()~=nil) or e:GetHandler()==Duel.GetAttackTarget()
+	local c=e:GetHandler()
+	return (Duel.GetAttacker()==c or Duel.GetAttackTarget()==c) and s.eqcon2(e)
 end
 	function s.disfilter(c)
 	return aux.disfilter1(c) and c:IsType(TYPE_MONSTER)
