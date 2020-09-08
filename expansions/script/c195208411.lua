@@ -12,6 +12,7 @@ function cid.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_GRAVE)
+	e2:SetCountLimit(1,id)
 	e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_END_PHASE)
 	e2:SetCost(aux.bfgcost)
 	e2:SetTarget(cid.sptg)
@@ -19,14 +20,13 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 	function cid.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0x83e) and c:IsType(TYPE_MONSTER)
+	return c:IsFaceup() and c:IsSetCard(0x83e)
 end
 	function cid.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetAttackTarget()==nil and Duel.GetAttacker()~=nil and Duel.GetAttacker():IsControler(1-tp)
 end
 	function cid.operation(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetAttacker()
-	if Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_REMOVED,0,1,nil) and Duel.NegateAttack() then
+	if Duel.NegateAttack() then
 		Duel.BreakEffect()
 		Duel.SkipPhase(1-tp,PHASE_BATTLE,RESET_PHASE+PHASE_BATTLE_STEP,1)
 	end
