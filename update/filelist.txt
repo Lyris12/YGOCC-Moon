@@ -1,4 +1,4 @@
-﻿expansions/cards-new.cdb	b94d017cdfc874ba91026465e286925d
+﻿expansions/cards-new.cdb	69fec78702719019ed443fb4a894caa1
 expansions/lflist.conf	082af94816b40691f95650dfb82eccc7
 expansions/strings.conf	fae019c2520aa343e306883a2abcdbc9
 expansions/pics/100000710.jpg	5f925a97b1c60d7d69acb8f229938263
@@ -1756,7 +1756,7 @@ expansions/pics/195208407.jpg	76eb31533f4e4b59b729a77814232e19
 expansions/pics/195208408.jpg	c8061403ccf2a0a685d2375aea2c5b40
 expansions/pics/195208409.jpg	46e0b53b6786a298e0a95d6499a8c6d5
 expansions/pics/195208410.jpg	10c6fb85978646fbdb1a25f141b30880
-expansions/pics/195208411.png	8c4d2becf839c4e6ec05f5e91b77ed26
+expansions/pics/195208411.png	5f6a2978076c840ee00f71c25eb6d397
 expansions/pics/195208413.jpg	ab32a1c1dec92dc85db8c90913dad5a9
 expansions/pics/195208414.jpg	7204fe02530096e62a31bd5f777382a6
 expansions/pics/195208415.jpg	5008f440b6df0a948b7ef2fc63e494a7
@@ -6532,7 +6532,7 @@ expansions/script/c195208407.lua	7a0274026be35f6f2e24f6809ae3224c
 expansions/script/c195208408.lua	ace51747e883626283ccd2405cd2d683
 expansions/script/c195208409.lua	00030b1112efe1753aeb5f01971a342c
 expansions/script/c195208410.lua	8db27ce5f6593a50f2c48cce569f0ae8
-expansions/script/c195208411.lua	a522cb13dc92ab207677ec5a6c64637b
+expansions/script/c195208411.lua	3a45ed624ab4ab545a00aebbb19ca608
 expansions/script/c195208413.lua	9113a7d70c832a35d8a40a62487e8395
 expansions/script/c195208414.lua	76054f0a8b12624ed467260372593395
 expansions/script/c195208415.lua	7574469dc3a5e9e62512f1c56073088b
@@ -9515,6 +9515,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	98379f3d98e947f8d30c189fff19e8eb
+update/filelist.txt	ce843e961967a6d29e1aed02d727cbed
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	d23593d81602aec777a63279e945e94d
+update/version.txt	28db8df8ad17b72d03bd6d42955cb6ee
