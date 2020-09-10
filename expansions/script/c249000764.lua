@@ -12,7 +12,7 @@ function c249000764.initial_effect(c)
 	--to hand 
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(92826944,0))
-	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_REMOVE)
+	e2:SetCategory(CATEGORY_TOHAND)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_GRAVE)
