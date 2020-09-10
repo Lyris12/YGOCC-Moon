@@ -61,7 +61,7 @@ function cid.op(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function cid.repfilter(c)
-	return (c:IsFaceup() or not c:IsOnField()) and c:IsSetCard(0x7c4) and c:IsType(TYPE_MONSTER) and not c:IsReason(REASON_REPLACE)
+	return (c:IsFaceup() or not c:IsOnField()) and c:IsSetCard(0x7c4) and c:IsType(TYPE_MONSTER) and not c:IsReason(REASON_REPLACE+REASON_MATERIAL)
 end
 function cid.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return eg:IsExists(cid.repfilter,1,nil) and not (re and re:GetHandler():IsCode(id)) end
