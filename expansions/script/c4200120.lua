@@ -70,7 +70,9 @@ function cid.target2(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then
+	local rc=re:GetHandler()
+	if Duel.NegateActivation(ev) and rc:IsRelateToEffect(re) then
+		rc:CancelToGrave()
 		Duel.SendtoDeck(eg,nil,2,REASON_EFFECT)
 	end
 end

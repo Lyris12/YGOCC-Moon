@@ -37,22 +37,9 @@ function c31231313.initial_effect(c)
 	e3:SetOperation(c31231313.hspop)
 	c:RegisterEffect(e3)
 end
-local pack={}
-	pack[1]={
-		31231300
-	}
-	pack[2]={
-		31231200
-	}
 --filters
 function c31231313.rfilter(c)
 	return c:IsRace(RACE_AQUA) and c:IsAbleToRemoveAsCost()
-end
-function c31231313.seqfilter(c,g)
-	return g:IsContains(c)
-end
-function c31231313.fixfilter(c,loc,zone)
-	return c:IsLocation(loc) and c:GetSequence()==zone
 end
 --atk/def
 function c31231313.zrcon(e,tp,eg,ep,ev,re,r,rp)
@@ -89,34 +76,18 @@ function c31231313.cltg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
 	--detect column
-	local marker=Group.CreateGroup()
-	local loc=bc:GetPreviousLocation()
 	local zone=bc:GetPreviousSequence()
-	local cpack=pack[1]
-	local mk=cpack[math.random(#cpack)]
-	local cl=nil
-	marker:AddCard(Duel.CreateToken(tp,mk))
-	Duel.MoveToField(marker:GetFirst(),tp,1-tp,loc,POS_FACEUP_ATTACK,true)
-	if not Duel.GetFieldCard(1-tp,loc,zone) then
-		Duel.MoveSequence(marker:GetFirst(),zone)
-		cl=marker:GetFirst():GetColumnGroup()
-		Duel.Exile(marker:GetFirst(),REASON_RULE)
-	else
-		local sub=Duel.GetMatchingGroup(c31231313.fixfilter,tp,0,LOCATION_ONFIELD,nil,loc,zone)
-		local fix=sub:GetFirst()
-		cl=fix:GetColumnGroup()
-		Duel.Exile(marker:GetFirst(),REASON_RULE)
-	end
+	local z=2^zone|2^(zone<5 and zone or (zone==5 and 1 or 3)+8)
+	if zone==1 or zone==5 then z=z|0x400022
+	elseif zone==3 or zone==6 then z=z|0x200048 end
+	e:SetLabel(z)
 	--
-	local seq=Duel.GetMatchingGroup(c31231313.seqfilter,tp,0,LOCATION_ONFIELD,bc,cl)
-	seq:KeepAlive()
-	e:SetLabelObject(seq)
-	local g=seq:Filter(Card.IsControler,nil,1-tp)
+	local g=Duel.GetCardsInZone(1-tp,z)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 end
 function c31231313.clop(e,tp,eg,ep,ev,re,r,rp)
-	local cl=e:GetLabelObject()
-	local g=cl:Filter(Card.IsControler,nil,1-tp)
+	local z=e:GetLabel()
+	local g=Duel.GetCardsInZone(1-tp,z)
 	if g:GetCount()>0 then
 		Duel.Destroy(g,REASON_EFFECT)
 	end
