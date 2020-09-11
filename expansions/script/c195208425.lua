@@ -31,6 +31,9 @@ end
 			ae:SetValue(ct*500)
 			ae:SetReset(RESET_EVENT+0xff0000)
 			c:RegisterEffect(ae)
+			local de=ae:Clone()
+			de:SetCode(EFFECT_SET_DEFENSE)
+			c:RegisterEffect(de)
 	end
 	if ct>=3 then
 			local e1=Effect.CreateEffect(c)
