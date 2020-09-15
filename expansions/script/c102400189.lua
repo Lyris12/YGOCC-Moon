@@ -16,7 +16,7 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function cid.mfilter1(c,fc,sub,mg,sg)
-	return c:IsFusionSetCard(0xf7a) and (not sg or sg:FilterCount(aux.TRUE,c)==0 or sg:Filter(Card.IsLevelAbove,c,1):CheckWithSumGreater(Card.GetLevel,fc:GetLevel()-c:GetLevel()))
+	return c:IsFusionSetCard(0xa5f) and (not sg or sg:FilterCount(aux.TRUE,c)==0 or sg:Filter(Card.IsLevelAbove,c,1):CheckWithSumGreater(Card.GetLevel,fc:GetLevel()-c:GetLevel()))
 end
 function cid.mfilter2(c,fc,sub,mg,sg)
 	return c:IsFusionAttribute(ATTRIBUTE_LIGHT) and (not sg or sg:FilterCount(aux.TRUE,c)==0 or sg:Filter(Card.IsLevelAbove,c,1):CheckWithSumGreater(Card.GetLevel,fc:GetLevel()-c:GetLevel()))
@@ -25,7 +25,7 @@ function cid.filter(c,e,tp)
 	return c:IsAttribute(ATTRIBUTE_DARK+ATTRIBUTE_LIGHT) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function cid.cfilter(c,tp)
-	return c:IsSetCard(0xf7a) and c:IsReleasableByEffect() and Duel.GetMZoneCount(tp,c)>0
+	return c:IsSetCard(0xa5f) and c:IsReleasableByEffect() and Duel.GetMZoneCount(tp,c)>0
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and cid.filter(chkc,e,tp) end

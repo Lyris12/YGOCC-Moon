@@ -1,308 +1,81 @@
---Princess Destroyer Zetta
-function c11110105.initial_effect(c)
-aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_WARRIOR),aux.NonTuner(Card.IsSetCard,0x222),1)
- c:EnableReviveLimit()
-	--synchro summon
-	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_FIELD)
-	e5:SetCode(EFFECT_SPSUMMON_PROC)
-	e5:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_IGNORE_IMMUNE)
-	e5:SetRange(LOCATION_EXTRA)
-	e5:SetCondition(c11110105.syncon)
-	e5:SetOperation(c11110105.synop)
-	e5:SetValue(SUMMON_TYPE_SYNCHRO)
---	c:RegisterEffect(e5)
-	--Special Sum
+local m=11110105
+local cm=_G["c"..m]
+cm.name="Zetta, Warrior Princess of Ichyaltas"
+function cm.initial_effect(c)
+	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_WARRIOR),aux.NonTuner(Card.IsSetCard,0x2a7),1)
+	c:EnableReviveLimit()
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1,m)
+	e1:SetCost(cm.buffcost)
+	e1:SetOperation(cm.buffop)
+	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(11110105,0))
-	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
-	e2:SetCondition(c11110105.spcon)
-	e2:SetTarget(c11110105.sptg)
-	e2:SetOperation(c11110105.spop)
---	c:RegisterEffect(e2)
-	--multiatk
-	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(11110105,1))
-	e3:SetType(EFFECT_TYPE_IGNITION)
-	e3:SetRange(LOCATION_MZONE)
-	e3:SetCondition(c11110105.atkcon)
-	e3:SetCost(c11110105.atkcost)
-	e3:SetTarget(c11110105.atktg)
-	e3:SetOperation(c11110105.atkop)
-	c:RegisterEffect(e3)
-	local e4=Effect.CreateEffect(c)
-    e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-    e4:SetCode(EVENT_PRE_BATTLE_DAMAGE)
-    e4:SetCondition(c11110105.damcon)
-    e4:SetOperation(c11110105.damop)
-    c:RegisterEffect(e4)
-	local e5=Effect.CreateEffect(c)
-	e5:SetDescription(aux.Stringid(11110105,2))
-	e5:SetCategory(CATEGORY_DESTROY)
-	e5:SetType(EFFECT_TYPE_QUICK_O)
-	e5:SetCode(EVENT_FREE_CHAIN)
-	e5:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e5:SetRange(LOCATION_MZONE)
-	e5:SetCountLimit(1,id)
-	e5:SetCost(c11110105.cost)
-	e5:SetTarget(c11110105.tgtg)
-	e5:SetOperation(c11110105.tgop)
-	c:RegisterEffect(e5)
+	e2:SetCategory(CATEGORY_DESTROY)
+	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e2:SetCode(EVENT_FREE_CHAIN)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1,m+100000000)
+	e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_END_PHASE)
+	e2:SetCost(cm.descost)
+	e2:SetTarget(cm.destg)
+	e2:SetOperation(cm.desop)
+	c:RegisterEffect(e2)
 end
-function c11110105.matfilter1(c,syncard)
-	return c:IsType(TYPE_TUNER) and (c:IsLocation(LOCATION_HAND) or c:IsFaceup()) and c:IsCanBeSynchroMaterial(syncard)
+function cm.bufffilter(c)
+	return c:IsSetCard(0x2a7) and c:IsType(TYPE_MONSTER) and c:IsReleasable()
 end
-function c11110105.matfilter2(c,syncard)
-	return c:IsNotTuner() and c:IsRace(RACE_WARRIOR) and (c:IsLocation(LOCATION_HAND) or c:IsFaceup()) and c:IsCanBeSynchroMaterial(syncard)
+function cm.buffcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(cm.bufffilter,tp,0x3,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
+	local sg=Duel.SelectMatchingCard(tp,cm.bufffilter,tp,0x3,0,1,1,nil)
+	Duel.SendtoGrave(sg,REASON_RELEASE+REASON_COST)
 end
-function c11110105.synfilter1(c,syncard,lv,g1,g2,g3,g4)
-	local tlv=c:GetSynchroLevel(syncard)
-	if lv-tlv<=0 then return false end
-	local f1=c.tuner_filter
-	if c:IsHasEffect(EFFECT_HAND_SYNCHRO) then
-		return g3:IsExists(c11110105.synfilter2,1,c,syncard,lv-tlv,g2,g4,f1,c)
-	else
-		return g1:IsExists(c11110105.synfilter2,1,c,syncard,lv-tlv,g2,g4,f1,c)
-	end
-end
-function c11110105.synfilter2(c,syncard,lv,g2,g4,f1,tuner1)
-	local tlv=c:GetSynchroLevel(syncard)
-	if lv-tlv<=0 then return false end
-	local f2=c.tuner_filter
-	if f1 and not f1(c) then return false end
-	if f2 and not f2(tuner1) then return false end
-	if (tuner1:IsHasEffect(EFFECT_HAND_SYNCHRO) and not c:IsLocation(LOCATION_HAND)) or c:IsHasEffect(EFFECT_HAND_SYNCHRO) then
-		return g4:IsExists(c11110105.synfilter3,1,nil,syncard,lv-tlv,f1,f2,g2)
-	else
-		return g2:CheckWithSumEqual(Card.GetSynchroLevel,lv-tlv,1,62,syncard)
-	end
-end
-function c11110105.synfilter3(c,syncard,lv,f1,f2,g2)
-	if not (not f1 or f1(c)) and not (not f2 or f2(c)) then return false end
-	local mlv=c:GetSynchroLevel(syncard)
-	local slv=lv-mlv
-	if slv<0 then return false end
-	if slv==0 then
-		return true
-	else
-		return g2:CheckWithSumEqual(Card.GetSynchroLevel,slv,1,61,syncard)
-	end
-end
-function c11110105.syncon(e,c,tuner,mg)
-	if c==nil then return true end
-	local tp=c:GetControler()
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<-2 then return false end
-	local g1=nil
-	local g2=nil
-	local g3=nil
-	local g4=nil
-	if mg then
-		g1=mg:Filter(c11110105.matfilter1,nil,c)
-		g2=mg:Filter(c11110105.matfilter2,nil,c)
-		g3=mg:Filter(c11110105.matfilter1,nil,c)
-		g4=mg:Filter(c11110105.matfilter2,nil,c)
-	else
-		g1=Duel.GetMatchingGroup(c11110105.matfilter1,tp,LOCATION_MZONE,LOCATION_MZONE,nil,c)
-		g2=Duel.GetMatchingGroup(c11110105.matfilter2,tp,LOCATION_MZONE,LOCATION_MZONE,nil,c)
-		g3=Duel.GetMatchingGroup(c11110105.matfilter1,tp,LOCATION_MZONE+LOCATION_HAND,LOCATION_MZONE,nil,c)
-		g4=Duel.GetMatchingGroup(c11110105.matfilter2,tp,LOCATION_MZONE+LOCATION_HAND,LOCATION_MZONE,nil,c)
-	end
-	local pe=Duel.IsPlayerAffectedByEffect(tp,EFFECT_MUST_BE_SMATERIAL)
-	local lv=c:GetLevel()
-	if tuner then
-		local tlv=tuner:GetSynchroLevel(c)
-		if lv-tlv<=0 then return false end
-		local f1=tuner.tuner_filter
-		if not pe then
-			return g1:IsExists(c11110105.synfilter2,1,tuner,c,lv-tlv,g2,g4,f1,tuner)
-		else
-			return c11110105.synfilter2(pe:GetOwner(),c,lv-tlv,g2,nil,f1,tuner)
-		end
-	end
-	if not pe then
-		return g1:IsExists(c11110105.synfilter1,1,nil,c,lv,g1,g2,g3,g4)
-	else
-		return c11110105.synfilter1(pe:GetOwner(),c,lv,g1,g2,g3,g4)
-	end
-end
-function c11110105.synop(e,tp,eg,ep,ev,re,r,rp,c,tuner,mg)
-	local g=Group.CreateGroup()
-	local g1=nil
-	local g2=nil
-	local g3=nil
-	local g4=nil
-	if mg then
-		g1=mg:Filter(c11110105.matfilter1,nil,c)
-		g2=mg:Filter(c11110105.matfilter2,nil,c)
-		g3=mg:Filter(c11110105.matfilter1,nil,c)
-		g4=mg:Filter(c11110105.matfilter2,nil,c)
-	else
-		g1=Duel.GetMatchingGroup(c11110105.matfilter1,tp,LOCATION_MZONE,LOCATION_MZONE,nil,c)
-		g2=Duel.GetMatchingGroup(c11110105.matfilter2,tp,LOCATION_MZONE,LOCATION_MZONE,nil,c)
-		g3=Duel.GetMatchingGroup(c11110105.matfilter1,tp,LOCATION_MZONE+LOCATION_HAND,LOCATION_MZONE,nil,c)
-		g4=Duel.GetMatchingGroup(c11110105.matfilter2,tp,LOCATION_MZONE+LOCATION_HAND,LOCATION_MZONE,nil,c)
-	end
-	local pe=Duel.IsPlayerAffectedByEffect(tp,EFFECT_MUST_BE_SMATERIAL)
-	local lv=c:GetLevel()
-	if tuner then
-		g:AddCard(tuner)
-		local lv1=tuner:GetSynchroLevel(c)
-		local f1=tuner.tuner_filter
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
-		local tuner2=nil
-		if not pe then
-			local t2=g1:FilterSelect(tp,c11110105.synfilter2,1,1,tuner,c,lv-lv1,g2,g4,f1,tuner)
-			tuner2=t2:GetFirst()
-		else
-			tuner2=pe:GetOwner()
-			Group.FromCards(tuner2):Select(tp,1,1,nil)
-		end
-		g:AddCard(tuner2)
-		local lv2=tuner2:GetSynchroLevel(c)
-		local f2=tuner2.tuner_filter
-		local m3=nil
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
-		if tuner2:IsHasEffect(EFFECT_HAND_SYNCHRO) then
-			m3=g4:FilterSelect(tp,c11110105.synfilter3,1,1,nil,c,lv-lv1-lv2,f1,f2,g2)
-			local lv3=m3:GetFirst():GetSynchroLevel(c)
-			if lv-lv1-lv2-lv3>0 then
-				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
-				local m4=g2:SelectWithSumEqual(tp,Card.GetSynchroLevel,lv-lv1-lv2-lv3,1,61,c)
-				g:Merge(m4)
-			end
-		else
-			m3=g2:SelectWithSumEqual(tp,Card.GetSynchroLevel,lv-lv1-lv2,1,62,c)
-		end
-		g:Merge(m3)
-	else
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
-		local tuner1=nil
-		local hand=nil
-		if not pe then
-			local t1=g1:FilterSelect(tp,c11110105.synfilter1,1,1,nil,c,lv,g1,g2,g3,g4)
-			tuner1=t1:GetFirst()
-		else
-			tuner1=pe:GetOwner()
-			Group.FromCards(tuner1):Select(tp,1,1,nil)
-		end
-		g:AddCard(tuner1)
-		local lv1=tuner1:GetSynchroLevel(c)
-		local f1=tuner1.tuner_filter
-		local tuner2=nil
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
-		if tuner1:IsHasEffect(EFFECT_HAND_SYNCHRO) then
-			local t2=g3:FilterSelect(tp,c11110105.synfilter2,1,1,tuner1,c,lv-lv1,g2,g4,f1,tuner1)
-			tuner2=t2:GetFirst()
-		else
-			local t2=g1:FilterSelect(tp,c11110105.synfilter2,1,1,tuner1,c,lv-lv1,g2,g4,f1,tuner1)
-			tuner2=t2:GetFirst()
-		end
-		g:AddCard(tuner2)
-		local lv2=tuner2:GetSynchroLevel(c)
-		local f2=tuner2.tuner_filter
-		local m3=nil
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
-		if (tuner1:IsHasEffect(EFFECT_HAND_SYNCHRO) and not tuner2:IsLocation(LOCATION_HAND))
-			or tuner2:IsHasEffect(EFFECT_HAND_SYNCHRO) then
-			m3=g4:FilterSelect(tp,c11110105.synfilter3,1,1,nil,c,lv-lv1-lv2,f1,f2,g2)
-			local lv3=m3:GetFirst():GetSynchroLevel(c)
-			if lv-lv1-lv2-lv3>0 then
-				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
-				local m4=g2:SelectWithSumEqual(tp,Card.GetSynchroLevel,lv-lv1-lv2-lv3,1,61,c)
-				g:Merge(m4)
-			end
-		else
-			m3=g2:SelectWithSumEqual(tp,Card.GetSynchroLevel,lv-lv1-lv2,1,63,c)
-		end
-		g:Merge(m3)
-	end
-	c:SetMaterial(g)
-	Duel.SendtoGrave(g,REASON_MATERIAL+REASON_SYNCHRO)
-end
-function c11110105.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SYNCHRO
-end
-function c11110105.spfilter(c,e,tp)
-	return c:IsSetCard(0x222) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-end
-function c11110105.tributefilter(c,e,tp)
-	return c:IsSetCard(0x222) and c:IsCanBeTributed()
-end
-function c11110105.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(c11110105.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_GRAVE)
-end
-function c11110105.spop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,c11110105.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
-	local tc=g:GetFirst()
-	if g:GetCount()>0 then
-		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
-		if tc:IsRelateToEffect(e) and tc:IsFaceup() then
-		local e5=Effect.CreateEffect(e:GetHandler())
-		e5:SetType(EFFECT_TYPE_SINGLE)
-		e5:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e5:SetCode(EFFECT_CHANGE_LEVEL)
-		e5:SetValue(8)
-		e5:SetReset(RESET_EVENT+0x1fe0000)
-		tc:RegisterEffect(e5)
-		end
-	end
-end
-function c11110105.atkcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsAbleToEnterBP()
-end
-function c11110105.rfilter(c)
-	return c:IsType(TYPE_MONSTER)
-end
-function c11110105.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroupEx(tp,Card.IsType,1,e:GetHandler(),TYPE_MONSTER) end
-	local g=Duel.SelectReleaseGroupEx(tp,Card.IsType,1,1,e:GetHandler(),TYPE_MONSTER)
-	Duel.Release(g,REASON_COST)
-end
-function c11110105.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():GetEffectCount(EFFECT_PIERCE)==0 end
-end
-function c11110105.atkop(e,tp,eg,ep,ev,re,r,rp)
+function cm.buffop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) then
-		local e5=Effect.CreateEffect(c)
-		e5:SetType(EFFECT_TYPE_SINGLE)
-		e5:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e5:SetCode(EFFECT_PIERCE)
-		e5:SetValue(1)
-		e5:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
-		c:RegisterEffect(e5)
-	end
-	e:GetHandler():RegisterFlagEffect(11110105,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,0)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_PIERCE)
+	e1:SetValue(DOUBLE_DAMAGE)
+	e1:SetReset(RESET_PHASE+PHASE_END+RESET_EVENT+RESETS_STANDARD)
+	c:RegisterEffect(e1)
 end
-function c11110105.damcon(e,tp,eg,ep,ev,re,r,rp)
-	return ep~=tp and e:GetHandler():GetBattleTarget()~=nil and e:GetHandler():GetBattleTarget():IsDefensePos()
-		and c:GetFlagEffect(11110105)>0
+function cm.descost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if Duel.GetTurnPlayer()==tp then return false end
+	e:SetLabel(1)
+	return true
 end
-function c11110105.damop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.ChangeBattleDamage(ep,ev*2)
+function cm.desfilter(c,tc,ec)
+	return c:GetEquipTarget()~=tc and c~=ec
 end
-function c11110105.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroupEx(tp,Card.IsType,1,e:GetHandler(),TYPE_MONSTER) end
-	local g=Duel.SelectReleaseGroupEx(tp,Card.IsType,1,1,e:GetHandler(),TYPE_MONSTER)
-	Duel.Release(g,REASON_COST)
+function cm.costfilter(c,ec,tp)
+	return c:IsSetCard(0x2a7) and Duel.IsExistingTarget(cm.desfilter,tp,0,LOCATION_ONFIELD,1,c,c,ec)
 end
-function c11110105.tgtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function cm.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	local c=e:GetHandler()
 	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) end
-	if chk==0 then return Duel.IsExistingTarget(aux.TRUE,tp,0,LOCATION_ONFIELD,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTORY)
+	if chk==0 then
+		if e:GetLabel()==1 then
+			e:SetLabel(0)
+			return Duel.CheckReleaseGroupEx(tp,cm.costfilter,1,nil,c,tp)
+		else
+			return Duel.IsExistingTarget(aux.TRUE,tp,0,LOCATION_ONFIELD,1,nil)
+		end
+	end
+	if e:GetLabel()==1 then
+		e:SetLabel(0)
+		local sg=Duel.SelectReleaseGroupEx(tp,cm.costfilter,1,1,nil,c,tp)
+		Duel.Release(sg,REASON_COST)
+	end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectTarget(tp,aux.TRUE,tp,0,LOCATION_ONFIELD,1,1,nil)
-	Duel.SetOperationInfo(0,CATEGORY_DESTORY,g,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 end
-function c11110105.tgop(e,tp,eg,ep,ev,re,r,rp)
+function cm.desop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and tc:IsControler(1-tp) then
+	if tc:IsRelateToEffect(e) then
 		Duel.Destroy(tc,REASON_EFFECT)
 	end
-end	
+end

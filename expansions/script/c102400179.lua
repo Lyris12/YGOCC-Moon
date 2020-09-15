@@ -19,7 +19,7 @@ function cid.fcheck(tp,sg,fc)
 	return sg:Filter(Card.IsLevelAbove,nil,1):CheckWithSumGreater(Card.GetLevel,fc:GetLevel())
 end
 function cid.filter2(c,e,tp,m,f,chkf)
-	return c:IsType(TYPE_FUSION) and c:IsSetCard(0xf7a) and (not f or f(c))
+	return c:IsType(TYPE_FUSION) and c:IsSetCard(0xa5f) and (not f or f(c))
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false) and c:CheckFusionMaterial(m,nil,chkf)
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)

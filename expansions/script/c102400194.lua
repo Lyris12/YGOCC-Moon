@@ -26,7 +26,7 @@ function cid.mfilter1(c,fc,sub,mg,sg)
 	return c:IsLevelAbove(5) and (not sg or sg:FilterCount(aux.TRUE,c)==0 or sg:Filter(Card.IsLevelAbove,c,1):CheckWithSumGreater(Card.GetLevel,fc:GetLevel()-c:GetLevel()))
 end
 function cid.mfilter2(c,fc,sub,mg,sg)
-	return c:IsFusionSetCard(0xf7a) and (not sg or sg:FilterCount(aux.TRUE,c)==0 or sg:Filter(Card.IsLevelAbove,c,1):CheckWithSumGreater(Card.GetLevel,fc:GetLevel()-c:GetLevel()))
+	return c:IsFusionSetCard(0xa5f) and (not sg or sg:FilterCount(aux.TRUE,c)==0 or sg:Filter(Card.IsLevelAbove,c,1):CheckWithSumGreater(Card.GetLevel,fc:GetLevel()-c:GetLevel()))
 end
 function cid.indct(e,re,r,rp)
 	if r&REASON_BATTLE+REASON_EFFECT~=0 then

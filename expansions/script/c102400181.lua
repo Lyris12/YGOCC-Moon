@@ -28,7 +28,7 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function cid.filter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xf7a) and (c:IsSSetable(true) or c:IsAbleToHand())
+	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xa5f) and (c:IsSSetable(true) or c:IsAbleToHand())
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToRemove,tp,0,LOCATION_ONFIELD,1,nil) end
@@ -66,7 +66,7 @@ function cid.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
 end
 function cid.filter(c)
-	return c:IsSetCard(0xf7a) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToHand()
+	return c:IsSetCard(0xa5f) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToHand()
 end
 function cid.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_GRAVE,0,1,nil) end

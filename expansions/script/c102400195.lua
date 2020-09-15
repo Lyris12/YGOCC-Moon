@@ -16,7 +16,7 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function cid.mfilter(c,fc,sub,mg,sg)
-	return c:IsFusionSetCard(0xf7a) and (not sg or sg:FilterCount(aux.TRUE,c)==0 or sg:Filter(Card.IsLevelAbove,c,1):CheckWithSumGreater(Card.GetLevel,fc:GetLevel()-c:GetLevel()))
+	return c:IsFusionSetCard(0xa5f) and (not sg or sg:FilterCount(aux.TRUE,c)==0 or sg:Filter(Card.IsLevelAbove,c,1):CheckWithSumGreater(Card.GetLevel,fc:GetLevel()-c:GetLevel()))
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local sg=Duel.GetFieldGroup(tp,0,LOCATION_ONFIELD)

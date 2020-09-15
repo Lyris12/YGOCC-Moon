@@ -28,12 +28,12 @@ function cid.reg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local e2=Effect.CreateEffect(e:GetHandler())
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e2:SetCode(EVENT_CHAINING)
-	e2:SetOperation(function(e,tp,eg,ep,ev,re) if re:GetHandler():IsSetCard(0xf7a) and ep==tp then Duel.SetChainLimit(function(e,p,rp) return rp==p end) end end)
+	e2:SetOperation(function(e,tp,eg,ep,ev,re) if re:GetHandler():IsSetCard(0xa5f) and ep==tp then Duel.SetChainLimit(function(e,p,rp) return rp==p end) end end)
 	e2:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e2,tp)
 end
 function cid.sfilter(c,e,tp)
-	return c:IsSetCard(0xf7a) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0xa5f) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

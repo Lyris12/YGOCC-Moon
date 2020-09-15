@@ -16,13 +16,13 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function cid.mfilter1(c,fc,sub,mg,sg)
-	return c:IsFusionSetCard(0xf7a) and (not sg or sg:FilterCount(aux.TRUE,c)==0 or sg:Filter(Card.IsLevelAbove,c,1):CheckWithSumGreater(Card.GetLevel,fc:GetLevel()-c:GetLevel()))
+	return c:IsFusionSetCard(0xa5f) and (not sg or sg:FilterCount(aux.TRUE,c)==0 or sg:Filter(Card.IsLevelAbove,c,1):CheckWithSumGreater(Card.GetLevel,fc:GetLevel()-c:GetLevel()))
 end
 function cid.mfilter2(c,fc,sub,mg,sg)
 	return c:IsRace(RACE_WARRIOR) and (not sg or sg:FilterCount(aux.TRUE,c)==0 or sg:Filter(Card.IsLevelAbove,c,1):CheckWithSumGreater(Card.GetLevel,fc:GetLevel()-c:GetLevel()))
 end
 function cid.filter1(c)
-	return c:IsFaceup() and c:IsType(TYPE_MONSTER) and c:IsSetCard(0xf7a) and c:IsAbleToDeck() and not c:IsCode(id)
+	return c:IsFaceup() and c:IsType(TYPE_MONSTER) and c:IsSetCard(0xa5f) and c:IsAbleToDeck() and not c:IsCode(id)
 end
 function cid.filter2(c)
 	return c:IsFaceup() and not c:IsDisabled() or c:IsType(TYPE_TRAPMONSTER)

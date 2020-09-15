@@ -28,7 +28,7 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function cid.filter(c)
-	return c:IsSetCard(0xf7a) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand() and not c:IsCode(id)
+	return c:IsSetCard(0xa5f) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand() and not c:IsCode(id)
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_DECK,0,1,nil) end
@@ -41,7 +41,7 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ConfirmCards(1-tp,g)
 end
 function cid.sfilter(c,e,tp)
-	return c:IsSetCard(0xf7a) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsCode(id)
+	return c:IsSetCard(0xa5f) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsCode(id)
 end
 function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

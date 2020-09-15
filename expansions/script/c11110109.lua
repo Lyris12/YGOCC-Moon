@@ -1,59 +1,55 @@
---Summoning
-function c11110109.initial_effect(c)
-	--Activate
+local m=11110109
+local cm=_G["c"..m]
+cm.name="Vesta, Royal Knight of Ichyaltas"
+function cm.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
-	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCountLimit(1,11110109)
-	e1:SetTarget(c11110109.target)
-	e1:SetOperation(c11110109.activate)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_SPSUMMON_PROC)
+	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
+	e1:SetRange(LOCATION_HAND)
+	e1:SetCondition(cm.dspcon)
+	e1:SetOperation(cm.dspop)
+	e1:SetValue(1)
+	e1:SetCountLimit(1,m)
 	c:RegisterEffect(e1)
-	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(11110109,1))
-	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e2:SetType(EFFECT_TYPE_QUICK_O)
+	local e2=e1:Clone()
 	e2:SetRange(LOCATION_GRAVE)
-	e2:SetCode(EVENT_FREE_CHAIN)
-	e2:SetHintTiming(0,0x1c0+TIMING_MAIN_END)
-	e2:SetCountLimit(1,11110109)
-	e2:SetCost(c11110109.thcost)
-	e2:SetTarget(c11110109.sptg)
-	e2:SetOperation(c11110109.spop)
 	c:RegisterEffect(e2)
-	end
-	function c11110109.filter(c)
-	return c:IsSetCard(0x222) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
+	local e3=Effect.CreateEffect(c)
+	e3:SetCategory(CATEGORY_TOHAND)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
+	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e3:SetCode(EVENT_RELEASE)
+	e3:SetTarget(cm.rltg)
+	e3:SetOperation(cm.rlop)
+	e3:SetCountLimit(1,m+100000000)
+	c:RegisterEffect(e3)
 end
-function c11110109.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c11110109.filter,tp,LOCATION_DECK,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+function cm.cfilter(c)
+	return c:IsPosition(POS_FACEUP) and c:IsReleasable() and c:IsSetCard(0x2a7) and not c:IsCode(m)
 end
-function c11110109.activate(e,tp,eg,ep,ev,re,r,rp)
+function cm.dspcon(e,c)
+	if c==nil then return true end
+	return Duel.CheckReleaseGroup(e:GetHandlerPlayer(),cm.cfilter,1,nil)
+end
+function cm.dspop(e,tp,eg,ep,ev,re,r,rp,c)
+	local g=Duel.SelectReleaseGroup(tp,cm.cfilter,1,1,nil)
+	Duel.Release(g,REASON_COST)
+end
+function cm.filter(c)
+	return c:IsSetCard(0x2a7) and c:IsAbleToHand()
+end
+function cm.rltg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and cm.filter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(cm.filter,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,c11110109.filter,tp,LOCATION_DECK,0,1,1,nil)
-	if g:GetCount()>0 then
-		Duel.SendtoHand(g,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,g)
-	end
+	local g=Duel.SelectTarget(tp,cm.filter,tp,LOCATION_GRAVE,0,1,1,nil)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
 end
-function c11110109.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
-	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
-end
-function c11110109.filter2(c,e,tp)
-	return c:IsSetCard(0x222) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-end
-function c11110109.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(c11110109.filter2,tp,LOCATION_DECK,0,1,nil,e,tp) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
-end
-function c11110109.spop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,c11110109.filter2,tp,LOCATION_DECK,0,1,1,nil,e,tp)
-	if g:GetCount()>0 then
-		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+function cm.rlop(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.GetFirstTarget()
+	if tc:IsRelateToEffect(e) then
+		Duel.SendtoHand(tc,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,tc)
 	end
 end

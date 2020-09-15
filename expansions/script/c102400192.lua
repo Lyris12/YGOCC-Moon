@@ -11,7 +11,7 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function cid.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0xf7a)
+	return c:IsFaceup() and c:IsSetCard(0xa5f)
 end
 function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(cid.filter,tp,LOCATION_MZONE,0,nil)

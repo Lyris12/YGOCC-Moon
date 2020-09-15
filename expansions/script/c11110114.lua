@@ -1,53 +1,41 @@
---Warrior Princess Virlae
-function c11110114.initial_effect(c)
-c:SetSPSummonOnce(11110114)
---special summon--
+local m=11110114
+local cm=_G["c"..m]
+cm.name="Zetta's Stand for Ichyaltas"
+function cm.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_SPSUMMON_PROC)
-	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
-	e1:SetRange(LOCATION_HAND)
-	e1:SetCondition(c11110114.spcon)
-	e1:SetOperation(c11110114.spop)
+	e1:SetCategory(CATEGORY_NEGATE+CATEGORY_DESTROY)
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetCode(EVENT_CHAINING)
+	e1:SetCondition(cm.condition)
+	e1:SetTarget(cm.target)
+	e1:SetOperation(cm.activate)
 	c:RegisterEffect(e1)
-	local e2=e1:Clone()
-	e2:SetRange(LOCATION_GRAVE)
-	c:RegisterEffect(e2)
-	local e3=Effect.CreateEffect(c)
-	e3:SetCategory(CATEGORY_TOGRAVE)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
-	e3:SetCountLimit(11110114,1)
-	e3:SetCode(EVENT_RELEASE)
-	e3:SetTarget(c11110114.target)
-	e3:SetOperation(c11110114.operation)
-	c:RegisterEffect(e3)
+end
+function cm.filter1(c)
+	return c:IsSetCard(0x2a7) and c:IsPosition(POS_FACEUP)
+end
+function cm.filter2(c)
+	return c:IsType(TYPE_SYNCHRO+TYPE_XYZ+TYPE_LINK) and cm.filter1(c)
+end
+function cm.condition(e,tp,eg,ep,ev,re,r,rp)
+	return re:IsActiveType(TYPE_SPELL+TYPE_TRAP) and Duel.IsChainNegatable(ev) and Duel.IsExistingMatchingCard(cm.filter1,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
+end
+function cm.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
+	if re:GetHandler():IsRelateToEffect(re) and re:GetHandler():IsLocation(LOCATION_ONFIELD+LOCATION_HAND) then
+		Duel.SetOperationInfo(0,CATEGORY_DESTROY,re:GetHandler(),1,0,0)
 	end
-
-function c11110114.spfilter(c)
-	return c:IsSetCard(0x222) and not c:IsCode(11110114)
 end
-function c11110114.spcon(e,c)
-	if c==nil then return true end
-	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-1
-		and Duel.CheckReleaseGroup(c:GetControler(),c11110114.spfilter,1,nil)
-end
-function c11110114.spop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.SelectReleaseGroup(c:GetControler(),c11110114.spfilter,1,1,nil)
-	Duel.Release(g,REASON_COST)
-end
-
-function c11110114.tgfilter(c,e,tp)
-	return c:IsSetCard(0x222) and c:IsAbleToGrave() and not c:IsCode(11110114)
-end
-function c11110114.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c11110114.tgfilter,tp,LOCATION_DECK,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
-end
-function c11110114.operation(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=Duel.SelectMatchingCard(tp,c11110114.tgfilter,tp,LOCATION_DECK,0,1,1,nil)
-	if g:GetCount()>0 then
-		Duel.SendtoGrave(g,REASON_EFFECT)
+function cm.activate(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then
+		Duel.Destroy(eg,REASON_EFFECT)
+	end
+	local c=e:GetHandler()
+	if c:IsRelateToEffect(e) and c:IsCanTurnSet() and Duel.GetFieldGroup(tp,LOCATION_MZONE,0):Filter(cm.filter2,nil):GetClassCount(Card.GetCode)>=2 then
+		Duel.BreakEffect()
+		c:CancelToGrave()
+		Duel.ChangePosition(c,POS_FACEDOWN)
+		Duel.RaiseEvent(c,EVENT_SSET,e,REASON_EFFECT,tp,tp,0)
 	end
 end

@@ -1,96 +1,82 @@
---Warrior Princess Immortal Madell
-function c11110107.initial_effect(c)
-	--synchro summon
-	aux.AddSynchroProcedure(c,nil,aux.NonTuner(Card.IsRace,RACE_WARRIOR),1)
+local m=11110107
+local cm=_G["c"..m]
+cm.name="Garleth, Crown Prince of Ichyaltas"
+function cm.initial_effect(c)
+	aux.AddSynchroProcedure(c,nil,aux.NonTuner(Card.IsSetCard,0x2a7),1)
 	c:EnableReviveLimit()
-	--tograve
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_TOGRAVE)
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
-	e1:SetCondition(c11110107.thcon)
-	e1:SetTarget(c11110107.thtg)
-	e1:SetOperation(c11110107.thop)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1,m)
+	e1:SetTarget(cm.sptg)
+	e1:SetOperation(cm.spop)
 	c:RegisterEffect(e1)
---destroy replace
-    local e2=Effect.CreateEffect(c)
-    e2:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
-    e2:SetCode(EFFECT_DESTROY_REPLACE)
-    e2:SetRange(LOCATION_MZONE)
-    e2:SetTarget(c11110107.destg)
-    e2:SetValue(c11110107.value)
-    c:RegisterEffect(e2)
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetTargetRange(LOCATION_MZONE,0)
+	e2:SetCode(EFFECT_UPDATE_ATTACK)
+	e2:SetTarget(cm.tg)
+	e2:SetValue(cm.val)
+	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(11110107,1))
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetCode(EVENT_TO_GRAVE)
-	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
-	e3:SetCost(c11110107.spcost)
-	e3:SetTarget(c11110107.sptg)
-	e3:SetOperation(c11110107.spop)
+	e3:SetType(EFFECT_TYPE_IGNITION)
+	e3:SetRange(LOCATION_GRAVE)
+	e3:SetCost(cm.spselfcost)
+	e3:SetTarget(cm.spselftg)
+	e3:SetOperation(cm.spselfop)
 	c:RegisterEffect(e3)
+end
+function cm.spfilter(c,e,tp)
+	return c:IsSetCard(0x2a7) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+end
+function cm.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and cm.spfilter(chkc,e,tp) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingTarget(cm.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local g=Duel.SelectTarget(tp,cm.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
+end
+function cm.spop(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.GetFirstTarget()
+	if tc and tc:IsRelateToEffect(e) then
+		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
 	end
-		function c11110107.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SYNCHRO
-	end
-	function c11110107.tgfilter(c,e,tp)
-	return c:IsSetCard(0x222) and c:IsType(TYPE_MONSTER) and c:IsAbleToGrave()
 end
-function c11110107.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c11110107.tgfilter,tp,LOCATION_DECK,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
+function cm.filter(c)
+	return c:IsFaceup() and c:IsSetCard(0x2a7)
 end
-function c11110107.thop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=Duel.SelectMatchingCard(tp,c11110107.tgfilter,tp,LOCATION_DECK,0,1,1,nil)
-	if g:GetCount()>0 then
-		Duel.SendtoGrave(g,REASON_EFFECT)
-	end
+function cm.tg(e,c)
+	return c~=e:GetHandler()
 end
-function c11110107.dfilter(c)
-    return c:IsLocation(LOCATION_MZONE) and c:IsFaceup() and c:IsSetCard(0x222) and not c:IsReason(REASON_REPLACE)
+function cm.val(e,c)
+	return Duel.GetMatchingGroupCount(cm.filter,c:GetControler(),LOCATION_MZONE,0,nil)*200
 end
-function c11110107.destg(e,tp,eg,ep,ev,re,r,rp,chk)
-    if chk==0 then return not eg:IsContains(e:GetHandler())
-        and eg:IsExists(c11110107.dfilter,1,nil) end
-    if Duel.SelectYesNo(tp,aux.Stringid(84847656,0)) then
-        local e1=Effect.CreateEffect(e:GetHandler())
-        e1:SetType(EFFECT_TYPE_SINGLE)
-        e1:SetCode(EFFECT_UPDATE_DEFENSE)
-        e1:SetValue(-500)
-        e1:SetReset(RESET_EVENT+0x1ff0000)
-        e:GetHandler():RegisterEffect(e1)
-        return true
-    else return false end
+function cm.rfilter(c,tp)
+	return c:IsSetCard(0x2a7) and (c:IsControler(tp) or c:IsFaceup())
 end
-function c11110107.value(e,c)
-    return c:IsLocation(LOCATION_MZONE) and c:IsFaceup() and c:IsSetCard(0x222) and not c:IsReason(REASON_REPLACE)
+function cm.spselfcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	local rg=Duel.GetReleaseGroup(tp):Filter(cm.rfilter,nil,tp)
+	if chk==0 then return rg:CheckSubGroup(aux.mzctcheckrel,2,2,tp) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
+	local g=rg:SelectSubGroup(tp,aux.mzctcheckrel,false,2,2,tp)
+	Duel.Release(g,REASON_COST)
 end
-function c11110107.spfilter(c)
-	return c:IsSetCard(0x222) and c:IsType(TYPE_MONSTER) and c:IsAbleToRemoveAsCost()
-end
-function c11110107.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c11110107.spfilter,tp,LOCATION_GRAVE,0,2,e:GetHandler()) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=Duel.SelectMatchingCard(tp,c11110107.spfilter,tp,LOCATION_GRAVE,0,2,2,e:GetHandler())
-	Duel.Remove(g,POS_FACEUP,REASON_COST)
-end
-function c11110107.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
+function cm.spselftg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
-function c11110107.spop(e,tp,eg,ep,ev,re,r,rp)
+function cm.spselfop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and c:IsRelateToEffect(e) then
-		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e1:SetReset(RESET_EVENT+0x47e0000)
+		e1:SetReset(RESET_EVENT+RESETS_REDIRECT)
 		e1:SetValue(LOCATION_REMOVED)
 		c:RegisterEffect(e1,true)
 	end

@@ -20,7 +20,7 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function cid.filter(c)
-	return c:IsSetCard(0xf7a) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
+	return c:IsSetCard(0xa5f) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_DECK,0,1,nil) end
@@ -102,5 +102,5 @@ function cid.cpop(e,tp,eg,ep,ev,re,r,rp)
 	if op then op(e,tp,eg,ep,ev,re,r,rp) end
 end
 function cid.sumlimit(e,c,sp,st,spos,tp,te)
-	return st==SUMMON_TYPE_FUSION and not c:IsSetCard(0xf7a)
+	return st==SUMMON_TYPE_FUSION and not c:IsSetCard(0xa5f)
 end

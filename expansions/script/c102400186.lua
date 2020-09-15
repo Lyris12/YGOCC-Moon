@@ -14,7 +14,7 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function cid.cpfilter(c,e,tp,eg,ep,ev,re,r,rp)
-	if not c:IsSetCard(0xf7a) or not c:IsType(TYPE_MONSTER) or not c:IsAbleToDeck()
+	if not c:IsSetCard(0xa5f) or not c:IsType(TYPE_MONSTER) or not c:IsAbleToDeck()
 		or c:IsCode(id) then return false end
 	for _,ef in pairs(global_card_effect_table[c]) do
 		local con=ef:GetCondition()
