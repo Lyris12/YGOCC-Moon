@@ -25,6 +25,12 @@ CARD_DRAGON_EGG_TOKEN			   =20157305
 CARD_BLACK_GARDEN				   =71645242
 CARD_EVIL_DRAGON_ANANTA			 =8400623
 
+--Effect Aliases
+-- EFFECT_MUST_BE_SYNCHRO_MATERIAL = EFFECT_MUST_BE_SMATERIAL
+-- EFFECT_MUST_BE_LINK_MATERIAL = EFFECT_MUST_BE_LMATERIAL
+-- EFFECT_MUST_BE_XYZ_MATERIAL = EFFECT_MUST_BE_XMATERIAL
+-- EFFECT_MUST_BE_FUSION_MATERIAL = EFFECT_MUST_BE_FMATERIAL
+
 --Custom Type Tables
 Auxiliary.Customs={} --check if card uses custom type, indexing card
 Auxiliary.CannotBeEDMatCodes = {}
@@ -83,8 +89,20 @@ end
 Card.IsType=function(c,tpe,scard,sumtype,p)
 	local custpe=tpe>>32
 	local otpe=tpe&0xffffffff
-	if (scard and c:GetType(scard,sumtype,p)&otpe>0)
-		or (not scard and c:GetType()&otpe>0) then return true end
+	
+	--fix for changing type in deck
+	if c:IsLocation(LOCATION_DECK) and c:IsHasEffect(EFFECT_ADD_TYPE) and not scard and not sumtype and not p then
+		local egroup={c:IsHasEffect(EFFECT_ADD_TYPE)}
+		local typ=0
+		for _,ce in ipairs(egroup) do
+			if typ&ce:GetValue()==0 then
+				typ=typ|ce:GetValue()
+			end
+		end
+		return typ&tpe>0
+	end
+	
+	if (scard and c:GetType(scard,sumtype,p)&otpe>0) or (not scard and c:GetType()&otpe>0) then return true end
 	if custpe<=0 then return false end
 	return c:IsCustomType(custpe,scard,sumtype,p)
 end
@@ -132,7 +150,11 @@ end
 	-- -- registereff(c,ex,forced)
 -- end
 Auxiliary.kaiju_procs={}
+target_range_table={}
 Effect.SetTargetRange=function(e,self,oppo)
+	if not target_range_table[e] then target_range_table[e]={} end
+	table.insert(target_range_table[e],self)
+	table.insert(target_range_table[e],oppo)
 	if e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G then
 		if oppo==1 then
 			table.insert(Auxiliary.kaiju_procs,e)
@@ -311,6 +333,7 @@ Card.SetUniqueOnField=function(c,s,o,code,loc)
 	card_sethighlander(c,s,o,code,loc)
 	if aux.GetValueType(code)=="number" then aux.AddCodeList(c,code) end
 end
+
 
 --Custom Functions
 function Auxiliary.TribCheckRecursive(c,tp,mg,sg,sc,ct,min,max,p,zone)
@@ -623,6 +646,18 @@ if not global_card_effect_table_global_check then
 	end
 end
 
+--Global Card Effect Table (for Duel.RegisterEffect)
+if not global_duel_effect_table_global_check then
+	global_duel_effect_table_global_check=true
+	global_duel_effect_table={}
+	Duel.register_global_duel_effect_table = Duel.RegisterEffect
+	Duel.RegisterEffect = function(e,tp)
+							if not global_duel_effect_table[tp] then global_duel_effect_table[tp]={} end
+							table.insert(global_duel_effect_table[tp],e)
+							return Duel.register_global_duel_effect_table(e,tp)
+	end
+end
+
 --Hardcode AZW Phalanx Unicorn (39510) allow equipped monster to activate its effect without detaching
 local ocheck,oremove=Card.CheckRemoveOverlayCard,Card.RemoveOverlayCard
 function Card.CheckRemoveOverlayCard(c,p,ct,r)
@@ -654,6 +689,7 @@ GLCATEGORY_DEACTIVATE_LMARKER=0x20000
 
 EFFECT_CANNOT_ACTIVATE_LMARKER=8000
 EFFECT_CANNOT_DEACTIVATE_LMARKER=8001
+EFFECT_PRE_LOCATION=8002
 
 EVENT_ACTIVATE_LINK_MARKER=9000
 EVENT_DEACTIVATE_LINK_MARKER=9000
