@@ -24,21 +24,13 @@ function c111765883.initial_effect(c)
 	e2:SetTarget(c111765883.target)
 	e2:SetOperation(c111765883.activate)
 	c:RegisterEffect(e2)
-	--atkgain opponentsbanishedcards
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e3:SetRange(LOCATION_MZONE)
-	e3:SetCode(EFFECT_UPDATE_ATTACK)
-	e3:SetValue(c111765883.value1)
-	c:RegisterEffect(e3)
 	--remove
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(111765883,0))
 	e4:SetCategory(CATEGORY_REMOVE)
 	e4:SetType(EFFECT_TYPE_QUICK_O)
 	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e4:SetEvent(EVENT_FREE_CHAIN)
+	e4:SetCode(EVENT_FREE_CHAIN)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetCountLimit(1,111765983)
 	e4:SetCost(c111765883.rmcost)
@@ -52,11 +44,7 @@ function c111765883.lcheck(g,lc)
 end
 --atkgain
 function c111765883.value(e,c)
-	return Duel.GetFieldGroupCount(c:GetControler(),LOCATION_REMOVED,0)*100
-end
---atkgain2
-function c111765883.value1(e,c)
-	return Duel.GetFieldGroupCount(c:GetControler(-1),LOCATION_REMOVED,0)*100
+	return Duel.GetMatchingGroupCount(Card.IsFacedown,0,LOCATION_REMOVED,LOCATION_REMOVED,nil)*100
 end
 --special summon
 function c111765883.spcfilter(c,tp)
