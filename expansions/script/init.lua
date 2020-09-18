@@ -1,29 +1,29 @@
 --Not yet finalized values
 --Custom constants
-EFFECT_DEFAULT_CALL				 =31993443
-EFFECT_EXTRA_GEMINI				 =86433590
-EFFECT_AVAILABLE_LMULTIPLE		  =86433612
-EFFECT_MULTIPLE_LMATERIAL		   =86433613
+EFFECT_DEFAULT_CALL			  =31993443
+EFFECT_EXTRA_GEMINI			  =86433590
+EFFECT_AVAILABLE_LMULTIPLE		=86433612
+EFFECT_MULTIPLE_LMATERIAL		  =86433613
 EFFECT_RANDOM_TARGET				=39759371
-EFFECT_CANNOT_BANISH_FD_EFFECT	  =856
-TYPE_CUSTOM						 =0
+EFFECT_CANNOT_BANISH_FD_EFFECT	=856
+TYPE_CUSTOM					  =0
 
 CTYPE_CUSTOM						=0
 
-EVENT_XYZATTACH					 =EVENT_CUSTOM+9966607
-EVENT_LP_CHANGE					 =EVENT_CUSTOM+68007397
+EVENT_XYZATTACH				  =EVENT_CUSTOM+9966607
+EVENT_LP_CHANGE				  =EVENT_CUSTOM+68007397
 
 EFFECT_COUNT_SECOND_HOPT			=10000000
 
 --Commonly used cards
 CARD_BLUEEYES_SPIRIT				=59822133
-CARD_CYBER_DRAGON				   =70095154
-CARD_PYRO_CLOCK					 =1082946
-CARD_INLIGHTENED_PSYCHIC_HELMET	 =102400006
-CARD_NEBULA_TOKEN				   =218201917
-CARD_DRAGON_EGG_TOKEN			   =20157305
-CARD_BLACK_GARDEN				   =71645242
-CARD_EVIL_DRAGON_ANANTA			 =8400623
+CARD_CYBER_DRAGON				  =70095154
+CARD_PYRO_CLOCK				  =1082946
+CARD_INLIGHTENED_PSYCHIC_HELMET  =102400006
+CARD_NEBULA_TOKEN				  =218201917
+CARD_DRAGON_EGG_TOKEN			  =20157305
+CARD_BLACK_GARDEN				  =71645242
+CARD_EVIL_DRAGON_ANANTA		  =8400623
 
 --Effect Aliases
 -- EFFECT_MUST_BE_SYNCHRO_MATERIAL = EFFECT_MUST_BE_SMATERIAL
@@ -36,7 +36,7 @@ Auxiliary.Customs={} --check if card uses custom type, indexing card
 Auxiliary.CannotBeEDMatCodes = {}
 
 --overwrite constants
-TYPE_EXTRA						  =TYPE_FUSION+TYPE_SYNCHRO+TYPE_XYZ+TYPE_LINK
+TYPE_EXTRA						=TYPE_FUSION+TYPE_SYNCHRO+TYPE_XYZ+TYPE_LINK
 
 --Custom Functions
 function Card.IsCustomType(c,tpe,scard,sumtype,p)
@@ -444,7 +444,7 @@ end
 function Auxiliary.PerformFusionFilter(c,e)
 	return not c:IsImmuneToEffect(e)
 end
-function Auxiliary.PerformFusionSummon(f,e,tp,mg1,gc)
+function Auxiliary.PerformFusionSummon(f,e,tp,mg1,gc,procedure)
 	local chkf=tp
 	if mg1==nil then mg1=Duel.GetFusionMaterial(tp):Filter(Auxiliary.PerformFusionFilter,nil,e) end
 	local sg1=Duel.GetMatchingGroup(f,tp,LOCATION_EXTRA,0,nil,e,tp,mg1,nil,chkf)
@@ -466,7 +466,8 @@ function Auxiliary.PerformFusionSummon(f,e,tp,mg1,gc)
 		if sg1:IsContains(tc) and (sg2==nil or not sg2:IsContains(tc) or not Duel.SelectYesNo(tp,ce:GetDescription())) then
 			local mat1=Duel.SelectFusionMaterial(tp,tc,mg1,gc,chkf)
 			tc:SetMaterial(mat1)
-			Duel.SendtoGrave(mat1,REASON_EFFECT+REASON_MATERIAL+REASON_FUSION)
+			if procedure then procedure(mat1,tp,tc)
+			else Duel.SendtoGrave(mat1,REASON_EFFECT+REASON_MATERIAL+REASON_FUSION) end
 			Duel.BreakEffect()
 			Duel.SpecialSummon(tc,SUMMON_TYPE_FUSION,tp,tp,false,false,POS_FACEUP)
 		else
