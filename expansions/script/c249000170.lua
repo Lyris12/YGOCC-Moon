@@ -45,13 +45,10 @@ function c249000170.initial_effect(c)
 end
 c249000170.lvdncount=2
 c249000170.lvdn={249000168,249000169}
-function c249000170.cfilter(c)
-	return c:IsDiscardable() and c:IsType(TYPE_SPELL)
-end
 function c249000170.descost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c249000170.cfilter,tp,LOCATION_HAND,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=Duel.SelectMatchingCard(tp,c249000170.cfilter,tp,LOCATION_HAND,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,Card.IsDiscardable,tp,LOCATION_HAND,0,1,1,nil)
 	Duel.SendtoGrave(g,REASON_COST+REASON_DISCARD)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
@@ -99,7 +96,7 @@ function c249000170.operation(e,tp,eg,ep,ev,re,r,rp)
 				e1:SetValue(-2500)
 				tc:RegisterEffect(e1)
 				local e2=e1:Clone()
-				e2:SetCode(EFFECT_UPDATE_DEFENCE)
+				e2:SetCode(EFFECT_UPDATE_DEFENSE)
 				tc:RegisterEffect(e2)
 				--destroy
 				local e3=Effect.CreateEffect(e:GetHandler())
@@ -117,7 +114,7 @@ function c249000170.operation(e,tp,eg,ep,ev,re,r,rp)
 end
 function c249000170.descon(e)
 	local tc=e:GetHandler()
-	return tc and (tc:GetAttack()==0 or tc:GetDefense()==0)
+	return tc and (tc:GetAttack()==0 or (not tc:IsType(TYPE_LINK) and tc:GetDefense()==0)
 end
 function c249000170.tfilter(c,tp)
 	return c:IsLocation(LOCATION_MZONE) and c:IsControler(tp)

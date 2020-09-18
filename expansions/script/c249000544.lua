@@ -26,38 +26,29 @@ function c249000544.costfilter(c,e,tp)
 	if not c:IsSetCard(0x41) or not c:IsAbleToGraveAsCost() or not c:IsFaceup() then return false end
 	local code=c:GetCode()
 	local class=_G["c"..code]
-	if class==nil or class.lvupcount==nil then return false end
+	if class==nil or class.lvup==nil then return false end
 	return Duel.IsExistingMatchingCard(c249000544.spfilter,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE,0,1,nil,class,e,tp)
 end
 function c249000544.spfilter(c,class,e,tp)
 	local code=c:GetCode()
-	for i=1,class.lvupcount do
-		if code==class.lvup[i] then	return c:IsCanBeSpecialSummoned(e,0,tp,true,true) end
-	end
-	return false
+	return c:IsCode(table.unpack(class.lvup)) and c:IsCanBeSpecialSummoned(e,0,tp,true,true)
 end
 function c249000544.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	e:SetLabel(1)
-	if chk==0 then return true end
-end
-function c249000544.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then
-		if e:GetLabel()~=1 then return false end
-		e:SetLabel(0)
-		return Duel.IsExistingMatchingCard(c249000544.costfilter,tp,LOCATION_MZONE,0,1,nil,e,tp) 
-			and Duel.GetLocationCount(tp,LOCATION_MZONE)>-1 end
+	if chk==0 then return Duel.IsExistingMatchingCard(c249000544.costfilter,tp,LOCATION_MZONE,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,c249000544.costfilter,tp,LOCATION_MZONE,0,1,1,nil,e,tp)
 	Duel.SendtoGrave(g,REASON_COST)
-	local code=g:GetFirst():GetCode()
-	Duel.SetTargetParam(code)
+	e:SetLabel(g:GetFirst():GetCode())
+end
+function c249000544.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1 end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE)
 end
 function c249000544.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-	local code=Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)
+	local code=e:GetLabel()
 	local class=_G["c"..code]
-	if class==nil or class.lvupcount==nil then return end
+	if class==nil or class.lvup==nil then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,c249000544.spfilter,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil,class,e,tp)
 	local tc=g:GetFirst()

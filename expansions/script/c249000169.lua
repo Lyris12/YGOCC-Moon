@@ -84,7 +84,7 @@ function c249000169.operation(e,tp,eg,ep,ev,re,r,rp)
 				e1:SetValue(-2000)
 				tc:RegisterEffect(e1)
 				local e2=e1:Clone()
-				e2:SetCode(EFFECT_UPDATE_DEFENCE)
+				e2:SetCode(EFFECT_UPDATE_DEFENSE)
 				tc:RegisterEffect(e2)
 				--destroy
 				local e3=Effect.CreateEffect(e:GetHandler())
@@ -100,7 +100,7 @@ function c249000169.operation(e,tp,eg,ep,ev,re,r,rp)
 end
 function c249000169.descon(e)
 	local tc=e:GetHandler()
-	return tc and (tc:GetAttack()==0 or tc:GetDefence()==0)
+	return tc and (tc:GetAttack()==0 or (not tc:IsType(TYPE_LINK) and tc:GetDefense()==0)
 end
 function c249000169.spcostfilter(c)
 	return c:IsLevelAbove(1) and c:IsAbleToRemoveAsCost() and c:IsRace(RACE_SPELLCASTER)
