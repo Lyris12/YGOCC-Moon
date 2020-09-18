@@ -1,4 +1,4 @@
-﻿expansions/cards-new.cdb	30b01de9442de389d129c6d286543f28
+﻿expansions/cards-new.cdb	c262bb018deb3c0f66e4a78ceb712003
 expansions/lflist.conf	09482eb00b0f3dff5c4bd3ac3efd21fa
 expansions/strings.conf	69661223abe939ecf59233e7679355a0
 expansions/pics/100000710.jpg	5f925a97b1c60d7d69acb8f229938263
@@ -532,7 +532,7 @@ expansions/pics/102400032.png	c18da26ac3549b873fe84b01a1f80915
 expansions/pics/102400033.png	0702a4d9eef2c7178952f99a8e4cdab9
 expansions/pics/102400034.png	24631cbb63b189c21e7ac334f90d17ed
 expansions/pics/102400035.png	ca1ba0fec0e9065647f88ffec7656125
-expansions/pics/102400036.png	6d5c5153a3e287d64b1a17d6f53160d5
+expansions/pics/102400036.png	9a688b0843fceedb1c188f0938d66923
 expansions/pics/102400037.png	a617a0775bac1f09ed7965ec53798dc9
 expansions/pics/102400038.png	5092066dd7829e05d38b06a983d60145
 expansions/pics/102400039.png	c8602f67e7d4c7cdf2b7441838be413b
@@ -5459,7 +5459,7 @@ expansions/script/c102400032.lua	3def50be899babc70b099888beba4680
 expansions/script/c102400033.lua	f76ccd0ddce0cecdf65ceb70a53c8b53
 expansions/script/c102400034.lua	1ef0fc22fddf09e2beee877f1b13c1e9
 expansions/script/c102400035.lua	4eeaa5947696c60a4d6c893a19c3b467
-expansions/script/c102400036.lua	f1ff3a5fc89c953c77ab493e1ccdb8f6
+expansions/script/c102400036.lua	1e951a01e7629f3ada0a637fdc2bacc2
 expansions/script/c102400037.lua	7ff3b0dc5719e2bfa64132813f687ba9
 expansions/script/c102400038.lua	9a7c81484a8741bac642e29afad72df7
 expansions/script/c102400039.lua	47165bc6e734950c46e0a17b3af6bd4d
@@ -9624,6 +9624,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	cf8feb136416713b0e2d192da798c171
+update/filelist.txt	f3fda2903ceee3a9e558dd9c64c51035
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	76398c15b8f2b870e1a55f5f1e16b638
+update/version.txt	30a190524a1a25bd31e051e05fc1098a

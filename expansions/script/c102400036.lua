@@ -32,12 +32,12 @@ function cid.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingTarget(aux.AND(Card.IsFaceup,aux.nzatk,Card.IsType),tp,LOCATION_REMOVED,LOCATION_REMOVED,1,nil,TYPE_MONSTER) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local tc=Duel.SelectTarget(tp,aux.AND(Card.IsFaceup,aux.nzatk,Card.IsType),tp,LOCATION_REMOVED,LOCATION_REMOVED,1,1,nil,TYPE_MONSTER):GetFirst()
-	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,tc:GetControler(),tc:GetAttack())
+	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,tc:GetOwner(),tc:GetAttack())
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,tc,1,0,0)
 end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and Duel.Damage(tc:GetControler(),tc:GetAttack(),REASON_EFFECT)>0 then
+	if tc:IsRelateToEffect(e) and Duel.Damage(tc:GetOwner(),tc:GetAttack(),REASON_EFFECT)>0 then
 		Duel.SendtoGrave(tc,REASON_EFFECT+REASON_RETURN)
 	end
 end
