@@ -44,7 +44,7 @@ function cid.hspcon(e,c)
   if c==nil then return true end
 	if chk==0 then return Duel.GetFlagEffect(tp,id)==0 end
 	local tp=c:GetControler()
-	return Duel.IsExistingMatchingCard(cid.spfilter,tp,LOCATION_MZONE,0,1,nil,c.tp)
+	return Duel.IsExistingMatchingCard(cid.spfilter,tp,LOCATION_MZONE,0,1,nil,c,tp)
 end
 function cid.hspop(e,tp,eg,ep,ev,re,r,rp,c)
 	   Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_MATERIAL)
