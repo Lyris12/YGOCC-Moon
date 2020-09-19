@@ -10,6 +10,7 @@ function cid.initial_effect(c)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetHintTiming(TIMING_DAMAGE_STEP)
 	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1)
 	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
 	e2:SetCondition(cid.condition2)
 	e2:SetOperation(cid.operation2)
@@ -30,6 +31,23 @@ function cid.initial_effect(c)
 	e1:SetOperation(cid.ntop)
 	e1:SetValue(SUMMON_TYPE_NORMAL)
 	c:RegisterEffect(e3)
+end
+function cid.condition2(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetCurrentPhase()~=PHASE_DAMAGE or Duel.IsDamageCalculated() then return false end
+	local a=e:GetHandler()
+	local d=a:GetBattleTarget()
+	return d~=nil and not d:IsType(TYPE_LINK+TYPE_EVOLUTE) and (a:IsRelateToBattle() or d:IsRelateToBattle())
+end
+function cid.operation2(e,tp,eg,ep,ev,re,r,rp)
+	local a=e:GetHandler()
+	local d=a:GetBattleTarget()
+	if not d:IsRelateToBattle() or d:IsImmuneToEffect(e) or not a:IsRelateToBattle() or not a:IsRelateToEffect(e) then return end
+	local e3=Effect.CreateEffect(a)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetCode(EFFECT_UPDATE_ATTACK)
+	e3:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,2)
+	e3:SetValue(Duel.ReadCard(d,CARDDATA_LEVEL)*100)
+	a:RegisterEffect(e3)
 end
 function cid.cfilter(c,tp)
 	return c:IsFaceup() and c:IsLevelAbove(5) and c:GetSummonPlayer()~=tp
@@ -76,35 +94,13 @@ function cid.ntop(e,tp,eg,ep,ev,re,r,rp,c)
 		c:SetMaterial(g)
 		Duel.Release(g,REASON_SUMMON+REASON_MATERIAL)
 		e:SetValue(SUMMON_TYPE_ADVANCE)
-	else e:SetValue(SUMMON_TYPE_NORMAL) end
-end
-function cid.condition2(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetCurrentPhase()~=PHASE_DAMAGE or Duel.IsDamageCalculated() then return false end
-	local a=e:GetHandler()
-	local d=a:GetBattleTarget()
-	return d~=nil and (a:IsRelateToBattle() or d:IsRelateToBattle())
-end
-function cid.operation2(e,tp,eg,ep,ev,re,r,rp)
-	local a=e:GetHandler()
-	local d=a:GetBattleTarget()
-	if not d:IsRelateToBattle() or d:IsImmuneToEffect(e) then return end
-	local atk=d:GetAttack()
-	local e1=Effect.CreateEffect(a)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_SET_ATTACK_FINAL)
-	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-	e1:SetValue(math.ceil(atk/2))
-	d:RegisterEffect(e1)
-	local e2=e1:Clone()
-	e2:SetCode(EFFECT_SET_DEFENSE_FINAL)
-	e2:SetValue(math.ceil(d:GetDefense()/2))
-	d:RegisterEffect(e2)
-	if a:IsRelateToBattle() and a:IsRelateToEffect(e) then
-		local e3=Effect.CreateEffect(a)
-		e3:SetType(EFFECT_TYPE_SINGLE)
-		e3:SetCode(EFFECT_UPDATE_ATTACK)
-		e3:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,2)
-		e3:SetValue(math.ceil(atk/2))
-		a:RegisterEffect(e3)
+	else
+		e:SetValue(SUMMON_TYPE_NORMAL)
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_UPDATE_ATTACK)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD+RESET_DISABLE)
+		e1:SetValue(-600)
+		c:RegisterEffect(e1)
 	end
 end
