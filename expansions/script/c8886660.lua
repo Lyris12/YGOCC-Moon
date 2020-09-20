@@ -23,7 +23,7 @@ function cm.initial_effect(c)
 	e1:SetCondition(cm.testcon)
 	e1:SetTarget(cm.testtg)
 	e1:SetOperation(cm.testop)
---	c:RegisterEffect(e1)]]--
+--  c:RegisterEffect(e1)]]--
 --  Horrifc Echo Check
 	local e2a=Effect.CreateEffect(c)
 	e2a:SetDescription(aux.Stringid(m,1))
@@ -43,7 +43,7 @@ function cm.initial_effect(c)
 	e2b:SetOperation(cm.corruption_check_op)
 	c:RegisterEffect(e2b)
 --  Resource Generation
-	if not cm.global_check then
+--[[	if not cm.global_check then
 		cm.global_check=true
 		local ge1=Effect.CreateEffect(c)
 		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
@@ -59,7 +59,7 @@ function cm.initial_effect(c)
 		ge3:SetRange(LOCATION_EXTRA)
 		ge3:SetOperation(cm.acop)
 		c:RegisterEffect(ge3,0)
-	end
+	end]]--
 --  Corruption Decay
 	local dc1=Effect.CreateEffect(c)
 	dc1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
@@ -124,7 +124,7 @@ function cm.initial_effect(c)
 	vom1:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_IGNORE_RANGE+EFFECT_FLAG_IGNORE_IMMUNE)
 	vom1:SetCode(EFFECT_TO_GRAVE_REDIRECT)
 	vom1:SetRange(LOCATION_EXTRA)
-	vom1:SetTargetRange(0xff,0xfe)
+	vom1:SetTargetRange(0xff,0)
 	vom1:SetCondition(cm.vom1condition)
 	vom1:SetValue(LOCATION_REMOVED)
 	c:RegisterEffect(vom1)
@@ -148,19 +148,23 @@ end
 ------------------
 
 function cm.startcon(e,tp,eg,ep,ev,re,r,rp)
-		return (Duel.GetFlagEffect(tp,88866600) < 1)
+		return (Duel.GetFlagEffect(tp,88866600) < 100)
 end
 
 function cm.start(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tp=c:GetOwner()
 	-- Horrific Echos
-	Duel.RegisterFlagEffect(tp,88866600,RESET_DISABLE,0,1)
-	Duel.SetFlagEffectLabel(tp,88866600,0)
+	if Duel.GetFlagEffect(tp,88866600) == 0 then
+		Duel.RegisterFlagEffect(tp,88866600,RESET_DISABLE,0,1)
+		Duel.Remove(c,tp,REASON_EFFECT)
+		Duel.SendtoExtraP(c,tp,REASON_EFFECT)
+	end
+	Duel.SetFlagEffectLabel(tp,88866600,150)
 	-- Corruption
-	Duel.RegisterFlagEffect(tp,88866601,RESET_DISABLE,0,1)
-	Duel.Remove(c,tp,REASON_EFFECT)
-	Duel.SendtoExtraP(c,tp,REASON_EFFECT)
+	if Duel.GetFlagEffect(tp,88866600) == 0 then
+		Duel.RegisterFlagEffect(tp,88866601,RESET_DISABLE,0,1)
+	end
 end
 
 -----------------------
@@ -204,7 +208,7 @@ end
 function cm.decayop(e,tp,eg,ep,ev,re,r,rp)
 	local tp=e:GetHandler():GetOwner()
 	local cur= Duel.GetFlagEffectLabel(tp,88866601)
-	local new= math.floor(cur * 0.75)
+	local new= math.floor(cur * 0.33)
 	Duel.SetFlagEffectLabel(tp,88866601,new)
 end
 
@@ -420,6 +424,12 @@ function cm.grtdopdestg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 end
 
+function cm.grtdopdesop(e,tp,eg,ep,ev,re,r,rp)
+ local tc=Duel.GetFirstTarget()
+	if tc:IsRelateToEffect(e) then
+		Duel.Destroy(tc,REASON_EFFECT)
+	end
+end
 ---------------------
 --Burning Eye Token--
 ---------------------
