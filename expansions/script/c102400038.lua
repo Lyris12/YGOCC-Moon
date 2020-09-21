@@ -46,7 +46,7 @@ function cid.operation2(e,tp,eg,ep,ev,re,r,rp)
 	local e3=Effect.CreateEffect(a)
 	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetCode(EFFECT_UPDATE_ATTACK)
-	e3:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,2)
+	e3:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_DISABLE+RESET_PHASE+PHASE_END,2)
 	e3:SetValue(Duel.ReadCard(d,CARDDATA_LEVEL)*100)
 	a:RegisterEffect(e3)
 end
