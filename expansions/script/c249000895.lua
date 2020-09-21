@@ -88,7 +88,7 @@ function c249000895.operation(e,tp,eg,ep,ev,re,r,rp)
 		cc=Duel.CreateToken(tp,ac)
 		if ac==3027001 then return end
 	until (cc:IsSummonableCard()
-		and (cc:GetLevel()==tc:GetLevel() or cc:GetLevel()+1==tc:GetLevel()) and not banned_list_table[ac])
+		and (cc:GetLevel()==tc:GetLevel() or cc:GetLevel()+1==tc:GetLevel() or cc:GetLevel()-1==tc:GetLevel()) and not banned_list_table[ac])
 	Duel.ConfirmCards(1-tp,Group.FromCards(cc))
 	local e1=Effect.CreateEffect(tc2)
 	e1:SetType(EFFECT_TYPE_SINGLE)
