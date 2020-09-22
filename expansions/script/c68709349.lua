@@ -1,48 +1,84 @@
 --HDD's Struggle
 local cid,id=GetID()
 function cid.initial_effect(c)
-	--You can only activate 1 "HDD's Struggle" per turn.
+	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCountLimit(1,id+EFFECT_COUNT_CODE_OATH)
 	c:RegisterEffect(e1)
-	--You can target 1 "HDD" monster you control, and up to 2 cards your opponent controls;  destroy the first target, and if you do, destroy the other targets.
+	--special summon
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_QUICK_O)
-	e2:SetCode(EVENT_FREE_CHAIN)
+	e2:SetDescription(aux.Stringid(id,0))
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
+	e2:SetCode(EVENT_TO_GRAVE)
 	e2:SetRange(LOCATION_SZONE)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e2:SetCategory(CATEGORY_DESTROY)
-	e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_END_PHASE)
-	e2:SetTarget(cid.target)
-	e2:SetOperation(cid.operation)
+	e2:SetCountLimit(1,id)
+	e2:SetCondition(cid.spcon)
+	e2:SetCost(cid.spcost)
+	e2:SetTarget(cid.sptg)
+	e2:SetOperation(cid.spop)
 	c:RegisterEffect(e2)
+	--to hand
+	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(id,1))
+	e3:SetCategory(CATEGORY_TOHAND)
+	e3:SetType(EFFECT_TYPE_QUICK_O)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e3:SetCode(EVENT_FREE_CHAIN)
+	e3:SetRange(LOCATION_GRAVE)
+	e3:SetCountLimit(1,id)
+	e3:SetCondition(aux.exccon)
+	e3:SetCost(aux.bfgcost)
+	e3:SetTarget(cid.thtg)
+	e3:SetOperation(cid.thop)
+	c:RegisterEffect(e3)
 end
-function cid.cfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0xf09)
+--SPECIAL SUMMON
+function cid.cfilter(c,tp)
+	return c:IsSetCard(0xf09) and c:IsReason(REASON_DESTROY) and c:IsType(TYPE_MONSTER)
+		and c:GetPreviousControler()==tp and c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousPosition(POS_FACEUP)
 end
-function cid.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return false end
-	local g=Duel.GetFieldGroup(tp,0,LOCATION_ONFIELD)
-	if chk==0 then return Duel.IsExistingTarget(cid.cfilter,tp,LOCATION_MZONE,0,1,nil)
-		and #g>0 end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g1=Duel.SelectTarget(tp,cid.cfilter,tp,LOCATION_MZONE,0,1,1,nil)
-	e:SetLabelObject(g1:GetFirst())
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g2=Duel.SelectTarget(tp,aux.TRUE,tp,0,LOCATION_ONFIELD,1,2,nil)
-	g1:Merge(g2)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g1,#g1,0,0)
+function cid.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return eg:IsExists(cid.cfilter,1,nil,tp)
+end
+function cid.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.CheckLPCost(tp,500) end
+	Duel.PayLPCost(tp,500)
 end
 function cid.filter(c,e,tp)
-	return c:IsRelateToEffect(e) and c:IsControler(tp)
+	return c:IsSetCard(0xf08) and c:IsType(TYPE_MONSTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function cid.operation(e,tp,eg,ep,ev,re,r,rp)
+function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_DECK,0,1,nil,e,tp) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
+end
+function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
-	local sc=e:GetLabelObject()
-	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)-sc
-	if sc:IsFacedown() or not sc:IsSetCard(0xf09) or sc:IsControler(1-tp) or Duel.Destroy(sc,REASON_EFFECT)==0 then return end
-	g:RemoveCard(sc)
-	Duel.Destroy(g:Filter(cid.filter,nil,e,1-tp),REASON_EFFECT)
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local g=Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
+	if g:GetCount()>0 then
+		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+	end
+end
+
+--TO HAND
+function cid.thfilter(c)
+	return c:IsSetCard(0xf08) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
+end
+function cid.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and cid.thfilter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(cid.thfilter,tp,LOCATION_GRAVE,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local g=Duel.SelectTarget(tp,aux.NecroValleyFilter(cid.thfilter),tp,LOCATION_GRAVE,0,1,1,nil)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
+end
+function cid.thop(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.GetFirstTarget()
+	if tc:IsRelateToEffect(e) then
+		Duel.SendtoHand(tc,nil,REASON_EFFECT)
+	end
 end
