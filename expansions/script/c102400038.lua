@@ -11,8 +11,9 @@ function cid.initial_effect(c)
 	e2:SetHintTiming(TIMING_DAMAGE_STEP)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1)
-	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
+	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_CARD_TARGET)
 	e2:SetCondition(cid.condition2)
+	e2:SetTarget(cid.target2)
 	e2:SetOperation(cid.operation2)
 	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
@@ -33,17 +34,25 @@ function cid.initial_effect(c)
 	e3:SetLabelObject(e1)
 end
 function cid.condition2(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetCurrentPhase()~=PHASE_DAMAGE or Duel.IsDamageCalculated() then return false end
-	local a=e:GetHandler()
+	return Duel.GetCurrentPhase()==PHASE_DAMAGE and not Duel.IsDamageCalculated()
+end
+function cid.bfilter(a)
 	local d=a:GetBattleTarget()
-	return d~=nil and (d:IsLevelAbove(1) or d:IsRankAbove(1) or d:GetDimensionNo()>0 or d:GetFuture()>0)
+	return a:IsCode(id) and d~=nil and (d:IsLevelAbove(1) or d:IsRankAbove(1) or d:GetDimensionNo()>0 or d:GetFuture()>0)
 		and (a:IsRelateToBattle() or d:IsRelateToBattle())
 end
+function cid.target2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and cid.bfilter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(cid.bfilter,tp,LOCATION_MZONE,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
+	Duel.SelectTarget(tp,cid.bfilter,tp,LOCATION_MZONE,0,1,1,nil)
+end
 function cid.operation2(e,tp,eg,ep,ev,re,r,rp)
-	local a=e:GetHandler()
+	local a=Duel.GetFirstTarget()
 	local d=a:GetBattleTarget()
-	if not d:IsRelateToBattle() or d:IsImmuneToEffect(e) or not a:IsRelateToBattle() or not a:IsRelateToEffect(e) then return end
-	local e3=Effect.CreateEffect(a)
+	if not a:IsRelateToEffect(e) or not a:IsRelateToBattle() or not d:IsRelateToBattle()
+		or d:IsImmuneToEffect(e) then return end
+	local e3=Effect.CreateEffect(e:GetHandler())
 	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetCode(EFFECT_UPDATE_ATTACK)
 	e3:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_DISABLE+RESET_PHASE+PHASE_END,2)

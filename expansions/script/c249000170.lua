@@ -114,7 +114,7 @@ function c249000170.operation(e,tp,eg,ep,ev,re,r,rp)
 end
 function c249000170.descon(e)
 	local tc=e:GetHandler()
-	return tc and (tc:GetAttack()==0 or (not tc:IsType(TYPE_LINK) and tc:GetDefense()==0)
+	return tc and tc:GetAttack()==0 or (not tc:IsType(TYPE_LINK) and tc:GetDefense()==0)
 end
 function c249000170.tfilter(c,tp)
 	return c:IsLocation(LOCATION_MZONE) and c:IsControler(tp)
