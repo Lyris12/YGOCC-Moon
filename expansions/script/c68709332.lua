@@ -1,8 +1,6 @@
 --HDD Neptune
 --coded by Concordia
-xpcall(function() require("expansions/script/c37564765") end,function() require("script/c37564765") end)
 function c68709332.initial_effect(c)
-	Senya.AddSummonSE(c,aux.Stringid(68709332,0))
 	--fusion material
 	c:EnableReviveLimit()
 	aux.AddFusionProcCodeFun(c,68709329,aux.FilterBoolFunction(Card.IsFusionSetCard,0xf08),1,true,true)
@@ -51,9 +49,10 @@ function c68709332.initial_effect(c)
 	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e5:SetCountLimit(1,68739332)
 	e5:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e5:SetCode(EVENT_LEAVE_FIELD)
+	e5:SetCode(EVENT_BE_MATERIAL)
 	e5:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
 	e5:SetCost(c68709332.sp2cost)
+	e5:SetCondition(c68709332.sp2con)
 	e5:SetTarget(c68709332.sp2tg)
 	e5:SetOperation(c68709332.sp2op)
 	c:RegisterEffect(e5)
@@ -162,6 +161,10 @@ function c68709332.sp2cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
 end
+function c68709332.sp2con(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return c:IsLocation(LOCATION_GRAVE) and r==REASON_LINK and c:GetReasonCard():IsSetCard(0xf09)
+end
 function c68709332.filter1(c,e,tp)
 	return c:IsSetCard(0xf08) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
@@ -175,15 +178,15 @@ function c68709332.sp2tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		if Duel.IsPlayerAffectedByEffect(tp,59822133) then return false end
 		if Duel.GetLocationCount(tp,LOCATION_MZONE)<2 then return false end
-		local g=Duel.GetMatchingGroup(c68709332.filter1,tp,LOCATION_HAND+LOCATION_GRAVE,0,nil,e,tp)
+		local g=Duel.GetMatchingGroup(c68709332.filter1,tp,LOCATION_DECK,0,nil,e,tp)
 		return g:IsExists(c68709332.filter2,1,nil,g)
 	end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,tp,LOCATION_HAND+LOCATION_GRAVE)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,tp,LOCATION_DECK)
 end
 function c68709332.sp2op(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.IsPlayerAffectedByEffect(tp,59822133) then return end
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<2 then return end
-	local g=Duel.GetMatchingGroup(c68709332.filter1,tp,LOCATION_HAND+LOCATION_GRAVE,0,nil,e,tp)
+	local g=Duel.GetMatchingGroup(c68709332.filter1,tp,LOCATION_DECK,0,nil,e,tp)
 	local dg=g:Filter(c68709332.filter2,nil,g)
 	if dg:GetCount()>=1 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)

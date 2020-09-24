@@ -1,7 +1,7 @@
 --overdrive
---coded by Concordia
+--coded by Lyris. Card owned by Concordia.
 function c68709324.initial_effect(c)
-    --Activate
+	--Activate: All "HDD" Monsters you control gain 1500 ATK. All battle damage your opponent takes this turn is halved. You can only activate 1 "CPU Gear: HDD Overdrive!" per turn.
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_ATKCHANGE)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)

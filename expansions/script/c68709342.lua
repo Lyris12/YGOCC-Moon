@@ -37,7 +37,7 @@ function c68709342.filter(c)
 end
 function c68709342.negcon(e,tp,eg,ep,ev,re,r,rp)
 	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED)
-		and (re:IsActiveType(TYPE_MONSTER) or re:IsHasType(EFFECT_TYPE_ACTIVATE)) and Duel.IsChainNegatable(ev)
+		and (re:IsActiveType(TYPE_MONSTER) or re:IsHasType(EFFECT_TYPE_ACTIVATE)) and Duel.IsChainNegatable(ev)  and ep==1-tp
 		and Duel.IsExistingMatchingCard(c68709342.filter,tp,LOCATION_MZONE,0,3,nil)
 end
 function c68709342.cfilter(c,rtype)
