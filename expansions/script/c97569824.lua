@@ -2,7 +2,7 @@
 function c97569824.initial_effect(c)
     c:SetUniqueOnField(1,0,97569824)
     --synchro summon
-    aux.AddSynchroProcedure(c,nil,aux.NonTuner(nil),1)
+    aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_WARRIOR),aux.NonTuner(Card.IsSetCard,0xd0a1),1)
     c:EnableReviveLimit()
     --equip
     local e1=Effect.CreateEffect(c)
