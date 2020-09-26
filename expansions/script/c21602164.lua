@@ -8,6 +8,9 @@ local function getID()
 end
 local id,cid=getID()
 function cid.initial_effect(c)
+	--synchro summon
+	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_AQUA),aux.NonTuner(Card.IsRace,RACE_AQUA),1)
+	c:EnableReviveLimit()
     local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_POSITION)
