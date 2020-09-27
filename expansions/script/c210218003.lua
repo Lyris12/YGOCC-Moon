@@ -108,17 +108,6 @@ function cid.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.SelectMatchingCard(tp,cid.spfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
 	if g:GetCount()>0 then
 	Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
-	
-    if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
-    Duel.SetTargetPlayer(1-tp)
-    Duel.SetTargetParam(1)
-    Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,1-tp,1)
-    if
-    Duel.SelectYesNo(1-tp,aux.Stringid(2160,0)) then
-            Duel.BreakEffect()
-    local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
-    Duel.Draw(p,d,REASON_EFFECT)
-	end
 end
 end
 function cid.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
