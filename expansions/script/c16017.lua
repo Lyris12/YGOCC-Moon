@@ -14,7 +14,17 @@ function s.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
 	aux.AddFusionProcFunRep(c,s.matfilter,3,true)
-	aux.AddContactFusionProcedure(c,Card.IsAbleToRemoveAsCost,LOCATION_ONFIELD,0,Duel.Remove,POS_FACEUP,REASON_COST)
+	--Contact
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetCode(EFFECT_SPSUMMON_PROC)
+	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e2:SetRange(LOCATION_EXTRA)
+	e2:SetValue(SUMMON_TYPE_FUSION)
+	e2:SetCondition(Auxiliary.ContactFusionCondition(Card.IsAbleToRemoveAsCost,LOCATION_ONFIELD,0))
+	e2:SetOperation(Auxiliary.ContactFusionOperation(Card.IsAbleToRemoveAsCost,LOCATION_ONFIELD,0,Duel.Remove,{POS_FACEUP,REASON_COST+REASON_MATERIAL}))
+	c:RegisterEffect(e2)
+	--banish
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetProperty(EFFECT_FLAG_DELAY)
