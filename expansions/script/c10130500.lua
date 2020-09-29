@@ -46,7 +46,7 @@ function cod.activate(e,tp,eg,ep,ev,re,r,rp)
 		local g=Duel.SelectMatchingCard(tp,cod.scfilter,tp,LOCATION_DECK,0,1,1,nil,scale,code)
 		if g:GetCount()>0 then
 			local c=g:GetFirst()
-			Duel.MoveToField(c,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
+			Duel.MoveToField(c,tp,tp,LOCATION_PZONE,POS_FACEUP,true)
 			local te=c:GetActivateEffect()
 			local tep=c:GetControler()
 			local cost=te:GetCost()
