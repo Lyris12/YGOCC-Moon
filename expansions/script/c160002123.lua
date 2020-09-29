@@ -137,7 +137,7 @@ function c160002123.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RegisterEffect(e1,tp)
 end
 function c160002123.splimit(e,c,sump,sumtype,sumpos,targetp)
-	return c:IsLocation(LOCATION_EXTRA) and not c:IsSetCard(0x185a)
+	return c:IsLocation(LOCATION_EXTRA) and not c:IsSetCard(0x85a)
 end
 
 function c160002123.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
