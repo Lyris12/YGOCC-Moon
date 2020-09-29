@@ -1,7 +1,7 @@
 --Buttergal of Fiber VINE
 function c500311550.initial_effect(c)
 	 aux.AddOrigEvoluteType(c)
-  aux.AddEvoluteProc(c,nil,4,c500311550.filter1,c500311550.filter2)
+  aux.AddEvoluteProc(c,nil,4,c500311550.filter1,2,2)
 	c:EnableReviveLimit() 
   --cannot be target/battle indestructable
 	local e1=Effect.CreateEffect(c)

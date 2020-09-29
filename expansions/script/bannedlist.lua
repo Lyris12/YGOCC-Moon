@@ -1,9 +1,9 @@
 if not banned_list_table then banned_list_table={} end
 local string=require'string'
 local ls=[[
-#[2020.5 YGOCC+2020.4 TCG]
+#[2020.9 YGOCC+2020.9 TCG]
 
-!2020.5.16 YGOCC
+!2020.9.13 YGOCC
 #Forbidden YGOCC
 --							MAIN DECK MONSTERS
 33700093 0 -- Anifriends Aardwolf
@@ -42,7 +42,6 @@ local ls=[[
 --							LINK
 33700082 0 -- Anifriends Seiryu of the East
 75977701 0 -- Infected knight of Ivory
-32904930 0 -- Jaden the Aeonbreaker’s Alchemist
 80347321 0 -- Metalfoes Mercuryrider
 56642463 0 -- Noble Knight Mordred
 79854547 0 -- Verdant Illusion
@@ -54,22 +53,17 @@ local ls=[[
 --
 --							SPELLS CARDS
 19772596 0 -- The Advocate of Justice’s Summoning
-195208413 0 -- False Reality Distortion
 79854546 0 -- Numbing Winter jewel
-10130500 0 -- Pendulum Advance
 23251031 0 -- Pharaohnic Papyrus of Patience
 17029608 0 -- Psychether priestess, Joan
 28915253 0 -- Shadowflame Calvary
 500311692 0 -- VINE Sunflower of Greed
-99998878 0 -- Voidictator Rune - Greater Gating Art
 --
 --							TRAPS CARDS
 --
 #Limited YGOCC
 --							MAIN DECK MONSTERS
-171000121 1 -- Amethyst-Winged Kuriboh
 33700744 1 -- Anifriends "Ikkaku"
-33700181 1 -- Anifriends Caracal
 33700054 1 -- Anifriends Ezo Red Fox
 33700065 1 -- Anifriends PPP Gentoo
 77585595 1 -- Forgalgia Emperor Jinzo
@@ -77,10 +71,6 @@ local ls=[[
 50031699 1 -- Mana, Sharpshooter of Fiber VINE
 32904923 1 -- Serene the Aeonbreaker's Sword
 11000533 1 -- Shya Shadowlord
-221594305 1 -- Voidictator Servant - Knight of Corvus
-221594304 1 -- Voidictator Servant - Rune Artist
-99998880 1 -- Voidictator Servant - Shield of Corvus
-79854524 1 -- Woodland Wing
 --							RITUAL
 --							PENDULUM
 33700746 1 -- Anifriends Sky Impulse
@@ -117,18 +107,14 @@ local ls=[[
 15747847 1 -- Mythos Valor
 63553459 1 -- Nethergear Unit
 37564903 1 -- Sayuri - ALICE
-37564902 1 -- Sayuri - GRAZE
 96212378 1 -- Spiral Drill Formation
 20181413 1 -- Terradication Living Fortress
-99998875 1 -- Voidictator Rune - Lesser Gating Art
-221594311 1 -- Voidictator Rune - Zanyris's Realm
 --
 --							TRAP CARDS
 500311592 1 -- Power Portrait's Cursed Portait Trap
 --
 #Semi-limited YGOCC
 --							MAIN DECK MONSTERS
-16000128 2 -- Ivy Butterfly of Fiber VINE
 32904921 2 -- Laura the Aeonbreaker's Bow
 --
 --							EXTRA DECK MONSTERS
@@ -139,6 +125,21 @@ local ls=[[
 210424266 2 -- Battle in the Storm
 --
 --							TRAP CARDS
+--							New 9/13/2020
+86148577 0 --Guardragon Elpy
+85243784 0 --Linkross
+44097050 0 --Mecha Phantom Beast Auroradon
+83152482 0 --Union Carrier
+6172122 0 --Red-Eyes Fusion
+195208417 0 --False Reality Knight Thrax
+195208424 0 --False Reality Wrath Bringer Makolo
+50588353 1 --Crystron Halqifibrax
+99189323 1 --Arcarum 11 - JUSTICE
+195208409 1 --False Reality Aquamancer Gyalros
+195208422 1 --False Reality Spirit Monk Dalos
+32904930 1 --Jaden, The Aeonbreaker's Alchemist
+79854524 2 --Woodland Wing
+37564902 2 --Sayuri - GRAZE
 --
 #FORBIDDEN TCG					===Forbidden===
 76794549 0 --Astrograph Sorcerer
@@ -156,7 +157,6 @@ local ls=[[
 57421866 0 --Level Eater
 34206604 0 --Magical Scientist
 31178212 0 --Majespecter Unicorn - Kirin
-21593977 0 --Makyura the Destructor
 21377582 0 --Master Peace, the True Dracoslaying King
 23434538 0 --Maxx "C"
 96782886 0 --Mind Master
@@ -240,12 +240,11 @@ local ls=[[
 67441435 0 --Glow-Up Bulb
 83190280 0 --Lunalight Tiger
 91258852 0 --SPYRAL Master Plan
-#LIMITED TCG						====Limited===
+#LIMITED TCG				====Limited===
 07902349 1 --Left Arm of the Forbidden One
 44519536 1 --Left Leg of the Forbidden One
 70903634 1 --Right Arm of the Forbidden One
 08124921 1 --Right Leg of the Forbidden One
-42790071 1 --Altergeist Multifaker
 28985331 1 --Armageddon Knight
 61901281 1 --Black Dragon Collapserpent
 57143342 1 --Cir, Malebranche of the Burning Abyss
@@ -271,11 +270,8 @@ local ls=[[
 30539496 1 --True King Lithosagym, the Disaster
 99234526 1 --White Dragon Wyverburster
 78872731 1 --Zoodiac Ratpier
-45222299 1 --Evigishki Gustkraken
 11877465 1 --Evigishki Mind Augus
-89463537 1 --Nekroz of Unicore
 39512984 1 --Gem-Knight Master Diamond
-48063985 1 --Ritual Beast Ulti-Cannahawk
 70583986 1 --Dewloren, Tiger King of the Ice Barrier
 18239909 1 --Ignister Prominence, the Blasting Dracoslayer
 74586817 1 --PSY-Framelord Omega
@@ -300,7 +296,6 @@ local ls=[[
 83764718 1 --Monster Reborn
 33782437 1 --One Day of Peace
 02295440 1 --One for One
-22842126 1 --Pantheism of the Monarchs
 12580477 1 --Raigeki
 58577036 1 --Reasoning
 32807846 1 --Reinforcement of the Army
@@ -309,7 +304,6 @@ local ls=[[
 24940422 1 --Sekka's Light
 73468603 1 --Set Rotation
 52340444 1 --Sky Striker Mecha - Hornet Drones
-98338152 1 --Sky Striker Mecha - Widow Anchor
 24010609 1 --Sky Striker Mecha Modules - Multirole
 71344451 1 --Slash Draw
 54631665 1 --SPYRAL Resort
@@ -335,10 +329,20 @@ local ls=[[
 1845204 1 --Instant Fusion
 37520316 1 --Mind Control
 46060017 1 --Zoodiac Barrage
-#SEMI LIMITED TCG					===Semi Limited===
-10802915 2 --Tour Guide From the Underworld
+#SEMI LIMITED TCG			===Semi Limited===
 9411399 2 --Destiny HERO - Malicious
-98338152 2 --Sky Striker Mecha - Widow Anchor
+--							New 9/14/2020
+94689206 0
+09742784 0
+72291078 0
+49684352 1
+26692769 1
+24224830 1
+18144506 1
+57143342 2
+20758643 2
+01561110 2
+90809975 2
 ]]
 for id in ls:sub(ls:find("!"),ls:find("!",ls:find("!")+1) and ls:find("!",ls:find("!")+1)-1 or -1):gmatch("([0-9]+) 0") do
 	banned_list_table[tonumber(id)]=true
