@@ -9,6 +9,7 @@ function c101600116.initial_effect(c)
 	e1:SetRange(LOCATION_HAND)
 	e1:SetCondition(c101600116.spco)
 	e1:SetOperation(c101600116.spop)
+	e1:SetValue(1)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
@@ -33,6 +34,7 @@ function c101600116.initial_effect(c)
 	local ae3=ae1:Clone()
 	ae3:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(ae3)
+	--
 	local ne1=Effect.CreateEffect(c)
 	ne1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	ne1:SetCode(EVENT_SPSUMMON_SUCCESS)
@@ -116,12 +118,10 @@ function c101600116.spco(e,c)
 	pwr:Merge(pwr3)
 	pwr:Merge(pwr4)
 	local br=Duel.GetMatchingGroup(c101600116.br,tp,LOCATION_EXTRA,0,nil)
-	-- Debug.Message(str:GetCount() .. arc:GetCount() .. bw:GetCount() .. af:GetCount() .. pwr:GetCount() .. br:GetCount())
 	return str:GetCount()>0 and arc:GetCount()>0 and bw:GetCount()>0 and af:GetCount()>0 and pwr:GetCount()>0 and br:GetCount()>0
 		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 end
 function c101600116.spop(e,tp,eg,ep,ev,re,r,rp)
-	e:GetHandler():RegisterFlagEffect(101600116,RESET_EVENT+0xfe0000+RESET_PHASE+PHASE_END,0,1)
 	local str=Duel.GetMatchingGroup(c101600116.str,tp,LOCATION_EXTRA,0,nil)
 	local arc=Duel.GetMatchingGroup(c101600116.arc,tp,LOCATION_EXTRA,0,nil)
 	local bw=Duel.GetMatchingGroup(c101600116.bw,tp,LOCATION_EXTRA,0,nil)
@@ -137,7 +137,6 @@ function c101600116.spop(e,tp,eg,ep,ev,re,r,rp)
 	pwr:Merge(pwr4)
 	local br=Duel.GetMatchingGroup(c101600116.br,tp,LOCATION_EXTRA,0,nil)
 	local g=Group.CreateGroup()
-	-- Debug.Message(str:GetCount() .. arc:GetCount() .. bw:GetCount() .. af:GetCount() .. pwr:GetCount() .. br:GetCount())
 	if str:GetCount()==1 then
 		g:AddCard(str:GetFirst())
 	else
@@ -192,7 +191,7 @@ function c101600116.disfilter(c)
 	return not (c:IsType(TYPE_SYNCHRO) and c:IsType(TYPE_MONSTER) and c:IsRace(RACE_DRAGON))
 end
 function c101600116.distg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():GetFlagEffect(101600116)>0 end
+	if chk==0 then return e:GetHandler():GetSummonType()&1==1 end
 end
 function c101600116.disop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -228,7 +227,7 @@ function c101600116.cpfilter(c)
 	return c:IsRace(RACE_DRAGON) and c:IsType(TYPE_SYNCHRO) and c:IsAbleToGraveAsCost() and (c:GetLevel()==7 or c:GetLevel()==8)
 end
 function c101600116.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chk==0 then return Duel.IsExistingTarget(c101600116.cpfilter,tp,LOCATION_EXTRA,0,1,nil) and e:GetHandler():GetFlagEffect(101600117)<1 end
+	if chk==0 then return Duel.IsExistingTarget(c101600116.cpfilter,tp,LOCATION_EXTRA,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectTarget(tp,c101600116.cpfilter,tp,LOCATION_EXTRA,0,1,1,nil)
 	Duel.SendtoGrave(g,REASON_COST)
@@ -247,7 +246,6 @@ function c101600116.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EFFECT_CHANGE_CODE)
 		e1:SetValue(code)
 		c:RegisterEffect(e1)
-		c:RegisterFlagEffect(101600117,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,2)
 	end
 end
 function c101600116.specost(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -265,6 +263,6 @@ function c101600116.spetg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
 function c101600116.speop(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsLocation(LOCATION_GRAVE) then return end
+	if not e:GetHandler():IsRelateToEffect(e) then return end
 	Duel.SpecialSummon(e:GetHandler(),0,tp,tp,true,false,POS_FACEUP)
 end
