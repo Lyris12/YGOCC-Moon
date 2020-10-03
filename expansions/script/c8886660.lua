@@ -208,7 +208,7 @@ end
 function cm.decayop(e,tp,eg,ep,ev,re,r,rp)
 	local tp=e:GetHandler():GetOwner()
 	local cur= Duel.GetFlagEffectLabel(tp,88866601)
-	local new= math.floor(cur * 0.33)
+	local new= math.floor(cur * 0.67)
 	Duel.SetFlagEffectLabel(tp,88866601,new)
 end
 
