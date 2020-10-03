@@ -215,7 +215,7 @@ function Duel.GetUtilRed(player)
 	local drhalf = 100
 	local damagereductioncapperc = 90
 	local damagereductioncap = damagereductioncapperc * 0.01
-	return (Util / (Util + 100)) * damagereductioncap
+	return 1 - (Util / (Util + 100)) * damagereductioncap
 end
 
 function Duel.GetUtilAmp(player)
@@ -282,7 +282,6 @@ function Auxiliary.Utilval2(e,re,dam,r,rp,rc)
 	local c=e:GetHandler()
 	local tp=c:GetOwner()
 	local utilred = Duel.GetUtilRed(tp)
-	Debug.Message(utilred)
 	return dam * utilred
 end
 
