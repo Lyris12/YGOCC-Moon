@@ -76,7 +76,7 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,p)
 end
 function cid.splimit(e,c)
-	return not (c:IsSetCard(0xfe9) or c:IsCode(table.unpack(c43954163.FELGRAND))) and (not c:IsRace(RACE_DRAGON) or c:IsType(TYPE_LINK)) and c:IsLocation(LOCATION_EXTRA)
+	return not (c:IsSetCard(0xfe9) or c:IsCode(table.unpack(c43954163.FELGRAND))) and not c:IsRace(RACE_DRAGON) and c:IsLocation(LOCATION_EXTRA)
 end
 --TO DECK
 function cid.tfilter(c)

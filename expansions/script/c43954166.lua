@@ -111,7 +111,7 @@ function cid.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,tp)
 end
 function cid.splimit(e,c)
-	return not c:IsSetCard(0xfe9) and not c:IsCode(table.unpack(c43954163.FELGRAND)) and (c:IsType(TYPE_LINK) or not c:IsRace(RACE_DRAGON))
+	return not c:IsSetCard(0xfe9) and not c:IsCode(table.unpack(c43954163.FELGRAND)) and not c:IsRace(RACE_DRAGON)
 end
 --EQUIP
 function cid.efilter(c)
