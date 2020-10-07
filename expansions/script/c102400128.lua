@@ -4,6 +4,12 @@ local cid,id=GetID()
 function cid.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddFusionProcFunRep(c,aux.AND(aux.FilterBoolFunction(Card.IsSetCard,0x7c4),aux.FilterBoolFunction(Card.IsAttackAbove,1600)),2,false)
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_SINGLE)
+	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e4:SetCode(EFFECT_SPSUMMON_CONDITION)
+	e4:SetValue(aux.fuslimit)
+	c:RegisterEffect(e4)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_FIELD)
 	e1:SetCode(EVENT_DESTROYED)
@@ -32,6 +38,7 @@ function cid.initial_effect(c)
 	e0:SetType(EFFECT_TYPE_QUICK_O)
 	e0:SetRange(LOCATION_MZONE)
 	e0:SetCode(EVENT_FREE_CHAIN)
+	e0:SetCountLimit(1)
 	e0:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_ATTACK)
 	e0:SetCondition(cid.descon)
 	e0:SetTarget(cid.destg)
@@ -46,9 +53,7 @@ function cid.desfilter(c,e,tp)
 end
 function cid.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	local ch=Duel.GetCurrentChain()
-	if chk==0 then return Duel.GetMZoneCount(tp,c)>0 and (ch==0
-		or Duel.GetChainInfo(ch,CHAININFO_TRIGGERING_PLAYER)~=tp) and Duel.GetTurnPlayer()~=tp
+	if chk==0 then return Duel.GetMZoneCount(tp,c)>0
 		and Duel.IsExistingMatchingCard(cid.desfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,e:GetHandler(),1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_GRAVE)
@@ -56,15 +61,17 @@ end
 function cid.desop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and Duel.Destroy(c,REASON_EFFECT)~=0 then
-		if Duel.GetAttacker() then Duel.NegateAttack()
-		else
-			local e1=Effect.CreateEffect(e:GetHandler())
-			e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-			e1:SetCode(EVENT_ATTACK_ANNOUNCE)
-			e1:SetReset(RESET_PHASE+PHASE_END)
-			e1:SetCountLimit(1)
-			e1:SetOperation(cid.disop)
-			Duel.RegisterEffect(e1,tp)
+		if Duel.GetTurnPlayer()~=tp then
+			if Duel.GetAttacker() then Duel.NegateAttack()
+			else
+				local e1=Effect.CreateEffect(e:GetHandler())
+				e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+				e1:SetCode(EVENT_ATTACK_ANNOUNCE)
+				e1:SetReset(RESET_PHASE+PHASE_END)
+				e1:SetCountLimit(1)
+				e1:SetOperation(cid.disop)
+				Duel.RegisterEffect(e1,tp)
+			end
 		end
 		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)

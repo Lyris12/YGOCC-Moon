@@ -20,8 +20,8 @@ TYPE_EXTRA							=TYPE_EXTRA|TYPE_IMPURE
 Auxiliary.Impures={}
 
 --overwrite functions
-local get_type, get_orig_type, get_prev_type_field, get_rank, get_orig_rank, prev_rank_field, is_rank, is_rank_below, is_rank_above, get_level, get_syn_level, get_rit_level, get_orig_level, is_xyz_level, get_prev_level_field, is_level, is_level_below, is_level_above =--, duel_damage, duel_recover = 
-	Card.GetType, Card.GetOriginalType, Card.GetPreviousTypeOnField, Card.GetRank, Card.GetOriginalRank, Card.GetPreviousRankOnField, Card.IsRank, Card.IsRankBelow, Card.IsRankAbove, Card.GetLevel,Card.GetSynchroLevel, Card.GetRitualLevel, Card.GetOriginalLevel, Card.IsXyzLevel, Card.GetPreviousLevelOnField, Card.IsLevel, Card.IsLevelBelow, Card.IsLevelAbove--, Duel.Damage, Duel.Recover
+local get_type, get_orig_type, get_prev_type_field, get_rank, get_orig_rank, prev_rank_field, is_rank, is_rank_below, is_rank_above, get_level, get_syn_level, get_rit_level, get_orig_level, is_xyz_level, get_prev_level_field, is_level, is_level_below, is_level_above =
+	Card.GetType, Card.GetOriginalType, Card.GetPreviousTypeOnField, Card.GetRank, Card.GetOriginalRank, Card.GetPreviousRankOnField, Card.IsRank, Card.IsRankBelow, Card.IsRankAbove, Card.GetLevel,Card.GetSynchroLevel, Card.GetRitualLevel, Card.GetOriginalLevel, Card.IsXyzLevel, Card.GetPreviousLevelOnField, Card.IsLevel, Card.IsLevelBelow, Card.IsLevelAbove
 
 Card.GetType=function(c,scard,sumtype,p)
 	local tpe=scard and get_type(c,scard,sumtype,p) or get_type(c)
@@ -185,16 +185,6 @@ Card.IsRankAbove=function(c,rk)
 	if Auxiliary.Impures[c] and not Auxiliary.Impures[c]() then return false end
 	return is_rank_above(c,rk)
 end
--- Duel.Damage=function(p,val,r,step)
-	-- if not step then step=false end
-	-- if val<0 then return duel_recover(p,val,r,step) end
-	-- return duel_damage(p,val,r,step)
--- end
--- Duel.Recover=function(p,val,r,step)
-	-- if not step then step=false end
-	-- if val<0 then return duel_damage(p,val,r,step) end
-	-- return duel_recover(p,val,r,step)
--- end
 
 --Custom functions
 function Card.IsCanBeImpureMaterial(c,ec)

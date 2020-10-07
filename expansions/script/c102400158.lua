@@ -1,4 +1,5 @@
 --created by Walrus, coded by Lyris
+--ストーミング・データ・リンク・ドラゴン
 local cid,id=GetID()
 function cid.initial_effect(c)
 	c:EnableReviveLimit()

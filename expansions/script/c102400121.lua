@@ -33,7 +33,8 @@ function cid.initial_effect(c)
 	e3:SetCode(EVENT_CHAINING)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1,id)
-	e3:SetCategory(CATEGORY_DISABLE+CATEGORY_TODECK)
+	e3:SetCategory(CATEGORY_NEGATE+CATEGORY_TODECK)
+	e3:SetProperty(EFFECT_FLAG_DAMAGE_CAL+EFFECT_FLAG_DAMAGE_STEP)
 	e3:SetCondition(cid.discon)
 	e3:SetTarget(cid.distg)
 	e3:SetOperation(cid.negop)
@@ -54,9 +55,7 @@ function cid.desfilter(c,e,tp)
 end
 function cid.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	local ch=Duel.GetCurrentChain()
-	if chk==0 then return Duel.GetMZoneCount(tp,c)>0 and (ch==0
-		or Duel.GetChainInfo(ch,CHAININFO_TRIGGERING_PLAYER)~=tp) and Duel.GetTurnPlayer()~=tp
+	if chk==0 then return Duel.GetMZoneCount(tp,c)>0
 		and Duel.IsExistingMatchingCard(cid.desfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,e:GetHandler(),1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_GRAVE)
@@ -64,15 +63,17 @@ end
 function cid.desop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and Duel.Destroy(c,REASON_EFFECT)~=0 then
-		if Duel.GetAttacker() then Duel.NegateAttack()
-		else
-			local e1=Effect.CreateEffect(e:GetHandler())
-			e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-			e1:SetCode(EVENT_ATTACK_ANNOUNCE)
-			e1:SetReset(RESET_PHASE+PHASE_END)
-			e1:SetCountLimit(1)
-			e1:SetOperation(cid.disop)
-			Duel.RegisterEffect(e1,tp)
+		if Duel.GetTurnPlayer()~=tp then
+			if Duel.GetAttacker() then Duel.NegateAttack()
+			else
+				local e1=Effect.CreateEffect(e:GetHandler())
+				e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+				e1:SetCode(EVENT_ATTACK_ANNOUNCE)
+				e1:SetReset(RESET_PHASE+PHASE_END)
+				e1:SetCountLimit(1)
+				e1:SetOperation(cid.disop)
+				Duel.RegisterEffect(e1,tp)
+			end
 		end
 		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
@@ -94,14 +95,14 @@ function cid.etarget(e,re)
 	return g and g:IsContains(e:GetHandler())
 end
 function cid.discon(e,tp,eg,ep,ev,re,r,rp)
-	return ep==1-tp and Duel.IsChainDisablable(ev)
+	return ep==1-tp and not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and Duel.IsChainNegatable(ev)
 end
 function cid.filter(c)
 	return c:IsSetCard(0x7c4) and c:IsType(TYPE_PENDULUM) and c:IsAbleToDeck()
 end
 function cid.distg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return not re:GetHandler():IsStatus(STATUS_DISABLED) and Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_GRAVE,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_DISABLE,eg,1,0,0)
+	if chk==0 then return Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_GRAVE,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
 	local ct=1
 	if re:GetHandler():IsAbleToDeck() and re:GetHandler():IsRelateToEffect(re) then
 		ct=ct+1
@@ -110,7 +111,7 @@ function cid.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function cid.negop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(cid.filter,tp,LOCATION_GRAVE,0,nil)
-	if #g>0 and Duel.NegateEffect(ev) and re:GetHandler():IsRelateToEffect(re) then
+	if #g>0 and Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 		local dg=g:Select(tp,1,1,nil)
 		Duel.SendtoDeck(eg+dg,nil,2,REASON_EFFECT)
