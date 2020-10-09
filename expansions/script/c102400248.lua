@@ -46,7 +46,7 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	local p=Duel.GetTurnPlayer()
 	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) or not re:IsHasType(EFFECT_TYPE_QUICK_O) or not re:GetHandler():IsSetCard(0xd10) then return false end
 	local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
-	if g and g:IsExists(aux.AND(Card.IsOnField,Card.IsType),1,nil,TYPE_LINK) then
+	if g and g:IsExists(aux.AND(Card.IsOnField,Card.IsType),1,nil,TYPE_LINK) and Duel.SelectEffectYesNo(tp,e:GetHandler()) then
 		Duel.ChangeTargetCard(ev,g+Duel.SelectMatchingCard(tp,Card.IsType,p,LOCATION_MZONE,0,1,99,nil,TYPE_LINK))
 	end
 end
