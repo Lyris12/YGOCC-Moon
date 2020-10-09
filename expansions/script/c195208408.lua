@@ -39,7 +39,7 @@ end
 	end
 end
 	function cid.hdcon(e,tp,eg,ep,ev,re,r,rp)
-	return ep~=tp and e:GetHandler()==Duel.GetAttacker()
+	return ep~=tp and e:GetHandler()==Duel.GetAttacker() and Duel.GetAttackTarget()==nil
 end
 	function cid.hdtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
