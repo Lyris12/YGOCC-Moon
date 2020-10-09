@@ -39,12 +39,18 @@ function cid.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
 	local zone=Duel.GetLinkedZone(tp)
-	for tc in Duel.GetMatchingGroup(aux.AND(Card.IsFaceup,Card.IsSetCard),tp,LOCATION_MZONE,0,nil,0xd10) do zone=zone|tc:GetColumnZone(LOCATION_MZONE,1,1,tp) end
+	for tc in aux.Next(Duel.GetMatchingGroup(aux.AND(Card.IsFaceup,Card.IsSetCard),tp,LOCATION_MZONE,0,nil,0xd10)) do
+		local s=tc:GetSequence()
+		zone=zone|(s>0 and 2^s-1 or 0)|(s<4 and 2^s+1 or 0)|tc:GetColumnZone(LOCATION_MZONE,0,0,tp)
+	end
 	return Duel.GetLocationCount(tp,LOCATION_MZONE,tp,LOCATION_REASON_TOFIELD,zone)>0
 end
 function cid.spval(e,c)
 	local zone=Duel.GetLinkedZone(c:GetControler())
-	for tc in Duel.GetMatchingGroup(aux.AND(Card.IsFaceup,Card.IsSetCard),tp,LOCATION_MZONE,0,nil,0xd10) do zone=zone|tc:GetColumnZone(LOCATION_MZONE,1,1,tp) end
+	for tc in aux.Next(Duel.GetMatchingGroup(aux.AND(Card.IsFaceup,Card.IsSetCard),tp,LOCATION_MZONE,0,nil,0xd10)) do
+		local s=tc:GetSequence()
+		zone=zone|(s>0 and 2^s-1 or 0)|(s<4 and 2^s+1 or 0)|tc:GetColumnZone(LOCATION_MZONE,0,0,tp)
+	end
 	return 0,zone
 end
 function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk)

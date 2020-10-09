@@ -38,11 +38,15 @@ function cid.initial_effect(c)
 	e6:SetLabelObject(e5)
 	c:RegisterEffect(e6)
 end
+function cid.filter(c)
+	return c:IsFaceup() and c:IsSetCard(0xd10) and c:GetSequence()<5
+end
 function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:GetColumnGroupCount(1,1):Filter(aux.AND(Card.IsFaceup,Card.IsSetCard),nil,0xd10)==0 then Duel.Destroy(c,REASON_EFFECT) end
+	if not c:IsRelateToEffect(e) then return end
+	if c:GetColumnGroupCount(1,1):Filter(cid.filter,nil)==0 then Duel.Destroy(c,REASON_EFFECT) end
 	local pt,t=0,{[-1]=LINK_MARKER_TOP_LEFT,[0]=LINK_MARKER_TOP,[1]=LINK_MARKER_TOP_RIGHT,}
-	for i=-1,1 do if c:GetColumnGroup(i,-i):FilterCount(aux.AND(Card.IsFaceup,Card.IsSetCard),nil,0xd10)>0 then pt=pt|t[i] end end
+	for i=-1,1 do if c:GetColumnGroup(i,-i):FilterCount(cid.filter,nil)>0 then pt=pt|t[i] end end
 	if pt==0 then Duel.Destroy(c,REASON_EFFECT)
 	else e:SetLabel(pt) end
 end
