@@ -661,16 +661,6 @@ expansions/pics/102400161.png	1d53d43cee67c779206eb30985ae58aa
 expansions/pics/102400162.png	55e0652b095302d1db1d962596613167
 expansions/pics/102400163.png	6bd7fe88b94511ec4037be03e35b1a3d
 expansions/pics/102400164.png	68c24f742e41d3a52480779ba182c493
-expansions/pics/102400165.png	54d6c84d0cad445779f56243d17a27dc
-expansions/pics/102400166.png	e6128ce8c1f0ed90e90b390e881d6cb8
-expansions/pics/102400167.png	47f3fa28d039bab979fab0fdef0d0500
-expansions/pics/102400168.png	edaa7afe9ba306ef656ea165683e2065
-expansions/pics/102400169.png	708cf80ec28d4d5d7fdf4cfceafef750
-expansions/pics/102400170.png	4b2cc0b5dcbdf862f12b2c3b7c8566b1
-expansions/pics/102400171.png	56c14eaf7237f4c8f8e59df6debe2e02
-expansions/pics/102400172.png	b5f5703eb04f92ba0b72f2c3167a4896
-expansions/pics/102400173.png	40a6e91b062a4e01d5b9c6e135a0f3b6
-expansions/pics/102400174.png	0dec6c375fe032a9d3f7639e4710360f
 expansions/pics/102400175.png	6ede5b0399a53c816e39dbacf47f4de4
 expansions/pics/102400176.png	ab29ce1d7a47bf9a28c3372a8974aabc
 expansions/pics/102400177.png	5a7c97da6c9ee50b1f6a57acea9a4ec8
@@ -5000,6 +4990,7 @@ expansions/pics/field/100001205.PNG	bb38b50e08bcd77b84d2cbe2e594d73e
 expansions/pics/field/100001222.jpg	3b9cec7c68b16f51de4b9013c2695a62
 expansions/pics/field/102400133.png	ffd843c7b6d51da3090fdab236675330
 expansions/pics/field/102400142.png	effee3607d845c23ffbb3a37e603c7b7
+expansions/pics/field/102400248.jpg	c1c6d0016d9ccc34e62a57d7a422928b
 expansions/pics/field/11000120.jpg	8e19b88ceb0d2a7cdd13340416d19a87
 expansions/pics/field/11795155.png	324ef52539861828b435c6e4fcf752b7
 expansions/pics/field/1392002.jpg	fe3df02113db0c4ab5ff43f0e92c9653
@@ -9823,7 +9814,7 @@ sound/custom/suzaku_summon.wav	047cba54e35639aef7cdf66ec0121e37
 sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
-update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	2293d3632b5545070904f4822f1bd119
+update/delete.txt	327c34a1a70215e7c0703f2dd12a21fe
+update/filelist.txt	482adf7d9547ab25945630f9eddd71de
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	f64d2d1bf5db11ea4f3a199488f41c37
+update/version.txt	25a142ef8486e111a1468911ef2ffbb4
