@@ -77,17 +77,14 @@ end
 function cm.ntcon(e)
 	return e:GetHandler():GetLinkedGroup():IsExists(cm.ntfilter,1,nil)
 end
-function cm.ntfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x412) c:IsType(TYPE_XYZ)
-end
-function cm.imcon(e)
+function cm.indescon(e)
 	return e:GetHandler():GetLinkedGroup():IsExists(cm.ntfilter,1,nil)
 end
 function cm.sparkfilter(c)
 return c:IsCode(4200100)
 end
 function cm.tucon(e,c)
-	return Duel.IsExistingMatchingCard(cm.sparkfilter,tp,LOCATION_GRAVE,0,1,nil)
+	return Duel.IsExistingMatchingCard(cm.sparkfilter,e:GetHandlerPlayer(),LOCATION_GRAVE,0,1,nil)
 end
 function cm.tucost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -109,7 +106,7 @@ function cm.tuop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function cm.bancon(e,c)
-	return Duel.IsExistingMatchingCard(cm.sparkfilter,tp,LOCATION_GRAVE,0,1,nil)
+	return Duel.IsExistingMatchingCard(cm.sparkfilter,e:GetHandlerPlayer(),LOCATION_GRAVE,0,1,nil)
 end
 function cm.bancost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -130,7 +127,7 @@ function cm.banop(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 end
 function cm.negcon(e,c)
-	return Duel.IsExistingMatchingCard(cm.sparkfilter,tp,LOCATION_GRAVE,0,1,nil)
+	return Duel.IsExistingMatchingCard(cm.sparkfilter,e:GetHandlerPlayer(),LOCATION_GRAVE,0,1,nil)
 end
 function cm.negcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

@@ -46,7 +46,7 @@ function cm.sparkfilter(c)
 return c:IsCode(4200100)
 end
 function cm.noorcon(e,c)
-	return Duel.IsExistingMatchingCard(cm.sparkfilter,tp,LOCATION_GRAVE,0,1,nil)
+	return Duel.IsExistingMatchingCard(cm.sparkfilter,e:GetHandlerPlayer(),LOCATION_GRAVE,0,1,nil)
 end
 function cm.addcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetAttacker()==e:GetHandler() and aux.bdcon(e,tp,eg,ep,ev,re,r,rp)
