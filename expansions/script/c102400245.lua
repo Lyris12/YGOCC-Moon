@@ -28,7 +28,7 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function cid.lcheck(g)
-	return (g:GetClassCount(Card.GetLinkAttribute)==1 or g:GetClassCount(Card.GetLinkRace)==1) and g:GetClassCount(Card.GetLinkCode)==g:GetCount()
+	return (g:GetClassCount(Card.GetLinkAttribute)==1 or g:GetClassCount(Card.GetLinkRace)==1) and g:GetClassCount(Card.GetLinkCode)==#g
 end
 function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -60,7 +60,8 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.BreakEffect()
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CLIENT_HINT)
+	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCode(EFFECT_CHANGE_LINK_MARKER_KOISHI)
 	e1:SetValue(nlpt)
 	e1:SetReset(RESET_EVENT+RESETS_STANDARD)

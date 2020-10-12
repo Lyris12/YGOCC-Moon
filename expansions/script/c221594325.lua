@@ -151,7 +151,7 @@ function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,e:GetHandler(),1,0,0)
 end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Damage(tp,1000,REASON_COST)
+	Duel.Damage(tp,1000,REASON_EFFECT)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) then
 		Duel.BreakEffect()

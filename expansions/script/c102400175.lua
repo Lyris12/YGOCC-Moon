@@ -1,4 +1,4 @@
---created by Nadège, coded by Lyris, art from Angel O7
+--created by Nadège, coded by Lyris, art from "Angel O7"
 --エンジェルO8
 local cid,id=GetID()
 function cid.initial_effect(c)

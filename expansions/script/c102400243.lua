@@ -3,7 +3,7 @@
 local cid,id=GetID()
 function cid.initial_effect(c)
 	c:EnableReviveLimit()
-	aux.AddLinkProcedure(c,nil,2,99,cid.lcheck)
+	aux.AddLinkProcedure(c,nil,3,99,cid.lcheck)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e2:SetCode(EVENT_CHAIN_SOLVING)
@@ -23,12 +23,13 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function cid.lcheck(g)
-	return (g:GetClassCount(Card.GetLinkAttribute)==1 or g:GetClassCount(Card.GetLinkRace)==1) and g:GetClassCount(Card.GetLinkCode)==g:GetCount()
+	return (g:GetClassCount(Card.GetLinkAttribute)==1 or g:GetClassCount(Card.GetLinkRace)==1) and g:GetClassCount(Card.GetLinkCode)==#g
 end
 function cid.discon(e,tp,eg,ep,ev,re,r,rp)
-	local c=re:GetHandler()
 	local p=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_CONTROLER)
-	return re:IsActiveType(TYPE_LINK) and p~=tp and Duel.IsExistingMatchingCard(Card.IsLinkMarker,tp,LOCATION_MZONE,LOCATION_MZONE,1,c,c:GetLinkMarker())
+	local ct=0
+	for i=0,8 do ct=math.max(ct,Duel.GetMatchingGroupCount(Card.IsLinkMarker,e:GetHandlerPlayer(),LOCATION_MZONE,LOCATION_MZONE,nil,0x1<<i)) end
+	return ct>1 and p~=tp
 end
 function cid.disop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.NegateEffect(ev)
@@ -65,7 +66,8 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.BreakEffect()
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CLIENT_HINT)
+	e1:SetDescription(aux.Stringid(id,op))
 	e1:SetCode(EFFECT_CHANGE_LINK_MARKER_KOISHI)
 	e1:SetValue(nlpt)
 	e1:SetReset(RESET_EVENT+RESETS_STANDARD)

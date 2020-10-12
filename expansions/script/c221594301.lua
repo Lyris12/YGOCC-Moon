@@ -33,7 +33,8 @@ function cid.spfilter(c,e,tp,t)
 		[TYPE_XYZ]=SUMMON_TYPE_XYZ,
 		[TYPE_LINK]=SUMMON_TYPE_LINK,
 		[TYPE_TIMELEAP]=SUMMON_TYPE_BIGBANG,
-		[TYPE_SPATIAL]=SUMMON_TYPE_EVOLUTE,
+		[TYPE_EVOLUTE]=SUMMON_TYPE_EVOLUTE,
+		[TYPE_SPATIAL]=SUMMON_TYPE_SPATIAL,
 	} end
 	local st=t[c:GetType()&TYPE_EXTRA]
 	return st~=nil and c:IsCanBeSpecialSummoned(e,st,tp,false,false)
@@ -56,7 +57,8 @@ function cid.xop(e,tp,eg,ep,ev,re,r,rp)
 		[TYPE_XYZ]=SUMMON_TYPE_XYZ,
 		[TYPE_LINK]=SUMMON_TYPE_LINK,
 		[TYPE_TIMELEAP]=SUMMON_TYPE_BIGBANG,
-		[TYPE_SPATIAL]=SUMMON_TYPE_EVOLUTE,
+		[TYPE_EVOLUTE]=SUMMON_TYPE_EVOLUTE,
+		[TYPE_SPATIAL]=SUMMON_TYPE_SPATIAL,
 	}
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local sc=Duel.SelectMatchingCard(tp,cid.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,t):GetFirst()
