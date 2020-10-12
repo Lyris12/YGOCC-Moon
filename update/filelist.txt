@@ -9814,7 +9814,7 @@ sound/custom/suzaku_summon.wav	047cba54e35639aef7cdf66ec0121e37
 sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
-update/delete.txt	7409e1c868c03173aeff27a35b5ea72f
-update/filelist.txt	d0f03e4b4260daa9a4c30fb3fa172027
+update/delete.txt	b3eebe3a136d8a29ad3e38af3deb24b0
+update/filelist.txt	69f1ae9a980454e777bdc3ab4fc02fb4
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	7f56e6e8ef5f508d1ec95a06eca091d8
+update/version.txt	e12c988d9363ce3bd20099e71637645e
