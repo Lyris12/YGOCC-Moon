@@ -1,1 +1,11 @@
 ﻿# Delete List (Codepage is UTF-8, please use TAB to seperate entries, Use Relative Address.)
+expansions\pics\102400165.png
+expansions\pics\102400166.png
+expansions\pics\102400167.png
+expansions\pics\102400168.png
+expansions\pics\102400169.png
+expansions\pics\102400170.png
+expansions\pics\102400171.png
+expansions\pics\102400172.png
+expansions\pics\102400173.png
+expansions\pics\102400174.png
