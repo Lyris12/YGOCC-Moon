@@ -24,8 +24,7 @@ function c400015.initial_effect(c)
 		local re0=Effect.CreateEffect(c)
 		re0:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		re0:SetCode(EVENT_PHASE_START+PHASE_DRAW)
-		re0:SetLabelObject(e1)
-		re0:SetOperation(function (e,tp,eg,ep,ev,re,r,rp) return e:GetLabelObject():SetLabel(0) end)
+		re0:SetOperation(function() e1:SetLabel(0) end)
 		Duel.RegisterEffect(re0,0)
 	end
 end
@@ -34,14 +33,13 @@ end
 function c400015.prop(e,tp,eg,ep,ev,re,r,rp)
 	local rc=re:GetHandler()
 	local ct=e:GetLabelObject():GetLabel()
-	if Duel.GetTurnPlayer()==1-tp and re:IsHasType(EFFECT_TYPE_ACTIVATE) and rc:IsType(TYPE_QUICKPLAY) and rc:IsSetCard(0x246) then
-		ct=ct+1
-		e:GetLabelObject():SetLabel(ct)
+	if re:IsHasType(EFFECT_TYPE_ACTIVATE) and rc:IsType(TYPE_QUICKPLAY) and rc:IsSetCard(0x246) then
+		e:GetLabelObject():SetLabel(ct+1)
 	end
 end
 
 function c400015.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()~=tp
+	return Duel.GetTurnPlayer()~=tp and Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsSetCard),tp,LOCATION_MZONE,0,1,nil,0x246)
 end
 function c400015.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ct=e:GetLabel()
