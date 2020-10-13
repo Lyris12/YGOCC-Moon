@@ -262,7 +262,7 @@ Duel.Remove=function(cc,pos,r)
 	local cc=Group.CreateGroup()+cc
 	local tg=cc:Clone()
 	for c in aux.Next(tg) do
-		if pos&POS_FACEDOWN~=0 and r&REASON_EFFECT~=0 then
+		if (not pos or pos&POS_FACEDOWN~=0) and r&REASON_EFFECT~=0 then
 			local ef={c:IsHasEffect(EFFECT_CANNOT_BANISH_FD_EFFECT)}
 			for _,te1 in ipairs(ef) do
 				local cf=te1:GetValue()
