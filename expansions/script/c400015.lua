@@ -76,4 +76,5 @@ function c400015.desop(e,tp,eg,ep,ev,re,r,rp)
 	if g:FilterCount(Card.IsLocation,nil,LOCATION_HAND)==0 then return end
 	g:Remove(Card.IsType,nil,TYPE_SPELL)
 	Duel.SendtoGrave(g,REASON_EFFECT+REASON_DISCARD)
+	g:DeleteGroup()
 end
