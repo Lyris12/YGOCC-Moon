@@ -45,6 +45,7 @@ function cid.mfilter(c)
 	return c:IsLevelAbove(5) and c:IsRace(RACE_ZOMBIE) and c:IsType(TYPE_MONSTER)
 end
 function cid.sumcon(e,c)
+	if c==nil then return true end
 	return Duel.IsExistingMatchingCard(cid.mfilter,c:GetControler(),LOCATION_GRAVE,0,3,nil)
 end
 function cid.sumop(e,tp,eg,ep,ev,re,r,rp,c,g)
