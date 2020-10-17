@@ -1,6 +1,6 @@
 --Shrine of the Lotus Blade
 --Commissioned by: Leon Duvall
---Scripted by: Remnance
+--Scripted by: Remnancee & Lyris
 local function getID()
 	local str=string.match(debug.getinfo(2,'S')['source'],"c%d+%.lua")
 	str=string.sub(str,1,string.len(str)-4)
@@ -71,7 +71,7 @@ function cid.initial_effect(c)
 	--double attack
 	local e7=Effect.CreateEffect(c)
 	e7:SetType(EFFECT_TYPE_FIELD)
-	e7:SetCode(EFFECT_EXTRA_ATTACK)
+	e7:SetCode(EFFECT_EXTRA_ATTACK_MONSTER)
 	e7:SetRange(LOCATION_FZONE)
 	e7:SetTargetRange(LOCATION_MZONE,0)
 	e7:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x3ff))

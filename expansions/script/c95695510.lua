@@ -1,6 +1,6 @@
 --Lotus Blade Arte - Jigen
 --Commissioned by: Leon Duvall
---Scripted by: Remnance
+--Scripted by: Remnance & Lyris
 local function getID()
 	local str=string.match(debug.getinfo(2,'S')['source'],"c%d+%.lua")
 	str=string.sub(str,1,string.len(str)-4)
@@ -62,13 +62,13 @@ function cid.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingTarget(cid.costfilter,tp,LOCATION_ONFIELD,0,1,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	local g=Duel.SelectTarget(tp,cid.costfilter,tp,LOCATION_ONFIELD,0,1,1,e:GetHandler())
-	local cl=g:GetFirst():GetColumnGroup():Filter(Card.IsControler,nil,1-tp)
+	local cl=g:GetFirst():GetColumnGroup():Filter(aux.AND(Card.IsFaceup,Card.IsControler),nil,1-tp)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,cl,#cl,0,0)
 end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToEffect(e) then
-		local cl=tc:GetColumnGroup():Filter(Card.IsControler,nil,1-tp)
+		local cl=tc:GetColumnGroup():Filter(aux.AND(Card.IsFaceup,Card.IsControler),nil,1-tp)
 		if #cl>0 then
 			Duel.Destroy(cl,REASON_EFFECT)
 		end
