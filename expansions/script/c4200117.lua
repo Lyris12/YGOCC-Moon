@@ -41,11 +41,11 @@ function cm.cfilter(c)
 end
 function cm.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	if Duel.IsPlayerCanDraw(tp,2) and Duel.IsExistingMatchingCard(cid.cfilter,tp,LOCATION_HAND,0,1,nil) and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
+	if Duel.IsPlayerCanDraw(tp,2) and Duel.IsExistingMatchingCard(cm.cfilter,tp,LOCATION_HAND,0,1,nil) and Duel.SelectYesNo(tp,aux.Stringid(m,0)) then
 		e:SetCategory(CATEGORY_DRAW)
 		e:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-		e:SetOperation(cid.activate)
-		if Duel.DiscardHand(tp,cid.cfilter,1,1,REASON_COST+REASON_DISCARD)>0 then
+		e:SetOperation(cm.activate)
+		if Duel.DiscardHand(tp,cm.cfilter,1,1,REASON_COST+REASON_DISCARD)>0 then
 			Duel.SetTargetPlayer(tp)
 			Duel.SetTargetParam(2)
 			Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,2)
@@ -94,7 +94,7 @@ function cm.thfilter(c,tp)
 		and c:IsPreviousLocation(LOCATION_ONFIELD)
 end
 function cm.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c77116346.thfilter,1,nil,tp)
+	return eg:IsExists(cm.thfilter,1,nil,tp)
 end
 function cm.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

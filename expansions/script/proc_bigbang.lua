@@ -244,18 +244,19 @@ end
 function Auxiliary.BigbangOperation(e,tp,eg,ep,ev,re,r,rp,c,smat,mg)
 	local g=e:GetLabelObject()
 	c:SetMaterial(g)
+	local dg=Group.CreateGroup()
 	for tc in aux.Next(g) do
 		local tef={tc:IsHasEffect(EFFECT_EXTRA_BIGBANG_MATERIAL)}
-		if #tef==0 then
-			Duel.SendtoGrave(tc,REASON_DESTROY+REASON_MATERIAL+REASON_BIGBANG)
+		if #tef==0 then dg:AddCard(tc)
 		else for i=1,#tef do
 			local op=tef[i]:GetOperation()
 			if op then
 				op(tc,tp)
 			else
-				Duel.SendtoGrave(tc,REASON_DESTROY+REASON_MATERIAL+REASON_BIGBANG)
-			end end
-		end
+				dg:AddCard(tc)
+			end
+		end end
 	end
+	Duel.SendtoGrave(dg,REASON_DESTROY+REASON_MATERIAL+REASON_BIGBANG)
 	g:DeleteGroup()
 end

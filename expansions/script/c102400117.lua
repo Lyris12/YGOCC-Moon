@@ -6,68 +6,66 @@ function cid.initial_effect(c)
 	local og=Group.CreateGroup()
 	og:KeepAlive()
 	Duel.SendtoGrave=function(tg,r)
-		local ct=0
 		local g=Group.CreateGroup()+tg
+		local dg,fg=Group.CreateGroup(),Group.CreateGroup()
 		for tc in aux.Next(g) do
-			local ot=0
-			if tc:IsHasEffect(id) then
-				ot=Duel.Destroy(tc,r)
-			else ot=f1(tc,r) end
-			if ot>0 then ct=ct+ot og:AddCard(tc) end
+			if tc:IsHasEffect(id) then dg:AddCard(tc)
+			else fg:AddCard(tc) end
 		end
+		local ct=Duel.Destroy(dg,r)+f1(fg,r)
+		og:Merge((dg+fg):Filter(Card.IsLocation,nil,LOCATION_GRAVE+LOCATION_EXTRA))
 		return ct
 	end
 	Duel.SendtoHand=function(tg,tp,r)
-		local ct=0
 		local g=Group.CreateGroup()+tg
+		local dg,fdg,fg=Group.CreateGroup(),Group.CreateGroup(),Group.CreateGroup()
 		for tc in aux.Next(g) do
-			local ot=0
 			if tc:IsHasEffect(id) then
-				if tp==tc:GetControler() then ot=Duel.Destroy(tc,r,LOCATION_HAND)
-				else ot=f2(tc,tp,r|REASON_DESTROY) end
-			else ot=f2(tc,tp,r) end
-			if ot>0 then ct=ct+ot og:AddCard(tc) end
+				if tp~=1-tc:GetControler() then dg:AddCard(tc)
+				else fdg:AddCard(tc) end
+			else fg:AddCard(tc) end
 		end
+		local ct=Duel.Destroy(dg,r,LOCATION_HAND)+f2(fdg,tp,r|REASON_DESTROY)+f2(fg,tp,r)
+		og:Merge((dg+fdg+fg):Filter(Card.IsLocation,nil,LOCATION_HAND))
 		return ct
 	end
 	Duel.SendtoDeck=function(tg,tp,seq,r)
-		local ct=0
 		local g=Group.CreateGroup()+tg
+		local dg,fdg,fg=Group.CreateGroup(),Group.CreateGroup(),Group.CreateGroup()
 		for tc in aux.Next(g) do
-			local ot=0
 			if tc:IsHasEffect(id) then
-				if tp~=1-tc:GetControler() then ot=Duel.Destroy(tc,r,LOCATION_DECK+seq<<16)
-				else ot=f3(tc,tp,seq,r|REASON_DESTROY) end
-			else ot=f3(tc,tp,seq,r) end
-			if ot>0 then ct=ct+ot og:AddCard(tc) end
+				if tp~=1-tc:GetControler() then dg:AddCard(tc)
+				else fdg:AddCard(tc) end
+			else fg:AddCard(tc) end
 		end
+		local ct=Duel.Destroy(dg,r,LOCATION_DECK+seq<<16)+f3(fdg,tp,seq,r|REASON_DESTROY)+f3(fg,tp,seq,r)
+		og:Merge((dg+fdg+fg):Filter(Card.IsLocation,nil,LOCATION_DECK))
 		return ct
 	end
 	Duel.Remove=function(tg,pos,r)
-		local ct=0
 		local g=Group.CreateGroup()+tg
+		local dg,fdg,fg=Group.CreateGroup(),Group.CreateGroup(),Group.CreateGroup()
 		for tc in aux.Next(g) do
-			local ot=0
 			if tc:IsHasEffect(id) then
-				if pos&POS_FACEUP>0 then ot=Duel.Destroy(tc,r,LOCATION_REMOVED)
-				else ot=f5(tc,pos,r|REASON_DESTROY)
-			end
-			else ot=f5(tc,pos,r) end
-			if ot>0 then ct=ct+ot og:AddCard(tc) end
+				if pos&POS_FACEUP>0 then dg:AddCard(tc)
+				else fdg:AddCard(tc) end
+			else fg:AddCard(tc) end
 		end
+		local ct=Duel.Destroy(dg,r,LOCATION_REMOVED)+dg(fdg,pos,r|REASON_DESTROY)+f5(fg,pos,r)
+		og:Merge((dg+fdg+fg):Filter(Card.IsLocation,nil,LOCATION_REMOVED))
 		return ct
 	end
 	Duel.SendtoExtraP=function(tg,tp,r)
-		local ct=0
 		local g=Group.CreateGroup()+tg
+		local dg,fdg,fg=Group.CreateGroup(),Group.CreateGroup(),Group.CreateGroup()
 		for tc in aux.Next(g) do
-			local ot=0
 			if tc:IsHasEffect(id) then
-				if tp~=1-tc:GetControler() then ot=Duel.Destroy(tc,r,LOCATION_EXTRA)
-				else ot=f4(tc,tp,r|REASON_DESTROY) end
-			else ot=f4(tc,tp,r) end
-			if ot>0 then ct=ct+ot og:AddCard(tc) end
+				if tp~=1-tc:GetControler() then dg:AddCard(tc)
+				else fdg:AddCard(tc) end
+			else fg:AddCard(tc) end
 		end
+		local ct=Duel.Destroy(dg,r,LOCATION_EXTRA)+f4(fdg,tp,r|REASON_DESTROY)+f4(fg,tp,r)
+		og:Merge((dg+fdg+fg):Filter(Card.IsLocation,nil,LOCATION_EXTRA))
 		return ct
 	end
 	Duel.GetOperatedGroup=function()

@@ -67,7 +67,7 @@ Card.GetRitualLevel=function(c,rc)
 	if Auxiliary.Timeleaps[c] and not Auxiliary.Timeleaps[c]() then return 0 end
 	return get_rit_level(c,rc)
 end
-GetSynchroLevel=function(c,sc)
+Card.GetSynchroLevel=function(c,sc)
 	if Auxiliary.Timeleaps[c] and not Auxiliary.Timeleaps[c]() then return 0 end
 	return get_syn_level(c,sc)
 end
