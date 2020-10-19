@@ -76,10 +76,8 @@ function cid.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,0,0)
 	end
 function cid.desop(e,tp,eg,ep,ev,re,r,rp)
-local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) or c:IsFacedown() then return end
-local g=Duel.GetMatchingGroup(cid.filter,tp,0,LOCATION_MZONE,nil,c:GetAttack())
-local ct=Duel.Destroy(g,REASON_EFFECT)
+	local g=Duel.GetMatchingGroup(cid.desfilter,tp,0,LOCATION_MZONE,nil,c:GetAttack())
+	Duel.Destroy(g,REASON_EFFECT)
 end
 function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

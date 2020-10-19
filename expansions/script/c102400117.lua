@@ -51,7 +51,7 @@ function cid.initial_effect(c)
 				else fdg:AddCard(tc) end
 			else fg:AddCard(tc) end
 		end
-		local ct=Duel.Destroy(dg,r,LOCATION_REMOVED)+dg(fdg,pos,r|REASON_DESTROY)+f5(fg,pos,r)
+		local ct=Duel.Destroy(dg,r,LOCATION_REMOVED)+f5(fdg,pos,r|REASON_DESTROY)+f5(fg,pos,r)
 		og:Merge((dg+fdg+fg):Filter(Card.IsLocation,nil,LOCATION_REMOVED))
 		return ct
 	end

@@ -25,10 +25,9 @@ function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(Card.IsSetCard,tp,LOCATION_PZONE,0,nil,0x7c4)
-	for tc in aux.Next(g) do g:Remove(Card.IsCode,nil,tc:GetCode()) end
 	local ct=3-g:GetClassCount(Card.GetCode)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local tg=Duel.GetMatchingGroup(aux.AND(cid.filter,Card.IsDestructable),tp,LOCATION_EXTRA,0,nil):SelectSubGroup(tp,aux.dncheck,false,ct,ct)
+	local tg=Duel.GetMatchingGroup(cid.filter,tp,LOCATION_EXTRA,0,nil):SelectSubGroup(tp,aux.dncheck,false,ct,ct)
 	Duel.Destroy(tg+Duel.GetFieldGroup(tp,LOCATION_PZONE,0),REASON_EFFECT)
 	local dt=Duel.GetOperatedGroup():FilterCount(function(c,dg) return dg:IsContains(c) end,nil,g+tg)
 	if dt>=3 then
