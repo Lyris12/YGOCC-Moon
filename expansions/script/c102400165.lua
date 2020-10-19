@@ -34,17 +34,17 @@ function cid.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 		and Duel.IsExistingTarget(cid.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c+Duel.SelectTarget,2,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,Duel.SelectTarget(tp,cid.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)+c,2,0,0)
 end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) or not c:IsRelateToEffect(e)
-		or not tc or not tc:IsRelateToEffect(e) or Duel.SpecialSummon(c+tc,0,tp,tp,false,false,POS_FACEUP)<2 then return end
+		or not tc or not tc:IsRelateToEffect(e) or Duel.SpecialSummon(Group.FromCards(c,tc),0,tp,tp,false,false,POS_FACEUP)<2 then return end
 	local sg=Duel.GetMatchingGroup(Card.IsSynchroSummonable,tp,LOCATION_EXTRA,0,1,nil,nil)
 	if #sg>0 and Duel.SelectYesNo(tp,1164) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		Duel.SynchroSummon(tp,sg:Select(tp,1,1,nil):GetFirst())
+		Duel.SynchroSummon(tp,sg:Select(tp,1,1,nil):GetFirst(),nil)
 	end
 end
 function cid.filter(c)
