@@ -1,5 +1,6 @@
+--created & coded by Lyris, art by Silverdart99 of DeviantArt
+--TGサイズ・スネーク
 local cid,id=GetID()
---T.G. Scythe Snake
 function cid.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
@@ -34,7 +35,7 @@ function cid.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 		and Duel.IsExistingTarget(cid.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,Duel.SelectTarget(tp,cid.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)+c,2,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c+Duel.SelectTarget(tp,cid.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp),2,0,0)
 end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

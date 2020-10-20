@@ -1,4 +1,4 @@
---created by LionHeartKIng, coded by Lyris, art at http://nicolelbates.com/wp-content/uploads///Lightning-Bolt-by-Todd-Secki.jpg
+--created by LionHeartKIng, coded by Lyris, art at http://nicolelbates.com/wp-content/uploads/2012/07/Lightning-Bolt-by-Todd-Secki.jpg
 --襲雷ラッシュ
 local cid,id=GetID()
 function cid.initial_effect(c)
@@ -25,9 +25,11 @@ function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(Card.IsSetCard,tp,LOCATION_PZONE,0,nil,0x7c4)
+	local mg=Duel.GetMatchingGroup(cid.filter,tp,LOCATION_EXTRA,0,nil)
+	for tc in aux.Next(g) do mg:Remove(Card.IsCode,nil,tc:GetCode()) end
 	local ct=3-g:GetClassCount(Card.GetCode)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local tg=Duel.GetMatchingGroup(cid.filter,tp,LOCATION_EXTRA,0,nil):SelectSubGroup(tp,aux.dncheck,false,ct,ct)
+	local tg=mg:SelectSubGroup(tp,aux.dncheck,false,ct,ct)
 	Duel.Destroy(tg+Duel.GetFieldGroup(tp,LOCATION_PZONE,0),REASON_EFFECT)
 	local dt=Duel.GetOperatedGroup():FilterCount(function(c,dg) return dg:IsContains(c) end,nil,g+tg)
 	if dt>=3 then
