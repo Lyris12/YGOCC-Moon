@@ -14,6 +14,7 @@ function cid.initial_effect(c)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e2:SetRange(LOCATION_GRAVE)
 	e2:SetCountLimit(1,id+100)
+	e2:SetProperty(EFFECT_FLAG_DELAY)
 	e2:SetCategory(CATEGORY_TODECK+CATEGORY_DRAW)
 	e2:SetCondition(function(e,tp,eg) return eg:IsExists(cid.cfilter,1,nil,tp) end)
 	e2:SetTarget(cid.tdtg)
@@ -46,6 +47,5 @@ end
 function cid.tdop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) or Duel.Remove(c,POS_FACEUP,REASON_EFFECT)==0 or not c:IsLocation(LOCATION_REMOVED) then return end
-	Duel.ShuffleDeck(tp)
 	Duel.Draw(tp,1,REASON_EFFECT)
 end

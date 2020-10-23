@@ -97,8 +97,18 @@ function Card.GetStage(c)
 		return te:GetValue()
 	end
 end
-function Card.IsStage(c,stage)
-	return c:GetStage()==stage
+function Card.IsStage(c,...)
+	for stage in pairs({...}) do
+		if c:GetStage()==stage then return true end
+	end
+	return false
+end
+function Card.IsStageAbove(c,stage)
+	return c:GetStage()>=stage
+end
+function Card.IsStageBelow(c,stage)
+	local stg=c:GetStage()
+	return stg>0 and stg<=stage
 end
 GLOBAL_E_COUNTER={0,0}
 GLOBAL_E_COUNTER[0]=0

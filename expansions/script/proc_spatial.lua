@@ -120,14 +120,24 @@ function Card.GetDimensionNo(c)
 		return te:GetValue()
 	end
 end
-function Card.IsDimensionNo(c,djn)
-	return c:GetDimensionNo()==djn
+function Card.IsDimensionNo(c,...)
+	for djn in pairs({...}) do
+		if c:GetDimensionNo()==djn then return true end
+	end
+	return false
+end
+function Card.IsDimensionNoAbove(c,djn)
+	return c:GetDimensionNo()>=djn
+end
+function Card.IsDimensionNoBelow(c,djn)
+	local dim=c:GetDimensionNo()
+	return dim>0 and dim<=djn
 end
 function Card.IsCanBeSpaceMaterial(c,sptc)
 	if c:IsOnField() and c:IsFacedown() then return false end
 	local tef={c:IsHasEffect(EFFECT_CANNOT_BE_SPACE_MATERIAL)}
 	for _,te in ipairs(tef) do
-		if (type(te:GetValue())=="function" and te:GetValue()(te,spct)) or te:GetValue()==1 then return false end
+		if (type(te:GetValue())=="function" and te:GetValue()(te,sptc)) or te:GetValue()==1 then return false end
 	end
 	return true
 end
@@ -162,24 +172,10 @@ function Auxiliary.AddSpatialProc(c,sptcheck,djn,...)
 	end
 	local ge1=Effect.CreateEffect(c)
 	ge1:SetType(EFFECT_TYPE_SINGLE)
-	ge1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	ge1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	ge1:SetCode(EFFECT_DIMENSION_NUMBER)
 	ge1:SetValue(Auxiliary.DimensionNoVal(djn))
 	c:RegisterEffect(ge1)
-	local ge4=Effect.CreateEffect(c)
-	ge4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	ge4:SetCode(EVENT_PHASE_START+PHASE_DRAW)
-	ge4:SetRange(LOCATION_EXTRA)
-	ge4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	ge4:SetOperation(function()
-		if c:IsLocation(LOCATION_EXTRA) and c:IsPosition(POS_FACEDOWN) then
-			if not Duel.Exile or Duel.Exile(c,REASON_RULE)==0 then
-				Duel.SendtoDeck(c,nil,-2,REASON_RULE)
-			end
-			Duel.SendtoExtraP(c,nil,REASON_RULE)
-		end
-	end)
-	c:RegisterEffect(ge4)
 	local ge2=Effect.CreateEffect(c)
 	ge2:SetType(EFFECT_TYPE_FIELD)
 	ge2:SetCode(EFFECT_SPSUMMON_PROC)
@@ -355,22 +351,18 @@ end
 function Auxiliary.SpatialOperation(e,tp,eg,ep,ev,re,r,rp,c,smat,mg)
 	local g=e:GetLabelObject()
 	c:SetMaterial(g)
-	local tc=g:GetFirst()
-	while tc do
+	local rg=Group.CreateGroup()
+	for tc in aux.Next(g) do
 		if c:IsHasEffect(EFFECT_EXTRA_SPACE_MATERIAL) then
 			local tef={tc:IsHasEffect(EFFECT_EXTRA_SPACE_MATERIAL)}
 			for _,te in ipairs(tef) do
 				local op=te:GetOperation()
-				if op then
-					op(tc,tp)
-				else
-					Duel.Remove(tc,POS_FACEUP,REASON_MATERIAL+REASON_SPATIAL)
-				end
+				if op then op(tc,tp)
+				else rg:AddCard(tc) end
 			end
-		else
-			Duel.Remove(tc,POS_FACEUP,REASON_MATERIAL+REASON_SPATIAL)
-		end
+		else rg:AddCard(tc) end
 		tc=g:GetNext()
 	end
+	Duel.Remove(rg,POS_FACEUP,REASON_MATERIAL+REASON_SPATIAL)
 	g:DeleteGroup()
 end

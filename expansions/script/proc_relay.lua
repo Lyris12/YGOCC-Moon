@@ -64,7 +64,7 @@ function Auxiliary.AddRelayProc(c)
 	if c:IsStatus(STATUS_COPYING_EFFECT) then return end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetCode(EVENT_BE_PRE_MATERIAL)
 	e1:SetOperation(function(e) Auxiliary.RelayPass(c,e:GetHandler():GetReasonCard()) end)
 	c:RegisterEffect(e1)

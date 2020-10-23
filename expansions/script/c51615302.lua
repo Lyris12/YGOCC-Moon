@@ -38,7 +38,8 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SendtoGrave(Duel.SelectMatchingCard(tp,aux.AND(Card.IsSetCard,Card.IsAbleToGrave),tp,LOCATION_DECK,0,1,1,nil,0xcfd),REASON_EFFECT)
 end
 function cid.condition(e,tp,eg,ep,ev,re,r,rp)
-	return r==REASON_TIMELEAP and e:GetHandler():GetReasonCard():IsSetCard(0xcfd)
+	local c=e:GetHandler()
+	return c:IsReason(REASON_TIMELEAP) and c:GetReasonCard():IsSetCard(0xcfd)
 end
 function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetCustomActivityCount(id,tp,ACTIVITY_SPSUMMON)==0 end

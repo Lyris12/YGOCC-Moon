@@ -93,6 +93,19 @@ function Card.GetCell(c)
 		return te:GetValue()
 	end
 end
+function Card.IsCell(c,...)
+	for cell in pairs({...}) do
+		if c:GetCell()==cell then return true end
+	end
+	return false
+end
+function Card.IsCellAbove(c,cell)
+	return c:GetCell()>=cell
+end
+function Card.IsCellBelow(c,cell)
+	local cl=c:GetCell()
+	return cl>0 and cl<=cell
+end
 function Card.IsCanBeBypathMaterial(c,bc)
 	if c:IsFacedown() then return false end
 	local tef2={bc:IsHasEffect(EFFECT_CANNOT_BE_BYPATH_MATERIAL)}
