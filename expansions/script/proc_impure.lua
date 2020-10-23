@@ -91,7 +91,7 @@ Card.GetLevel=function(c)
 	end
 	return lv
 end
-GetSynchroLevel=function(c,sc)
+Card.GetSynchroLevel=function(c,sc)
 	local lv=get_syn_level(c,sc)
 	if Auxiliary.Impures[c] and not Auxiliary.Impures[c]() then
 		local te=c:IsHasEffect(EFFECT_NEGATIVE_LEVEL)

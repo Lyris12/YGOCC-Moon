@@ -1,4 +1,4 @@
-﻿expansions/cards-new.cdb	adc1e952fd317d2e384121bb528ff47b
+﻿expansions/cards-new.cdb	a62974b3c4df0fead2c4da45ed5cfcb3
 expansions/lflist.conf	bc119f956e3ff11e4d79c49f7f46dd83
 expansions/strings.conf	8e779b250f863c0e317514bf5139816f
 expansions/pics/100000710.jpg	5f925a97b1c60d7d69acb8f229938263
@@ -5990,7 +5990,7 @@ expansions/script/c111765900.lua	1a0f87ca8a2caab494ff7fa463b5d864
 expansions/script/c111765901.lua	2636ddd199a8777e6d3e760d125c2d85
 expansions/script/c112221900.lua	c5e1aff4ec375c8ec08dd82d3ee565c6
 expansions/script/c112221901.lua	21fed0d33c82a62cd2c23fb801aa00fd
-expansions/script/c112221902.lua	258ae7d7ed5eccda79cbfe8d8f28a716
+expansions/script/c112221902.lua	15b9d0e7860bdfb61678d0388e377f07
 expansions/script/c112221903.lua	b7d7b7648b27ec7e91a9247009dfc0ec
 expansions/script/c112221904.lua	fcc247de29c9f667b88c3a7442c0cfaf
 expansions/script/c112221905.lua	d8f752a2d4f62263cbb61a8b9c280898
@@ -9735,16 +9735,16 @@ expansions/script/proc_corona.lua	447ba131b9de38718dc740bccedaf965
 expansions/script/proc_deckmaster.lua	b0cd59261bcd72b81e00df8e18958ace
 expansions/script/proc_evolute.lua	e7f359cca69366137545926684ae300a
 expansions/script/proc_harmony.lua	cbefc28d5c16b26a11bad99a8f34c7d0
-expansions/script/proc_impure.lua	80b1b067cf7568036310f0ed2ff77b60
+expansions/script/proc_impure.lua	056c6d8fc43c61715f720215d8f09a5f
 expansions/script/proc_magick.lua	55427221fcbf4aebefa397a9fc05cde4
 expansions/script/proc_pandemonium.lua	700bbaab36d030be7ca8215bbbc48676
 expansions/script/proc_perdition.lua	c6418313b7040b2094968d29a6065803
-expansions/script/proc_polarity.lua	a98cde1edf9e7dce3255db00d5d8a801
+expansions/script/proc_polarity.lua	e4adf63d8caf628f4362852467e3561a
 expansions/script/proc_relay.lua	3c7693eb5f8220d4f8341a62ea650e13
 expansions/script/proc_runic.lua	70e1dd87f37d5597f199c01d24e9fe24
 expansions/script/proc_skill.lua	cbaa68f0971f731a81abf7bd080276b2
 expansions/script/proc_spatial.lua	b52107965b0cd9d052796a4b1aea9cb8
-expansions/script/proc_timeleap.lua	c21fe9cf8508b8f93d76d983403dd359
+expansions/script/proc_timeleap.lua	5948740e1c28258c866a78aaf12fefb4
 expansions/script/proc_toxia.lua	a10d0095f34a3e87ae013bc2f973587c
 expansions/script/tables.lua	b7624ef6402bd0ccd6460918daf9bbc3
 sound/BGM/custom/akarihasarrived.mp3	3833294a82eeb5fb18a46893f95d1b4f
@@ -9817,6 +9817,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	8142ce8083665c9f94be6549834dfcad
+update/filelist.txt	b7dcfb050cad9e45c0413b1e37341ffb
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	118da067a9b5c7d81e042ac2e3d9fb9e
+update/version.txt	319bcdec18f8155b34de5f4b8a9af11d

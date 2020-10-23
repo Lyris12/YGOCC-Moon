@@ -54,7 +54,7 @@ Card.GetLevel=function(c)
 	if Auxiliary.Polarities[c] and not Auxiliary.Polarities[c]() then return 0 end
 	return get_level(c)
 end
-GetSynchroLevel=function(c,sc)
+Card.GetSynchroLevel=function(c,sc)
 	if Auxiliary.Polarities[c] and not Auxiliary.Polarities[c]() then return 0 end
 	return get_syn_level(c,sc)
 end

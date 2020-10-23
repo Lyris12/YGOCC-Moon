@@ -338,6 +338,7 @@ function Auxiliary.TimeleapTarget(filter,...)
 					if exsumcheck~=nil then
 						Duel.RegisterFlagEffect(tp,829,RESET_PHASE+PHASE_END,0,1)
 						Duel.Hint(HINT_CARD,0,exsumcheck:GetOwner():GetOriginalCode())
+						exsumcheck:Reset()
 					end
 					sg:KeepAlive()
 					e:SetLabelObject(sg)
