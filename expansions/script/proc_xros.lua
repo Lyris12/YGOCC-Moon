@@ -218,7 +218,7 @@ end
 function Auxiliary.LoadOperation(e,tp,eg,ep,ev,re,r,rp,c,sg)
 	local g=Duel.GetMatchingGroup(aux.AND(Card.IsFaceup,Card.IsType),tp,LOCATION_MZONE,0,c,TYPE_XROS)
 	if #g>0 and Duel.SelectOption(tp,1000,1007)~=0 then
-		Duel.Overlay(g:Select(tp,1,1,nil),c)
+		Duel.Overlay(g:Select(tp,1,1,nil):GetFirst(),c)
 	else Duel.SendtoDeck(c,nil,1,REASON_RULE) end
 	g_Reserve[tp]=g_Reserve[tp]+5
 	Duel.CheckReserve(tp)
