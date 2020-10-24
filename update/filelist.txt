@@ -8778,7 +8778,7 @@ expansions/script/c5555.lua	17cb30d6585de66e8e6841f6ccecebbd
 expansions/script/c56642461.lua	70c2236db8196f32517ba3be4b654c53
 expansions/script/c56642462.lua	636161abd9ce5045a01a1287716f4f07
 expansions/script/c56642465.lua	4b5cde403b2fd1daa7073c50f020d17b
-expansions/script/c56731815.lua	db5aeaf3549aa7938e260467d76064ee
+expansions/script/c56731815.lua	be2aed93a68191218f66ad462918f91b
 expansions/script/c57093524.lua	30d4400b890cc4f9ab68939d7d512ed9
 expansions/script/c57460650.lua	980488b8f1337ef4219ebc66cf9d6d33
 expansions/script/c57460651.lua	b2b10830f923219ce114811a65e513ce
@@ -9748,7 +9748,7 @@ expansions/script/proc_skill.lua	cbaa68f0971f731a81abf7bd080276b2
 expansions/script/proc_spatial.lua	450fd6cab067f036eb75eb77dc10c262
 expansions/script/proc_timeleap.lua	9e644eb3a9e352a55c5a28b1a83e6eac
 expansions/script/proc_toxia.lua	a10d0095f34a3e87ae013bc2f973587c
-expansions/script/proc_xros.lua	4748cd742eb9f9761926c202f4231f0a
+expansions/script/proc_xros.lua	590476b4fec949794a56b0dbf429481d
 expansions/script/tables.lua	b7624ef6402bd0ccd6460918daf9bbc3
 sound/BGM/custom/akarihasarrived.mp3	3833294a82eeb5fb18a46893f95d1b4f
 sound/BGM/custom/Bad Apple.mp3	d311848fb68c40452d5a19b65b35f47d
@@ -9820,6 +9820,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	93d71c1ecc6eaa15ab078121c1fc1468
+update/filelist.txt	fcbca10c54e50429a1b32f8552c4e019
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	f4625c5bc44d539061300c6dcb1c4113
+update/version.txt	a588494656a8f95ed73d367bfeba851e

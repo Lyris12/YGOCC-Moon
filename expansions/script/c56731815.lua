@@ -34,16 +34,20 @@ function cid.initial_effect(c)
 	e3:SetOperation(cid.grop)
 	c:RegisterEffect(e3)
 end
+function cid.filter(c,tc)
+	return c:IsFaceup() and c:GetAttack()~=tc:GetAttack()
+end
 function cid.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() end
-	if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
+	local c=e:GetHandler()
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and cid.filter(chkc,c) end
+	if chk==0 then return Duel.IsExistingTarget(cid.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,c) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil)
+	Duel.SelectTarget(tp,cid.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil,c)
 end
 function cid.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if not (c:IsRelateToEffect(e) and tc and tc:IsRelateToEffect(e)) then return end
+	if not (c:IsRelateToEffect(e) and tc and tc:IsRelateToEffect(e)) or c:GetAttack()==tc:GetAttack() then return end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_UPDATE_ATTACK)
