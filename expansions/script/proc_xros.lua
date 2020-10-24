@@ -26,8 +26,7 @@ g_Reserve={0}
 g_Reserve[0]=0
 
 --overwrite functions
-local get_rank, get_orig_rank, prev_rank_field, is_rank, is_rank_below, is_rank_above, get_type, get_orig_type, get_prev_type_field, get_level, is_level, is_level_above, is_level_below, get_stage, is_stage, is_stage_above, is_stage_below, get_stability, is_stability, is_stability_above, is_stability_below, get_dimension, is_dimension, is_dimension_above, is_dimension_below, get_future, is_future, is_future_above, is_future_below, get_cell, is_cell, is_cell_above, is_cell_below,
-	card_overlay_group, card_overlay_count, duel_overlay_group, duel_overlay_count = 
+local get_rank, get_orig_rank, prev_rank_field, is_rank, is_rank_below, is_rank_above, get_type, get_orig_type, get_prev_type_field, get_level, is_level, is_level_above, is_level_below, get_stage, is_stage, is_stage_above, is_stage_below, get_stability, is_stability, is_stability_above, is_stability_below, get_dimension, is_dimension, is_dimension_above, is_dimension_below, get_future, is_future, is_future_above, is_future_below, get_cell, is_cell, is_cell_above, is_cell_below, card_overlay_group, card_overlay_count, duel_overlay_group, duel_overlay_count = 
 	Card.GetRank, Card.GetOriginalRank, Card.GetPreviousRankOnField, Card.IsRank, Card.IsRankBelow, Card.IsRankAbove, Card.GetType, Card.GetOriginalType, Card.GetPreviousTypeOnField, Card.GetLevel, Card.IsLevel, Card.IsLevelAbove, Card.IsLevelBelow, Card.GetStage, Card.IsStage, Card.IsStageAbove, Card.IsStageBelow, Card.GetStability, Card.IsStability, Card.IsStabilityAbove, Card.IsStabilityBelow, Card.GetDimensionNo, Card.IsDimensionNo, Card.IsDimensionNoAbove, Card.IsDimensionNoBelow, Card.GetFuture, Card.IsFuture, Card.IsFutureAbove, Card.IsFutureBelow, Card.GetCell, Card.IsCell, Card.IsCellAbove, Card.IsCellBelow,
 		Card.GetOverlayGroup, Card.GetOverlayCount, Duel.GetOverlayGroup, Duel.GetOverlayCount
 
@@ -451,6 +450,23 @@ function Auxiliary.XrosCheckOtherMaterial(c,mg,xsc,tp)
 		if f and type(f)=="function" and not f(te,xsc,mg) then return false end
 	end
 	return true
+end
+function Auxiliary.XrosExtraFilter(c,xc,tp,...)
+	local flist={...}
+	local check=false
+	for i=1,#flist do
+		if flist[i][1](c) then
+			check=true
+		end
+	end
+	local tef1={c:IsHasEffect(EFFECT_EXTRA_XROS_MATERIAL,tp)}
+	local ValidSubstitute=false
+	for _,te1 in ipairs(tef1) do
+		local con=te1:GetCondition()
+		if (not con or con(c,xc,1)) then ValidSubstitute=true end
+	end
+	if not ValidSubstitute or c:IsLocation(LOCATION_ONFIELD) and not c:IsFaceup() then return false end
+	return c:IsCanBeXrosMaterial(xc) and (not flist or #flist<=0 or check)
 end
 function Auxiliary.XrosCondition(xscheck,...)
 	local funs={...}

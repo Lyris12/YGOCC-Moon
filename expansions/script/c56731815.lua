@@ -1,5 +1,6 @@
 --Mezodrives Huntress
-function c56731815.initial_effect(c)
+local cid,id=GetID()
+function cid.initial_effect(c)
 	aux.AddOrigXrosType(c)
 	aux.AddXrosProc(c,nil,4,aux.TRUE,1,3)
 	--Once per turn: You can target 1 face-up monster on the field; it lose ATK equal to the difference of ATK between this card and that target.
