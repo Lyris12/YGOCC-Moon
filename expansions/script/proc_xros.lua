@@ -67,7 +67,7 @@ Card.GetType=function(c,scard,sumtype,p)
 			tpe=tpe&~TYPE_XYZ
 		end
 		for tc in aux.Next(c:GetCoreGroup()) do
-			tpe=tpe|c:GetType()&0x401e30
+			tpe=tpe|get_type(c)&0x401e30
 		end
 	end
 	return tpe

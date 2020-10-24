@@ -68,7 +68,7 @@ function cid.grcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return aux.XrosEffectCon(aux.TRUE)(e) and c:IsRelateToBattle() and c:GetBattleTarget():IsType(TYPE_MONSTER)
 end
-function cid.cost(e,tp,eg,ep,ev,re,r,rp)
+function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return c:IsReleasable() end
 	Duel.Release(c,REASON_COST)
