@@ -26,8 +26,10 @@ g_Reserve={0}
 g_Reserve[0]=0
 
 --overwrite functions
-local get_rank, get_orig_rank, prev_rank_field, is_rank, is_rank_below, is_rank_above, get_type, get_orig_type, get_prev_type_field, get_level, is_level, is_level_above, is_level_below, get_stage, is_stage, is_stage_above, is_stage_below, get_stability, is_stability, is_stability_above, is_stability_below, get_dimension, is_dimension, is_dimension_above, is_dimension_below, get_future, is_future, is_future_above, is_future_below, get_cell, is_cell, is_cell_above, is_cell_below = 
-	Card.GetRank, Card.GetOriginalRank, Card.GetPreviousRankOnField, Card.IsRank, Card.IsRankBelow, Card.IsRankAbove, Card.GetType, Card.GetOriginalType, Card.GetPreviousTypeOnField, Card.GetLevel, Card.IsLevel, Card.IsLevelAbove, Card.IsLevelBelow, Card.GetStage, Card.IsStage, Card.IsStageAbove, Card.IsStageBelow, Card.GetStability, Card.IsStability, Card.IsStabilityAbove, Card.IsStabilityBelow, Card.GetDimensionNo, Card.IsDimensionNo, Card.IsDimensionNoAbove, Card.IsDimensionNoBelow, Card.GetFuture, Card.IsFuture, Card.IsFutureAbove, Card.IsFutureBelow, Card.GetCell, Card.IsCell, Card.IsCellAbove, Card.IsCellBelow
+local get_rank, get_orig_rank, prev_rank_field, is_rank, is_rank_below, is_rank_above, get_type, get_orig_type, get_prev_type_field, get_level, is_level, is_level_above, is_level_below, get_stage, is_stage, is_stage_above, is_stage_below, get_stability, is_stability, is_stability_above, is_stability_below, get_dimension, is_dimension, is_dimension_above, is_dimension_below, get_future, is_future, is_future_above, is_future_below, get_cell, is_cell, is_cell_above, is_cell_below,
+	card_overlay_group, card_overlay_count, duel_overlay_group, duel_overlay_count = 
+	Card.GetRank, Card.GetOriginalRank, Card.GetPreviousRankOnField, Card.IsRank, Card.IsRankBelow, Card.IsRankAbove, Card.GetType, Card.GetOriginalType, Card.GetPreviousTypeOnField, Card.GetLevel, Card.IsLevel, Card.IsLevelAbove, Card.IsLevelBelow, Card.GetStage, Card.IsStage, Card.IsStageAbove, Card.IsStageBelow, Card.GetStability, Card.IsStability, Card.IsStabilityAbove, Card.IsStabilityBelow, Card.GetDimensionNo, Card.IsDimensionNo, Card.IsDimensionNoAbove, Card.IsDimensionNoBelow, Card.GetFuture, Card.IsFuture, Card.IsFutureAbove, Card.IsFutureBelow, Card.GetCell, Card.IsCell, Card.IsCellAbove, Card.IsCellBelow,
+		Card.GetOverlayGroup, Card.GetOverlayCount, Duel.GetOverlayGroup, Duel.GetOverlayCount
 
 Card.GetRank=function(c)
 	if Auxiliary.Xroses[c] then return c:GetOverlayGroup():IsExists(Card.IsRankAbove,1,nil,1) and c:GetGrade() or 0 end
@@ -205,8 +207,43 @@ Card.IsCellBelow=function(c,val)
 	if Auxiliary.Xroses[c] and c:GetOverlayGroup():IsExists(Card.IsCellAbove,1,nil,1) then return c:IsGradeBelow(val) end
 	return is_cell_below(c,val)
 end
+Card.GetOverlayGroup=function(c)
+	if Auxiliary.Xroses[c] then return Group.CreateGroup() end
+	return card_overlay_group(c)
+end
+Card.GetOverlayCount=function(c)
+	return #c:GetOverlayGroup()
+end
+Duel.GetOverlayGroup=function(tp,s,o)
+	return duel_overlay_group(tp,s,o):Filter(function(c) return not Auxiliary.Xroses[c:GetOverlayTarget()] end,nil)
+end
+Duel.GetOverlayCount=function(tp,s,o)
+	return #Duel.GetOverlayGroup(tp,s,o)
+end
 
 --Custom Functions
+function Card.GetCoreGroup(c,typ)
+	if not Auxiliary.Xroses[c] then return Group.CreateGroup() end
+	local t={["Main"]=c:GetMaterial(),
+	["Extra"]=card_overlay_group(c)-c:GetMaterial()}
+	return not typ and card_overlay_group(c) or t[typ]
+end
+function Card.GetCoreCount(c,typ)
+	return #c:GetCoreGroup(typ)
+end
+function Duel.GetCoreGroup(tp,s,o,typ)
+	local g=duel_overlay_group(tp,s,o):Filter(function(c) return Auxiliary.Xroses[c:GetOverlayTarget()] end,nil)
+	local t={["Main"]=g:Filter(function(c) return c:GetMaterial():IsContains(c) end,nil),
+	["Extra"]=g:Filter(function(c) return not c:GetMaterial():IsContains(c) end,nil)}
+	return not typ and g or t[typ]
+end
+function Duel.GetCoreCount(tp,s,o,typ)
+	return #Duel.GetCoreGroup(tp,s,o,typ)
+end
+function Duel.ChangeReserve(tp,ct)
+	g_Reserve[tp]=g_Reserve[tp]+ct
+	Duel.CheckReserve(tp)
+end
 function Duel.CheckReserve(tp)
 	Duel.AnnounceNumber(tp,g_Reserve[tp])
 end
@@ -222,8 +259,7 @@ function Auxiliary.LoadOperation(e,tp,eg,ep,ev,re,r,rp,c,sg)
 	if #g>0 and Duel.SelectOption(tp,1000,1007)~=0 then
 		Duel.Overlay(g:Select(tp,1,1,nil):GetFirst(),c)
 	else Duel.SendtoDeck(c,nil,1,REASON_RULE) end
-	g_Reserve[tp]=g_Reserve[tp]+5
-	Duel.CheckReserve(tp)
+	Duel.ChangeReserve(tp,5)
 end
 
 local ge2=Effect.GlobalEffect()
@@ -354,8 +390,13 @@ function Auxiliary.AddXrosProc(c,xscheck,gd,...)
 	end)
 	c:RegisterEffect(ge4)
 end
-function Auxiliary.XrosEffectCon(e)
-	return not e:GetHandler():GetOverlayGroup():IsExists(Card.IsType,1,nil,TYPE_EFFECT)
+function Auxiliary.XrosEffectCon(f,...)
+	local ext_params={...}
+	return	function(e)
+				local c=e:GetHandler()
+				local g=c:GetOverlayGroup()
+				return g:IsExists(Card.IsType,1,nil,TYPE_EFFECT) and (not f or (g-c:GetMaterial()):IsExists(f,1,nil,table.unpack(ext_params)))
+			end
 end
 function Auxiliary.GradeVal(gd)
 	return	function(e,c)
@@ -425,7 +466,7 @@ function Auxiliary.XrosCondition(xscheck,...)
 				if fg:IsExists(aux.MustMaterialCounterFilter,1,nil,mg) then return false end
 				Duel.SetSelectedCard(fg)
 				local sg=Group.CreateGroup()
-				return mg:IsExists(Auxiliary.XsCheckRecursive,1,nil,tp,sg,mg,c,0,gd,xscheck,table.unpack(funs))
+				return g_Reserve[tp]>=gd and mg:IsExists(Auxiliary.XsCheckRecursive,1,nil,tp,sg,mg,c,0,gd,xscheck,table.unpack(funs))
 			end
 end
 function Auxiliary.XrosTarget(xscheck,...)
@@ -481,5 +522,6 @@ function Auxiliary.XrosOperation(e,tp,eg,ep,ev,re,r,rp,c)
 	local g=e:GetLabelObject()
 	c:SetMaterial(g)
 	Duel.Overlay(c,g)
+	Duel.ChangeReserve(tp,-c:GetGrade())
 	g:DeleteGroup()
 end
