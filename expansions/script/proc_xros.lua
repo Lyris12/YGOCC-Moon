@@ -19,6 +19,7 @@ TYPE_EXTRA						=TYPE_EXTRA|TYPE_XROS
 
 --Custom Tables
 Auxiliary.Xroses={} --number as index	= card, card as index	= function() is_synchro
+Auxiliary.HasLoad=false
 table.insert(aux.CannotBeEDMatCodes,EFFECT_CANNOT_BE_XROS_MATERIAL)
 --Track
 g_Reserve={0}
@@ -212,6 +213,7 @@ end
 function Auxiliary.LoadCondition(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
+	if not Auxiliary.HasLoad then return false end
 	return c:IsAbleToDeck() and c:IsLocation(LOCATION_HAND)
 		or Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsType),tp,LOCATION_MZONE,0,1,c,TYPE_XROS)
 end
@@ -245,11 +247,13 @@ ge4:SetCode(EFFECT_SPSUMMON_PROC_G)
 ge4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 ge4:SetCountLimit(3,1215140)
 ge4:SetDescription(202)
-ge4:SetRange(0xfe)
+ge4:SetRange(LOCATION_DECK)
+ge4:SetCondition(function() return Auxiliary.HasLoad end)
 ge4:SetOperation(function(e,tp) Duel.CheckReserve(tp) end)
 local ge1=Effect.GlobalEffect()
 ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_GRANT)
-ge1:SetTargetRange(0xfe,0xfe)
+ge1:SetTargetRange(LOCATION_DECK,LOCATION_DECK)
+ge1:SetTarget(function(e,c) return c:GetSequence()==1 end)
 ge1:SetLabelObject(ge4)
 Duel.RegisterEffect(ge1,0)
 
@@ -312,6 +316,7 @@ function Auxiliary.AddXrosProc(c,xscheck,gd,...)
 		end
 		if #t<2 then break end
 	end
+	Auxiliary.HasLoad=true
 	local ge1=Effect.CreateEffect(c)
 	ge1:SetType(EFFECT_TYPE_SINGLE)
 	ge1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
