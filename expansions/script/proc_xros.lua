@@ -44,7 +44,7 @@ Card.GetPreviousRankOnField=function(c)
 	return prev_rank_field(c)
 end
 Card.IsRank=function(c,...)
-	if Auxiliary.Xroses[c] and not Auxiliary.Xroses[c]() then return false end
+	if Auxiliary.Xroses[c] and not (Auxiliary.Xroses[c]() or (c:GetCoreGroup():IsExists(Card.IsRankAbove,1,nil,1) and c:IsGradeBelow(rk))) then return false end
 	local funs={...}
 	for key,value in pairs(funs) do
 		if c:GetCoreGroup():IsExists(Card.IsRankAbove,1,nil,1) and c:GetGrade()==value or c:GetRank()==value then return true end
@@ -52,13 +52,11 @@ Card.IsRank=function(c,...)
 	return false
 end
 Card.IsRankBelow=function(c,rk)
-	if Auxiliary.Xroses[c] and not Auxiliary.Xroses[c]() then return false end
-	if c:GetCoreGroup():IsExists(Card.IsRankAbove,1,nil,1) then return c:IsGradeBelow(rk) end
+	if Auxiliary.Xroses[c] and not (Auxiliary.Xroses[c]() or (c:GetCoreGroup():IsExists(Card.IsRankAbove,1,nil,1) and c:IsGradeBelow(rk))) then return false end
 	return is_rank_below(c,rk)
 end
 Card.IsRankAbove=function(c,rk)
-	if Auxiliary.Xroses[c] and not Auxiliary.Xroses[c]() then return false end
-	if c:GetCoreGroup():IsExists(Card.IsRankAbove,1,nil,1) then return c:IsGradeAbove(rk) end
+	if Auxiliary.Xroses[c] and not (Auxiliary.Xroses[c]() or (c:GetCoreGroup():IsExists(is_rank_above,1,nil,1) and c:IsGradeAbove(rk))) then return false end
 	return is_rank_above(c,rk)
 end
 Card.GetType=function(c,scard,sumtype,p)
