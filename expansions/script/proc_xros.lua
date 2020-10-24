@@ -248,15 +248,14 @@ function Auxiliary.LoadCondition(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
 	if not Auxiliary.HasLoad then return false end
-	return Duel.IsExistingMatchingCard(function(tc) return tc:IsAbleToDeck() and tc:IsLocation(LOCATION_HAND) or Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsType),tp,LOCATION_MZONE,0,1,c,TYPE_XROS),tp,LOCATION_HAND+LOCATION_MZONE,0,1,c)
+	return c:IsAbleToDeck() and c:IsLocation(LOCATION_HAND)
+		or Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsType),tp,LOCATION_MZONE,0,1,c,TYPE_XROS)
 end
 function Auxiliary.LoadOperation(e,tp,eg,ep,ev,re,r,rp,c,sg)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local oc=Duel.SelectMatchingCard(tp,function(tc) return tc:IsAbleToDeck() and tc:IsLocation(LOCATION_HAND) or Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsType),tp,LOCATION_MZONE,0,1,tc,TYPE_XROS),tp,LOCATION_HAND+LOCATION_MZONE,0,1,1,c)
-	local g=Duel.GetMatchingGroup(aux.AND(Card.IsFaceup,Card.IsType),tp,LOCATION_MZONE,0,oc,TYPE_XROS)
+	local g=Duel.GetMatchingGroup(aux.AND(Card.IsFaceup,Card.IsType),tp,LOCATION_MZONE,0,c,TYPE_XROS)
 	if #g>0 and Duel.SelectOption(tp,1000,1007)~=0 then
-		Duel.Overlay(g:Select(tp,1,1,nil):GetFirst(),oc)
-	else Duel.SendtoDeck(oc,nil,1,REASON_RULE) end
+		Duel.Overlay(g:Select(tp,1,1,nil):GetFirst(),c)
+	else Duel.SendtoDeck(c,nil,1,REASON_RULE) end
 	Duel.ChangeReserve(tp,5)
 end
 
