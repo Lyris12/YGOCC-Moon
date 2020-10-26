@@ -1,4 +1,4 @@
-﻿expansions/cards-new.cdb	1109a26e7a03ca1c3cff4280dc9b0782
+﻿expansions/cards-new.cdb	fafb5a323a44e83665db0ae189ab01f8
 expansions/lflist.conf	bc119f956e3ff11e4d79c49f7f46dd83
 expansions/strings.conf	2cd145654de856461e99d81d1ea946ae
 expansions/pics/100000710.jpg	5f925a97b1c60d7d69acb8f229938263
@@ -9456,7 +9456,7 @@ expansions/script/c91091091.lua	69dc5fe8ae1434ec34d5391b0be18531
 expansions/script/c911630820.lua	0821276af45aa452c1f5c0c51678a0a6
 expansions/script/c911630821.lua	5b777f1bc78b1c1d7f667bd43527ac5b
 expansions/script/c911630822.lua	751055e0d80892c0da75f3982707192c
-expansions/script/c911630823.lua	ba324e7ac91dd35c27257ae545a171e8
+expansions/script/c911630823.lua	5fd0f25a4b3220152d1539feffa3e5e5
 expansions/script/c911630824.lua	86896e68aab1caba28882d862c00ac4e
 expansions/script/c911630825.lua	8672ebf86a2e59dda6618d289d541a4e
 expansions/script/c911630826.lua	4a5493286d63cc011565755e5ba4243a
@@ -9466,7 +9466,7 @@ expansions/script/c911630829.lua	80416a0ee681e7959339974ca4c3dcef
 expansions/script/c911630830.lua	01307858d4ebe510fc69ac9fd6254e55
 expansions/script/c911630831.lua	5236c19ec46aafbc3053e847ede7cdd5
 expansions/script/c911630832.lua	1d0c5dc52e09dd3c1edd6b836b53284f
-expansions/script/c911630833.lua	0aee24ac53924a2bf5739d0cf472167b
+expansions/script/c911630833.lua	d0bbe7850259692c1ec5675a1d336b54
 expansions/script/c911630834.lua	08dfaea1661bfe186352deea49eca23f
 expansions/script/c911630836.lua	bdf7d9136c29c9515bac1e94adfafaed
 expansions/script/c911630837.lua	3aa6b8da461031b535fb9e34112822fe
@@ -9848,6 +9848,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	566c1742cfdfddaf0f1346fee33f0c2d
+update/filelist.txt	8bf637c3cc4458edf91924bca419a8b6
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	69f4e491edf12d0db16272612b84fa2d
+update/version.txt	6e8b7c222783308fa0ae0029d8b10dc2
