@@ -15,7 +15,6 @@ function Duel.SetRP(player, rp)
 	_r = g_RP
 	g_RP[player] = rp
 	--Duel.Hint(HINT_NUMBER,player,rp)
-	Duel.AnnounceNumber(player,rp)
 	return _r
 end
 function Duel.CheckRPCost(player, rp)
@@ -30,25 +29,143 @@ function Duel.GainRP(player, rp)
 	Duel.SetRP(player,value)
 end
 
-function Auxiliary.EnableRunicPower(c)
-	--[[if not runic_global_check then
-		runic_global_check=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_ADJUST)
-		ge1:SetRange(0xff)
-		ge1:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
-		ge1:SetOperation(Auxiliary.runicreg)
-		c:RegisterEffect(ge1,tp)
-	end]]
+function Card.GetRuneslots(c)
+	return c:GetFlagEffectLabel(80808881)
+end
 
+function Card.AddRuneslots(c,number)
+	if c:GetFlagEffect(80808881) == 0 then
+		c:RegisterFlagEffect(80808881,RESETS_STANDARD,0,1)
+		c:SetFlagEffectLabel(80808881,0)
+	end
+	local current = c:GetFlagEffectLabel(80808881)
+	c:SetFlagEffectLabel(80808881,current+number)
 end
-function Auxiliary.runicreg(e,tp,eg,ep,ev,re,r,rp)
-	local token=Duel.CreateToken(tp,557)
-	Duel.Remove(token,POS_FACEUP,REASON_RULE)
+	
+function Card.RemoveRuneslots(c,number)
+	local current = c:GetRuneslots()
+	if number >= current then number = current end
+	if current == 0 then return end
+	c:SetFlagEffectLabel(80808881,current-number)
 end
+
+function Auxiliary.Add_Runeslots(c,number)
+	c:RegisterFlagEffect(1000,nil,0,1)
+	c:SetFlagEffectLabel(1000,number)
+	local Runeslots=Effect.CreateEffect(c)
+	Runeslots:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	Runeslots:SetCode(EVENT_PREDRAW)
+	Runeslots:SetRange(LOCATION_DECK+LOCATION_GRAVE+LOCATION_HAND+LOCATION_REMOVED+LOCATION_EXTRA)
+	Runeslots:SetCountLimit(1)
+	Runeslots:SetOperation(Auxiliary.Runeslotsstart)
+	c:RegisterEffect(Runeslots)
+end
+
+function Auxiliary.Runeslotsstart(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local number = c:GetFlagEffectLabel(1000)
+	if c:GetFlagEffect(80808881) == 0 then
+		c:RegisterFlagEffect(80808881,nil,0,1)
+		c:SetFlagEffectLabel(80808881,0)
+	end
+	local current = c:GetFlagEffectLabel(80808881)
+	c:SetFlagEffectLabel(80808881,current+number)
+end
+
+function Auxiliary.Ability_Infused(c)
+	local INFUSED1=Effect.CreateEffect(c)
+	INFUSED1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	INFUSED1:SetCode(EVENT_BE_MATERIAL)
+	INFUSED1:SetProperty(EFFECT_FLAG_EVENT_PLAYER)
+	INFUSED1:SetOperation(aux.INFUSED1op)
+	c:RegisterEffect(INFUSED1)
+	local INFUSED2=Effect.CreateEffect(c)
+	INFUSED2:SetCategory(CATEGORY_CONTROL)
+	INFUSED2:SetType(EFFECT_TYPE_IGNITION)
+	INFUSED2:SetRange(LOCATION_HAND+LOCATION_MZONE)
+	INFUSED2:SetCost(aux.INFUSED2cost)
+	INFUSED2:SetOperation(aux.INFUSED2op)
+	c:RegisterEffect(INFUSED2)
+end
+
+function Auxiliary.INFUSED1op(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local rc=c:GetReasonCard()
+	rc:AddRuneslots(1)
+end
+
+function Auxiliary.INFUSED2cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():IsReleasable() end
+	Duel.Release(e:GetHandler(),REASON_COST)
+end
+
+function Auxiliary.INFUSED2op(e,tp,eg,ep,ev,re,r,rp)
+   local atk=e:GetHandler():GetAttack()
+   if atk<0 then atk=0 end
+   Duel.GainRP(tp,atk)
+end
+
+function Auxiliary.I_Am_Runic(c)
+	local RUNICS=Effect.CreateEffect(c)
+	RUNICS:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	RUNICS:SetCode(EVENT_TO_GRAVE)
+	RUNICS:SetOperation(Auxiliary.runicbanish)
+	c:RegisterEffect(RUNICS)
+end
+
+function Auxiliary.runicbanish(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	Duel.Exile(c,REASON_EFFECT)
+end 
+
+
+
+function Auxiliary.Normal_Runic_Attach(c)
+	local RUNICS2=Effect.CreateEffect(c)
+	RUNICS2:SetType(EFFECT_TYPE_IGNITION)
+	RUNICS2:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	RUNICS2:SetRange(LOCATION_EXTRA)
+	RUNICS2:SetTarget(Auxiliary.runicmattg)
+	RUNICS2:SetOperation(Auxiliary.runicmatop)
+	c:RegisterEffect(RUNICS2)
+end
+
+function Auxiliary.runicmatfilter(c)
+	c:AddRuneslots(0)
+	return c:IsFaceup() and c:GetRuneslots()>0 
+end
+
+function Auxiliary.runicmattg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_ONFIELD) and chkc:IsControler(tp) and Auxiliary.runicmatfilter(chkc) end
+	if chk==0 then return not e:GetHandler():IsStatus(STATUS_CHAINING)
+		and Duel.IsExistingTarget(Auxiliary.runicmatfilter,tp,LOCATION_ONFIELD,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
+	Duel.SelectTarget(tp,Auxiliary.runicmatfilter,tp,LOCATION_ONFIELD,0,1,1,nil)
+end
+
+function Auxiliary.runicmatop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local tc=Duel.GetFirstTarget()
+	if c:IsRelateToEffect(e) and tc:IsRelateToEffect(e) and not tc:IsImmuneToEffect(e) then
+		Duel.Overlay(tc,Group.FromCards(c))
+		tc:RemoveRuneslots(1)
+	end
+end
+
+
+
+
+
+
+
+
+
+
+
+
 
 --  New Stats
+
 
 				---------
 				--HASTE--

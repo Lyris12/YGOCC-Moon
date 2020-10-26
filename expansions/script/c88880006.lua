@@ -3,6 +3,7 @@ function c88880006.initial_effect(c)
 --xyz summon
 	aux.AddXyzProcedure(c,c88880006.mfilter,4,2,c88880006.ovfilter,aux.Stringid(88880006,0),2,c88880006.xyzop)
 	c:EnableReviveLimit()
+	Auxiliary.Ability_Infused(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(88880006,2))
 	e1:SetCategory(CATEGORY_RECOVER)
