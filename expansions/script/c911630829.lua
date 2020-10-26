@@ -90,7 +90,7 @@ function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Remove(Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_GRAVE,0,2,2,nil)+e:GetHandler(),POS_FACEUP,REASON_COST)
 end
 function cid.sfilter(c,e,tp)
-	return not c:IsAttribute(ATTRIBUTE_DARK) and c:IsCanBeSpecialSummoned(e,0,tp,true,false) and Duel.GetLocationCountFromEx(tp,tp,c:GetType()&TYPE_EXTRA)>0
+	return not c:IsAttribute(ATTRIBUTE_DARK) and c:IsCanBeSpecialSummoned(e,0,tp,true,false) and Duel.GetLocationCountFromEx(tp,tp,nil,c:GetType()&TYPE_EXTRA)>0
 end
 function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cid.sfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp) end

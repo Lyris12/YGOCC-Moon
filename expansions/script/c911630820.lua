@@ -4,7 +4,7 @@ function cid.initial_effect(c)
 	c:SetUniqueOnField(1,0,id)
 	--special summon
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(id,0))
+	e1:SetDescription(2)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_HAND+LOCATION_GRAVE)
@@ -34,6 +34,7 @@ function cid.initial_effect(c)
 	e4:SetCategory(CATEGORY_DESTROY)
 	e4:SetType(EFFECT_TYPE_IGNITION)
 	e4:SetRange(LOCATION_HAND)
+	e4:SetDescription(1124)
 	e4:SetCountLimit(1,id)
 	e4:SetCost(cid.tgcost)
 	e4:SetTarget(cid.tgtg)
@@ -51,10 +52,13 @@ function cid.initial_effect(c)
 	e5:SetOperation(cid.desop)
 	c:RegisterEffect(e5)
 end
+function cid.costfilter(c)
+	return c:IsRace(RACE_ZOMBIE) and c:IsDiscardable()
+end
 function cid.tgcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return Duel.IsExistingMatchingCard(cid.costfilter,tp,LOCATION_HAND,0,1,c) and c:IsDiscardable() end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DISCARD)
 	Duel.SendtoGrave(Duel.SelectMatchingCard(tp,cid.costfilter,tp,LOCATION_HAND,0,1,1,c)+c,REASON_COST+REASON_DISCARD)
 end
 function cid.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -64,7 +68,9 @@ function cid.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function cid.tgop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	Duel.Destroy(Duel.GetFieldGroup(tp,LOCATION_ONFIELD,LOCATION_ONFIELD):Select(tp,1,1,nil),REASON_EFFECT)
+	local g=Duel.GetFieldGroup(tp,LOCATION_ONFIELD,LOCATION_ONFIELD):Select(tp,1,1,nil)
+	Duel.HintSelection(g)
+	Duel.Destroy(g,REASON_EFFECT)
 end
 function cid.filter(c,tp)
 	return c:IsCode(4064256) and c:GetActivateEffect() and c:GetActivateEffect():IsActivatable(tp,true,true)
@@ -147,7 +153,4 @@ function cid.ccon(e,tp,eg,ep,ev,re,r,rp)
 end
 function cid.aclimit(e,re,tp)
 	return re:GetActivateLocation()==LOCATION_GRAVE and re:IsActiveType(TYPE_MONSTER)
-end
-function cid.costfilter(c)
-	return c:IsRace(RACE_ZOMBIE) and c:IsDiscardable()
 end
