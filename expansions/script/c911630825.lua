@@ -71,7 +71,7 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,cid.spfilter1,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,1,nil,e,tp)
 	if #g==0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	Duel.SpecialSummon(g+Duel.SelectMatchingCard(tp,cid.spfilter2,tp,LOCATION_GRAVE,0,1,1,g,e,tp),0,tp,tp,false,false,POS_FACEUP) end
+	Duel.SpecialSummon(g+Duel.SelectMatchingCard(tp,cid.spfilter2,tp,LOCATION_GRAVE,0,1,1,g,e,tp),0,tp,tp,false,false,POS_FACEUP)
 end
 function cid.costfilter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x2e7) and c:IsDiscardable()

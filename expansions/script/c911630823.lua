@@ -66,10 +66,10 @@ function cid.desop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ConfirmCards(1-tp,g)
 end
 function cid.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return c:IsLocation(LOCATION_HAND) or not Duel.IsPlayerAffectedByEffect(tp,911630825)
+	return e:GetHandler():IsLocation(LOCATION_HAND) or not Duel.IsPlayerAffectedByEffect(tp,911630825)
 end
 function cid.spcon2(e,tp,eg,ep,ev,re,r,rp)
-	return c:IsLocation(LOCATION_GRAVE) and Duel.IsPlayerAffectedByEffect(tp,911630825)
+	return e:GetHandler():IsLocation(LOCATION_GRAVE) and Duel.IsPlayerAffectedByEffect(tp,911630825)
 end
 function cid.cfilter(c)
 	return c:IsRace(RACE_ZOMBIE) and c:IsAbleToRemoveAsCost()
