@@ -34,6 +34,33 @@ function cid.initial_effect(c)
 	e3:SetCondition(cid.ccon)
 	e3:SetCode(EFFECT_SWAP_AD)
 	c:RegisterEffect(e3)
+	--Once per turn, during your Standby Phase, if there is no "Lich-Lord's Phylactery" in your GY: Destroy this card, and if you do, add 1 Level 5 or lower Zombie monster from your Deck or GY to your hand.
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
+	e5:SetCode(EVENT_PHASE+PHASE_STANDBY)
+	e5:SetRange(LOCATION_MZONE)
+	e5:SetCountLimit(1)
+	e5:SetCategory(CATEGORY_DESTROY+CATEGORY_SEARCH+CATEGORY_TOHAND)
+	e5:SetCondition(function(e) return not cid.ccon(e) and Duel.GetTurnPlayer()==e:GetHandlerPlayer() end)
+	e5:SetTarget(cid.destg)
+	e5:SetOperation(cid.desop)
+	c:RegisterEffect(e5)
+end
+function cid.thfilter(c)
+	return c:IsLevelBelow(5) and c:IsRace(RACE_ZOMBIE) and c:IsAbleToHand()
+end
+function cid.destg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,e:GetHandler(),1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE)
+end
+function cid.desop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) or Duel.Destroy(c,REASON_EFFECT)==0 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(cid.thfilter),tp,LOCATION_GRAVE+LOCATION_DECK,0,1,1,nil)
+	Duel.SendtoHand(g,nil,REASON_EFFECT)
+	Duel.ConfirmCards(1-tp,g)
 end
 function cid.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local ph=Duel.GetCurrentPhase()

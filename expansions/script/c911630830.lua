@@ -39,9 +39,10 @@ function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(sel)
 	if sel==1 then
 		Duel.Hint(HINT_OPSELECTED,1-tp,aux.Stringid(9163835,1))
-		e:SetCategory(CATEGORY_TOGRAVE)
+		e:SetCategory(CATEGORY_TOGRAVE+CATEGORY_SEARCH+CATEGORY_TOHAND)
 		e:SetOperation(cid.tgop)
-		Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,1-tp,LOCATION_DECK)
+		Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+		Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
 	elseif sel==2 then
 		Duel.Hint(HINT_OPSELECTED,1-tp,aux.Stringid(9163835,2))
 		e:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
@@ -55,18 +56,23 @@ function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 end
 function cid.tgfilter(c)
-	return c:IsSetCard(0x2e7) and c:IsType(TYPE_MONSTER) and c:IsAbleToGrave()
+	return c:IsSetCard(0x2e7) and c:IsType(TYPE_MONSTER) and (c:IsAbleToHand() or c:IsAbleToGrave())
 end
 function cid.tgop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,cid.tgfilter,tp,LOCATION_DECK,0,1,1,nil)
-	if g:GetCount()>0 then
-		Duel.SendtoGrave(g,REASON_EFFECT)
-		Duel.RegisterFlagEffect(tp,911630831,RESET_PHASE+PHASE_END,0,1)
+	if #g>0 then
+		local tc=g:GetFirst()
+		if tc and tc:IsAbleToHand() and (not tc:IsAbleToGrave() or Duel.SelectOption(tp,1190,1191)==0) then
+			Duel.SendtoHand(tc,nil,REASON_EFFECT)
+			Duel.ConfirmCards(1-tp,tc)
+		else
+			Duel.SendtoGrave(tc,REASON_EFFECT)
+		end
 	end
 end
 function cid.thfilter(c)
-	return c:IsCode(911630827) and c:IsAbleToHand()
+	return c:IsSetCard(0x2e7) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToHand() and not c:IsCode(id)
 end
 function cid.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)

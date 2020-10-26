@@ -381,8 +381,8 @@ function Auxiliary.XrosEffectCon(f,...)
 	local ext_params={...}
 	return	function(e)
 				local c=e:GetHandler()
-				local g=c:GetCoreGroup()
-				return f and (g-c:GetMaterial()):IsExists(f,1,nil,table.unpack(ext_params)) or g:IsExists(Card.IsType,1,nil,TYPE_EFFECT)
+				if f then return c:GetCoreGroup("Extra"):IsExists(f,1,nil,table.unpack(ext_params)) end
+				return c:GetCoreGroup():IsExists(Card.IsType,1,nil,TYPE_EFFECT)
 			end
 end
 function Auxiliary.GradeVal(gd)

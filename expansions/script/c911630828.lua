@@ -41,13 +41,26 @@ function cid.initial_effect(c)
 	e5:SetOperation(cid.spop)
 	e5:SetLabelObject(e4)
 	c:RegisterEffect(e5)
+	--If this card is in the GY, except during the turn it was sent to the GY: You can banish this card from your GY; draw cards up to the number of "Lich-Lord" monsters you currently control +1, then shuffle 1 card back into your Deck from your hand.
+	local e6=Effect.CreateEffect(c)
+	e6:SetType(EFFECT_TYPE_IGNITION)
+	e6:SetRange(LOCATION_GRAVE)
+	e6:SetCountLimit(1,id+1000)
+	e6:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e6:SetCategory(CATEGORY_DRAW+CATEGORY_TODECK)
+	e6:SetCondition(aux.exccon)
+	e6:SetCost(aux.bfgcost)
+	e6:SetTarget(cid.tg)
+	e6:SetOperation(cid.op)
+	c:RegisterEffect(e6)
 end
 function cid.ctfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x2e7)
 end
 function cid.ctop(e,tp,eg,ep,ev,re,r,rp)
-	if eg:IsExists(cid.ctfilter,1,nil) then
+	if eg:IsExists(cid.ctfilter,1,nil) and Duel.GetFlagEffect(tp,id)==0 then
 		e:GetHandler():AddCounter(0x2e7,1)
+		Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
 	end
 end
 function cid.atkval(e)
@@ -81,19 +94,23 @@ function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 	if g:GetClassCount(Card.GetCode)<2 then return end
 	if g:GetCount()>=2 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local sg=g:SelectSubGroup(tp,aux.dncheck,false,2,2)
-		local gc=sg:GetFirst()
-		while gc do
-			Duel.SpecialSummonStep(gc,0,tp,tp,false,false,POS_FACEUP)
-			local e1=Effect.CreateEffect(e:GetHandler())
-			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
-			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-			e1:SetReset(RESET_EVENT+RESETS_REDIRECT)
-			e1:SetValue(LOCATION_DECKBOT)
-			gc:RegisterEffect(e1)
-			gc=sg:GetNext()
-		end
-	Duel.SpecialSummonComplete()
+		Duel.SpecialSummon(g:SelectSubGroup(tp,aux.dncheck,false,2,2),0,tp,tp,false,false,POS_FACEUP)
+	end
+end
+function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local ct=Duel.GetMatchingGroupCount(aux.AND(Card.IsFaceup,Card.IsSetCard),tp,LOCATION_MZONE,0,nil,0x2e7)
+	if chk==0 then return Duel.IsPlayerCanDraw(tp,ct+1) end
+	Duel.SetTargetPlayer(tp)
+	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,ct+1)
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,0,tp,1)
+end
+function cid.op(e,tp,eg,ep,ev,re,r,rp)
+	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
+	if Duel.Draw(p,Duel.GetMatchingGroupCount(aux.AND(Card.IsFaceup,Card.IsSetCard),tp,LOCATION_MZONE,0,nil,0x2e7)+1,REASON_EFFECT)==0 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToDeck,tp,LOCATION_HAND,0,1,1,nil)
+	if #g>0 then
+		Duel.BreakEffect()
+		Duel.SendtoDeck(g,nil,2,REASON_EFFECT)
 	end
 end

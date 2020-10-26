@@ -11,15 +11,18 @@ function cid.initial_effect(c)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
 	e1:SetValue(aux.fuslimit)
 	c:RegisterEffect(e1)
-	--Prevent Activation
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetCode(EFFECT_CANNOT_ACTIVATE)
-	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e2:SetTargetRange(0,1)
-	e2:SetValue(cid.aclimit)
-	c:RegisterEffect(e2)
+	c:SetUniqueOnField(1,0,id)
+	--Once per turn, during your Standby Phase, if there is no "Lich-Lord's Phylactery" in your GY: Destroy this card, and if you do, destroy all other cards on the field, except "Zombie World", then both players draw cards until they have 7 in their hand. Other cards destroyed by this effect cannot activate their effects.
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
+	e5:SetCode(EVENT_PHASE+PHASE_STANDBY)
+	e5:SetRange(LOCATION_MZONE)
+	e5:SetCountLimit(1)
+	e4:SetCategory(CATEGORY_DESTROY+CATEGORY_DRAW)
+	e5:SetCondition(function(e) return not Duel.IsExistingMatchingCard(cid.cfilter,e:GetHandler():GetControler(),LOCATION_GRAVE,0,1,nil) and Duel.GetTurnPlayer()==e:GetHandlerPlayer() end)
+	e5:SetTarget(cid.destg)
+	e5:SetOperation(cid.desop)
+	c:RegisterEffect(e5)
 	--copy
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(9163835,5))
@@ -36,9 +39,43 @@ function cid.initial_effect(c)
 	e4:SetCode(EVENT_FREE_CHAIN)
 	e4:SetCondition(cid.cpcon1)
 	c:RegisterEffect(e4)
+	--Prevent Activation
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetCode(EFFECT_CANNOT_ACTIVATE)
+	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e2:SetTargetRange(0,1)
+	e2:SetCondition(function(e,tp) return Duel.IsExistingMatchingCard(cid.cfilter,e:GetHandler():GetControler(),LOCATION_GRAVE,0,1,nil) end)
+	e2:SetValue(cid.aclimit)
+	c:RegisterEffect(e2)
 end
 function cid.ffilter(c,fc,sub,mg,sg)
-	return c:IsRace(RACE_ZOMBIE) and (not sg or sg:IsExists(Card.IsFusionSetCard,1,nil,0x2e7))
+	return c:IsRace(RACE_ZOMBIE) and (not sg or sg:IsExists(Card.IsFusionSetCard,2,nil,0x2e7))
+end
+function cid.destg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	local g=Duel.GetMatchingGroup(aux.OR(Card.IsFacedown,aux.NOT(Card.IsCode)),tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil,4064256)+e:GetHandler()
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,PLAYER_ALL,1)
+end
+function cid.desop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) or Duel.Destroy(c,REASON_EFFECT)==0 then return end
+	local g=Duel.GetMatchingGroup(aux.OR(Card.IsFacedown,aux.NOT(Card.IsCode)),tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil,4064256)
+	local ct=Duel.Destroy(g,REASON_EFFECT)
+	for tc in aux.Next(g:Filter(aux.NOT(Card.IsOnField),nil)) do
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_CANNOT_TRIGGER)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+		tc:RegisterEffect(e1)
+	end
+	if ct==#g then
+		Duel.BreakEffect()
+		Duel.Draw(tp,7-Duel.GetFieldGroupCount(tp,LOCATION_HAND,0),REASON_EFFECT)
+		Duel.Draw(1-tp,7-Duel.GetFieldGroup(tp,0,LOCATION_HAND),REASON_EFFECT)
+	end
 end
 function cid.aclimit(e,re,tp)
 	return re:GetActivateLocation()==LOCATION_MZONE and re:IsActiveType(TYPE_MONSTER) and re:GetHandler():IsRace(RACE_ZOMBIE)

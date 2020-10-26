@@ -35,6 +35,55 @@ function cid.initial_effect(c)
 	e4:SetCode(EVENT_FREE_CHAIN)
 	e4:SetCondition(cid.thcon1)
 	c:RegisterEffect(e4)
+	--You can discard this card and 1 other Zombie monster; send 1 "Lich-Lord" Spell/Trap from your Deck to the GY. You can only use this effect of "Lich-Lord Hraxx'n" once per turn.
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_IGNITION)
+	e4:SetRange(LOCATION_HAND)
+	e4:SetCountLimit(1,id)
+	e4:SetCost(cid.tgcost)
+	e4:SetCategory(CATEGORY_TOGRAVE)
+	e4:SetTarget(cid.tgtg)
+	e4:SetOperation(cid.tgop)
+	c:RegisterEffect(e4)
+	--Once per turn, during your Standby Phase, if there is no "Lich-Lord's Phylactery" in your GY: Destroy this card, and if you do, return 1 of your banished cards to the GY.
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
+	e5:SetCode(EVENT_PHASE+PHASE_STANDBY)
+	e5:SetRange(LOCATION_MZONE)
+	e5:SetCountLimit(1)
+	e5:SetCategory(CATEGORY_DESTROY+CATEGORY_TOGRAVE)
+	e5:SetCondition(function(e) return not cid.ccon(e) and Duel.GetTurnPlayer()==e:GetHandlerPlayer() end)
+	e5:SetTarget(cid.destg)
+	e5:SetOperation(cid.desop)
+	c:RegisterEffect(e5)
+end
+function cid.tgcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return Duel.IsExistingMatchingCard(cid.costfilter,tp,LOCATION_HAND,0,1,c) and c:IsDiscardable() end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+	Duel.SendtoGrave(Duel.SelectMatchingCard(tp,cid.costfilter,tp,LOCATION_HAND,0,1,1,c)+c,REASON_COST+REASON_DISCARD)
+end
+function cid.tgfilter(c)
+	return c:IsSetCard(0x2e7) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToGrave()
+end
+function cid.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(cid.tgfilter,tp,LOCATION_DECK,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
+end
+function cid.tgop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+	Duel.SendtoGrave(Duel.SelectMatchingCard(tp,cid.tgfilter,tp,LOCATION_DECK,0,1,1,nil),REASON_EFFECT)
+end
+function cid.destg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,e:GetHandler(),1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_REMOVED)
+end
+function cid.desop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) or Duel.Destroy(c,REASON_EFFECT)==0 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+	Duel.SendtoGrave(Duel.GetFieldGroup(tp,LOCATION_REMOVED,0):Select(tp,1,1,nil),REASON_EFFECT+REASON_RETURN)
 end
 function cid.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp and (Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2) and not Duel.IsPlayerAffectedByEffect(tp,911630825)

@@ -32,6 +32,53 @@ function cid.initial_effect(c)
 	e3:SetTarget(cid.atktg)
 	e3:SetOperation(cid.atkop)
 	c:RegisterEffect(e3)
+	--You can discard this card and 1 other Zombie monster;  send the top 3 cards of your Deck to the GY, and if you do, draw 1 card. You can only use this effect of "Lich-Lord Zhera" once per turn.
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_IGNITION)
+	e4:SetRange(LOCATION_HAND)
+	e4:SetCountLimit(1,id)
+	e4:SetCost(cid.tgcost)
+	e4:SetCategory(CATEGORY_DECKDES+CATEGORY_DRAW)
+	e4:SetTarget(cid.tgtg)
+	e4:SetOperation(cid.tgop)
+	c:RegisterEffect(e4)
+	--Once per turn, during your Standby Phase, if there is no "Lich-Lord's Phylactery" in your GY: Destroy this card, and if you do, send 1 "Lich-Lord's Phylactery" from your Deck to your GY.
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
+	e5:SetCode(EVENT_PHASE+PHASE_STANDBY)
+	e5:SetRange(LOCATION_MZONE)
+	e5:SetCountLimit(1)
+	e5:SetCategory(CATEGORY_DESTROY+CATEGORY_TOGRAVE)
+	e5:SetCondition(function(e) return not cid.ccon(e) and Duel.GetTurnPlayer()==e:GetHandlerPlayer() end)
+	e5:SetTarget(cid.destg)
+	e5:SetOperation(cid.desop)
+	c:RegisterEffect(e5)
+end
+function cid.tgcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return Duel.IsExistingMatchingCard(cid.costfilter,tp,LOCATION_HAND,0,1,c) and c:IsDiscardable() end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+	Duel.SendtoGrave(Duel.SelectMatchingCard(tp,cid.costfilter,tp,LOCATION_HAND,0,1,1,c)+c,REASON_COST+REASON_DISCARD)
+end
+function cid.destg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,e:GetHandler(),1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
+end
+function cid.desop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) or Duel.Destroy(c,REASON_EFFECT)==0 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+	Duel.SendtoGrave(Duel.SelectMatchingCard(tp,cid.cfilter1,tp,LOCATION_DECK,0,1,1,nil),REASON_EFFECT)
+end
+function cid.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsPlayerCanDiscardDeck(tp,3) and Duel.IsPlayerCanDraw(tp,1)
+		and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>3 end
+	Duel.SetOperationInfo(0,CATEGORY_DECKDES,nil,0,tp,3)
+	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
+end
+function cid.tgop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.DiscardDeck(tp,3,REASON_EFFECT) then Duel.Draw(tp,1,REASON_EFFECT) end
 end
 function cid.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp and (Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2) and not Duel.IsPlayerAffectedByEffect(tp,911630825)

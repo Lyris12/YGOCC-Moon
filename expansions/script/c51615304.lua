@@ -39,19 +39,19 @@ function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
 end
-function cid.cfilter(c,tp)
+function cid.rfilter(c,tp)
 	return c:IsSetCard(0x1cfd) and Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_DECK,0,1,nil,c)
 end
 function cid.filter(c,ec)
 	return aux.IsCodeListed(ec,c:GetCode()) and c:IsAbleToGrave()
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(cid.cfilter,tp,LOCATION_EXTRA,0,1,nil,tp) end
+	if chk==0 then return Duel.IsExistingMatchingCard(cid.rfilter,tp,LOCATION_EXTRA,0,1,nil,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
 end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
-	local tc=Duel.SelectMatchingCard(tp,cid.cfilter,tp,LOCATION_EXTRA,0,1,1,nil,tp):GetFirst()
+	local tc=Duel.SelectMatchingCard(tp,cid.rfilter,tp,LOCATION_EXTRA,0,1,1,nil,tp):GetFirst()
 	if not tc then return end
 	Duel.ConfirmCards(1-tp,tc)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)

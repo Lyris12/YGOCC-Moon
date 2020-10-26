@@ -29,6 +29,69 @@ function cid.initial_effect(c)
 	e3:SetCondition(cid.ccon)
 	e3:SetValue(cid.aclimit)
 	c:RegisterEffect(e3)
+	--You can discard this card and 1 other Zombie monster; destroy 1 card on the field. You can only use this effect of "Lich-Lord Irq" once per turn.
+	local e4=Effect.CreateEffect(c)
+	e4:SetCategory(CATEGORY_DESTROY)
+	e4:SetType(EFFECT_TYPE_IGNITION)
+	e4:SetRange(LOCATION_HAND)
+	e4:SetCountLimit(1,id)
+	e4:SetCost(cid.tgcost)
+	e4:SetTarget(cid.tgtg)
+	e4:SetOperation(cid.tgop)
+	c:RegisterEffect(e4)
+	--Once per turn, during your Standby Phase, if a "Lich-Lord's Phylactery" is not in your GY: Destroy this card, and if you do, activate 1 "Zombie World" directly from your Deck or GY.
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
+	e5:SetCode(EVENT_PHASE+PHASE_STANDBY)
+	e5:SetRange(LOCATION_MZONE)
+	e5:SetCountLimit(1)
+	e5:SetCategory(CATEGORY_DESTROY)
+	e5:SetCondition(function(e) return not cid.ccon(e) and Duel.GetTurnPlayer()==e:GetHandlerPlayer() end)
+	e5:SetTarget(cid.destg)
+	e5:SetOperation(cid.desop)
+	c:RegisterEffect(e5)
+end
+function cid.tgcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return Duel.IsExistingMatchingCard(cid.costfilter,tp,LOCATION_HAND,0,1,c) and c:IsDiscardable() end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+	Duel.SendtoGrave(Duel.SelectMatchingCard(tp,cid.costfilter,tp,LOCATION_HAND,0,1,1,c)+c,REASON_COST+REASON_DISCARD)
+end
+function cid.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local g=Duel.GetFieldGroup(tp,LOCATION_ONFIELD,LOCATION_ONFIELD)
+	if chk==0 then return #g>0 end
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
+end
+function cid.tgop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+	Duel.Destroy(Duel.GetFieldGroup(tp,LOCATION_ONFIELD,LOCATION_ONFIELD):Select(tp,1,1,nil),REASON_EFFECT)
+end
+function cid.filter(c,tp)
+	return c:IsCode(4064256) and c:GetActivateEffect() and c:GetActivateEffect():IsActivatable(tp,true,true)
+end
+function cid.destg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,e:GetHandler(),1,0,0)
+end
+function cid.desop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) or Duel.Destroy(c,REASON_EFFECT)==0 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
+	local tc=Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_GRAVE+LOCATION_DECK,0,1,1,nil,tp):GetFirst()
+	if tc then
+		local fc=Duel.GetFieldCard(tp,LOCATION_FZONE,0)
+		if fc then
+			Duel.SendtoGrave(fc,REASON_RULE)
+			Duel.BreakEffect()
+		end
+		Duel.MoveToField(tc,tp,tp,LOCATION_FZONE,POS_FACEUP,true)
+		local te=tc:GetActivateEffect()
+		te:UseCountLimit(tp,1,true)
+		local tep=tc:GetControler()
+		local cost=te:GetCost()
+		if cost then cost(te,tep,eg,ep,ev,re,r,rp,1) end
+		Duel.RaiseEvent(tc,4179255,te,0,tp,tp,Duel.GetCurrentChain())
+	end
 end
 function cid.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp and (Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2) and not Duel.IsPlayerAffectedByEffect(tp,911630825)
@@ -84,4 +147,7 @@ function cid.ccon(e,tp,eg,ep,ev,re,r,rp)
 end
 function cid.aclimit(e,re,tp)
 	return re:GetActivateLocation()==LOCATION_GRAVE and re:IsActiveType(TYPE_MONSTER)
+end
+function cid.costfilter(c)
+	return c:IsRace(RACE_ZOMBIE) and c:IsDiscardable()
 end

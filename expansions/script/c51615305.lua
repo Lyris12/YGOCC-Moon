@@ -53,7 +53,7 @@ end
 function cid.condition(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(cid.cfilter,1,nil) and rp==tp
 end
-function cid.thtg(e,tp,eg,ep,ev,re,rp,chk)
+function cid.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(aux.AND(Card.IsCode,Card.IsAbleToHand),tp,LOCATION_DECK,0,1,nil,id+8) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
