@@ -16,13 +16,14 @@ function cm.initial_effect(c)
 	e2:SetDescription(aux.Stringid(m,2))
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_EXTRA)
+	e2:SetCountLimit(3)
 	e2:SetTarget(cm.target)
 	e2:SetOperation(cm.operation)
 	c:RegisterEffect(e2)
 
 	local RUNEC=Effect.CreateEffect(c)
 	RUNEC:SetDescription(aux.Stringid(m,1))
-	RUNEC:SetType(EFFECT_TYPE_IGNITION)
+	RUNEC:SetType(EFFECT_TYPE_FIELD)
 	RUNEC:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_SINGLE_RANGE)
 	RUNEC:SetRange(LOCATION_EXTRA)
 	RUNEC:SetCode(EFFECT_SPSUMMON_PROC_G)
@@ -48,6 +49,7 @@ function cm.start(e,tp,eg,ep,ev,re,r,rp)
 end
 
 function cid.skillop(e,tp,eg,ep,ev,re,r,rp,c)
+	Duel.Hint(HINT_CARD,0,id)
 	Duel.AnnounceNumber(e:GetHandlerPlayer(),Duel.GetRP(e:GetHandlerPlayer()))
 	cid.announce_filter={0xff5,OPCODE_ISSETCARD}
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CODE)
@@ -79,10 +81,9 @@ end
 function cm.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsFaceup() end
 	if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
-	local g=Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
+	local g=Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,99,nil)
 end
 
 function cm.operation(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFirstTarget()
-	tc:AddRuneslots(1)
+	for tc in aux.Next(Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)) do tc:AddRuneslots(1) end
 end
