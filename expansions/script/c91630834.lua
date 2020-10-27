@@ -64,6 +64,18 @@ function cid.initial_effect(c)
 	e8:SetCondition(cid.mtcon)
 	e8:SetOperation(cid.mtop)
 	c:RegisterEffect(e8)
+	--If this card is in the GY, except during the turn it was sent to the GY: You can target 1 of your banished Zombie monsters, or 1 of your banished "Lich-Lord" Spell/Traps; shuffle this card into your Deck, and if you do, add that target to your hand. You can only use this effect of "Lich-Lord's Black Book" once per turn.
+	local e9=Effect.CreateEffect(c)
+	e9:SetType(EFFECT_TYPE_QUICK_O)
+	e9:SetCode(EVENT_FREE_CHAIN)
+	e9:SetRange(LOCATION_GRAVE)
+	e9:SetCountLimit(1,id)
+	e9:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e9:SetCategory(CATEGORY_TODECK+CATEGORY_TOHAND)
+	e9:SetCondition(aux.exccon)
+	e9:SetTarget(cid.tg)
+	e9:SetOperation(cid.op)
+	c:RegisterEffect(e9)
 end
 function cid.rmfilter(c)
 	return c:IsRace(RACE_ZOMBIE) and c:IsType(TYPE_MONSTER) and c:IsAbleToDeckAsCost()
@@ -125,4 +137,23 @@ function cid.mtop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Hint(HINT_CARD,0,id)
 		Duel.SendtoDeck(e:GetHandler(),nil,1,REASON_COST)
 	end
+end
+function cid.filter(c)
+	if c:IsFacedown() or not c:IsAbleToHand() then return false end
+	if c:IsType(TYPE_MONSTER) then return c:IsRace(RACE_ZOMBIE)
+	else return c:IsSetCard(0x2e7) end
+end
+function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and chkc:IsControler(tp) and cid.filter(chkc) end
+	local c=e:GetHandler()
+	if chk==0 then return c:IsAbleToDeck() and Duel.IsExistingTarget(cid.filter,tp,LOCATION_REMOVED,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,c,1,0,0)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,Duel.SelectTarget(tp,cid.filter,tp,LOCATION_REMOVED,0,1,1,nil),1,0,0)
+end
+function cid.op(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) or Duel.SendtoDeck(c,nil,2,REASON_EFFECT)==0 or not c:IsLocation(LOCATION_DECK) then return end
+	local tc=Duel.GetFirstTarget()
+	if tc and tc:IsRelateToEffect(e) then Duel.SendtoHand(tc,nil,REASON_EFFECT) end
 end
