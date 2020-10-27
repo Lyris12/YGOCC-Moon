@@ -33,7 +33,9 @@ function cid.checkop(e,tp,eg,ep,ev,re,r,rp)
 end
 function cid.attg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsRelateToEffect(e) end
-	Duel.Hint(HINT_OPSELECTED,0,aux.Stringid(id,tp))
+	local p=rp
+	if tp~=0 then p=1-p end
+	Duel.Hint(HINT_OPSELECTED,0,aux.Stringid(id,p))
 	local tc=Group.FromCards(re:GetHandler())
 	Duel.HintSelection(tc)
 	Duel.SetTargetCard(tc)
