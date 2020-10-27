@@ -26,11 +26,6 @@ function cid.initial_effect(c)
 	e4:SetCode(EFFECT_SELF_DESTROY)
 	e4:SetCondition(cid.sdcon)
 	c:RegisterEffect(e4)
-	if not cid.global_check then
-		cid.global_check=true
-		cid[0]=aux.Stringid(id,0)
-		cid[1]=aux.Stringid(id,1)
-	end
 end
 function cid.checkop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=re:GetHandler()
@@ -38,7 +33,7 @@ function cid.checkop(e,tp,eg,ep,ev,re,r,rp)
 end
 function cid.attg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsRelateToEffect(e) end
-	Duel.Hint(HINT_OPSELECTED,0,cid[rp])
+	Duel.Hint(HINT_OPSELECTED,0,aux.Stringid(id,tp))
 	local tc=Group.FromCards(re:GetHandler())
 	Duel.HintSelection(tc)
 	Duel.SetTargetCard(tc)
@@ -46,7 +41,7 @@ end
 function cid.atop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if not c:IsRelateToEffect(e) or not tc:IsRelateToEffect(e) then return end
+	if not c:IsRelateToEffect(e) or not tc:IsRelateToEffect(e) or not tc:IsType(TYPE_XYZ) then return end
 	local p=e:GetLabel()
 	local g=Duel.GetDecktopGroup(p,1)
 	if #g==0 then return end
