@@ -50,7 +50,7 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function cid.mfilter(c,fc,sub,mg,sg)
-	return c:IsRace(RACE_ZOMBIE) and (not sg or sg:IsExists(Card.IsFusionSetCard,1,nil,0x2e7))
+	return c:IsRace(RACE_ZOMBIE) and (not sg or #sg==0 or sg:IsExists(Card.IsFusionSetCard,1,nil,0x2e7))
 end
 function cid.spfilter1(c,e,tp)
 	return c:IsLevelBelow(5) and c:IsRace(RACE_ZOMBIE) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

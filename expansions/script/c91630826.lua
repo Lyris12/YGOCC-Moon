@@ -3,7 +3,7 @@ local cid,id=GetID()
 function cid.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
-	aux.AddFusionProcFunRep(c,cid.ffilter,5,true)
+	aux.AddFusionProcFunRep(c,cid.ffilter,5,false)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -51,7 +51,7 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function cid.ffilter(c,fc,sub,mg,sg)
-	return c:IsRace(RACE_ZOMBIE) and (not sg or sg:IsExists(Card.IsFusionSetCard,2,nil,0x2e7))
+	return c:IsRace(RACE_ZOMBIE) and (not sg or #sg==0 or sg:IsExists(Card.IsFusionSetCard,2,nil,0x2e7))
 end
 function cid.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
