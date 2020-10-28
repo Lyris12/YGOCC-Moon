@@ -193,9 +193,6 @@ end
 
 function Duel.GetHasteChance(player)
 	local haste=Duel.GetHaste(player)
-	local drhalf = 100
---	local chancecapperc = 50
---	local chancecap = chancecapperc * 0.01
 	return haste/100
 end
 
