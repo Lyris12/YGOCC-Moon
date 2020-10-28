@@ -51,7 +51,7 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function cid.ffilter(c,fc,sub,mg,sg)
-	return c:IsRace(RACE_ZOMBIE) and (not sg or #sg==0 or sg:IsExists(Card.IsFusionSetCard,2,nil,0x2e7))
+	return c:IsRace(RACE_ZOMBIE) and (not sg or #sg<2 or sg:IsExists(Card.IsFusionSetCard,2,nil,0x2e7))
 end
 function cid.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
