@@ -35,6 +35,7 @@ function cid.initial_effect(c)
 	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e5:SetProperty(EFFECT_FLAG_DELAY)
 	e5:SetCode(EVENT_TO_GRAVE)
+	e5:SetCountLimit(1,id)
 	e5:SetCondition(cid.spcon)
 	e5:SetTarget(cid.sptg)
 	e5:SetOperation(cid.spop)
@@ -44,7 +45,7 @@ function cid.initial_effect(c)
 	local e6=Effect.CreateEffect(c)
 	e6:SetType(EFFECT_TYPE_IGNITION)
 	e6:SetRange(LOCATION_GRAVE)
-	e6:SetCountLimit(1,id)
+	e6:SetCountLimit(1,id+1000)
 	e6:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e6:SetCategory(CATEGORY_DRAW+CATEGORY_TODECK)
 	e6:SetCondition(aux.exccon)
@@ -57,10 +58,7 @@ function cid.ctfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x2e7)
 end
 function cid.ctop(e,tp,eg,ep,ev,re,r,rp)
-	if eg:IsExists(cid.ctfilter,1,nil) and Duel.GetFlagEffect(tp,id)==0 then
-		e:GetHandler():AddCounter(0x2e7,1)
-		Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
-	end
+	if eg:IsExists(cid.ctfilter,1,nil) then e:GetHandler():AddCounter(0x2e7,1) end
 end
 function cid.atkval(e)
 	return e:GetHandler():GetCounter(0x2e7)*-100
