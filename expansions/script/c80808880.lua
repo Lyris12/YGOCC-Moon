@@ -85,5 +85,7 @@ function cm.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 
 function cm.operation(e,tp,eg,ep,ev,re,r,rp)
-	for tc in aux.Next(Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)) do tc:AddRuneslots(1) end
+	local t={}
+	for i=1,12 do table.insert(t,i) end
+	for tc in aux.Next(Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)) do tc:AddRuneslots(Duel.AnnounceNumber(tp,table.unpack(t))) end
 end
