@@ -74,7 +74,7 @@ function cid.desop(e,tp,eg,ep,ev,re,r,rp)
 	if ct==#g then
 		Duel.BreakEffect()
 		Duel.Draw(tp,7-Duel.GetFieldGroupCount(tp,LOCATION_HAND,0),REASON_EFFECT)
-		Duel.Draw(1-tp,7-Duel.GetFieldGroup(tp,0,LOCATION_HAND),REASON_EFFECT)
+		Duel.Draw(1-tp,7-Duel.GetFieldGroupCount(tp,0,LOCATION_HAND),REASON_EFFECT)
 	end
 end
 function cid.aclimit(e,re,tp)
