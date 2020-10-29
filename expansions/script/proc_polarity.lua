@@ -16,9 +16,9 @@ TYPE_EXTRA							=TYPE_EXTRA|TYPE_POLARITY
 
 --overwrite functions
 local get_type, get_orig_type, get_prev_type_field, get_level, get_syn_level, get_rit_level, get_orig_level, is_xyz_level, 
-	get_prev_level_field, is_level, is_level_below, is_level_above = 
+	get_prev_level_field, is_level, is_level_below, is_level_above, syn_target = 
 	Card.GetType, Card.GetOriginalType, Card.GetPreviousTypeOnField, Card.GetLevel,
-	Card.GetSynchroLevel, Card.GetRitualLevel, Card.GetOriginalLevel, Card.IsXyzLevel, Card.GetPreviousLevelOnField, Card.IsLevel, Card.IsLevelBelow, Card.IsLevelAbove
+	Card.GetSynchroLevel, Card.GetRitualLevel, Card.GetOriginalLevel, Card.IsXyzLevel, Card.GetPreviousLevelOnField, Card.IsLevel, Card.IsLevelBelow, Card.IsLevelAbove, Auxiliary.SynTarget
 
 Card.GetType=function(c,scard,sumtype,p)
 	local tpe=scard and get_type(c,scard,sumtype,p) or get_type(c)
@@ -89,6 +89,17 @@ end
 Card.IsLevelAbove=function(c,lv)
 	if Auxiliary.Polarities[c] and not Auxiliary.Polarities[c]() then return false end
 	return is_level_above(c,lv)
+end
+Auxiliary.SynTarget=function(f1,f2,minc,maxc)
+	return	function(e,tp,eg,ep,ev,re,r,rp,chk,c,smat,mg,min,max)
+				local res=syn_target(f1,f2,minc,maxc)(e,tp,eg,ep,ev,re,r,rp,chk,c,smat,mg,min,max)
+				local g=e:GetLabelObject()
+				if g:IsExists(function(tc) return Auxiliary.Polarities[tc] and not Auxiliary.Polarities[tc]() end,1,nil) then
+					g:DeleteGroup()
+					res=false
+				end
+				return res
+	end
 end
 
 --Custom Functions

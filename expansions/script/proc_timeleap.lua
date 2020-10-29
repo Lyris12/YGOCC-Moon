@@ -25,9 +25,9 @@ TYPE_EXTRA							=TYPE_EXTRA|TYPE_TIMELEAP
 
 --overwrite functions
 local get_type, get_orig_type, get_prev_type_field, get_level, get_syn_level, get_rit_level, get_orig_level, is_xyz_level, 
-	get_prev_level_field, is_level, is_level_below, is_level_above, get_reason = 
+	get_prev_level_field, is_level, is_level_below, is_level_above, get_reason, syn_target = 
 	Card.GetType, Card.GetOriginalType, Card.GetPreviousTypeOnField, Card.GetLevel, 
-	Card.GetSynchroLevel, Card.GetRitualLevel, Card.GetOriginalLevel, Card.IsXyzLevel, Card.GetPreviousLevelOnField, Card.IsLevel, Card.IsLevelBelow, Card.IsLevelAbove, Card.GetReason
+	Card.GetSynchroLevel, Card.GetRitualLevel, Card.GetOriginalLevel, Card.IsXyzLevel, Card.GetPreviousLevelOnField, Card.IsLevel, Card.IsLevelBelow, Card.IsLevelAbove, Card.GetReason, Auxiliary.SynTarget
 
 Card.GetType=function(c,scard,sumtype,p)
 	local tpe=scard and get_type(c,scard,sumtype,p) or get_type(c)
@@ -106,6 +106,17 @@ Card.GetReason=function(c)
 		rs=rs|REASON_TIMELEAP
 	end
 	return rs
+end
+Auxiliary.SynTarget=function(f1,f2,minc,maxc)
+	return	function(e,tp,eg,ep,ev,re,r,rp,chk,c,smat,mg,min,max)
+				local res=syn_target(f1,f2,minc,maxc)(e,tp,eg,ep,ev,re,r,rp,chk,c,smat,mg,min,max)
+				local g=e:GetLabelObject()
+				if g:IsExists(function(tc) return Auxiliary.Timeleaps[tc] and not Auxiliary.Timeleaps[tc]() end,1,nil) then
+					g:DeleteGroup()
+					res=false
+				end
+				return res
+	end
 end
 
 --Custom Functions
@@ -351,7 +362,7 @@ function Auxiliary.TimeleapOperation(customop)
 				local g=e:GetLabelObject()
 				c:SetMaterial(g)
 				if not customop then
-					Duel.Remove(g,POS_FACEUP,REASON_MATERIAL+0x10000000000)
+					Duel.Remove(g,POS_FACEUP,REASON_MATERIAL+REASON_TIMELEAP)
 					if Duel.GetFlagEffect(tp,829)<=0 then
 						Duel.RegisterFlagEffect(tp,828,RESET_PHASE+PHASE_END,0,1)
 					else

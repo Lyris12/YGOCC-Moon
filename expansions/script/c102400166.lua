@@ -14,7 +14,7 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function cid.filter(c,tp)
-	return c:GetSequence()<21 and c:IsAbleToRemove(tp,POS_FACEDOWN)
+	return c:GetSequence()<20 and c:IsAbleToRemove(tp,POS_FACEDOWN)
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>24 and Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_DECK,0,20,nil,tp)
@@ -25,25 +25,27 @@ end
 function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
 	local g1,g2=Duel.GetMatchingGroup(cid.filter,p,LOCATION_DECK,0,nil,p),Duel.GetMatchingGroup(Card.IsAbleToDeck,p,LOCATION_GRAVE+LOCATION_REMOVED,0,nil)
-	local b1,b2=Duel.GetFieldGroupCount(p,LOCATION_DECK,0)>24 and #g1>19,#g2>19
+	local b1,b2=Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>21 and #g1>19,#g2>19
 	if not b1 and not b2 then return end
 	if b2 and (not b1 or Duel.SelectOption(tp,1192,1105)~=0) then
-		Duel.SendtoDeck(g:Select(p,20,20,nil),nil,2,REASON_EFFECT)
+		if Duel.SendtoDeck(g2:Select(p,20,20,nil),nil,2,REASON_EFFECT)==0 or not g2:IsExists(Card.IsLocation,20,nil,LOCATION_DECK+LOCATION_EXTRA) then return end
 		Duel.ShuffleDeck(p)
-	else Duel.Remove(g1,POS_FACEDOWN,REASON_EFFECT) end
-	Duel.DisableShuffleCheck()
+	else
+		Duel.DisableShuffleCheck()
+		if Duel.Remove(g1,POS_FACEDOWN,REASON_EFFECT)==0 then return end
+	end
 	Duel.BreakEffect()
 	Duel.ConfirmDecktop(p,5)
 	local g=Duel.GetDecktopGroup(p,5)
 	Duel.Hint(HINT_SELECTMSG,p,HINTMSG_ATOHAND)
-	local sc=g:Select(p,2,2,nil):GetFirst()
-	if not sc then return end
-	if sc:IsAbleToHand() then
-		Duel.SendtoHand(sc,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-p,sc)
+	local sg=g:Select(p,2,2,nil)
+	Duel.DisableShuffleCheck()
+	Duel.SendtoHand(sg:Filter(Card.IsAbleToHand,nil),nil,REASON_EFFECT)
+	Duel.SendtoGrave(sg:Filter(aux.NOT(Card.IsAbleToHand),nil),REASON_RULE)
+	local hg=sg:Filter(Card.IsLocation,nil,LOCATION_HAND)
+	if #hg>0 then
+		Duel.ConfirmCards(1-p,hg)
 		Duel.ShuffleHand(p)
-	else
-		Duel.SendtoGrave(sc,REASON_RULE)
 	end
 	Duel.SortDecktop(p,p,3)
 	for i=1,3 do
