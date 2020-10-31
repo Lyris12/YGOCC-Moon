@@ -55,12 +55,11 @@ function cm.spop(e,tp,eg,ep,ev,re,r,rp)
 		if Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)~=0 and Duel.IsExistingMatchingCard(cm.sparkfilter,tp,LOCATION_GRAVE,0,1,nil) then
 			ifclause=true
 		end
-		Duel.ConfirmCards(1-tp,g)
 		if ifclause and Duel.IsExistingMatchingCard(cm.addfilter,tp,0,LOCATION_GRAVE,1,nil) then
 			local sg=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(cm.addfilter),tp,0,LOCATION_GRAVE,1,1,nil)
 			if #sg>0 then
 				Duel.HintSelection(sg)
-				Duel.SendToHand(sg,nil,REASON_EFFECT)
+				Duel.SendtoHand(sg,nil,REASON_EFFECT)
 			end
 		end
 	end
