@@ -491,7 +491,7 @@ function Auxiliary.PandOperation(e,tp,eg,ep,ev,re,r,rp,c,sg,og)
 										end
 									end
 								else
-									Duel.SendtoGrave(e:GetHandler(),REASON_RULE)
+									Duel.Destroy(e:GetHandler(),REASON_RULE)
 								end
 							end)
 			e1:SetReset(RESET_EVENT+RESETS_STANDARD)
