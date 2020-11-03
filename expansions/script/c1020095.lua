@@ -95,7 +95,7 @@ function c1020095.atkop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 --spsummon
-function c1020094.spcon(e,tp,eg,ep,ev,re,r,rp)
+function c1020095.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return c:IsReason(REASON_DESTROY) and c:IsReason(REASON_BATTLE+REASON_EFFECT) and c:IsPreviousLocation(LOCATION_ONFIELD)
 		and c:IsPreviousPosition(POS_FACEUP) and c:GetPreviousControler()==tp

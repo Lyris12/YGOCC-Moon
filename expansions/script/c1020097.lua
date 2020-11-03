@@ -103,7 +103,7 @@ function c1020097.rmop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 --spsummon LINK
-function c1020096.spcon(e,tp,eg,ep,ev,re,r,rp)
+function c1020097.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousLocation(LOCATION_MZONE)
 		and e:GetHandler():GetPreviousSequence()>4
 end
