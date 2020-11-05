@@ -28,7 +28,7 @@ function c500310020.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c500310020.thfilter(c)
-	return c:IsSetCard(0xa34) and not c:IsCode(500310020) and c:IsAbleToHand()
+	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xa34) and not c:IsCode(500310020) and c:IsAbleToHand()
 end
 function c500310020.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	 if chkc then return chkc:GetControler()==tp and chkc:GetLocation()==LOCATION_GRAVE and c500310020.thfilter(chkc) end

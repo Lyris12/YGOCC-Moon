@@ -3,7 +3,7 @@ local cid,id=GetID()
 function cid.initial_effect(c)
 	--time leap procedure
 	aux.AddOrigTimeleapType(c,false)
-	aux.AddTimeleapProc(c,5,function(e,tc) return Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsCode),tp,LOCATION_FZONE,0,1,nil,41198608) end,aux.FilterBoolFunction(Card.IsCode,41198605))
+	aux.AddTimeleapProc(c,5,function(e,tc) return Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsCode),tc:GetControler(),LOCATION_FZONE,0,1,nil,41198608) end,aux.FilterBoolFunction(Card.IsCode,41198605))
 	c:EnableReviveLimit()
 	--spsummon limit
 	local e1=Effect.CreateEffect(c)

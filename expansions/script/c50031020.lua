@@ -10,6 +10,7 @@ function cid.initial_effect(c)
 	e0:SetCode(EFFECT_EXTRA_EVOLUTE_MATERIAL)
 	e0:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SET_AVAILABLE)
 	e0:SetValue(cid.evofilter)
+	e0:SetOperation(function(c,tp) Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1) end)
 	c:RegisterEffect(e0) 
 	--negate
 	local e1=Effect.CreateEffect(c)
@@ -45,7 +46,7 @@ function cid.checkfilter(c,tp,sg,ec,ct,minc,maxc)
 	return not sg:IsExists(Card.IsType,1,nil,TYPE_EVOLUTE)
 end
 function cid.evofilter(e,c)
-	return c:IsSetCard(0xa34) and c:IsType(TYPE_EVOLUTE)
+	return c:IsSetCard(0xa34) and c:IsType(TYPE_EVOLUTE) and Duel.GetFlagEffect(e:GetHandlerPlayer(),id)==0
 end
 function cid.filter1(c,ec,tp)
 	return c:IsAttribute(ATTRIBUTE_DARK) and not c:IsType(TYPE_EVOLUTE)
@@ -104,6 +105,6 @@ end
 function cid.hspop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_MATERIAL)
 	local g=Duel.SelectMatchingCard(tp,cid.spfilter,tp,LOCATION_MZONE,0,1,1,nil,c,tp)
-    Duel.SendtoGrave(g,REASON_MATERIAL+0x10000000)
+	Duel.SendtoGrave(g,REASON_MATERIAL+0x10000000)
 	Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
 end
