@@ -124,7 +124,7 @@ function Card.IsCanBeTimeleapMaterial(c,ec,...)
 	local funs={...}
 	local exctyp=funs[1]
 	if not exctyp then
-		if c:IsType(TYPE_LINK) or c:IsType(TYPE_EVOLUTE) or c:IsType(TYPE_XYZ) then return false end
+		if c:IsType(TYPE_LINK+TYPE_EVOLUTE+TYPE_XYZ) then return false end
 	end
 	local tef={c:IsHasEffect(EFFECT_CANNOT_BE_TIMELEAP_MATERIAL)}
 	for _,te in ipairs(tef) do
