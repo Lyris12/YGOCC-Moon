@@ -12,7 +12,7 @@ function cid.initial_effect(c)
 	--add counters
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_COUNTER)
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
 	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e1:SetCountLimit(1,id)
@@ -73,13 +73,13 @@ function cid.counterfilter(c)
 end
 --add counters
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsCanAddCounter(tp,0x81081,5,e:GetHandler()) end
+	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_COUNTER,nil,5,0,0x81081)
 end
 function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) then
-		c:AddCounter(0x81081,5)
+		c:AddCounter(0x83081,5)
 	end
 end
 --token spawn
@@ -133,8 +133,6 @@ function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetValue(cid.efilter)
 		token:RegisterEffect(e2,true)
 		token:RegisterFlagEffect(0,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(21770262,2))
-	else
-		return
 	end
 end
 function cid.efilter(e,te)

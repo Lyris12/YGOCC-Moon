@@ -72,7 +72,7 @@ end
 function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) then
-		c:AddCounter(0x81081,5)
+		c:AddCounter(0x83081,5)
 	end
 end
 --token spawn
@@ -126,8 +126,6 @@ function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetValue(cid.efilter)
 		token:RegisterEffect(e2,true)
 		token:RegisterFlagEffect(0,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(21770262,0))
-	else
-		return
 	end
 end
 function cid.efilter(e,te)

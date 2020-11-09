@@ -46,8 +46,8 @@ function cid.costfilter(c,tp)
 	return c:IsFaceup() and c:IsSetCard(0x3ff)
 		and Duel.IsExistingMatchingCard(cid.clfilter,tp,0,LOCATION_ONFIELD,1,nil,c,tp)
 end
-function cid.clfilter(c,tg,tp)
-	local g=tg:GetColumnGroup()
+function cid.clfilter(c,tc,tp)
+	local g=tc:GetColumnGroup()
 	return g:IsContains(c) and c:GetControler()~=tp 
 end
 function cid.thfilter(c)
@@ -69,9 +69,7 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToEffect(e) then
 		local cl=tc:GetColumnGroup():Filter(aux.AND(Card.IsFaceup,Card.IsControler),nil,1-tp)
-		if #cl>0 then
-			Duel.Destroy(cl,REASON_EFFECT)
-		end
+		Duel.Destroy(cl,REASON_EFFECT)
 	end
 end
 --act in hand
