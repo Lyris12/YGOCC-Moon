@@ -24,7 +24,6 @@ function cid.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCountLimit(1)
-	e2:SetCost(cid.spcost)
 	e2:SetTarget(cid.sptg)
 	e2:SetOperation(cid.spop)
 	c:RegisterEffect(e2)
@@ -38,27 +37,11 @@ function cid.initial_effect(c)
 	e3:SetTarget(cid.destg)
 	e3:SetOperation(cid.desop)
 	c:RegisterEffect(e3)
-	Duel.AddCustomActivityCounter(id,ACTIVITY_SPSUMMON,cid.counterfilter)
 end
 --Conditions
 function cid.condition(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return rp==1-tp and c:IsReason(REASON_EFFECT) and c:GetPreviousControler()==tp
-end
---Costs
-function cid.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetCustomActivityCount(id,tp,ACTIVITY_SPSUMMON)==0 end
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)
-	e1:SetTargetRange(1,0)
-	e1:SetTarget(cid.splimit)
-	e1:SetReset(RESET_PHASE+PHASE_END)
-	Duel.RegisterEffect(e1,tp)
-end
-function cid.splimit(e,c,sump,sumtype,sumpos,targetp,se)
-	return not c:IsSetCard(0x8108) and c:IsLocation(LOCATION_EXTRA)
 end
 --Filters
 function cid.counterfilter(c)
@@ -126,6 +109,8 @@ function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetValue(cid.efilter)
 		token:RegisterEffect(e2,true)
 		token:RegisterFlagEffect(0,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(21770262,0))
+	else
+		return
 	end
 end
 function cid.efilter(e,te)
