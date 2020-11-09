@@ -44,14 +44,14 @@ function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 		local g=Duel.SelectMatchingCard(tp,cid.costfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil)
 		Duel.Remove(g,POS_FACEUP,REASON_COST)
-		e:SetLabel(1)
+		e:SetLabel(0)
 		Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,2)
 	else
-		e:SetLabel(0)
+		e:SetLabel(1)
 	end
 end
 function cid.activate(e,tp,eg,ep,ev,re,r,rp,chk)
-	if e:GetHandler():IsRelateToEffect(e) and e:GetLabel()==1 then
+	if e:GetHandler():IsRelateToEffect(e) and e:GetLabel()==0 then
 		Duel.Draw(tp,2,REASON_EFFECT)
 	end
 end
