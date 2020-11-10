@@ -53,7 +53,7 @@ function cid.spfilter(c,e,tp)
 		if e:GetCode()==EFFECT_SPSUMMON_PROC then
 			local ev=e:GetValue()
 			local ec=e:GetCondition()
-			if ev and (aux.GetValueType(ev)=="function" and ev(ef,c) or ev&825==825) and (not ec or ec(e,c)) then res=true end
+			if ev and (aux.GetValueType(ev)=="function" and ev(ef,c) or ev==SUMMON_TYPE_TIMELEAP) and (not ec or ec(e,c)) then res=true end
 		end
 	end
 	return res
