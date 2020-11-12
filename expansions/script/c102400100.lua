@@ -56,7 +56,7 @@ function cid.cfilter(c,tp)
 	return c:GetOriginalType()&TYPE_MONSTER~=0 and (c:IsPreviousPosition(POS_FACEUP) or c:GetPreviousControler()==tp) and c:IsSetCard(0x7c4)
 end
 function cid.setfilter(c,e,tp)
-	return c:IsSetCard(0x7c4) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsSSetable(true) and (c:IsType(TYPE_FIELD) or Duel.GetLocationCount(tp,LOCATION_SZONE)>0)
+	return (c:IsSetCard(0x7c4) and c:IsType(TYPE_SPELL+TYPE_TRAP) or c:IsCode(id+42)) and c:IsSSetable(true) and (c:IsType(TYPE_FIELD) or Duel.GetLocationCount(tp,LOCATION_SZONE)>0)
 end
 function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and cid.setfilter(chkc,e,tp) end

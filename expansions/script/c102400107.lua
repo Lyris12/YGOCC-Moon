@@ -57,7 +57,7 @@ function cid.cfilter(c,tp)
 	return c:GetOriginalType()&TYPE_MONSTER~=0 and (c:IsPreviousPosition(POS_FACEUP) or c:GetPreviousControler()==tp) and c:IsSetCard(0x7c4)
 end
 function cid.filter(c)
-	return c:IsSetCard(0x7c4) and c:IsAbleToHand() and c:IsType(TYPE_SPELL+TYPE_TRAP)
+	return c:IsAbleToHand() and (c:IsSetCard(0x7c4) and c:IsType(TYPE_SPELL+TYPE_TRAP) or c:IsCode(id+35))
 end
 function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and cid.filter(chkc) end
