@@ -42,7 +42,8 @@ function cid.splimit(e,c,sump,sumtype,sumpos,targetp,se)
 	return not c:IsSetCard(0xcfd) and c:IsLocation(LOCATION_EXTRA)
 end
 function cid.mfilter(c,tp,sc)
-	return c:IsCanBeTimeleapMaterial(sc) and c:GetLevel()==sc:GetFuture()-1 and Duel.GetMZoneCount(tp,c)>0
+	return c:IsCanBeTimeleapMaterial(sc) and c:GetLevel()==sc:GetFuture()-1
+		and Duel.GetLocationCountFromEx(tp,tp,c)>0
 end
 function cid.spfilter(c,e,tp)
 	if not Duel.IsExistingMatchingCard(cid.mfilter,tp,LOCATION_MZONE,0,1,nil,tp,c) or not c:IsSetCard(0xcfd)
@@ -59,49 +60,47 @@ function cid.spfilter(c,e,tp)
 	return res
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
 	if chk==0 then
-		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=-1 then return false end
-		local ef=Effect.CreateEffect(c)
-		ef:SetType(EFFECT_TYPE_SINGLE)
-		ef:SetCode(EFFECT_IGNORE_TIMELEAP_HOPT)
+		local c=e:GetHandler()
 		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_GRANT)
+		ge1:SetType(EFFECT_TYPE_FIELD)
+		ge1:SetCode(EFFECT_IGNORE_TIMELEAP_HOPT)
+		ge1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
 		ge1:SetTargetRange(LOCATION_EXTRA,LOCATION_EXTRA)
 		ge1:SetTarget(aux.TargetBoolFunction(Card.IsType,TYPE_TIMELEAP))
-		ge1:SetLabelObject(ef)
 		Duel.RegisterEffect(ge1,0)
 		local res=Duel.IsExistingMatchingCard(cid.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp)
 		ge1:Reset()
-		ef:Reset()
 		return res
 	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local ef=Effect.CreateEffect(c)
-	ef:SetType(EFFECT_TYPE_SINGLE)
-	ef:SetCode(EFFECT_IGNORE_TIMELEAP_HOPT)
 	local ge1=Effect.CreateEffect(c)
-	ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_GRANT)
+	ge1:SetType(EFFECT_TYPE_FIELD)
+	ge1:SetCode(EFFECT_IGNORE_TIMELEAP_HOPT)
+	ge1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
 	ge1:SetTargetRange(LOCATION_EXTRA,LOCATION_EXTRA)
 	ge1:SetTarget(aux.TargetBoolFunction(Card.IsType,TYPE_TIMELEAP))
-	ge1:SetLabelObject(ef)
-	Duel.RegisterEffect(ge1,tp)
+	Duel.RegisterEffect(ge1,0)
 	local g=Duel.GetMatchingGroup(cid.spfilter,tp,LOCATION_EXTRA,0,nil,e,tp)
 	if #g>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local sc=g:Select(tp,1,1,nil):GetFirst()
+		local tl=Duel.GetFlagEffect(tp,828)==0
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-		e1:SetCode(EVENT_SPSUMMON)
-		e1:SetCondition(function() return sc:IsSummonType(SUMMON_TYPE_TIMELEAP) end)
-		e1:SetOperation(function() ge1:Reset() ef:Reset() end)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+		e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+		e1:SetOperation(function(e) if tl then Duel.ResetFlagEffect(tp,828) end ge1:Reset() e:Reset() e:GetLabelObject():Reset() end)
 		sc:RegisterEffect(e1,true)
+		local e2=e1:Clone()
+		e2:SetCode(EVENT_SPSUMMON_NEGATED)
+		e2:SetLabelObject(e1)
+		sc:RegisterEffect(e2,true)
+		e1:SetLabelObject(e2)
 		Duel.SpecialSummonRule(tp,sc)
-	else ge1:Reset() ef:Reset() end
+	else ge1:Reset() end
 end
 function cid.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,nil) end
