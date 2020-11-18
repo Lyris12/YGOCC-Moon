@@ -1,7 +1,7 @@
 --created & coded by Lyris, art from Cardfight!! Vanguard's Soul Charge
 --ソウルチャージ
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
@@ -13,9 +13,9 @@ function cid.initial_effect(c)
 	e2:SetCode(EVENT_CHAIN_SOLVED)
 	e2:SetCountLimit(3)
 	e2:SetLabel(0)
-	e2:SetCondition(cid.checkop)
-	e2:SetTarget(cid.attg)
-	e2:SetOperation(cid.atop)
+	e2:SetCondition(s.checkop)
+	e2:SetTarget(s.attg)
+	e2:SetOperation(s.atop)
 	c:RegisterEffect(e2)
 	local e3=e2:Clone()
 	e3:SetLabel(1)
@@ -24,14 +24,14 @@ function cid.initial_effect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE)
 	e4:SetRange(LOCATION_SZONE)
 	e4:SetCode(EFFECT_SELF_DESTROY)
-	e4:SetCondition(cid.sdcon)
+	e4:SetCondition(s.sdcon)
 	c:RegisterEffect(e4)
 end
-function cid.checkop(e,tp,eg,ep,ev,re,r,rp)
+function s.checkop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=re:GetHandler()
 	return re:IsActiveType(TYPE_XYZ) and tc:IsLocation(LOCATION_ONFIELD) and tc:IsControler(e:GetLabel())
 end
-function cid.attg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.attg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsRelateToEffect(e) end
 	local p=rp
 	if tp~=0 then p=1-p end
@@ -40,7 +40,7 @@ function cid.attg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.HintSelection(tc)
 	Duel.SetTargetCard(tc)
 end
-function cid.atop(e,tp,eg,ep,ev,re,r,rp)
+function s.atop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if not c:IsRelateToEffect(e) or not tc:IsRelateToEffect(e) or not tc:IsType(TYPE_XYZ) then return end
@@ -57,7 +57,7 @@ function cid.atop(e,tp,eg,ep,ev,re,r,rp)
 		c:SetFlagEffectLabel(id,ap|ct)
 	end
 end
-function cid.sdcon(e)
+function s.sdcon(e)
 	local c=e:GetHandler()
 	return c:GetFlagEffect(id)>0 and bit.band(c:GetFlagEffectLabel(id),0x3)==0x3
 end

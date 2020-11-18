@@ -1,13 +1,13 @@
 --created & coded by Lyris, art by dsorokin755 of DeviantArt
 --ニュートリックス・ナイトクラッブ
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCountLimit(1,id+EFFECT_COUNT_CODE_OATH)
 	e1:SetCategory(CATEGORY_TOHAND)
-	e1:SetOperation(cid.activate)
+	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
@@ -26,15 +26,15 @@ function cid.initial_effect(c)
 	e3:SetCode(EVENT_CHAIN_SOLVING)
 	e3:SetRange(LOCATION_FZONE)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e3:SetOperation(cid.operation)
+	e3:SetOperation(s.operation)
 	c:RegisterEffect(e3)
 end
-function cid.filter(c)
+function s.filter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xd10) and c:IsAbleToHand()
 end
-function cid.activate(e,tp,eg,ep,ev,re,r,rp)
+function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
-	local g=Duel.GetMatchingGroup(aux.NecroValleyFilter(cid.filter),tp,LOCATION_DECK+LOCATION_GRAVE,0,nil)
+	local g=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.filter),tp,LOCATION_DECK+LOCATION_GRAVE,0,nil)
 	if g:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 		local sg=g:Select(tp,1,1,nil)
@@ -42,7 +42,7 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(1-tp,sg)
 	end
 end
-function cid.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local p=Duel.GetTurnPlayer()
 	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) or not re:IsHasType(EFFECT_TYPE_QUICK_O) or not re:GetHandler():IsSetCard(0xd10) then return false end
 	local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)

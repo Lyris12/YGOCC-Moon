@@ -1,23 +1,23 @@
 --created & coded by Lyris
 --インライトメント・エアトス翼
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1)
 	e1:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
-	e1:SetCondition(cid.atkcon)
-	e1:SetTarget(cid.atktg2)
-	e1:SetOperation(cid.atkop)
+	e1:SetCondition(s.atkcon)
+	e1:SetTarget(s.atktg2)
+	e1:SetOperation(s.atkop)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_CANNOT_ATTACK)
-	e2:SetCondition(cid.natkcon)
+	e2:SetCondition(s.natkcon)
 	c:RegisterEffect(e2)
-	Duel.AddCustomActivityCounter(id,ACTIVITY_ATTACK,cid.diratk(c))
+	Duel.AddCustomActivityCounter(id,ACTIVITY_ATTACK,s.diratk(c))
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e3:SetCode(EVENT_ATTACK_ANNOUNCE)
@@ -25,35 +25,35 @@ function cid.initial_effect(c)
 	e3:SetCountLimit(1,id)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e3:SetCategory(CATEGORY_DESTROY+CATEGORY_DAMAGE)
-	e3:SetCondition(cid.descon)
-	e3:SetTarget(cid.destg)
-	e3:SetOperation(cid.desop)
+	e3:SetCondition(s.descon)
+	e3:SetTarget(s.destg)
+	e3:SetOperation(s.desop)
 	c:RegisterEffect(e3)
 end
-function cid.atkcon(e,tp,eg,ep,ev,re,r,rp)
+function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
 	local at=Duel.GetAttackTarget()
 	return a:IsControler(tp) and a:IsSetCard(0xda6) and at
 end
-function cid.atktg2(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.atktg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return not Duel.GetAttacker():IsHasEffect(EFFECT_CANNOT_DIRECT_ATTACK) end
 end
-function cid.atkop(e,tp,eg,ep,ev,re,r,rp)
+function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ChangeAttackTarget(nil)
 end
-function cid.natkcon(e)
+function s.natkcon(e)
 	return Duel.GetCustomActivityCount(id,tp,ACTIVITY_ATTACK)>0
 end
-function cid.diratk(ec)
+function s.diratk(ec)
 	return  function(c)
 				return Duel.GetAttackTarget()~=nil or c==ec
 			end
 end
-function cid.descon(e,tp,eg,ep,ev,re,r,rp)
+function s.descon(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
 	return a:IsSetCard(0xda6) and a~=e:GetHandler()
 end
-function cid.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local dir=Duel.GetAttackTarget()==nil
 	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) end
 	if chk==0 then return true end
@@ -67,7 +67,7 @@ function cid.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		end
 	end
 end
-function cid.desop(e,tp,eg,ep,ev,re,r,rp)
+function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local dir=Duel.GetAttackTarget()==nil
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToEffect(e) then

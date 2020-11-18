@@ -1,37 +1,37 @@
 --created by Nadège, coded by Lyris, art from "Angel O7"
 --エンジェルO8
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetRange(LOCATION_HAND)
 	e1:SetCode(EFFECT_SUMMON_PROC)
-	e1:SetCondition(cid.hspcon)
-	e1:SetOperation(cid.hspop)
+	e1:SetCondition(s.hspcon)
+	e1:SetOperation(s.hspop)
 	e1:SetValue(SUMMON_TYPE_ADVANCE)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e2:SetCode(EVENT_SUMMON_SUCCESS)
-	e2:SetOperation(cid.regop)
+	e2:SetOperation(s.regop)
 	c:RegisterEffect(e2)
 end
-function cid.hspfilter(c,ft,tp)
+function s.hspfilter(c,ft,tp)
 	return c:IsCode(56784842) and (ft>0 or (c:IsControler(tp) and c:GetSequence()<5)) and (c:IsControler(tp) or c:IsFaceup())
 end
-function cid.hspcon(e,c,minc)
+function s.hspcon(e,c,minc)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	return c:IsLevelAbove(7) and minc<=1 and Duel.CheckTribute(c,1,1,Duel.GetMatchingGroup(cid.hspfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,Duel.GetLocationCount(tp,LOCATION_MZONE),tp))
+	return c:IsLevelAbove(7) and minc<=1 and Duel.CheckTribute(c,1,1,Duel.GetMatchingGroup(s.hspfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,Duel.GetLocationCount(tp,LOCATION_MZONE),tp))
 end
-function cid.hspop(e,tp,eg,ep,ev,re,r,rp,c)
-	local sg=Duel.SelectTribute(tp,c,1,1,Duel.GetMatchingGroup(cid.hspfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,Duel.GetLocationCount(tp,LOCATION_MZONE),tp))
+function s.hspop(e,tp,eg,ep,ev,re,r,rp,c)
+	local sg=Duel.SelectTribute(tp,c,1,1,Duel.GetMatchingGroup(s.hspfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,Duel.GetLocationCount(tp,LOCATION_MZONE),tp))
 	c:SetMaterial(sg)
 	Duel.Release(sg,REASON_SUMMON+REASON_MATERIAL)
 end
-function cid.regop(e,tp,eg,ep,ev,re,r,rp)
+function s.regop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsSummonType(SUMMON_TYPE_ADVANCE) then
 		local e1=Effect.CreateEffect(c)

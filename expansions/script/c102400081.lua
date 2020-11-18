@@ -1,7 +1,7 @@
 --created & coded by Lyris, art by Sinad Jaruartjanapat
 --天剣主女王十
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddLinkProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0xbb2),2,2)
 	local e0=Effect.CreateEffect(c)
@@ -13,7 +13,7 @@ function cid.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCode(EFFECT_UPDATE_ATTACK)
-	e1:SetValue(cid.val)
+	e1:SetValue(s.val)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
@@ -21,7 +21,7 @@ function cid.initial_effect(c)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1)
 	e2:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
-	e2:SetOperation(cid.op)
+	e2:SetOperation(s.op)
 	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
@@ -30,20 +30,20 @@ function cid.initial_effect(c)
 	e3:SetOperation(function(e,tp,eg,ep,ev,re,r,rp) local c=e:GetHandler() local rc=re:GetHandler() if c:GetFlagEffect(id)==0 and re:IsActiveType(TYPE_MONSTER) and rc:IsSetCard(0xbb2) and c:GetLinkedGroup():IsContains(rc) then c:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD,0,1) end end)
 	c:RegisterEffect(e3)
 end
-function cid.atkfilter(c)
+function s.atkfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0xbb2)
 end
-function cid.val(e)
-	return Duel.GetMatchingGroupCount(cid.atkfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,nil)*100
+function s.val(e)
+	return Duel.GetMatchingGroupCount(s.atkfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,nil)*100
 end
-function cid.filter(c,e,tp)
+function s.filter(c,e,tp)
 	return c:IsSetCard(0xbb2) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE)
 		and (Duel.GetLocationCount(tp,LOCATION_MZONE)>0 or ((Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE,1-tp))))
 end
-function cid.op(e,tp,eg,ep,ev,re,r,rp)
+function s.op(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local g=Duel.GetMatchingGroup(cid.filter,tp,LOCATION_GRAVE,0,nil,e,tp)
+	local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_GRAVE,0,nil,e,tp)
 	if c:GetFlagEffect(id)==0 or #g==0
 		or not Duel.SelectEffectYesNo(tp,c) then
 		c:ResetFlagEffect(id)

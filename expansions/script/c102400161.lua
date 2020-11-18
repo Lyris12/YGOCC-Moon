@@ -1,7 +1,7 @@
 --created & coded by Lyris, art by Dino-master of DeviantArt
 --銀河眼の固体光子竜
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	c:EnableReviveLimit()
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE)
@@ -13,9 +13,9 @@ function cid.initial_effect(c)
 	e1:SetCode(EFFECT_SPSUMMON_PROC)
 	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
 	e1:SetRange(LOCATION_HAND)
-	e1:SetCondition(cid.spcon)
-	e1:SetTarget(cid.sptg)
-	e1:SetOperation(cid.spop)
+	e1:SetCondition(s.spcon)
+	e1:SetTarget(s.sptg)
+	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
@@ -23,8 +23,8 @@ function cid.initial_effect(c)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1,id)
 	e2:SetCategory(CATEGORY_ATKCHANGE)
-	e2:SetTarget(cid.target)
-	e2:SetOperation(cid.operation)
+	e2:SetTarget(s.target)
+	e2:SetOperation(s.operation)
 	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
@@ -32,46 +32,46 @@ function cid.initial_effect(c)
 	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e3:SetCondition(function(e) return e:GetHandler():IsPreviousLocation(LOCATION_MZONE) end)
-	e3:SetTarget(cid.tg)
-	e3:SetOperation(cid.op)
+	e3:SetTarget(s.tg)
+	e3:SetOperation(s.op)
 	c:RegisterEffect(e3)
 end
-function cid.rfilter(c,tp)
+function s.rfilter(c,tp)
 	return c:IsAttackAbove(2000) and (c:IsControler(tp) or c:IsFaceup())
 end
-function cid.spcfilter(c)
+function s.spcfilter(c)
 	return c:IsFaceup() and c:IsCode(93717133) and c:GetEquipGroup():IsExists(aux.AND(Card.IsFaceup,Card.IsCode),1,nil,id)
 end
-function cid.spgoal(g)
-	return g:IsExists(cid.spcfilter,1,nil) and Duel.GetMZoneCount(tp,g)>0
+function s.spgoal(g)
+	return g:IsExists(s.spcfilter,1,nil) and Duel.GetMZoneCount(tp,g)>0
 end
-function cid.spcon(e,c)
+function s.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	return Duel.GetLocationCount(tp,LOCATION_MZONE)>-2 and Duel.GetReleaseGroup(tp):Filter(cid.rfilter,nil,tp):CheckSubGroup(cid.spgoal,2,2)
+	return Duel.GetLocationCount(tp,LOCATION_MZONE)>-2 and Duel.GetReleaseGroup(tp):Filter(s.rfilter,nil,tp):CheckSubGroup(s.spgoal,2,2)
 end
-function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk,c)
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,c)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local g=Duel.GetReleaseGroup(tp):Filter(cid.rfilter,nil,tp):SelectSubGroup(tp,cid.spgoal,Duel.IsSummonCancelable(),2,2)
+	local g=Duel.GetReleaseGroup(tp):Filter(s.rfilter,nil,tp):SelectSubGroup(tp,s.spgoal,Duel.IsSummonCancelable(),2,2)
 	if g then
 		g:KeepAlive()
 		e:SetLabelObject(g)
 		return true
 	else return false end
 end
-function cid.spop(e,tp,eg,ep,ev,re,r,rp,c)
+function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	local g=e:GetLabelObject()
 	Duel.Release(g,REASON_COST)
 	c:RegisterFlagEffect(0,RESET_EVENT+0x4fc0000,EFFECT_FLAG_CLIENT_HINT,1,0,5)
 	g:DeleteGroup()
 end
-function cid.filter(c)
+function s.filter(c)
 	return c:GetMaterialCount()>0 and c:GetSummonLocation()==LOCATION_EXTRA
 end
-function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 end
-function cid.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
 	local e2=Effect.CreateEffect(c)
@@ -83,29 +83,29 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	local e1=e2:Clone()
 	e1:SetCode(EFFECT_UPDATE_ATTACK)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	e1:SetValue(Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil):GetFirst():GetMaterialCount()*500)
+	e1:SetValue(Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil):GetFirst():GetMaterialCount()*500)
 	c:RegisterEffect(e1)
 end
-function cid.eqfilter(c,tp)
+function s.eqfilter(c,tp)
 	return c:IsCode(68540058) and c:GetActivateEffect():IsActivatable(tp,true,true)
 end
-function cid.spfilter(c,e,tp)
+function s.spfilter(c,e,tp)
 	return c:IsSetCard(0x107b) and c:IsRace(RACE_DRAGON) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.GetLocationCount(tp,LOCATION_SZONE)>0
-		and Duel.IsExistingMatchingCard(cid.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp)
-		and Duel.IsExistingMatchingCard(cid.eqfilter,tp,LOCATION_GRAVE,0,1,nil,tp) end
+		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp)
+		and Duel.IsExistingMatchingCard(s.eqfilter,tp,LOCATION_GRAVE,0,1,nil,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_GRAVE)
 end
-function cid.op(e,tp,eg,ep,ev,re,r,rp)
+function s.op(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local sc=Duel.SelectMatchingCard(tp,cid.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp):GetFirst()
+	local sc=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp):GetFirst()
 	if not sc or Duel.SpecialSummon(sc,0,tp,tp,false,false,POS_FACEUP)==0 or not sc:IsCanBeEffectTarget()
 		or Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
-	local tc=Duel.SelectMatchingCard(tp,cid.eqfilter,tp,LOCATION_GRAVE,0,1,1,nil,tp):GetFirst()
+	local tc=Duel.SelectMatchingCard(tp,s.eqfilter,tp,LOCATION_GRAVE,0,1,1,nil,tp):GetFirst()
 	if not tc then return end
 	local te=tc:GetActivateEffect()
 	local condition=te:GetCondition()

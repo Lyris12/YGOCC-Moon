@@ -1,7 +1,7 @@
 --created by Walrus, coded by Lyris
 --ワーリング・データ・リンク・ドラゴン
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddLinkProcedure(c,aux.FilterBoolFunction(Card.IsLinkType,TYPE_EFFECT),2)
 	local e0=Effect.CreateEffect(c)
@@ -11,8 +11,8 @@ function cid.initial_effect(c)
 	e0:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e0:SetCategory(CATEGORY_DESTROY)
 	e0:SetCondition(function(e) return e:GetHandler():IsSummonType(SUMMON_TYPE_LINK) end)
-	e0:SetTarget(cid.destg)
-	e0:SetOperation(cid.desop)
+	e0:SetTarget(s.destg)
+	e0:SetOperation(s.desop)
 	c:RegisterEffect(e0)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_QUICK_F)
@@ -21,19 +21,19 @@ function cid.initial_effect(c)
 	e1:SetCountLimit(1,id+1000)
 	e1:SetCategory(CATEGORY_ATKCHANGE)
 	e1:SetCondition(function(e,tp,eg) local tc=eg:GetFirst() return e:GetHandler()==Duel.GetAttacker() and tc and tc==Duel.GetAttackTarget() and tc:IsControler(1-tp) end)
-	e1:SetOperation(cid.operation)
+	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e2:SetCode(EVENT_LEAVE_FIELD)
 	e2:SetCountLimit(1,id+2000)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e2:SetCondition(cid.spcon)
-	e2:SetTarget(cid.sptg)
-	e2:SetOperation(cid.spop)
+	e2:SetCondition(s.spcon)
+	e2:SetTarget(s.sptg)
+	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
 end
-function cid.destg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	local c=e:GetHandler()
 	local g=Group.CreateGroup()
@@ -41,13 +41,13 @@ function cid.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	g=g-c
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,0,0)
 end
-function cid.desop(e,tp,eg,ep,ev,re,r,rp)
+function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local g=Group.CreateGroup()
 	for tc in aux.Next(c:GetLinkedGroup()) do g=g+tc:GetColumnGroup() end
 	Duel.Destroy(g-c,REASON_EFFECT)
 end
-function cid.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetDecktopGroup(tp,4):Filter(Card.IsRace,nil,RACE_DRAGON)
 	Duel.ConfirmDecktop(tp,4)
 	local c=e:GetHandler()
@@ -60,25 +60,25 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 		c:RegisterEffect(e1)
 	end
 end
-function cid.spcon(e,tp,eg,ep,ev,re,r,rp)
+function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return c:IsSummonType(SUMMON_TYPE_LINK) and (c:IsReason(REASON_BATTLE) or c:IsReason(REASON_EFFECT) and c:GetReasonPlayer()==1-tp)
 end
-function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,tp,LOCATION_GRAVE)
 end
-function cid.filter(c,e,tp)
+function s.filter(c,e,tp)
 	return c:IsLevelBelow(8) and c:IsRace(RACE_DRAGON) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function cid.check(g)
+function s.check(g)
 	return aux.dncheck(g) and g:GetClassCount(Card.GetLevel)==1
 end
-function cid.spop(e,tp,eg,ep,ev,re,r,rp)
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<2 or Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then return end
 	local c=e:GetHandler()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.GetMatchingGroup(cid.filter,tp,LOCATION_GRAVE,0,nil,e,tp):SelectSubGroup(tp,cid.check,false,2,2)
+	local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_GRAVE,0,nil,e,tp):SelectSubGroup(tp,s.check,false,2,2)
 	for tc in aux.Next(g) do if Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP) then
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_SINGLE)

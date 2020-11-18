@@ -1,7 +1,7 @@
 --created & coded by Lyris, art from Shadowverse's "Spinaria, Keeper of Enigmas"
 --謎の管理者スフィネ
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_MONSTER_SSET)
@@ -11,15 +11,15 @@ function cid.initial_effect(c)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e2:SetCode(EVENT_TO_GRAVE)
-	e2:SetCondition(cid.spcon)
-	e2:SetTarget(cid.sptg)
-	e2:SetOperation(cid.spop)
+	e2:SetCondition(s.spcon)
+	e2:SetTarget(s.sptg)
+	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e3:SetCondition(cid.descon)
-	e3:SetOperation(cid.desop)
+	e3:SetCondition(s.descon)
+	e3:SetOperation(s.desop)
 	c:RegisterEffect(e3)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_QUICK_O)
@@ -27,8 +27,8 @@ function cid.initial_effect(c)
 	e4:SetRange(LOCATION_HAND)
 	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e4:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TODECK+CATEGORY_DESTROY)
-	e4:SetTarget(cid.sptg2)
-	e4:SetOperation(cid.spop2)
+	e4:SetTarget(s.sptg2)
+	e4:SetOperation(s.spop2)
 	c:RegisterEffect(e4)
 	local s1=Effect.CreateEffect(c)
 	s1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
@@ -55,46 +55,46 @@ function cid.initial_effect(c)
 	s6:SetOperation(function(e,tp) if not c:IsPreviousLocation(LOCATION_SZONE) or Duel.GetTurnPlayer()==tp then Duel.Hint(HINT_SOUND,0,aux.Stringid(id,13)) else Duel.Hint(HINT_SOUND,0,aux.Stringid(id,11)) end end)
 	c:RegisterEffect(s6)
 end
-function cid.spcon(e,tp,eg,ep,ev,re,r,rp)
+function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return c:IsPreviousLocation(LOCATION_SZONE) and c:IsPreviousPosition(POS_FACEDOWN)
 		and c:IsReason(REASON_DESTROY) and Duel.GetTurnPlayer()~=tp
 end
-function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
-function cid.spop(e,tp,eg,ep,ev,re,r,rp)
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsRelateToEffect(e) then
 		Duel.SpecialSummon(e:GetHandler(),0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-function cid.descon(e,tp,eg,ep,ev,re,r,rp)
+function s.descon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()~=tp
 end
-function cid.ssfilter(c)
+function s.ssfilter(c)
 	return c:IsSetCard(0x97) and c:IsType(TYPE_MONSTER) and c:IsSSetable(true)
 end
-function cid.desop(e,tp,eg,ep,ev,re,r,rp)
+function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
-	local g=Duel.SelectMatchingCard(tp,cid.ssfilter,tp,LOCATION_DECK,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,s.ssfilter,tp,LOCATION_DECK,0,1,1,nil)
 	if #g>0 then
 		Duel.SSet(tp,g:GetFirst())
 	end
 end
-function cid.filter(c)
+function s.filter(c)
 	return c:IsFacedown() and c:IsType(TYPE_SPELL+TYPE_TRAP)
 end
-function cid.sptg2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingTarget(cid.filter,tp,LOCATION_SZONE,0,1,nil)
+function s.sptg2(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingTarget(s.filter,tp,LOCATION_SZONE,0,1,nil)
 		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEDOWN)
-	Duel.SelectTarget(tp,cid.filter,tp,LOCATION_SZONE,0,1,64,nil)
+	Duel.SelectTarget(tp,s.filter,tp,LOCATION_SZONE,0,1,64,nil)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
-function cid.spop2(e,tp,eg,ep,ev,re,r,rp)
+function s.spop2(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tg=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
 	if not c:IsRelateToEffect(e) or Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)==0 or #tg==0 then return end

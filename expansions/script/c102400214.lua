@@ -1,7 +1,7 @@
 --created & coded by Lyris
 --ローマ・キー・XXXIII
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	c:EnableReviveLimit()
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -17,28 +17,28 @@ function cid.initial_effect(c)
 	e1:SetCountLimit(1,id+EFFECT_COUNT_CODE_DUEL)
 	e1:SetHintTiming(TIMING_BATTLE_END)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e1:SetCondition(cid.condition)
+	e1:SetCondition(s.condition)
 	e1:SetCost(aux.bfgcost)
-	e1:SetTarget(cid.target)
-	e1:SetOperation(cid.activate)
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 end
-function cid.cfilter(c)
+function s.cfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0xeeb)
 end
-function cid.condition(e,tp,eg,ep,ev,re,r,rp)
+function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetCurrentPhase()~=PHASE_BATTLE or Duel.GetTurnPlayer()~=tp then return false end
 	local g=Duel.GetFieldGroup(tp,LOCATION_MZONE,0)
-	return #g>1 and g:FilterCount(cid.cfilter,e:GetHandler())==#g-1
+	return #g>1 and g:FilterCount(s.cfilter,e:GetHandler())==#g-1
 end
-function cid.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and chkc:IsAbleToRemove() end
 	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToRemove,tp,0,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,Duel.SelectTarget(tp,Card.IsAbleToRemove,tp,0,LOCATION_MZONE,1,1,nil),1,0,0)
 	Duel.SetChainLimit(aux.FALSE)
 end
-function cid.activate(e,tp,eg,ep,ev,re,r,rp)
+function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if not tc or not tc:IsRelateToEffect(e) or Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)==0
 		or not tc:IsLocation(LOCATION_REMOVED) then return end

@@ -1,7 +1,7 @@
 --created & coded by Lyris, art by Ali Rauf
 --襲雷渦動
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetType(EFFECT_TYPE_ACTIVATE)
@@ -9,26 +9,26 @@ function cid.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e2:SetCountLimit(1)
 	e2:SetCategory(CATEGORY_NEGATE+CATEGORY_DESTROY)
-	e2:SetCondition(cid.discon)
-	e2:SetTarget(cid.distg)
-	e2:SetOperation(cid.disop)
+	e2:SetCondition(s.discon)
+	e2:SetTarget(s.distg)
+	e2:SetOperation(s.disop)
 	c:RegisterEffect(e2)
 end
-function cid.discon(e,tp,eg,ep,ev,re,r,rp)
+function s.discon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsChainNegatable(ev)
 end
-function cid.dfilter(c)
+function s.dfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x7c4) and c:IsDestructable()
 end
-function cid.distg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(cid.dfilter,tp,LOCATION_ONFIELD,0,1,aux.ExceptThisCard(e)) and not re:GetHandler():IsStatus(STATUS_DISABLED) end
-	local g=Duel.GetMatchingGroup(cid.dfilter,tp,LOCATION_ONFIELD,0,aux.ExceptThisCard(e))
+function s.distg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.dfilter,tp,LOCATION_ONFIELD,0,1,aux.ExceptThisCard(e)) and not re:GetHandler():IsStatus(STATUS_DISABLED) end
+	local g=Duel.GetMatchingGroup(s.dfilter,tp,LOCATION_ONFIELD,0,aux.ExceptThisCard(e))
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,1,tp,LOCATION_ONFIELD)
 	Duel.SetOperationInfo(0,CATEGORY_DISABLE,eg,1,0,0)
 end
-function cid.disop(e,tp,eg,ep,ev,re,r,rp)
+function s.disop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectMatchingCard(tp,cid.dfilter,tp,LOCATION_ONFIELD,0,1,1,aux.ExceptThisCard(e))
+	local g=Duel.SelectMatchingCard(tp,s.dfilter,tp,LOCATION_ONFIELD,0,1,1,aux.ExceptThisCard(e))
 	Duel.HintSelection(g)
 	if Duel.Destroy(g,REASON_EFFECT)==0 then return end
 	Duel.NegateEffect(ev)

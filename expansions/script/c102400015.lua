@@ -1,7 +1,7 @@
 --created & coded by Lyris, art from Yu-Gi-Oh! Duel Monsters Episode 158
 --インライトメント・アルティマ エアトス
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	c:EnableReviveLimit()
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -14,16 +14,16 @@ function cid.initial_effect(c)
 	e2:SetCode(EFFECT_SPSUMMON_PROC)
 	e2:SetProperty(EFFECT_FLAG_UNCOPYABLE)
 	e2:SetRange(LOCATION_HAND)
-	e2:SetCondition(cid.spcon)
-	e2:SetOperation(cid.spop)
+	e2:SetCondition(s.spcon)
+	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
 	e3:SetCategory(CATEGORY_EQUIP)
-	e3:SetTarget(cid.eqtg)
-	e3:SetOperation(cid.eqop)
+	e3:SetTarget(s.eqtg)
+	e3:SetOperation(s.eqop)
 	c:RegisterEffect(e3)
 	local e5=Effect.CreateEffect(c)
 	e5:SetType(EFFECT_TYPE_SINGLE)
@@ -33,40 +33,40 @@ function cid.initial_effect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e4:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e4:SetCategory(CATEGORY_DAMAGE)
-	e4:SetTarget(cid.target)
-	e4:SetOperation(cid.operation)
+	e4:SetTarget(s.target)
+	e4:SetOperation(s.operation)
 	c:RegisterEffect(e4)
 	c:SetUniqueOnField(1,0,aux.FilterBoolFunction(Card.IsSetCard,0x1da6),LOCATION_MZONE)
 end
-function cid.spfilter(c)
+function s.spfilter(c)
 	return c:IsCode(id-10)
 end
-function cid.cfilter(c)
+function s.cfilter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xda6) and c:IsAbleToDeckAsCost()
 end
-function cid.spcon(e,c)
+function s.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	return Duel.CheckReleaseGroup(tp,cid.spfilter,1,nil)
-		and Duel.IsExistingMatchingCard(cid.cfilter,tp,LOCATION_GRAVE,0,3,nil)
+	return Duel.CheckReleaseGroup(tp,s.spfilter,1,nil)
+		and Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_GRAVE,0,3,nil)
 end
-function cid.spop(e,tp,eg,ep,ev,re,r,rp,c)
+function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local dg=Duel.SelectMatchingCard(tp,cid.cfilter,tp,LOCATION_GRAVE,0,3,3,nil)
-	local g=Duel.SelectReleaseGroup(tp,cid.spfilter,1,1,nil)
+	local dg=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_GRAVE,0,3,3,nil)
+	local g=Duel.SelectReleaseGroup(tp,s.spfilter,1,1,nil)
 	Duel.SendtoDeck(dg,nil,2,REASON_COST)
 	Duel.Release(g,REASON_COST)
 end
-function cid.eqfilter(c,tp)
+function s.eqfilter(c,tp)
 	return c:IsFaceup() and c:IsType(TYPE_MONSTER) and c:CheckUniqueOnField(tp) and not c:IsForbidden()
 end
-function cid.eqtg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.eqtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
-		and Duel.IsExistingTarget(cid.eqfilter,tp,0,LOCATION_GRAVE+LOCATION_REMOVED,1,nil,tp) end
+		and Duel.IsExistingTarget(s.eqfilter,tp,0,LOCATION_GRAVE+LOCATION_REMOVED,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
-	Duel.SetOperationInfo(0,CATEGORY_EQUIP,Duel.SelectTarget(tp,cid.eqfilter,tp,0,LOCATION_GRAVE+LOCATION_REMOVED,1,1,nil,tp),1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_EQUIP,Duel.SelectTarget(tp,s.eqfilter,tp,0,LOCATION_GRAVE+LOCATION_REMOVED,1,1,nil,tp),1,0,0)
 end
-function cid.eqop(e,tp,eg,ep,ev,re,r,rp)
+function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 or c:IsFacedown() or not c:IsRelateToEffect(e) then return end
 	local tc=Duel.GetFirstTarget()
@@ -78,23 +78,23 @@ function cid.eqop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_EQUIP_LIMIT)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-		e1:SetValue(cid.eqlimit)
+		e1:SetValue(s.eqlimit)
 		tc:RegisterEffect(e1)
 	end
 end
-function cid.eqlimit(e,c)
+function s.eqlimit(e,c)
 	return e:GetOwner()==c
 end
-function cid.filter(c)
+function s.filter(c)
 	return c:GetFlagEffect(id)~=0
 end
-function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	local eqc=e:GetHandler():GetEquipGroup():Filter(cid.filter,nil):GetFirst()
+	local eqc=e:GetHandler():GetEquipGroup():Filter(s.filter,nil):GetFirst()
 	if eqc then Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,eqc:GetTextAttack()/2) end
 end
-function cid.operation(e,tp,eg,ep,ev,re,r,rp)
-	local eqc=e:GetHandler():GetEquipGroup():Filter(cid.filter,nil):GetFirst()
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
+	local eqc=e:GetHandler():GetEquipGroup():Filter(s.filter,nil):GetFirst()
 	if eqc then
 		Duel.Damage(1-tp,eqc:GetTextAttack()/2,REASON_EFFECT)
 	end

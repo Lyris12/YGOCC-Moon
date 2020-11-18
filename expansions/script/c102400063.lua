@@ -1,35 +1,35 @@
 --created & coded by Lyris, art from Yu-Gi-Oh! GX Episode 98
 --光の波動
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_NEGATE+CATEGORY_DAMAGE)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_CHAINING)
-	e1:SetCondition(cid.condition)
-	e1:SetTarget(cid.target)
-	e1:SetOperation(cid.activate)
+	e1:SetCondition(s.condition)
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_DISABLE+CATEGORY_DAMAGE)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_ATTACK_ANNOUNCE)
-	e1:SetCondition(cid.condition2)
-	e1:SetTarget(cid.target)
-	e1:SetOperation(cid.activate)
+	e1:SetCondition(s.condition2)
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 end
-function cid.condition(e,tp,eg,ep,ev,re,r,rp)
+function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return rp~=tp and re:IsActiveType(TYPE_MONSTER) and Duel.IsChainNegatable(ev)
 end
-function cid.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local tg=Duel.GetAttacker()
 	if not tg then tg=eg:GetFirst() end
 	if chkc then return chkc==tg end
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsFaceup,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.SetTargetCard(tg)
 end
-function cid.activate(e,tp,eg,ep,ev,re,r,rp)
+function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.CheckEvent(EVENT_CHAINING) then Duel.NegateActivation(ev) end
 	local tc=Duel.GetFirstTarget()
 	if tc:IsFaceup() and tc:IsRelateToEffect(e) and not tc:IsDisabled() then
@@ -52,6 +52,6 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 		ac:RegisterEffect(e1)
 	end
 end
-function cid.condition2(e,tp,eg,ep,ev,re,r,rp)
+function s.condition2(e,tp,eg,ep,ev,re,r,rp)
 	return eg:GetFirst():IsControler(1-tp)
 end

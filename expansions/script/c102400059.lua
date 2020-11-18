@@ -1,7 +1,7 @@
 --created & coded by Lyris
 --サイバー・ドラゴン・ティマイオス
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	local f1,f2,f3=Card.IsCanBeFusionMaterial,Duel.GetMatchingGroup,Duel.GetFusionMaterial
 	Card.IsCanBeFusionMaterial=function(tc,fc)
 		return f1(tc,fc) or (not tc:IsHasEffect(EFFECT_CANNOT_BE_FUSION_MATERIAL) and tc:GetOriginalCode()==c:GetOriginalCode())
@@ -28,16 +28,16 @@ function cid.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCountLimit(1,id+EFFECT_COUNT_CODE_OATH)
-	e1:SetTarget(cid.target)
-	e1:SetOperation(cid.activate)
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 end
-function cid.tgfilter(c,e,tp,n)
+function s.tgfilter(c,e,tp,n)
 	return c:IsFaceup() and c:IsCode(CARD_CYBER_DRAGON) and c:IsCanBeFusionMaterial()
-		and Duel.IsExistingMatchingCard(cid.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,c,n)
+		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,c,n)
 		and Duel.GetLocationCountFromEx(tp,tp,c)>0
 end
-function cid.spfilter(c,e,tp,tc,n)
+function s.spfilter(c,e,tp,tc,n)
 	if not (aux.IsMaterialListCode(c,CARD_CYBER_DRAGON) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false)) then return false end
 	local g=Group.FromCards(tc)
 	for i=2,n do
@@ -53,26 +53,26 @@ function cid.spfilter(c,e,tp,tc,n)
 	aux.FCheckAdditional=nil
 	return res
 end
-function cid.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local t={}
 	for i=2,6 do
-		if Duel.IsExistingTarget(cid.tgfilter,tp,LOCATION_MZONE,0,1,nil,e,tp,i) then table.insert(t,i) end
+		if Duel.IsExistingTarget(s.tgfilter,tp,LOCATION_MZONE,0,1,nil,e,tp,i) then table.insert(t,i) end
 	end
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and cid.tgfilter(chkc,e,tp,e:GetLabel()) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.tgfilter(chkc,e,tp,e:GetLabel()) end
 	if chk==0 then return #t>0 end
 	local ct=Duel.AnnounceNumber(tp,table.unpack(t))
 	e:SetLabel(ct)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	Duel.SelectTarget(tp,cid.tgfilter,tp,LOCATION_MZONE,0,1,1,nil,e,tp,ct)
+	Duel.SelectTarget(tp,s.tgfilter,tp,LOCATION_MZONE,0,1,1,nil,e,tp,ct)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
-function cid.activate(e,tp,eg,ep,ev,re,r,rp)
+function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if Duel.GetLocationCountFromEx(tp,tp,tc)<=0 then return end
 	if tc:IsRelateToEffect(e) and tc:IsFaceup() and tc:IsCanBeFusionMaterial() and not tc:IsImmuneToEffect(e) then
 		local ct=e:GetLabel()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local sg=Duel.SelectMatchingCard(tp,cid.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,tc,ct)
+		local sg=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,tc,ct)
 		local sc=sg:GetFirst()
 		if sc then
 			local mg=Group.FromCards(tc)
@@ -94,7 +94,7 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 					e2:SetLabel(sc:GetBaseAttack())
 					e2:SetLabelObject(sc)
 					e2:SetReset(RESET_PHASE+PHASE_END)
-					e2:SetOperation(cid.damop)
+					e2:SetOperation(s.damop)
 					Duel.RegisterEffect(e2,tp)
 				end
 				local e0=Effect.CreateEffect(e:GetHandler())
@@ -103,7 +103,7 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 				e0:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 				e0:SetReset(RESET_PHASE+PHASE_END)
 				e0:SetTargetRange(1,0)
-				e0:SetTarget(cid.splimit)
+				e0:SetTarget(s.splimit)
 				Duel.RegisterEffect(e0,tp)
 				local e1=Effect.CreateEffect(e:GetHandler())
 				e1:SetType(EFFECT_TYPE_SINGLE)
@@ -115,10 +115,10 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-function cid.splimit(e,c,sump,sumtype,sumpos,targetp,se)
+function s.splimit(e,c,sump,sumtype,sumpos,targetp,se)
 	return c:GetRace()~=RACE_MACHINE
 end
-function cid.damop(e,tp,eg,ep,ev,re,r,rp)
+function s.damop(e,tp,eg,ep,ev,re,r,rp)
 	local dam,ec=e:GetLabel(),e:GetLabelObject()
 	local atk=ec:GetAttack()
 	if atk>dam and atk>=ec:GetBaseAttack()*2 then

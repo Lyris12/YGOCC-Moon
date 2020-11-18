@@ -1,7 +1,7 @@
 --created & coded by Lyris, art from "Rod of the Mind's Eye"
 --インライトメント・クレアボイアント笏
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_AVOID_BATTLE_DAMAGE)
@@ -16,59 +16,59 @@ function cid.initial_effect(c)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetCategory(CATEGORY_TOGRAVE)
-	e2:SetCondition(cid.descon)
-	e2:SetTarget(cid.destg)
-	e2:SetOperation(cid.desop)
+	e2:SetCondition(s.descon)
+	e2:SetTarget(s.destg)
+	e2:SetOperation(s.desop)
 	c:RegisterEffect(e2)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(1152)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_HAND)
-	e1:SetCost(cid.cost)
-	e1:SetTarget(cid.target)
-	e1:SetOperation(cid.operation)
+	e1:SetCost(s.cost)
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
 end
-function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return c:IsDiscardable() end
 	Duel.SendtoGrave(c,REASON_COST+REASON_DISCARD)
 end
-function cid.filter(c,e,tp)
+function s.filter(c,e,tp)
 	return c:IsCode(CARD_INLIGHTENED_PSYCHIC_HELMET) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function cid.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil,e,tp) end
+		and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_GRAVE)
 end
-function cid.operation(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.operation(e,tp,eg,ep,ev,re,r,rp,chk)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	Duel.SpecialSummon(Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil,e,tp),0,tp,tp,false,false,POS_FACEUP)
+	Duel.SpecialSummon(Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil,e,tp),0,tp,tp,false,false,POS_FACEUP)
 end
-function cid.descon(e,tp,eg,ep,ev,re,r,rp)
+function s.descon(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
 	local d=Duel.GetAttackTarget()
 	if d and d:IsControler(tp) then a,d=d,a end
 	return a:IsSetCard(0xda6) and a~=e:GetHandler()
 end
-function cid.nfilter(c)
+function s.nfilter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xda6) and c:IsAbleToGrave()
 end
-function cid.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and chkc:IsFaceup() end
 	if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_MZONE,0,1,nil)
-		and Duel.IsExistingMatchingCard(cid.nfilter,tp,LOCATION_DECK+LOCATION_HAND,0,1,nil) end
+		and Duel.IsExistingMatchingCard(s.nfilter,tp,LOCATION_DECK+LOCATION_HAND,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	local g=Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_MZONE,0,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK+LOCATION_HAND)
 end
-function cid.desop(e,tp,eg,ep,ev,re,r,rp)
+function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local dir=Duel.GetAttackTarget()==nil
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=Duel.SelectMatchingCard(tp,cid.nfilter,tp,LOCATION_DECK+LOCATION_HAND,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,s.nfilter,tp,LOCATION_DECK+LOCATION_HAND,0,1,1,nil)
 	if #g>0 then
 		local sg=g:GetFirst()
 		if Duel.SendtoGrave(g,REASON_EFFECT)~=0 and sg:IsLocation(LOCATION_GRAVE) then
@@ -91,7 +91,7 @@ function cid.desop(e,tp,eg,ep,ev,re,r,rp)
 					e2:SetRange(LOCATION_MZONE)
 					e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 					e2:SetLabelObject(e1)
-					e2:SetOperation(cid.rstop)
+					e2:SetOperation(s.rstop)
 					tc:RegisterEffect(e2)
 				else 
 					e1:SetReset(RESET_EVENT+RESETS_STANDARD)
@@ -101,7 +101,7 @@ function cid.desop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-function cid.rstop(e,tp,eg,ep,ev,re,r,rp)
+function s.rstop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local e1=e:GetLabelObject()
 	e1:Reset()

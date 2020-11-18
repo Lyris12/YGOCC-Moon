@@ -1,7 +1,7 @@
 --created & coded by Lyris
 --フェイト・ヒーロープロヒビトガル
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_BE_MATERIAL)
@@ -9,11 +9,11 @@ function cid.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
 	e1:SetCondition(function(e,tp,eg,ep,ev,re,r) return r==REASON_FUSION end)
 	e1:SetCategory(CATEGORY_TODECK)
-	e1:SetTarget(cid.target)
-	e1:SetOperation(cid.activate)
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 end
-function cid.cpfilter(c,e,tp,eg,ep,ev,re,r,rp)
+function s.cpfilter(c,e,tp,eg,ep,ev,re,r,rp)
 	if not c:IsSetCard(0xa5f) or not c:IsType(TYPE_MONSTER) or not c:IsAbleToDeck()
 		or c:IsCode(id) then return false end
 	for _,ef in pairs(global_card_effect_table[c]) do
@@ -23,13 +23,13 @@ function cid.cpfilter(c,e,tp,eg,ep,ev,re,r,rp)
 	end
 	return false
 end
-function cid.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chk==0 then return Duel.IsExistingMatchingCard(cid.cpfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp,eg,ep,ev,re,r,rp) end
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.cpfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp,eg,ep,ev,re,r,rp) end
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,1,tp,LOCATION_GRAVE)
 end
-function cid.activate(e,tp,eg,ep,ev,re,r,rp)
+function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g=Duel.SelectMatchingCard(tp,cid.cpfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.SelectMatchingCard(tp,s.cpfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp,eg,ep,ev,re,r,rp)
 	Duel.HintSelection(g)
 	if #g==0 or Duel.SendtoDeck(g,nil,2,REASON_EFFECT)==0 then return end
 	local tc=g:GetFirst()
@@ -52,22 +52,22 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 	local op=te:GetOperation()
 	if op then op(e,tp,eg,ep,ev,re,r,rp) end
 end
-function cid.con(e,tp,eg,ep,ev,re,r,rp)
+function s.con(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsPreviousPosition(POS_FACEDOWN)
 end
-function cid.hdop(e,tp,eg,ep,ev,re,r,rp)
+function s.hdop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetFlagEffect(tp,id)~=0 then return end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CHANGE_DAMAGE)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetTargetRange(1,0)
-	e1:SetValue(cid.val)
+	e1:SetValue(s.val)
 	e1:SetReset(RESET_PHASE+PHASE_END,2)
 	Duel.RegisterEffect(e1,tp)
 	Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
 end
-function cid.val(e,re,dam,r,rp,rc)
+function s.val(e,re,dam,r,rp,rc)
 	return dam/2
 end

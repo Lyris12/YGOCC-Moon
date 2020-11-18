@@ -1,7 +1,7 @@
 --created & coded by Lyris, art at http://blog-imgs-65.fc2.com/m/a/t/matome2chmatome2ch/dbd0e7f2-s.jpg
 --襲雷属性－地球
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	aux.EnablePendulumAttribute(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
@@ -10,18 +10,18 @@ function cid.initial_effect(c)
 	e1:SetCountLimit(1,id)
 	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_DESTROY)
-	e1:SetCondition(function(e,tp,eg,ep,ev,re,r,rp) return eg:IsExists(cid.cfilter,1,nil,tp) end)
-	e1:SetTarget(cid.tg)
-	e1:SetOperation(cid.op)
+	e1:SetCondition(function(e,tp,eg,ep,ev,re,r,rp) return eg:IsExists(s.cfilter,1,nil,tp) end)
+	e1:SetTarget(s.tg)
+	e1:SetOperation(s.op)
 	c:RegisterEffect(e1)
 	local e0=Effect.CreateEffect(c)
 	e0:SetCategory(CATEGORY_DESTROY)
 	e0:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e0:SetRange(LOCATION_MZONE)
 	e0:SetCode(EVENT_ATTACK_ANNOUNCE)
-	e0:SetCondition(cid.descon)
-	e0:SetTarget(cid.destg)
-	e0:SetOperation(cid.desop)
+	e0:SetCondition(s.descon)
+	e0:SetTarget(s.destg)
+	e0:SetOperation(s.desop)
 	c:RegisterEffect(e0)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
@@ -29,19 +29,19 @@ function cid.initial_effect(c)
 	e2:SetCountLimit(1,id)
 	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e2:SetTarget(cid.tg)
-	e2:SetOperation(cid.op)
+	e2:SetTarget(s.tg)
+	e2:SetOperation(s.op)
 	c:RegisterEffect(e2)
 end
-function cid.descon(e,tp,eg,ep,ev,re,r,rp)
+function s.descon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return Duel.GetTurnPlayer()~=tp and c:IsFaceup() and Duel.GetAttackTarget()==c
 end
-function cid.destg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,e:GetHandler(),1,0,0)
 end
-function cid.desop(e,tp,eg,ep,ev,re,r,rp)
+function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	Duel.NegateAttack()
 	if c:IsRelateToEffect(e) and Duel.Destroy(c,REASON_EFFECT)~=0 then
@@ -53,22 +53,22 @@ function cid.desop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-function cid.cfilter(c,tp)
+function s.cfilter(c,tp)
 	return c:GetOriginalType()&TYPE_MONSTER~=0 and (c:IsPreviousPosition(POS_FACEUP) or c:GetPreviousControler()==tp) and c:IsSetCard(0x7c4)
 end
-function cid.filter(c,e,tp)
+function s.filter(c,e,tp)
 	return c:IsSetCard(0x7c4) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsCode(id)
 end
-function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and cid.filter(chkc,e,tp) end
+function s.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.filter(chkc,e,tp) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingTarget(cid.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp) and (e:IsHasType(EFFECT_TYPE_SINGLE) or e:GetHandler():IsDestructable()) end
+		and Duel.IsExistingTarget(s.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp) and (e:IsHasType(EFFECT_TYPE_SINGLE) or e:GetHandler():IsDestructable()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectTarget(tp,cid.filter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
+	local g=Duel.SelectTarget(tp,s.filter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
 	if e:IsHasType(EFFECT_TYPE_FIELD) then Duel.SetOperationInfo(0,CATEGORY_DESTROY,e:GetHandler(),1,0,0) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
 end
-function cid.op(e,tp,eg,ep,ev,re,r,rp)
+function s.op(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	local n=e:IsHasType(EFFECT_TYPE_FIELD) and 1 or 0
@@ -87,14 +87,14 @@ function cid.op(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetCountLimit(1)
 		e2:SetLabel(fid)
 		e2:SetLabelObject(tc)
-		e2:SetCondition(cid.tdescon)
-		e2:SetOperation(cid.tdesop)
+		e2:SetCondition(s.tdescon)
+		e2:SetOperation(s.tdesop)
 		Duel.RegisterEffect(e2,tp)
 		tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1,fid)
 	end
 	Duel.SpecialSummonComplete()
 end
-function cid.tdescon(e,tp,eg,ep,ev,re,r,rp)
+function s.tdescon(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetLabelObject()
 	if tc:GetFlagEffectLabel(id)==e:GetLabel() then
 		return true
@@ -103,6 +103,6 @@ function cid.tdescon(e,tp,eg,ep,ev,re,r,rp)
 		return false
 	end
 end
-function cid.tdesop(e,tp,eg,ep,ev,re,r,rp)
+function s.tdesop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Destroy(e:GetLabelObject(),REASON_EFFECT)
 end

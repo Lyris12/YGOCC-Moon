@@ -1,7 +1,7 @@
 --created & coded by Lyris, art by kreegan of DeviantArt
 --天剣主シロ六
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE)
 	e0:SetCode(EFFECT_PIERCE)
@@ -13,8 +13,8 @@ function cid.initial_effect(c)
 	e1:SetRange(LOCATION_HAND)
 	e1:SetCode(EVENT_DAMAGE)
 	e1:SetCondition(function(e,tp,eg,ep,ev,re,r,rp) return bit.band(r,REASON_BATTLE)>0 and ep==tp end)
-	e1:SetTarget(cid.sumtg)
-	e1:SetOperation(cid.sumop)
+	e1:SetTarget(s.sumtg)
+	e1:SetOperation(s.sumop)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
@@ -22,19 +22,19 @@ function cid.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e2:SetCountLimit(1,id+EFFECT_COUNT_CODE_DUEL)
 	e2:SetCondition(function(e,tp,eg,ep,ev,re,r,rp) return e:GetHandler():GetSummonType()==SUMMON_TYPE_SPECIAL+1 end)
-	e2:SetOperation(cid.haltop)
+	e2:SetOperation(s.haltop)
 	c:RegisterEffect(e2)
 end
-function cid.sumtg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.sumtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and e:GetHandler():IsCanBeSpecialSummoned(e,1,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
-function cid.sumop(e,tp,eg,ep,ev,re,r,rp)
+function s.sumop(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsRelateToEffect(e) then
 		Duel.SpecialSummon(e:GetHandler(),1,tp,tp,false,false,POS_FACEUP)
 	end
 end
-function cid.haltop(e,tp,eg,ep,ev,re,r,rp)
+function s.haltop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SkipPhase(Duel.GetTurnPlayer(),PHASE_BATTLE,RESET_PHASE+PHASE_BATTLE,1)
 end

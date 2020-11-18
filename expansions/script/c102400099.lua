@@ -1,7 +1,7 @@
 --created & coded by Lyris
 --S－VINEの騎士クライッシャ(アナザー宙)
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddOrigSpatialType(c)
 	aux.AddSpatialProc(c,nil,8,aux.TRUE,2)
@@ -13,23 +13,23 @@ function cid.initial_effect(c)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e3:SetCategory(CATEGORY_TOHAND+CATEGORY_REMOVE)
 	e3:SetHintTiming(0,0x1e0)
-	e3:SetCost(cid.descost)
-	e3:SetTarget(cid.destg)
-	e3:SetOperation(cid.desop)
+	e3:SetCost(s.descost)
+	e3:SetTarget(s.destg)
+	e3:SetOperation(s.desop)
 	c:RegisterEffect(e3)
 end
-function cid.descost(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToRemoveAsCost,tp,LOCATION_HAND,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	Duel.Remove(Duel.SelectMatchingCard(tp,Card.IsAbleToRemoveAsCost,tp,LOCATION_HAND,0,1,1,nil),POS_FACEUP,REASON_COST)
 end
-function cid.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsFaceup() end
 	if chk==0 then return Duel.IsExistingTarget(nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,Duel.SelectTarget(tp,nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil),1,0,0)
 end
-function cid.desop(e,tp,eg,ep,ev,re,r,rp)
+function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) and Duel.SendtoHand(tc,nil,REASON_EFFECT)~=0 and tc:IsPreviousPosition(POS_FACEUP) then
 		tc:RegisterFlagEffect(id,RESET_EVENT+0x3fc0000+RESET_PHASE+PHASE_END,0,2)
@@ -39,17 +39,17 @@ function cid.desop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EVENT_PHASE+PHASE_END)
 		e1:SetCountLimit(1)
 		e1:SetLabelObject(tc)
-		e1:SetCondition(cid.con)
-		e1:SetOperation(cid.op)
+		e1:SetCondition(s.con)
+		e1:SetOperation(s.op)
 		e1:SetReset(RESET_PHASE+PHASE_END,2)
 		Duel.RegisterEffect(e1,tp)
 	end
 end
-function cid.con(e,tp,eg,ep,ev,re,r,rp)
+function s.con(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetLabelObject()
 	return tc:GetFlagEffect(id)~=0 and Duel.GetTurnCount()~=tc:GetTurnID()
 end
-function cid.op(e,tp,eg,ep,ev,re,r,rp)
+function s.op(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetLabelObject()
 	local g=Duel.GetMatchingGroup(Card.IsCode,tp,LOCATION_HAND+LOCATION_EXTRA,LOCATION_HAND+LOCATION_EXTRA,nil,tc:GetPreviousCodeOnField())
 	Duel.Hint(HINT_CARD,0,id)

@@ -1,7 +1,7 @@
 --created by Walrus, coded by Lyris, art from "Supreme King Z-ARC"
-local cid,id=GetID()
-cid.other_space=id+1
-function cid.initial_effect(c)
+local s,id=GetID()
+s.other_space=id+1
+function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddOrigSpatialType(c)
 	aux.AddSpatialProc(c,nil,7)
@@ -10,8 +10,8 @@ function cid.initial_effect(c)
 	ge2:SetCode(EFFECT_SPSUMMON_PROC)
 	ge2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE)
 	ge2:SetRange(LOCATION_EXTRA)
-	ge2:SetCondition(cid.SpatialCondition)
-	ge2:SetTarget(cid.SpatialTarget)
+	ge2:SetCondition(s.SpatialCondition)
+	ge2:SetTarget(s.SpatialTarget)
 	ge2:SetOperation(aux.SpatialOperation)
 	ge2:SetValue(SUMMON_TYPE_SPATIAL)
 	c:RegisterEffect(ge2)
@@ -21,15 +21,15 @@ function cid.initial_effect(c)
 	e2:SetCode(EFFECT_DISABLE)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetTargetRange(0,LOCATION_MZONE+LOCATION_REMOVED)
-	e2:SetTarget(cid.disable)
+	e2:SetTarget(s.disable)
 	c:RegisterEffect(e2)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e1:SetCode(EFFECT_IMMUNE_EFFECT)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetCondition(cid.tgcon)
-	e1:SetValue(cid.efilter)
+	e1:SetCondition(s.tgcon)
+	e1:SetValue(s.efilter)
 	c:RegisterEffect(e1)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE)
@@ -39,17 +39,17 @@ function cid.initial_effect(c)
 	local e5=Effect.CreateEffect(c)
 	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e5:SetCode(EVENT_ATTACK_ANNOUNCE)
-	e5:SetCost(cid.cost)
-	e5:SetTarget(cid.atktg)
-	e5:SetOperation(cid.atkop)
+	e5:SetCost(s.cost)
+	e5:SetTarget(s.atktg)
+	e5:SetOperation(s.atkop)
 	c:RegisterEffect(e5)
 	local e6=Effect.CreateEffect(c)
 	e6:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e6:SetCode(EVENT_LEAVE_FIELD)
 	e6:SetCategory(CATEGORY_REMOVE)
-	e6:SetCondition(cid.con)
-	e6:SetTarget(cid.rmtg)
-	e6:SetOperation(cid.rmop)
+	e6:SetCondition(s.con)
+	e6:SetTarget(s.rmtg)
+	e6:SetOperation(s.rmop)
 	c:RegisterEffect(e6)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
@@ -57,14 +57,14 @@ function cid.initial_effect(c)
 	e3:SetCountLimit(1,id)
 	e3:SetCategory(CATEGORY_TODECK)
 	e3:SetCondition(function(e,tp,eg,ep,ev,re,r,rp) return re and re:GetHandler():IsSetCard(0xc97) and e:GetHandler():IsReason(REASON_EFFECT) end)
-	e3:SetTarget(cid.target)
-	e3:SetOperation(cid.operation)
+	e3:SetTarget(s.target)
+	e3:SetOperation(s.operation)
 	c:RegisterEffect(e3)
 end
-function cid.mfilter(c)
+function s.mfilter(c)
 	return c:IsAttribute(ATTRIBUTE_DARK) and c:IsRace(RACE_FIEND)
 end
-function cid.SpatialCondition(e,c)
+function s.SpatialCondition(e,c)
 	if c==nil then return true end
 	if c:IsType(TYPE_PENDULUM+TYPE_PANDEMONIUM) and c:IsFaceup() then return false end
 	local tp=c:GetControler()
@@ -74,9 +74,9 @@ function cid.SpatialCondition(e,c)
 	if fg:IsExists(aux.MustMaterialCounterFilter,1,nil,mg) then return false end
 	Duel.SetSelectedCard(fg)
 	local sg=Group.CreateGroup()
-	return mg:IsExists(aux.SptCheckRecursive,1,nil,tp,sg,mg,c,0,djn,nil,aux.FilterBoolFunction(Card.IsSetCard,0xc97),1,cid.mfilter,1)
+	return mg:IsExists(aux.SptCheckRecursive,1,nil,tp,sg,mg,c,0,djn,nil,aux.FilterBoolFunction(Card.IsSetCard,0xc97),1,99,s.mfilter,1,99)
 end
-function cid.SpatialTarget(e,tp,eg,ep,ev,re,r,rp,chk,c)
+function s.SpatialTarget(e,tp,eg,ep,ev,re,r,rp,chk,c)
 	local mg=Duel.GetMatchingGroup(Card.IsCanBeSpaceMaterial,tp,LOCATION_HAND,0,nil,c)
 	local ogmg=mg:Clone()
 	local bg=Group.CreateGroup()
@@ -94,8 +94,8 @@ function cid.SpatialTarget(e,tp,eg,ep,ev,re,r,rp,chk,c)
 	local finish=false
 	local djn=c:GetDimensionNo()
 	while #sg<max do
-		finish=aux.SptCheckGoal(tp,sg,c,#sg,nil,aux.FilterBoolFunction(Card.IsSetCard,0xc97),1,cid.mfilter,1)
-		local cg=mg:Filter(aux.SptCheckRecursive,sg,tp,sg,mg,c,#sg,djn,nil,aux.FilterBoolFunction(Card.IsSetCard,0xc97),1,cid.mfilter,1)
+		finish=aux.SptCheckGoal(tp,sg,c,#sg,nil,aux.FilterBoolFunction(Card.IsSetCard,0xc97),1,s.mfilter,1)
+		local cg=mg:Filter(aux.SptCheckRecursive,sg,tp,sg,mg,c,#sg,djn,nil,aux.FilterBoolFunction(Card.IsSetCard,0xc97),1,99,s.mfilter,1,99)
 		if #cg==0 then break end
 		local cancel=not finish
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
@@ -118,32 +118,32 @@ function cid.SpatialTarget(e,tp,eg,ep,ev,re,r,rp,chk,c)
 		return true
 	else return false end
 end
-function cid.disable(e,c)
+function s.disable(e,c)
 	return (c:IsType(TYPE_EFFECT) or bit.band(c:GetOriginalType(),TYPE_EFFECT)==TYPE_EFFECT) and c:IsType(TYPE_SPATIAL)
 end
-function cid.tgfilter(c)
+function s.tgfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x3c97)
 end
-function cid.tgcon(e)
-	return Duel.IsExistingMatchingCard(cid.tgfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
+function s.tgcon(e)
+	return Duel.IsExistingMatchingCard(s.tgfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
 end
-function cid.efilter(e,re)
+function s.efilter(e,re)
 	return e:GetOwnerPlayer()~=re:GetOwnerPlayer()
 end
-function cid.cfilter(c)
+function s.cfilter(c)
 	return c:IsSetCard(0xc97) and c:IsAbleToRemoveAsCost()
 end
-function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	local g=Duel.GetMatchingGroup(cid.cfilter,tp,LOCATION_HAND,0,nil)
+	local g=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_HAND,0,nil)
 	if #g>0 and Duel.SelectOption(tp,1192,1122)==0 then
 		Duel.Remove(g:RandomSelect(tp,1),POS_FACEUP,REASON_COST)
 	else Duel.Damage(tp,1000,REASON_COST) end
 end
-function cid.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():GetBattleTarget()~=nil end
 end
-function cid.atkop(e,tp,eg,ep,ev,re,r,rp)
+function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
 	if bc and bc:IsRelateToBattle() then
@@ -162,15 +162,15 @@ function cid.atkop(e,tp,eg,ep,ev,re,r,rp)
 		bc:RegisterEffect(e2)
 	end
 end
-function cid.con(e,tp,eg,ep,ev,re,r,rp)
+function s.con(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_SPATIAL) and r&REASON_EFFECT+REASON_BATTLE~=0 and (r&REASON_BATTLE~=0 or rp~=tp)
 end
-function cid.rmtg(e,tp,eg,ep,ev,re,r,rp)
+function s.rmtg(e,tp,eg,ep,ev,re,r,rp)
 	if chk==0 then return true end
 	local g=Duel.GetMatchingGroup(Card.IsAbleToRemove,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,#g,0,0)
 end
-function cid.rmop(e,tp,eg,ep,ev,re,r,rp)
+function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(Card.IsAbleToRemove,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
 	if Duel.Remove(g,POS_FACEUP,REASON_EFFECT)==0 then return end
 	for tc in aux.Next(g:Filter(Card.IsLocation,nil,LOCATION_REMOVED)) do
@@ -181,11 +181,11 @@ function cid.rmop(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e1)
 	end
 end
-function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,e:GetHandler(),1,0,0)
 end
-function cid.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Damage(tp,1000,REASON_EFFECT)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) then

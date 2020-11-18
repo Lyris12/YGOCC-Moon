@@ -1,40 +1,40 @@
 --created & coded by Lyris
 --フェイト・ヒーロー・オーガナイゼーション
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCountLimit(1,id+EFFECT_COUNT_CODE_OATH)
-	e1:SetTarget(cid.target)
-	e1:SetOperation(cid.activate)
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_GRAVE)
 	e2:SetLabel(0)
 	e2:SetCost(function(e) e:SetLabel(100) return true end)
-	e2:SetTarget(cid.cptg)
-	e2:SetOperation(cid.cpop)
+	e2:SetTarget(s.cptg)
+	e2:SetOperation(s.cpop)
 	c:RegisterEffect(e2)
 end
-function cid.filter(c)
+function s.filter(c)
 	return c:IsSetCard(0xa5f) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
-function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_DECK,0,1,nil) end
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
-function cid.activate(e,tp,eg,ep,ev,re,r,rp)
+function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_DECK,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil)
 	if #g>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
 	end
 end
-function cid.cpfilter(c,e,tp,eg,ep,ev,re,r,rp)
+function s.cpfilter(c,e,tp,eg,ep,ev,re,r,rp)
 	if not c:IsType(TYPE_SPELL) or not c:IsAbleToRemoveAsCost() then return false end
 	for _,ef in pairs(global_card_effect_table[c]) do
 		local tg=ef:GetTarget()
@@ -42,7 +42,7 @@ function cid.cpfilter(c,e,tp,eg,ep,ev,re,r,rp)
 	end
 	return false
 end
-function cid.cptg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.cptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then
 		if e:GetLabel()~=100 then return false end
@@ -52,9 +52,9 @@ function cid.cptg(e,tp,eg,ep,ev,re,r,rp,chk)
 		e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 		e1:SetTargetRange(1,0)
-		e1:SetTarget(cid.sumlimit)
+		e1:SetTarget(s.sumlimit)
 		Duel.RegisterEffect(e1,tp)
-		local res=aux.bfgcost(e,tp,eg,ep,ev,re,r,rp,0) and Duel.IsExistingMatchingCard(cid.cpfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp,eg,ep,ev,re,r,rp)
+		local res=aux.bfgcost(e,tp,eg,ep,ev,re,r,rp,0) and Duel.IsExistingMatchingCard(s.cpfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp,eg,ep,ev,re,r,rp)
 		e1:Reset()
 		return res
 	end
@@ -63,10 +63,10 @@ function cid.cptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetTargetRange(1,0)
-	e1:SetTarget(cid.sumlimit)
+	e1:SetTarget(s.sumlimit)
 	Duel.RegisterEffect(e1,tp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local tc=Duel.SelectMatchingCard(tp,cid.cpfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp,eg,ep,ev,re,r,rp):GetFirst()
+	local tc=Duel.SelectMatchingCard(tp,s.cpfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp,eg,ep,ev,re,r,rp):GetFirst()
 	e1:Reset()
 	Duel.Remove(Group.FromCards(tc,c),POS_FACEUP,REASON_COST)
 	local t={}
@@ -86,13 +86,13 @@ function cid.cptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabelObject(te)
 	Duel.ClearOperationInfo(0)
 end
-function cid.cpop(e,tp,eg,ep,ev,re,r,rp)
+function s.cpop(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetTargetRange(1,0)
-	e1:SetTarget(cid.sumlimit)
+	e1:SetTarget(s.sumlimit)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
 	local te=e:GetLabelObject()
@@ -101,6 +101,6 @@ function cid.cpop(e,tp,eg,ep,ev,re,r,rp)
 	local op=te:GetOperation()
 	if op then op(e,tp,eg,ep,ev,re,r,rp) end
 end
-function cid.sumlimit(e,c,sp,st,spos,tp,te)
+function s.sumlimit(e,c,sp,st,spos,tp,te)
 	return st==SUMMON_TYPE_FUSION and not c:IsSetCard(0xa5f)
 end

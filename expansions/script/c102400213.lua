@@ -1,7 +1,7 @@
 --created & coded by Lyris
 --ローマ・キー・XXVII
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	c:EnableReviveLimit()
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -16,8 +16,8 @@ function cid.initial_effect(c)
 	e5:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e5:SetCategory(CATEGORY_RECOVER)
 	e5:SetCondition(function(e) return e:GetHandler():IsSummonType(SUMMON_TYPE_FUSION) end)
-	e5:SetTarget(cid.target)
-	e5:SetOperation(cid.costop)
+	e5:SetTarget(s.target)
+	e5:SetOperation(s.costop)
 	c:RegisterEffect(e5)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -25,14 +25,14 @@ function cid.initial_effect(c)
 	e1:SetValue(1)
 	c:RegisterEffect(e1)
 end
-function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetTargetPlayer(tp)
 	local _,atk=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,nil):GetMaxGroup(Card.GetAttack)
 	Duel.SetTargetParam(atk)
 	Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,atk)
 end
-function cid.costop(e,tp,eg,ep,ev,re,r,rp)
+function s.costop(e,tp,eg,ep,ev,re,r,rp)
 	local p,_,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER),Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,nil):GetMaxGroup(Card.GetAttack)
 	Duel.Recover(p,d,REASON_EFFECT)
 end
