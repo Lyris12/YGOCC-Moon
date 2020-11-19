@@ -23,13 +23,14 @@ function s.con(e,tp)
 	local a=Duel.GetAttacker()
 	if not a then return false end
 	if a:IsControler(1-tp) then a=Duel.GetAttackTarget() end
-	return a~=e:GetHandler() and a:IsSetCard(0xa6c) and a:IsRelateToBattle()
+	return a and a~=e:GetHandler() and a:IsSetCard(0xa6c) and a:IsRelateToBattle()
 		and Duel.GetCurrentPhase()==PHASE_DAMAGE and not Duel.IsDamageCalculated()
 end
 function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local a=Duel.GetAttacker()
 	if a:IsControler(1-tp) then a=Duel.GetAttackTarget() end
-	if chk==0 then return a:IsAbleToRemove() end
+	a=a:GetBattleTarget()
+	if chk==0 then return a and a:IsAbleToRemove() end
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,a,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,e:GetHandler(),1,0,0)
 end
@@ -57,8 +58,8 @@ function s.regop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCode(EVENT_PRE_BATTLE_DAMAGE)
 	e1:SetOperation(function(e,tp,eg,ep,ev)
 		local a=Duel.GetAttacker()
-		if not a then return end
 		if a:IsControler(1-tp) then a=Duel.GetAttackTarget() end
+		if not a then return end
 		if a:IsSetCard(0xa6c) and ep~=tp and Duel.SelectEffectYesNo(tp,c) then
 			Duel.ChangeBattleDamage(1-tp,ev*2)
 			e1:Reset()
