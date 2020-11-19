@@ -4,7 +4,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
-	e1:SetCode(EVENT_PRE_DAMAGE_CALCULATE)
+	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_DESTROY)
 	e1:SetHintTiming(TIMING_DAMAGE_STEP)
@@ -24,8 +24,10 @@ function s.initial_effect(c)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
+	if not a then return false end
 	if a:IsControler(1-tp) then a=Duel.GetAttackTarget() end
-	return a:IsRelateToBattle()
+	return a~=e:GetHandler() and a:IsRelateToBattle() and a:IsSetCard(0xa6c)
+		and Duel.GetCurrentPhase()==PHASE_DAMAGE and not Duel.IsDamageCalculated()
 end
 function s.filter(c,e,tp)
 	return c:IsSetCard(0xa6c) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

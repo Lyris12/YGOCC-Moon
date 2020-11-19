@@ -20,15 +20,14 @@ function s.initial_effect(c)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
-	if a~=e:GetHandler() then return false end
 	if a:IsControler(1-tp) then a=Duel.GetAttackTarget() end
-	return a:IsRelateToBattle()
+	return a==e:GetHandler() and a:IsRelateToBattle()
 end
 function s.filter(c,e,tp)
 	return c:IsSetCard(0xa6c) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local loc=LOCATION_HAND+(e:GetHandler():IsHasEffect(id+8) and LOCATION_DECK or 0)
+	local loc=LOCATION_HAND+(e:GetHandler():IsHasEffect(id+14) and LOCATION_DECK or 0)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(s.filter,tp,loc,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,loc)
@@ -37,7 +36,7 @@ end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	if Duel.SpecialSummon(Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_HAND+(e:GetHandler():IsHasEffect(id+8) and LOCATION_DECK or 0),0,1,1,nil,e,tp),0,tp,tp,false,false,POS_FACEUP)>0 then
+	if Duel.SpecialSummon(Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_HAND+(e:GetHandler():IsHasEffect(id+14) and LOCATION_DECK or 0),0,1,1,nil,e,tp),0,tp,tp,false,false,POS_FACEUP)>0 then
 		Duel.BreakEffect()
 		Duel.Destroy(e:GetHandler(),REASON_EFFECT)
 	end
