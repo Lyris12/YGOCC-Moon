@@ -37,7 +37,8 @@ function s.op(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local a=Duel.GetAttacker()
 	if a:IsControler(1-tp) then a=Duel.GetAttackTarget() end
-	if not (a and a:IsRelateToBattle()) or Duel.Remove(a,POS_FACEUP,REASON_EFFECT+REASON_TEMPORARY)==0
+	a=a:GetBattleTarget()
+	if not a:IsRelateToBattle() or Duel.Remove(a,POS_FACEUP,REASON_EFFECT+REASON_TEMPORARY)==0
 		or a:IsType(TYPE_TOKEN) then return end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
@@ -59,7 +60,7 @@ function s.regop(e,tp,eg,ep,ev,re,r,rp)
 		if not a then return end
 		if a:IsControler(1-tp) then a=Duel.GetAttackTarget() end
 		if a:IsSetCard(0xa6c) and ep~=tp and Duel.SelectEffectYesNo(tp,c) then
-			Duel.ChangeBattleDamage(tp,ev*2)
+			Duel.ChangeBattleDamage(1-tp,ev*2)
 			e1:Reset()
 		end
 	end)

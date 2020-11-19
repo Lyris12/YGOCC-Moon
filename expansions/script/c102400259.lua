@@ -38,13 +38,16 @@ function s.filter(c)
 	return c:IsSetCard(0xa6c) and c:IsType(TYPE_MONSTER) and c:IsAbleToDeck()
 end
 function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return (Duel.GetTurnPlayer()~=tp or Duel.IsAbleToEnterBP())
+	local ph=Duel.GetCurrentPhase()
+	if chk==0 then return (ph>=PHASE_BATTLE_START and ph<=PHASE_BATTLE or Duel.GetTurnPlayer()~=tp or Duel.IsAbleToEnterBP())
 		and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,1,tp,LOCATION_GRAVE)
 end
 function s.op(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	if Duel.SendtoDeck(Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_GRAVE,0,1,99,nil))==0 then return end
+	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_GRAVE,0,1,99,nil)
+	Duel.HintSelection(g)
+	if Duel.SendtoDeck(g,nil,2,REASON_EFFECT)==0 then return end
 	local ct=Duel.GetOperatedGroup():FilterCount(Card.IsLocation,nil,LOCATION_DECK+LOCATION_EXTRA)-1
 	local c=e:GetHandler()
 	local e1=Effect.CreateEffect(c)
