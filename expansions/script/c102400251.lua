@@ -56,7 +56,7 @@ function s.regop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCode(EVENT_PRE_BATTLE_DAMAGE)
 	e1:SetOperation(function(e,tp,eg,ep,ev)
 		local a=Duel.GetAttacker()
-		if not a then return false end
+		if not a then return end
 		if a:IsControler(1-tp) then a=Duel.GetAttackTarget() end
 		if a:IsSetCard(0xa6c) and ep~=tp and Duel.SelectEffectYesNo(tp,c) then
 			Duel.ChangeBattleDamage(tp,ev*2)
