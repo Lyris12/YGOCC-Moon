@@ -20,8 +20,9 @@ function s.initial_effect(c)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
+	if a~=e:GetHandler() then return false end
 	if a:IsControler(1-tp) then a=Duel.GetAttackTarget() end
-	return a==e:GetHandler() and a:IsRelateToBattle()
+	return a:IsRelateToBattle()
 end
 function s.filter(c,e,tp)
 	return c:IsSetCard(0xa6c) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
