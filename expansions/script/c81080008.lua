@@ -58,7 +58,7 @@ function cid.regop(e,tp,eg,ep,ev,re,r,rp)
 	e:GetHandler():RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET+RESET_CHAIN,0,1)
 end
 function cid.lpcon(e,tp,eg,ep,ev,re,r,rp)
-	return re:IsActiveType(TYPE_MONSTER) and re:GetHandler():GetFlagEffect(1)>0
+	return re:IsActiveType(TYPE_MONSTER) and Duel.GetFlagEffect(tp,1)>0
 end
 function cid.thop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -68,7 +68,7 @@ function cid.thop(e,tp,eg,ep,ev,re,r,rp)
 	e2:SetCode(EVENT_CHAINING)
 	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e2:SetReset(RESET_PHASE+PHASE_END,2)
-	e2:SetOperation(aux.chainreg)
+	e2:SetOperation(function() if Duel.GetFlagEffect(tp,1)==0 then Duel.RegisterFlagEffect(tp,1,RESET_CHAIN,0,1) end end)
 	Duel.RegisterEffect(e2,tp)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
