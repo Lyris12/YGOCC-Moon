@@ -38,7 +38,7 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 end
 function cid.chainop(e,tp,eg,ep,ev,re,r,rp)
 	if re:IsActiveType(e:GetLabel()) and re:GetHandler():IsSetCard(0xcfd) and ep==tp then
-		Duel.SetChainLimit(function(e,rpr) return tp==rpr end)
+		Duel.SetChainLimit(function(e,rpr,p) return p==rpr end)
 	end
 end
 function cid.condition(e,tp,eg,ep,ev,re,r,rp)

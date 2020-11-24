@@ -43,7 +43,7 @@ function cid.splimit(e,c,sump,sumtype,sumpos,targetp,se)
 end
 function cid.mfilter(c,tp,sc)
 	return c:IsCanBeTimeleapMaterial(sc) and c:GetLevel()==sc:GetFuture()-1
-		and Duel.GetLocationCountFromEx(tp,tp,c)>0
+		and Duel.GetLocationCountFromEx(tp,tp,c,TYPE_TIMELEAP)>0
 end
 function cid.spfilter(c,e,tp)
 	if not Duel.IsExistingMatchingCard(cid.mfilter,tp,LOCATION_MZONE,0,1,nil,tp,c) or not c:IsSetCard(0xcfd)

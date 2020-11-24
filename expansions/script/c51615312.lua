@@ -51,7 +51,7 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e8)
 end
 function cid.mfilter(c,tp,sc)
-	return c:IsCanBeTimeleapMaterial(sc) and c:GetLevel()==sc:GetFuture()-1 and Duel.GetMZoneCount(tp,c)>0
+	return c:IsCanBeTimeleapMaterial(sc) and c:GetLevel()==sc:GetFuture()-1 and Duel.GetLocationCountFromEx(tp,tp,c,TYPE_TIMELEAP)>0
 end
 function cid.spfilter(c,e,tp)
 	if not Duel.IsExistingMatchingCard(cid.mfilter,tp,LOCATION_MZONE,0,1,nil,tp,c) or not c:IsSetCard(0xcfd)
