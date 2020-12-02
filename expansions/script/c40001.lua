@@ -41,8 +41,7 @@ end
 	local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_DECK,LOCATION_DECK,nil)
 	if g:GetCount()==0 then return end
 	local c1,c2,c3=Duel.TossCoin(tp,3)
-	local ct=c1+c2+c3
-	if ct==0 then return end
+	local ct=c1+c2+c3+3
 	if ct>g:GetCount() then ct=g:GetCount() end
 	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
 	Duel.ConfirmDecktop(p,ct)

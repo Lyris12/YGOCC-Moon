@@ -16,11 +16,11 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.op)
 	c:RegisterEffect(e1)
-	--special summon
+	--recycle
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_TOHAND)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e2:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
 	e2:SetCode(EVENT_LEAVE_FIELD)
 	e2:SetCondition(s.spcon)
@@ -75,7 +75,7 @@ end
 	return c:IsType(TYPE_EQUIP) and c:IsAbleToHand()
 end
 	function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.addfilter,tp,LOCATION_GRAVE,0,1,nil) end
+	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_GRAVE)
 end
 	function s.spop(e,tp,eg,ep,ev,re,r,rp)

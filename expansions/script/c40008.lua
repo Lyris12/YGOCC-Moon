@@ -88,7 +88,7 @@ end
 		e1:SetCode(EFFECT_EXTRA_ATTACK)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-		e1:SetValue(0)
+		e1:SetValue(1)
 		tc:RegisterEffect(e1)
 		elseif c1+c2==2 then 
 			local e2=Effect.CreateEffect(e:GetHandler())
@@ -96,7 +96,7 @@ end
 			e2:SetCode(EFFECT_EXTRA_ATTACK)
 			e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 			e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-			e2:SetValue(1)
+			e2:SetValue(2)
 			tc:RegisterEffect(e2)
 				else
 					local e3=Effect.CreateEffect(e:GetHandler())

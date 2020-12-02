@@ -6,14 +6,14 @@ function s.initial_effect(c)
 	Xyz.AddProcedure(c,aux.FilterBoolFunctionEx(Card.IsSetCard,0xa3),8,2)
 	c:EnableReviveLimit()
 	--must be xyz summoned
-    local e0=Effect.CreateEffect(c)
-    e0:SetType(EFFECT_TYPE_SINGLE)
-    e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-    e0:SetCode(EFFECT_SPSUMMON_CONDITION)
-    e0:SetValue(s.splimit)
-    c:RegisterEffect(e0)
+    local e1=Effect.CreateEffect(c)
+    e1:SetType(EFFECT_TYPE_SINGLE)
+    e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+    e1:SetCode(EFFECT_SPSUMMON_CONDITION)
+    e1:SetValue(s.splimit)
+    c:RegisterEffect(e1)
 	--indes
-	local e2=Effect.CreateEffect(c)
+	local e=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
 	e2:SetCode(EFFECT_INDESTRUCTABLE_COUNT)
@@ -50,6 +50,11 @@ s.listed_series={0xa3}
 s.synchro_nt_required=2
 function s.splimit(e,se,sp,st)
 	return (st&SUMMON_TYPE_XYZ)==SUMMON_TYPE_XYZ
+end
+function s.indct(e,re,r,rp)
+	if (r&REASON_BATTLE+REASON_EFFECT)~=0 then
+		return 1
+	else return 0 end
 end
 function s.discon(e,tp,eg,ep,ev,re,r,rp)
 	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and Duel.IsChainNegatable(ev)

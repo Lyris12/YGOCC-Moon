@@ -44,7 +44,7 @@ function s.initial_effect(c)
 	e5:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e5:SetValue(aux.tgoval)
 	c:RegisterEffect(e5)
-	--banish all
+	--banish
 	local e6=Effect.CreateEffect(c)
 	e6:SetCategory(CATEGORY_REMOVE)
 	e6:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
@@ -108,7 +108,7 @@ end
 	return e:GetHandler():GetEquipGroup():IsExists(Card.IsCode,1,nil,49306994)
 end
 	function s.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return s.eqcon2(e) and e:GetHandler():IsLocation(LOCATION_GRAVE) and e:GetHandler():GetPreviousControler()==tp and e:GetHandler():IsPreviousLocation(LOCATION_MZONE) and e:GetHandler():IsReason(REASON_DESTROY)
+	return s.eqcon2(e) and e:GetHandler():IsLocation(LOCATION_GRAVE) and e:GetHandler():IsReason(REASON_DESTROY)
 end
 	function s.bfilter(c)
 	return c:IsCode(49306994) and c:IsAbleToRemoveAsCost() and c:IsLocation(LOCATION_GRAVE)
@@ -121,12 +121,19 @@ end
 	g:AddCard(e:GetHandler())
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
+	function s.thfilter(c)
+	return c:IsType(TYPE_MONSTER) and c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsLocation(LOCATION_REMOVED) and c:IsFaceup()
+end
 	function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	local g=Duel.GetMatchingGroup(aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,g:GetCount(),0,0)
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,0,0)
 end
-	function s.spop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
-	Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
+	function s.spop(e,tp,eg,ep,ev,re,r,rp,chk)
+	local ct=Duel.GetMatchingGroupCount(s.thfilter,tp,LOCATION_REMOVED,0,nil)
+	local rg=Duel.GetMatchingGroup(Card.IsAbleToRemove,tp,0,LOCATION_ONFIELD,nil)
+	if rg:GetCount()<ct then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+	local sg=rg:Select(tp,ct,ct,nil)
+	Duel.HintSelection(sg)
+	Duel.Remove(sg,POS_FACEUP,REASON_EFFECT)
 end
