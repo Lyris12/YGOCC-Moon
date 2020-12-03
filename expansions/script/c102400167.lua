@@ -1,4 +1,4 @@
---created & coded by Lyris, art from "Degenerate Circuit" & Yu-Gi-Oh! GX Episode 95
+--created & coded by Lyris, art from "Degenerate Circuit"
 --サイバー・ダーク・コンダクター
 local s,id=GetID()
 function s.initial_effect(c)
