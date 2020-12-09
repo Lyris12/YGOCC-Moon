@@ -70,10 +70,12 @@ function cid.op(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCode(EVENT_PHASE_START+PHASE_BATTLE_START)
 	e1:SetRange(LOCATION_GRAVE)
 	e1:SetCountLimit(1)
-	e1:SetOperation(cid.spop)
 	e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_BATTLE_START)
 	tc:RegisterEffect(e1)
-end
-function cid.spop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then Duel.SpecialSummon(e:GetHandler(),0,tp,tp,false,false,POS_FACEUP) end
-end
+	local e2=e1:Clone()
+	e2:SetCode(EVENT_PHASE_START+PHASE_END)
+	e2:SetOperation(function(e,tp) if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then Duel.SpecialSummon(e:GetHandler(),0,tp,tp,false,false,POS_FACEUP) end e1:Reset() e2:Reset() end)
+	e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+	c:RegisterEffect(e2)
+	e1:SetOperation(e2:GetOperation())
+end   
