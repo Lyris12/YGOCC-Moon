@@ -76,6 +76,6 @@ function cid.op(e,tp,eg,ep,ev,re,r,rp)
 	e2:SetCode(EVENT_PHASE_START+PHASE_END)
 	e2:SetOperation(function(e,tp) if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then Duel.SpecialSummon(e:GetHandler(),0,tp,tp,false,false,POS_FACEUP) end e1:Reset() e2:Reset() end)
 	e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-	c:RegisterEffect(e2)
+	tc:RegisterEffect(e2)
 	e1:SetOperation(e2:GetOperation())
 end   
