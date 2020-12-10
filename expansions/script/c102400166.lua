@@ -17,17 +17,8 @@ function s.initial_effect(c)
 	local e3=e1:Clone()
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e3)
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_FIELD)
-	e4:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_IGNORE_RANGE+EFFECT_FLAG_IGNORE_IMMUNE)
-	e4:SetCode(EFFECT_REMOVE_REDIRECT)
-	e4:SetRange(LOCATION_SZONE)
-	e4:SetTarget(s.rmtarget)
-	e4:SetTargetRange(0xff,0)
-	e4:SetValue(LOCATION_GRAVE)
-	c:RegisterEffect(e4)
 	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_QUICK_O)
+	e5:SetType(EFFECT_TYPE_IGNITION)
 	e5:SetCode(EVENT_FREE_CHAIN)
 	e5:SetRange(LOCATION_MZONE)
 	e5:SetCountLimit(1,id)
@@ -45,7 +36,7 @@ function s.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and s.filter(chkc) end
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
-	local g=Duel.SelectTarget(tp,s.filter,tp,LOCATION_GRAVE,0,1,1,nil)
+	local g=Duel.SelectTarget(tp,s.filter,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,g,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,g,1,0,0)
 end
@@ -83,9 +74,6 @@ function s.eqlimit(e,c)
 end
 function s.repval(e,re,r,rp)
 	return bit.band(r,REASON_BATTLE)~=0
-end
-function s.rmtarget(e,c)
-	return not c:IsLocation(0x80) and not c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsSetCard(0x4093)
 end
 function s.cfilter(c)
 	return c:IsSetCard(0x4093) and (c:IsFaceup() or c:GetEquipTarget()) and c:IsType(TYPE_EQUIP) and c:IsAbleToGraveAsCost()

@@ -17,14 +17,6 @@ function s.initial_effect(c)
 	local e3=e1:Clone()
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e3)
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e4:SetCode(EVENT_CHAIN_SOLVING)
-	e4:SetRange(LOCATION_MZONE)
-	e4:SetCountLimit(1)
-	e4:SetCondition(s.negcon)
-	e4:SetOperation(s.negop)
-	c:RegisterEffect(e4)
 	local e5=Effect.CreateEffect(c)
 	e5:SetCategory(CATEGORY_TOHAND+CATEGORY_SUMMON)
 	e5:SetType(EFFECT_TYPE_IGNITION)
@@ -77,18 +69,6 @@ function s.eqlimit(e,c)
 end
 function s.repval(e,re,r,rp)
 	return bit.band(r,REASON_BATTLE)~=0
-end
-function s.cfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x4093) and c:IsType(TYPE_EQUIP)
-end
-function s.negcon(e,tp,eg,ep,ev,re,r,rp)
-	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return false end
-	local tg=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
-	return rp~=tp and tg and tg:IsExists(s.cfilter,1,nil)
-end
-function s.negop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_CARD,0,id)
-	Duel.NegateEffect(ev)
 end
 function s.thfilter(c)
 	return c:IsRace(RACE_MACHINE) and c:IsSetCard(0x4093) and c:IsAbleToHand()

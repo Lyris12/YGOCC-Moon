@@ -39,7 +39,7 @@ function s.initial_effect(c)
 end
 function s.condition(e)
 	local tp=e:GetHandlerPlayer()
-	return not Duel.IsPlayerAffectedByEffect(tp,EFFECT_NECRO_VALLEY) and not Duel.IsPlayerAffectedByEffect(1-tp,EFFECT_NECRO_VALLEY)
+	return Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsSetCard),tp,LOCATION_MZONE,0,1,nil,0x4093) and not Duel.IsPlayerAffectedByEffect(tp,EFFECT_NECRO_VALLEY) and not Duel.IsPlayerAffectedByEffect(1-tp,EFFECT_NECRO_VALLEY)
 end
 function s.cfilter(c)
 	return c:IsType(TYPE_MONSTER) and c:GetOriginalRace()&RACE_DRAGON>0 and c:IsAbleToDeckAsCost()
