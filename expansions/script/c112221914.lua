@@ -1,12 +1,12 @@
 --created by Hoshi, coded by Lyris
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
 	e1:SetCountLimit(1,id+EFFECT_COUNT_CODE_OATH)
-	e1:SetOperation(cid.activate)
+	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 	aux.AddCodeList(c,id-14)
 	local e2=Effect.CreateEffect(c)
@@ -35,35 +35,35 @@ function cid.initial_effect(c)
 	e6:SetCountLimit(1)
 	e6:SetCategory(CATEGORY_EQUIP)
 	e6:SetDescription(1068)
-	e6:SetTarget(cid.eqtg)
-	e6:SetOperation(cid.eqop)
+	e6:SetTarget(s.eqtg)
+	e6:SetOperation(s.eqop)
 	c:RegisterEffect(e6)
 end
-function cid.sfilter(c)
+function s.sfilter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xcda) and c:IsAbleToHand()
 end
-function cid.activate(e,tp,eg,ep,ev,re,r,rp)
+function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
-	local g=Duel.GetMatchingGroup(cid.sfilter,tp,LOCATION_DECK,0,nil)
+	local g=Duel.GetMatchingGroup(s.sfilter,tp,LOCATION_DECK,0,nil)
 	if #g==0 or not Duel.SelectYesNo(tp,1109) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local sg=g:Select(tp,1,1,nil)
 	Duel.SendtoHand(sg,nil,REASON_EFFECT)
 	Duel.ConfirmCards(1-tp,sg)
 end
-function cid.eqfilter(c,tp)
+function s.eqfilter(c,tp)
 	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xcda) and c:CheckUniqueOnField(tp) and not c:IsForbidden()
 end
-function cid.eqtg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.eqtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
-		and Duel.IsExistingMatchingCard(cid.eqfilter,tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_HAND,0,1,nil,tp)
+		and Duel.IsExistingMatchingCard(s.eqfilter,tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_HAND,0,1,nil,tp)
 		and Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsCode),tp,LOCATION_MZONE,0,1,nil,id-14) end
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_HAND)
 end
-function cid.eqop(e,tp,eg,ep,ev,re,r,rp)
+function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
-	local ec=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(cid.eqfilter),tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_HAND,0,1,1,nil,tp):GetFirst()
+	local ec=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.eqfilter),tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_HAND,0,1,1,nil,tp):GetFirst()
 	if not ec then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	local tc=Duel.SelectMatchingCard(tp,aux.AND(Card.IsFaceup,Card.IsCode),tp,LOCATION_MZONE,0,1,1,nil,id-14):GetFirst()

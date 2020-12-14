@@ -1,8 +1,8 @@
 --created by Xeno, coded by Lyris
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	c:EnableReviveLimit()
-	aux.AddSynchroProcedure(c,cid.tfilter,aux.NonTuner(Card.IsRace,RACE_REPTILE),1)
+	aux.AddSynchroProcedure(c,s.tfilter,aux.NonTuner(Card.IsRace,RACE_REPTILE),1)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_SET_ATTACK)
@@ -21,9 +21,9 @@ function cid.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetCategory(CATEGORY_DISABLE)
 	e2:SetHintTiming(0,TIMINGS_CHECK_MONSTER)
-	e2:SetCost(cid.negcost)
-	e2:SetTarget(cid.negtg)
-	e2:SetOperation(cid.negop)
+	e2:SetCost(s.negcost)
+	e2:SetTarget(s.negtg)
+	e2:SetOperation(s.negop)
 	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
@@ -32,29 +32,29 @@ function cid.initial_effect(c)
 	e3:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_DESTROY)
 	e3:SetCondition(function(e) local tc=e:GetHandler() return tc:IsPreviousLocation(LOCATION_MZONE) and tc:IsSummonType(SUMMON_TYPE_SYNCHRO) end)
-	e3:SetCost(cid.cost)
-	e3:SetTarget(cid.sptg)
-	e3:SetOperation(cid.spop)
+	e3:SetCost(s.cost)
+	e3:SetTarget(s.sptg)
+	e3:SetOperation(s.spop)
 	c:RegisterEffect(e3)
 end
-function cid.tfilter(c)
+function s.tfilter(c)
 	return c:IsRace(RACE_REPTILE) and (c:IsSetCard(0xe80) or c:IsCode(CARD_EVIL_DRAGON_ANANTA))
 end
-function cid.cfilter(c)
+function s.cfilter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsRace(RACE_REPTILE) and c:IsAbleToRemoveAsCost()
 end
-function cid.negcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(aux.AND(cid.cfilter,aux.OR(Card.IsFaceup,Card.IsLocation)),tp,LOCATION_GRAVE+LOCATION_MZONE,0,2,nil,LOCATION_GRAVE) end
+function s.negcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(aux.AND(s.cfilter,aux.OR(Card.IsFaceup,Card.IsLocation)),tp,LOCATION_GRAVE+LOCATION_MZONE,0,2,nil,LOCATION_GRAVE) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	Duel.Remove(Duel.SelectMatchingCard(tp,aux.AND(cid.cfilter,aux.OR(Card.IsFaceup,Card.IsLocation)),tp,LOCATION_GRAVE+LOCATION_MZONE,0,2,2,nil,LOCATION_GRAVE),POS_FACEUP,REASON_COST)
+	Duel.Remove(Duel.SelectMatchingCard(tp,aux.AND(s.cfilter,aux.OR(Card.IsFaceup,Card.IsLocation)),tp,LOCATION_GRAVE+LOCATION_MZONE,0,2,2,nil,LOCATION_GRAVE),POS_FACEUP,REASON_COST)
 end
-function cid.negtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) and aux.disfilter1(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(aux.disfilter1,tp,0,LOCATION_ONFIELD,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	Duel.SetOperationInfo(0,CATEGORY_DISABLE,Duel.SelectTarget(tp,aux.disfilter1,tp,0,LOCATION_ONFIELD,1,1,nil),1,0,0)
 end
-function cid.negop(e,tp,eg,ep,ev,re,r,rp)
+function s.negop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if ((tc:IsFaceup() and not tc:IsDisabled()) or tc:IsType(TYPE_TRAPMONSTER)) and tc:IsRelateToEffect(e) then
@@ -80,18 +80,18 @@ function cid.negop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(cid.cfilter,tp,LOCATION_GRAVE,0,1,nil) end
+function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	Duel.Remove(Duel.SelectMatchingCard(tp,cid.cfilter,tp,LOCATION_GRAVE,0,1,1,nil),POS_FACEUP,REASON_COST)
+	Duel.Remove(Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_GRAVE,0,1,1,nil),POS_FACEUP,REASON_COST)
 end
-function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,Duel.GetFieldGroup(tp,LOCATION_ONFIELD,LOCATION_ONFIELD),1,0,LOCATION_ONFIELD)
 end
-function cid.spop(e,tp,eg,ep,ev,re,r,rp)
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)

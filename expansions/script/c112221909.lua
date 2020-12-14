@@ -1,6 +1,6 @@
 --created by Hoshi, coded by Lyris
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	c:SetUniqueOnField(1,0,id)
 	aux.AddCodeList(c,id-9)
 	local e2=Effect.CreateEffect(c)
@@ -12,8 +12,8 @@ function cid.initial_effect(c)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetDescription(1152)
 	e2:SetCondition(function(e,tp,eg) return eg:IsExists(aux.AND(Card.IsFaceup,Card.IsCode),1,nil,id-9) end)
-	e2:SetTarget(cid.sptg)
-	e2:SetOperation(cid.spop)
+	e2:SetTarget(s.sptg)
+	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
 	local e3=e2:Clone()
 	e3:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
@@ -42,16 +42,16 @@ function cid.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
 	e1:SetDescription(1190)
 	e1:SetCondition(function(e) return aux.IsCodeListed(e:GetHandler():GetReasonCard(),id-9) end)
-	e1:SetTarget(cid.target)
-	e1:SetOperation(cid.operation)
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
 end
-function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
-function cid.spop(e,tp,eg,ep,ev,re,r,rp)
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) then Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP) end
 	local e1=Effect.CreateEffect(c)
@@ -63,16 +63,16 @@ function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
 end
-function cid.filter(c)
+function s.filter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xcda) and c:IsAbleToHand()
 end
-function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_GRAVE,0,1,nil) end
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_GRAVE)
 end
-function cid.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_GRAVE,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_GRAVE,0,1,1,nil)
 	Duel.SendtoHand(g,nil,REASON_EFFECT)
 	Duel.ConfirmCards(1-tp,g)
 end

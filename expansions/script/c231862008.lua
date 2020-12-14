@@ -1,8 +1,8 @@
 --created by ZEN, coded by TaxingCorn117
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	c:SetSPSummonOnce(id)
-	aux.AddLinkProcedure(c,cid.mfilter,1,1)
+	aux.AddLinkProcedure(c,s.mfilter,1,1)
 	c:EnableReviveLimit()
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(math.floor(id/100),1))
@@ -10,39 +10,39 @@ function cid.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1)
-	e1:SetTarget(cid.sptg)
-	e1:SetOperation(cid.spop)
+	e1:SetTarget(s.sptg)
+	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
 end
-function cid.mfilter(c)
+function s.mfilter(c)
 	return c:IsLinkSetCard(0x52f)
 end
-function cid.cfilter(c)
+function s.cfilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_LINK)
 end
-function cid.checkzone(tp)
+function s.checkzone(tp)
 	local zone=0
-	local g=Duel.GetMatchingGroup(cid.cfilter,tp,LOCATION_MZONE,0,nil)
+	local g=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_MZONE,0,nil)
 	for tc in aux.Next(g) do
 		zone=bit.bor(zone,tc:GetLinkedZone(tp))
 	end
 	return bit.band(zone,0x1f)
 end
-function cid.spfilter(c,e,tp,lv,zone)
+function s.spfilter(c,e,tp,lv,zone)
 	return c:IsLevelBelow(lv) and not c:IsType(TYPE_LINK) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,tp,zone)
 end
-function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_DICE,nil,0,tp,1)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,tp,100)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,0,tp,LOCATION_GRAVE)
 end
-function cid.spop(e,tp,eg,ep,ev,re,r,rp)
-	local zone=cid.checkzone(tp)
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
+	local zone=s.checkzone(tp)
 	local dc=Duel.TossDice(tp,1)
 	if zone==0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.GetMatchingGroup(cid.spfilter,tp,LOCATION_GRAVE,LOCATION_GRAVE,nil,e,tp,dc,zone)
+	local g=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_GRAVE,LOCATION_GRAVE,nil,e,tp,dc,zone)
 	if Duel.Damage(tp,dc*100,REASON_EFFECT)~=0 and Duel.GetLP(tp)>0 and #g>0 then
 		Duel.BreakEffect()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)

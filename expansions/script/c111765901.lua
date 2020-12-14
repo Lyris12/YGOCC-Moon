@@ -1,27 +1,27 @@
 --created by NTA, coded by Lyris
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_ACTIVATE)
 	e3:SetCode(EVENT_PHASE+PHASE_END)
 	e3:SetCountLimit(1,id+EFFECT_COUNT_CODE_OATH)
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_SEARCH+CATEGORY_TOHAND)
 	e3:SetCondition(function(e,tp) return Duel.GetTurnPlayer()~=tp end)
-	e3:SetTarget(cid.sptg)
-	e3:SetOperation(cid.spop)
+	e3:SetTarget(s.sptg)
+	e3:SetOperation(s.spop)
 	c:RegisterEffect(e3)
 end
-function cid.spfilter(c,e,tp)
+function s.spfilter(c,e,tp)
 	return aux.NOT(aux.exccon)(e) and c:IsSetCard(0x4578) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(cid.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
+		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_GRAVE)
 end
-function cid.spop(e,tp,eg,ep,ev,re,r,rp)
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	local tg=Duel.GetMatchingGroup(cid.spfilter,tp,LOCATION_GRAVE,0,nil,e,tp)
+	local tg=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_GRAVE,0,nil,e,tp)
 	if ft<1 or #tg<1 then return end
 	if Duel.IsPlayerAffectedByEffect(tp,id) then ft=1 end
 	local g=Duel.GetMatchingGroup(aux.AND(Card.IsCode,Card.IsAbleToHand),tp,LOCATION_DECK,0,nil,id)

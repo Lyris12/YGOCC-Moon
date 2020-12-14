@@ -1,6 +1,6 @@
 --created by Eaden, coded by Lyris
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_DARK),6,2)
 	local e1=Effect.CreateEffect(c)
@@ -10,7 +10,7 @@ function cid.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e1:SetCategory(CATEGORY_TOHAND)
 	e1:SetTarget(function(e,tp,eg,ep,ev,re,r,rp,chk) if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0 end end)
-	e1:SetOperation(cid.thop)
+	e1:SetOperation(s.thop)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
@@ -20,11 +20,11 @@ function cid.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
 	e2:SetCategory(CATEGORY_ATKCHANGE)
 	e2:SetCondition(function(e) local c=e:GetHandler() return aux.dscon() and c:GetBattleTarget() and c:GetOverlayCount()>5 end)
-	e2:SetTarget(cid.target)
-	e2:SetOperation(cid.operation)
+	e2:SetTarget(s.target)
+	e2:SetOperation(s.operation)
 	c:RegisterEffect(e2)
 end
-function cid.thop(e,tp,eg,ep,ev,re,r,rp)
+function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
 	local g=Duel.GetDecktopGroup(tp,1)
@@ -38,17 +38,17 @@ function cid.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(1-tp,sg)
 	end
 end
-function cid.filter(c)
+function s.filter(c)
 	return c:IsCanOverlay() and c:GetBaseAttack()>0
 end
-function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_MZONE,0,1,e:GetHandler()) end
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_MZONE,0,1,e:GetHandler()) end
 end
-function cid.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
-	local g=Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_MZONE,0,1,1,c)
+	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_MZONE,0,1,1,c)
 	local tc=g:GetFirst()
 	local atk=tc:GetBaseAttack()
 	Duel.Overlay(c,g)

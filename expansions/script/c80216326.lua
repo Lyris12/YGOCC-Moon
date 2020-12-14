@@ -1,6 +1,6 @@
 --created by Eaden, coded by Lyris
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_DARK),8,4)
 	local e1=Effect.CreateEffect(c)
@@ -8,14 +8,14 @@ function cid.initial_effect(c)
 	e1:SetCode(EFFECT_IMMUNE_EFFECT)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetCondition(function(e) return e:GetHandler():GetOverlayGroup():IsExists(cid.cfilter,1,nil) end)
-	e1:SetValue(cid.efilter)
+	e1:SetCondition(function(e) return e:GetHandler():GetOverlayGroup():IsExists(s.cfilter,1,nil) end)
+	e1:SetValue(s.efilter)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_BATTLE_START)
-	e2:SetTarget(cid.ovtg)
-	e2:SetOperation(cid.ovop)
+	e2:SetTarget(s.ovtg)
+	e2:SetOperation(s.ovop)
 	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_QUICK_O)
@@ -23,39 +23,39 @@ function cid.initial_effect(c)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1,id)
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e3:SetCost(cid.cost)
-	e3:SetTarget(cid.target)
-	e3:SetOperation(cid.operation)
+	e3:SetCost(s.cost)
+	e3:SetTarget(s.target)
+	e3:SetOperation(s.operation)
 	c:RegisterEffect(e3)
 end
-function cid.cfilter(c)
+function s.cfilter(c)
 	return c:IsRankAbove(6) and c:IsSetCard(0x2ead) and c:IsType(TYPE_XYZ)
 end
-function cid.efilter(e,te)
+function s.efilter(e,te)
 	return te:GetOwner()~=e:GetOwner()
 end
-function cid.ovtg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.ovtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	local d=Duel.GetAttackTarget()
 	if chk==0 then return Duel.GetAttacker()==c and d and d:IsCanOverlay() end
 end
-function cid.ovop(e,tp,eg,ep,ev,re,r,rp)
+function s.ovop(e,tp,eg,ep,ev,re,r,rp)
 	local d=Duel.GetAttackTarget()
 	if d and d:IsRelateToBattle() then Duel.Overlay(e:GetHandler(),d) end
 end
-function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return c:CheckRemoveOverlayCard(tp,1,REASON_COST) and Duel.IsPlayerCanDiscardDeckAsCost(tp,2) end
 	c:RemoveOverlayCard(tp,1,1,REASON_COST)
 	Duel.BreakEffect()
 	Duel.DiscardDeck(tp,2,REASON_COST)
 end
-function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and e:GetHandler():GetOverlayGroup():IsExists(Card.IsCanBeSpecialSummoned,1,nil,e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_OVERLAY)
 end
-function cid.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)

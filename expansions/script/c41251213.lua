@@ -1,6 +1,6 @@
 --created by Alastar Rainford, coded by Lyris
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	aux.EnablePendulumAttribute(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
@@ -8,30 +8,30 @@ function cid.initial_effect(c)
 	e1:SetCountLimit(1)
 	e1:SetLabel(0)
 	e1:SetCost(function(e) e:SetLabel(100) return true end)
-	e1:SetTarget(cid.target)
-	e1:SetOperation(cid.operation)
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
 end
-function cid.cfilter(c,tp)
+function s.cfilter(c,tp)
 	return c:IsRace(RACE_PLANT) and c:IsType(TYPE_FUSION) and (c:IsAttribute(ATTRIBUTE_FIRE)
-		or Duel.IsExistingTarget(cid.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil,c:GetOriginalAttribute()))
+		or Duel.IsExistingTarget(s.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil,c:GetOriginalAttribute()))
 end
-function cid.filter(c,at)
+function s.filter(c,at)
 	if at&0x11~=0 then
 		if not c:IsAbleToRemove() then return false end
 		return at==ATTRIBUTE_LIGHT or c:IsFacedown()
 	elseif at==ATTRIBUTE_WIND then return c:IsAbleToHand()
 	else return at==ATTRIBUTE_DARK and c:IsType(TYPE_MONSTER) or c:IsType(TYPE_SPELL+TYPE_TRAP) end
 end
-function cid.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local at=e:GetLabel()
-	if chkc then return at~=ATTRIBUTE_FIRE and chkc:IsOnField() and cid.filter(chkc,at) end
+	if chkc then return at~=ATTRIBUTE_FIRE and chkc:IsOnField() and s.filter(chkc,at) end
 	if chk==0 then
 		if at~=100 then return false end
 		e:SetLabel(0)
-		return Duel.CheckReleaseGroup(tp,cid.cfilter,1,nil,tp)
+		return Duel.CheckReleaseGroup(tp,s.cfilter,1,nil,tp)
 	end
-	local tc=Duel.SelectReleaseGroup(tp,cid.cfilter,1,1,nil,tp):GetFirst()
+	local tc=Duel.SelectReleaseGroup(tp,s.cfilter,1,1,nil,tp):GetFirst()
 	local att=tc:GetOriginalAttribute()
 	local lv=tc:GetLevel()
 	e:SetLabel(att)
@@ -44,7 +44,7 @@ function cid.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	else
 		e:SetProperty(EFFECT_FLAG_CARD_TARGET)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-		local g=Duel.SelectTarget(tp,cid.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil,att)
+		local g=Duel.SelectTarget(tp,s.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil,att)
 		if att&0x11~=0 then
 			e:SetCategory(CATEGORY_REMOVE)
 			Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,0,0)
@@ -57,7 +57,7 @@ function cid.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		end
 	end
 end
-function cid.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local at=e:GetLabel()
 	if at==ATTRIBUTE_FIRE then Duel.Damage(1-tp,e:GetLabelObject():GetLevel()*200)

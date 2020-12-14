@@ -1,6 +1,6 @@
 --created by Zolanark, coded by XGlitchy30
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	aux.EnablePendulumAttribute(c)
 	c:EnableReviveLimit()
 	local p1=Effect.CreateEffect(c)
@@ -11,9 +11,9 @@ function cid.initial_effect(c)
 	p1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	p1:SetRange(LOCATION_PZONE)
 	p1:SetCountLimit(1)
-	p1:SetCondition(cid.damcon)
-	p1:SetTarget(cid.damtg)
-	p1:SetOperation(cid.damop)
+	p1:SetCondition(s.damcon)
+	p1:SetTarget(s.damtg)
+	p1:SetOperation(s.damop)
 	c:RegisterEffect(p1)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,4))
@@ -21,23 +21,23 @@ function cid.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1)
-	e1:SetTarget(cid.drytg)
-	e1:SetOperation(cid.dryop)
+	e1:SetTarget(s.drytg)
+	e1:SetOperation(s.dryop)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,5))
 	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e2:SetCode(EVENT_TO_GRAVE)
-	e2:SetCondition(cid.thcon)
-	e2:SetTarget(cid.thtg)
-	e2:SetOperation(cid.thop)
+	e2:SetCondition(s.thcon)
+	e2:SetTarget(s.thtg)
+	e2:SetOperation(s.thop)
 	c:RegisterEffect(e2)
 end
-function cid.thfilter(c)
+function s.thfilter(c)
 	return c:IsSetCard(0x89f) and c:IsAbleToHand()
 end
-function cid.damcon(e,tp,eg,ep,ev,re,r,rp)
+function s.damcon(e,tp,eg,ep,ev,re,r,rp)
 	local des=eg:GetFirst()
 	if des:IsReason(REASON_BATTLE) then
 		local rc=des:GetReasonCard()
@@ -49,7 +49,7 @@ function cid.damcon(e,tp,eg,ep,ev,re,r,rp)
 	end
 	return false
 end
-function cid.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	local tc
 	if #eg>1 then
@@ -66,11 +66,11 @@ function cid.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetTargetParam(dam)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,dam)
 end
-function cid.damop(e,tp,eg,ep,ev,re,r,rp)
+function s.damop(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	Duel.Damage(p,d,REASON_EFFECT)
 end
-function cid.drytg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.drytg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsDestructable() end
 	local dam=Duel.GetMatchingGroupCount(Card.IsType,tp,LOCATION_MZONE,0,e:GetHandler(),TYPE_MONSTER)*200
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,e:GetHandler(),1,0,0)
@@ -78,7 +78,7 @@ function cid.drytg(e,tp,eg,ep,ev,re,r,rp,chk)
 		Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,dam)
 	end
 end
-function cid.dryop(e,tp,eg,ep,ev,re,r,rp)
+function s.dryop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and Duel.Destroy(c,REASON_EFFECT)~=0 then
 		local dam=Duel.GetMatchingGroupCount(Card.IsType,tp,LOCATION_MZONE,0,nil,TYPE_MONSTER)*200
@@ -87,17 +87,17 @@ function cid.dryop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-function cid.thcon(e,tp,eg,ep,ev,re,r,rp)
+function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsReason(REASON_BATTLE+REASON_EFFECT)
 end
-function cid.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	local g=Duel.GetMatchingGroup(cid.thfilter,tp,LOCATION_DECK,0,nil)
+	local g=Duel.GetMatchingGroup(s.thfilter,tp,LOCATION_DECK,0,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
 end
-function cid.thop(e,tp,eg,ep,ev,re,r,rp)
+function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,cid.thfilter,tp,LOCATION_DECK,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil)
 	if #g>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)

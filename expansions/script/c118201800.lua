@@ -1,6 +1,6 @@
 --created by Zolanark, coded by XGlitchy30
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	aux.EnablePendulumAttribute(c)
 	c:EnableReviveLimit()
 	local p1=Effect.CreateEffect(c)
@@ -10,16 +10,16 @@ function cid.initial_effect(c)
 	p1:SetCode(EVENT_TO_GRAVE)
 	p1:SetRange(LOCATION_PZONE)
 	p1:SetCountLimit(1)
-	p1:SetCondition(cid.rtcon)
-	p1:SetTarget(cid.rttg)
-	p1:SetOperation(cid.rtop)
+	p1:SetCondition(s.rtcon)
+	p1:SetTarget(s.rttg)
+	p1:SetOperation(s.rtop)
 	c:RegisterEffect(p1)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetTargetRange(LOCATION_MZONE,0)
 	e1:SetCode(EFFECT_UPDATE_ATTACK)
-	e1:SetCondition(cid.atkcon)
+	e1:SetCondition(s.atkcon)
 	e1:SetTarget(aux.TargetBoolFunction(Card.IsType,0x81))
 	e1:SetValue(500)
 	c:RegisterEffect(e1)
@@ -31,10 +31,10 @@ function cid.initial_effect(c)
 	e2:SetTarget(aux.TargetBoolFunction(Card.IsType,0x81))
 	c:RegisterEffect(e2)
 end
-function cid.cfilter(c,tp)
+function s.cfilter(c,tp)
 	return (c:IsSetCard(0x89f) or c:IsPreviousSetCard(0x89f)) and c:GetPreviousControler()==tp and c:IsReason(REASON_BATTLE+REASON_EFFECT)
 end
-function cid.filter(c,e,tp,m1,m2)
+function s.filter(c,e,tp,m1,m2)
 	if bit.band(c:GetType(),0x81)==0 or not c:IsSetCard(0x89f) or not (c:IsLocation(LOCATION_HAND) or (c:IsLocation(LOCATION_EXTRA) and c:IsFaceup()))
 		or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,false,true) then 
 			return false
@@ -51,35 +51,35 @@ function cid.filter(c,e,tp,m1,m2)
 		return false
 	end
 end
-function cid.rmfilter(c)
+function s.rmfilter(c)
 	return c:IsAbleToRemove() and c:IsLocation(LOCATION_HAND)
 end
-function cid.exfilter0(c)
+function s.exfilter0(c)
 	return c:IsAbleToRemove() and c:IsType(TYPE_MONSTER) and c:IsLocation(LOCATION_GRAVE+LOCATION_EXTRA) and c:GetLevel()>0
 end
-function cid.atkfilter(c)
+function s.atkfilter(c)
 	return c:IsFaceup() and bit.band(c:GetType(),0x81)==0x81
 end
-function cid.rtcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(cid.cfilter,1,nil,tp)
+function s.rtcon(e,tp,eg,ep,ev,re,r,rp)
+	return eg:IsExists(s.cfilter,1,nil,tp)
 end
-function cid.rttg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.rttg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
-		local mg1=Duel.GetRitualMaterial(tp):Filter(cid.rmfilter,nil)
-		local sg=Duel.GetMatchingGroup(cid.exfilter0,tp,LOCATION_GRAVE+LOCATION_EXTRA,0,nil)
-		return e:GetHandler():IsAbleToRemove() and Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_HAND+LOCATION_EXTRA,0,1,nil,e,tp,mg1,sg)
+		local mg1=Duel.GetRitualMaterial(tp):Filter(s.rmfilter,nil)
+		local sg=Duel.GetMatchingGroup(s.exfilter0,tp,LOCATION_GRAVE+LOCATION_EXTRA,0,nil)
+		return e:GetHandler():IsAbleToRemove() and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_HAND+LOCATION_EXTRA,0,1,nil,e,tp,mg1,sg)
 	end
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,e:GetHandler(),1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_EXTRA)
 end
-function cid.rtop(e,tp,eg,ep,ev,re,r,rp)
+function s.rtop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	if Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)~=0 then
 		local mg1=Duel.GetRitualMaterial(tp):Filter(Card.IsLocation,nil,LOCATION_HAND)
-		local sg=Duel.GetMatchingGroup(cid.exfilter0,tp,LOCATION_GRAVE+LOCATION_EXTRA,0,nil)
+		local sg=Duel.GetMatchingGroup(s.exfilter0,tp,LOCATION_GRAVE+LOCATION_EXTRA,0,nil)
 		local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local g=Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_HAND+LOCATION_EXTRA,0,1,1,nil,e,tp,mg1,sg)
+		local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_HAND+LOCATION_EXTRA,0,1,1,nil,e,tp,mg1,sg)
 		local tc=g:GetFirst()
 		if tc then
 			local mg=mg1:Filter(Card.IsCanBeRitualMaterial,tc,tc)
@@ -105,6 +105,6 @@ function cid.rtop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-function cid.atkcon(e)
-	return Duel.IsExistingMatchingCard(cid.atkfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,e:GetHandler())
+function s.atkcon(e)
+	return Duel.IsExistingMatchingCard(s.atkfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,e:GetHandler())
 end

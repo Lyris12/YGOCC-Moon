@@ -1,8 +1,8 @@
 --created by Walrus, coded by Lyris
-local cid,id=GetID()
-function cid.initial_effect(c)
-	local e1=aux.AddRitualProcUltimate(c,aux.FilterBoolFunction(Card.IsSetCard,0xc97),Card.GetLevel,"Greater",LOCATION_HAND+LOCATION_GRAVE,aux.FilterBoolFunction(aux.AND(Card.IsFaceup,Card.IsSetCard),0xc97),cid.mfilter)
-	e1:SetOperation(cid.RitualUltimateOperation(aux.FilterBoolFunction(Card.IsSetCard,0xc97),Card.GetLevel,"Greater",LOCATION_HAND+LOCATION_GRAVE,aux.FilterBoolFunction(aux.AND(Card.IsFaceup,Card.IsSetCard),0xc97),cid.mfilter))
+local s,id=GetID()
+function s.initial_effect(c)
+	local e1=aux.AddRitualProcUltimate(c,aux.FilterBoolFunction(Card.IsSetCard,0xc97),Card.GetLevel,"Greater",LOCATION_HAND+LOCATION_GRAVE,aux.FilterBoolFunction(aux.AND(Card.IsFaceup,Card.IsSetCard),0xc97),s.mfilter)
+	e1:SetOperation(s.RitualUltimateOperation(aux.FilterBoolFunction(Card.IsSetCard,0xc97),Card.GetLevel,"Greater",LOCATION_HAND+LOCATION_GRAVE,aux.FilterBoolFunction(aux.AND(Card.IsFaceup,Card.IsSetCard),0xc97),s.mfilter))
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_REMOVE)
@@ -10,15 +10,15 @@ function cid.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e2:SetCategory(CATEGORY_TOHAND)
 	e2:SetCondition(function(e,tp,eg,ep,ev,re) return re and re:GetHandler():IsSetCard(0xc97) and e:GetHandler():IsReason(REASON_EFFECT) end)
-	e2:SetCost(cid.cost)
-	e2:SetTarget(cid.tg)
-	e2:SetOperation(cid.op)
+	e2:SetCost(s.cost)
+	e2:SetTarget(s.tg)
+	e2:SetOperation(s.op)
 	c:RegisterEffect(e2)
 end
-function cid.mfilter(c)
+function s.mfilter(c)
 	return c:IsAttribute(ATTRIBUTE_DARK) and c:IsRace(RACE_FIEND)
 end
-function cid.RitualUltimateOperation(filter,level_function,greater_or_equal,summon_location,grave_filter,mat_filter)
+function s.RitualUltimateOperation(filter,level_function,greater_or_equal,summon_location,grave_filter,mat_filter)
 	return  function(e,tp,eg,ep,ev,re,r,rp)
 				local mg=Duel.GetRitualMaterial(tp):Filter(Card.IsOnField,nil)
 				if mat_filter then mg=mg:Filter(mat_filter,nil,e,tp) end
@@ -53,16 +53,16 @@ function cid.RitualUltimateOperation(filter,level_function,greater_or_equal,summ
 				end
 			end
 end
-function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.Damage(tp,500,REASON_COST)
 end
-function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return c:IsAbleToHand() end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,c,1,0,0)
 end
-function cid.op(e,tp,eg,ep,ev,re,r,rp)
+function s.op(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) then
 		Duel.SendtoHand(c,nil,REASON_EFFECT)

@@ -1,15 +1,15 @@
 --created by Ace, coded by Lyris
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCountLimit(1,id+EFFECT_COUNT_CODE_OATH)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetDescription(1118)
-	e1:SetCost(cid.hcost)
-	e1:SetTarget(cid.sptg)
-	e1:SetOperation(cid.spop)
+	e1:SetCost(s.hcost)
+	e1:SetTarget(s.sptg)
+	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_ACTIVATE)
@@ -17,9 +17,9 @@ function cid.initial_effect(c)
 	e2:SetCountLimit(1,id+EFFECT_COUNT_CODE_OATH)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOKEN)
 	e2:SetDescription(1119)
-	e2:SetCost(cid.hcost)
-	e2:SetTarget(cid.tg)
-	e2:SetOperation(cid.op)
+	e2:SetCost(s.hcost)
+	e2:SetTarget(s.tg)
+	e2:SetOperation(s.op)
 	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_ACTIVATE)
@@ -27,36 +27,36 @@ function cid.initial_effect(c)
 	e3:SetCountLimit(1,id+EFFECT_COUNT_CODE_OATH)
 	e3:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
 	e3:SetDescription(1109)
-	e3:SetCost(cid.hcost)
-	e3:SetTarget(cid.target)
-	e3:SetOperation(cid.operation)
+	e3:SetCost(s.hcost)
+	e3:SetTarget(s.target)
+	e3:SetOperation(s.operation)
 	c:RegisterEffect(e3)
 end
-function cid.hcost(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.hcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.Hint(HINT_OPSELECTED,0,e:GetDescription())
 end
-function cid.filter(c,e,tp)
+function s.filter(c,e,tp)
 	return c:IsSetCard(0xfc1) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil,e,tp) end
+		and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_GRAVE)
 end
-function cid.spop(e,tp,eg,ep,ev,re,r,rp)
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(cid.filter),tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil,e,tp)
+	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.filter),tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil,e,tp)
 	if #g>0 then Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP) end
 end
-function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsPlayerCanSpecialSummonMonster(tp,CARD_DRAGON_EGG_TOKEN,0,0x4011,300,300,1,RACE_DRAGON,ATTRIBUTE_FIRE) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,1,0,0)
 end
-function cid.op(e,tp,eg,ep,ev,re,r,rp)
+function s.op(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0
 		or not Duel.IsPlayerCanSpecialSummonMonster(tp,CARD_DRAGON_EGG_TOKEN,0,0x4011,300,300,1,RACE_DRAGON,ATTRIBUTE_FIRE) then return end
 	local token=Duel.CreateToken(tp,CARD_DRAGON_EGG_TOKEN)
@@ -74,13 +74,13 @@ function cid.op(e,tp,eg,ep,ev,re,r,rp)
 	e3:SetCode(EFFECT_CANNOT_BE_FUSION_MATERIAL)
 	token:RegisterEffect(e3,true)
 end
-function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		local ct=Duel.GetMatchingGroupCount(Card.IsCode,tp,LOCATION_ONFIELD,0,1,nil,CARD_DRAGON_EGG_TOKEN)
 		return ct>0 and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>=ct
 	end
 end
-function cid.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local ct=Duel.GetMatchingGroupCount(Card.IsCode,tp,LOCATION_ONFIELD,0,nil,CARD_DRAGON_EGG_TOKEN)
 	if ct==0 then return end
 	Duel.ConfirmDecktop(tp,ct)

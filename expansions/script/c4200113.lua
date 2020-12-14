@@ -1,6 +1,6 @@
 --created & coded by Swag
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	aux.AddSynchroProcedure(c,aux.Tuner(nil),aux.NonTuner(Card.IsSetCard,0x412),2,2)
 	c:EnableReviveLimit()
 	c:SetSPSummonOnce(id)
@@ -21,7 +21,7 @@ function cid.initial_effect(c)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetCode(EFFECT_EXTRA_ATTACK_MONSTER)
-	e3:SetCondition(cid.atkcon)
+	e3:SetCondition(s.atkcon)
 	e3:SetValue(3)
 	c:RegisterEffect(e3)
 	local e4=Effect.CreateEffect(c)
@@ -30,53 +30,53 @@ function cid.initial_effect(c)
 	e4:SetCategory(CATEGORY_TOHAND)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e4:SetCondition(cid.gycon)
-	e4:SetTarget(cid.gytg)
-	e4:SetOperation(cid.gyop)
+	e4:SetCondition(s.gycon)
+	e4:SetTarget(s.gytg)
+	e4:SetOperation(s.gyop)
 	c:RegisterEffect(e4)
 	local e5=Effect.CreateEffect(c)
 	e5:SetCategory(CATEGORY_ATKCHANGE)
 	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e5:SetCode(EVENT_BATTLE_START)
 	e5:SetRange(LOCATION_MZONE)
-	e5:SetCondition(cid.atkcon)
-	e5:SetCost(cid.atkcost)
-	e5:SetOperation(cid.atkop)
+	e5:SetCondition(s.atkcon)
+	e5:SetCost(s.atkcost)
+	e5:SetOperation(s.atkop)
 	c:RegisterEffect(e5)
 	end
-function cid.gycon(e,tp,eg,ep,ev,re,r,rp)
+function s.gycon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_SYNCHRO)
 end
-function cid.gyfilter(c)
+function s.gyfilter(c)
 	return c:IsFaceup() and c:IsAbleToGrave()
 end
-function cid.gytg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function s.gytg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) end
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 	local g=Duel.SelectTarget(tp,aux.AND(Card.IsFaceup,Card.IsAbleToGrave),tp,0,LOCATION_ONFIELD,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,#g,0,0)
 end
-function cid.gyop(e,tp,eg,ep,ev,re,r,rp)
+function s.gyop(e,tp,eg,ep,ev,re,r,rp)
 	local tg=Duel.GetFirstTarget()
 	if tg:IsRelateToEffect(e) then Duel.SendtoGrave(tg,REASON_EFFECT) end
 end
-function cid.sparkfilter(c)
+function s.sparkfilter(c)
 return c:IsCode(id-13)
 end
-function cid.atkcon(e,c)
-	return Duel.IsExistingMatchingCard(cid.sparkfilter,tp,LOCATION_GRAVE,0,1,nil)
+function s.atkcon(e,c)
+	return Duel.IsExistingMatchingCard(s.sparkfilter,tp,LOCATION_GRAVE,0,1,nil)
 end
-function cid.atkfilter(c)
+function s.atkfilter(c)
 	return c:IsSetCard(0x412) and c:GetAttack()>0 and c:IsAbleToGraveAsCost()
 end
-function cid.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(cid.atkfilter,tp,LOCATION_DECK,0,1,nil) end
-	local g=Duel.SelectMatchingCard(tp,cid.atkfilter,tp,LOCATION_DECK,0,1,1,nil)
+function s.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.atkfilter,tp,LOCATION_DECK,0,1,nil) end
+	local g=Duel.SelectMatchingCard(tp,s.atkfilter,tp,LOCATION_DECK,0,1,1,nil)
 	e:SetLabel(g:GetFirst():GetAttack())
 	Duel.SendtoGrave(g,REASON_COST)
 end
-function cid.atkop(e,tp,eg,ep,ev,re,r,rp)
+function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local tc=e:GetLabelObject()
 	if tc:IsRelateToBattle() and tc:IsFaceup() and tc:IsControler(tp) then

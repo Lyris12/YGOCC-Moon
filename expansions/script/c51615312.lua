@@ -1,11 +1,11 @@
 --created by LeonDuvall, coded by Lyris
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e1:SetOperation(cid.operation)
+	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
@@ -13,7 +13,7 @@ function cid.initial_effect(c)
 	e2:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
 	e2:SetRange(LOCATION_FZONE)
 	e2:SetLabel(1)
-	e2:SetCondition(cid.con)
+	e2:SetCondition(s.con)
 	e2:SetValue(1)
 	c:RegisterEffect(e2)
 	local e3=e2:Clone()
@@ -25,7 +25,7 @@ function cid.initial_effect(c)
 	e4:SetRange(LOCATION_FZONE)
 	e4:SetTargetRange(LOCATION_MZONE,0)
 	e4:SetLabel(2)
-	e4:SetCondition(cid.con)
+	e4:SetCondition(s.con)
 	e4:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x1cfd))
 	e4:SetValue(1)
 	c:RegisterEffect(e4)
@@ -42,7 +42,7 @@ function cid.initial_effect(c)
 	e7:SetRange(LOCATION_FZONE)
 	e7:SetTargetRange(LOCATION_MZONE,0)
 	e7:SetLabel(3)
-	e7:SetCondition(cid.con)
+	e7:SetCondition(s.con)
 	e7:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0xcfd))
 	e7:SetValue(500)
 	c:RegisterEffect(e7)
@@ -50,11 +50,11 @@ function cid.initial_effect(c)
 	e8:SetCode(EFFECT_UPDATE_DEFENSE)
 	c:RegisterEffect(e8)
 end
-function cid.mfilter(c,tp,sc)
+function s.mfilter(c,tp,sc)
 	return c:IsCanBeTimeleapMaterial(sc) and c:GetLevel()==sc:GetFuture()-1 and Duel.GetLocationCountFromEx(tp,tp,c,TYPE_TIMELEAP)>0
 end
-function cid.spfilter(c,e,tp)
-	if not Duel.IsExistingMatchingCard(cid.mfilter,tp,LOCATION_MZONE,0,1,nil,tp,c) or not c:IsSetCard(0xcfd)
+function s.spfilter(c,e,tp)
+	if not Duel.IsExistingMatchingCard(s.mfilter,tp,LOCATION_MZONE,0,1,nil,tp,c) or not c:IsSetCard(0xcfd)
 		or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_TIMELEAP,tp,false,false) then return false end
 	local et=global_card_effect_table[c]
 	local res=false
@@ -67,7 +67,7 @@ function cid.spfilter(c,e,tp)
 	end
 	return res
 end
-function cid.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) or Duel.GetFlagEffect(tp,id)>0 or Duel.GetLocationCount(tp,LOCATION_MZONE)<=-1 then return end
 	local ef=Effect.CreateEffect(c)
@@ -79,7 +79,7 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	ge1:SetTarget(aux.TargetBoolFunction(Card.IsType,TYPE_TIMELEAP))
 	ge1:SetLabelObject(ef)
 	Duel.RegisterEffect(ge1,0)
-	local g=Duel.GetMatchingGroup(cid.spfilter,tp,LOCATION_EXTRA,0,nil,e,tp)
+	local g=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_EXTRA,0,nil,e,tp)
 	if #g>0 and Duel.SelectEffectYesNo(tp,c) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local sc=g:Select(tp,1,1,nil):GetFirst()
@@ -93,6 +93,6 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
 	else ge1:Reset() ef:Reset() end
 end
-function cid.con(e,tp)
+function s.con(e,tp)
 	return Duel.GetMatchingGroup(aux.AND(Card.IsFaceup,Card.IsSetCard),tp,LOCATION_MZONE,0,nil,0x1cfd):GetClassCount(Card.GetCode)>e:GetLabel()
 end

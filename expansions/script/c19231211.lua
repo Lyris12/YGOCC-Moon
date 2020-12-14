@@ -1,6 +1,6 @@
 --created by Thauma, coded by Lyris
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddFusionProcFunRep(c,aux.FilterBoolFunction(Card.IsFusionSetCard,0xa44),3,true)
 	aux.AddContactFusionProcedure(c,aux.FilterBoolFunction(Card.IsAbleToRemove),LOCATION_MZONE,0,Duel.Remove,POS_FACEUP,REASON_COST)
@@ -18,7 +18,7 @@ function cid.initial_effect(c)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetTargetRange(0,1)
 	e2:SetValue(1)
-	e2:SetCondition(cid.actcon)
+	e2:SetCondition(s.actcon)
 	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_IGNITION)
@@ -26,20 +26,20 @@ function cid.initial_effect(c)
 	e3:SetCountLimit(1,id)
 	e3:SetCondition(function() return Duel.IsAbleToEnterBP() end)
 	e3:SetCost(function(e) e:SetLabel(100) return true end)
-	e3:SetTarget(cid.target)
-	e3:SetOperation(cid.operation)
+	e3:SetTarget(s.target)
+	e3:SetOperation(s.operation)
 	c:RegisterEffect(e3)
 end
-cid.toss_dice=true
-function cid.actcon(e)
+s.toss_dice=true
+function s.actcon(e)
 	return Duel.GetAttacker()==e:GetHandler() or Duel.GetAttackTarget()==e:GetHandler()
 end
-function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local res=e:GetLabel()==100
 	if chk==0 then e:SetLabel(0) return res end
 	e:SetLabel(Duel.TossDice(tp,1))
 end
-function cid.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local ct=e:GetLabel()
 	if ct>1 then

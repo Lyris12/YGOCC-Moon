@@ -1,6 +1,6 @@
 --created by Moon Burst, coded by Lyris
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	c:EnableReviveLimit()
 	local e0=Effect.CreateEffect(c)
 	e0:SetDescription(1166)
@@ -9,8 +9,8 @@ function cid.initial_effect(c)
 	e0:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_IGNORE_IMMUNE)
 	e0:SetRange(LOCATION_EXTRA)
 	e0:SetValue(SUMMON_TYPE_LINK)
-	e0:SetCondition(cid.condition)
-	e0:SetOperation(cid.operation)
+	e0:SetCondition(s.condition)
+	e0:SetOperation(s.operation)
 	c:RegisterEffect(e0)
 	local e4=Effect.CreateEffect(c)
 	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
@@ -36,19 +36,19 @@ function cid.initial_effect(c)
 	e2:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
 	c:RegisterEffect(e2)
 end
-function cid.matfilter(c,codes)
+function s.matfilter(c,codes)
 	return codes[Card.GetLinkCode()] and c:IsAbleToDeckAsCost()
 end
-function cid.condition(e,c)
+function s.condition(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
 	local t={[id-3]=true,[id+8]=true,[id+5]=true}
-	local g=Duel.GetMatchingGroup(cid.matfilter,tp,LOCATION_GRAVE,0,nil,t)
+	local g=Duel.GetMatchingGroup(s.matfilter,tp,LOCATION_GRAVE,0,nil,t)
 	return g:GetClassCount(Card.GetLinkCode)>2 and Duel.GetLocationCountFromEx(tp)>0
 end
-function cid.operation(e,tp,eg,ep,ev,re,r,rp,c)
+function s.operation(e,tp,eg,ep,ev,re,r,rp,c)
 	local t={[id-3]=true,[id+8]=true,[id+5]=true}
-	local g,mg,g1,mc=Duel.GetMatchingGroup(cid.matfilter,tp,LOCATION_GRAVE,0,nil,t),Group.CreateGroup()
+	local g,mg,g1,mc=Duel.GetMatchingGroup(s.matfilter,tp,LOCATION_GRAVE,0,nil,t),Group.CreateGroup()
 	for i=0,2 do
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 		g1=g:FilterSelect(tp,Card.IsLinkCode,1,1,nil,table.unpack(t))

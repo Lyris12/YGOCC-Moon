@@ -1,6 +1,6 @@
 --created by Jake, coded by Lyris
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddLinkProcedure(c,aux.FilterBoolFunction(Card.IsLinkSetCard,0x613),2)
 	local e1=Effect.CreateEffect(c)
@@ -9,9 +9,9 @@ function cid.initial_effect(c)
 	e1:SetCategory(CATEGORY_TOHAND)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCondition(function(e) return e:GetHandler():IsSummonType(SUMMON_TYPE_LINK) end)
-	e1:SetCost(cid.thcost)
-	e1:SetTarget(cid.thtg)
-	e1:SetOperation(cid.thop)
+	e1:SetCost(s.thcost)
+	e1:SetTarget(s.thtg)
+	e1:SetOperation(s.thop)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
@@ -19,8 +19,8 @@ function cid.initial_effect(c)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetProperty(EFFECT_FLAG_DELAY)
 	e2:SetCategory(CATEGORY_EQUIP)
-	e2:SetTarget(cid.eqtg)
-	e2:SetOperation(cid.eqop)
+	e2:SetTarget(s.eqtg)
+	e2:SetOperation(s.eqop)
 	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_QUICK_O)
@@ -28,12 +28,12 @@ function cid.initial_effect(c)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1)
 	e3:SetCategory(CATEGORY_ATKCHANGE)
-	e3:SetCost(cid.cost)
+	e3:SetCost(s.cost)
 	e3:SetTarget(function(e,tp,eg,ep,ev,re,r,rp,chk) if chk==0 then return #(Duel.GetFieldGroup(tp,LOCATION_MZONE,LOCATION_MZONE)-e:GetHandler())>0 end end)
-	e3:SetOperation(cid.operation)
+	e3:SetOperation(s.operation)
 	c:RegisterEffect(e3)
 end
-function cid.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -42,45 +42,45 @@ function cid.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
 end
-function cid.thfilter(c)
+function s.thfilter(c)
 	return c:IsSetCard(0x613) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
-function cid.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local ct=Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)
-	if chkc then return ct==1 and chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and cid.thfilter(chkc) end
+	if chkc then return ct==1 and chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.thfilter(chkc) end
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectTarget(tp,cid.thfilter,tp,LOCATION_GRAVE,0,ct,ct,nil)
+	local g=Duel.SelectTarget(tp,s.thfilter,tp,LOCATION_GRAVE,0,ct,ct,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,ct,0,0)
 end
-function cid.thop(e,tp,eg,ep,ev,re,r,rp)
+function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
 	if #g>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
 	end
 end
-function cid.eqfilter(c)
+function s.eqfilter(c)
 	return c:GetFlagEffect(id)~=0
 end
-function cid.eqcon(e,tp,eg,ep,ev,re,r,rp)
-	local g=c:GetEquipGroup():Filter(cid.eqfilter,nil)
+function s.eqcon(e,tp,eg,ep,ev,re,r,rp)
+	local g=c:GetEquipGroup():Filter(s.eqfilter,nil)
 	return #g<3
 end
-function cid.cfilter(c,g,tp)
+function s.cfilter(c,g,tp)
 	return g:IsContains(c) and c:IsFaceup() and c:IsSetCard(0x613) and (c:IsControler(tp) or c:IsAbleToChangeControler())
 end
-function cid.eqtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local qg=eg:Filter(cid.cfilter,nil,e:GetHandler():GetLinkedGroup(),tp)
-	local ct,max=#qg,3-#c:GetEquipGroup():Filter(cid.eqfilter,nil)
+function s.eqtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local qg=eg:Filter(s.cfilter,nil,e:GetHandler():GetLinkedGroup(),tp)
+	local ct,max=#qg,3-#c:GetEquipGroup():Filter(s.eqfilter,nil)
 	if ct>max then ct=max end
 	if chk==0 then return ct>0 and Duel.GetLocationCount(tp,LOCATION_SZONE)>=ct end
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,qg,ct,0,0)
 end
-function cid.eqop(e,tp,eg,ep,ev,re,r,rp)
+function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local qg=eg:Filter(cid.cfilter,nil,c:GetLinkedGroup(),tp)
-	local ect,ct,max=0,#qg,3-#c:GetEquipGroup():Filter(cid.eqfilter,nil)
+	local qg=eg:Filter(s.cfilter,nil,c:GetLinkedGroup(),tp)
+	local ect,ct,max=0,#qg,3-#c:GetEquipGroup():Filter(s.eqfilter,nil)
 	if max==0 then return end
 	if ct>max then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
@@ -96,7 +96,7 @@ function cid.eqop(e,tp,eg,ep,ev,re,r,rp)
 					e1:SetProperty(EFFECT_FLAG_COPY_INHERIT+EFFECT_FLAG_OWNER_RELATE)
 					e1:SetCode(EFFECT_EQUIP_LIMIT)
 					e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-					e1:SetValue(cid.eqlimit)
+					e1:SetValue(s.eqlimit)
 					tc:RegisterEffect(e1)
 					ect=ect+1
 				end
@@ -105,20 +105,20 @@ function cid.eqop(e,tp,eg,ep,ev,re,r,rp)
 	end
 	if ect>0 then Duel.EquipComplete() end
 end
-function cid.eqlimit(e,c)
+function s.eqlimit(e,c)
 	return e:GetOwner()==c
 end
-function cid.rfilter(c)
+function s.rfilter(c)
 	return c:IsSetCard(0x613) and c:GetOriginalType()&TYPE_MONSTER>0 and c:IsAbleToRemoveAsCost()
 end
-function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=e:GetHandler():GetEquipGroup()
-	if chk==0 then return g:IsExists(cid.rfilter,1,nil) end
+	if chk==0 then return g:IsExists(s.rfilter,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local rg=g:FilterSelect(tp,cid.rfilter,1,1,nil)
+	local rg=g:FilterSelect(tp,s.rfilter,1,1,nil)
 	Duel.Remove(rg,POS_FACEUP,REASON_COST)
 end
-function cid.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetFieldGroup(tp,LOCATION_MZONE,LOCATION_MZONE)-e:GetHandler()
 	local tc=g:GetFirst()
 	while tc do

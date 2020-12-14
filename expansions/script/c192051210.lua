@@ -1,14 +1,14 @@
 --coded by Lyris
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_DISABLE+CATEGORY_SPECIAL_SUMMON+CATEGORY_DESTROY)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetCode(EVENT_CHAINING)
 	e1:SetRange(LOCATION_HAND)
-	e1:SetCondition(cid.discon)
-	e1:SetTarget(cid.distg)
-	e1:SetOperation(cid.disop)
+	e1:SetCondition(s.discon)
+	e1:SetTarget(s.distg)
+	e1:SetOperation(s.disop)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
@@ -17,15 +17,15 @@ function cid.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e2:SetTargetRange(LOCATION_MZONE,0)
 	e2:SetLabel(1)
-	e2:SetCondition(cid.condition)
-	e2:SetTarget(cid.imtg)
+	e2:SetCondition(s.condition)
+	e2:SetTarget(s.imtg)
 	e2:SetValue(aux.imval1)
 	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
 	e3:SetLabel(2)
-	e3:SetCondition(cid.condition)
+	e3:SetCondition(s.condition)
 	e3:SetValue(1)
 	c:RegisterEffect(e3)
 	local e4=e3:Clone()
@@ -38,9 +38,9 @@ function cid.initial_effect(c)
 	e5:SetRange(LOCATION_MZONE)
 	e5:SetCountLimit(1)
 	e5:SetLabel(3)
-	e5:SetCondition(cid.condition)
-	e5:SetTarget(cid.drtg)
-	e5:SetOperation(cid.drop)
+	e5:SetCondition(s.condition)
+	e5:SetTarget(s.drtg)
+	e5:SetOperation(s.drop)
 	c:RegisterEffect(e5)
 	local e6=Effect.CreateEffect(c)
 	e6:SetDescription(aux.Stringid(id,1))
@@ -48,17 +48,17 @@ function cid.initial_effect(c)
 	e6:SetRange(LOCATION_MZONE)
 	e6:SetCountLimit(1)
 	e6:SetLabel(4)
-	e6:SetCondition(cid.condition)
-	e6:SetTarget(cid.sptg)
-	e6:SetOperation(cid.spop)
+	e6:SetCondition(s.condition)
+	e6:SetTarget(s.sptg)
+	e6:SetOperation(s.spop)
 	c:RegisterEffect(e6)
 end
-function cid.discon(e,tp,eg,ep,ev,re,r,rp)
+function s.discon(e,tp,eg,ep,ev,re,r,rp)
 	if not Duel.IsChainNegatable(ev) then return false end
 	local rc=re:GetHandler()
 	return rp==tp and re:IsHasCategory(CATEGORY_SPECIAL_SUMMON) and rc:IsSetCard(0x617) and rc:GetLevel()==3
 end
-function cid.distg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(0)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
@@ -67,7 +67,7 @@ function cid.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(Card.IsDestructable,tp,LOCATION_MZONE,0,e:GetHandler())
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,0,0)
 end
-function cid.disop(e,tp,eg,ep,ev,re,r,rp)
+function s.disop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.NegateEffect(ev) then
 		if Duel.SpecialSummon(e:GetHandler(),0,tp,tp,false,false,POS_FACEUP)==0 then return end
 		local g=Duel.GetMatchingGroup(Card.IsDestructable,tp,LOCATION_MZONE,0,e:GetHandler())
@@ -75,36 +75,36 @@ function cid.disop(e,tp,eg,ep,ev,re,r,rp)
 		e:GetHandler():RegisterFlagEffect(id,RESET_EVENT+0x1ff0000,0,1,ct)
 	end
 end
-function cid.condition(e)
+function s.condition(e)
 	local c=e:GetHandler()
 	return c:GetFlagEffect(id)>0 and c:GetFlagEffectLabel(id)>=e:GetLabel()
 end
-function cid.imtg(e,c)
+function s.imtg(e,c)
 	return c:IsSetCard(0x617) and not c:IsCode(id)
 end
-function cid.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
 	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(1)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end
-function cid.drop(e,tp,eg,ep,ev,re,r,rp)
+function s.drop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	Duel.Draw(p,d,REASON_EFFECT)
 end
-function cid.spfilter(c,e,tp)
+function s.spfilter(c,e,tp)
 	return c:IsSetCard(0x617) and c:GetLevel()==3 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(cid.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
+		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_GRAVE)
 end
-function cid.spop(e,tp,eg,ep,ev,re,r,rp)
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,cid.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
+	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
 	local tc=g:GetFirst()
 	if tc and Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP) then
 		local e1=Effect.CreateEffect(e:GetHandler())

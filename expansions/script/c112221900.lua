@@ -1,6 +1,6 @@
 --created by Hoshi, coded by Lyris
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	c:SetUniqueOnField(1,0,id)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
@@ -9,16 +9,16 @@ function cid.initial_effect(c)
 	e2:SetDescription(1127)
 	e2:SetCountLimit(1)
 	e2:SetCategory(CATEGORY_DICE+CATEGORY_RELEASE+CATEGORY_DESTROY+CATEGORY_TOHAND+CATEGORY_REMOVE+CATEGORY_TODECK)
-	e2:SetTarget(cid.eftg)
-	e2:SetOperation(cid.efop)
+	e2:SetTarget(s.eftg)
+	e2:SetOperation(s.efop)
 	c:RegisterEffect(e2)
 end
-cid.toss_dice=true
-function cid.eftg(e,tp,eg,ep,ev,re,r,rp,chk)
+s.toss_dice=true
+function s.eftg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_DICE,nil,0,tp,1)
 end
-function cid.efop(e,tp,eg,ep,ev,re,r,rp)
+function s.efop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local dc=Duel.TossDice(tp,1)
 	if dc==1 then

@@ -1,6 +1,6 @@
 --created & coded by Swag
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 c:SetSPSummonOnce(id)
 	c:EnableReviveLimit()
 	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x412),4,2,nil,nil,99)
@@ -23,9 +23,9 @@ c:SetSPSummonOnce(id)
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
-	e3:SetCondition(cid.stcon)
-	e3:SetTarget(cid.sttg)
-	e3:SetOperation(cid.stop)
+	e3:SetCondition(s.stcon)
+	e3:SetTarget(s.sttg)
+	e3:SetOperation(s.stop)
 	c:RegisterEffect(e3)
 	local e4=Effect.CreateEffect(c)
 	e4:SetCategory(CATEGORY_DRAW+CATEGORY_HANDES)
@@ -33,36 +33,36 @@ c:SetSPSummonOnce(id)
 	e4:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetCountLimit(1)
-	e4:SetCost(cid.drcost)
-	e4:SetTarget(cid.drtg)
-	e4:SetOperation(cid.drop)
+	e4:SetCost(s.drcost)
+	e4:SetTarget(s.drtg)
+	e4:SetOperation(s.drop)
 	c:RegisterEffect(e4)
 end
-function cid.sparkfilter(c)
+function s.sparkfilter(c)
 	return c:IsCode(id-8)
 end
-function cid.filter(c,e,tp)
+function s.filter(c,e,tp)
 	if c:IsType(TYPE_MONSTER) then
 		return c:IsCanBeSpecialSummoned(e,0,tp,false,false) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 	else
 		return c:IsSSetable(true) and (c:IsType(TYPE_FIELD) or Duel.GetLocationCount(tp,LOCATION_SZONE)>0)
 	end
 end
-function cid.stcon(e,tp)
-	return Duel.IsExistingMatchingCard(cid.sparkfilter,tp,LOCATION_GRAVE,0,1,nil)
+function s.stcon(e,tp)
+	return Duel.IsExistingMatchingCard(s.sparkfilter,tp,LOCATION_GRAVE,0,1,nil)
 end
-function cid.sttg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(1-tp) and cid.filter(chkc,e,tp) end
-	if chk==0 then return Duel.IsExistingTarget(cid.filter,tp,0,LOCATION_GRAVE,1,nil,e,tp) end
+function s.sttg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(1-tp) and s.filter(chkc,e,tp) end
+	if chk==0 then return Duel.IsExistingTarget(s.filter,tp,0,LOCATION_GRAVE,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	local g=Duel.SelectTarget(tp,cid.filter,tp,0,LOCATION_GRAVE,1,1,nil,e,tp)
+	local g=Duel.SelectTarget(tp,s.filter,tp,0,LOCATION_GRAVE,1,1,nil,e,tp)
 	if g:GetFirst():IsType(TYPE_MONSTER) then
 		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
 	else
 		Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,g,1,0,0)
 	end
 end
-function cid.stop(e,tp,eg,ep,ev,re,r,rp)
+function s.stop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if not tc:IsRelateToEffect(e) then return end
 	if tc:IsType(TYPE_MONSTER) then
@@ -72,24 +72,24 @@ function cid.stop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(1-tp,tc)
 	end
 end
-function cid.drcost(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.drcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,2,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,2,2,REASON_COST)
 end
-function cid.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end
-function cid.olfilter(c,typ)
+function s.olfilter(c,typ)
 	return c:IsCanOverlay() and c:IsType(typ)
 end
-function cid.drop(e,tp,eg,ep,ev,re,r,rp)
+function s.drop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.Draw(tp,1,REASON_EFFECT)==0 then return end
 	local dc=Duel.GetOperatedGroup():GetFirst()
 	Duel.ConfirmCards(1-tp,dc)
 	Duel.ShuffleHand(tp)
 	local c=e:GetHandler()
-	local g=Duel.GetMatchingGroup(aux.NecroValleyFilter(cid.olfilter),tp,0,LOCATION_GRAVE,nil,dc:GetType()&0x7)
+	local g=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.olfilter),tp,0,LOCATION_GRAVE,nil,dc:GetType()&0x7)
 	if #g>0 and c:IsRelateToEffect(e) and Duel.SelectEffectYesNo(tp,c) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
 		local sg=g:Select(tp,1,1,nil)

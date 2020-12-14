@@ -1,18 +1,18 @@
 --created by NeverThisAgain, coded by Lyris
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetTarget(cid.target)
-	e1:SetOperation(cid.operation)
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
 end
-function cid.check(c,rc,g)
+function s.check(c,rc,g)
 	return g:IsContains(c) and c:IsCanBeRitualMaterial(rc)
 end
-function cid.alvcheck(c,rc)
+function s.alvcheck(c,rc)
 	local raw_level=c:GetRitualLevel(rc)
 	local lv1=raw_level&0xffff
 	local lv2=raw_level>>16
@@ -22,16 +22,16 @@ function cid.alvcheck(c,rc)
 		return lv1
 	end
 end
-function cid.acheck(c,lv)
+function s.acheck(c,lv)
 	return  function(g,ec)
 				if ec then
-					return g:GetSum(cid.alvcheck,c)-cid.alvcheck(ec,c)<=lv
+					return g:GetSum(s.alvcheck,c)-s.alvcheck(ec,c)<=lv
 				else
 					return true
 				end
 			end
 end
-function cid.filter(c,e,tp,m1,m2)
+function s.filter(c,e,tp,m1,m2)
 	if bit.band(c:GetType(),0x81)~=0x81 or not c:IsSetCard(0x50b) or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,false,true) then return false end
 	local mg=m1:Filter(Card.IsCanBeRitualMaterial,c,c)
 	if c.mat_filter then
@@ -39,35 +39,35 @@ function cid.filter(c,e,tp,m1,m2)
 	else
 		mg:RemoveCard(c)
 	end
-	if m2 and m2:IsExists(cid.check,1,c,c,mg) then return true end
+	if m2 and m2:IsExists(s.check,1,c,c,mg) then return true end
 	local lv=c:GetLevel()
-	aux.GCheckAdditional=cid.acheck(c,lv)
+	aux.GCheckAdditional=s.acheck(c,lv)
 	local res=mg:CheckSubGroup(aux.RitualCheck,1,lv,tp,c,lv,"Greater")
 	aux.GCheckAdditional=nil
 	return res
 end
-function cid.mfilter(c)
+function s.mfilter(c)
 	return c:GetLevel()>0 and c:IsFaceup() and c:IsType(TYPE_FUSION) and c:GetSummonLocation()==LOCATION_EXTRA
 end
-function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		local mg=Duel.GetRitualMaterial(tp)
-		local exg=Duel.GetMatchingGroup(cid.mfilter,tp,LOCATION_MZONE,0,nil)
-		return Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_HAND,0,1,nil,e,tp,mg,exg)
+		local exg=Duel.GetMatchingGroup(s.mfilter,tp,LOCATION_MZONE,0,nil)
+		return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_HAND,0,1,nil,e,tp,mg,exg)
 	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
 end
-function cid.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local mg=Duel.GetRitualMaterial(tp)
-	local exg=Duel.GetMatchingGroup(cid.mfilter,tp,LOCATION_MZONE,0,nil)
+	local exg=Duel.GetMatchingGroup(s.mfilter,tp,LOCATION_MZONE,0,nil)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local tg=Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_HAND,0,1,1,nil,e,tp,mg,exg)
+	local tg=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_HAND,0,1,1,nil,e,tp,mg,exg)
 	local tc=tg:GetFirst()
 	if tc then
 		mg=mg:Filter(Card.IsCanBeRitualMaterial,tc,tc)
 		local mat=nil
-		if exg and exg:IsExists(cid.check,1,tc,tc,mg) and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
-			mat=exg:FilterSelect(tp,cid.check,1,1,tc,tc,mg)
+		if exg and exg:IsExists(s.check,1,tc,tc,mg) and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
+			mat=exg:FilterSelect(tp,s.check,1,1,tc,tc,mg)
 		else
 			if tc.mat_filter then
 				mg=mg:Filter(tc.mat_filter,tc,tp)
@@ -76,7 +76,7 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 			end
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
 			local lv=tc:GetLevel()
-			aux.GCheckAdditional=cid.acheck(tc,lv)
+			aux.GCheckAdditional=s.acheck(tc,lv)
 			mat=mg:SelectSubGroup(tp,aux.RitualCheck,false,1,lv,tp,tc,lv,"Greater")
 			aux.GCheckAdditional=nil
 		end

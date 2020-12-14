@@ -1,6 +1,6 @@
 --created by Walrus, coded by Lyris
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
@@ -35,15 +35,15 @@ function cid.initial_effect(c)
 	e6:SetProperty(EFFECT_FLAG_EVENT_PLAYER+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e6:SetCode(EVENT_CUSTOM+id)
 	e6:SetCountLimit(1)
-	e6:SetCost(cid.negcost)
-	e6:SetOperation(cid.operation)
+	e6:SetCost(s.negcost)
+	e6:SetOperation(s.operation)
 	c:RegisterEffect(e6)
-	if not cid.global_check then
-		cid.global_check=true
+	if not s.global_check then
+		s.global_check=true
 		local ge1=Effect.CreateEffect(c)
 		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		ge1:SetCode(EVENT_ATTACK_ANNOUNCE)
-		ge1:SetOperation(cid.regop)
+		ge1:SetOperation(s.regop)
 		Duel.RegisterEffect(ge1,0)
 	end
 	local e2=Effect.CreateEffect(c)
@@ -53,12 +53,12 @@ function cid.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_DELAY)
 	e2:SetCategory(CATEGORY_REMOVE)
 	e2:SetCondition(function(e,tp,eg,ep,ev,re,r,rp) return re and re:GetHandler():IsSetCard(0xc97) and e:GetHandler():IsReason(REASON_EFFECT) end)
-	e2:SetCost(cid.cost)
-	e2:SetTarget(cid.settg)
-	e2:SetOperation(cid.setop)
+	e2:SetCost(s.cost)
+	e2:SetTarget(s.settg)
+	e2:SetOperation(s.setop)
 	c:RegisterEffect(e2)
 end
-function cid.regop(e,tp,eg,ep,ev,re,r,rp)
+function s.regop(e,tp,eg,ep,ev,re,r,rp)
 	local ac=Duel.GetAttacker()
 	local bc=Duel.GetAttackTarget()
 	local g=Group.FromCards(ac)
@@ -66,7 +66,7 @@ function cid.regop(e,tp,eg,ep,ev,re,r,rp)
 	g=g:Filter(aux.AND(Card.IsFaceup,Card.IsSetCard),nil,0xc97)
 	if #g>0 then Duel.RaiseEvent(g,EVENT_CUSTOM+id,re,r,rp,1-tp,0) end
 end
-function cid.negcost(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.negcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
@@ -76,18 +76,18 @@ function cid.negcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
 end
-function cid.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	if Duel.NegateAttack() then Duel.SkipPhase(tp,PHASE_BATTLE,RESET_PHASE+PHASE_BATTLE_STEP,1) end
 end
-function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.Damage(tp,3000,REASON_COST)
 end
-function cid.settg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.settg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsSSetable() end
 end
-function cid.setop(e,tp,eg,ep,ev,re,r,rp)
+function s.setop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) then Duel.SSet(tp,c) end
 end

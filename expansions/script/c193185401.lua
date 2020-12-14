@@ -1,6 +1,6 @@
 --created by Swag, coded by Lyris
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
@@ -8,33 +8,33 @@ function cid.initial_effect(c)
 	e1:SetCountLimit(1,id)
 	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e1:SetCondition(cid.spcon)
-	e1:SetTarget(cid.sptg)
-	e1:SetOperation(cid.spop)
+	e1:SetCondition(s.spcon)
+	e1:SetTarget(s.sptg)
+	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_TO_GRAVE)
 	e2:SetCountLimit(1,id+100)
 	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
-	e2:SetCondition(cid.condition)
+	e2:SetCondition(s.condition)
 	e2:SetCategory(CATEGORY_DECKDES)
-	e2:SetTarget(cid.thtg)
-	e2:SetOperation(cid.thop)
+	e2:SetTarget(s.thtg)
+	e2:SetOperation(s.thop)
 	c:RegisterEffect(e2)
 end
-function cid.cfilter(c)
+function s.cfilter(c)
 	return c:IsLevelAbove(5) and c:IsSetCard(0xd78) and c:IsFaceup()
 end
-function cid.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(cid.cfilter,1,e:GetHandler())
+function s.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return eg:IsExists(s.cfilter,1,e:GetHandler())
 end
-function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
-function cid.spop(e,tp,eg,ep,ev,re,r,rp)
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 then
 		local e2=Effect.CreateEffect(c)
@@ -48,13 +48,13 @@ function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 		c:RegisterEffect(e2,true)
 	end
 end
-function cid.condition(e,tp,eg,ep,ev,re,r,rp)
+function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsReason(REASON_EFFECT) and re and re:GetHandler():IsSetCard(0xd78)
 end
-function cid.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDiscardDeck(tp,1) end
 end
-function cid.thop(e,tp,eg,ep,ev,re,r,rp)
+function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	if not Duel.IsPlayerCanDiscardDeck(tp,1) then return end
 	local g=Duel.GetDecktopGroup(tp,3)
 	Duel.ConfirmCards(tp,g)

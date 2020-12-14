@@ -1,6 +1,6 @@
 --created by Walrus, coded by Lyris
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
@@ -12,8 +12,8 @@ function cid.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_DELAY)
 	e2:SetCategory(CATEGORY_REMOVE)
 	e2:SetCondition(function(e,tp,eg) return Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsSetCard),tp,LOCATION_MZONE,0,1,nil,0x6c97,0x9c97) and eg:IsExists(Card.IsSetCard,1,nil,0xc97) end)
-	e2:SetTarget(cid.rmtg)
-	e2:SetOperation(cid.rmop)
+	e2:SetTarget(s.rmtg)
+	e2:SetOperation(s.rmop)
 	c:RegisterEffect(e2)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE)
@@ -35,37 +35,37 @@ function cid.initial_effect(c)
 	e6:SetCategory(CATEGORY_TODECK+CATEGORY_DRAW)
 	e6:SetCountLimit(1,id+1000)
 	e6:SetCondition(function(e,tp) return e:GetHandler():GetReasonPlayer()~=tp and not e:GetHandler():IsReason(REASON_RULE) end)
-	e6:SetCost(cid.cost)
-	e6:SetTarget(cid.target)
-	e6:SetOperation(cid.operation)
+	e6:SetCost(s.cost)
+	e6:SetTarget(s.target)
+	e6:SetOperation(s.operation)
 	c:RegisterEffect(e6)
 end
-function cid.filter(c)
+function s.filter(c)
 	return c:IsSetCard(0xc97) and c:IsAbleToRemove()
 end
-function cid.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_GRAVE,0,1,nil) end
+function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,tp,LOCATION_GRAVE)
 end
-function cid.rmop(e,tp,eg,ep,ev,re,r,rp)
+function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	Duel.Remove(Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_GRAVE,0,1,2,nil),POS_FACEUP,REASON_EFFECT)
+	Duel.Remove(Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_GRAVE,0,1,2,nil),POS_FACEUP,REASON_EFFECT)
 end
-function cid.repfilter(c)
+function s.repfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0xc97)
 end
-function cid.repcfilter(c,e,val)
+function s.repcfilter(c,e,val)
 	return c:IsDefenseAbove(val) and not c:IsImmuneToEffect(e)
 end
-function cid.rev(e,re,dam,r,rp,rc)
-	local g=Duel.GetMatchingGroup(cid.repfilter,tp,LOCATION_MZONE,0,1,nil,e,dam)
+function s.rev(e,re,dam,r,rp,rc)
+	local g=Duel.GetMatchingGroup(s.repfilter,tp,LOCATION_MZONE,0,1,nil,e,dam)
 	local rec=rc
 	if not rec and re then rec=re:GetHandler() end
 	local val=dam
 	Duel.DisableActionCheck(true)
 	if rec:IsSetCard(0xc97) and rec:GetOwner()==e:GetHandlerPlayer() and r&REASON_COST+REASON_EFFECT>0 and #g>0
-		and g:FilterCount(cid.repcfilter,nil,e,dam)==#g and Duel.GetFlagEffect(tp,id)<2 then
-		local tg=g:Filter(cid.repcfilter,nil,e,dam)
+		and g:FilterCount(s.repcfilter,nil,e,dam)==#g and Duel.GetFlagEffect(tp,id)<2 then
+		local tg=g:Filter(s.repcfilter,nil,e,dam)
 		Duel.HintSelection(tg)
 		for tc in aux.Next(tg) do
 			local e1=Effect.CreateEffect(e:GetHandler())
@@ -82,16 +82,16 @@ function cid.rev(e,re,dam,r,rp,rc)
 	Duel.DisableActionCheck(false)
 	return val
 end
-function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.Damage(tp,1000,REASON_COST)
 end
-function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,e:GetHandler(),1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end
-function cid.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsRelateToEffect(e) and Duel.SendtoDeck(e:GetHandler(),nil,2,REASON_EFFECT)>0 then
 		Duel.ShuffleDeck(tp)
 		Duel.Draw(tp,1,REASON_EFFECT)

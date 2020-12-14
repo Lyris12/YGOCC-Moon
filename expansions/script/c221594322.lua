@@ -1,14 +1,14 @@
 --created by Walrus, coded by Lyris
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCountLimit(1,id)
 	e1:SetCategory(CATEGORY_DAMAGE)
-	e1:SetCost(cid.cost(0x6c97,0x9c97))
-	e1:SetTarget(cid.rmtg)
-	e1:SetOperation(cid.rmop)
+	e1:SetCost(s.cost(0x6c97,0x9c97))
+	e1:SetTarget(s.rmtg)
+	e1:SetOperation(s.rmop)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
@@ -16,18 +16,18 @@ function cid.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e2:SetCountLimit(1,id+100)
 	e2:SetCondition(function(e,tp,eg,ep,ev,re,r,rp) return re and re:GetHandler():IsSetCard(0xc97) and e:GetHandler():IsReason(REASON_EFFECT) end)
-	e2:SetCost(cid.cost(0xc97))
-	e2:SetTarget(cid.settg)
-	e2:SetOperation(cid.setop)
+	e2:SetCost(s.cost(0xc97))
+	e2:SetTarget(s.settg)
+	e2:SetOperation(s.setop)
 	c:RegisterEffect(e2)
 end
-function cid.filter(c)
+function s.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x6c97,0x9c97) and c:IsAbleToRemove()
 end
-function cid.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.GetMatchingGroupCount(Card.IsFacedown,tp,0,LOCATION_EXTRA,nil)>0 end
 end
-function cid.rmop(e,tp,eg,ep,ev,re,r,rp)
+function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetMatchingGroup(Card.IsFacedown,tp,0,LOCATION_EXTRA,nil):RandomSelect(1-tp,1):GetFirst()
 	if not tc then return end
 	local atk=tc:GetTextAttack()//2
@@ -59,20 +59,20 @@ function cid.rmop(e,tp,eg,ep,ev,re,r,rp)
 	e4:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 	Duel.RegisterEffect(e4,tp)
 end
-function cid.cfilter(c,sets)
+function s.cfilter(c,sets)
 	return c:IsSetCard(table.unpack(sets)) and c:IsAbleToRemoveAsCost()
 end
-function cid.cost(...)
+function s.cost(...)
 	local sets={...}
 	return  function(e,tp,eg,ep,ev,re,r,rp,chk)
-			if chk==0 then return Duel.IsExistingMatchingCard(cid.cfilter,tp,LOCATION_GRAVE+LOCATION_ONFIELD,0,1,nil,sets) end
-			Duel.Remove(Duel.SelectMatchingCard(tp,cid.cfilter,tp,LOCATION_GRAVE+LOCATION_ONFIELD,0,1,1,nil,sets),POS_FACEUP,REASON_COST)
+			if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_GRAVE+LOCATION_ONFIELD,0,1,nil,sets) end
+			Duel.Remove(Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_GRAVE+LOCATION_ONFIELD,0,1,1,nil,sets),POS_FACEUP,REASON_COST)
 		end
 end
-function cid.settg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.settg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsSSetable() end
 end
-function cid.setop(e,tp,eg,ep,ev,re,r,rp)
+function s.setop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) then Duel.SSet(tp,c) end
 end

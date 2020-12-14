@@ -1,6 +1,6 @@
 --created by Ace, coded by Lyris
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
@@ -19,9 +19,9 @@ function cid.initial_effect(c)
 	e3:SetCountLimit(1)
 	e3:SetCategory(CATEGORY_TOKEN+CATEGORY_SPECIAL_SUMMON)
 	e3:SetDescription(1119)
-	e3:SetCost(cid.hcost)
-	e3:SetTarget(cid.tg)
-	e3:SetOperation(cid.op)
+	e3:SetCost(s.hcost)
+	e3:SetTarget(s.tg)
+	e3:SetOperation(s.op)
 	c:RegisterEffect(e3)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_IGNITION)
@@ -30,22 +30,22 @@ function cid.initial_effect(c)
 	e4:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e4:SetDescription(1118)
 	e4:SetLabel(0)
-	e4:SetCost(cid.hcost)
-	e4:SetTarget(cid.sptg)
-	e4:SetOperation(cid.spop)
+	e4:SetCost(s.hcost)
+	e4:SetTarget(s.sptg)
+	e4:SetOperation(s.spop)
 	c:RegisterEffect(e4)
 end
-function cid.hcost(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.hcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.Hint(HINT_OPSELECTED,0,e:GetDescription())
 end
-function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsPlayerCanSpecialSummonMonster(tp,CARD_DRAGON_EGG_TOKEN,0,0x4011,300,300,1,RACE_DRAGON,ATTRIBUTE_FIRE) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,1,0,0)
 end
-function cid.op(e,tp,eg,ep,ev,re,r,rp)
+function s.op(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_MZONE)<=0
 		or not Duel.IsPlayerCanSpecialSummonMonster(tp,CARD_DRAGON_EGG_TOKEN,0,0x4011,300,300,1,RACE_DRAGON,ATTRIBUTE_FIRE) then return end
 	local token=Duel.CreateToken(tp,CARD_DRAGON_EGG_TOKEN)
@@ -63,14 +63,14 @@ function cid.op(e,tp,eg,ep,ev,re,r,rp)
 	e3:SetCode(EFFECT_CANNOT_BE_FUSION_MATERIAL)
 	token:RegisterEffect(e3,true)
 end
-function cid.filter(c,e,tp)
+function s.filter(c,e,tp)
 	return c:IsSetCard(0xfc1) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 		and c:GetLevel()>0 and Duel.CheckReleaseGroup(tp,Card.IsCode,c:GetLevel(),nil,CARD_DRAGON_EGG_TOKEN)
 end
-function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_DECK,0,1,nil,e,tp) end
-	local g=Duel.GetMatchingGroup(cid.filter,tp,LOCATION_DECK,0,nil,e,tp)
+		and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil,e,tp) end
+	local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_DECK,0,nil,e,tp)
 	local lvt={}
 	for tc in aux.Next(g) do
 		local tlv=tc:GetLevel()
@@ -86,15 +86,15 @@ function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Release(Duel.SelectReleaseGroup(tp,nil,lv,lv,nil),REASON_COST)
 	e:SetLabel(lv)
 end
-function cid.sfilter(c,lv,e,tp)
+function s.sfilter(c,lv,e,tp)
 	return c:IsSetCard(0xfc1) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 		and c:IsLevel(lv)
 end
-function cid.spop(e,tp,eg,ep,ev,re,r,rp)
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local lv=e:GetLabel()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,cid.sfilter,tp,LOCATION_DECK,0,1,1,nil,lv,e,tp)
+	local g=Duel.SelectMatchingCard(tp,s.sfilter,tp,LOCATION_DECK,0,1,1,nil,lv,e,tp)
 	if #g>0 and Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)~=0 then
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_FIELD)

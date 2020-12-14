@@ -1,32 +1,32 @@
 --created by Ace, coded by Lyris
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	local e0=Effect.CreateEffect(c)
 	e0:SetCategory(CATEGORY_ATKCHANGE)
 	e0:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e0:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e0:SetCondition(function(e,tp,eg,ep,ev,re,r,rp) return e:GetHandler():GetBattleTarget()~=nil end)
-	e0:SetOperation(cid.atkop)
+	e0:SetOperation(s.atkop)
 	c:RegisterEffect(e0)
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOKEN)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCode(EVENT_DESTROYED)
 	e1:SetCondition(function(e,tp,eg,ep,ev,re,r) return r&REASON_BATTLE+REASON_EFFECT~=0 end)
-	e1:SetTarget(cid.target)
-	e1:SetOperation(cid.operation)
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_IGNITION)
 	e4:SetRange(LOCATION_GRAVE)
 	e4:SetCountLimit(1,id)
 	e4:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e4:SetCost(cid.tdcost)
-	e4:SetTarget(cid.tg)
-	e4:SetOperation(cid.op)
+	e4:SetCost(s.tdcost)
+	e4:SetTarget(s.tg)
+	e4:SetOperation(s.op)
 	c:RegisterEffect(e4)
 end
-function cid.atkop(e,tp,eg,ep,ev,re,r,rp)
+function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=c:GetBattleTarget()
 	if tc:IsFaceup() and tc:IsDefenseAbove(0) and not tc:IsImmuneToEffect(e) then
@@ -55,12 +55,12 @@ function cid.atkop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,2,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,0,0)
 end
-function cid.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.IsPlayerAffectedByEffect(tp,id) or Duel.GetLocationCount(tp,LOCATION_MZONE)<2 
 		or not Duel.IsPlayerCanSpecialSummonMonster(tp,CARD_DRAGON_EGG_TOKEN,0,0x4011,300,300,1,RACE_DRAGON,ATTRIBUTE_FIRE) then return end
 	for i=0,1 do
@@ -81,17 +81,17 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 	Duel.SpecialSummonComplete()
 end
-function cid.tdcost(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.tdcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsCode,2,nil,CARD_DRAGON_EGG_TOKEN) end
 	Duel.Release(Duel.SelectReleaseGroup(tp,Card.IsCode,2,2,nil,CARD_DRAGON_EGG_TOKEN),REASON_COST)
 end
-function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
 end
-function cid.op(e,tp,eg,ep,ev,re,r,rp)
+function s.op(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) then Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP) end
 end

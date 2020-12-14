@@ -1,8 +1,8 @@
 --created by Moon Burst, coded by Lyris
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	c:EnableReviveLimit()
-	aux.AddLinkProcedure(c,nil,4,4,cid.gcheck)
+	aux.AddLinkProcedure(c,nil,4,4,s.gcheck)
 	local e1=Effect.CreateEffect(c)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SINGLE_RANGE)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -25,8 +25,8 @@ function cid.initial_effect(c)
 	e3:SetCode(EVENT_DESTROYED)
 	e3:SetCountLimit(1,id)
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e3:SetTarget(cid.sptg)
-	e3:SetOperation(cid.spop)
+	e3:SetTarget(s.sptg)
+	e3:SetOperation(s.spop)
 	c:RegisterEffect(e3)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE)
@@ -40,43 +40,43 @@ function cid.initial_effect(c)
 	e5:SetRange(LOCATION_MZONE)
 	e5:SetCountLimit(1,id)
 	e5:SetDescription(1050)
-	e5:SetCost(cid.cost)
-	e5:SetOperation(cid.op1)
+	e5:SetCost(s.cost)
+	e5:SetOperation(s.op1)
 	c:RegisterEffect(e5)
 	local e6=e5:Clone()
 	e6:SetCategory(CATEGORY_REMOVE)
 	e6:SetDescription(1102)
-	e6:SetTarget(cid.tg)
-	e6:SetOperation(cid.op2)
+	e6:SetTarget(s.tg)
+	e6:SetOperation(s.op2)
 	c:RegisterEffect(e6)
 end
-function cid.gcheck(g)
+function s.gcheck(g)
 	return g:IsExists(Card.IsLinkCode,1,nil,id-5) and g:IsExists(Card.IsLinkCode,1,nil,id-4) and g:IsExists(Card.IsLinkSetCard,2,nil,0x191)
 end
-function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,tp,LOCATION_GRAVE)
 end
-function cid.filter(c,e,tp,code)
+function s.filter(c,e,tp,code)
 	return c:IsCode(code) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function cid.spop(e,tp,eg,ep,ev,re,r,rp)
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT)
 		or Duel.GetLocationCount(tp,LOCATION_MZONE)<2 then return end
 	local g=Group.CreateGroup()
 	for i=0,1 do Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	g:Merge(Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_GRAVE,0,1,1,g,e,tp,id-5+i)) end
+	g:Merge(Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_GRAVE,0,1,1,g,e,tp,id-5+i)) end
 	if #g==2 then Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP) end
 end
-function cid.cfilter(c)
+function s.cfilter(c)
 	return c:IsType(TYPE_UNION) and c:IsSetCard(0x191) and c:IsDiscardable()
 end
-function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(cid.cfilter,tp,LOCATION_HAND,0,1,nil) end
+function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_HAND,0,1,nil) end
 	Duel.Hint(HINT_OPSELECTED,0,e:GetDescription())
-	Duel.DiscardHand(tp,cid.cfilter,1,1,REASON_COST)
+	Duel.DiscardHand(tp,s.cfilter,1,1,REASON_COST)
 end
-function cid.op1(e,tp,eg,ep,ev,re,r,rp)
+function s.op1(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
 	local e3=Effect.CreateEffect(c)
@@ -84,19 +84,19 @@ function cid.op1(e,tp,eg,ep,ev,re,r,rp)
 	e3:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetTargetRange(0,LOCATION_MZONE)
-	e3:SetTarget(cid.indestg)
+	e3:SetTarget(s.indestg)
 	e3:SetValue(1)
 	c:RegisterEffect(e3)
 end
-function cid.indestg(e,c)
+function s.indestg(e,c)
 	return c==e:GetHandler():GetBattleTarget()
 end
-function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(Card.IsAbleToRemove,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
 	if chk==0 then return #g>0 end
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,0,0)
 end
-function cid.op2(e,tp,eg,ep,ev,re,r,rp)
+function s.op2(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToRemove,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
 	if #g>0 then

@@ -1,6 +1,6 @@
 --created by Hoshi, coded by Lyris
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddXyzProcedureLevelFree(c,aux.FilterBoolFunction(aux.AND(Card.IsFaceup,Card.IsXyzLevel),c,4),function(g) return g:IsExists(Card.IsSetCard,1,nil,0xcda) end,2,2)
 	c:SetUniqueOnField(1,0,id)
@@ -12,7 +12,7 @@ function cid.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetCondition(function(e,tp) return e:GetHandler():IsSummonType(SUMMON_TYPE_XYZ) and not Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsCode),tp,LOCATION_ONFIELD,0,1,nil,id-11) end)
-	e1:SetOperation(cid.operation)
+	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
@@ -21,8 +21,8 @@ function cid.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
 	e2:SetCategory(CATEGORY_EQUIP)
 	e2:SetCondition(function(e,tp) return Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsCode),tp,LOCATION_ONFIELD,0,1,nil,id-11) end)
-	e2:SetTarget(cid.eqstg)
-	e2:SetOperation(cid.eqsop)
+	e2:SetTarget(s.eqstg)
+	e2:SetOperation(s.eqsop)
 	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_IGNITION)
@@ -30,27 +30,27 @@ function cid.initial_effect(c)
 	e3:SetDescription(1068)
 	e3:SetCategory(CATEGORY_EQUIP)
 	e3:SetLabelObject(c)
-	e3:SetTarget(cid.eqtg)
-	e3:SetOperation(cid.eqop)
+	e3:SetTarget(s.eqtg)
+	e3:SetOperation(s.eqop)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_GRANT)
 	e4:SetRange(LOCATION_SZONE)
 	e4:SetTargetRange(LOCATION_MZONE,0)
-	e4:SetTarget(cid.tg)
+	e4:SetTarget(s.tg)
 	e4:SetLabelObject(e3)
 	c:RegisterEffect(e4)
 end
-function cid.spfilter(c,e,tp)
+function s.spfilter(c,e,tp)
 	return c:IsCode(id-11) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function cid.operation(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(aux.NecroValleyFilter(cid.spfilter),tp,LOCATION_GRAVE+LOCATION_HAND,0,nil,e,tp)
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.spfilter),tp,LOCATION_GRAVE+LOCATION_HAND,0,nil,e,tp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) or c:RemoveOverlayCard(tp,2,2,REASON_COST)~=2 or #g==0 or not Duel.SelectYesNo(tp,1152) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	Duel.SpecialSummon(g:Select(tp,1,1,nil),0,tp,tp,false,false,POS_FACEUP)
 end
-function cid.eqstg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.eqstg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and c:CheckUniqueOnField(tp) and not c:IsForbidden() end
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,c,1,0,0)
@@ -58,7 +58,7 @@ function cid.eqstg(e,tp,eg,ep,ev,re,r,rp,chk)
 		Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,c,1,0,0)
 	end
 end
-function cid.eqsop(e,tp,eg,ep,ev,re,r,rp)
+function s.eqsop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
@@ -72,22 +72,22 @@ function cid.eqsop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetValue(function(ef,cc) return cc==tc end)
 	c:RegisterEffect(e1)
 end
-function cid.eqfilter(c,tp)
+function s.eqfilter(c,tp)
 	return c:IsSetCard(0xcda) and c:CheckUniqueOnField(tp) and not c:IsForbidden()
 end
-function cid.eqtg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.eqtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetLabelObject()
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
-		and Duel.IsExistingMatchingCard(cid.eqfilter,tp,LOCATION_GRAVE+LOCATION_HAND,0,1,nil,tp)
+		and Duel.IsExistingMatchingCard(s.eqfilter,tp,LOCATION_GRAVE+LOCATION_HAND,0,1,nil,tp)
 		and c:GetFlagEffect(id)==0 end
 	c:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,nil,1,tp,LOCATION_GRAVE+LOCATION_HAND)
 end
-function cid.eqop(e,tp,eg,ep,ev,re,r,rp)
+function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 	for i=0,1 do
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
-		local ec=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(cid.eqfilter),tp,LOCATION_GRAVE+LOCATION_HAND,0,1,1,nil,tp):GetFirst()
+		local ec=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.eqfilter),tp,LOCATION_GRAVE+LOCATION_HAND,0,1,1,nil,tp):GetFirst()
 		if ec then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 			local tc=Duel.SelectMatchingCard(tp,Card.IsFaceup,tp,LOCATION_MZONE,0,1,1,nil):GetFirst()
@@ -105,6 +105,6 @@ function cid.eqop(e,tp,eg,ep,ev,re,r,rp)
 	end
 	Duel.EquipComplete()
 end
-function cid.tg(e,c)
+function s.tg(e,c)
 	return c==e:GetHandler():GetEquipTarget() and c:IsCode(id-11)
 end

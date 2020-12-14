@@ -1,6 +1,6 @@
 --created by Alastar Rainford, coded by Lyris
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_ACTIVATE)
 	e0:SetCode(EVENT_FREE_CHAIN)
@@ -17,11 +17,11 @@ function cid.initial_effect(c)
 	e1:SetRange(LOCATION_SZONE)
 	e1:SetCountLimit(1,id)
 	e1:SetCategory(CATEGORY_DESTROY+CATEGORY_TOKEN+CATEGORY_SPECIAL_SUMMON)
-	e1:SetTarget(cid.tg)
-	e1:SetOperation(cid.op)
+	e1:SetTarget(s.tg)
+	e1:SetOperation(s.op)
 	c:RegisterEffect(e1)
 end
-function cid.filter(c,tp)
+function s.filter(c,tp)
 	local ft=Duel.GetMZoneCount(tp,c)+Duel.GetMZoneCount(tp,c,1-tp)
 	local lv=c:GetLink()>0 and c:GetLink() or c:GetOriginalRank()>0 and c:GetOriginalRank() or c:GetOriginalLevel()
 	if c:IsFacedown() or c:IsType(TYPE_EFFECT) or not c:IsRace(RACE_PLANT) or lv==0 or lv>ft
@@ -31,17 +31,17 @@ function cid.filter(c,tp)
 	end
 	return false
 end
-function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local g=Duel.GetMatchingGroup(cid.filter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,tp)
+function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,tp)
 	if chk==0 then return #g>0 end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,0,PLAYER_ALL,0)
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,0,PLAYER_ALL,0)
 end
-function cid.op(e,tp,eg,ep,ev,re,r,rp)
+function s.op(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil,tp)
+	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil,tp)
 	local tc=g:GetFirst()
 	if not tc or Duel.Destroy(tc,REASON_EFFECT)==0 then return end
 	local ct=tc:GetLink()>0 and tc:GetLink() or tc:GetOriginalRank()>0 and tc:GetOriginalRank() or tc:GetOriginalLevel()

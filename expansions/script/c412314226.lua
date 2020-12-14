@@ -1,6 +1,6 @@
 --created by Jake, coded by Lyris
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_ACTIVATE)
 	e0:SetCode(EVENT_FREE_CHAIN)
@@ -13,17 +13,17 @@ function cid.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e1:SetCategory(CATEGORY_DESTROY)
 	e1:SetCondition(function(e,tp,eg,ep,ev,re,r,rp) return eg:IsExists(Card.IsRace,1,nil,RACE_WARRIOR) and ep==tp end)
-	e1:SetTarget(cid.destg)
-	e1:SetOperation(cid.desop)
+	e1:SetTarget(s.destg)
+	e1:SetOperation(s.desop)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_DELAY)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_DRAW)
-	e2:SetCost(cid.drcost)
-	e2:SetTarget(cid.drtg)
-	e2:SetOperation(cid.drop)
+	e2:SetCost(s.drcost)
+	e2:SetTarget(s.drtg)
+	e2:SetOperation(s.drop)
 	c:RegisterEffect(e2)
 	c:SetUniqueOnField(1,0,id)
 	local e3=Effect.CreateEffect(c)
@@ -34,12 +34,12 @@ function cid.initial_effect(c)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON+CATEGORY_REMOVE)
 	e2:SetCondition(function(e,tp) return Duel.GetTurnPlayer()==tp and (Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2) end)
 	e2:SetCost(aux.bfgcost)
-	e2:SetTarget(cid.fustg)
-	e2:SetOperation(cid.fusop)
+	e2:SetTarget(s.fustg)
+	e2:SetOperation(s.fusop)
 	c:RegisterEffect(e2)
 end
-cid.material_setcode=0x613
-function cid.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+s.material_setcode=0x613
+function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
 	if chkc then return false end
 	if chk==0 then return Duel.IsExistingTarget(aux.TRUE,tp,LOCATION_ONFIELD,0,1,c)
@@ -51,7 +51,7 @@ function cid.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	g1:Merge(g2)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g1,2,0,0)
 end
-function cid.desop(e,tp,eg,ep,ev,re,r,rp)
+function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	local tg=g:Filter(Card.IsRelateToEffect,nil,e)
@@ -59,59 +59,59 @@ function cid.desop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Destroy(tg,REASON_EFFECT)
 	end
 end
-function cid.filter(c)
+function s.filter(c)
 	return c:IsRace(RACE_WARRIOR) and not c:IsPublic()
 end
-function cid.drcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return ep==tp and eg:IsExists(cid.filter,1,nil) end
-	local g=eg:Filter(cid.filter,nil)
+function s.drcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return ep==tp and eg:IsExists(s.filter,1,nil) end
+	local g=eg:Filter(s.filter,nil)
 	Duel.ConfirmCards(1-tp,g)
 	Duel.ShuffleHand(tp)
 end
-function cid.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) and Duel.IsExistingMatchingCard(aux.NOT(aux.FilterBoolFunction(Card.IsRace,RACE_WARRIOR)),tp,LOCATION_HAND,0,1,nil) end
 	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(1)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end
-function cid.drop(e,tp,eg,ep,ev,re,r,rp)
+function s.drop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	if Duel.Draw(p,d,REASON_EFFECT)==0 then return end
 	Duel.DiscardHand(tp,aux.NOT(aux.FilterBoolFunction(Card.IsRace,RACE_WARRIOR)),1,1)
 end
-function cid.filter0(c)
+function s.filter0(c)
 	return c:IsType(TYPE_MONSTER) and c:IsCanBeFusionMaterial() and c:IsAbleToRemove()
 end
-function cid.filter1(c,e)
+function s.filter1(c,e)
 	return not c:IsImmuneToEffect(e)
 end
-function cid.filter2(c,e,tp,m,f,chkf)
+function s.filter2(c,e,tp,m,f,chkf)
 	return c:IsType(TYPE_FUSION) and c:IsSetCard(0x613) and (not f or f(c))
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false) and c:CheckFusionMaterial(m,nil,chkf)
 end
-function cid.fustg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.fustg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		local chkf=tp
-		local mg1=Duel.GetFusionMaterial(tp)+Duel.GetMatchingGroup(cid.filter0,tp,LOCATION_GRAVE,0,nil)
-		local res=Duel.IsExistingMatchingCard(cid.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,mg1,nil,chkf)
+		local mg1=Duel.GetFusionMaterial(tp)+Duel.GetMatchingGroup(s.filter0,tp,LOCATION_GRAVE,0,nil)
+		local res=Duel.IsExistingMatchingCard(s.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,mg1,nil,chkf)
 		if not res then
 			local ce=Duel.GetChainMaterial(tp)
 			if ce~=nil then
 				local fgroup=ce:GetTarget()
 				local mg3=fgroup(ce,e,tp)
 				local mf=ce:GetValue()
-				res=Duel.IsExistingMatchingCard(cid.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,mg3,mf,chkf)
+				res=Duel.IsExistingMatchingCard(s.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,mg3,mf,chkf)
 			end
 		end
 		return res
 	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
-function cid.fusop(e,tp,eg,ep,ev,re,r,rp)
+function s.fusop(e,tp,eg,ep,ev,re,r,rp)
 	local chkf=tp
-	local mg1=(Duel.GetFusionMaterial(tp)+Duel.GetMatchingGroup(cid.filter0,tp,LOCATION_GRAVE,0,nil)):Filter(cid.filter1,nil,e)
-	local sg1=Duel.GetMatchingGroup(cid.filter2,tp,LOCATION_EXTRA,0,nil,e,tp,mg1,nil,chkf)
+	local mg1=(Duel.GetFusionMaterial(tp)+Duel.GetMatchingGroup(s.filter0,tp,LOCATION_GRAVE,0,nil)):Filter(s.filter1,nil,e)
+	local sg1=Duel.GetMatchingGroup(s.filter2,tp,LOCATION_EXTRA,0,nil,e,tp,mg1,nil,chkf)
 	local mg3=nil
 	local sg2=nil
 	local ce=Duel.GetChainMaterial(tp)
@@ -119,7 +119,7 @@ function cid.fusop(e,tp,eg,ep,ev,re,r,rp)
 		local fgroup=ce:GetTarget()
 		mg3=fgroup(ce,e,tp)
 		local mf=ce:GetValue()
-		sg2=Duel.GetMatchingGroup(cid.filter2,tp,LOCATION_EXTRA,0,nil,e,tp,mg3,mf,chkf)
+		sg2=Duel.GetMatchingGroup(s.filter2,tp,LOCATION_EXTRA,0,nil,e,tp,mg3,mf,chkf)
 	end
 	if #sg1>0 or (sg2~=nil and #sg2>0) then
 		local sg=sg1:Clone()

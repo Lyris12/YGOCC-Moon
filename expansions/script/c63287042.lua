@@ -1,0 +1,103 @@
+--created by Pina, coded by Lyris
+local s,id=GetID()
+function s.initial_effect(c)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCategory(CATEGORY_DAMAGE)
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.activate)
+	c:RegisterEffect(e1)
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetCode(EFFECT_CANNOT_ATTACK)
+	e2:SetRange(LOCATION_SZONE)
+	e2:SetTargetRange(0,LOCATION_MZONE)
+	e2:SetLabel(1)
+	e2:SetCondition(s.con)
+	e2:SetTarget(s.atktarget)
+	c:RegisterEffect(e2)
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_FIELD)
+	e3:SetCode(EFFECT_ACTIVATE_COST)
+	e3:SetRange(LOCATION_SZONE)
+	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e3:SetTargetRange(0,1)
+	e3:SetLabel(2)
+	e3:SetCondition(s.con)
+	e3:SetTarget(aux.TargetBoolFunction(Effect.IsActiveType,TYPE_MONSTER))
+	e3:SetCost(s.costchk)
+	e3:SetOperation(s.costop)
+	c:RegisterEffect(e3)
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e4:SetCode(EVENT_PHASE+PHASE_STANDBY)
+	e4:SetRange(LOCATION_SZONE)
+	e4:SetCountLimit(1)
+	e4:SetLabel(3)
+	e4:SetCondition(aux.AND(s.con,function(e,tp) return Duel.GetTurnPlayer()~=tp end))
+	e4:SetOperation(s.operation)
+	c:RegisterEffect(e4)
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	e5:SetCode(EVENT_LEAVE_FIELD)
+	e5:SetCondition(s.atkcon)
+	e5:SetOperation(s.atkop)
+	c:RegisterEffect(e5)
+end
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.SetTargetPlayer(1-tp)
+	Duel.SetTargetParam(500)
+	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,500)
+end
+function s.activate(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
+	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
+	Duel.Damage(p,d,REASON_EFFECT)
+end
+function s.con(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetMatchingGroupCount(aux.AND(Card.IsFaceup,Card.IsCode),tp,LOCATION_ONFIELD,0,nil,id)==e:GetLabel()
+end
+function s.atktarget(e,c)
+	return Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsSetCard),e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil,0xb2)
+end
+function s.costchk(e,te_or_c,tp)
+	return Duel.CheckLPCost(tp,2000)
+end
+function s.costop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_CARD,0,id)
+	Duel.PayLPCost(tp,1000)
+end
+function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return c:IsPreviousPosition(POS_FACEUP) and c:IsPreviousLocation(LOCATION_ONFIELD)
+end
+function s.atkop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_CARD,0,id)
+	local c=e:GetHandler()
+	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,0,LOCATION_MZONE,nil)
+	for tc in aux.Next(g) do
+		local e3=Effect.CreateEffect(c)
+		e3:SetType(EFFECT_TYPE_SINGLE)
+		e3:SetCode(EFFECT_UPDATE_ATTACK)
+		e3:SetReset(RESET_EVENT+RESETS_STANDARD)
+		e3:SetValue(-500)
+		tc:RegisterEffect(e3)
+	end
+end
+function s.filter(c)
+	return c:IsSetCard(0xb2) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToHand()
+end
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.GetDecktopGroup(1-tp,1):GetFirst()
+	if tc:IsAbleToRemove() and Duel.SelectOption(1-tp,1102,aux.Stringid(id,0))==0 then
+		Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)
+		local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_DECK,0,nil)
+		if #g==0 or not Duel.SelectYesNo(tp,1109) then return end
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+		local sg=g:Select(tp,1,1,nil)
+		Duel.SendtoHand(sg,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,sg)
+	else Duel.SetLP(1-tp,Duel.GetLP(1-tp)-1000) end
+end

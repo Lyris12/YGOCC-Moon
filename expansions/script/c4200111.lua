@@ -1,6 +1,6 @@
 --created & coded by Swag
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(Card.IsSetCard,0x412),1,1)
 	c:EnableReviveLimit()
 	c:SetSPSummonOnce(id)
@@ -28,48 +28,48 @@ function cid.initial_effect(c)
 	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCode(EVENT_BATTLE_DAMAGE)
-	e3:SetTarget(cid.rectg)
-	e3:SetOperation(cid.recop)
+	e3:SetTarget(s.rectg)
+	e3:SetOperation(s.recop)
 	c:RegisterEffect(e3)
 	local e4=Effect.CreateEffect(c)
 	e4:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetCode(EVENT_BATTLE_DAMAGE)
-	e4:SetCondition(cid.sscon)
-	e4:SetTarget(cid.sstg)
-	e4:SetOperation(cid.ssop)
+	e4:SetCondition(s.sscon)
+	e4:SetTarget(s.sstg)
+	e4:SetOperation(s.ssop)
 	c:RegisterEffect(e4)
 end
-function cid.rectg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.rectg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(ev)
 	Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,ev)
 end
-function cid.recop(e,tp,eg,ep,ev,re,r,rp)
+function s.recop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	Duel.Recover(p,d,REASON_EFFECT)
 end
-function cid.sparkfilter(c)
+function s.sparkfilter(c)
 return c:IsCode(id-11)
 end
-function cid.sscon(e,c)
-	return Duel.IsExistingMatchingCard(cid.sparkfilter,tp,LOCATION_GRAVE,0,1,nil)
+function s.sscon(e,c)
+	return Duel.IsExistingMatchingCard(s.sparkfilter,tp,LOCATION_GRAVE,0,1,nil)
 end
-function cid.ssfilter1(c,e,tp)
+function s.ssfilter1(c,e,tp)
 	return c:IsSetCard(0x412) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function cid.sstg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.sstg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(cid.ssfilter1,tp,LOCATION_DECK,0,1,nil,e,tp) end
+		and Duel.IsExistingMatchingCard(s.ssfilter1,tp,LOCATION_DECK,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK  )
 end
-function cid.ssop(e,tp,eg,ep,ev,re,r,rp)
+function s.ssop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,cid.ssfilter1,tp,LOCATION_DECK,0,1,1,nil,e,tp)
+	local g=Duel.SelectMatchingCard(tp,s.ssfilter1,tp,LOCATION_DECK,0,1,1,nil,e,tp)
 	if #g>0 and Duel.SpecialSummonStep(g:GetFirst(),0,tp,tp,false,false,POS_FACEUP) then
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)

@@ -1,13 +1,13 @@
 --created by Swag, coded by Lyris
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCategory(CATEGORY_TODECK+CATEGORY_SPECIAL_SUMMON)
-	e1:SetTarget(cid.target)
-	e1:SetOperation(cid.activate)
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
@@ -15,22 +15,22 @@ function cid.initial_effect(c)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCountLimit(1)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e2:SetTarget(cid.artg)
-	e2:SetOperation(cid.arop)
+	e2:SetTarget(s.artg)
+	e2:SetOperation(s.arop)
 	c:RegisterEffect(e2)
 	c:SetUniqueOnField(1,0,id)
 end
-function cid.cfilter(c,e,tp)
+function s.cfilter(c,e,tp)
 	return c:IsFaceup() and c:IsSetCard(0x412) and c:IsAbleToDeck()
-		and Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_DECK,0,1,nil,e,tp,c:GetRace(),c:GetAttribute())
+		and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil,e,tp,c:GetRace(),c:GetAttribute())
 end
-function cid.filter(c,e,tp,rc,at)
+function s.filter(c,e,tp,rc,at)
 	return c:IsSetCard(0x412) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and c:GetRace()~=rc and c:GetAttribute()~=at
 end
-function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and cid.cfilter(chkc,e,tp) end
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.cfilter(chkc,e,tp) end
 	if chk==0 then return true end
-	local g=Duel.GetMatchingGroup(aux.AND(cid.cfilter,Card.IsCanBeEffectTarget),tp,LOCATION_MZONE,0,nil,e,tp)
+	local g=Duel.GetMatchingGroup(aux.AND(s.cfilter,Card.IsCanBeEffectTarget),tp,LOCATION_MZONE,0,nil,e,tp)
 	if #g>0 and Duel.SelectYesNo(tp,1152) then
 		e:SetCategory(CATEGORY_TODECK+CATEGORY_SPECIAL_SUMMON)
 		e:SetProperty(EFFECT_FLAG_CARD_TARGET)
@@ -41,21 +41,21 @@ function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 	else e:SetCategory(0) e:SetProperty(0) end
 end
-function cid.activate(e,tp,eg,ep,ev,re,r,rp)
+function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if e:GetHandler():IsRelateToEffect(e) and tc and tc:IsRelateToEffect(e)
 		and Duel.SendtoDeck(tc,nil,2,REASON_EFFECT)~=0 and tc:IsLocation(LOCATION_DECK) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		Duel.SpecialSummon(Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_DECK,0,1,1,nil,e,tp,tc:GetRace(),tc:GetAttribute()),0,tp,tp,false,false,POS_FACEUP)
+		Duel.SpecialSummon(Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil,e,tp,tc:GetRace(),tc:GetAttribute()),0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-function cid.artg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function s.artg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) end
 	if chk==0 then return Duel.IsExistingTarget(nil,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	Duel.SelectTarget(tp,nil,tp,LOCATION_MZONE,0,1,1,nil)
 end
-function cid.arop(e,tp,eg,ep,ev,re,r,rp)
+function s.arop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if not c:IsRelateToEffect(e) or not tc:IsRelateToEffect(e) then return end

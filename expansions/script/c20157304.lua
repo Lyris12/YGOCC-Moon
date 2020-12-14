@@ -1,8 +1,8 @@
 --created by Ace, coded by Lyris
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	c:EnableReviveLimit()
-	aux.AddLinkProcedure(c,cid.mfilter,2,2)
+	aux.AddLinkProcedure(c,s.mfilter,2,2)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
@@ -10,7 +10,7 @@ function cid.initial_effect(c)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetTargetRange(1,0)
 	e2:SetCondition(function(e) return not e:GetHandler():IsForbidden() end)
-	e2:SetTarget(cid.splimit)
+	e2:SetTarget(s.splimit)
 	c:RegisterEffect(e2)
 	local e0=e2:Clone()
 	e0:SetCode(EFFECT_CANNOT_SUMMON)
@@ -25,8 +25,8 @@ function cid.initial_effect(c)
 	e1:SetCategory(CATEGORY_TOKEN+CATEGORY_SPECIAL_SUMMON)
 	e1:SetCountLimit(1,id)
 	e1:SetCondition(function(e) return e:GetHandler():IsSummonType(SUMMON_TYPE_LINK) end)
-	e1:SetTarget(cid.tg)
-	e1:SetOperation(cid.op)
+	e1:SetTarget(s.tg)
+	e1:SetOperation(s.op)
 	c:RegisterEffect(e1)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_QUICK_O)
@@ -35,9 +35,9 @@ function cid.initial_effect(c)
 	e4:SetCountLimit(1,id-2)
 	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e4:SetCategory(CATEGORY_DESTROY)
-	e4:SetCost(cid.cost)
-	e4:SetTarget(cid.destg)
-	e4:SetOperation(cid.desop)
+	e4:SetCost(s.cost)
+	e4:SetTarget(s.destg)
+	e4:SetOperation(s.desop)
 	c:RegisterEffect(e4)
 	local e5=Effect.CreateEffect(c)
 	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
@@ -46,22 +46,22 @@ function cid.initial_effect(c)
 	e5:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e5:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e5:SetCondition(function(e,tp,eg,ep,ev,re,r) return r&REASON_BATTLE+REASON_EFFECT~=0 end)
-	e5:SetTarget(cid.sptg)
-	e5:SetOperation(cid.spop)
+	e5:SetTarget(s.sptg)
+	e5:SetOperation(s.spop)
 	c:RegisterEffect(e5)
 end
-function cid.mfilter(c)
+function s.mfilter(c)
 	return c:IsLinkRace(RACE_DRAGON) and c:IsLinkAttribute(ATTRIBUTE_FIRE)
 end
-function cid.splimit(e,c)
+function s.splimit(e,c)
 	return not c:IsRace(RACE_DRAGON) or not c:IsAttribute(ATTRIBUTE_FIRE)
 end
-function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,1,0,0)
 end
-function cid.op(e,tp,eg,ep,ev,re,r,rp)
+function s.op(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0
 		or not Duel.IsPlayerCanSpecialSummonMonster(tp,CARD_DRAGON_EGG_TOKEN,0,0x4011,300,300,1,RACE_DRAGON,ATTRIBUTE_FIRE) then return end
 	local token=Duel.CreateToken(tp,CARD_DRAGON_EGG_TOKEN)
@@ -79,31 +79,31 @@ function cid.op(e,tp,eg,ep,ev,re,r,rp)
 	e3:SetCode(EFFECT_CANNOT_BE_FUSION_MATERIAL)
 	token:RegisterEffect(e3,true)
 end
-function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsCode,1,nil,CARD_DRAGON_EGG_TOKEN) end
 	Duel.Release(Duel.SelectReleaseGroup(tp,Card.IsCode,1,1,nil,CARD_DRAGON_EGG_TOKEN),REASON_COST)
 end
-function cid.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() end
 	if chk==0 then return Duel.IsExistingTarget(nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,Duel.SelectTarget(tp,nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil),1,0,0)
 end
-function cid.desop(e,tp,eg,ep,ev,re,r,rp)
+function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) then Duel.Destroy(tc,REASON_EFFECT) end
 end
-function cid.filter(c,e,tp)
+function s.filter(c,e,tp)
 	return c:IsSetCard(0xfc1) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsCode(id)
 end
-function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and cid.filter(chkc,e,tp) end
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.filter(chkc,e,tp) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingTarget(cid.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
+		and Duel.IsExistingTarget(s.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,Duel.SelectTarget(tp,cid.filter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp),1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,Duel.SelectTarget(tp,s.filter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp),1,0,0)
 end
-function cid.spop(e,tp,eg,ep,ev,re,r,rp)
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) then Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP) end
 end

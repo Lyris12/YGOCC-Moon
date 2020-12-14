@@ -1,6 +1,6 @@
 --created by Thauma, coded by Lyris
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	aux.EnablePendulumAttribute(c)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE)
@@ -18,52 +18,52 @@ function cid.initial_effect(c)
 	e2:SetRange(LOCATION_PZONE)
 	e2:SetCountLimit(1,id)
 	e2:SetCategory(CATEGORY_COIN)
-	e2:SetTarget(cid.target)
-	e2:SetOperation(cid.operation)
+	e2:SetTarget(s.target)
+	e2:SetOperation(s.operation)
 	c:RegisterEffect(e2)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e1:SetCountLimit(1,id+100)
 	e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
-	e1:SetCondition(cid.condition)
+	e1:SetCondition(s.condition)
 	e1:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
-	e1:SetTarget(cid.tg)
-	e1:SetOperation(cid.op)
+	e1:SetTarget(s.tg)
+	e1:SetOperation(s.op)
 	c:RegisterEffect(e1)
 end
-cid.toss_coin=true
-function cid.filter(c,e,tp)
+s.toss_coin=true
+function s.filter(c,e,tp)
 	return c:IsType(TYPE_PENDULUM) and c:IsSetCard(0xa44) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 		and c:IsFaceup()
 end
-function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_COIN,nil,0,tp,1)
 end
-function cid.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
 	if Duel.TossCoin(tp,1)==1 then
 		if Duel.SendtoGrave(Duel.SelectMatchingCard(tp,aux.AND(Card.IsType,Card.IsAbleToGrave),tp,LOCATION_HAND,0,1,1,nil,TYPE_PENDULUM),REASON_EFFECT)==0
 			or Duel.GetLocationCountFromEx(tp)<=0 then return end
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		Duel.SpecialSummon(Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp),0,tp,tp,false,false,POS_FACEUP)
+		Duel.SpecialSummon(Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp),0,tp,tp,false,false,POS_FACEUP)
 	else Duel.Destroy(c,REASON_EFFECT) end
 end
-function cid.condition(e,tp,eg,ep,ev,re,r,rp)
+function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return re and re:GetHandler():IsSetCard(0xa44) and re:IsHasType(EFFECT_TYPE_ACTIONS)
 end
-function cid.sfilter(c)
+function s.sfilter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xa44) and c:IsAbleToHand()
 end
-function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(cid.sfilter,tp,LOCATION_DECK,0,1,nil) end
+function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.sfilter,tp,LOCATION_DECK,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
-function cid.op(e,tp,eg,ep,ev,re,r,rp)
+function s.op(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,cid.sfilter,tp,LOCATION_DECK,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,s.sfilter,tp,LOCATION_DECK,0,1,1,nil)
 	Duel.SendtoHand(g,nil,REASON_EFFECT)
 	Duel.ConfirmCards(1-tp,g)
 end

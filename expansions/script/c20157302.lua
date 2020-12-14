@@ -1,15 +1,15 @@
 --created by Ace, coded by Lyris
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e1:SetCategory(CATEGORY_TOGRAVE)
 	e1:SetLabel(0)
-	e1:SetCost(cid.cost)
-	e1:SetTarget(cid.tgtg)
-	e1:SetOperation(cid.tgop)
+	e1:SetCost(s.cost)
+	e1:SetTarget(s.tgtg)
+	e1:SetOperation(s.tgop)
 	c:RegisterEffect(e1)
 	local e2=e1:Clone()
 	e2:SetCode(EVENT_SUMMON_SUCCESS)
@@ -22,33 +22,33 @@ function cid.initial_effect(c)
 	e2:SetCode(EVENT_TO_GRAVE)
 	e2:SetCategory(CATEGORY_TOKEN+CATEGORY_SPECIAL_SUMMON)
 	e2:SetLabel(1)
-	e2:SetCost(cid.cost)
-	e2:SetTarget(cid.tg)
-	e2:SetOperation(cid.op)
+	e2:SetCost(s.cost)
+	e2:SetTarget(s.tg)
+	e2:SetOperation(s.op)
 	c:RegisterEffect(e2)
 end
-function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,id)==0 or Duel.GetFlagEffectLabel(tp,id)==e:GetLabel() end
 	Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1,e:GetLabel())
 end
-function cid.filter(c)
+function s.filter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xfc1) and c:IsAbleToGrave()
 end
-function cid.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_DECK,0,1,nil) end
+function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
 end
-function cid.tgop(e,tp,eg,ep,ev,re,r,rp)
+function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_DECK,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil)
 	if #g>0 then Duel.SendtoGrave(g,REASON_EFFECT) end
 end
-function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,1,0,0)
 end
-function cid.op(e,tp,eg,ep,ev,re,r,rp)
+function s.op(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0
 		or not Duel.IsPlayerCanSpecialSummonMonster(tp,CARD_DRAGON_EGG_TOKEN,0,0x4011,300,300,1,RACE_DRAGON,ATTRIBUTE_FIRE) then return end
 	local token=Duel.CreateToken(tp,CARD_DRAGON_EGG_TOKEN)

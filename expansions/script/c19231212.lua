@@ -1,6 +1,6 @@
 --created by Thauma, coded by Lyris
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_ACTIVATE)
 	e0:SetCode(EVENT_FREE_CHAIN)
@@ -12,9 +12,9 @@ function cid.initial_effect(c)
 	e5:SetCountLimit(1,id)
 	e5:SetProperty(EFFECT_FLAG_DELAY)
 	e5:SetCategory(CATEGORY_DRAW)
-	e5:SetCondition(cid.drcon)
-	e5:SetTarget(cid.drtg)
-	e5:SetOperation(cid.drop)
+	e5:SetCondition(s.drcon)
+	e5:SetTarget(s.drtg)
+	e5:SetOperation(s.drop)
 	c:RegisterEffect(e5)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_GRANT)
@@ -26,43 +26,43 @@ function cid.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetRange(LOCATION_ONFIELD)
 	e1:SetCode(EVENT_TOSS_DICE_NEGATE)
-	e1:SetCondition(cid.dicecon)
-	e1:SetOperation(cid.diceop)
+	e1:SetCondition(s.dicecon)
+	e1:SetOperation(s.diceop)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e2:SetRange(LOCATION_ONFIELD)
 	e2:SetCode(EVENT_TOSS_COIN_NEGATE)
-	e2:SetCondition(cid.coincon)
-	e2:SetOperation(cid.coinop)
+	e2:SetCondition(s.coincon)
+	e2:SetOperation(s.coinop)
 	local e4=e3:Clone()
 	e4:SetLabelObject(e2)
 	c:RegisterEffect(e4)
 	e3:SetLabelObject(e1)
 end
-cid.toss_coin=true
-cid.toss_dice=true
-function cid.cfilter(c)
+s.toss_coin=true
+s.toss_dice=true
+function s.cfilter(c)
 	return c:IsSetCard(0xa44) and c:IsPreviousLocation(LOCATION_PZONE) and c:GetPreviousControler()==tp
 end
-function cid.drcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(cid.cfilter,1,nil,tp)
+function s.drcon(e,tp,eg,ep,ev,re,r,rp)
+	return eg:IsExists(s.cfilter,1,nil,tp)
 end
-function cid.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
 	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(1)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end
-function cid.drop(e,tp,eg,ep,ev,re,r,rp)
+function s.drop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	Duel.Draw(p,d,REASON_EFFECT)
 end
-function cid.coincon(e,tp,eg,ep,ev,re,r,rp)
+function s.coincon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return re:GetHandler()==c and c:GetFlagEffect(id)==0
 end
-function cid.coinop(e,tp,eg,ep,ev,re,r,rp)
+function s.coinop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:GetFlagEffect(id)==0 and Duel.SelectEffectYesNo(tp,c) then
 		Duel.Hint(HINT_CARD,0,id)
@@ -70,11 +70,11 @@ function cid.coinop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.TossCoin(tp,ev)
 	end
 end
-function cid.dicecon(e,tp,eg,ep,ev,re,r,rp)
+function s.dicecon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return re:GetHandler()==c and c:GetFlagEffect(id)==0
 end
-function cid.diceop(e,tp,eg,ep,ev,re,r,rp)
+function s.diceop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:GetFlagEffect(id)==0 and Duel.SelectEffectYesNo(tp,c) then
 		Duel.Hint(HINT_CARD,0,id)

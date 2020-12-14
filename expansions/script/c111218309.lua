@@ -1,6 +1,6 @@
 --created by NeverThisAgain, coded by Lyris
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddFusionProcFun2(c,aux.FilterBoolFunction(Card.IsSetCard,0x50b),aux.FilterBoolFunction(Card.IsType,TYPE_RITUAL),true)
 	local e2=Effect.CreateEffect(c)
@@ -8,8 +8,8 @@ function cid.initial_effect(c)
 	e2:SetCode(EVENT_RELEASE)
 	e2:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
 	e2:SetCategory(CATEGORY_TOHAND)
-	e2:SetTarget(cid.target)
-	e2:SetOperation(cid.operation)
+	e2:SetTarget(s.target)
+	e2:SetOperation(s.operation)
 	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
@@ -27,27 +27,27 @@ function cid.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e1:SetCondition(function(e,tp,eg,ep,ev,re) return e:GetHandler():GetSummonLocation()==LOCATION_GRAVE and re and re:IsActiveType(TYPE_MONSTER) and re:GetHandler():IsType(TYPE_RITUAL) end)
-	e1:SetOperation(cid.regop)
+	e1:SetOperation(s.regop)
 	c:RegisterEffect(e1)
 end
-function cid.gthfilter(c)
+function s.gthfilter(c)
 	return not c:IsType(TYPE_FUSION) and c:IsAttribute(ATTRIBUTE_WATER) and c:IsAbleToHand()
 end
-function cid.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chk:IsControler(tp) and cid.gthfilter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(cid.gthfilter,tp,LOCATION_GRAVE,0,1,nil) end
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chk:IsControler(tp) and s.gthfilter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(s.gthfilter,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectTarget(tp,cid.gthfilter,tp,LOCATION_GRAVE,0,1,1,nil)
+	local g=Duel.SelectTarget(tp,s.gthfilter,tp,LOCATION_GRAVE,0,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
 end
-function cid.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) then
 		Duel.SendtoHand(tc,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,tc)
 	end
 end
-function cid.regop(e,tp,eg,ep,ev,re,r,rp)
+function s.regop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)

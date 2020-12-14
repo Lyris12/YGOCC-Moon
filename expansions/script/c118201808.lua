@@ -1,28 +1,28 @@
 --created by Zolanark, coded by Lyris
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	aux.AddRitualProcGreaterCode(c,id-3)
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_IGNITION)
 	e0:SetRange(LOCATION_GRAVE)
 	e0:SetCategory(CATEGORY_REMOVE+CATEGORY_ATKCHANGE)
-	e0:SetCondition(cid.condition)
-	e0:SetTarget(cid.target)
-	e0:SetOperation(cid.operation)
+	e0:SetCondition(s.condition)
+	e0:SetTarget(s.target)
+	e0:SetOperation(s.operation)
 	c:RegisterEffect(e0)
 end
-function cid.filter(c)
+function s.filter(c)
 	return c:IsCode(id-3) and c:IsPosition(POS_FACEUP_ATTACK)
 end
-function cid.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_MZONE,0,1,nil)
+function s.condition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_MZONE,0,1,nil)
 end
-function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return c:IsAbleToRemove() end
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,c,1,0,0)
 end
-function cid.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) or Duel.Remove(c,POS_FACEUP,REASON_EFFECT)==0 then return end
 	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,0,nil)

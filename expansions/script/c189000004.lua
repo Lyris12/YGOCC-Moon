@@ -1,6 +1,6 @@
 --created by Moon Burst, coded by Lyris
-local cid,id=GetID()
-function cid.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddLinkProcedure(c,nil,3,3,aux.gcheck)
 	local e0=Effect.CreateEffect(c)
@@ -10,8 +10,8 @@ function cid.initial_effect(c)
 	e0:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_IGNORE_IMMUNE)
 	e0:SetRange(LOCATION_EXTRA)
 	e0:SetValue(SUMMON_TYPE_LINK)
-	e0:SetCondition(cid.condition)
-	e0:SetOperation(cid.operation)
+	e0:SetCondition(s.condition)
+	e0:SetOperation(s.operation)
 	c:RegisterEffect(e0)
 	local e3=Effect.CreateEffect(c)
 	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
@@ -42,8 +42,8 @@ function cid.initial_effect(c)
 	e3:SetCode(EVENT_SUMMON_SUCCESS)
 	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
 	e3:SetCategory(CATEGORY_EQUIP)
-	e3:SetTarget(cid.tg)
-	e3:SetOperation(cid.op)
+	e3:SetTarget(s.tg)
+	e3:SetOperation(s.op)
 	c:RegisterEffect(e3)
 	local e4=e3:Clone()
 	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
@@ -55,23 +55,23 @@ function cid.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCode(EVENT_DAMAGE)
-	e3:SetCondition(cid.atkcon)
-	e3:SetOperation(cid.atkop)
+	e3:SetCondition(s.atkcon)
+	e3:SetOperation(s.atkop)
 	c:RegisterEffect(e3)
 end
-function cid.matfilter(c,codes)
+function s.matfilter(c,codes)
 	return codes[Card.GetLinkCode()] and c:IsAbleToDeckAsCost()
 end
-function cid.condition(e,c)
+function s.condition(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
 	local t={[id-3]=true,[id+2]=true,[id+6]=true}
-	local g=Duel.GetMatchingGroup(cid.matfilter,tp,LOCATION_GRAVE,0,nil,t)
+	local g=Duel.GetMatchingGroup(s.matfilter,tp,LOCATION_GRAVE,0,nil,t)
 	return g:GetClassCount(Card.GetLinkCode)>2 and Duel.GetLocationCountFromEx(tp)>0
 end
-function cid.operation(e,tp,eg,ep,ev,re,r,rp,c)
+function s.operation(e,tp,eg,ep,ev,re,r,rp,c)
 	local t={[id-3]=true,[id+2]=true,[id+6]=true}
-	local g,mg,g1,mc=Duel.GetMatchingGroup(cid.matfilter,tp,LOCATION_GRAVE,0,nil,t),Group.CreateGroup()
+	local g,mg,g1,mc=Duel.GetMatchingGroup(s.matfilter,tp,LOCATION_GRAVE,0,nil,t),Group.CreateGroup()
 	for i=0,2 do
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 		g1=g:FilterSelect(tp,Card.IsLinkCode,1,1,nil,table.unpack(t))
@@ -81,15 +81,15 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp,c)
 	end
 	Duel.SendtoDeck(mg,nil,2,REASON_COST)
 end
-function cid.filter(c,e,tp,ec)
+function s.filter(c,e,tp,ec)
 	return c:IsType(TYPE_UNION) and c:IsSetCard(0x191) and c:IsCanBeEffectTarget(e) and c:CheckUniqueOnField(tp) and c:CheckEquipTarget(ec) and aux.CheckUnionEquip(ec,c)
 end
-function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and cid.filter(chkc,e,tp,e:GetHandler()) end
+function s.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and s.filter(chkc,e,tp,e:GetHandler()) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
-		and Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp,e:GetHandler()) end
+		and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp,e:GetHandler()) end
 	local ft=Duel.GetLocationCount(tp,LOCATION_SZONE)
-	local g,mg,g1=Duel.GetMatchingGroup(cid.filter,tp,LOCATION_GRAVE,0,nil,e,tp,e:GetHandler()),Group.CreateGroup()
+	local g,mg,g1=Duel.GetMatchingGroup(s.filter,tp,LOCATION_GRAVE,0,nil,e,tp,e:GetHandler()),Group.CreateGroup()
 	repeat
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
 		local g1=g:Select(tp,1,1,nil)
@@ -100,7 +100,7 @@ function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetTargetCard(mg)
 	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,mg,#mg,0,0)
 end
-function cid.op(e,tp,eg,ep,ev,re,r,rp)
+function s.op(e,tp,eg,ep,ev,re,r,rp)
 	local ft=Duel.GetLocationCount(tp,LOCATION_SZONE)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
 	if ft<#g then return end
@@ -116,11 +116,11 @@ function cid.op(e,tp,eg,ep,ev,re,r,rp)
 	end
 	Duel.EquipComplete()
 end
-function cid.atkcon(e,tp,eg,ep,ev,re,r,rp)
+function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	if ep~=tp then return false end
 	return e:GetHandler():IsRelateToBattle()
 end
-function cid.atkop(e,tp,eg,ep,ev,re,r,rp)
+function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local g=e:GetHandler():GetEquipGroup():Filter(Card.IsHasEffect,nil,EFFECT_UNION_STATUS)
 	Duel.Destroy(g,REASON_EFFECT)
 end
