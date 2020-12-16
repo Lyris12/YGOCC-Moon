@@ -31,7 +31,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.chainop(e,tp,eg,ep,ev,re,r,rp)
 	if re:IsActiveType(TYPE_MONSTER) and re:GetHandler():IsSetCard(0xead) then
-		Duel.SetChainLimit(function(e,rpr) return tp==rpr end)
+		Duel.SetChainLimit(function(e,rpr,p) return p==rpr end)
 	end
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
