@@ -21,7 +21,7 @@ function s.initial_effect(c)
 	e1:SetCountLimit(1,id)
 	e1:SetCategory(CATEGORY_DESTROY)
 	e1:SetDescription(1124)
-	e1:SetCost(s.cost(s.cfilter))
+	e1:SetCost(s.cost1)
 	e1:SetTarget(s.tg1)
 	e1:SetOperation(s.op1)
 	c:RegisterEffect(e1)
@@ -32,7 +32,7 @@ function s.initial_effect(c)
 	e3:SetCountLimit(1,id)
 	e3:SetCategory(CATEGORY_DRAW)
 	e3:SetDescription(1108)
-	e3:SetCost(s.cost(s.tdfilter))
+	e3:SetCost(s.cost2)
 	e3:SetTarget(s.tg2)
 	e3:SetOperation(s.op2)
 	c:RegisterEffect(e3)
@@ -42,30 +42,33 @@ function s.condition(e)
 	return Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsSetCard),tp,LOCATION_MZONE,0,1,nil,0x4093) and not Duel.IsPlayerAffectedByEffect(tp,EFFECT_NECRO_VALLEY) and not Duel.IsPlayerAffectedByEffect(1-tp,EFFECT_NECRO_VALLEY)
 end
 function s.cfilter(c)
-	return c:IsType(TYPE_MONSTER) and c:GetOriginalRace()&RACE_DRAGON>0 and c:IsAbleToDeckAsCost()
+	return (c:IsFaceup() or c:GetEquipTarget()) and c:IsType(TYPE_EQUIP) and c:IsAbleToGraveAsCost()
 end
-function s.cost(f)
-	return  function(e,tp,eg,ep,ev,re,r,rp,chk)
-				if chk==0 then return Duel.IsExistingMatchingCard(f,tp,LOCATION_GRAVE,0,1,nil) end
-				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-				Duel.SendtoDeck(Duel.SelectMatchingCard(tp,f,tp,LOCATION_GRAVE,0,1,1,nil),nil,2,REASON_COST)
-			end
+function s.cost1(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_ONFIELD,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+	Duel.SendtoGrave(Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_ONFIELD,0,1,1,nil),REASON_COST)
 end
-function s.tg1(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.tg1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) end
 	local g=Duel.GetFieldGroup(tp,0,LOCATION_ONFIELD)
-	if chk==0 then return #g>0 end
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
+	if chk==0 then return g:FilterCount(Card.IsCanBeEffectTarget,nil,e)>0 end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,Duel.SelectTarget(tp,nil,tp,0,LOCATION_ONFIELD,1,1,nil),1,0,0)
 end
 function s.op1(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.GetFieldGroup(tp,0,LOCATION_ONFIELD):Select(tp,1,1,nil)
-	Duel.HintSelection(g)
-	Duel.Destroy(g,REASON_EFFECT)
+	local tc=Duel.GetFirstTarget()
+	if tc and tc:IsRelateToEffect(e) then Duel.Destroy(tc,REASON_EFFECT) end
 end
 function s.tdfilter(c)
 	return c:IsType(TYPE_MONSTER) and (c:IsFaceup() or c:IsLocation(LOCATION_GRAVE)) and c:IsSetCard(0x4093)
 		and c:IsAbleToDeckAsCost()
+end
+function s.cost2(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.tdfilter,tp,LOCATION_GRAVE,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+	Duel.SendtoDeck(Duel.SelectMatchingCard(tp,s.tdfilter,tp,LOCATION_GRAVE,0,1,1,nil),nil,2,REASON_COST)
 end
 function s.tg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
