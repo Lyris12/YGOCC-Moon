@@ -9,15 +9,6 @@ function s.initial_effect(c)
 	e0:SetTarget(s.target)
 	e0:SetOperation(s.activate)
 	c:RegisterEffect(e0)
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e2:SetCode(EVENT_ATTACK_ANNOUNCE)
-	e2:SetRange(LOCATION_FZONE)
-	e2:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
-	e2:SetCondition(s.thcon)
-	e2:SetTarget(s.thtg)
-	e2:SetOperation(s.thop)
-	c:RegisterEffect(e2)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_FZONE)
@@ -27,6 +18,15 @@ function s.initial_effect(c)
 	e1:SetTarget(s.tg)
 	e1:SetOperation(s.op)
 	c:RegisterEffect(e1)
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_FIELD)
+	e3:SetCode(EFFECT_CANNOT_ACTIVATE)
+	e3:SetRange(LOCATION_FZONE)
+	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e3:SetTargetRange(0,1)
+	e3:SetValue(1)
+	e3:SetCondition(s.actcon)
+	c:RegisterEffect(e3)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetFieldGroup(tp,LOCATION_ONFIELD,LOCATION_ONFIELD)-c
@@ -40,37 +40,6 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetFieldGroup(tp,LOCATION_ONFIELD,LOCATION_ONFIELD):Select(tp,1,1,c)
 	Duel.HintSelection(g)
 	Duel.Destroy(g,REASON_EFFECT)
-end
-function s.thcon(e,tp,eg,ep,ev,re,r,rp)
-	local a=Duel.GetAttacker()
-	if a:IsControler(1-tp) then a=Duel.GetAttackTarget() end
-	return a and a:IsSetCard(0xa6c)
-end
-function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
-end
-function s.thop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local a=Duel.GetAttacker()
-	if a:IsControler(1-tp) then a=Duel.GetAttackTarget() end
-	if not c:IsRelateToEffect(e) or not a:IsRelateToBattle() then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,aux.AND(s.cfilter,Card.IsAbleToHand,aux.NOT(Card.IsCode)),tp,LOCATION_DECK,0,1,1,nil,a:GetCode())
-	if Duel.SendtoHand(g,nil,REASON_EFFECT)==0 then return end
-	Duel.ConfirmCards(1-tp,g)
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e1:SetCode(EFFECT_CANNOT_TO_HAND)
-	e1:SetTargetRange(1,0)
-	e1:SetTarget(s.thlimit)
-	e1:SetLabel(g:GetFirst():GetCode())
-	e1:SetReset(RESET_PHASE+PHASE_END)
-	Duel.RegisterEffect(e1,tp)
-end
-function s.thlimit(e,c,tp,r,re)
-	return c:IsCode(e:GetLabel()) and re and re:IsActiveType(TYPE_MONSTER) and re:GetHandler():IsCode(id) and r==REASON_EFFECT
 end
 function s.cfilter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xa6c)
@@ -109,4 +78,11 @@ function s.op(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetValue(lv)
 	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 	tc:RegisterEffect(e1)
+end
+function s.actfilter(c,tp)
+	return c and c:IsFaceup() and c:IsSetCard(0xa6c) and c:IsType(TYPE_MONSTER) and c:IsControler(tp)
+end
+function s.actcon(e)
+	local tp=e:GetHandlerPlayer()
+	return s.actfilter(Duel.GetAttacker(),tp) or s.actfilter(Duel.GetAttackTarget(),tp)
 end
