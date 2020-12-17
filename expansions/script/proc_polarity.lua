@@ -94,7 +94,7 @@ Auxiliary.SynTarget=function(f1,f2,minc,maxc)
 	return	function(e,tp,eg,ep,ev,re,r,rp,chk,c,smat,mg,min,max)
 				local res=syn_target(f1,f2,minc,maxc)(e,tp,eg,ep,ev,re,r,rp,chk,c,smat,mg,min,max)
 				local g=e:GetLabelObject()
-				if g:IsExists(function(tc) return Auxiliary.Polarities[tc] and not Auxiliary.Polarities[tc]() end,1,nil) then
+				if g and g:IsExists(function(tc) return Auxiliary.Polarities[tc] and not Auxiliary.Polarities[tc]() end,1,nil) then
 					g:DeleteGroup()
 					res=false
 				end
