@@ -59,7 +59,7 @@ function c67864746.rmop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c67864746.desfilter(c)
-	return c:Race(RACE_PSYCHO) and c:IsAbleToRemoveAsCost()
+	return c:IsRace(RACE_PSYCHO) and c:IsAbleToRemoveAsCost()
 end
 function c67864746.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c67864746.desfilter,tp,LOCATION_GRAVE,0,1,nil) end
