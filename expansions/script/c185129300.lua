@@ -2,6 +2,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	c:SetUniqueOnField(1,0,id)
+	c:SetSPSummonOnce(c,id)
 	c:EnableReviveLimit()
 	aux.AddXyzProcedureLevelFree(c,s.mfilter,s.xyzcheck,2,99)
 	local e1=Effect.CreateEffect(c)
