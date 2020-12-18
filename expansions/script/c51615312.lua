@@ -34,7 +34,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e5)
 	local e6=e4:Clone()
 	e6:SetCode(EFFECT_IMMUNE_EFFECT)
-	e6:SetValue(aux.TargetBoolFunction(aux.NOT(Effect.IsHasProperty),EFFECT_FLAG_CARD_TARGET))
+	e6:SetValue(function(e,re) return re and re:GetHandlerPlayer()~=e:GetHandlerPlayer() and not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) end)
 	c:RegisterEffect(e6)
 	local e7=Effect.CreateEffect(c)
 	e7:SetType(EFFECT_TYPE_FIELD)
@@ -51,7 +51,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e8)
 end
 function s.mfilter(c,tp,sc)
-	return c:IsCanBeTimeleapMaterial(sc) and c:GetLevel()==sc:GetFuture()-1 and Duel.GetLocationCountFromEx(tp,tp,c,TYPE_TIMELEAP)>0
+	return c:IsCanBeTimeleapMaterial(sc) and c:GetLevel()==sc:GetFuture()-1 and Duel.GetLocationCountFromEx(tp,tp,c,sc)>0
 end
 function s.spfilter(c,e,tp)
 	if not Duel.IsExistingMatchingCard(s.mfilter,tp,LOCATION_MZONE,0,1,nil,tp,c) or not c:IsSetCard(0xcfd)
@@ -69,13 +69,13 @@ function s.spfilter(c,e,tp)
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) or Duel.GetFlagEffect(tp,id)>0 or Duel.GetLocationCount(tp,LOCATION_MZONE)<=-1 then return end
+	if not c:IsRelateToEffect(e) or Duel.GetFlagEffect(tp,id)>0 then return end
 	local mg=Duel.GetMatchingGroup(Card.IsType,tp,LOCATION_EXTRA,0,nil,TYPE_TIMELEAP)
 	for tc in aux.Next(mg) do
 		local ef=Effect.CreateEffect(c)
 		ef:SetType(EFFECT_TYPE_SINGLE)
 		ef:SetCode(EFFECT_IGNORE_TIMELEAP_HOPT)
-		ef:SetReset(RESET_EVENT+RESET_DISABLE)
+		ef:SetReset(RESET_EVENT+RESET_CONTROL)
 		tc:RegisterEffect(ef)
 	end
 	local g=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_EXTRA,0,nil,e,tp)
@@ -83,15 +83,16 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local sc=g:Select(tp,1,1,nil):GetFirst()
 		mg:RemoveCard(sc)
-		local tl=Duel.GetFlagEffect(tp,828)==0
+		local tl=Duel.GetFlagEffect(tp,828)
 		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e1:SetCode(EVENT_SPSUMMON)
-		e1:SetOperation(function() if not sc:IsSummonType(SUMMON_TYPE_TIMELEAP) then return end if tl then Duel.ResetFlagEffect(tp,828) end sc:ResetEffect(RESET_DISABLE,RESET_EVENT) e1:Reset() end)
-		sc:RegisterEffect(e1,true)
+		e1:SetOperation(function(ef,p,tg) if tg:GetFirst()~=sc then return end if tl==0 then Duel.ResetFlagEffect(tp,828) end sc:ResetEffect(RESET_CONTROL,RESET_EVENT) e1:Reset() end)
+		Duel.RegisterEffect(e1,tp)
 		Duel.SpecialSummonRule(tp,sc)
 		Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
 	end
+	for tc in aux.Next(mg) do tc:ResetEffect(RESET_CONTROL,RESET_EVENT) end
 end
 function s.con(e,tp)
 	return Duel.GetMatchingGroup(aux.AND(Card.IsFaceup,Card.IsSetCard),tp,LOCATION_MZONE,0,nil,0x1cfd):GetClassCount(Card.GetCode)>e:GetLabel()

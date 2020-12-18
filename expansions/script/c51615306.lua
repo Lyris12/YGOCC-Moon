@@ -28,7 +28,7 @@ function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingTarget(nil,tp,0,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,Duel.SelectTarget(tp,nil,tp,0,LOCATION_MZONE,1,1,nil),1,0,0)
-	Duel.SetChainLimit(function(ef,rpr) return rpr==tp or not ef:GetHandler():IsType(TYPE_MONSTER) end)
+	Duel.SetChainLimit(function(ef,rpr,p) return rpr==p or not ef:GetHandler():IsType(TYPE_MONSTER) end)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
