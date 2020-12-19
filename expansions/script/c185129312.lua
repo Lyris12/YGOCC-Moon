@@ -60,7 +60,7 @@ function s.atkfilter(c)
 	return c:GetSummonLocation()==LOCATION_EXTRA
 end
 function s.atkval(e,c)
-	return Duel.GetMatchingGroupCount(s.atkfilter,c:GetControler(),LOCATION_MZONE,0,nil)*500
+	return Duel.GetMatchingGroupCount(s.atkfilter,c:GetControler(),0,LOCATION_MZONE,nil)*500
 end
 function s.thfilter(c)
 	return c:IsSetCard(0x1145) and c:IsAbleToHand()
