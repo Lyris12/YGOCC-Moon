@@ -1,7 +1,7 @@
 --Spiral Drill - Brothers
-local m=32957213
-local cm=_G["c"..m]
-function cm.initial_effect(c)
+--Script by TaxingCorn117
+local cid,id=GetID()
+function cid.initial_effect(c)
 	--pierce
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)

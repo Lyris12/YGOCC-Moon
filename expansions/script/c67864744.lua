@@ -44,7 +44,7 @@ function c67864744.rmop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c67864744.filter(c,e,tp)
-	return c:IsRace(RACE_PSYCHO) and c:IsAttribute(ATTRIBUTE_DARK) and c:IsLevel(5) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsRace(RACE_PSYCHO) and c:IsAttribute(ATTRIBUTE_DARK) and c:IsLevel(2) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c67864744.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end

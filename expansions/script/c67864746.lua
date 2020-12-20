@@ -57,7 +57,19 @@ function c67864746.rmop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and tc and tc:IsRelateToEffect(e) then
 		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
 	end
+	local e1=Effect.CreateEffect(e:GetHandler())
+e1:SetType(EFFECT_TYPE_FIELD)
+e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+e1:SetTargetRange(1,0)
+e1:SetTarget(c67864746.splimit)
+e1:SetReset(RESET_PHASE+PHASE_END)
+Duel.RegisterEffect(e1,tp)
 end
+function c67864746.splimit(e,c)
+	return not c:IsType(TYPE_SYNCHRO) and c:IsLocation(LOCATION_EXTRA)
+end
+
 function c67864746.desfilter(c)
 	return c:IsRace(RACE_PSYCHO) and c:IsAbleToRemoveAsCost()
 end
