@@ -95,7 +95,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e1:SetCode(EVENT_SPSUMMON)
 		e1:SetOperation(function(ef,p,tg) if tg:GetFirst()~=sc then return end if tl==0 then Duel.ResetFlagEffect(tp,828) end sc:ResetEffect(RESET_CONTROL,RESET_EVENT) e1:Reset() end)
-		sc:RegisterEffect(e1,true)
+		Duel.RegisterEffect(e1,tp)
 		Duel.SpecialSummonRule(tp,sc)
 	end
 	for tc in aux.Next(mg) do tc:ResetEffect(RESET_CONTROL,RESET_EVENT) end
