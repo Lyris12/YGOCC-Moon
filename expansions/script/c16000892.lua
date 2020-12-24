@@ -1,19 +1,19 @@
 --Daddou, Mage of Magnificent Vine
 function c16000892.initial_effect(c)
-		aux.EnablePendulumAttribute(c)
-			--end battle phase
+	aux.EnablePendulumAttribute(c)
+	--end battle phase
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(16000892,0))
-	   e1:SetCategory(CATEGORY_DESTROY)
-	 e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e1:SetCategory(CATEGORY_DESTROY)
+	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e1:SetRange(LOCATION_PZONE)
 	e1:SetCountLimit(1,16000892+EFFECT_COUNT_CODE_DUEL)
 	e1:SetCondition(c16000892.condition)
-   -- e1:SetCost(c16000892.cost)
+	-- e1:SetCost(c16000892.cost)
 	e1:SetOperation(c16000892.operation)
 	c:RegisterEffect(e1)
-			--Search
+	--Search
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(16000892,1))
 	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
@@ -35,13 +35,13 @@ function c16000892.initial_effect(c)
 	e3:SetTarget(c16000892.sumtg)
 	e3:SetOperation(c16000892.sumop)
 	c:RegisterEffect(e3)
-		local e4=e3:Clone()
+	local e4=e3:Clone()
 	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e4)
 	local e5=e3:Clone()
 	e5:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
 	c:RegisterEffect(e5)
-		local e6=Effect.CreateEffect(c)
+	local e6=Effect.CreateEffect(c)
 	e6:SetDescription(aux.Stringid(16000892,3))
 	e6:SetCategory(CATEGORY_TODECK+CATEGORY_DRAW)
 	e6:SetType(EFFECT_TYPE_IGNITION)
@@ -51,31 +51,23 @@ function c16000892.initial_effect(c)
 	e6:SetTarget(c16000892.target2)
 	e6:SetOperation(c16000892.operation2)
 	c:RegisterEffect(e6)
-
 end
-
 function c16000892.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()~=tp 
 end
-function c16000892.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToExtra()  end
-		Duel.Destroy(e:GetHandler(),REASON_COST)
-end
-
 function c16000892.operation(e,tp,eg,ep,ev,re,r,rp)
- local c=e:GetHandler()
+	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) or Duel.Destroy(c,REASON_EFFECT)==0 then return end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e1:SetCode(EFFECT_CANNOT_BP)
+	e1:SetCode(EFFECT_CANNOT_ATTACK_ANNOUNCE)
 	e1:SetTargetRange(0,1)
 	e1:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN,1)
 	Duel.RegisterEffect(e1,tp)
 end
-
 function c16000892.descon1(e,tp,eg,ep,ev,re,r,rp,chk)
-		if chk==0 then return Duel.IsExistingMatchingCard(c16000892.cfilter,tp,LOCATION_HAND,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c16000892.cfilter,tp,LOCATION_HAND,0,1,nil) end
 	Duel.DiscardHand(tp,c16000892.cfilter,1,1,REASON_COST+REASON_DISCARD)
 end
 function c16000892.cfilter(c)
@@ -90,14 +82,14 @@ function c16000892.destg1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c16000892.desop1(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-if  c:IsFaceup() then
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local tg=Duel.SelectMatchingCard(tp,c16000892.xfilter,tp,LOCATION_DECK,0,1,1,nil):GetFirst()
-	if tg then
-		Duel.SendtoHand(tg,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,tg)
+	if c:IsFaceup() then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+		local tg=Duel.SelectMatchingCard(tp,c16000892.xfilter,tp,LOCATION_DECK,0,1,1,nil):GetFirst()
+		if tg then
+			Duel.SendtoHand(tg,nil,REASON_EFFECT)
+			Duel.ConfirmCards(1-tp,tg)
+		end
 	end
-end
 end
 function c16000892.filter(c,e,tp)
 	return c:IsLevelBelow(4) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
@@ -142,7 +134,7 @@ function c16000892.target2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end
 function c16000892.operation2(e,tp,eg,ep,ev,re,r,rp)
-local tg=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
+	local tg=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	if not tg or tg:FilterCount(Card.IsRelateToEffect,nil,e)~=3 then return end
 	Duel.SendtoDeck(tg,nil,0,REASON_EFFECT)
 	local g=Duel.GetOperatedGroup()
