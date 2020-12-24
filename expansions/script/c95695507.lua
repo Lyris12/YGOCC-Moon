@@ -16,7 +16,6 @@ function cid.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCountLimit(1,id+EFFECT_COUNT_CODE_OATH)
-	e1:SetTarget(cid.target)
 	e1:SetOperation(cid.activate)
 	c:RegisterEffect(e1)
 	--spsummon
@@ -47,10 +46,6 @@ function cid.spfilter(c,e,tp)
 	return c:IsSetCard(0x3ff) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 --Activate
-function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_DECK,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
-end
 function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local g=Duel.GetMatchingGroup(cid.filter,tp,LOCATION_DECK,0,nil)

@@ -79,7 +79,7 @@ end
 function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=eg:GetFirst()
-	if tc:IsFaceup() then
+	if tc:IsFaceup() and not tc:IsDisabled() then
 		Duel.NegateRelatedChain(tc,RESET_TURN_SET)
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_SINGLE)
@@ -92,6 +92,8 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 		e3:SetValue(RESET_TURN_SET)
 		e3:SetReset(RESET_EVENT+RESETS_STANDARD)
 		tc:RegisterEffect(e3)
+		Duel.AdjustInstantly()
+		if not tc:IsDisabled() then return end
 		for tc in aux.Next(Duel.GetMatchingGroup(cid.atkfilter,tp,LOCATION_MZONE,0,nil)) do
 			local e1=Effect.CreateEffect(c)
 			e1:SetType(EFFECT_TYPE_SINGLE)
