@@ -46,7 +46,7 @@ end
 function cid.cfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x3ff) and c:IsLocation(LOCATION_ONFIELD)
 end
-function cid.clfilter(c)
+function cid.clfilter(c,tp)
 	return c:IsSetCard(0x3ff)
 		and c:IsType(TYPE_SPELL) and (c:IsLocation(LOCATION_HAND) or c:IsFaceup()) and c:IsAbleToGraveAsCost()
 		and Duel.IsExistingTarget(cid.imfilter,tp,LOCATION_MZONE,0,1,c) 
@@ -68,9 +68,9 @@ function cid.condition(e,tp,eg,ep,ev,re,r,rp)
 	return g and g:IsExists(cid.cfilter,1,nil,tp) and Duel.IsChainNegatable(ev)
 end
 function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(cid.clfilter,tp,LOCATION_HAND+LOCATION_ONFIELD,0,1,e:GetHandler()) end
+	if chk==0 then return Duel.IsExistingMatchingCard(cid.clfilter,tp,LOCATION_HAND+LOCATION_ONFIELD,0,1,e:GetHandler(),tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=Duel.SelectMatchingCard(tp,cid.clfilter,tp,LOCATION_HAND+LOCATION_ONFIELD,0,1,1,e:GetHandler())
+	local g=Duel.SelectMatchingCard(tp,cid.clfilter,tp,LOCATION_HAND+LOCATION_ONFIELD,0,1,1,e:GetHandler(),tp)
 	Duel.SendtoGrave(g,REASON_COST)
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
