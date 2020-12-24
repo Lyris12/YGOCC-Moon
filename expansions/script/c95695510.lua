@@ -48,7 +48,7 @@ function cid.costfilter(c,tp)
 end
 function cid.clfilter(c,tc,tp)
 	local g=tc:GetColumnGroup()
-	return g:IsContains(c) and c:GetControler()~=tp 
+	return g:IsContains(c) and c:IsFaceup()
 end
 function cid.thfilter(c)
 	return c:IsSetCard(0x3ff) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
@@ -58,10 +58,10 @@ function cid.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(cid.cfilter,tp,LOCATION_ONFIELD,0,2,nil)
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_ONFIELD) and cid.costfilter(chkc) and chkc~=e:GetHandler() end
-	if chk==0 then return Duel.IsExistingTarget(cid.costfilter,tp,LOCATION_ONFIELD,0,1,e:GetHandler()) end
+	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_ONFIELD) and cid.costfilter(chkc,tp) and chkc~=e:GetHandler() end
+	if chk==0 then return Duel.IsExistingTarget(cid.costfilter,tp,LOCATION_ONFIELD,0,1,e:GetHandler(),tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	local g=Duel.SelectTarget(tp,cid.costfilter,tp,LOCATION_ONFIELD,0,1,1,e:GetHandler())
+	local g=Duel.SelectTarget(tp,cid.costfilter,tp,LOCATION_ONFIELD,0,1,1,e:GetHandler(),tp)
 	local cl=g:GetFirst():GetColumnGroup():Filter(aux.AND(Card.IsFaceup,Card.IsControler),nil,1-tp)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,cl,#cl,0,0)
 end
@@ -73,8 +73,8 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 --act in hand
-function cid.handcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(cid.cfilter,tp,LOCATION_MZONE,0,1,nil)
+function cid.handcon(e)
+	return Duel.IsExistingMatchingCard(cid.cfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
 end
 --search
 function cid.thtg(e,tp,eg,ep,ev,re,r,rp,chk)

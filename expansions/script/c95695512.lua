@@ -79,8 +79,8 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 --act in hand
-function cid.handcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(cid.cfilter1,tp,LOCATION_MZONE,0,1,nil)
+function cid.handcon(e)
+	return Duel.IsExistingMatchingCard(cid.cfilter1,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
 end
 --remove
 function cid.rmcon(e,tp,eg,ep,ev,re,r,rp)
