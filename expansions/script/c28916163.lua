@@ -50,7 +50,7 @@ function ref.operation0(e,tp,eg,ep,ev,re,r,rp)
 end
 
 function ref.flipfilter(c)
-	return c:IsFacedown() and (c:IsLocation(LOCATION_MZONE) or c:IsType(TYPE_CONTINUOUS) or (c:IsType(TYPE_FIELD) and c:IsType(TYPE_SPELL)))
+	return c:IsFacedown() and (c:IsLocation(LOCATION_MZONE) or c:IsType(TYPE_CONTINUOUS) or (c:IsType(TYPE_FIELD) and c:IsType(TYPE_SPELL))) and c:IsSetCard(1856)
 end
 function ref.thfilter(c)
 	return c:IsSetCard(1856) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToHand()

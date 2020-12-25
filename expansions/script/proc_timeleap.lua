@@ -111,7 +111,7 @@ Auxiliary.SynTarget=function(f1,f2,minc,maxc)
 	return	function(e,tp,eg,ep,ev,re,r,rp,chk,c,smat,mg,min,max)
 				local res=syn_target(f1,f2,minc,maxc)(e,tp,eg,ep,ev,re,r,rp,chk,c,smat,mg,min,max)
 				local g=e:GetLabelObject()
-				if g:IsExists(function(tc) return Auxiliary.Timeleaps[tc] and not Auxiliary.Timeleaps[tc]() end,1,nil) then
+				if g and g:IsExists(function(tc) return Auxiliary.Timeleaps[tc] and not Auxiliary.Timeleaps[tc]() end,1,nil) then
 					g:DeleteGroup()
 					res=false
 				end
@@ -359,6 +359,7 @@ function Auxiliary.TimeleapTarget(filter,...)
 end
 function Auxiliary.TimeleapOperation(customop)
 	return  function(e,tp,eg,ep,ev,re,r,rp,c)
+				if Duel.SetSummonCancelable then Duel.SetSummonCancelable(true) end
 				local g=e:GetLabelObject()
 				c:SetMaterial(g)
 				if not customop then
