@@ -84,7 +84,7 @@ local c=e:GetHandler()
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_EQUIP_LIMIT)
 	e1:SetReset(RESET_EVENT+0x1fe0000)
-	e1:SetValue(c16000021.eqlimit)
+	e1:SetValue(c16000025.eqlimit)
 	e1:SetLabelObject(tc)
 	c:RegisterEffect(e1)
 	   --Atk up

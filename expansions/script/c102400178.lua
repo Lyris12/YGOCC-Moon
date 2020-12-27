@@ -77,7 +77,7 @@ function s.SpatialCondition(e,c)
 	if fg:IsExists(aux.MustMaterialCounterFilter,1,nil,mg) then return false end
 	Duel.SetSelectedCard(fg)
 	local sg=Group.CreateGroup()
-	return mg:IsExists(aux.SptCheckRecursive,1,nil,tp,sg,mg,c,0,djn,nil,aux.FilterBoolFunction(Card.IsSetCard,0xc97),1,99,s.mfilter,1,99)
+	return mg:IsExists(aux.SptCheckRecursive,1,nil,tp,sg,mg,c,0,djn,nil,{aux.FilterBoolFunction(Card.IsSetCard,0xc97),1,99},{s.mfilter,1,99})
 end
 function s.SpatialTarget(e,tp,eg,ep,ev,re,r,rp,chk,c)
 	local mg=Duel.GetMatchingGroup(Card.IsCanBeSpaceMaterial,tp,LOCATION_HAND,0,nil,c)
@@ -96,9 +96,9 @@ function s.SpatialTarget(e,tp,eg,ep,ev,re,r,rp,chk,c)
 	sg:Merge(bg)
 	local finish=false
 	local djn=c:GetDimensionNo()
-	while #sg<max do
-		finish=aux.SptCheckGoal(tp,sg,c,#sg,nil,aux.FilterBoolFunction(Card.IsSetCard,0xc97),1,s.mfilter,1)
-		local cg=mg:Filter(aux.SptCheckRecursive,sg,tp,sg,mg,c,#sg,djn,nil,aux.FilterBoolFunction(Card.IsSetCard,0xc97),1,99,s.mfilter,1,99)
+	while #sg<99 do
+		finish=aux.SptCheckGoal(tp,sg,c,#sg,nil,{aux.FilterBoolFunction(Card.IsSetCard,0xc97),1},{s.mfilter,1})
+		local cg=mg:Filter(aux.SptCheckRecursive,sg,tp,sg,mg,c,#sg,djn,nil,{aux.FilterBoolFunction(Card.IsSetCard,0xc97),1,99},{s.mfilter,1,99})
 		if #cg==0 then break end
 		local cancel=not finish
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
@@ -107,7 +107,7 @@ function s.SpatialTarget(e,tp,eg,ep,ev,re,r,rp,chk,c)
 		if not bg:IsContains(tc) then
 			if not sg:IsContains(tc) then
 				sg:AddCard(tc)
-				if (#sg>=max) then finish=true end
+				if (#sg>=99) then finish=true end
 			else
 				sg:RemoveCard(tc)
 			end

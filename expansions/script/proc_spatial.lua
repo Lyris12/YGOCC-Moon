@@ -361,7 +361,6 @@ function Auxiliary.SpatialOperation(e,tp,eg,ep,ev,re,r,rp,c,smat,mg)
 				else rg:AddCard(tc) end
 			end
 		else rg:AddCard(tc) end
-		tc=g:GetNext()
 	end
 	Duel.Remove(rg,POS_FACEUP,REASON_MATERIAL+REASON_SPATIAL)
 	g:DeleteGroup()

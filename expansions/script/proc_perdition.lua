@@ -220,8 +220,7 @@ end
 function Auxiliary.PerditionOperation(e,tp,eg,ep,ev,re,r,rp,c,smat,mg)
 	local g=e:GetLabelObject()
 	c:SetMaterial(g)
-	local tc=g:GetFirst()
-	while tc do
+	for tc in aux.Next(g) do
 		if c:IsHasEffect(EFFECT_EXTRA_PERDITION_MATERIAL) then
 			local tef={tc:IsHasEffect(EFFECT_EXTRA_PERDITION_MATERIAL)}
 			for _,te in ipairs(tef) do
@@ -235,7 +234,6 @@ function Auxiliary.PerditionOperation(e,tp,eg,ep,ev,re,r,rp,c,smat,mg)
 		else
 			Duel.Remove(tc,POS_FACEUP,REASON_MATERIAL+REASON_PERDITION)
 		end
-		tc=g:GetNext()
 	end
 	g:DeleteGroup()
 end

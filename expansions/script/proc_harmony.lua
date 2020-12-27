@@ -246,8 +246,7 @@ function Auxiliary.HarmonyOperation(ph)
 	return  function(e,tp,eg,ep,ev,re,r,rp,c,smat,mg)
 				local g=e:GetLabelObject()
 				c:SetMaterial(g)
-				local tc=g:GetFirst()
-				while tc do
+				for tc in aux.Next(g) do
 					if c:IsHasEffect(EFFECT_EXTRA_HARMONIZED_MATERIAL) then
 						local tef={tc:IsHasEffect(EFFECT_EXTRA_HARMONIZED_MATERIAL)}
 						for _,te in ipairs(tef) do
@@ -261,7 +260,6 @@ function Auxiliary.HarmonyOperation(ph)
 					else
 						Duel.SendtoDeck(tc,nil,2,REASON_MATERIAL+REASON_HARMONY)
 					end
-					tc=g:GetNext()
 				end
 				g:DeleteGroup()
 				local p

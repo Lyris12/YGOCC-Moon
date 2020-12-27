@@ -437,9 +437,8 @@ end
 function Auxiliary.EvoluteOperation(e,tp,eg,ep,ev,re,r,rp,c,smat,mg)
 	local g=e:GetLabelObject()
 	c:SetMaterial(g)
-	local tc=g:GetFirst()
 	local lvTotal=0
-	while tc do
+	for tc in aux.Next(g) do
 		lvTotal = lvTotal + tc:GetValueForEvolute(c)
 		if not tc:IsLocation(LOCATION_MZONE) then
 			local tef={tc:IsHasEffect(EFFECT_EXTRA_EVOLUTE_MATERIAL)}
@@ -463,7 +462,6 @@ function Auxiliary.EvoluteOperation(e,tp,eg,ep,ev,re,r,rp,c,smat,mg)
 		e2:SetOperation(function() e1:Reset() e2:Reset() end)
 		tc:RegisterEffect(e2)
 		e1:SetLabelObject(e2)
-		tc=g:GetNext()
 	end
 	--Set Maximum for Convergents
 	local cone={c:IsHasEffect(EFFECT_CONVERGENT_EVOLUTE)}
@@ -477,8 +475,7 @@ function Auxiliary.ECSumFilter(c)
 end
 function Auxiliary.EvoluteCounter(e,tp,eg,ep,ev,re,r,rp,c,smat,mg)
 	local g=eg:Filter(Auxiliary.ECSumFilter,nil)
-	local tc=g:GetFirst()
-	while tc do
+	for tc in aux.Next(g) do
 		if not tc:IsHasEffect(EFFECT_CONVERGENT_EVOLUTE) then tc:AddEC(tc:GetStage(),tp) end
 		if tc:IsHasEffect(EFFECT_CONVERGENT_EVOLUTE) then 
 			local cone={tc:IsHasEffect(EFFECT_CONVERGENT_EVOLUTE)}
@@ -494,6 +491,5 @@ function Auxiliary.EvoluteCounter(e,tp,eg,ep,ev,re,r,rp,c,smat,mg)
 			end
 			tc:AddEC(val)]]
 		end
-		tc=g:GetNext()
 	end
 end
