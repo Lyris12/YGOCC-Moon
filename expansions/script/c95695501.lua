@@ -42,6 +42,7 @@ end
 --filters
 function cid.setfilter(c)
 	return c:IsSetCard(0x3ff) and c:IsType(TYPE_SPELL) and c:IsSSetable()
+		and (Duel.GetLocationCount(tp,LOCATION_SZONE)>0 or c:IsType(TYPE_FIELD))
 end
 function cid.cfilter(c,tp)
 	return c:IsFaceup() and c:IsSetCard(0x3ff) and c:IsType(TYPE_SPELL)

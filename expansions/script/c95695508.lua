@@ -71,10 +71,10 @@ function cid.thop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local ex=Duel.GetDecktopGroup(tp,5)
 	Duel.ConfirmCards(tp,ex)
-	Duel.SortDecktop(tp,tp,5)
 	local t={}
 	for i=0,#ex do table.insert(t,i) end
 	local j=Duel.AnnounceNumber(tp,table.unpack(t))
+	Duel.SortDecktop(tp,tp,5)
 	for k=1,j do Duel.MoveSequence(Duel.GetDecktopGroup(tp,1):GetFirst(),1) end
 	Duel.BreakEffect()
 	Duel.ConfirmCards(tp,Duel.GetDecktopGroup(tp,5-j))
