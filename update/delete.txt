@@ -1,1 +1,8 @@
 ﻿# Delete List (Codepage is UTF-8, please use TAB to seperate entries, Use Relative Address.)
+expansions\pics\field\1392002.jpg
+expansions\pics\field\2320004.png
+expansions\pics\field\4200122.png
+expansions\pics\field\11000120.jpg
+expansions\pics\field\36541449.png
+expansions\pics\field\53313927.jpg
+expansions\pics\field\84607231.png
