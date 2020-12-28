@@ -2,7 +2,7 @@
 local id,cod=23251021,c23251021
 function cod.initial_effect(c)
 	--Synchro Summon
-	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0xd3e),aux.NonTuner(Card.IsSetCode,0xd3e),1)
+	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0xd3e),aux.NonTuner(Card.IsSetCard,0xd3e),1)
 	c:EnableReviveLimit()
 	--
 	local e1=Effect.CreateEffect(c)

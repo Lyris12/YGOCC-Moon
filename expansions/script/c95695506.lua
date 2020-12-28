@@ -34,7 +34,7 @@ function cid.costfilter(c)
 	return c:IsSetCard(0x3ff) and c:IsAbleToRemoveAsCost()
 end
 function cid.atkfilter(c)
-	return (c:IsFaceup() or c:IsLocation(LOCATION_GRAVE)) and c:IsSetCard(0x3ff) and c:IsType(TYPE_SPELL)
+	return (c:IsFaceup() or c:IsLocation(LOCATION_GRAVE)) and c:IsSetCard(0x3ff)
 end
 --activate
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -57,5 +57,5 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 --atk
 function cid.atkval(e,c)
-	return Duel.GetMatchingGroupCount(cid.atkfilter,0,LOCATION_GRAVE+LOCATION_REMOVED,LOCATION_REMOVED,nil)*200
+	return Duel.GetMatchingGroupCount(cid.atkfilter,e:GetHandlerPlayer(),LOCATION_GRAVE+LOCATION_REMOVED,LOCATION_REMOVED,nil)*200
 end
