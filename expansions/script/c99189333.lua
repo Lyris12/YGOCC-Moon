@@ -18,6 +18,7 @@ function cid.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
 	e1:SetRange(LOCATION_HAND)
 	e1:SetCondition(cid.spcon)
+	e1:SetTarget(cid.sptg)
 	e1:SetOperation(cid.spop)
 	c:RegisterEffect(e1)
 	--spsummon condition
@@ -30,7 +31,7 @@ function cid.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e2:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
+	e2:SetProperty(EFFECT_FLAG_DELAY)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e2:SetCondition(cid.skipcon)
 	e2:SetTarget(cid.skiptg)
@@ -77,13 +78,23 @@ end
 function cid.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	return Duel.GetLocationCount(tp,LOCATION_MZONE)>-3 and Duel.CheckReleaseGroup(tp,cid.spfilter,3,nil)
+	local rg=Duel.GetReleaseGroup(tp):Filter(cid.spfilter,nil)
+	return rg:CheckSubGroup(aux.mzctcheck,3,3,tp)
+end
+function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk,c)
+	local rg=Duel.GetReleaseGroup(tp):Filter(cid.spfilter,nil)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
+	local sg=rg:SelectSubGroup(tp,aux.mzctcheck,true,3,3,tp)
+	if sg then
+		sg:KeepAlive()
+		e:SetLabelObject(sg)
+		return true
+	else return false end
 end
 function cid.spop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g1=Duel.SelectReleaseGroup(tp,cid.spfilter,3,3,nil)
-	if Duel.Release(g1,REASON_COST)~=0 then
-		local og=Duel.GetOperatedGroup()
-		local b1,b2,b3=og:IsExists(cid.checktribute,1,nil,id-4),og:IsExists(cid.checktribute,1,nil,id-3),og:IsExists(cid.checktribute,1,nil,id-2)
+	local g=e:GetLabelObject()
+	if Duel.Release(g,REASON_COST)~=0 then
+		local b1,b2,b3=g:IsExists(cid.checktribute,1,nil,id-4),og:IsExists(cid.checktribute,1,nil,id-3),og:IsExists(cid.checktribute,1,nil,id-2)
 		if b1 and b2 and b3 then
 			e:SetValue(SUMMON_TYPE_SPECIAL+2)
 			local e2x=Effect.CreateEffect(c)
@@ -96,6 +107,7 @@ function cid.spop(e,tp,eg,ep,ev,re,r,rp,c)
 			c:RegisterEffect(e2x)
 		end
 	end
+	g:DeleteGroup()
 end
 function cid.resetcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetLabelObject():GetValue()==SUMMON_TYPE_SPECIAL+2

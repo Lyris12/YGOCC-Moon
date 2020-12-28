@@ -79,5 +79,7 @@ function cm.tdop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_MESSAGE,tp,aux.Stringid(m,1))
 	Duel.Hint(HINT_MESSAGE,1-tp,aux.Stringid(m,1))
 	local g=Duel.GetMatchingGroup(Card.IsAbleToDeck,tp,LOCATION_HAND+LOCATION_ONFIELD+LOCATION_GRAVE+LOCATION_REMOVED,LOCATION_HAND+LOCATION_ONFIELD+LOCATION_GRAVE+LOCATION_REMOVED,aux.ExceptThisCard(e))
-	Duel.SendtoDeck(g,nil,2,REASON_EFFECT)
+	if #g>0 then
+		Duel.SendtoDeck(g,nil,2,REASON_EFFECT)
+	end
 end

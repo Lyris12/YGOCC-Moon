@@ -41,7 +41,7 @@ function cid.initial_effect(c)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e3:SetCountLimit(1,id+200)
-	e3:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_END_PHASE)
+	e3:SetHintTiming(0,TIMINGS_CHECK_MONSTER)
 	e3:SetCondition(cid.drycon)
 	e3:SetCost(cid.drycost)
 	e3:SetTarget(cid.drytg)
@@ -51,7 +51,7 @@ function cid.initial_effect(c)
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(id,3))
 	e4:SetCategory(CATEGORY_REMOVE)
-	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e4:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetCountLimit(1,id+300)
@@ -62,8 +62,8 @@ function cid.initial_effect(c)
 end
 --filters
 function cid.cfilter(c,ft,tp)
-	return c:IsSetCard(0x5477) and c:IsType(TYPE_MONSTER)
-		and (ft>0 or (c:IsControler(tp) and c:GetSequence()<5)) and (c:IsControler(tp) or c:IsFaceup())
+	return c:IsSetCard(0x5477) and c:IsType(TYPE_MONSTER) and c:IsFaceup()
+		and (ft>0 or (c:IsControler(tp) and c:GetSequence()<5))
 end
 function cid.millfilter(c)
 	return c:IsSetCard(0x5477) and c:IsType(TYPE_MONSTER) and c:IsAbleToGrave()
@@ -85,6 +85,7 @@ function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
 function cid.spop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
 	Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
@@ -118,7 +119,7 @@ function cid.drycon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2
 end
 function cid.drycost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,e:GetHandler()) end
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,nil) end
 	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD)
 	if Duel.GetCurrentPhase()==PHASE_STANDBY and Duel.GetTurnPlayer()~=tp then
 		e:GetHandler():RegisterFlagEffect(id+100,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_STANDBY+RESET_OPPO_TURN,0,2,Duel.GetTurnCount())
@@ -146,7 +147,7 @@ function cid.rmcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function cid.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local rg=Duel.GetDecktopGroup(1-tp,3)
-	if chk==0 then return rg:FilterCount(Card.IsAbleToRemove,nil)==3 end
+	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,rg,3,0,0)
 end
 function cid.rmop(e,tp,eg,ep,ev,re,r,rp)

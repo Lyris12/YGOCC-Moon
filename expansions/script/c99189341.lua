@@ -61,7 +61,6 @@ end
 --Activate
 function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	if e:GetProperty()&EFFECT_FLAG_PLAYER_TARGET>0 then e:SetProperty(e:GetProperty()&(~EFFECT_FLAG_PLAYER_TARGET)) end
 	if Duel.GetCurrentPhase()==PHASE_STANDBY and Duel.GetTurnPlayer()==tp then
 		e:GetHandler():RegisterFlagEffect(id,RESET_EVENT+(RESETS_STANDARD-RESET_TOGRAVE-RESET_LEAVE)+RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN,0,2,Duel.GetTurnCount())
 	else
@@ -75,7 +74,6 @@ function cid.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local g=Duel.SelectTarget(tp,cid.filter,tp,LOCATION_MZONE,0,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_POSITION,g,1,0,0)
 	if g:GetFirst():GetLevel()>0 then
-		e:SetProperty(e:GetProperty()|EFFECT_FLAG_PLAYER_TARGET)
 		local lv=g:GetFirst():GetLevel()
 		Duel.SetTargetPlayer(tp)
 		Duel.SetTargetParam(lv*300)

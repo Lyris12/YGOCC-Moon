@@ -9,26 +9,27 @@ end
 local id,cid=getID()
 function cid.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
-                e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:SetDescription(aux.Stringid(id,0))
+    e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-                e2:SetCode(EVENT_SUMMON_SUCCESS)
+    e2:SetCode(EVENT_SUMMON_SUCCESS)
 	e2:SetCountLimit(1,id)
 	e2:SetCost(cid.rmcost)
 	e2:SetTarget(cid.rmtg)
 	e2:SetOperation(cid.rmop)
 	c:RegisterEffect(e2)
-                local e2x=e2:Clone()
-                e2x:SetCode(EVENT_SPSUMMON_SUCCESS)
-                c:RegisterEffect(e2x)
-
+	local e2x=e2:Clone()
+	e2x:SetCode(EVENT_SPSUMMON_SUCCESS)
+	c:RegisterEffect(e2x)
 	--to hand
 	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_TOHAND)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1,id+10000)
-                e3:SetCondition(cid.tdcon1)
+    e3:SetCondition(cid.tdcon1)
 	e3:SetCost(cid.thcost)
 	e3:SetTarget(cid.thtg)
 	e3:SetOperation(cid.thop)
@@ -38,7 +39,6 @@ function cid.initial_effect(c)
 	e3x:SetCode(EVENT_FREE_CHAIN)
 	e3x:SetCondition(cid.tdcon2)
 	c:RegisterEffect(e3x)
-
 end
 function cid.tdcon1(e,tp,eg,ep,ev,re,r,rp)
 	return not Duel.IsPlayerAffectedByEffect(tp,21022007)
@@ -50,9 +50,9 @@ function cid.rmfilter(c,atk)
 	return c:IsSetCard(0x312) and c:IsAbleToHand()
 end
 function cid.rmcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToRemoveAsCost,tp,LOCATION_HAND,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToRemoveAsCost,tp,LOCATION_HAND,0,1,nil,POS_FACEDOWN) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToRemoveAsCost,tp,LOCATION_HAND,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToRemoveAsCost,tp,LOCATION_HAND,0,1,1,nil,POS_FACEDOWN)
 	Duel.Remove(g,POS_FACEDOWN,REASON_COST)
 end
 function cid.spfilter(c,e,tp)
@@ -85,7 +85,7 @@ function cid.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and cid.thfilter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(cid.thfilter,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectTarget(tp,cid.thfilter,tp,LOCATION_GRAVE,0,1,1,nil)
+	local g=Duel.SelectTarget(tp,aux.NecroValleyFilter(cid.thfilter),tp,LOCATION_GRAVE,0,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
 end
 function cid.thop(e,tp,eg,ep,ev,re,r,rp)

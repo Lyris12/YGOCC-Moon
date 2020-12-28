@@ -32,10 +32,10 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function cid.value(e,c)
-	return Duel.GetMatchingGroupCount(Card.IsFacedown,c:GetControler(),LOCATION_REMOVED, LOCATION_REMOVED,nil)*300
+	return Duel.GetMatchingGroupCount(Card.IsFacedown,c:GetControler(),LOCATION_REMOVED,LOCATION_REMOVED,nil)*300
 end
 function cid.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0x312)
+	return c:IsFaceup() and c:IsType(TYPE_MONSTER) and c:IsSetCard(0x312)
 end
 function cid.spcon(e,c)
 	if c==nil then return true end

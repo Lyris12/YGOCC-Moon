@@ -39,17 +39,18 @@ function c212330.initial_effect(c)
 	c:RegisterEffect(e5)
 end
 function c212330.cfilter(c,tp)
-	return c:IsPreviousSetCard(0x2500) and c:IsReason(REASON_RELEASE) and c:IsPreviousLocation(LOCATION_MZONE) and c:GetPreviousControler()==tp
+	return c:IsPreviousSetCard(0x2500) and c:GetPreviousTypeOnField()&TYPE_MONSTER>0 and c:IsPreviousLocation(LOCATION_MZONE) and c:GetPreviousControler()==tp
 end
 function c212330.drcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c212330.cfilter,1,nil,tp)
 end
 function c212330.drop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_CARD,0,e:GetHandler():GetCode())
+	Duel.Hint(HINT_CARD,tp,212330)
+	Duel.Hint(HINT_CARD,1-tp,212330)
 	Duel.Draw(tp,1,REASON_EFFECT)
 end
 function c212330.indtg(e,c)
-	return c:IsSetCard(0x2500) or (c:IsLocation(LOCATION_MZONE) and c:IsSetCard(0x2500))
+	return c:IsSetCard(0x2500)
 end
 function c212330.indval(e,re,r,rp)
 	return bit.band(r,REASON_EFFECT)~=0

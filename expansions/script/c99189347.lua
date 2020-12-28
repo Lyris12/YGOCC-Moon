@@ -119,9 +119,7 @@ function cid.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function cid.negop(e,tp,eg,ep,ev,re,r,rp)
 	if not Duel.NegateActivation(ev) then return end
-	local rc=re:GetHandler()
-	if rc:IsRelateToEffect(re) then
-		rc:CancelToGrave()
+	if re:GetHandler():IsRelateToEffect(re) then
 		Duel.SendtoDeck(eg,nil,2,REASON_EFFECT)
 	end
 end

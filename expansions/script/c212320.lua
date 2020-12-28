@@ -56,8 +56,8 @@ function c212320.drop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c212320.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsAttribute,1,c,ATTRIBUTE_LIGHT) end
-	local rg=Duel.SelectReleaseGroup(tp,Card.IsAttribute,1,1,c,ATTRIBUTE_LIGHT)
+	if chk==0 then return Duel.CheckReleaseGroup(tp,aux.AND(Card.IsFaceup,Card.IsAttribute),1,c,ATTRIBUTE_LIGHT) end
+	local rg=Duel.SelectReleaseGroup(tp,aux.AND(Card.IsFaceup,Card.IsAttribute),1,1,c,ATTRIBUTE_LIGHT)
 	Duel.Release(rg,REASON_COST)
 end
 function c212320.disfilter(c)
@@ -67,7 +67,8 @@ function c212320.distg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and c212320.disfilter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c212320.disfilter,tp,0,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	Duel.SelectTarget(tp,c212320.disfilter,tp,0,LOCATION_MZONE,1,1,nil)
+	local g=Duel.SelectTarget(tp,c212320.disfilter,tp,0,LOCATION_MZONE,1,1,nil)
+	Duel.SetOperationInfo(0,CATEGORY_DISABLE,g,#g,0,0)
 end
 function c212320.disop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -85,6 +86,14 @@ function c212320.disop(e,tp,eg,ep,ev,re,r,rp)
 		e3:SetValue(RESET_TURN_SET)
 		e3:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e3)
+		if tc:IsType(TYPE_TRAPMONSTER) then
+			local e4=Effect.CreateEffect(c)
+			e4:SetType(EFFECT_TYPE_SINGLE)
+			e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+			e4:SetCode(EFFECT_DISABLE_TRAPMONSTER)
+			e4:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+			tc:RegisterEffect(e4)
+		end
 	end
 end
 function c212320.spcon(e,tp,eg,ep,ev,re,r,rp)
@@ -96,7 +105,8 @@ function c212320.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
 function c212320.spop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	if e:GetHandler():IsRelateToEffect(e) then
-		Duel.SpecialSummon(e:GetHandler(),1,tp,tp,false,false,POS_FACEUP)
+		Duel.SpecialSummon(e:GetHandler(),0,tp,tp,false,false,POS_FACEUP)
 	end
 end

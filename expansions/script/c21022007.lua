@@ -8,11 +8,11 @@ local function getID()
 end
 local id,cid=getID()
 function cid.initial_effect(c)
-               c:SetUniqueOnField(1,0,id)
-               --fusion material	
-               c:EnableReviveLimit()
-               aux.AddFusionProcFunRep(c,aux.FilterBoolFunction(Card.IsFusionSetCard,0x312),2,true)
-               aux.AddContactFusionProcedure(c,Card.IsAbleToRemoveAsCost,LOCATION_MZONE,0,Duel.Remove,POS_FACEDOWN,REASON_COST)
+   c:SetUniqueOnField(1,0,id)
+   --fusion material	
+   c:EnableReviveLimit()
+   aux.AddFusionProcFunRep(c,aux.FilterBoolFunction(Card.IsFusionSetCard,0x312),2,true)
+   aux.AddContactFusionProcedure(c,cid.ffilter,LOCATION_MZONE,0,Duel.Remove,POS_FACEDOWN,REASON_COST)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -30,14 +30,18 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e2)
 	--tohand
 	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(id,0))
 	e3:SetType(EFFECT_TYPE_QUICK_O)
-                e3:SetCode(EVENT_FREE_CHAIN)
-                e3:SetRange(LOCATION_MZONE)
+    e3:SetCode(EVENT_FREE_CHAIN)
+    e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1,id)
-                e3:SetCost(cid.setcost)
+    e3:SetCost(cid.setcost)
 	e3:SetTarget(cid.settg)
 	e3:SetOperation(cid.setop)
 	c:RegisterEffect(e3)
+end
+function cid.ffilter(c)
+	return c:IsAbleToRemoveAsCost(POS_FACEDOWN)
 end
 function cid.splimit(e,se,sp,st)
 	return e:GetHandler():GetLocation()~=LOCATION_EXTRA
@@ -51,8 +55,10 @@ end
 function cid.setcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cid.cfilter,tp,LOCATION_REMOVED,0,2,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g=Duel.SelectMatchingCard(tp,cid.cfilter,tp,LOCATION_REMOVED,0,2,2,e:GetHandler())
-	Duel.SendtoDeck(g,nil,2,REASON_COST)
+	local g=Duel.SelectMatchingCard(tp,cid.cfilter,tp,LOCATION_REMOVED,0,2,2,nil)
+	if #g>0 then
+		Duel.SendtoDeck(g,nil,2,REASON_COST)
+	end
 end
 function cid.settg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0

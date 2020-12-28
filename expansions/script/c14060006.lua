@@ -27,7 +27,7 @@ function cm.initial_effect(c)
 	--To grave
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(m,1))
-	e2:SetCategory(CATEGORY_DECKDES)
+	e2:SetCategory(CATEGORY_TOGRAVE)
 	e2:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_EXTRA)
@@ -51,6 +51,9 @@ function cm.rettg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return not c:IsForbidden() end
 	Duel.SetOperationInfo(0,CATEGORY_TOEXTRA,c,1,0,0)
+	if c:IsLocation(LOCATION_GRAVE) then
+		Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,c,1,0,0)
+	end
 end
 function cm.retop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

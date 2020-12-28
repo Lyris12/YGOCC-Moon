@@ -7,7 +7,7 @@ function cm.initial_effect(c)
 	e1:SetDescription(aux.Stringid(m,0))
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e1:SetType(EFFECT_TYPE_IGNITION)
-	e1:SetRange(LOCATION_ONFIELD)
+	e1:SetRange(LOCATION_MZONE+LOCATION_SZONE)
 	e1:SetCountLimit(1,m)
 	e1:SetCondition(cm.con)
 	e1:SetTarget(cm.thtg)
@@ -42,6 +42,7 @@ function cm.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
 function cm.thop(e,tp,eg,ep,ev,re,r,rp)
+	if e:IsActiveType(TYPE_SPELL+TYPE_CONTINUOUS) and not e:GetHandler():IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,cm.filter,tp,LOCATION_DECK,0,1,1,nil)
 	if g:GetCount()>0 then

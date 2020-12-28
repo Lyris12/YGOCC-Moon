@@ -22,7 +22,7 @@ function cm.initial_effect(c)
 	--To grave
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(m,1))
-	e3:SetCategory(CATEGORY_DECKDES)
+	e3:SetCategory(CATEGORY_TOGRAVE)
 	e3:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_DECK)
@@ -47,8 +47,10 @@ function cm.activate(e,tp,eg,ep,ev,re,r,rp)
 			local tc=Duel.IsExistingMatchingCard(Card.IsAbleToGrave,tp,LOCATION_HAND,0,1,nil)
 			if tc and Duel.SelectYesNo(tp,aux.Stringid(m,2)) then
 				Duel.BreakEffect()
-				g=Duel.SelectMatchingCard(tp,Card.IsAbleToGrave,tp,LOCATION_HAND,0,1,1,nil,e,tp)
-				Duel.SendtoGrave(g,nil,REASON_EFFECT)
+				local g=Duel.SelectMatchingCard(tp,Card.IsAbleToGrave,tp,LOCATION_HAND,0,1,1,nil)
+				if #g>0 then
+					Duel.SendtoGrave(g,REASON_EFFECT)
+				end
 			end
 		end
 	end

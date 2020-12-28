@@ -5,6 +5,7 @@ function cm.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
 	aux.AddFusionProcCodeFun(c,cm.fusfilter1,cm.fusfilter,1,true,true)
+	aux.AddContactFusionProcedure(c,Card.IsReleasable,LOCATION_MZONE,0,Duel.Release,REASON_COST+REASON_MATERIAL)
 	--pendulum summon
 	aux.EnablePendulumAttribute(c,false)
 	--base attack
@@ -23,14 +24,14 @@ function cm.initial_effect(c)
 	e1:SetValue(cm.splimit)
 	c:RegisterEffect(e1)
 	--special summon rule
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetCode(EFFECT_SPSUMMON_PROC)
-	e2:SetProperty(EFFECT_FLAG_UNCOPYABLE)
-	e2:SetRange(LOCATION_EXTRA)
-	e2:SetCondition(cm.sprcon)
-	e2:SetOperation(cm.sprop)
-	c:RegisterEffect(e2)
+	-- local e2=Effect.CreateEffect(c)
+	-- e2:SetType(EFFECT_TYPE_FIELD)
+	-- e2:SetCode(EFFECT_SPSUMMON_PROC)
+	-- e2:SetProperty(EFFECT_FLAG_UNCOPYABLE)
+	-- e2:SetRange(LOCATION_EXTRA)
+	-- e2:SetCondition(cm.sprcon)
+	-- e2:SetOperation(cm.sprop)
+	-- c:RegisterEffect(e2)
 	--to extra
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(m,0))
@@ -64,56 +65,17 @@ function cm.initial_effect(c)
 	c:RegisterEffect(e5)
 end
 function cm.fusfilter(c,e,tp)
-	return (c:IsFacedown() or (c:IsRace(RACE_ZOMBIE) and c:IsAttribute(ATTRIBUTE_DARK))) and c:IsType(TYPE_MONSTER)
+	return (c:IsFacedown() or (c:IsRace(RACE_ZOMBIE) and c:IsFusionAttribute(ATTRIBUTE_DARK))) and c:IsFusionType(TYPE_MONSTER)
 end
 function cm.fusfilter1(c,e,tp)
-	return c:IsFusionSetCard(0x1406) and c:IsType(TYPE_MONSTER)
+	return c:IsFusionSetCard(0x1406) and c:IsFusionType(TYPE_MONSTER)
 end
 function cm.splimit(e,se,sp,st)
-	return e:GetHandler():GetLocation()~=LOCATION_EXTRA
+	return not e:GetHandler():IsLocation(LOCATION_EXTRA) or aux.fuslimit(e,se,sp,st)
 end
 function cm.cfilter(c,tp)
 	return ((c:IsFusionSetCard(0x1406) or c:IsFacedown() or (c:IsRace(RACE_ZOMBIE) and c:IsAttribute(ATTRIBUTE_DARK))) and c:IsType(TYPE_MONSTER))
 		and c:IsCanBeFusionMaterial() 
-end
-function cm.fcheck(c,sg)
-	return c:IsFusionSetCard(0x1406) and c:IsType(TYPE_MONSTER) and sg:FilterCount(cm.fcheck2,c)+1==sg:GetCount()
-end
-function cm.fcheck2(c)
-	return (c:IsFacedown() or (c:IsRace(RACE_ZOMBIE) and c:IsAttribute(ATTRIBUTE_DARK))) and c:IsType(TYPE_MONSTER)
-end
-function cm.fgoal(c,tp,sg)
-	return sg:GetCount()>1 and Duel.GetLocationCountFromEx(tp,tp,sg)>0 and sg:IsExists(cm.fcheck,1,nil,sg)
-end
-function cm.fselect(c,tp,mg,sg)
-	sg:AddCard(c)
-	local res=cm.fgoal(c,tp,sg) or mg:IsExists(cm.fselect,1,sg,tp,mg,sg)
-	sg:RemoveCard(c)
-	return res
-end
-function cm.sprcon(e,c)
-	if c==nil then return true end
-	local tp=c:GetControler()
-	local mg=Duel.GetReleaseGroup(tp):Filter(cm.cfilter,nil,c)
-	local mg1=Duel.GetReleaseGroup(1-tp):Filter(cm.cfilter,nil,c)
-	mg:Merge(mg1)
-	local sg=Group.CreateGroup()
-	return mg:IsExists(cm.fselect,1,nil,tp,mg,sg)
-end
-function cm.sprop(e,tp,eg,ep,ev,re,r,rp,c)
-	local mg=Duel.GetReleaseGroup(tp):Filter(cm.cfilter,nil,c)
-	local mg1=Duel.GetReleaseGroup(1-tp):Filter(cm.cfilter,nil,c)
-	mg:Merge(mg1)
-	local sg=Group.CreateGroup()
-	while true do
-		local cg=mg:Filter(cm.fselect,sg,tp,mg,sg)
-		if cg:GetCount()==0
-			or (cm.fgoal(c,tp,sg) and not Duel.SelectYesNo(tp,210)) then break end
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-		local g=cg:Select(tp,1,1,nil)
-		sg:Merge(g)
-	end
-	Duel.Release(sg,REASON_COST+REASON_FUSION+REASON_MATERIAL)
 end
 function cm.atkfilter(c,e,tp)
 	return c:IsSetCard(0x1406) and c:IsFaceup()
@@ -125,6 +87,9 @@ function cm.rettg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return not c:IsForbidden() end
 	Duel.SetOperationInfo(0,CATEGORY_TOEXTRA,c,1,0,0)
+	if c:IsLocation(LOCATION_GRAVE) then
+		Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,c,1,0,0)
+	end
 end
 function cm.retop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -147,6 +112,6 @@ function cm.tsop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ChangePosition(g,POS_FACEDOWN_DEFENSE)
 	end
 end
-function cm.efilter(e,re)
-	return (re:IsActiveType(TYPE_SPELL) or re:IsActiveType(TYPE_TRAP)) and re:GetOwner()~=e:GetOwner()
+function cm.efilter(e,te)
+	return (te:IsActiveType(TYPE_SPELL) or te:IsActiveType(TYPE_TRAP)) and te:GetOwner()~=e:GetOwner()
 end

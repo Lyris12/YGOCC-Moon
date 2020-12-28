@@ -1,0 +1,41 @@
+--Geargiauction
+--Script by: XGlitchy30
+local function getID()
+	local str=string.match(debug.getinfo(2,'S')['source'],"c%d+%.lua")
+	str=string.sub(str,1,string.len(str)-4)
+	local cod=_G[str]
+	local id=tonumber(string.sub(str,2))
+	return id,cod
+end
+local id,cid=getID()
+function cid.initial_effect(c)
+	--Activate
+	local e1=Effect.CreateEffect(c)
+	e1:GLString(0)
+	e1:SetCategory(CATEGORY_DRAW)
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCountLimit(1,id+EFFECT_COUNT_CODE_OATH)
+	e1:SetCost(cid.cost)
+	e1:SetTarget(cid.target)
+	e1:SetOperation(cid.activate)
+	c:RegisterEffect(e1)
+end
+function cid.filter(c)
+	return c:IsSetCard(0x72) and c:IsType(TYPE_MONSTER) and c:IsDiscardable()
+end
+function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_HAND,0,1,nil) end
+	Duel.DiscardHand(tp,cid.filter,1,1,REASON_COST+REASON_DISCARD)
+end
+function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsPlayerCanDraw(tp,2) end
+	Duel.SetTargetPlayer(tp)
+	Duel.SetTargetParam(2)
+	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,2)
+end
+function cid.activate(e,tp,eg,ep,ev,re,r,rp)
+	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
+	Duel.Draw(p,d,REASON_EFFECT)
+end

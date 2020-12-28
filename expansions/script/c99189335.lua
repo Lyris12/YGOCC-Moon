@@ -91,7 +91,7 @@ function cid.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x5477) and c:IsType(TYPE_MONSTER)
 end
 function cid.cfilter(c)
-	return c:IsReason(REASON_BATTLE+REASON_EFFECT) and c:IsType(TYPE_MONSTER) and c:IsPreviousLocation(LOCATION_MZONE)
+	return c:IsReason(REASON_BATTLE+REASON_EFFECT) and bit.band(c:GetPreviousTypeOnField(),TYPE_MONSTER)>0 and c:IsPreviousLocation(LOCATION_ONFIELD)
 end
 function cid.millfilter(c)
 	return c:IsSetCard(0x5477) and c:IsAbleToGrave()
@@ -171,5 +171,5 @@ function cid.rttg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function cid.rtop(e,tp,eg,ep,ev,re,r,rp)
 	if not (e:GetHandler():IsControler(tp) or e:GetHandler():IsLocation(LOCATION_MZONE)) then return end
-	Duel.SendtoHand(e:GetHandler(),tp,REASON_EFFECT)
+	Duel.SendtoHand(e:GetHandler(),nil,REASON_EFFECT)
 end

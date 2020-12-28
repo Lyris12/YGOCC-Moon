@@ -82,11 +82,10 @@ function cod.initial_effect(c)
 	c:RegisterEffect(e9)
 end
 function cod.cfilter(c)
-	return c:IsType(TYPE_MONSTER) and not c:IsSetCard(0x312)
+	return c:IsFacedown() or (c:IsType(TYPE_MONSTER) and not c:IsSetCard(0x312))
 end
 function cod.actcon(e,tp,eg,ep,ev,re,r,rp)
-    return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0
-        or not Duel.IsExistingMatchingCard(cod.cfilter,tp,LOCATION_MZONE,0,1,nil)
+    return not Duel.IsExistingMatchingCard(cod.cfilter,tp,LOCATION_MZONE,0,1,nil)
 end
  
 function cod.thcost(e,tp,eg,ep,ev,re,r,rp,chk)

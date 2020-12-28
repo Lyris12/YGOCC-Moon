@@ -75,24 +75,21 @@ function cm.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<2 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,cm.spfilter,tp,LOCATION_HAND+LOCATION_DECK,0,1,1,c,e,tp)
-	if g:GetCount()>0 then
+	g:AddCard(c)
+	if g:GetCount()>1 then
 		local tc=g:GetFirst()
-		g:AddCard(c)
-		if Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP) then
-			local e1=Effect.CreateEffect(c)
-			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
-			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-			e1:SetReset(RESET_EVENT+0x47e0000)
-			e1:SetValue(LOCATION_DECKBOT)
-			c:RegisterEffect(e1)
-			local e2=Effect.CreateEffect(tc)
-			e2:SetType(EFFECT_TYPE_SINGLE)
-			e2:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
-			e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-			e2:SetReset(RESET_EVENT+0x47e0000)
-			e2:SetValue(LOCATION_DECKBOT)
-			tc:RegisterEffect(e2)
+		while tc do
+			if Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP) then
+				local e1=Effect.CreateEffect(c)
+				e1:SetType(EFFECT_TYPE_SINGLE)
+				e1:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
+				e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+				e1:SetReset(RESET_EVENT+RESETS_REDIRECT)
+				e1:SetValue(LOCATION_DECKBOT)
+				tc:RegisterEffect(e1)
+			end
+			tc=g:GetNext()
 		end
+		Duel.SpecialSummonComplete()
 	end
 end

@@ -15,23 +15,27 @@ function cm.initial_effect(c)
 	c:RegisterEffect(e1)	
 end
 function cm.afilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x1449)
+	return c:IsFaceup() and c:IsSetCard(0x1449) and c:IsType(TYPE_MONSTER)
+end
+function cm.afilter2(c,e)
+	return c:IsFaceup() and c:IsSetCard(0x1449) and c:IsType(TYPE_MONSTER) and not c:IsImmuneToEffect(e)
 end
 function cm.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cm.afilter,tp,LOCATION_MZONE,0,1,nil) end
 end
 function cm.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local g=Duel.GetMatchingGroup(cm.afilter,tp,LOCATION_MZONE,0,nil)
+	local g=Duel.GetMatchingGroup(cm.afilter2,tp,LOCATION_MZONE,0,nil,e)
 	if g:GetCount()<=0 then return end
+	local fid=c:GetFieldID()
 	for tc in aux.Next(g) do
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_SET_ATTACK_FINAL)
-		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		e1:SetValue(tc:GetAttack()*2)
 		tc:RegisterEffect(e1)
-		tc:RegisterFlagEffect(m,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1,fid)
+		tc:RegisterFlagEffect(m,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1,fid)
 	end
 	g:KeepAlive()
 	local e2=Effect.CreateEffect(c)
@@ -60,22 +64,17 @@ end
 function cm.desop(e,tp,eg,ep,ev,re,r,rp)
 	local g=e:GetLabelObject()
 	local dg=g:Filter(cm.desfilter,nil,e:GetLabel())
-	local rng=dg:Filter(Card.IsDestructable,nil,e)
-	local huangjun=rng:GetCount()
-	local edg=Duel.GetMatchingGroup(cm.rfilter,tp,LOCATION_ONFIELD,0,nil,dg,e)
-	if edg:GetCount()>=huangjun and Duel.SelectEffectYesNo(tp,e:GetHandler(),96) then
+	local huangjun=dg:GetCount()
+	local edg=Duel.GetMatchingGroup(cm.rfilter,tp,LOCATION_ONFIELD,0,dg,e)
+	if edg:GetCount()>=huangjun and Duel.SelectEffectYesNo(tp,aux.Stringid(m,0)) then
 	   Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESREPLACE)
 	   local ig=edg:Select(tp,huangjun,huangjun,nil)
 	   Duel.Hint(HINT_CARD,0,33700316)
-	   Duel.Destroy(ig,REASON_EFFECT+REASON_REPLACE)
-	   dg:Sub(rng)
-	   if dg:GetCount()>0 then
-		  Duel.Destroy(dg,REASON_EFFECT)
-	   end
+	   Duel.Destroy(ig,REASON_EFFECT)
 	else
 	   Duel.Destroy(dg,REASON_EFFECT)
 	end
 end
-function cm.rfilter(c,g,e)
-	return not g:IsContains(c) and c:IsSetCard(0x1449) and c:IsFaceup() and c:IsDestructable(e) and not c:IsStatus(STATUS_DESTROY_CONFIRMED)
+function cm.rfilter(c,e)
+	return and c:IsSetCard(0x1449) and c:IsFaceup() and not c:IsStatus(STATUS_DESTROY_CONFIRMED)
 end

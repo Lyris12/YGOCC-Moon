@@ -8,7 +8,7 @@ function cm.initial_effect(c)
 	e1:SetCategory(CATEGORY_DESTROY+CATEGORY_DAMAGE)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e1:SetRange(LOCATION_ONFIELD)
+	e1:SetRange(LOCATION_MZONE+LOCATION_SZONE)
 	e1:SetCountLimit(1,m)
 	e1:SetCondition(cm.con)
 	e1:SetTarget(cm.destg)
@@ -69,6 +69,7 @@ function cm.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function cm.desop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
+	if e:IsActiveType(TYPE_SPELL+TYPE_CONTINUOUS) and not e:GetHandler():IsRelateToEffect(e) then return end
 	if tc:IsRelateToEffect(e) and Duel.Destroy(tc,REASON_EFFECT)~=0 then
 	   Duel.Damage(1-tp,500,REASON_EFFECT)
 	end

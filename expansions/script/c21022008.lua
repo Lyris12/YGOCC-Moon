@@ -8,15 +8,16 @@ local function getID()
 end
 local id,cid=getID()
 function cid.initial_effect(c)
-                c:SetUniqueOnField(1,0,id)
+    c:SetUniqueOnField(1,0,id)
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCountLimit(1,id+EFFECT_COUNT_CODE_OATH)
 	e1:SetCondition(cid.actcon)
 	c:RegisterEffect(e1)
-
 	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_REMOVE)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_REMOVE)
@@ -39,27 +40,28 @@ function cid.initial_effect(c)
 
 	--remove
 	local e6=Effect.CreateEffect(c)
+	e6:SetDescription(aux.Stringid(id,1))
 	e6:SetCategory(CATEGORY_TODECK+CATEGORY_TOGRAVE)
 	e6:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e6:SetCode(EVENT_PHASE+PHASE_END)
 	e6:SetRange(LOCATION_SZONE)
-                e6:SetCondition(cid.rmcon)
+    e6:SetCondition(cid.rmcon)
 	e6:SetCountLimit(1)
 	e6:SetTarget(cid.rmtg)
 	e6:SetOperation(cid.rmop)
 	c:RegisterEffect(e6)
 end
 function cid.cfilter1(c)
-	return c:IsFaceup() and c:IsSetCard(0x312)
+	return c:IsFaceup() and c:IsSetCard(0x312) and c:IsType(TYPE_MONSTER)
 end
-function cid.spcfilter(c,tp)
-	return (c:IsPreviousLocation(LOCATION_ONFIELD) or c:IsPreviousLocation(LOCATION_DECK) or c:IsPreviousLocation(LOCATION_HAND) or c:IsPreviousLocation(LOCATION_GRAVE) or c:IsPreviousLocation(LOCATION_EXTRA)) and c:IsPosition(POS_FACEDOWN)
+function cid.spcfilter(c)
+	return c:IsPosition(POS_FACEDOWN)
 end
 function cid.actcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(cid.cfilter1,tp,LOCATION_MZONE,0,1,nil)
 end
 function cid.sdcon(e)
-                local tp=e:GetHandlerPlayer()
+    local tp=e:GetHandlerPlayer()
 	return not Duel.IsExistingMatchingCard(cid.cfilter1,tp,LOCATION_MZONE,0,1,nil)
 end
 function cid.cfilter(c)
@@ -70,7 +72,7 @@ function cid.rmcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function cid.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,3,tp,LOCATION_REMOVED)
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,e:GetHandler(),1,0,0)
 end
 function cid.rmop(e,tp,eg,ep,ev,re,r,rp)
@@ -78,22 +80,23 @@ function cid.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local res=false
 	local g=Duel.IsExistingMatchingCard(cid.cfilter,tp,LOCATION_REMOVED,0,3,nil) 
 	if g then
-	                 local sg=Duel.SelectMatchingCard(tp,cid.cfilter,tp,LOCATION_REMOVED,0,3,3,e:GetHandler())
-	                 Duel.SendtoDeck(sg,nil,3,REASON_COST)
-		 res=true
+		local sg=Duel.SelectMatchingCard(tp,cid.cfilter,tp,LOCATION_REMOVED,0,3,3,nil)
+		if #sg>0 and Duel.SendtoDeck(sg,nil,2,REASON_COST)==3 then
+			res=true
+		end
 	end
 	if not res and c:IsRelateToEffect(e) then
 		Duel.SendtoGrave(c,REASON_EFFECT)
 	end
 end
 function cid.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return not eg:IsContains(e:GetHandler()) and eg:IsExists(cid.spcfilter,1,nil,tp)
+	return not eg:IsContains(e:GetHandler()) and eg:IsExists(cid.spcfilter,1,nil)
 end
 function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_ONFIELD) and chkc:IsAbleToRemove() end
-	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToRemove,tp,0,LOCATION_ONFIELD,1,nil) end
+	if chkc then return chkc:IsLocation(LOCATION_ONFIELD) and chkc:IsAbleToRemove(POS_FACEDOWN) end
+	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToRemove,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil,POS_FACEDOWN) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=Duel.SelectTarget(tp,Card.IsAbleToRemove,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
+	local g=Duel.SelectTarget(tp,Card.IsAbleToRemove,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil,POS_FACEDOWN)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,0,0)
 end
 function cid.spop(e,tp,eg,ep,ev,re,r,rp)

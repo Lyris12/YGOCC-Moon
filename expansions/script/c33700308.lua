@@ -85,7 +85,7 @@ function cm.desop(e,tp,eg,ep,ev,re,r,rp)
 	   local atk=g:GetFirst():GetBaseAttack()
 	   local dg=Duel.GetMatchingGroup(cm.cfilter,tp,0,LOCATION_MZONE,nil)
 	   if dg:GetCount()>0 then
-		  for tc in aux.Next(g) do
+		  for tc in aux.Next(dg) do
 			  local e1=Effect.CreateEffect(e:GetHandler())
 			  e1:SetType(EFFECT_TYPE_SINGLE)
 			  e1:SetCode(EFFECT_UPDATE_ATTACK)

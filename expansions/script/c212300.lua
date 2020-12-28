@@ -35,19 +35,20 @@ function c212300.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
 function c212300.spop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) then
 		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-function c212300.costfilter(c,tp)
-	return c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsReleasable()
-		and Duel.IsExistingMatchingCard(c212300.thfilter,tp,LOCATION_HAND+LOCATION_ONFIELD,LOCATION_HAND+LOCATION_ONFIELD,1,c)
+function c212300.costfilter(c,e,tp)
+	return c:IsAttribute(ATTRIBUTE_LIGHT) and Duel.IsExistingMatchingCard(c212300.filter,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE,0,1,c,e,tp)
+		and Duel.GetMZoneCount(tp,c)>0 and (c:IsLocation(LOCATION_HAND) or c:IsFaceup())
 end
 function c212300.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c212300.costfilter,tp,LOCATION_MZONE+LOCATION_HAND,0,1,nil,tp) end
+	if chk==0 then return Duel.CheckReleaseGroupEx(tp,c212300.costfilter,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local g=Duel.SelectMatchingCard(tp,c212300.costfilter,tp,LOCATION_MZONE+LOCATION_HAND,0,1,1,nil,tp)
+	local g=Duel.SelectReleaseGroupEx(tp,c212300.costfilter,1,1,nil,e,tp)
 	Duel.Release(g,REASON_COST)
 end
 function c212300.filter(c,e,tp)
@@ -60,7 +61,7 @@ end
 function c212300.operation(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,c212300.filter,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil,e,tp)
+	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(c212300.filter),tp,LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil,e,tp)
 	if g:GetCount()>0 then
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end

@@ -4,6 +4,7 @@ function c63553466.initial_effect(c)
 	--fusion summon
 	c:EnableReviveLimit()
 	aux.AddFusionProcFunRep(c,c63553466.matfilter,3,false)
+	aux.AddContactFusionProcedure(c,Card.IsReleasable,LOCATION_MZONE,0,Duel.Release,REASON_COST+REASON_MATERIAL)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -12,14 +13,14 @@ function c63553466.initial_effect(c)
 	e1:SetValue(c63553466.splimit)
 	c:RegisterEffect(e1)
 	--special summon rule
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetCode(EFFECT_SPSUMMON_PROC)
-	e2:SetProperty(EFFECT_FLAG_UNCOPYABLE)
-	e2:SetRange(LOCATION_EXTRA)
-	e2:SetCondition(c63553466.spcon)
-	e2:SetOperation(c63553466.spop)
-	c:RegisterEffect(e2)
+	-- local e2=Effect.CreateEffect(c)
+	-- e2:SetType(EFFECT_TYPE_FIELD)
+	-- e2:SetCode(EFFECT_SPSUMMON_PROC)
+	-- e2:SetProperty(EFFECT_FLAG_UNCOPYABLE)
+	-- e2:SetRange(LOCATION_EXTRA)
+	-- e2:SetCondition(c63553466.spcon)
+	-- e2:SetOperation(c63553466.spop)
+	-- c:RegisterEffect(e2)
 	--cannot trigger/ flip summon limit
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD)
@@ -34,7 +35,7 @@ function c63553466.initial_effect(c)
 	e3x:SetCode(EFFECT_CANNOT_FLIP_SUMMON)
 	e3x:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
 	e3x:SetRange(LOCATION_MZONE)
-	e3x:SetTargetRange(0,LOCATION_SZONE)
+	e3x:SetTargetRange(0,LOCATION_MZONE)
 	e3x:SetTarget(c63553466.limittg)
 	c:RegisterEffect(e3x)
 	--quick activation
@@ -63,19 +64,10 @@ function c63553466.initial_effect(c)
 	local e7=Effect.CreateEffect(c)
 	e7:SetType(EFFECT_TYPE_FIELD)
 	e7:SetCode(0x10000000+63553466)
-	e7:SetRange(LOCATION_SZONE)
+	e7:SetRange(LOCATION_MZONE)
 	e7:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e7:SetTargetRange(1,1)
 	c:RegisterEffect(e7)
-	--check turn set
-	local e8=Effect.CreateEffect(c)
-	e8:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e8:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_UNCOPYABLE)
-	e8:SetCode(EVENT_SSET)
-	e8:SetRange(LOCATION_MZONE)
-	e8:SetCondition(c63553466.ckcon)
-	e8:SetOperation(c63553466.ckop)
-	c:RegisterEffect(e8)
 	--gain lp
 	local e9=Effect.CreateEffect(c)
 	e9:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
@@ -98,6 +90,12 @@ function c63553466.initial_effect(c)
 		ge2:SetCode(EVENT_PHASE_START+PHASE_DRAW)
 		ge2:SetOperation(c63553466.clear)
 		Duel.RegisterEffect(ge2,0)
+		--check turn set
+		local e8=Effect.CreateEffect(c)
+		e8:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e8:SetCode(EVENT_SSET)
+		e8:SetOperation(c63553466.ckop)
+		Duel.RegisterEffect(e8,0)
 	end
 end
 c63553466.lpcost1=0
@@ -105,10 +103,10 @@ c63553466.lpcost2=0
 --cost payment check
 function c63553466.checkop(e,tp,eg,ep,ev,re,r,rp)
 	if ep==Duel.GetTurnPlayer() then
-		local val=math.ceil(ev/1)
+		local val=math.ceil(ev)
 		c63553466.lpcost1=c63553466.lpcost1+val
 	else
-		local val=math.ceil(ev/1)
+		local val=math.ceil(ev)
 		c63553466.lpcost2=c63553466.lpcost2+val
 	end
 end
@@ -172,7 +170,7 @@ function c63553466.limittg(e,c)
 end
 --activate cost
 function c63553466.actarget(e,te,tp)
-	return te:GetHandler():IsLocation(LOCATION_SZONE) and te:GetHandler():IsFacedown() and te:GetHandler():GetFlagEffect(63553416)>0
+	return te:GetHandler():IsFacedown() and te:GetHandler():GetFlagEffect(63553416)>0
 end
 function c63553466.costchk(e,te_or_c,tp)
 	local ct=Duel.GetFlagEffect(tp,63553466)
@@ -183,9 +181,6 @@ function c63553466.costop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.PayLPCost(tp,1000)
 end
 --check turn set
-function c63553466.ckcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(Card.IsType,1,nil,TYPE_TRAP)
-end
 function c63553466.ckop(e,tp,eg,ep,ev,re,r,rp)
 	for tc in aux.Next(eg) do
 		tc:RegisterFlagEffect(63553416,RESET_PHASE+PHASE_END,EFFECT_FLAG_SET_AVAILABLE,1)

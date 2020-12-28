@@ -2,6 +2,7 @@
 function c212325.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(212325,0))
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
@@ -12,6 +13,7 @@ function c212325.initial_effect(c)
 	c:RegisterEffect(e1)
 	--spsummon
 	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(212325,1))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
@@ -22,14 +24,13 @@ function c212325.initial_effect(c)
 	e2:SetOperation(c212325.spop)
 	c:RegisterEffect(e2)
 end
-function c212325.costfilter(c,tp)
-	return c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsReleasable()
-		and Duel.IsExistingMatchingCard(c212325.thfilter,tp,LOCATION_HAND+LOCATION_ONFIELD,LOCATION_HAND+LOCATION_ONFIELD,1,c)
+function c212325.costfilter(c)
+	return c:IsAttribute(ATTRIBUTE_LIGHT) and (c:IsLocation(LOCATION_HAND) or c:IsFaceup())
 end
 function c212325.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c212325.costfilter,tp,LOCATION_MZONE+LOCATION_HAND,0,1,nil,tp) end
+	if chk==0 then return Duel.CheckReleaseGroupEx(tp,c212325.costfilter,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local g=Duel.SelectMatchingCard(tp,c212325.costfilter,tp,LOCATION_MZONE+LOCATION_HAND,0,1,1,nil,tp)
+	local g=Duel.SelectReleaseGroupEx(tp,c212325.costfilter,1,1,nil)
 	Duel.Release(g,REASON_COST)
 end
 function c212325.filter(c)

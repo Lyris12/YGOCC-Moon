@@ -85,6 +85,9 @@ function cm.rettg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return not c:IsForbidden() end
 	Duel.SetOperationInfo(0,CATEGORY_TOEXTRA,c,1,0,0)
+	if c:IsLocation(LOCATION_GRAVE) then
+		Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,c,1,0,0)
+	end
 end
 function cm.retop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -97,21 +100,23 @@ function cm.tdcon(e,tp,eg,ep,ev,re,r,rp)
 	return c:IsFaceup()
 end
 function cm.tdtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
+	if chk==0 then return Duel.GetFieldGroup(tp,LOCATION_REMOVED+LOCATION_GRAVE,LOCATION_REMOVED+LOCATION_GRAVE):IsExists(Card.IsAbleToDeck,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,1,PLAYER_ALL,LOCATION_REMOVED+LOCATION_GRAVE)
 end
 function cm.tdop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local g=Duel.GetFieldGroup(tp,LOCATION_REMOVED+LOCATION_GRAVE,LOCATION_REMOVED+LOCATION_GRAVE)
-	Duel.SendtoDeck(g,nil,2,REASON_EFFECT)
+	if #g>0 then
+		Duel.SendtoDeck(g,nil,2,REASON_EFFECT)
+	end
 end
-function cm.efilter(e,re)
-	return re:IsActiveType(TYPE_MONSTER) and re:GetOwner()~=e:GetOwner()
+function cm.efilter(e,te)
+	return te:IsActiveType(TYPE_MONSTER) and te:GetOwner()~=e:GetOwner()
 end
 function cm.disable(e,c)
 	local atk=e:GetHandler():GetBaseAttack()
 	local atk1=c:GetBaseAttack()
-	return (c:IsType(TYPE_EFFECT) or bit.band(c:GetOriginalType(),TYPE_EFFECT)==TYPE_EFFECT) and c:IsType(TYPE_MONSTER) and atk1<=atk and (atk1>=0 or c:IsLocation(LOCATION_MZONE)) and not (c:IsFacedown() and c:IsLocation(LOCATION_EXTRA))
+	return (c:IsType(TYPE_EFFECT) or bit.band(c:GetOriginalType(),TYPE_EFFECT)>0) and c:IsType(TYPE_MONSTER) and atk1<=atk and (atk1>=0 or c:IsLocation(LOCATION_MZONE)) and not (c:IsFacedown() and c:IsLocation(LOCATION_EXTRA))
 end
 function cm.discon(e,tp,eg,ep,ev,re,r,rp)
 	local atk=e:GetHandler():GetBaseAttack()

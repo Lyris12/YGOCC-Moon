@@ -23,7 +23,7 @@ function cm.initial_effect(c)
 	--To grave
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(m,1))
-	e2:SetCategory(CATEGORY_DECKDES)
+	e2:SetCategory(CATEGORY_TOGRAVE)
 	e2:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_DECK)

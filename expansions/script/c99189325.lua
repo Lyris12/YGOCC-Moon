@@ -25,6 +25,7 @@ function cid.initial_effect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_HANDES)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
+	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e2:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1,id+100)
@@ -37,7 +38,7 @@ function cid.initial_effect(c)
 	e3:SetDescription(aux.Stringid(id,2))
 	e3:SetCategory(CATEGORY_TODECK)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
+	e3:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
 	e3:SetCode(EVENT_TO_GRAVE)
 	e3:SetCountLimit(1,id+200)
 	e3:SetCondition(cid.tdcon)
@@ -60,7 +61,7 @@ function cid.initial_effect(c)
 end
 --filters
 function cid.cfilter(c)
-	return c:IsSetCard(0x5477) and c:IsDiscardable() and c:IsAbleToGraveAsCost()
+	return c:IsSetCard(0x5477) and c:IsDiscardable()
 end
 --spsummon self
 function cid.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -79,6 +80,7 @@ function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
 function cid.spop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
 	Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
@@ -90,10 +92,12 @@ function cid.dccon(e,tp,eg,ep,ev,re,r,rp)
 end
 function cid.dctg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
+	Duel.SetTargetPlayer(1-tp)
 	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,1-tp,1)
 end
 function cid.dcop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.DiscardHand(1-tp,nil,1,1,REASON_EFFECT+REASON_DISCARD)
+	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
+	Duel.DiscardHand(p,nil,1,1,REASON_EFFECT+REASON_DISCARD)
 end
 --spin
 function cid.tdcon(e,tp,eg,ep,ev,re,r,rp)
@@ -119,9 +123,6 @@ function cid.tdop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToEffect(e) then 
 		if Duel.SendtoDeck(tc,nil,2,REASON_EFFECT)~=0 then
-			if tc:IsLocation(LOCATION_DECK) and tc:IsControler(tp) then
-				Duel.ShuffleDeck(tp)
-			end
 		end
 	end
 end
