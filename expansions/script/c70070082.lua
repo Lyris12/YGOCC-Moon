@@ -50,22 +50,19 @@ function cid.drop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Draw(p,d,REASON_EFFECT)
 end
 function cid.thfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x777) and Duel.IsExistingMatchingCard(cid.desfilter,tp,0,LOCATION_MZONE,1,nil,c:GetAttack())
+	return c:IsFaceup() and c:IsSetCard(0x777)
 end
 function cid.desfilter(c,atk)
 	return c:IsFaceup() and c:GetAttack()<atk
 end
-function cid.spfilter1(c)
-	return c:IsSetCard(0x777) and c:IsFaceup()
-end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingTarget(cid.thfilter,tp,LOCATION_MZONE,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	local g=Duel.SelectTarget(tp,cid.thfilter,tp,LOCATION_MZONE,0,1,1,nil,tp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,0,tp,1)
 end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
-	local g1=Duel.GetMatchingGroup(cid.spfilter1,tp,LOCATION_MZONE,0,nil)
+	local g1=Duel.GetMatchingGroup(cid.thfilter,tp,LOCATION_MZONE,0,nil)
 	local tc=g1:GetFirst()
 	while tc do
 		--Activate
@@ -79,8 +76,10 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 		tc=g1:GetNext()
 	end
 	local tc1=Duel.GetFirstTarget()
-	if not tc1:IsRelateToEffect(e) or tc1:IsFacedown() then return end
+	if not tc1:IsRelateToEffect(e) or tc1:IsFacedown() or not Duel.IsExistingMatchingCard(cid.desfilter,tp,0,LOCATION_MZONE,1,nil,tc1:GetAttack())
+		or not Duel.SelectYesNo(tp,1101) then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local tc2=Duel.SelectMatchingCard(tp,cid.desfilter,tp,0,LOCATION_MZONE,1,1,nil,tc1:GetAttack())
+	Duel.HintSelection(tc2)
 	Duel.Destroy(tc2,REASON_EFFECT)
 end
- 
