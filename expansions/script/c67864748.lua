@@ -13,7 +13,7 @@ e1:SetOperation(c67864748.spop)
 c:RegisterEffect(e1)
 end
 function c67864748.spfilter1(c,e,tp)
-	return c:IsRace(RACE_PSYCHO) and c:IsAbleToRemoveAsCost()
+	return c:IsRace(RACE_PSYCHO) and c:IsAttribute(ATTRIBUTE_DARK) and c:IsAbleToRemoveAsCost()
 end
 function c67864748.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c67864748.spfilter1,tp,LOCATION_DECK,0,1,nil) end

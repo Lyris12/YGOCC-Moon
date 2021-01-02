@@ -56,7 +56,7 @@ function c67864747.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
 end
 function c67864747.filter1(c)
-	return c:IsCode(67864748) and c:IsAbleToHand()
+	return c:IsCode(67864748) or c:IsCode(67864741) and c:IsAbleToHand()
 end
 function c67864747.target2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c67864747.filter1,tp,LOCATION_DECK,0,1,nil) end
