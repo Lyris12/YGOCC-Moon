@@ -863,7 +863,7 @@ Auxiliary.AddSynchroProcedure=function(c,f1,f2,minc,maxc)
 	table.insert(c.extradeckproc,syn)
 	if f1==nil then f1=aux.Tuner(nil) end
 	if f2==nil then f2=false end
-	Auxiliary.XSynchroProcedure(c,false,f2,minc,maxc,nil,f1)
+	Auxiliary.XSynchroProcedure(c,false,f2,minc,maxc,nil,aux.Tuner(f1))
 end
 
 Auxiliary.AddSynchroMixProcedure=function(c,f1,f2,f3,f4,minc,maxc,gc)
