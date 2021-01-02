@@ -1,4 +1,4 @@
-﻿expansions/cards-new.cdb	7a11f1ce5b4e1df8844dac29973a8ba1
+﻿expansions/cards-new.cdb	dbb6b9198ec3e06f8806b2067ab9611b
 expansions/lflist.conf	375fc4f006737b4d0dd583b6d2ec52ce
 expansions/strings.conf	b5a00ef3c4e5164f80ed0352877e763e
 expansions/pics/100000710.jpg	5f925a97b1c60d7d69acb8f229938263
@@ -5905,11 +5905,22 @@ expansions/script/c102400212.lua	f7d34de33c00f7f95a1cebf2ecdc2eb6
 expansions/script/c102400213.lua	ff9677f452bea5db9711954442ade4ad
 expansions/script/c102400214.lua	a6b817423149841b5c24d1d90a89dd8d
 expansions/script/c102400215.lua	914f02422a98a597952cbb8ac0d0950c
+expansions/script/c102400216.lua	ca2c836ede557d7aaf3cffd18e3d981c
+expansions/script/c102400217.lua	8a714fa9fc74471faba643351a7acd57
+expansions/script/c102400218.lua	f6dec63fdf9bc463d4abde88ab18d67d
+expansions/script/c102400219.lua	3d3958dd28ca77e783d9510203a744e8
+expansions/script/c102400220.lua	ac5c008f30cd80673bc68820c77d1f67
 expansions/script/c102400221.lua	a89eac3b1014837fc7b1b306be01c7ed
 expansions/script/c102400223.lua	a572b9451e984e09193dc3a0f84544d1
 expansions/script/c102400224.lua	d862d80b6ff6936f35873fde7e2d7670
 expansions/script/c102400225.lua	7b373b506c50362bbfac8227bfe40d45
 expansions/script/c102400226.lua	79b9ffa8eeb3f17ccf59cd24df3153d5
+expansions/script/c102400228.lua	3be4892f4cf1e25dd45dee3c6a80253e
+expansions/script/c102400229.lua	4b4b005a1645ab116989eee859e7ce92
+expansions/script/c102400230.lua	8802456d77e9001b2a5684860fe87755
+expansions/script/c102400231.lua	298643f413cc53780e31e40b8159f80b
+expansions/script/c102400232.lua	fb90e99c9c5ee7f74aa279b3b1f85bf7
+expansions/script/c102400233.lua	076d9aad8e07f728956a75a03beb1a5b
 expansions/script/c102400234.lua	463d4619987521af49ec6634737a4e17
 expansions/script/c102400235.lua	d9f9f98575ff4a71e1b28d4da066b122
 expansions/script/c102400236.lua	53d7b7de59bcbc1e1d8eb6dc2112c8cc
@@ -10160,6 +10171,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	949d15af1a25b210236749007e9b6890
+update/filelist.txt	4eb257608a8fcc936d6abf18952148d4
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	d040c1944863195fcda60e2b4d27cdb3
+update/version.txt	4bb21668c47193da16de7693c4ceb98b
