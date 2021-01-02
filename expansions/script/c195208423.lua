@@ -2,7 +2,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 		--synchro summon
-		aux.AddSynchroProcedure(c,aux.Tuner(Card.IsSetCard,0x83e),aux.NonTuner(Card.IsSetCard,0x83e),1,1)
+		aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x83e),aux.NonTuner(Card.IsSetCard,0x83e),1,1)
 		c:EnableReviveLimit()
 		--add banished
 		local e1=Effect.CreateEffect(c)
