@@ -1,7 +1,7 @@
 if not banned_list_table then banned_list_table={} end
 local string=require'string'
 local ls=[[
-#[2020.9 YGOCC+2020.9 TCG]
+#[2020.11 YGOCC+2020.12 TCG]
 
 !2020.9.13 YGOCC
 #Forbidden YGOCC
@@ -14,11 +14,8 @@ local ls=[[
 33700750 0 -- Anifriends Reindeer
 33700079 0 -- Anifriends Small-clawed Otter
 33700751 0 -- Anifriends Tanuki
-57460651 0 -- Burn Point Alchemist
 31157205 0 -- Mezka Melodia
-195208400 0 -- Spectre Magician & Dark Light
-16599458 0 -- Telum of the Angel Organization, Zagar
-28916163 0 -- V-Idol Meiko
+#28916163 0 -- V-Idol Meiko
 --							RITUAL
 37564909 0 -- Sayuri - Scarlet Moon
 500316972 0 -- Twin-Venuses Fiber VINE Dragon
@@ -41,8 +38,7 @@ local ls=[[
 500314234 0 -- Hime, Ultimate Queen of Magnificient VINE
 --							LINK
 33700082 0 -- Anifriends Seiryu of the East
-75977701 0 -- Infected knight of Ivory
-80347321 0 -- Metalfoes Mercuryrider
+#75977701 0 -- Infected knight of Ivory
 56642463 0 -- Noble Knight Mordred
 79854547 0 -- Verdant Illusion
 160000786 0 -- Yuzu, Guardian of Magnificent VINE
@@ -64,10 +60,10 @@ local ls=[[
 #Limited YGOCC
 --							MAIN DECK MONSTERS
 33700744 1 -- Anifriends "Ikkaku"
-33700054 1 -- Anifriends Ezo Red Fox
+#33700054 1 -- Anifriends Ezo Red Fox
 33700065 1 -- Anifriends PPP Gentoo
 77585595 1 -- Forgalgia Emperor Jinzo
-33700304 1 -- GearGal Veno
+#33700304 1 -- GearGal Veno
 50031699 1 -- Mana, Sharpshooter of Fiber VINE
 32904923 1 -- Serene the Aeonbreaker's Sword
 11000533 1 -- Shya Shadowlord
@@ -75,12 +71,12 @@ local ls=[[
 --							PENDULUM
 33700746 1 -- Anifriends Sky Impulse
 102400114 1 -- Blitzkrieg Dragon - Steel
-102400102 1 -- Bitzkrieg Meklight - Dawn
+#102400102 1 -- Bitzkrieg Meklight - Dawn
 160005445 1 -- Paintress Da Vinca
 16000233 1 -- Paintress Gorgia
 17029601 1 -- Psychether Dreamer, Iman
 --							PANDEMONIUM
-53313934 1 -- Mysterious Luster Dragon
+53313934 1 -- Disstonant Luster Dragon
 --
 --							EXTRA DECK MONSTERS
 --							FUSION
@@ -100,47 +96,58 @@ local ls=[[
 --							SPELL CARDS
 19772610 1 -- The Advocate of Justice's Door
 32904931 1 -- Aeonbreaker Fusion
-102400133 1 -- Blitzkrieg Sky
-33700316 1 -- GearGal Abort
+#102400133 1 -- Blitzkrieg Sky
+#33700316 1 -- GearGal Abort
 33700058 1 -- Miracle of the Sandstar
 160004532 1 -- The Miscomposition of Power Portrait
 15747847 1 -- Mythos Valor
 63553459 1 -- Nethergear Unit
 37564903 1 -- Sayuri - ALICE
 96212378 1 -- Spiral Drill Formation
-20181413 1 -- Terradication Living Fortress
+#20181413 1 -- Terradication Living Fortress
 --
 --							TRAP CARDS
 500311592 1 -- Power Portrait's Cursed Portait Trap
 --
 #Semi-limited YGOCC
 --							MAIN DECK MONSTERS
-32904921 2 -- Laura the Aeonbreaker's Bow
+#32904921 2 -- Laura the Aeonbreaker's Bow
 --
 --							EXTRA DECK MONSTERS
 --
 --							SPELL CARDS
-53313927 2 -- Mysterious Dimension
+#53313927 2 -- Disstonant Dimension
 15747835 2 -- Mythos paradox
 210424266 2 -- Battle in the Storm
 --
 --							TRAP CARDS
 --							New 9/13/2020
-86148577 0 --Guardragon Elpy
-85243784 0 --Linkross
+#86148577 0 --Guardragon Elpy
 44097050 0 --Mecha Phantom Beast Auroradon
-83152482 0 --Union Carrier
+#83152482 0 --Union Carrier
 6172122 0 --Red-Eyes Fusion
 195208417 0 --False Reality Knight Thrax
 195208424 0 --False Reality Wrath Bringer Makolo
 50588353 1 --Crystron Halqifibrax
-99189323 1 --Arcarum 11 - JUSTICE
+#99189323 1 --Arcarum 11 - JUSTICE
 195208409 1 --False Reality Aquamancer Gyalros
 195208422 1 --False Reality Spirit Monk Dalos
 32904930 1 --Jaden, The Aeonbreaker's Alchemist
 79854524 2 --Woodland Wing
 37564902 2 --Sayuri - GRAZE
---
+--							New 11/10/2020
+102400133 0 -- Blitzkrieg Sky
+63287064 0 -- Horrible Reborn
+11000511 1 -- Hidden Secrets of the Shya
+80347321 1 -- Metalfoes Mercuryrider
+102400102 2 -- Bitzkrieg Meklight - Dawn
+#57460651 3 -- Burn Point Alchemist
+#80347321 3 -- Metalfoes Mercuryrider
+--							New 12/25/2020
+88581108 0
+38572779 1
+16599458 1 -- Telum of the Angel Organization, Zagar
+47325505 2
 #FORBIDDEN TCG					===Forbidden===
 76794549 0 --Astrograph Sorcerer
 09929398 0 --Blackwing - Gofu the Vague Shadow
@@ -247,7 +254,7 @@ local ls=[[
 08124921 1 --Right Leg of the Forbidden One
 28985331 1 --Armageddon Knight
 61901281 1 --Black Dragon Collapserpent
-57143342 1 --Cir, Malebranche of the Burning Abyss
+#57143342 1 --Cir, Malebranche of the Burning Abyss
 69015963 1 --Cyber-Stein
 70711847 1 --Danger! Nessie!
 14536035 1 --Dark Grepher
@@ -255,7 +262,7 @@ local ls=[[
 82385847 1 --Dinowrestler Pankratops
 33396948 1 --Exodia the Forbidden One
 64034255 1 --Genex Ally Birdman
-20758643 1 --Graff, Malebranche of the Burning Abyss
+#20758643 1 --Graff, Malebranche of the Burning Abyss
 99177923 1 --Infernity Archfiend
 33508719 1 --Morphing Jar
 16226786 1 --Night Assailant
@@ -270,7 +277,7 @@ local ls=[[
 30539496 1 --True King Lithosagym, the Disaster
 99234526 1 --White Dragon Wyverburster
 78872731 1 --Zoodiac Ratpier
-11877465 1 --Evigishki Mind Augus
+#11877465 1 --Evigishki Mind Augus
 39512984 1 --Gem-Knight Master Diamond
 70583986 1 --Dewloren, Tiger King of the Ice Barrier
 18239909 1 --Ignister Prominence, the Blasting Dracoslayer
@@ -317,14 +324,14 @@ local ls=[[
 89208725 1 --Metaverse
 23002292 1 --Red Reboot
 82732705 1 --Skill Drain
-35125879 1 --True King's Return
+#35125879 1 --True King's Return
 17078030 1 --Wall of Revealing Light
 43694650 1 --Danger!? Jackalope?
 99745551 1 --Danger!? Tsuchinoko?
 1561110 1 --ABC-Dragon Buster
 90953320 1 --T.G. Hyper Librarian
 52687916 1 --Trishula, Dragon of the Ice Barrier
-90809975 1 --Toadally Awesome
+#90809975 1 --Toadally Awesome
 48905153 1 --Zoodiac Drident
 1845204 1 --Instant Fusion
 37520316 1 --Mind Control
@@ -339,10 +346,15 @@ local ls=[[
 26692769 1
 24224830 1
 18144506 1
-57143342 2
-20758643 2
-01561110 2
-90809975 2
+#57143342 2
+#20758643 2
+#1561110 2
+#90809975 2
+--							New 12/15/2020
+76218313 0
+85243784 0
+63789924 0
+35125879 2
 ]]
 for id in ls:sub(ls:find("!"),ls:find("!",ls:find("!")+1) and ls:find("!",ls:find("!")+1)-1 or -1):gmatch("([0-9]+) 0") do
 	banned_list_table[tonumber(id)]=true
