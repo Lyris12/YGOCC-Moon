@@ -71,6 +71,13 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetLabel()==0 then
 		local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 		Duel.Draw(p,d,REASON_EFFECT)
+		local e2=Effect.CreateEffect(c)
+		e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e2:SetCode(EVENT_PREDRAW)
+		e2:SetCondition(cid.tdcon)
+		e2:SetTarget(cid.tdtg)
+		e2:SetOperation(cid.tdop)
+		Duel.RegisterEffect(e2,tp)
 	else
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 		local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(cid.filter),tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil)
@@ -95,13 +102,44 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
+
+function cid.condition(e,tp,eg,ep,ev,re,r,rp)
+	return 1-tp==Duel.GetTurnPlayer() and Duel.GetDrawCount(tp)>0
+end
+function cid.thfilter(c)
+	return c:IsFacedown() and c:IsAbleToDeck()
+end
+function cid.tdtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(cid.thfilter,1-tp,LOCATION_REMOVED,0,10,nil) end
+end
+function cid.tdop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.IsExistingMatchingCard(cid.thfilter,1-tp,LOCATION_REMOVED,0,10,nil) and Duel.SelectYesNo(1-tp,aux.Stringid(id,3)) then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+		local g=Duel.SelectMatchingCard(tp,cid.thfilter,1-tp,LOCATION_REMOVED,0,10,10,nil)
+		if g:GetCount()>0 then
+			Duel.SendtoDeck(g,nil,2,REASON_EFFECT)
+			if g:FilterCount(Card.IsLocation,nil,LOCATION_DECK)>0 then Duel.ShuffleDeck(1-tp) end
+			if g:Filter(Card.IsLocation,nil,LOCATION_DECK+LOCATION_EXTRA)==10 then
+				local e1=Effect.CreateEffect(e:GetHandler())
+				e1:SetType(EFFECT_TYPE_FIELD)
+				e1:SetCode(EFFECT_CANNOT_DRAW)
+				e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+				e1:SetTargetRange(0,1)
+				e1:SetReset(RESET_PHASE+PHASE_DRAW+PHASE_STANDBY+PHASE_MAIN1+PHASE_BATTLE_START+PHASE_BATTLE+PHASE_MAIN2+PHASE_END)
+				Duel.RegisterEffect(e1,tp)
+			end
+		end
+	end
+end
+
+
 function cid.rmcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousLocation(LOCATION_HAND) and e:GetHandler():GetPreviousControler()==1-tp and re and rp==1-tp
 		and (bit.band(r,REASON_EFFECT)==REASON_EFFECT or (re:IsActivated() and bit.band(r,REASON_COST)==REASON_COST))
 end
 function cid.rmop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_CARD,1-tp,id)
-	local g=Duel.GetDecktopGroup(1-tp,5)
+	local g=Duel.GetDecktopGroup(1-tp,10)
 	Duel.DisableShuffleCheck()
 	Duel.Remove(g,POS_FACEDOWN,REASON_EFFECT)
 end

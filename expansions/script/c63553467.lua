@@ -5,10 +5,6 @@ function c63553467.initial_effect(c)
 	--tuner fix
 	local tuner=Effect.CreateEffect(c)
 	tuner:SetType(EFFECT_TYPE_SINGLE)
-	tuner:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	tuner:SetCode(EFFECT_ADD_TYPE)
-	tuner:SetCondition(c63553467.tunerfix)
-	tuner:SetValue(TYPE_TUNER)
 	c:RegisterEffect(tuner)
 	aux.EnablePandemoniumAttribute(c,tuner,true,TYPE_EFFECT+TYPE_TUNER)
 	--set

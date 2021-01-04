@@ -77,7 +77,7 @@ function cid.actop(e,tp,eg,ep,ev,re,r,rp)
 		aux.PandSSet(g,REASON_EFFECT,aux.GetOriginalPandemoniumType(g:GetFirst()))(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(1-tp,g)
 		if g:GetFirst():IsLocation(LOCATION_SZONE) and g:GetFirst():IsFacedown() and g:GetFirst():IsSetCard(0x7a4) then
-			local cg=g:GetFirst():GetColumnGroup():Filter(nil,g:GetFirst())
+			local cg=g:GetFirst():GetColumnGroup():Filter(aux.TRUE,g:GetFirst())
 			if #cg==0 then return end
 			Duel.Destroy(cg,REASON_EFFECT)
 		end
