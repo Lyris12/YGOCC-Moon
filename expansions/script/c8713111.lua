@@ -18,6 +18,7 @@ function cid.initial_effect(c)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e1:SetCountLimit(1,id)
 	e1:SetCondition(cid.spcon)
+	e1:SetCost(cid.spcost)
 	e1:SetTarget(cid.sptg)
 	e1:SetOperation(cid.spop)
 	c:RegisterEffect(e1)
@@ -40,11 +41,15 @@ function cid.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetProperty(EFFECT_FLAG_DELAY)
 	e3:SetCode(EVENT_TO_GRAVE)
-	e3:SetCountLimit(1,id+200)
+	e3:SetCountLimit(1,id+200+EFFECT_COUNT_CODE_DUEL)
 	e3:SetCondition(cid.coincon)
 	e3:SetTarget(cid.cointg)
 	e3:SetOperation(cid.coinop)
 	c:RegisterEffect(e3)
+	Duel.AddCustomActivityCounter(id,ACTIVITY_SPSUMMON,cid.counterfilter)
+end
+function cid.counterfilter(c)
+	return (c:IsType(TYPE_SYNCHRO) and c:IsRace(RACE_PSYCHIC)) or c:GetSummonLocation()~=LOCATION_EXTRA
 end
 cid.toss_dice=true
 cid.toss_coin=true
@@ -54,6 +59,20 @@ function cid.cfilter(c)
 end
 function cid.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return not Duel.IsExistingMatchingCard(cid.cfilter,tp,LOCATION_MZONE,0,1,nil)
+end
+function cid.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetCustomActivityCount(id,tp,ACTIVITY_SPSUMMON)==0 end
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)
+	e1:SetTargetRange(1,0)
+	e1:SetTarget(cid.splimit)
+	e1:SetReset(RESET_PHASE+PHASE_END)
+	Duel.RegisterEffect(e1,tp)
+end
+function cid.splimit(e,c,sump,sumtype,sumpos,targetp,se)
+	return not cid.counterfilter(c)
 end
 function cid.spfilter(c,e,tp)
 	return c:IsType(TYPE_SYNCHRO) and c:IsRace(RACE_PSYCHO) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_SYNCHRO,tp,false,false)

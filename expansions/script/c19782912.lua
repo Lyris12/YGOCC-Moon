@@ -85,5 +85,5 @@ function cid.drycon(e,tp,eg,ep,ev,re,r,rp)
 	else return true end
 end
 function cid.dryop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Destroy(e:GetLabelObject(),REASON_EFFECT)
+	Duel.Remove(e:GetLabelObject(),POS_FACEUP,REASON_EFFECT)
 end

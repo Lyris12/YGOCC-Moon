@@ -32,8 +32,8 @@ function cid.excfilter2(c)
 	return c:IsType(TYPE_MONSTER) or c:IsFacedown()
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_MZONE+LOCATION_HAND,0,1,e:GetHandler(),e) end
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,1,tp,LOCATION_MZONE+LOCATION_HAND)
+	if chk==0 then return Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_MZONE,0,1,e:GetHandler(),e) end
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,1,tp,LOCATION_MZONE)
 	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,0,LOCATION_MZONE,nil)
 	if #g>0 then
 		Duel.SetOperationInfo(0,CATEGORY_ATKCHANGE,g,#g,tp,0)
@@ -52,7 +52,7 @@ function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if Duel.GetFieldGroupCount(tp,0,LOCATION_EXTRA)>0 then
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,1,1-tp,LOCATION_EXTRA)
 	end
-	if e:GetHandler():IsOnField() and Duel.GetMatchingGroupCount(cid.excfilter2,tp,LOCATION_MZONE,0,nil)==1 then
+	if Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)<Duel.GetFieldGroupCount(tp,0,LOCATION_MZONE) then
 		Duel.SetChainLimit(cid.chlimit)
 	end
 end
@@ -62,7 +62,7 @@ end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_MZONE+LOCATION_HAND,0,1,99,nil,nil)
+	local g=Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_MZONE,0,1,99,nil,nil)
 	if #g>0 then
 		local ct=Duel.Destroy(g,REASON_EFFECT)
 		if ct==0 then return end
