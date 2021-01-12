@@ -45,5 +45,5 @@ function cm.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,tp)
 end
 function cm.splimit(e,c)
-	return not c:IsRace(RACE_PSYCHO) and c:IsLocation(LOCATION_EXTRA)
+	return not c:IsType(TYPE_SYNCHRO) and c:IsLocation(LOCATION_EXTRA)
 end
