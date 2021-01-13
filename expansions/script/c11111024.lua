@@ -23,12 +23,12 @@ function cid.initial_effect(c)
     --Shuffle "Golden Skies Treasure" into deck and Search a "Golden Skies" spell
     local e2=Effect.CreateEffect(c)
     e2:SetDescription(aux.Stringid(id, 1))
-    e2:SetCategory(CATEGORY_TODECK)
+    e2:SetCategory(CATEGORY_TODECK+CATEGORY_TOGRAVE)
     e2:SetType(EFFECT_TYPE_IGNITION)
     e2:SetRange(LOCATION_MZONE)
     e2:SetCountLimit(1, id+100)
-    e2:SetTarget(cid.tdtg)
-    e2:SetOperation(cid.tdop)
+    e2:SetTarget(cid.tgtg)
+    e2:SetOperation(cid.tgop)
     c:RegisterEffect(e2)
 end
 
@@ -72,15 +72,18 @@ end
 function cid.tgfilter(c)
     return c:IsCode(11111040) and c:IsAbleToGrave()
 end
-function cid.tdtg(e, tp, eg, ep, ev, re, r, rp, chk)
-    if chk==0 then return Duel.IsExistingMatchingCard(cid.tdfilter, tp, LOCATION_HAND+LOCATION_GRAVE, 0, 1, nil) end
+function cid.tgtg(e, tp, eg, ep, ev, re, r, rp, chk)
+    if chk==0 then return Duel.IsExistingMatchingCard(cid.tdfilter, tp, LOCATION_HAND+LOCATION_GRAVE, 0, 1, nil)
+        and Duel.IsExistingMatchingCard(cid.tgfilter, tp, LOCATION_DECK, 0, 1, nil) end
     Duel.SetOperationInfo(0, CATEGORY_TODECK, nil, 1, tp, LOCATION_HAND+LOCATION_GRAVE)
+    Duel.SetOperationInfo(0, CATEGORY_TOHAND, nil, 1, tp, LOCATION_DECK)
 end
-function cid.tdop(e, tp, eg, ep, ev, re, r, rp)
+function cid.tgop(e, tp, eg, ep, ev, re, r, rp)
     Duel.Hint(HINT_SELECTMSG, tp, HINTMSG_TODECK)
     local g1=Duel.SelectMatchingCard(tp, cid.tdfilter, tp, LOCATION_HAND+LOCATION_GRAVE, 0, 1, 1, nil)
+    if g1:GetCount()==0 then return end
     if Duel.SendtoDeck(g1, tp, 2, REASON_EFFECT)~=0 and Duel.ShuffleDeck(tp)~=0 then
-        Duel.Hint(HINT_SELECTMSG, tp, HINTMSG_ATOHAND)
+        Duel.Hint(HINT_SELECTMSG, tp, HINTMSG_TOGRAVE)
         local g2=Duel.SelectMatchingCard(tp, cid.tgfilter, tp, LOCATION_DECK, 0, 1, 1, nil)
         if g2:GetCount()>0 then
             Duel.SendtoGrave(g2, REASON_EFFECT)

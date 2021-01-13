@@ -27,7 +27,7 @@ function cid.initial_effect(c)
     --Shuffle a "Golden Skies Treasure" to deck to negate a card or effect
     local e2=Effect.CreateEffect(c)
     e2:SetDescription(aux.Stringid(id, 1))
-    e2:SetCategory(CATEGORY_NEGATE+CATEGORY_TODECK)
+    e2:SetCategory(CATEGORY_TODECK+CATEGORY_NEGATE)
     e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
     e2:SetCode(EVENT_CHAINING)
@@ -74,22 +74,20 @@ function cid.tdfilter(c)
 	return c:IsCode(11111040) and c:IsAbleToDeck()
 end
 function cid.negtg(e, tp, eg, ep, ev, re, r, rp, chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(cid.tdfilter, tp, LOCATION_GRAVE, 0, 1, nil) end
+    if chk==0 then return Duel.IsExistingMatchingCard(cid.tdfilter, tp, LOCATION_GRAVE, 0, 1, nil) end
+    Duel.SetOperationInfo(0, CATEGORY_TODECK, nil, 1, tp, LOCATION_GRAVE)
 	Duel.SetOperationInfo(0, CATEGORY_NEGATE, eg, 1, 0, 0)
-	if re:GetHandler():IsAbleToDeck() and re:GetHandler():IsRelateToEffect(re) then
+	if re:GetHandler():IsRelateToEffect(re) then
 		Duel.SetOperationInfo(0, CATEGORY_TODECK, eg, 1, 0, 0)
 	end
-	Duel.SetOperationInfo(0, CATEGORY_TODECK, nil, 1, tp, LOCATION_GRAVE)
 end
 function cid.negop(e, tp, eg, ep, ev, re, r, rp)
     local ec=re:GetHandler()
-	Duel.Hint(HINT_SELECTMSG, tp, HINTMSG_TODECK)
-	local g=Duel.SelectMatchingCard(tp, cid.tdfilter, tp, LOCATION_GRAVE, 0, 1, 1, nil)
-	local tc=g:GetFirst()
-	if not tc then return end
-    if Duel.SendtoDeck(tc, tp, 2, REASON_EFFECT)>0 and tc:IsLocation(LOCATION_DECK)
-        and Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then
+    Duel.Hint(HINT_SELECTMSG, tp, HINTMSG_TODECK)
+    local g=Duel.SelectMatchingCard(tp, cid.tdfilter, tp, LOCATION_GRAVE, 0, 1, 1, nil)
+    if g:GetCount()==0 then return end
+    if Duel.SendtoDeck(g, tp, 2, REASON_EFFECT)~=0 and Duel.ShuffleDeck(tp)~=0 and Duel.NegateActivation(ev)~=0 and re:GetHandler():IsRelateToEffect(re) then
         ec:CancelToGrave()
-        Duel.SendtoDeck(ec,nil,2,REASON_EFFECT)
-    end
+        Duel.SendtoDeck(ec, nil, 2, REASON_EFFECT)
+	end
 end
