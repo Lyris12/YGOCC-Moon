@@ -105,7 +105,7 @@ function cid.clear(e,tp,eg,ep,ev,re,r,rp)
 end
 --ACTIVATE
 function cid.cfilter(c)
-	return c:IsFacedown() or not c:IsType(TYPE_PENDULUM+TYPE_PANDEMONIUM) or not c:IsSetCard(0x7a4)
+	return c:IsFacedown() or (not c:IsType(TYPE_PENDULUM+TYPE_PANDEMONIUM) and not c:IsSetCard(0x7a4))
 end
 function cid.actcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:IsHasType(EFFECT_TYPE_ACTIVATE) and aux.PandActCheck(e)
