@@ -56,7 +56,7 @@ end
 --Fusion materials
 
 function cid.ffilter(c, fc, sub, mg, sg)
-	return c:IsFusionSetCard(0x570) and (not sg or not sg:IsExists(Card.IsFusionCode, 1, c, c:GetFusionCode()))
+	return c:IsFusionSetCard(0x570) and c:IsType(TYPE_MONSTER) and (not sg or not sg:IsExists(Card.IsFusionCode, 1, c, c:GetFusionCode()))
 end
 
 --Excavate and add to hand
