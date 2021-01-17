@@ -1,6 +1,6 @@
-﻿expansions/cards-new.cdb	307cd8bc558f8a15bea1ef97235b674c
+﻿expansions/cards-new.cdb	0d2f215c01c8ad6ba958d6805d0c7f49
 expansions/lflist.conf	99b9ef6a9fbd9cabdf9d013d5f7d6e4f
-expansions/strings.conf	2812d3567bcddbdac682763b570508c0
+expansions/strings.conf	0504df27e90c53c565548d7cb316091a
 expansions/pics/100000710.jpg	5f925a97b1c60d7d69acb8f229938263
 expansions/pics/100000711.jpg	2e99619bb8c3574fcc9df5cd346b01f2
 expansions/pics/100000712.jpg	2b5b5aa0ad7a65eb926531aee1aa734f
@@ -496,7 +496,7 @@ expansions/pics/1020100.jpg	e000bfc21cba8e0495340f226f93cdbc
 expansions/pics/1020101.jpg	9017a30ed3add53626fa8b6e0a6978ce
 expansions/pics/1020200.jpg	bfaecaaa6a1889a02f972ee1ac514525
 expansions/pics/1020961.jpg	12cdd7e4fefb7a74b6083f1c3d5727b6
-expansions/pics/102400000.png	a504118f2e6c88b0731a4fad982d0af8
+expansions/pics/102400000.png	be9e29baddede89c704983bd334a3e14
 expansions/pics/102400001.png	499ba3f41dfb9b9e51afc84d77bf52b3
 expansions/pics/102400002.png	35d3f424fc8b01974080218e46634b8c
 expansions/pics/102400003.png	dfff35c9aba666af77798b15223dff42
@@ -553,7 +553,7 @@ expansions/pics/102400053.png	7699ca794e47dc22483b1c2cbf2fb2f0
 expansions/pics/102400054.png	f2e72c83cb0951134b0c39fcb6b98bd2
 expansions/pics/102400055.png	fb34be7479074c7146c887d46d44f726
 expansions/pics/102400056.png	59b632e1e0054dc3988821d30fc90f9f
-expansions/pics/102400057.png	30fe2fdc0352ef96dd5776f1a3e9fb05
+expansions/pics/102400057.png	0016cbaaed49ddd5ef41a951d7e8a996
 expansions/pics/102400058.png	e8d64fdc29453fe3fa72345395118661
 expansions/pics/102400059.png	ba7e3a40cde0a2d071b1eeda902c0824
 expansions/pics/102400060.png	04b8deb24211c9526348d63caf9704fc
@@ -10233,6 +10233,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	ecfafa651a8ff816ffc9a57f2006bbba
+update/filelist.txt	1a39e0f7f374ea9a08afe982b23a517b
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	115711052ee4c7c8520bc38b5b172f5c
+update/version.txt	3588cf1e30baec4597f07ffab7cd5097
