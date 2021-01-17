@@ -36,7 +36,7 @@ end
 --Activate
 
 function cid.filter(c, tp)
-	return c:IsControler(tp) and c:IsSetCard(0x570) and c:IsFaceup()
+	return c:IsControler(tp) and c:IsSetCard(0x570) and c:IsFaceup() and c:IsOnField()
 end
 function cid.condition(e, tp, eg, ep, ev, re, r, rp)
 	if rp==tp or not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return false end

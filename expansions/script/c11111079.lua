@@ -9,6 +9,7 @@ local function getID()
 end
 local id,cid=getID()
 function cid.initial_effect(c)
+	aux.AddCodeList(c, 11111081, 11111082)
     --Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id, 0))
