@@ -3,6 +3,12 @@ xpcall(function() require("expansions/script/c37564765") end,function() require(
 local m,cm=Senya.SayuriRitualPreload(37564908)
 function cm.initial_effect(c)
 	c:EnableReviveLimit()
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_SINGLE)
+	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e0:SetCode(EFFECT_SPSUMMON_CONDITION)
+	e0:SetValue(function(e,se,sp,st) local sc=se:GetHandler() return aux.ritlimit(e,se,sp,st) and Senya.check_set_sayuri(sc) and sc:GetType()&0x82==0x82 end)
+	c:RegisterEffect(e0)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(m,0))
 	e2:SetCategory(CATEGORY_TOHAND)
@@ -62,7 +68,7 @@ function cm.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,cm.sfilter,tp,LOCATION_HAND,0,1,1,nil,e,tp)
 	if #g>0 then
-		Duel.SpecialSummon(g,0,tp,tp,true,true,POS_FACEUP)
+		Duel.SpecialSummon(g,SUMMON_TYPE_RITUAL,tp,tp,true,true,POS_FACEUP)
 		g:GetFirst():CompleteProcedure()
 	end
 end

@@ -3,6 +3,12 @@ xpcall(function() require("expansions/script/c37564765") end,function() require(
 local m,cm=Senya.SayuriRitualPreload(37564916)
 function cm.initial_effect(c)
 	c:EnableReviveLimit()
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_SINGLE)
+	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e0:SetCode(EFFECT_SPSUMMON_CONDITION)
+	e0:SetValue(function(e,se,sp,st) local sc=se:GetHandler() return aux.ritlimit(e,se,sp,st) and Senya.check_set_sayuri(sc) and sc:GetType()&0x82==0x82 end)
+	c:RegisterEffect(e0)
 	Senya.AddSummonMusic(c,m*16,SUMMON_TYPE_RITUAL)
 	local e4=Effect.CreateEffect(c)
 	e4:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -112,7 +118,7 @@ function cm.activate(e,tp,eg,ep,ev,re,r,rp)
 		local tc=g:GetFirst()
 		if tc then
 			Duel.BreakEffect()
-			Duel.SpecialSummon(tc,0,tp,tp,true,true,POS_FACEUP)
+			Duel.SpecialSummon(tc,SUMMON_TYPE_RITUAL,tp,tp,true,true,POS_FACEUP)
 			tc:CompleteProcedure()
 		end
 	end
