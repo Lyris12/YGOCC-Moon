@@ -349,6 +349,7 @@ function Auxiliary.SpatialTarget(sptcheck,...)
 			end
 end
 function Auxiliary.SpatialOperation(e,tp,eg,ep,ev,re,r,rp,c,smat,mg)
+	if Duel.SetSummonCancelable then Duel.SetSummonCancelable(true) end
 	local g=e:GetLabelObject()
 	c:SetMaterial(g)
 	local rg=Group.CreateGroup()

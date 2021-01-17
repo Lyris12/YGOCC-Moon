@@ -97,6 +97,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetOperation(function(ef,p,tg) if tg:GetFirst()~=sc then return end if tl==0 then Duel.ResetFlagEffect(tp,828) end sc:ResetEffect(RESET_CONTROL,RESET_EVENT) e1:Reset() end)
 		Duel.RegisterEffect(e1,tp)
 		Duel.SpecialSummonRule(tp,sc)
+		if Duel.SetSummonCancelable then Duel.SetSummonCancelable(false) end
 	end
 	for tc in aux.Next(mg) do tc:ResetEffect(RESET_CONTROL,RESET_EVENT) end
 end

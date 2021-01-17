@@ -342,6 +342,7 @@ function Auxiliary.ImpureTarget(minc,maxc,...)
 			end
 end
 function Auxiliary.ImpureOperation(e,tp,eg,ep,ev,re,r,rp,c)
+	if Duel.SetSummonCancelable then Duel.SetSummonCancelable(true) end
 	local g=e:GetLabelObject()
 	c:SetMaterial(g)
 	for tc in aux.Next(g) do

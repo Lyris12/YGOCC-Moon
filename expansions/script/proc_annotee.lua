@@ -179,6 +179,7 @@ function Auxiliary.AnnoteeTarget(minc,maxc,alterf,...)
 			end
 end
 function Auxiliary.AnnoteeOperation(e,tp,eg,ep,ev,re,r,rp,c,og,mg)
+	if Duel.SetSummonCancelable then Duel.SetSummonCancelable(true) end
 	local g=e:GetLabelObject()
 	c:SetMaterial(g)
 	if e:GetLabel()~=1 then Duel.Release(g,REASON_MATERIAL+REASON_ANNOTEE) end

@@ -244,6 +244,7 @@ function Auxiliary.HarmonyTarget(...)
 end
 function Auxiliary.HarmonyOperation(ph)
 	return  function(e,tp,eg,ep,ev,re,r,rp,c,smat,mg)
+				if Duel.SetSummonCancelable then Duel.SetSummonCancelable(true) end
 				local g=e:GetLabelObject()
 				c:SetMaterial(g)
 				for tc in aux.Next(g) do

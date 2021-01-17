@@ -523,6 +523,7 @@ function Auxiliary.XrosTarget(xscheck,...)
 			end
 end
 function Auxiliary.XrosOperation(e,tp,eg,ep,ev,re,r,rp,c)
+	if Duel.SetSummonCancelable then Duel.SetSummonCancelable(true) end
 	local g=e:GetLabelObject()
 	c:SetMaterial(g)
 	Duel.Overlay(c,g)

@@ -324,6 +324,7 @@ function Auxiliary.BypathTarget(altcheck,...)
 			end
 end
 function Auxiliary.BypathOperation(e,tp,eg,ep,ev,re,r,rp,c)
+	if Duel.SetSummonCancelable then Duel.SetSummonCancelable(true) end
 	local mg=e:GetLabelObject()
 	local sg=Group.CreateGroup()
 	for tc in aux.Next(mg) do

@@ -80,6 +80,7 @@ function Auxiliary.ToxiaOperation(potency,sac,req,...)
 	local funs={...}
 	return  function(e,tp,eg,ep,ev,re,r,rp,c,sg,og)
 				req(e,tp,1,table.unpack(funs))
+				if Duel.SetSummonCancelable then Duel.SetSummonCancelable(true) end
 				Duel.ConfirmCards(tp,c)
 				Duel.ConfirmCards(1-tp,c)
 				local e0=sac(1-tp,potency)

@@ -232,6 +232,7 @@ function Auxiliary.PolarityTarget(f1,f2)
 			end
 end
 function Auxiliary.PolarityOperation(e,tp,eg,ep,ev,re,r,rp,c,smat,mg)
+	if Duel.SetSummonCancelable then Duel.SetSummonCancelable(true) end
 	local g=e:GetLabelObject()
 	c:SetMaterial(g)
 	Duel.SendtoGrave(g,REASON_MATERIAL+0x40000000)

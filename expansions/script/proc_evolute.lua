@@ -435,6 +435,7 @@ function Auxiliary.EvoluteTarget(outdate1,outdate2,minc,maxc,gcheck,...)
 			end
 end
 function Auxiliary.EvoluteOperation(e,tp,eg,ep,ev,re,r,rp,c,smat,mg)
+	if Duel.SetSummonCancelable then Duel.SetSummonCancelable(true) end
 	local g=e:GetLabelObject()
 	c:SetMaterial(g)
 	local lvTotal=0
