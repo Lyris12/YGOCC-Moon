@@ -48,7 +48,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 	local e5=e3:Clone()
 	e5:SetCode(EFFECT_CHANGE_LEVEL)
-	e5:SetValue(5)
+	e5:SetValue(3)
 	c:RegisterEffect(e5)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
