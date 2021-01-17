@@ -1,4 +1,4 @@
---Shisune No Yomeiri
+--Shisune Honden
 --Scripted by Yuno
 local function getID()
 	local str=string.match(debug.getinfo(2,'S')['source'],"c%d+%.lua")
@@ -45,7 +45,7 @@ end
 --Activate
 
 function cid.thfilter(c)
-	return c:IsSetCard(0x570) and c:IsType(TYPE_SPELL+TYPE_RITUAL) and c:IsAbleToHand()
+	return c:IsSetCard(0x570) and c:GetType()==TYPE_SPELL+TYPE_RITUAL and c:IsAbleToHand()
 end
 function cid.tgfilter(c)
     return c:IsSetCard(0x570) and c:IsType(TYPE_MONSTER) and c:IsAbleToGrave()
@@ -118,7 +118,7 @@ function cid.tdop(e, tp, eg, ep, ev, re, r, rp)
     Duel.Hint(HINT_SELECTMSG, tp, HINTMSG_TODECK)
     local g=Duel.SelectMatchingCard(tp, tdfilter, tp, LOCATION_GRAVE, 0, 1, 1, e:GetHandler())
     if g:GetCount()==0 then return end
-    if Duel.SendtoDeck(g, nil, 2, REASON_EFFECT)~=0 and sg:IsLocation(LOCATION_DECK+LOCATION_EXTRA) then
+    if Duel.SendtoDeck(g, nil, 2, REASON_EFFECT)~=0 and g:GetFirst():IsLocation(LOCATION_DECK+LOCATION_EXTRA) then
         if g:GetFirst():IsLocation(LOCATION_DECK) then Duel.ShuffleDeck(tp) end
         Duel.SendtoHand(e:GetHandler(), nil, REASON_EFFECT)
     end
