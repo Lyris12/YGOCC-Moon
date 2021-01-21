@@ -102,7 +102,7 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 		local ct=Duel.SendtoDeck(g,nil,2,REASON_EFFECT)
 		Duel.ShuffleDeck(tp)
 		Duel.BreakEffect()
-		if Duel.Draw(tp,ct+1,REASON_EFFECT)~=0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
+		if Duel.Draw(tp,ct,REASON_EFFECT)~=0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
 			local og=Duel.GetOperatedGroup():Filter(cid.rvfilter,nil,e,tp)
 			if #og>0 and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
 				Duel.Hint(HINT_SELECTMSG,p,HINTMSG_SPSUMMON)
