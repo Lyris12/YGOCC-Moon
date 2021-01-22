@@ -148,7 +148,7 @@ function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 				if g:GetFirst():IsType(TYPE_PENDULUM) then
 					Duel.MoveToField(g:GetFirst(),tp,tp,LOCATION_PZONE,POS_FACEUP,true)
 				else
-					aux.PandAct(g:GetFirst())(e,tp,eg,ep,ev,re,r,rp)
+					aux.PandAct(g:GetFirst(),tp,0xff,true)(e,tp,eg,ep,ev,re,r,rp)
 				end
 			end
 		end

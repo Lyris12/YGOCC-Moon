@@ -248,7 +248,7 @@ end
 
 --activate cost
 function cid.actarget(e,te,tp)
-	return te:GetHandler():IsFacedown() and te:GetHandler():GetFlagEffect(id)>0
+	return te:GetHandler():IsFacedown() and te:GetHandler():IsType(TYPE_TRAP) and te:GetHandler():IsSetCard(0xf2,0xf80,0x7a4) and te:GetHandler():GetFlagEffect(id)>0
 end
 function cid.costchk(e,te_or_c,tp)
 	return Duel.CheckLPCost(tp,1000) and Duel.GetFlagEffect(tp,id)<=0

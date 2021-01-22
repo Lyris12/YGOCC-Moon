@@ -29,7 +29,7 @@ function cid.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		and Duel.IsExistingTarget(Card.IsAbleToRemove,tp,0,LOCATION_ONFIELD,1,nil)
 	end
 	local sg=Duel.GetMatchingGroup(cid.cfilter,tp,LOCATION_MZONE,0,nil)
-	local typ={TYPE_FUSION,TYPE_SYNCHRO,TYPE_XYZ,TYPE_LINK,TYPE_PENDULUM,TYPE_PANDEMONIUM}
+	local typ={TYPE_FUSION,TYPE_SYNCHRO,TYPE_XYZ,TYPE_LINK}
 	local ct=0
 	for i=1,#typ do
 		if sg:IsExists(Card.IsType,1,nil,typ[i]) then

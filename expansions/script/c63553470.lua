@@ -142,7 +142,7 @@ function c63553470.actop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,c63553470.actfilter,tp,LOCATION_DECK,0,1,1,nil,tp)
 	local tc=g:GetFirst()
 	if tc:IsType(TYPE_PENDULUM) then
-		Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
+		Duel.MoveToField(tc,tp,tp,LOCATION_PZONE,POS_FACEUP,true)
 	else
 		Card.SetCardData(tc,CARDDATA_TYPE,TYPE_TRAP+TYPE_CONTINUOUS)
 		Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
@@ -167,10 +167,11 @@ function c63553470.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c63553470.thop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=nil
-	if eg:GetCount()>1 then
-		tc=eg:FilterSelect(tp,Card.IsAbleToHand,1,1,nil):GetFirst()
+	local sg=eg:Filter(c63553470.drcfilter,nil,tp)
+	if sg:Filter(Card.IsAbleToHand,nil):GetCount()>1 then
+		tc=sg:FilterSelect(tp,Card.IsAbleToHand,1,1,nil):GetFirst()
 	else
-		tc=eg:GetFirst()
+		tc=sg:GetFirst()
 	end
 	if not tc or not tc:IsAbleToHand() or tc:IsLocation(LOCATION_HAND) then return end
 	Duel.SendtoHand(tc,nil,REASON_EFFECT)
@@ -185,13 +186,14 @@ function c63553470.settg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 end
 function c63553470.setop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 or not eg:IsExists(c63553470.checksetfilter,1,nil,e,tp,eg,ep,ev,re,r,rp) then return end
+	local sg=eg:Filter(c63553470.drcfilter2,nil,e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 or not sg:IsExists(c63553470.checksetfilter,1,nil,e,tp,eg,ep,ev,re,r,rp) then return end
 	local tc=nil
 	if eg:GetCount()>1 then
-		local fg=eg:Filter(c63553470.checksetfilter,nil,e,tp,eg,ep,ev,re,r,rp)
+		local fg=sg:Filter(c63553470.checksetfilter,nil,e,tp,eg,ep,ev,re,r,rp)
 		tc=fg:Select(tp,1,1,nil):GetFirst()
 	else
-		local fg=eg:Filter(c63553470.checksetfilter,nil,e,tp,eg,ep,ev,re,r,rp)
+		local fg=sg:Filter(c63553470.checksetfilter,nil,e,tp,eg,ep,ev,re,r,rp)
 		tc=fg:GetFirst()
 	end
 	if tc then

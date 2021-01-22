@@ -808,13 +808,13 @@ function Auxiliary.PandActOperation(...)
 end
 function Auxiliary.PandAct(tc,...)
 	local funs={...}
-	local player,zonechk=funs[1],funs[2]
+	local player,zonechk,fromfield=funs[1],funs[2],funs[3]
 	return  function(e,tp,eg,ep,ev,re,r,rp)
 				local p,zone=tp,0xff
 				if player then p=player end
 				if zonechk then zone=zonechk end
 				tc:SetCardData(CARDDATA_TYPE,TYPE_TRAP+TYPE_CONTINUOUS)
-				if not tc:IsOnField() then
+				if not tc:IsOnField() or fromfield then
 					Duel.MoveToField(tc,tp,p,LOCATION_SZONE,POS_FACEUP,true,zone)
 					if not tc:IsLocation(LOCATION_SZONE) then
 						local edcheck=0
