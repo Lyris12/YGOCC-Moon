@@ -61,7 +61,7 @@ end
 --SPSUMMON
 function cid.spfilter(c,e,tp,atk)
 	return c:IsType(TYPE_MONSTER) and c:IsType(TYPE_PANDEMONIUM) and c:GetAttack()>atk and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-		and ((not c:IsLocation(LOCATION_EXTRA) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0) or c:IsFaceup() and Duel.GetLocationCountFromEx(tp,tp,nil,c)) 
+		and ((not c:IsLocation(LOCATION_EXTRA) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0) or c:IsFaceup() and Duel.GetLocationCountFromEx(tp,tp,nil,c)>0) 
 end
 function cid.filter(c,e,tp)
 	return c:IsFaceup() and c:IsType(TYPE_MONSTER) and c:IsType(TYPE_PENDULUM) and Duel.IsExistingMatchingCard(cid.spfilter,tp,LOCATION_HAND+LOCATION_GRAVE+LOCATION_EXTRA,0,1,nil,e,tp,c:GetAttack())
