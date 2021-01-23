@@ -1,5 +1,15 @@
+--Ysabella, Knights of the Fallen
 function c1553040.initial_effect(c)
 	aux.EnablePendulumAttribute(c)
+	--splimit
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_FIELD)
+	e0:SetRange(LOCATION_PZONE)
+	e0:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+	e0:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CANNOT_NEGATE)
+	e0:SetTargetRange(1,0)
+	e0:SetTarget(c1553040.splimit)
+	c:RegisterEffect(e0)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(1553040,0))
 	e2:SetCategory(CATEGORY_DESTROY+CATEGORY_TOHAND+CATEGORY_SEARCH)
@@ -20,6 +30,9 @@ function c1553040.initial_effect(c)
 	local e5=e4:Clone()
 	e5:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e5)
+end
+function c1553040.splimit(e,c,sump,sumtype,sumpos,targetp)
+	return not c:IsSetCard(0xFA0) and bit.band(sumtype,SUMMON_TYPE_PENDULUM)==SUMMON_TYPE_PENDULUM
 end
 function c1553040.filter(c)
 	return c:IsType(TYPE_PENDULUM) and c:IsType(TYPE_MONSTER) and c:IsSetCard(0xFA0) and c:IsAbleToHand() and not c:IsCode(1553040)
@@ -43,6 +56,7 @@ end
 function c1553040.sumop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetFlagEffect(tp,1553040)~=0 then return end
 	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetDescription(aux.Stringid(1553040,1))
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetTargetRange(LOCATION_HAND+LOCATION_MZONE,0)
 	e1:SetCode(EFFECT_EXTRA_SUMMON_COUNT)

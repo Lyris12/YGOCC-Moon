@@ -1,43 +1,34 @@
+--Alyufa, Knights of the Fallen
 function c1553050.initial_effect(c)
 	 --Pendulum Set
+	 aux.EnablePendulumAttribute(c)
+	 --splimit
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_FIELD)
+	e0:SetRange(LOCATION_PZONE)
+	e0:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+	e0:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CANNOT_NEGATE)
+	e0:SetTargetRange(1,0)
+	e0:SetTarget(c1553050.splimit)
+	c:RegisterEffect(e0)
+	--Ignition Top Deck
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_SPSUMMON_PROC_G)
-	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
+	e1:SetDescription(aux.Stringid(1553050,0))
+	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_PZONE)
-	e1:SetCountLimit(1,10000000)
-	e1:SetCondition(aux.PendCondition())
-	e1:SetOperation(aux.PendOperation())
-	e1:SetValue(SUMMON_TYPE_PENDULUM)
-	c:RegisterEffect(e1)
-	--register by default
-	if reg==nil or reg then
-		local e2=Effect.CreateEffect(c)
-		e2:SetDescription(1160)
-		e2:SetType(EFFECT_TYPE_ACTIVATE)
-		e2:SetCode(EVENT_FREE_CHAIN)
-		e2:SetOperation(c1553050.operation)
-		c:RegisterEffect(e2)
-	end
-	--[[
-	aux.AddPendulumProcedure(c)
-	--Activate
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCountLimit(1,1553050)
 	e1:SetOperation(c1553050.operation)
-	c:RegisterEffect(e1)]]--
-	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(1553050,0))
-	e3:SetCategory(CATEGORY_TODECK+CATEGORY_NEGATE+CATEGORY_DESTROY)
-	e3:SetType(EFFECT_TYPE_QUICK_O)
-	e3:SetRange(LOCATION_EXTRA)
-	e3:SetCode(EVENT_CHAINING)
-	e3:SetCondition(c1553050.condition)
-	e3:SetCost(c1553050.cost)
-	e3:SetTarget(c1553050.target)
-	e3:SetOperation(c1553050.activate)
-	c:RegisterEffect(e3)
+	c:RegisterEffect(e1)
+	--effect gain
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	e2:SetProperty(EFFECT_FLAG_EVENT_PLAYER+EFFECT_FLAG_CANNOT_DISABLE)
+	e2:SetCode(EVENT_BE_MATERIAL)
+	e2:SetCountLimit(1,1553050+1)
+	e2:SetCondition(c1553050.efcon)
+	e2:SetOperation(c1553050.efop)
+	c:RegisterEffect(e2)
+	--Atk Gain
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_FIELD)
 	e4:SetRange(LOCATION_PZONE)
@@ -47,37 +38,49 @@ function c1553050.initial_effect(c)
 	e4:SetValue(300)
 	c:RegisterEffect(e4)
 end
-function c1553050.filter(c)
-	return c:IsSetCard(0x190)
+function c1553050.splimit(e,c,sump,sumtype,sumpos,targetp)
+	return not c:IsSetCard(0xFA0) and bit.band(sumtype,SUMMON_TYPE_PENDULUM)==SUMMON_TYPE_PENDULUM
+end
+
+function c1553050.efcon(e,tp,eg,ep,ev,re,r,rp)
+	return (r&REASON_LINK+REASON_SYNCHRO+REASON_XYZ)~=0
+		and e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
+		
+end
+function c1553050.efop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local rc=c:GetReasonCard()
+	local e1=Effect.CreateEffect(rc)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_INDESTRUCTABLE_COUNT)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CLIENT_HINT+EFFECT_FLAG_NO_TURN_RESET)
+	e:SetCountLimit(1)
+	e1:SetValue(c1553050.valcon)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+	rc:RegisterEffect(e1,true)
+	if not rc:IsType(TYPE_EFFECT) then
+		local e2=Effect.CreateEffect(c)
+		e2:SetType(EFFECT_TYPE_SINGLE)
+		e2:SetCode(EFFECT_ADD_TYPE)
+		e2:SetValue(TYPE_EFFECT)
+		e2:SetReset(RESET_EVENT+RESETS_STANDARD)
+		rc:RegisterEffect(e2,true)
+	end
+	rc:RegisterFlagEffect(0,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(1553050,2))
+end
+function c1553050.valcon(e,re,r,rp)
+	return bit.band(r,REASON_BATTLE)~=0
+end
+function c1553050.tdfilter(c)
+	return c:IsSetCard(0xFA0) and c:GetCode()~=1553050
 end
 function c1553050.operation(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
-	local g=Duel.GetMatchingGroup(c1553050.filter,tp,LOCATION_DECK,0,nil)
-	if g:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(1553050,0)) then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
-		local sg=g:Select(tp,1,1,nil)
-		local tc=g:GetFirst()
+	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(1553050,1))
+	local g=Duel.SelectMatchingCard(tp,c1553050.tdfilter,tp,LOCATION_DECK,0,1,1,nil)
+	local tc=g:GetFirst()
+	if tc then
+		Duel.ShuffleDeck(tp)
 		Duel.MoveSequence(tc,0)
-		Duel.ConfirmDecktop(tp,tc)
-	end
-end
-function c1553050.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToDeckAsCost() end
-	Duel.SendtoDeck(e:GetHandler(),nil,0,REASON_COST)
-end
-function c1553050.condition(e,tp,eg,ep,ev,re,r,rp)
-	return re:IsActiveType(TYPE_TRAP) and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainNegatable(ev)
-end
-function c1553050.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
-	if re:GetHandler():IsDestructable() and re:GetHandler():IsRelateToEffect(re) then
-		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
-	end
-end
-function c1553050.activate(e,tp,eg,ep,ev,re,r,rp)
-	Duel.NegateActivation(ev)
-	if re:GetHandler():IsRelateToEffect(re) then
-		Duel.Destroy(eg,REASON_EFFECT)
+		Duel.ConfirmDecktop(tp,1)
 	end
 end

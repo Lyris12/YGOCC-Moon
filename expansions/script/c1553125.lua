@@ -2,7 +2,7 @@
 function c1553125.initial_effect(c)
 	--link summon
     c:EnableReviveLimit()
-    aux.AddLinkProcedure(c,c1553125.matfilter,1,1)
+    aux.AddLinkProcedure(c,aux.FilterBoolFunction(c1553125.matfilter),1,1)
     --splimit
 	local e0=Effect.CreateEffect(c)
 	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
@@ -34,7 +34,7 @@ function c1553125.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c1553125.matfilter(c)
-	return c:IsLinkSetCard(0x190) or c:IsLinkSetCard(0xFA0)
+	return c:IsSetCard(0x190) or c:IsSetCard(0xFA0)
 end
 function c1553125.regcon(e,tp,eg,ep,ev,re,r,rp)
 	return bit.band(e:GetHandler():GetSummonType(),SUMMON_TYPE_LINK)==SUMMON_TYPE_LINK
@@ -52,21 +52,20 @@ end
 function c1553125.splimit(e,c,sump,sumtype,sumpos,targetp,se)
 	return c:IsCode(1553125) and bit.band(sumtype,SUMMON_TYPE_LINK)==SUMMON_TYPE_LINK
 end
-function c1553125.spfilter(c,e,tp)
-	return c:IsSetCard(0xFA0) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+function c1553125.spfilter(c,e,tp,zone)
+	return c:IsSetCard(0xFA0) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,tp,zone)
 end
 function c1553125.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local zone=bit.band(e:GetHandler():GetLinkedZone(tp),0x1f)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(c1553125.spfilter,tp,LOCATION_HAND,0,1,nil,e,tp) end
+	if chk==0 then
+		local zone=e:GetHandler():GetLinkedZone(tp)
+	return zone~=0 and Duel.IsExistingMatchingCard(c1553125.spfilter,tp,LOCATION_HAND,0,1,nil,e,tp,zone) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
 end
 function c1553125.spop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local zone=bit.band(c:GetLinkedZone(tp),0x1f)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+	local zone=e:GetHandler():GetLinkedZone(tp)
+	if zone==0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,c1553125.spfilter,tp,LOCATION_HAND,0,1,1,nil,e,tp)
+	local g=Duel.SelectMatchingCard(tp,c1553125.spfilter,tp,LOCATION_HAND,0,1,1,nil,e,tp,zone)
 	local tc=g:GetFirst()
 	if tc and zone~=0 and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP,zone)~=0 then
 		local e1=Effect.CreateEffect(e:GetHandler())

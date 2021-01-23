@@ -32,7 +32,7 @@ function c1553060.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoGrave(g2,REASON_DISCARD)
 		Duel.BreakEffect()
 		local g1=Duel.GetDecktopGroup(tp,3)
-		Duel.ConfirmCards(tp,g1)
+		Duel.ConfirmCards(1-tp,g1)
 		if g1:GetCount()>0 then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 			local sg=g1:FilterSelect(tp,Card.IsAbleToRemove,1,1,nil)

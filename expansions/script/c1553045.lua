@@ -1,5 +1,16 @@
+--Isolde, Knights of the Fallen
 function c1553045.initial_effect(c)
+	--pendulum summon
 	aux.EnablePendulumAttribute(c)
+	 --splimit
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_FIELD)
+	e0:SetRange(LOCATION_PZONE)
+	e0:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+	e0:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CANNOT_NEGATE)
+	e0:SetTargetRange(1,0)
+	e0:SetTarget(c1553045.splimit)
+	c:RegisterEffect(e0)
 	local e2=Effect.CreateEffect(c)
 	e2:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
 	e2:SetType(EFFECT_TYPE_FIELD)
@@ -24,6 +35,9 @@ function c1553045.initial_effect(c)
 	local e5=e4:Clone()
 	e5:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e5)
+end
+function c1553045.splimit(e,c,sump,sumtype,sumpos,targetp)
+	return not c:IsSetCard(0xFA0) and bit.band(sumtype,SUMMON_TYPE_PENDULUM)==SUMMON_TYPE_PENDULUM
 end
 function c1553045.filter(c,e,tp)
 	return c:IsSetCard(0xFA0) and not c:IsCode(4007) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

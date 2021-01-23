@@ -13,7 +13,9 @@ function c1553020.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c1553020.condition(e,tp,eg,ep,ev,re,r,rp)
-	return e and (e:GetHandler():IsSetCard(0xFA0)) or (e:GetHandler():GetSummonType()==SUMMON_TYPE_PENDULUM)
+	if not re then return false end
+	local rc=re:GetHandler()
+	return rc and (rc:IsSetCard(0xFA0)) or (e:GetHandler():GetSummonType()==SUMMON_TYPE_PENDULUM)
 end
 function c1553020.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
