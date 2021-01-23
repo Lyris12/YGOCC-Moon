@@ -66,8 +66,9 @@ function cid.initial_effect(c)
     c:RegisterEffect(e6)
     --Destroy the equipped monster
     local e7=Effect.CreateEffect(c)
-    e7:SetCategory(CATEGORY_DESTROY)
-    e7:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
+	e7:SetCategory(CATEGORY_DESTROY)
+	e7:SetProperty(EFFECT_FLAG_DELAY)
+    e7:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e7:SetCode(EVENT_DESTROYED)
 	e7:SetCondition(cid.descon2)
     e7:SetTarget(cid.destg2)
@@ -109,8 +110,9 @@ function cid.eftg(e, c)
     end
 end
 function cid.negcon(e, tp, eg, ep, ev, re, r, rp)
-	local ex=(Duel.GetOperationInfo(ev,CATEGORY_SEARCH) or re:IsHasCategory(CATEGORY_SEARCH))
-	return rp~=tp and ex and not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and Duel.IsChainNegatable(ev)
+	local ex1=(Duel.GetOperationInfo(ev,CATEGORY_SEARCH) or re:IsHasCategory(CATEGORY_SEARCH))
+	local ex2=(Duel.GetOperationInfo(ev,CATEGORY_DRAW) or re:IsHasCategory(CATEGORY_DRAW))
+	return (ex1 or ex2) and rp~=tp and not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and Duel.IsChainNegatable(ev)
 end
 function cid.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return not re:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) end
@@ -135,14 +137,17 @@ function cid.desop1(e, tp, eg, ep, ev, re, r, rp)
 end
 --Destroy the equipped monster
 function cid.descon2(e, tp, eg, ep, ev, re, r, rp)
-	return e:GetHandler():IsReason(REASON_EFFECT)
+	local c=e:GetHandler()
+	return c:IsReason(REASON_EFFECT) and c:IsPreviousLocation(LOCATION_ONFIELD)
 end
 function cid.destg2(e, tp, eg, ep, ev, re, r, rp, chk)
 	if chk==0 then return true end
-	Duel.SetOperationInfo(0, CATEGORY_DESTROY, nil, 1, 0, 0)
+    local tc=e:GetHandler():GetPreviousEquipTarget()
+    Duel.SetTargetCard(tc)
+    Duel.SetOperationInfo(0, CATEGORY_DESTROY, tc, 1, 0, 0)
 end
 function cid.desop2(e, tp, eg, ep, ev, re, r, rp)
-	local tc=e:GetHandler():GetFirstCardTarget()
+	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsLocation(LOCATION_MZONE) then
         Duel.Destroy(tc,REASON_EFFECT)
     end
