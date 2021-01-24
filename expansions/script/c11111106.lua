@@ -73,9 +73,9 @@ end
 function cid.thcost(e, tp, eg, ep, ev, re, r, rp, chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cid.costfilter, tp, LOCATION_HAND, 0, 1, nil, tp) end
 	Duel.Hint(HINT_SELECTMSG, tp, HINTMSG_DISCARD)
-	local tc=Duel.SelectMatchingCard(tp, cid.costfilter, tp, LOCATION_HAND, 0, 1, 1, nil, tp):GetFirst()
-	e:SetLabel(tc:GetType())
-	Duel.DiscardHand(tp, cid.costfilter, 1, 1, REASON_COST+REASON_DISCARD, nil)
+	local tc=Duel.SelectMatchingCard(tp, cid.costfilter, tp, LOCATION_HAND, 0, 1, 1, nil, tp)
+    Duel.SendtoGrave(tc, REASON_COST+REASON_DISCARD)
+    e:SetLabel(tc:GetFirst():GetType())
 end
 function cid.thtg(e, tp, eg, ep, ev, re, r, rp, chk)
 	if chk==0 then return true end
