@@ -33,7 +33,7 @@ function s.initial_effect(c)
 	e3:SetOperation(s.activate)
 	c:RegisterEffect(e3)
 	aux.EnablePandemoniumAttribute(c,e3,true,TYPE_EFFECT+TYPE_EVOLUTE+TYPE_XYZ)
-	aux.AddEvoluteProc(c,nil,10,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_FIRE),aux.FilterBoolFunction(Card.IsRace,RACE_DINOSAUR))
+	aux.AddEvoluteProc(c,nil,10,s.matfilter,2,2)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
@@ -67,6 +67,9 @@ function s.initial_effect(c)
 	e7:SetTarget(s.pentg)
 	e7:SetOperation(s.penop)
 	c:RegisterEffect(e7)
+end
+function s.matfilter(c)
+	return c:IsAttribute(ATTRIBUTE_FIRE) or c:IsRace(RACE_DINOSAUR)
 end
 function s.splimit(e,c,sump,sumtype,sumpos,targetp)
 	if c:IsRace(RACE_DINOSAUR) then return false end
