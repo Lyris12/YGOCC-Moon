@@ -29,7 +29,7 @@ function c249000697.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c249000697.filter(c,e,sp)
-	return c:GetLevel() > 0 and c:GetLevel() <=7 and c:IsCanBeSpecialSummoned(e,0,sp,false,false)
+	return c:GetLevel() > 0 and c:GetLevel() <=10 and c:IsCanBeSpecialSummoned(e,0,sp,false,false)
 end
 function c249000697.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c249000697.filter(chkc,e,tp) end

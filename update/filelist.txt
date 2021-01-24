@@ -1,4 +1,4 @@
-﻿expansions/cards-new.cdb	d96cdb438d9466c665c5710fdcd7c573
+﻿expansions/cards-new.cdb	3792c3e216731b7a4afd5477507d0195
 expansions/lflist.conf	99b9ef6a9fbd9cabdf9d013d5f7d6e4f
 expansions/strings.conf	1ddfabc0a6febb53cd3393dc700d320d
 expansions/pics/100000710.jpg	5f925a97b1c60d7d69acb8f229938263
@@ -1335,9 +1335,12 @@ expansions/pics/1553125.jpg	11dba933bf66b3a2a70b8fc618b35fcf
 expansions/pics/1553130.jpg	da34ba44daa04ba8cd8c3eded07a62bd
 expansions/pics/1553130.png	f969e0fe738028dd955c3edc68cbbe15
 expansions/pics/1553135.jpg	8aa4ebce7c392cb2531be8b89550d2fd
+expansions/pics/1553135.png	90d89ccdce0d7be877ec9b728ff4dbc6
 expansions/pics/1553140.jpg	515223e05d5c49dd56ab18acd0623896
+expansions/pics/1553140.png	0867d412a14b522c0ff6f9d11c552228
 expansions/pics/1553145.png	de5492fbf71bba8b0f2c37e78987857e
 expansions/pics/1553150.jpg	269ab404faecd5cbf23edb050d2194ff
+expansions/pics/1553150.png	ba5eccbee9091ce8854b8993ec08eba9
 expansions/pics/1553155.png	1989e707d1e45d3391960aca5d917a02
 expansions/pics/1553160.png	3e73540ea8f0e8756d31ffe089bcc9de
 expansions/pics/1553165.png	b87c78507a6e92116a40d715081b661e
@@ -2488,7 +2491,7 @@ expansions/pics/24715205.jpg	8d4eb91966e0ecba11bb309bd3000545
 expansions/pics/24715206.jpg	4f1eeb48a9d6414202218e11151c9f64
 expansions/pics/24715207.jpg	792208733691b131ec4fae6fc361129d
 expansions/pics/249000004.jpg	39cf9057804dd7acfab612c18702cf80
-expansions/pics/249000005.jpg	fe7551326aba1559977fc7a1be179d52
+expansions/pics/249000005.jpg	796d191616cab832acb3d0eb38ae21c5
 expansions/pics/249000006.jpg	4a069c51e34124be7aa5f31ae889ddf9
 expansions/pics/249000008.jpg	106541ede1207d19cac61e1b722f717b
 expansions/pics/249000073.jpg	2a1e6e37d34f3b6559a447694ca97461
@@ -7627,7 +7630,7 @@ expansions/script/c24715205.lua	d22935fe6f9c519b993597637a510582
 expansions/script/c24715206.lua	ff8b0e285c3423c326cd0af25a0bf46a
 expansions/script/c24715207.lua	a533491127537448d83af18e390158d2
 expansions/script/c249000004.lua	66b1d7fc004987a1bab77e7f40102ce1
-expansions/script/c249000005.lua	6012a0d3879afe1013f62496d3138a90
+expansions/script/c249000005.lua	3116b9514147891667b9f31274f89582
 expansions/script/c249000006.lua	ed4e0b3da6de2c16041dab4e189823ae
 expansions/script/c249000008.lua	f8e2e16b90f348e99f8ec6db1d7b7e4a
 expansions/script/c249000073.lua	0fd7635a07a11c15163acadd90652a16
@@ -7714,7 +7717,7 @@ expansions/script/c249000525.lua	cbd4d3965855b25106dabd514f39937c
 expansions/script/c249000526.lua	068557f37408dc628f753e01a541eb0f
 expansions/script/c249000527.lua	a380d353249f86b13e5b3a741458dbcd
 expansions/script/c249000528.lua	cd93f443ab46a853e51c5f06ca28c45a
-expansions/script/c249000529.lua	59012f6ddd57de0e3d870424b05cd2ce
+expansions/script/c249000529.lua	1f5e06a4f6a987bbbff54c3cba0e8019
 expansions/script/c249000544.lua	2bb0f44a9d3096bb5744929fc1badc4a
 expansions/script/c249000545.lua	ebd35ef16964eb3b1a9d4d0904d6fed8
 expansions/script/c249000553.lua	bb60a2e6793fbb096c2a555f649c66d5
@@ -7749,7 +7752,7 @@ expansions/script/c249000648.lua	6e5db67838a8aeeef75b01ff27639f0f
 expansions/script/c249000649.lua	72e14850692c5d85ca948c54b3b239b7
 expansions/script/c249000695.lua	7a45197aff555774a85472d1d1aa4747
 expansions/script/c249000696.lua	ade477ae9eebe471dd5347cc26fb24f4
-expansions/script/c249000697.lua	e063598ba6c1042464a5214cb08a0f7c
+expansions/script/c249000697.lua	fe7c4084c972d501d4b028af7a5c219a
 expansions/script/c249000698.lua	1e034c3213962f911c679ec03dd9886d
 expansions/script/c249000699.lua	40b9753b1bfc3dc9383f121f388a2a04
 expansions/script/c249000700.lua	b546b9065c996e8743707d9ef4d853da
@@ -10341,6 +10344,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	022cc3b1677eb67e6c2fa6a76b39053f
+update/filelist.txt	1537506ae4da27e125cd3d7ede2459f0
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	27e00403227d846dd9558b81b1b9bbfa
+update/version.txt	b21722bda1ba4166984c4829c0e4cedd

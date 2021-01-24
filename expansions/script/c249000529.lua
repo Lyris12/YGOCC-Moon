@@ -37,6 +37,12 @@ function c249000529.initial_effect(c)
 	e4:SetTarget(c249000529.sptg2)
 	e4:SetOperation(c249000529.spop2)
 	c:RegisterEffect(e4)
+	--extra att
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_EQUIP)
+	e5:SetCode(EFFECT_EXTRA_ATTACK)
+	e5:SetValue(1)
+	c:RegisterEffect(e5)
 end
 function c249000529.filter(c)
 	local ct1,ct2=c:GetUnionCount()
