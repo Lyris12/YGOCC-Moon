@@ -9,7 +9,6 @@ local function getID()
 end
 local id,cid=getID()
 function cid.initial_effect(c)
-    c:EnableReviveLimit()
     --Must be Special Summoned by a card effect
     local e1=Effect.CreateEffect(c)
     e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
