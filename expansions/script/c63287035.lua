@@ -19,10 +19,10 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function s.mfilter(c,g)
-	return c:IsCode(id-38,id-39) and c:IsAbleToRemove()
+	return c:IsCode(id-10,id-11) and c:IsAbleToRemove()
 end
 function s.filter(c,e,tp)
-	return c:IsCode(id-3) and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
+	return c:IsCode(id-1) and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
