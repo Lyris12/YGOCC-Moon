@@ -63,7 +63,7 @@ end
 		
 		
 function s.cfilter(c,tp)
-	return (c:IsPreviousSetCard(0x190) or c:IsPreviousSetCard(0xFA0)) and c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousControler(tp)
+	return (c:IsPreviousSetCard(0x190) or c:IsPreviousSetCard(0xFA0)) and c:IsPreviousLocation(LOCATION_MZONE) and c:GetPreviousControler()==tp
 end
 function s.drcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.cfilter,1,nil,tp)
