@@ -48,13 +48,17 @@ function c249000366.eqcon(e,tp,eg,ep,ev,re,r,rp)
 	local ec=e:GetLabelObject()
 	return ec==nil or ec:GetFlagEffect(249000366)==0
 end
+function c249000366.equipfilter(c)
+	return c:IsType(TYPE_MONSTER) and c:IsLevelAbove(2) and c:IsLevelBelow(10)
+end
 function c249000366.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and chkc:IsType(TYPE_MONSTER) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
-		and Duel.IsExistingTarget(Card.IsType,tp,LOCATION_GRAVE,0,1,nil,TYPE_MONSTER) end
+		and Duel.IsExistingTarget(c249000366.equipfilter,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
-	local g=Duel.SelectTarget(tp,Card.IsType,tp,LOCATION_GRAVE,0,1,1,nil,TYPE_MONSTER)
+	local g=Duel.SelectTarget(tp,c249000366.equipfilter,tp,LOCATION_GRAVE,0,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,g,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,g,1,0,0)
 end
 function c249000366.eqlimit(e,c)
 	return e:GetOwner()==c
@@ -69,13 +73,13 @@ function c249000366.eqop(e,tp,eg,ep,ev,re,r,rp)
 			if atk<0 then atk=0 end
 			if not Duel.Equip(tp,tc,c,false) then return end
 			--Add Equip limit
-			tc:RegisterFlagEffect(249000366,RESET_EVENT+0x1fe0000,0,0)
+			tc:RegisterFlagEffect(249000366,RESET_EVENT+RESETS_STANDARD,0,0)
 			e:SetLabelObject(tc)
 			local e1=Effect.CreateEffect(c)
 			e1:SetType(EFFECT_TYPE_SINGLE)
 			e1:SetProperty(EFFECT_FLAG_COPY_INHERIT+EFFECT_FLAG_OWNER_RELATE)
 			e1:SetCode(EFFECT_EQUIP_LIMIT)
-			e1:SetReset(RESET_EVENT+0x1fe0000)
+			e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 			e1:SetValue(c249000366.eqlimit)
 			tc:RegisterEffect(e1)
 			if atk>0 then
@@ -83,7 +87,7 @@ function c249000366.eqop(e,tp,eg,ep,ev,re,r,rp)
 				e2:SetType(EFFECT_TYPE_EQUIP)
 				e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_OWNER_RELATE)
 				e2:SetCode(EFFECT_UPDATE_ATTACK)
-				e2:SetReset(RESET_EVENT+0x1fe0000)
+				e2:SetReset(RESET_EVENT+RESETS_STANDARD)
 				e2:SetValue(atk)
 				tc:RegisterEffect(e2)
 			end
@@ -93,7 +97,7 @@ function c249000366.eqop(e,tp,eg,ep,ev,re,r,rp)
 				e3:SetCode(EVENT_ADJUST)
 				e3:SetRange(LOCATION_SZONE)	
 				e3:SetOperation(c249000366.operation)
-				e3:SetReset(RESET_EVENT+0x1fe0000)
+				e3:SetReset(RESET_EVENT+RESETS_STANDARD)
 				tc:RegisterEffect(e3)
 			end
 		end
@@ -104,7 +108,7 @@ function c249000366.operation(e,tp,eg,ep,ev,re,r,rp)
 	local eq=e:GetHandler():GetEquipTarget()
 	local code=c:GetOriginalCode()
 	if eq:IsFaceup() and eq:GetFlagEffect(code)==0 then
-		eq:CopyEffect(code,RESET_EVENT+0x1fe0000+EVENT_CHAINING,1)
-		eq:RegisterFlagEffect(code,RESET_EVENT+0x1fe0000+EVENT_CHAINING,0,1) 	
+		eq:CopyEffect(code,RESET_EVENT+RESETS_STANDARD+EVENT_CHAINING,1)
+		eq:RegisterFlagEffect(code,RESET_EVENT+RESETS_STANDARD+EVENT_CHAINING,0,1) 	
 	end	
 end
