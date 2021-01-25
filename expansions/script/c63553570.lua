@@ -40,7 +40,7 @@ function cid.initial_effect(c)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCode(EVENT_FREE_CHAIN)
 	e3:SetCountLimit(1,id+100)
-	e3:SetLabel(id)
+	e3:SetLabel(101)
 	e3:SetCondition(cid.sscon)
 	e3:SetCost(cid.sscost)
 	e3:SetTarget(cid.sstg)
@@ -273,6 +273,6 @@ function cid.actop(e,tp,eg,ep,ev,re,r,rp)
 end
 function cid.limit(c)
 	return	function (e,lp,tp)
-				return not (tp==lp and e:GetHandler()==c and e:GetLabel()==id)
+				return not (tp==lp and e:GetHandler()==c and e:GetLabel()==101)
 			end
 end

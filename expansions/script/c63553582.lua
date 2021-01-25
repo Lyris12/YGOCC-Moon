@@ -80,7 +80,7 @@ function cid.initial_effect(c)
 end
 --SPECIAL SUMMON
 function cid.dryfilter(c,e,tp)
-	if not c:IsSetCard(0x7a4) then return false end
+	if not c:IsType(TYPE_MONSTER) or not c:IsSetCard(0x7a4) then return false end
 	local check=true
 	if c:IsLocation(LOCATION_HAND) then
 		check=c:IsAbleToRemove()
@@ -100,10 +100,10 @@ function cid.filter(c,e,tp,mc)
 		and Duel.GetLocationCountFromEx(tp,tp,mc,c)>0 and (not smat or aux.MustMaterialCheck(nil,tp,smat))
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(cid.dryfilter,tp,LOCATION_ONFIELD+LOCATION_HAND,0,1,e:GetHandler(),e,tp)
+	if chk==0 then return Duel.IsExistingMatchingCard(cid.dryfilter,tp,LOCATION_MZONE+LOCATION_HAND,0,1,e:GetHandler(),e,tp)
 		and Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_EXTRA,0,1,nil,e,tp,nil)
 	end
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,tp,LOCATION_ONFIELD+LOCATION_HAND)
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,tp,LOCATION_MZONE+LOCATION_HAND)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
 function cid.activate(e,tp,eg,ep,ev,re,r,rp)
@@ -257,7 +257,7 @@ function cid.linkop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCode(EFFECT_UPDATE_ATTACK)
 	e1:SetTargetRange(LOCATION_MZONE,0)
 	e1:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x7a4))
-	e1:SetValue(500)
+	e1:SetValue(1000)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
 	if e:GetHandler():GetFlagEffect(id+100)>1 then

@@ -101,14 +101,14 @@ end
 
 --SPSUMMON
 function cid.filter(c,e,tp)
-	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x7a4) and c:IsType(TYPE_PENDULUM+TYPE_PANDEMONIUM) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-		and (not c:IsLocation(LOCATION_EXTRA) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 or (c:IsFaceup() and Duel.GetLocationCountFromEx(tp,tp,nil,c)>0))
+	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x7a4) and c:IsType(TYPE_PENDULUM+TYPE_PANDEMONIUM) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and (not c:IsLocation(LOCATION_REMOVED) or c:IsFaceup())
 end
 function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE+LOCATION_EXTRA) and chkc:IsControler(tp) and cid.filter(chkc,e,tp) end
-	if chk==0 then return Duel.IsExistingTarget(cid.filter,tp,LOCATION_GRAVE+LOCATION_EXTRA,0,1,nil,e,tp) end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE+LOCATION_REMOVED) and chkc:IsControler(tp) and cid.filter(chkc,e,tp) end
+	if chk==0 then return Duel.IsExistingTarget(cid.filter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectTarget(tp,aux.NecroValleyFilter(cid.filter),tp,LOCATION_GRAVE+LOCATION_EXTRA,0,1,1,nil,e,tp)
+	local g=Duel.SelectTarget(tp,aux.NecroValleyFilter(cid.filter),tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,1,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
 end
 function cid.pfilter(c,e,tp,eg,ep,ev,re,r,rp)

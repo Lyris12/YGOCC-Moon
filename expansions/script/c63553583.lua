@@ -39,6 +39,7 @@ function cid.initial_effect(c)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e2:SetTargetRange(0,1)
+	e2:SetCondition(cid.costcon)
 	e2:SetCost(cid.costchk)
 	e2:SetTarget(cid.costtg)
 	e2:SetOperation(cid.costop)
@@ -100,9 +101,12 @@ function cid.dpop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 --ACTIVATE COST
+function cid.costcon(e)
+	return Duel.GetFlagEffect(1-e:GetHandlerPlayer(),id+100)<=0
+end
 function cid.costchk(e,te_or_c,tp)
 	local ct=Duel.GetFlagEffect(tp,id)
-	return Duel.CheckLPCost(tp,ct*2000)
+	return Duel.CheckLPCost(tp,ct*2000) 
 end
 function cid.costtg(e,te,tp)
 	if not te:IsActiveType(TYPE_TRAP) then return false end
@@ -110,6 +114,7 @@ function cid.costtg(e,te,tp)
 end
 function cid.costop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.PayLPCost(tp,2000)
+	Duel.RegisterFlagEffect(tp,id+100,RESET_PHASE+PHASE_END,0,1)
 end
 --SEARCH
 function cid.thcon(e,tp,eg,ep,ev,re,r,rp)

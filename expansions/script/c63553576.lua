@@ -40,7 +40,7 @@ function cid.initial_effect(c)
 	e3:SetCode(EVENT_FREE_CHAIN)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1,id+100)
-	e3:SetLabel(id)
+	e3:SetLabel(101)
 	e3:SetCondition(cid.sscon)
 	e3:SetTarget(cid.sstg)
 	e3:SetOperation(cid.ssop)
@@ -113,7 +113,7 @@ function cid.sscon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp and (Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2)
 end
 function cid.dryfilter(c,e,tp,eg,ep,ev,re,r,rp)
-	return (not c:IsLocation(LOCATION_MZONE) or c:IsFaceup()) and c:IsType(TYPE_MONSTER) and c:IsType(TYPE_PENDULUM+TYPE_PANDEMONIUM)
+	return (not c:IsLocation(LOCATION_MZONE) or c:IsFaceup()) and c:IsType(TYPE_MONSTER) and c:IsType(TYPE_PENDULUM+TYPE_PANDEMONIUM) and c:IsSetCard(0x7a4)
 		and Duel.IsExistingMatchingCard(cid.pfilter,tp,LOCATION_DECK,0,1,nil,e,tp,eg,ep,ev,re,r,rp,c:GetOriginalAttribute(),c:GetType())
 end
 function cid.pfilter(c,e,tp,eg,ep,ev,re,r,rp,attr,typ)
@@ -153,6 +153,6 @@ function cid.actop(e,tp,eg,ep,ev,re,r,rp)
 end
 function cid.limit(c)
 	return	function (e,lp,tp)
-				return not (tp==lp and e:GetHandler()==c and e:GetLabel()==id)
+				return not (tp==lp and e:GetHandler()==c and e:GetLabel()==101)
 			end
 end
