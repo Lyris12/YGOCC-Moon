@@ -22,7 +22,7 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function cid.condition(e, tp, eg, ep, ev, re, r, rp)
-	if e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) or not tp==ep or not Duel.IsChainNegatable(ev) then return false end
+	if tp==ep or not Duel.IsChainDisablable(ev) then return false end
 	local ex,tg,tc=Duel.GetOperationInfo(ev,CATEGORY_DISABLE)
 	return ex and tg~=nil and tc+tg:FilterCount(Card.IsControler, nil, tp)-#tg>0
 end
