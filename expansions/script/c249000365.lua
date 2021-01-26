@@ -32,9 +32,16 @@ function c249000365.spfilter1(c,e,tp,m,f,chkf)
 	return c:IsType(TYPE_FUSION) and (not f or f(c))
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false) and c:CheckFusionMaterial(m,nil,chkf)
 end
+function c249000365.fcheck(tp,sg,fc)
+	return sg:IsExists(Card.IsFusionType,1,nil,TYPE_SYNCHRO)
+end
 function c249000365.spfilter2(c,e,tp,m,f,chkf)
-	return c:IsType(TYPE_FUSION) and c.miracle_synchro_fusion and c:IsLevelBelow(10) and (not f or f(c))
-		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false) and c:CheckFusionMaterial(m,nil,chkf)
+	if not (c:IsType(TYPE_FUSION) and aux.IsMaterialListType(c,TYPE_SYNCHRO) and (not f or f(c))
+		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false)) then return false end
+	aux.FCheckAdditional=c.synchro_fusion_check or c249000365.fcheck
+	local res=c:CheckFusionMaterial(m,nil,chkf)
+	aux.FCheckAdditional=nil
+	return res
 end
 function c249000365.cfilter(c)
 	return c:IsSetCard(0x1B6) and c:IsFaceup() and c:GetCode()~=249000365
@@ -90,7 +97,7 @@ function c249000365.spop(e,tp,eg,ep,ev,re,r,rp)
 		local tg=sg:Select(tp,1,1,nil)
 		local tc=tg:GetFirst()
 		if sg1:IsContains(tc) and (sg3==nil or not sg3:IsContains(tc) or not Duel.SelectYesNo(tp,ce:GetDescription())) then
-			if tc.miracle_synchro_fusion then
+			if aux.IsMaterialListType(tc,TYPE_SYNCHRO) then
 				local mat1=Duel.SelectFusionMaterial(tp,tc,mg2,nil,chkf)
 				tc:SetMaterial(mat1)
 				local mat2=mat1:Filter(Card.IsLocation,nil,LOCATION_EXTRA)

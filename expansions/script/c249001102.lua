@@ -33,6 +33,14 @@ function c249001102.spfilter(c,e,tp)
 end
 function c249001102.activate(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
+	local e3=Effect.CreateEffect(e:GetHandler())
+	e3:SetType(EFFECT_TYPE_FIELD)
+	e3:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e3:SetTargetRange(1,0)
+	e3:SetTarget(c249001102.splimit)
+	e3:SetReset(RESET_PHASE+PHASE_END)
+	Duel.RegisterEffect(e3,tp)
 	local ct=Duel.Draw(tp,1,REASON_EFFECT)
 	if ct==0 then return end
 	local dc=Duel.GetOperatedGroup():GetFirst()
@@ -156,14 +164,6 @@ function c249001102.activate(e,tp,eg,ep,ev,re,r,rp)
 				tc:RegisterEffect(e5)
 			end
 			Duel.SpecialSummon(tc,0,tp,tp,true,false,POS_FACEUP)
-			local e3=Effect.CreateEffect(e:GetHandler())
-			e3:SetType(EFFECT_TYPE_FIELD)
-			e3:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-			e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-			e3:SetTargetRange(1,0)
-			e3:SetTarget(c249001102.splimit)
-			e3:SetReset(RESET_PHASE+PHASE_END)
-			Duel.RegisterEffect(e3,tp)
 		end
 	end
 end
