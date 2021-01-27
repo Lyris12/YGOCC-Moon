@@ -31,10 +31,13 @@ function c249000525.initial_effect(c)
 	e3:SetCondition(c249000525.spcon2)
 	e3:SetOperation(c249000525.spop2)
 	c:RegisterEffect(e3)
+	if not c249000525.global_check then
+		c249000525.global_check=true
+		c249000525.used_table={}
+		c249000525.used_table[0]={}
+		c249000525.used_table[1]={}
+	end
 end
-c249000525.used_table={}
-c249000525.used_table[0]={}
-c249000525.used_table[1]={}
 function c249000525.costfilter(c)
 	return c:IsSetCard(0x1C8) and c:IsAbleToRemoveAsCost()
 end
@@ -65,16 +68,28 @@ end
 function c249000525.op(e,tp,eg,ep,ev,re,r,rp)
 	local ac
 	local cc
+	local i=1
+	local code_table={}
+	for key,value in pairs(c249000525.used_table[tp]) do
+		code_table[i]=key
+		i=i+1
+		code_table[i]=OPCODE_ISCODE
+		i=i+1
+		code_table[i]=OPCODE_NOT
+		i=i+1
+		code_table[i]=OPCODE_AND
+		i=i+1
+	end	
 	repeat
-		ac=Duel.AnnounceCardFilter(tp,TYPE_RITUAL,OPCODE_ISTYPE,TYPE_SPELL,OPCODE_ISTYPE,OPCODE_NOT,OPCODE_AND)
+		ac=Duel.AnnounceCardFilter(tp,TYPE_RITUAL,OPCODE_ISTYPE,TYPE_SPELL,OPCODE_ISTYPE,OPCODE_NOT,OPCODE_AND,table.unpack(code_table))
 		cc=Duel.CreateToken(tp,ac)
-	until not banned_list_table[ac] and not c249000525.used_table[tp][ac] and cc:IsAbleToHand() and cc:GetType()==0x81
+	until not banned_list_table[ac] and cc:IsAbleToHand() -- and cc:GetType()==0x81 --and not c249000525.used_table[tp][ac]
 	c249000525.used_table[tp][ac]=true
 	Duel.SendtoHand(cc,nil,REASON_EFFECT)
 	repeat
-		ac=Duel.AnnounceCardFilter(tp,TYPE_RITUAL,OPCODE_ISTYPE,TYPE_MONSTER,OPCODE_ISTYPE,OPCODE_NOT,OPCODE_AND)
+		ac=Duel.AnnounceCardFilter(tp,TYPE_RITUAL,OPCODE_ISTYPE,TYPE_MONSTER,OPCODE_ISTYPE,OPCODE_NOT,OPCODE_AND,table.unpack(code_table))
 		cc=Duel.CreateToken(tp,ac)
-	until not banned_list_table[ac] and not c249000525.used_table[tp][ac] and cc:IsAbleToHand() and cc:GetType()==0x82
+	until not banned_list_table[ac] and cc:IsAbleToHand() -- and cc:GetType()==0x82 --and not c249000525.used_table[tp][ac]
 	c249000525.used_table[tp][ac]=true
 	Duel.SendtoHand(cc,nil,REASON_EFFECT)
 	e:GetHandler():RegisterFlagEffect(249000525,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
