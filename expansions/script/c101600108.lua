@@ -1,109 +1,95 @@
---Tool Gear
-function c101600108.initial_effect(c)
+--Power Tool Gear of the Signer Dragon
+local function getID()
+	local str=string.match(debug.getinfo(2,'S')['source'],"c%d+%.lua")
+	str=string.sub(str,1,string.len(str)-4)
+	local cod=_G[str]
+	local id=tonumber(string.sub(str,2))
+	return id,cod
+end
+local id,cid=getID()
+function cid.initial_effect(c)
 	--search
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(101600108,0))
+	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e1:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
-	e1:SetTarget(c101600108.tg)
-	e1:SetOperation(c101600108.op)
-	e1:SetCountLimit(1,101600108)
+	e1:SetTarget(cid.tg)
+	e1:SetOperation(cid.op)
+	e1:SetCountLimit(1,id)
 	c:RegisterEffect(e1)
-	local e2=e1:Clone()
-	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
+	local e3=e1:Clone()
+	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
+	c:RegisterEffect(e3)
+	--synchro summon
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,1))
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:SetType(EFFECT_TYPE_IGNITION)
+	e2:SetRange(LOCATION_GRAVE)
+	e2:SetCountLimit(1,id+100)
+	e2:SetLabel(0)
+	e2:SetCost(cid.syncost)
+	e2:SetTarget(cid.syntg)
+	e2:SetOperation(cid.synop)
 	c:RegisterEffect(e2)
-	--synchro custom
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE)
-	e4:SetCode(EFFECT_SYNCHRO_MATERIAL_CUSTOM)
-	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e4:SetTarget(c101600108.syntg)
-	e4:SetValue(1)
-	e4:SetOperation(c101600108.synop)
-	c:RegisterEffect(e4)
 end
-function c101600108.filter(c)
-	return c:IsSetCard(0xcd01) and c:IsAbleToHand() and not c:IsCode(101600108)
+--SEARCH
+function cid.filter(c)
+	return c:IsSetCard(0xcd01) and c:IsAbleToHand() and not c:IsCode(id)
 end
-function c101600108.tg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c101600108.filter,tp,LOCATION_DECK,0,1,nil) end
+function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_DECK,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
-function c101600108.op(e,tp,eg,ep,ev,re,r,rp)
+function cid.op(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,c101600108.filter,tp,LOCATION_DECK,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_DECK,0,1,1,nil)
 	if g:GetCount()>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
 	end
 end
-function c101600108.synfilter1(c,syncard,tuner,f)
-    return c:IsFaceup() and c:IsCanBeSynchroMaterial(syncard,tuner) and (f==nil or f(c))
+--SYNCHRO SUMMON
+function cid.filter1(c,e,tp,c1,c2,lv)
+	local g=(c1 and c2) and Group.FromCards(c1,c2) or nil
+	return c:IsType(TYPE_SYNCHRO) and c:IsSetCard(0xcd01) and c:IsRace(RACE_DRAGON) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_SYNCHRO,tp,false,false)
+		and Duel.GetLocationCountFromEx(tp,tp,g,c)>0 and c:IsLevel(lv)
 end
-function c101600108.synfilter2(c,syncard,tuner,f)
-    return c:IsSetCard(0xcd01) and c:IsNotTuner() and c:IsCanBeSynchroMaterial(syncard,tuner) and (f==nil or f(c))
+function cid.cfilter2(c,e,tp,c1)
+	return c:IsFaceup() and c:IsType(TYPE_TUNER) and c:IsAbleToGraveAsCost() and c:IsSetCard(0xcd01) and c:GetLevel()>0
+		and Duel.IsExistingMatchingCard(cid.filter1,tp,LOCATION_EXTRA,0,1,Group.FromCards(c,c1),e,tp,c1,c,c:GetLevel()+c1:GetLevel())
 end
-function c101600108.syncheck(c,g,mg,tp,lv,syncard,minc,maxc)
-    g:AddCard(c)
-    local ct=g:GetCount()
-    local res=c101600108.syngoal(g,tp,lv,syncard,minc,ct)
-        or (ct<maxc and mg:IsExists(c101600108.syncheck,1,g,g,mg,tp,lv,syncard,minc,maxc))
-    g:RemoveCard(c)
-    return res
+function cid.syncost(e,tp,eg,ep,ev,re,r,rp,chk)
+	e:SetLabel(100)
+	if chk==0 then return true end
 end
-function c101600108.syngoal(g,tp,lv,syncard,minc,ct)
-    return ct>=minc
-        and g:CheckWithSumEqual(Card.GetSynchroLevel,lv,ct,ct,syncard)
-        and Duel.GetLocationCountFromEx(tp,tp,g,syncard)>0
-end
-function c101600108.syntg(e,syncard,f,min,max)
-    local minc=min+1
-    local maxc=max+1
-    local c=e:GetHandler()
-    local tp=syncard:GetControler()
-    local lv=syncard:GetLevel()
-    if lv<=c:GetLevel() then return false end
-    local g=Group.FromCards(c)
-    local mg=Duel.GetMatchingGroup(c101600108.synfilter1,syncard:GetControler(),LOCATION_MZONE,LOCATION_MZONE,c,syncard,c,f)
-    if (syncard:GetLevel()==7 or syncard:GetLevel()==8) and syncard:IsRace(RACE_DRAGON) then
-        local exg=Duel.GetMatchingGroup(c101600108.synfilter2,syncard:GetControler(),LOCATION_GRAVE,0,c,syncard,c,f)
-        mg:Merge(exg)
-    end
-    return mg:IsExists(c101600108.syncheck,1,g,g,mg,tp,lv,syncard,minc,maxc)
-end
-function c101600108.synop(e,tp,eg,ep,ev,re,r,rp,syncard,f,min,max)
-    local minc=min+1
-    local maxc=max+1
-    local c=e:GetHandler()
-    local lv=syncard:GetLevel()
-    local g=Group.FromCards(c)
-    local mg=Duel.GetMatchingGroup(c101600108.synfilter1,syncard:GetControler(),LOCATION_MZONE,LOCATION_MZONE,c,syncard,c,f)
-    if (syncard:GetLevel()==7 or syncard:GetLevel()==8) and syncard:IsRace(RACE_DRAGON) then
-        local exg=Duel.GetMatchingGroup(c101600108.synfilter2,syncard:GetControler(),LOCATION_GRAVE,0,c,syncard,c,f)
-        mg:Merge(exg)
-    end
-    for i=1,maxc do
-        local cg=mg:Filter(c101600108.syncheck,g,g,mg,tp,lv,syncard,minc,maxc)
-        if cg:GetCount()==0 then break end
-        local minct=1
-        if c101600108.syngoal(g,tp,lv,syncard,minc,i) then
-            if not Duel.SelectYesNo(tp,210) then break end
-            minct=0
-        end
-        Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
-        local sg=cg:Select(tp,minct,1,nil)
-        if sg:GetCount()==0 then break end
-        g:Merge(sg)
-    end
-	local ban=g:Filter(Card.IsLocation,nil,LOCATION_GRAVE)
-    if ban then
-		for i=1,ban:GetCount() do
-			bann=ban:GetFirst()
-			g:RemoveCard(bann)
-		end
+function cid.syntg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then
+		if e:GetLabel()~=100 then return false end
+		e:SetLabel(0)
+		return aux.MustMaterialCheck(nil,tp,EFFECT_MUST_BE_SMATERIAL) and c:IsAbleToRemoveAsCost() and Duel.IsExistingMatchingCard(cid.cfilter2,tp,LOCATION_REMOVED,0,1,c,e,tp,c)
 	end
-	Duel.SetSynchroMaterial(g)
-	if ban and Duel.SendtoDeck(ban,nil,0,REASON_EFFECT+REASON_MATERIAL)~=0 then Duel.ShuffleDeck(tp) end
+	e:SetLabel(0)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+	local g2=Duel.SelectMatchingCard(tp,cid.cfilter2,tp,LOCATION_REMOVED,0,1,1,c,e,tp,c)
+	if not g2:GetFirst() then return end
+	lv=c:GetLevel()+g2:GetFirst():GetLevel()
+	if #g2>0 then
+		Duel.Remove(c,POS_FACEUP,REASON_COST)
+		Duel.SendtoGrave(g2,REASON_COST+REASON_RETURN)
+		Duel.SetTargetParam(lv)
+		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
+	end
+end
+function cid.synop(e,tp,eg,ep,ev,re,r,rp)
+	local lv=Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local tc=Duel.SelectMatchingCard(tp,cid.filter1,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,nil,nil,lv):GetFirst()
+	if tc then
+		Duel.SpecialSummon(tc,SUMMON_TYPE_SYNCHRO,tp,tp,false,false,POS_FACEUP)
+		tc:CompleteProcedure()
+	end
 end

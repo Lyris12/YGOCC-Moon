@@ -1,52 +1,60 @@
---Archfiend
-function c101600105.initial_effect(c)
+--Red Archfiend Soldier of the Signer Dragon
+local function getID()
+	local str=string.match(debug.getinfo(2,'S')['source'],"c%d+%.lua")
+	str=string.sub(str,1,string.len(str)-4)
+	local cod=_G[str]
+	local id=tonumber(string.sub(str,2))
+	return id,cod
+end
+local id,cid=getID()
+function cid.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(101600105,0))
+	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_HAND+LOCATION_GRAVE)
-	e1:SetCondition(c101600105.spcon)
-	e1:SetTarget(c101600105.sptg)
-	e1:SetOperation(c101600105.spop)
-	e1:SetCountLimit(1,11610105)
+	e1:SetCondition(cid.spcon)
+	e1:SetTarget(cid.sptg)
+	e1:SetOperation(cid.spop)
+	e1:SetCountLimit(1,id)
 	c:RegisterEffect(e1)
-	--"synchro custom"
+	--change level
 	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(101600105,0))
-	e4:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_REMOVE)
+	e4:SetDescription(aux.Stringid(id,1))
+	e4:SetCategory(CATEGORY_LVCHANGE)
 	e4:SetType(EFFECT_TYPE_IGNITION)
 	e4:SetRange(LOCATION_MZONE)
-	e4:SetTarget(c101600105.target)
-	e4:SetOperation(c101600105.operation)
-	e4:SetCountLimit(1,101610105)
+	e4:SetTarget(cid.target)
+	e4:SetOperation(cid.operation)
+	e4:SetCountLimit(1,id+100)
 	c:RegisterEffect(e4)
-	--damage
-	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(101600105,0))
-	e3:SetCategory(CATEGORY_DAMAGE)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e3:SetCode(EVENT_BE_MATERIAL)
-	e3:SetCondition(c101600105.damcon)
-	e3:SetTarget(c101600105.damtg)
-	e3:SetOperation(c101600105.damop)
-	e3:SetCountLimit(1,101600105)
-	c:RegisterEffect(e3)
+	--synchro summon
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,2))
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:SetType(EFFECT_TYPE_IGNITION)
+	e2:SetRange(LOCATION_GRAVE)
+	e2:SetCountLimit(1,id+200)
+	e2:SetLabel(0)
+	e2:SetCost(cid.syncost)
+	e2:SetTarget(cid.syntg)
+	e2:SetOperation(cid.synop)
+	c:RegisterEffect(e2)
 end
-function c101600105.cfilter(c)
+--SPECIAL SUMMON
+function cid.cfilter(c)
 	return c:IsSetCard(0xcd01) and c:IsFaceup() and c:IsType(TYPE_TUNER)
 end
-function c101600105.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetFieldGroup(tp,LOCATION_MZONE,0):IsExists(c101600105.cfilter,1,nil)
+function cid.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetFieldGroup(tp,LOCATION_MZONE,0):IsExists(cid.cfilter,1,nil)
 end
-function c101600105.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,0,tp,LOCATION_DECK)
 end
-function c101600105.spop(e,tp,eg,ep,ev,re,r,rp)
+function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
 	if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
@@ -55,63 +63,64 @@ function c101600105.spop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e1:SetReset(RESET_EVENT+0x47e0000)
+		e1:SetReset(RESET_EVENT+RESETS_REDIRECT)
 		e1:SetValue(LOCATION_REMOVED)
 		c:RegisterEffect(e1,true)
-		--level
-		local e2=Effect.CreateEffect(c)
-		e2:SetType(EFFECT_TYPE_SINGLE)
-		e2:SetCode(EFFECT_CHANGE_LEVEL)
-		e2:SetValue(4)
-		e2:SetReset(RESET_EVENT+0xff0000)
-		c:RegisterEffect(e2)
 	end
 end
-function c101600105.damcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsLocation(LOCATION_GRAVE) and r==REASON_SYNCHRO
+--CHANGE LEVEL
+function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return not e:GetHandler():IsLevel(4) end
+	Duel.SetOperationInfo(0,CATEGORY_LVCHANGE,e:GetHandler(),1,0,4)
 end
-function c101600105.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.SetTargetPlayer(1-tp)
-	Duel.SetTargetParam(500)
-	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,500)
-end
-function c101600105.damop(e,tp,eg,ep,ev,re,r,rp)
-	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
-	Duel.Damage(p,d,REASON_EFFECT)
-end
-function c101600105.filter(c,e,tp)
-	local lv=c:GetLevel()
-	local lv2=e:GetHandler():GetOriginalLevel()
-	return lv>0 and c:IsSetCard(0xcd01) and c:IsType(TYPE_TUNER) and c:IsAbleToRemoveAsCost()
-		and Duel.IsExistingMatchingCard(c101600105.exfilter,tp,LOCATION_EXTRA,0,1,nil,lv+lv2,e,tp)
-end
-function c101600105.exfilter(c,lv,e,tp)
-	return c:GetLevel()==lv and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_SYNCHRO,tp,false,false) and c:IsRace(RACE_DRAGON) and c:IsSetCard(0xcd01)
-		and c:IsType(TYPE_SYNCHRO)
-end
-function c101600105.ex(c,tc)
-	return c:GetSequence()==4 or c:GetSequence()==5 and c:GetLinkedGroup():IsContains(tc)
-end
-function c101600105.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	local xtra=Duel.GetMatchingGroup(c101600105.ex,tp,LOCATION_MZONE,LOCATION_MZONE,nil,e:GetHandler())
-	if chk==0 then return (Duel.GetLocationCountFromEx(tp)>0 or xtra:GetCount()>0)
-		and e:GetHandler():IsAbleToRemoveAsCost()
-		and Duel.IsExistingMatchingCard(c101600105.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=Duel.SelectMatchingCard(tp,c101600105.filter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
-	local rg=Group.FromCards(g:GetFirst(),e:GetHandler())
-	Duel.Remove(rg,POS_FACEUP,REASON_COST)
-	e:SetLabel(e:GetHandler():GetLevel()+g:GetFirst():GetLevel())
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
-end
-function c101600105.operation(e,tp,eg,ep,ev,re,r,rp)
+function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local lv=e:GetLabel()
-	if Duel.GetLocationCountFromEx(tp)>0 then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local sg=Duel.SelectMatchingCard(tp,c101600105.exfilter,tp,LOCATION_EXTRA,0,1,1,nil,lv,e,tp)
-		local sc=sg:GetFirst()
-		Duel.SpecialSummon(sg,SUMMON_TYPE_SYNCHRO,tp,tp,false,false,POS_FACEUP)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_CHANGE_LEVEL)
+	e1:SetValue(4)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_DISABLE+RESET_PHASE+PHASE_END)
+	c:RegisterEffect(e1)
+end
+--SYNCHRO SUMMON
+function cid.filter1(c,e,tp,c1,c2,lv)
+	local g=(c1 and c2) and Group.FromCards(c1,c2) or nil
+	return c:IsType(TYPE_SYNCHRO) and c:IsSetCard(0xcd01) and c:IsRace(RACE_DRAGON) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_SYNCHRO,tp,false,false)
+		and Duel.GetLocationCountFromEx(tp,tp,g,c)>0 and c:IsLevel(lv)
+end
+function cid.cfilter2(c,e,tp,c1)
+	return c:IsFaceup() and c:IsType(TYPE_TUNER) and c:IsAbleToRemoveAsCost() and c:IsSetCard(0xcd01) and c:GetLevel()>0
+		and Duel.IsExistingMatchingCard(cid.filter1,tp,LOCATION_EXTRA,0,1,Group.FromCards(c,c1),e,tp,c1,c,c:GetLevel()+c1:GetLevel())
+end
+function cid.syncost(e,tp,eg,ep,ev,re,r,rp,chk)
+	e:SetLabel(100)
+	if chk==0 then return true end
+end
+function cid.syntg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then
+		if e:GetLabel()~=100 then return false end
+		e:SetLabel(0)
+		return aux.MustMaterialCheck(nil,tp,EFFECT_MUST_BE_SMATERIAL) and c:IsAbleToRemoveAsCost() and Duel.IsExistingMatchingCard(cid.cfilter2,tp,LOCATION_MZONE,0,1,c,e,tp,c)
+	end
+	e:SetLabel(0)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+	local g2=Duel.SelectMatchingCard(tp,cid.cfilter2,tp,LOCATION_MZONE,0,1,1,c,e,tp,c)
+	if not g2:GetFirst() then return end
+	lv=c:GetLevel()+g2:GetFirst():GetLevel()
+	g2:AddCard(c)
+	if #g2==2 then
+		Duel.Remove(g2,POS_FACEUP,REASON_COST)
+		Duel.SetTargetParam(lv)
+		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
+	end
+end
+function cid.synop(e,tp,eg,ep,ev,re,r,rp)
+	local lv=Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local tc=Duel.SelectMatchingCard(tp,cid.filter1,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,nil,nil,lv):GetFirst()
+	if tc then
+		Duel.SpecialSummon(tc,SUMMON_TYPE_SYNCHRO,tp,tp,false,false,POS_FACEUP)
+		tc:CompleteProcedure()
 	end
 end
