@@ -63,7 +63,7 @@ function c36541433.drcost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c36541433.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) 
-		and Duel.IsExistingMatchingCard(c36541432.discard,tp,LOCATION_HAND,0,1,nil) end
+		and Duel.IsExistingMatchingCard(c36541433.discard,tp,LOCATION_HAND,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,tp,1)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end
@@ -83,7 +83,7 @@ function c36541433.draw(e,tp,eg,ep,ev,re,r,rp)
 		else return end
 	end
 end
---negate attack		
+--negate attack	 
 function c36541433.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local at=Duel.GetAttacker()

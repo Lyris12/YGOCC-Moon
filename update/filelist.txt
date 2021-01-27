@@ -1,4 +1,4 @@
-﻿expansions/cards-new.cdb	1d916f090495756a1b0d5a3e7adb8867
+﻿expansions/cards-new.cdb	091edf6e5a3f685d700da603c27a3404
 expansions/lflist.conf	99b9ef6a9fbd9cabdf9d013d5f7d6e4f
 expansions/strings.conf	63714dd5a7032de1662aff168a3a815d
 expansions/pics/100000710.jpg	5f925a97b1c60d7d69acb8f229938263
@@ -8701,7 +8701,7 @@ expansions/script/c34627892.lua	d79238482025e41064637d82ff179671
 expansions/script/c36429103.lua	991a976989b3c4abb46f7f8c6cb02553
 expansions/script/c36541431.lua	3198d895d1e05fc3111aac4e62e9e2eb
 expansions/script/c36541432.lua	0b7b3da51177e9b128f7aa1ad2489fc3
-expansions/script/c36541433.lua	d24da5de68d00707527e1c03a8eeb530
+expansions/script/c36541433.lua	9957a54412fdaf1407bbbb26bf7da83a
 expansions/script/c36541434.lua	e37c8e90238605b5b5dcda1457b16386
 expansions/script/c36541435.lua	e868ce9086c6b330a1b06f8c42a7e913
 expansions/script/c36541436.lua	ef9cceaed504281fe2117795415b1e50
@@ -9268,7 +9268,7 @@ expansions/script/c53313928.lua	cb6f4037f60844e62a9cdaf71787df6f
 expansions/script/c53313929.lua	403f920f8c1a5f8b5afa7100d5a840bd
 expansions/script/c53313930.lua	884b1aaa1c52d6a1d18bf4154d372d99
 expansions/script/c53313931.lua	78a61a3d3b73f3e5410ef9b8ab42327d
-expansions/script/c53313932.lua	3e1ff83bc1a3daea419a430d092c7178
+expansions/script/c53313932.lua	d6eb5cbd8e18b9889212a16787e60ab9
 expansions/script/c53313933.lua	1909ff56949be5105691e4200802a346
 expansions/script/c53313934.lua	c2992bad632e5368184bf6f98b7829ab
 expansions/script/c54181140.lua	820860ca017490be4253ebd59e867fb0
@@ -10395,6 +10395,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	a3a4f3f624f4b79a6668d09eb8650652
+update/filelist.txt	158087ffbf1e2173298a6f0037999a0b
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	6098f28fae687e044caefd8cfef8c099
+update/version.txt	087b120ab359fb933c3b14f2b1d2a3c2

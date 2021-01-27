@@ -10,7 +10,7 @@ function c53313932.initial_effect(c)
 	e1:SetCategory(CATEGORY_TOHAND)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
+	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e1:SetCountLimit(1,53313932)
 	e1:SetTarget(c53313932.thtg)
 	e1:SetOperation(c53313932.thop)
@@ -35,8 +35,8 @@ function c53313932.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 --filters
-function c53313932.thfilter(c)
-	return c:IsSetCard(0xcf6) and c:IsAbleToHand() and (c:IsLocation(LOCATION_GRAVE) or (c:IsLocation(LOCATION_EXTRA+LOCATION_REMOVED) and c:IsFaceup()))
+function c53313932.thfilter(c,e)
+	return c:IsSetCard(0xcf6) and c:IsAbleToHand() and (c:IsLocation(LOCATION_GRAVE) or c:IsFaceup())
 end
 function c53313932.rfilter(c,e,tp)
 	return Duel.IsExistingMatchingCard(c53313932.spfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,e:GetHandler(),e,tp,c:GetAttribute(),c:GetCode()) and Duel.GetMZoneCount(tp,c)>0
@@ -45,62 +45,29 @@ function c53313932.spfilter(c,e,tp,att,code)
 	return c:IsCanBeSpecialSummoned(e,0,tp,false,false) and c:IsAttribute(att) and c:IsSetCard(0xcf6) and not c:IsCode(53313932) and not c:IsCode(code)
 end
 --add to hand
-function c53313932.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(tp) and c53313932.thfilter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c53313932.thfilter,tp,LOCATION_GRAVE+LOCATION_EXTRA+LOCATION_REMOVED,0,1,nil) end
+function c53313932.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(c53313932.thfilter,tp,LOCATION_GRAVE+LOCATION_EXTRA+LOCATION_REMOVED,0,1,nil,e) end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,0,tp,LOCATION_GRAVE+LOCATION_EXTRA+LOCATION_REMOVED)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,0,tp,LOCATION_GRAVE+LOCATION_EXTRA+LOCATION_REMOVED)
+end
+function c53313932.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectTarget(tp,aux.NecroValleyFilter(c53313932.thfilter),tp,LOCATION_GRAVE+LOCATION_EXTRA+LOCATION_REMOVED,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(c53313932.thfilter),tp,LOCATION_GRAVE+LOCATION_EXTRA+LOCATION_REMOVED,0,1,1,nil,e)
+	if #g==0 then return end
 	local tc=g:GetFirst()
 	local op=0
-	if tc:GetType()&TYPE_PANDEMONIUM==TYPE_PANDEMONIUM then
+	if tc:IsType(TYPE_PANDEMONIUM) then
+		local ac=0
 		local con1=tc:IsCanBeSpecialSummoned(e,0,tp,false,false)
 		local con2=Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		local check=tc:IsLocation(LOCATION_EXTRA)
 		local excon=Duel.GetLocationCountFromEx(tp)>0
 		if (con1 and con2 and not check) or (check and excon and con1) then
-			op=1
+			ac=Duel.SelectOption(tp,aux.Stringid(53313932,0),aux.Stringid(53313932,1))
 		end
-	end
-	e:SetLabel(op)
-	if op==0 then
-		Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
-	else
-		e:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOHAND)
-		Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
-		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
-	end
-end
-function c53313932.thop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFirstTarget()
-	local op=e:GetLabel()
-	if tc:IsRelateToEffect(e) then
-		if op==0 then
-			Duel.SendtoHand(tc,nil,REASON_EFFECT)
-		else
-			local ac=0
-			local con1=tc:IsCanBeSpecialSummoned(e,0,tp,false,false)
-			local con2=Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-			local check=tc:IsLocation(LOCATION_EXTRA)
-			local excon=Duel.GetLocationCountFromEx(tp)>0
-			if (con1 and con2 and not check) or (check and excon and con1) then
-				ac=Duel.SelectOption(tp,aux.Stringid(53313932,0),aux.Stringid(53313932,1))
-			end
-			if ac==0 then
-				Duel.SendtoHand(tc,nil,REASON_EFFECT)
-			else
-				if tc:IsLocation(LOCATION_EXTRA) then
-					if Duel.GetLocationCountFromEx(tp)<=0 then
-						return
-					end
-				else
-					if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then
-						return
-					end
-				end
-				Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
-			end
-		end
-	end
+		if ac==0 then Duel.SendtoHand(tc,nil,REASON_EFFECT)
+		else Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP) end
+	else Duel.SendtoHand(tc,nil,REASON_EFFECT) end
 end
 --spsummon
 function c53313932.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
