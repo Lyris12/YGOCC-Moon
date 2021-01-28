@@ -51,6 +51,12 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 		and Duel.IsPlayerCanSpecialSummonMonster(tp,21770262,0,0x4011,300,300,1,RACE_AQUA,ATTRIBUTE_WATER) then
 		local token1=Duel.CreateToken(tp,21770262)
 		Duel.SpecialSummon(token1,0,tp,tp,false,false,POS_FACEUP)
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_CANNOT_BE_LINK_MATERIAL)
+		e1:SetValue(aux.TargetBoolFunction(aux.NOT(Card.IsSetCard),0x8108))
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+		token:RegisterEffect(e1,true)
 	end
 end
 --LP recover

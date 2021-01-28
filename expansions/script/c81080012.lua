@@ -54,8 +54,11 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 			Duel.ConfirmCards(1-tp,sg)
 			Duel.ShuffleHand(tp)
 			g:Sub(sg)
+			Duel.SendtoGrave(g,REASON_EFFECT+REASON_REVEAL)
 		end
-		Duel.SendtoGrave(g,REASON_EFFECT+REASON_REVEAL)
+		else
+			Duel.ShuffleDeck(tp)
+		end
 	end
 end
 --Recycle

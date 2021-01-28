@@ -1,7 +1,7 @@
 --Orcust Knightmare Zeframaximus
 local s,id=GetID()
 function s.initial_effect(c)
-	Pendulum.AddProcedure(c,false)
+	aux.EnablePendulumAttribute(c)
 	--destroy link
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
