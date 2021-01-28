@@ -54,8 +54,8 @@ function c249001134.operation(e,tp,eg,ep,ev,re,r,rp)
 	local lv=c:GetLevel()-1
 	local dcount=Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)
 	if not Duel.IsPlayerCanSpecialSummon(tp) or dcount < 1
-		or not Duel.IsExistingMatchingCard(c249000000.filter,tp,LOCATION_DECK,0,1,nil,e,tp,lv) or Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-	local g=Duel.GetMatchingGroup(c249000000.filter,tp,LOCATION_DECK,0,nil,e,tp,lv)
+		or not Duel.IsExistingMatchingCard(c249001134.filter,tp,LOCATION_DECK,0,1,nil,e,tp,lv) or Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+	local g=Duel.GetMatchingGroup(c249001134.filter,tp,LOCATION_DECK,0,nil,e,tp,lv)
 	local dcount=Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)
 	local seq=-1
 	local tc=g:GetFirst()
