@@ -1,14 +1,14 @@
 --Varia-Force Vetran Tactician
 function c249000767.initial_effect(c)
 	--destroy replace
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e1:SetCode(EFFECT_DESTROY_REPLACE)
-	e1:SetRange(LOCATION_GRAVE)
-	e1:SetTarget(c249000767.reptg)
-	e1:SetValue(c249000767.repval)
-	e1:SetOperation(c249000767.repop)
-	c:RegisterEffect(e1)
+	--local e1=Effect.CreateEffect(c)
+	--e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	--e1:SetCode(EFFECT_DESTROY_REPLACE)
+	--e1:SetRange(LOCATION_GRAVE)
+	--e1:SetTarget(c249000767.reptg)
+	--e1:SetValue(c249000767.repval)
+	--e1:SetOperation(c249000767.repop)
+	--c:RegisterEffect(e1)
 	--draw
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(1108)
@@ -39,6 +39,20 @@ function c249000767.initial_effect(c)
 		Duel.RegisterEffect(ge3,0)
 	end
 end
+--function c249000767.repfilter(c,tp)
+--	return c:IsFaceup() and c:IsControler(tp) and c:IsLocation(LOCATION_MZONE) and c:IsSetCard(0x1B6)
+--		and c:IsReason(REASON_EFFECT+REASON_BATTLE) and not c:IsReason(REASON_REPLACE)
+--end
+--function c249000767.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
+--	if chk==0 then return e:GetHandler():IsAbleToRemove() and eg:IsExists(c249000767.repfilter,1,nil,tp) end
+--	return Duel.SelectEffectYesNo(tp,e:GetHandler(),96)
+--end
+--function c249000767.repval(e,c)
+--	return c249000767.repfilter(c,e:GetHandlerPlayer())
+--end
+--function c249000767.repop(e,tp,eg,ep,ev,re,r,rp)
+--	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_EFFECT)
+--end
 function c249000767.checkop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
 	while tc do
@@ -83,18 +97,4 @@ function c249000767.operation(e,tp,eg,ep,ev,re,r,rp)
 end
 function c249000767.damval(e,re,val,r,rp,rc)
 	return val/2
-end
-function c249000767.repfilter(c,tp)
-	return c:IsFaceup() and c:IsControler(tp) and c:IsLocation(LOCATION_MZONE) and c:IsSetCard(0x1B6)
-		and c:IsReason(REASON_EFFECT+REASON_BATTLE) and not c:IsReason(REASON_REPLACE)
-end
-function c249000767.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToRemove() and eg:IsExists(c249000767.repfilter,1,nil,tp) end
-	return Duel.SelectEffectYesNo(tp,e:GetHandler(),96)
-end
-function c249000767.repval(e,c)
-	return c249000767.repfilter(c,e:GetHandlerPlayer())
-end
-function c249000767.repop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_EFFECT)
 end

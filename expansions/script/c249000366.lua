@@ -10,13 +10,13 @@ function c249000366.initial_effect(c)
 	e1:SetCondition(c249000366.spcon)
 	c:RegisterEffect(e1)
 	--cannot be target
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_SINGLE)
-	e2:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
-	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetValue(aux.tgoval)
-	c:RegisterEffect(e2)
+	--local e2=Effect.CreateEffect(c)
+	--e2:SetType(EFFECT_TYPE_SINGLE)
+	--e2:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
+	--e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	--e2:SetRange(LOCATION_MZONE)
+	--e2:SetValue(aux.tgoval)
+	--c:RegisterEffect(e2)
 	--equip
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(511000614,1))
@@ -49,7 +49,7 @@ function c249000366.eqcon(e,tp,eg,ep,ev,re,r,rp)
 	return ec==nil or ec:GetFlagEffect(249000366)==0
 end
 function c249000366.equipfilter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsLevelAbove(2) and c:IsLevelBelow(10)
+	return c:IsType(TYPE_MONSTER) and c:IsLevelAbove(2) and c:IsLevelBelow(10) and c:GetTextAttack()~=2350
 end
 function c249000366.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and chkc:IsType(TYPE_MONSTER) end
@@ -95,7 +95,7 @@ function c249000366.eqop(e,tp,eg,ep,ev,re,r,rp)
 				local e3=Effect.CreateEffect(c)
 				e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 				e3:SetCode(EVENT_ADJUST)
-				e3:SetRange(LOCATION_SZONE) 
+				e3:SetRange(LOCATION_SZONE)
 				e3:SetOperation(c249000366.operation)
 				e3:SetReset(RESET_EVENT+RESETS_STANDARD)
 				tc:RegisterEffect(e3)
