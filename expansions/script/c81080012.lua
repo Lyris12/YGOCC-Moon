@@ -55,7 +55,6 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 			Duel.ShuffleHand(tp)
 			g:Sub(sg)
 			Duel.SendtoGrave(g,REASON_EFFECT+REASON_REVEAL)
-		end
 		else
 			Duel.ShuffleDeck(tp)
 		end
