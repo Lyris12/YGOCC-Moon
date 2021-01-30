@@ -49,6 +49,7 @@ end
 cid.fu_banish_forced=true
 cid.effect_memory=nil
 cid.name_list={}
+cid.check=false
 
 function cid.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -85,7 +86,7 @@ end
 function cid.fliptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	local g=Duel.GetMatchingGroup(Card.IsFacedown,tp,LOCATION_REMOVED,0,nil)
-	if #g<=0 then return end
+	if #g<=0 then cid.check=false return end
 	for tc in aux.Next(g) do
 		Duel.SendtoGrave(tc,REASON_RULE)
 		Duel.Remove(tc,POS_FACEUP,REASON_RULE)
@@ -94,9 +95,10 @@ function cid.fliptg(e,tp,eg,ep,ev,re,r,rp,chk)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 		local tc=g:FilterSelect(tp,cid.checkfilter,1,1,nil,e,tp,eg,ep,ev,re,r,rp):GetFirst()
 		if tc then
+			cid.check=true
 			Duel.SendtoDeck(tc,nil,1,REASON_COST)
 			local egroup=global_card_effect_table[tc]
-			if #egroup<=0 then return end
+			if #egroup<=0 then cid.check=false return end
 			local flip={}
 			for i=1,#egroup do
 				local ce=egroup[i]
@@ -105,7 +107,7 @@ function cid.fliptg(e,tp,eg,ep,ev,re,r,rp,chk)
 					table.insert(flip,ce)
 				end
 			end
-			if #flip<=0 then return end
+			if #flip<=0 then cid.check=false return end
 			local effect=flip[1]
 			if #flip>1 then
 				local desc={}
@@ -115,20 +117,24 @@ function cid.fliptg(e,tp,eg,ep,ev,re,r,rp,chk)
 				end
 				effect=flip[Duel.SelectOption(tp,table.unpack(flip))+1]
 			end
-			if not effect then return end
+			if not effect then cid.check=false return end
 			e:SetProperty(effect:GetProperty())
 			if effect:GetTarget() then
 				effect:GetTarget()(e,tp,eg,ep,ev,re,r,rp,1)
 			end
 			cid.effect_memory=effect
 			table.insert(cid.name_list,tc:GetCode())
+		else
+			cid.check=false
 		end
+	else
+		cid.check=false
 	end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_REMOVED)
 end
 function cid.flipop(e,tp,eg,ep,ev,re,r,rp)
 	local ce=cid.effect_memory
-	if ce and ce~=nil then
+	if ce and ce~=nil and cid.check==true then
 		local run=pcall(ce:GetOperation()(e,tp,eg,ep,ev,re,r,rp),e,tp,eg,ep,ev,re,r,rp)
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)

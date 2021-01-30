@@ -283,6 +283,13 @@ Duel.Remove=function(cc,pos,r)
 			end
 		end
 	end
+	if pos&POS_FACEDOWN~=0 then
+		for c in aux.Next(cc) do
+			if c.fu_banish_forced then
+				c:RegisterFlagEffect(FLAG_FACEDOWN_BANISH,RESET_EVENT+RESETS_STANDARD-RESET_REMOVE,EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SET_AVAILABLE,1)
+			end
+		end
+	end
 	return duel_banish(cc,pos,r)
 end
 Card.CheckRemoveOverlayCard=function(c,tp,ct,r)
