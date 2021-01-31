@@ -33,12 +33,13 @@ function s.cfilter(c)
 	return c:IsFaceup() and c:IsRace(RACE_MACHINE) and c:IsSetCard(0x4093)
 end
 function s.filter3(c,tp,e)
-	return s.cfilter(c) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsRace(RACE_MACHINE) and c:IsSetCard(0x4093) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.filter2(c)
 	return c:IsLevelBelow(3) and c:IsRace(RACE_DRAGON) and not c:IsForbidden()
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and s.filter2(chkc) end
 	if chk==0 then
 		local b=e:GetHandler():IsLocation(LOCATION_HAND)
 		local ft=Duel.GetLocationCount(tp,LOCATION_SZONE)
@@ -56,13 +57,20 @@ end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 or Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(s.filter3,tp,LOCATION_DECK,0,1,nil,tp,e)
+	local g=Duel.SelectMatchingCard(tp,s.filter3,tp,LOCATION_DECK,0,1,1,nil,tp,e)
 	local c=g:GetFirst()
 	local tc=Duel.GetFirstTarget()
 	if c and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 and tc and tc:IsRelateToEffect(e) and tc:IsRace(RACE_DRAGON) and tc:IsLevelBelow(3) and not tc:IsForbidden() then
 		local atk=tc:GetTextAttack()
 		if atk<0 then atk=0 end
-		if not Duel.Equip(tp,tc,c,false) then return end
+		if not Duel.Equip(tp,tc,c) or not Duel.Equip(tp,e:GetHandler(),c) then return end
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetProperty(EFFECT_FLAG_OWNER_RELATE)
+		e1:SetCode(EFFECT_EQUIP_LIMIT)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+		e1:SetValue(s.eqlimit)
+		e:GetHandler():RegisterEffect(e1)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetProperty(EFFECT_FLAG_OWNER_RELATE)
@@ -133,7 +141,6 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=tg:GetFirst()
 	if c:IsFaceup() and tc then
 		local atk=tc:GetTextAttack()
-		if atk<0 then atk=0 end
 		if not Duel.Equip(tp,tc,c,false) then return end
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
@@ -147,8 +154,9 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetProperty(EFFECT_FLAG_OWNER_RELATE+EFFECT_FLAG_IGNORE_IMMUNE)
 		e2:SetCode(EFFECT_UPDATE_ATTACK)
 		e2:SetReset(RESET_EVENT+RESETS_STANDARD)
-		e2:SetValue(atk)
+		e2:SetValue(math.max(atk,0))
 		tc:RegisterEffect(e2)
+		if c:IsCode(18967507) then return end
 		local e3=Effect.CreateEffect(c)
 		e3:SetType(EFFECT_TYPE_EQUIP)
 		e3:SetCode(EFFECT_DESTROY_SUBSTITUTE)

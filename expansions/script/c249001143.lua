@@ -26,12 +26,11 @@ function c249001143.cfilter(c,tp,rp)
 	return c:IsPreviousPosition(POS_FACEUP) and c:GetPreviousControler()==tp and bit.band(c:GetPreviousTypeOnField(),TYPE_FUSION+TYPE_SYNCHRO)~=0 
 		and c:IsReason(REASON_EFFECT)
 end
-function c249001143.confilter(c,g)
-	return c:IsSetCard(0x22C) and c:GetCode()~=249001143 and not g:IsContains(c)
+function c249001143.confilter(c)
+	return c:IsSetCard(0x22C) and c:GetCode()~=249001143
 end
 function c249001143.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c249001143.cfilter,1,nil,tp,rp) and not eg:IsContains(e:GetHandler())
-		and Duel.IsExistingMatchingCard(c249001143.confilter,tp,LOCATION_GRAVE,0,1,e:GetHandler(),eg)
+	return eg:IsExists(c249001143.cfilter,1,nil,tp,rp) and Duel.IsExistingMatchingCard(c249001143.confilter,tp,LOCATION_GRAVE,0,1,nil)
 end
 function c249001143.spfilter(c,e,tp)
 	return c:IsLevel(4) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

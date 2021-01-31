@@ -1,17 +1,17 @@
 --Cyber Dragon Variation
 function c249001148.initial_effect(c)
 	--spsummon on attack
-	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(12423762,0))
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e1:SetCode(EVENT_ATTACK_ANNOUNCE)
-	e1:SetRange(LOCATION_GRAVE)
-	e1:SetCountLimit(1,249001148)
-	e1:SetCondition(c249001148.spcon)
-	e1:SetTarget(c249001148.sptg)
-	e1:SetOperation(c249001148.spop)
-	c:RegisterEffect(e1)
+	--local e1=Effect.CreateEffect(c)
+	--e1:SetDescription(aux.Stringid(12423762,0))
+	--e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	--e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	--e1:SetCode(EVENT_ATTACK_ANNOUNCE)
+	--e1:SetRange(LOCATION_GRAVE)
+	--e1:SetCountLimit(1,249001148)
+	--e1:SetCondition(c249001148.spcon)
+	--e1:SetTarget(c249001148.sptg)
+	--e1:SetOperation(c249001148.spop)
+	--c:RegisterEffect(e1)
 	--draw
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(1108)
@@ -45,24 +45,24 @@ function c249001148.initial_effect(c)
 	e4:SetValue(70095154)
 	c:RegisterEffect(e4)
 end
-function c249001148.spcon(e,tp,eg,ep,ev,re,r,rp)
-	local at=Duel.GetAttacker()
-	return at:GetControler()~=tp and Duel.GetAttackTarget()==nil
-end
-function c249001148.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
-end
-function c249001148.spop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) then
-		if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP) then
-			Duel.NegateAttack()
-		end
-	end
-end
+--function c249001148.spcon(e,tp,eg,ep,ev,re,r,rp)
+--	local at=Duel.GetAttacker()
+--	return at:GetControler()~=tp and Duel.GetAttackTarget()==nil
+--end
+--function c249001148.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+--	local c=e:GetHandler()
+--	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+--		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
+--	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
+--end
+--function c249001148.spop(e,tp,eg,ep,ev,re,r,rp)
+--	local c=e:GetHandler()
+--	if c:IsRelateToEffect(e) then
+--		if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP) then
+--			Duel.NegateAttack()
+--		end
+--	end
+--end
 function c249001148.drcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0
 end

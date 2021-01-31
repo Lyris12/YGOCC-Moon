@@ -95,7 +95,7 @@ function c249000366.eqop(e,tp,eg,ep,ev,re,r,rp)
 				local e3=Effect.CreateEffect(c)
 				e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 				e3:SetCode(EVENT_ADJUST)
-				e3:SetRange(LOCATION_SZONE)
+				e3:SetRange(LOCATION_SZONE)	
 				e3:SetOperation(c249000366.operation)
 				e3:SetReset(RESET_EVENT+RESETS_STANDARD)
 				tc:RegisterEffect(e3)
@@ -108,23 +108,7 @@ function c249000366.operation(e,tp,eg,ep,ev,re,r,rp)
 	local eq=e:GetHandler():GetEquipTarget()
 	local code=c:GetOriginalCode()
 	if eq:IsFaceup() and eq:GetFlagEffect(code)==0 then
-		eq:CopyEffect(code,RESET_EVENT+RESETS_STANDARD,1)
-		eq:RegisterFlagEffect(code,RESET_EVENT+RESETS_STANDARD,0,1)  
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e1:SetCode(EVENT_ADJUST)
-		e1:SetRange(LOCATION_MZONE)
-		e1:SetLabel(code)
-		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e1:SetOperation(c249000366.resetop)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-		eq:RegisterEffect(e1,true)
-	end
-end
-function c249000366.resetop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if not c:GetEquipGroup():IsExists(aux.AND(Card.IsFaceup,Card.IsCode),1,nil,e:GetLabel()) or c:IsDisabled() then
-		c:ResetEffect(e:GetLabel(),RESET_COPY)
-		c:ResetFlagEffect(e:GetLabel())
-	end
+		eq:CopyEffect(code,RESET_EVENT+RESETS_STANDARD+EVENT_CHAINING,1)
+		eq:RegisterFlagEffect(code,RESET_EVENT+RESETS_STANDARD+EVENT_CHAINING,0,1) 	
+	end	
 end
