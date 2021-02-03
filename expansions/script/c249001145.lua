@@ -1,6 +1,6 @@
 --Extra-Mastery Future Angel
 function c249001145.initial_effect(c)
-	--special summon
+	--special summon tuner
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(2)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -11,7 +11,7 @@ function c249001145.initial_effect(c)
 	e1:SetTarget(c249001145.sptg)
 	e1:SetOperation(c249001145.spop)
 	c:RegisterEffect(e1)
-	--special summon
+	--special summon synchro
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(88305978,0))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -24,6 +24,13 @@ function c249001145.initial_effect(c)
 	e2:SetTarget(c249001145.target)
 	e2:SetOperation(c249001145.operation)
 	c:RegisterEffect(e2)
+	--special summon tuner continued
+	local e3=e1:Clone()
+	e3:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
+	c:RegisterEffect(e3)
+	local e4=e1:Clone()
+	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
+	c:RegisterEffect(e4)
 end
 function c249001145.costfilter(c)
 	return c:IsSetCard(0x22C) and not c:IsPublic()

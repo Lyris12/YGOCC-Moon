@@ -1,4 +1,4 @@
---Extra-Mastery Synchron
+--Extra-Mastery Magical Synchron
 function c249001141.initial_effect(c)
 	--synchro custom
 	local e1=Effect.CreateEffect(c)
@@ -10,18 +10,17 @@ function c249001141.initial_effect(c)
 	e1:SetValue(1)
 	e1:SetOperation(c249001141.synop)
 	c:RegisterEffect(e1)
-	--special summon
-	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(2)
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e1:SetRange(LOCATION_GRAVE)
-	e1:SetCode(EVENT_BATTLE_DESTROYED)
-	e1:SetCountLimit(1,249001141)
-	e1:SetCondition(c249001141.spcon)
-	e1:SetTarget(c249001141.sptg)
-	e1:SetOperation(c249001141.spop)
-	c:RegisterEffect(e1)
+	--draw
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(92676637,0))
+	e2:SetCategory(CATEGORY_DRAW)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e2:SetCode(EVENT_BE_MATERIAL)
+	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_DELAY)
+	e2:SetCondition(c249001141.drcon)
+	e2:SetTarget(c249001141.drtg)
+	e2:SetOperation(c249001141.drop)
+	c:RegisterEffect(e2)
 	--hand synchro
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
@@ -93,26 +92,16 @@ function c249001141.synop(e,tp,eg,ep,ev,re,r,rp,syncard,f,min,max)
 	end
 	Duel.SetSynchroMaterial(g)
 end
-function c249001141.spfilter(c,tp)
-	return c:IsReason(REASON_BATTLE) and c:GetPreviousControler()==tp and c:IsType(TYPE_MONSTER)
+function c249001141.drcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():IsLocation(LOCATION_GRAVE) and r==REASON_SYNCHRO
 end
-function c249001141.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return not eg:IsContains(e:GetHandler()) and eg:IsExists(c249001141.spfilter,1,nil,tp)
+function c249001141.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
+	Duel.SetTargetPlayer(tp)
+	Duel.SetTargetParam(1)
+	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end
-function c249001141.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
-end
-function c249001141.spop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
-		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e1:SetReset(RESET_EVENT+RESETS_REDIRECT)
-		e1:SetValue(LOCATION_REMOVED)
-		c:RegisterEffect(e1,true)
-	end
+function c249001141.drop(e,tp,eg,ep,ev,re,r,rp)
+	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
+	Duel.Draw(p,d,REASON_EFFECT)
 end
