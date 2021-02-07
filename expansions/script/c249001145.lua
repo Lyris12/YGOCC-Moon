@@ -23,6 +23,7 @@ function c249001145.initial_effect(c)
 	e2:SetCost(aux.bfgcost)
 	e2:SetTarget(c249001145.target)
 	e2:SetOperation(c249001145.operation)
+	e1:SetHintTiming(0,TIMING_MAIN_END)
 	c:RegisterEffect(e2)
 	--special summon tuner continued
 	local e3=e1:Clone()
@@ -59,7 +60,8 @@ function c249001145.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c249001145.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()~=tp and (Duel.GetCurrentPhase()>=PHASE_BATTLE_START and Duel.GetCurrentPhase()<=PHASE_BATTLE)
+	return Duel.GetTurnPlayer()~=tp and ((Duel.GetCurrentPhase()>=PHASE_BATTLE_START and Duel.GetCurrentPhase()<=PHASE_BATTLE)
+	or (Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2))
 		and Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)<Duel.GetFieldGroupCount(tp,0,LOCATION_MZONE)
 end
 function c249001145.filter2(c,e,tp)

@@ -1,5 +1,6 @@
 --Change True Power of Elemental HERO - Elemental Fusion
 function c249001156.initial_effect(c)
+	return
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_REMOVE+CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON)

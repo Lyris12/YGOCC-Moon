@@ -1,5 +1,6 @@
 --Change True Power of Evil HERO - Supreme King's Imperative
 function c249001158.initial_effect(c)
+	return
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)

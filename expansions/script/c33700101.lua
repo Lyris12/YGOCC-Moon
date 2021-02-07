@@ -69,7 +69,7 @@ function c33700101.thop(e,tp,eg,ep,ev,re,r,rp)
 	 Duel.ConfirmDecktop(tp,3)
 	local g=Duel.GetDecktopGroup(tp,3)
 	if g:GetCount()>0 then
-	   local sg2=g:Filter(c33700101.filter2,nil)
+	   local sg2=g:Filter(tp,c33700101.filter2,nil)
 	 if g:IsExists(c33700101.filter,1,nil) then
 		Duel.DisableShuffleCheck() 
 	   Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)

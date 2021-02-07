@@ -1,5 +1,6 @@
 --Change Sentai - Change Robo
 function c249001155.initial_effect(c)
+	return
 	c:EnableReviveLimit()
 	aux.AddFusionProcFunRep(c,c249001155.matfilter,5,true,true)
 	aux.AddContactFusionProcedure(c,Card.IsAbleToDeckOrExtraAsCost,LOCATION_MZONE+LOCATION_GRAVE+LOCATION_REMOVED,0,aux.tdcfop(c))

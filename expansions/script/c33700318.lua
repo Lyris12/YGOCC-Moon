@@ -41,7 +41,7 @@ function cm.initial_effect(c)
 	end
 end
 function cm.drcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetFlagEffect(e:GetHandlerPlayer(),m)>0
+	return Duel.GetFlagEffect(0,m)>0
 end
 function cm.drcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckLPCost(tp,1000) end
@@ -60,17 +60,16 @@ function cm.drop(e,tp,eg,ep,ev,re,r,rp)
 	   local e1=Effect.CreateEffect(e:GetHandler())
 	   e1:SetType(EFFECT_TYPE_SINGLE)
 	   e1:SetCode(EFFECT_PUBLIC)
-	   e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+	   e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 	   tc:RegisterEffect(e1)
 	end
 end
 function cm.rfilter(c)
-	return c:IsSetCard(0x1449) and c:IsType(TYPE_MONSTER) and c:IsReason(REASON_EFFECT) and c:GetReasonEffect():GetHandler()==c
+	return c:IsSetCard(0x1449) and c:IsReason(REASON_EFFECT) and c:GetReasonEffect():GetHandler()==c
 end
 function cm.checkop(e,tp,eg,ep,ev,re,r,rp)
 	if eg:IsExists(cm.rfilter,1,nil) then
 	   Duel.RegisterFlagEffect(0,m,RESET_PHASE+PHASE_END,0,1)
-	   Duel.RegisterFlagEffect(1,m,RESET_PHASE+PHASE_END,0,1)
 	end
 end
 function cm.cfilter(c)
@@ -90,10 +89,10 @@ function cm.operation(e,tp,eg,ep,ev,re,r,rp)
 	   tc=sg:Select(tp,1,1,nil):GetFirst()
 	   Duel.ConfirmCards(1-tp,tc)
 	end
-	local atk=tc:GetTextAttack()
-	local def=tc:GetTextDefense()
-	local maxc=math.max(atk,def)
-	Duel.Recover(tp,maxc,REASON_EFFECT)
+	local atk=tc:GetAttack()
+	local def=tc:GetDefense()
+	local max=math.max(atk,def)
+	Duel.Recover(tp,max,REASON_EFFECT)
 end
 
 

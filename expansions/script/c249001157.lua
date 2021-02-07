@@ -1,5 +1,6 @@
 --Change True Power of Destiny HERO - Future Selection
 function c249001157.initial_effect(c)
+	return
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_DRAW+CATEGORY_TODECK)

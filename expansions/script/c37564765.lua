@@ -134,19 +134,63 @@ function cm.RegisterSingleEffect(c,setcd)
 	return e1
 end
 function cm.GetValueType(v)
-	return aux.GetValueType(v)
+	local t=type(v)
+	if t=="userdata" then
+		local mt=getmetatable(v)
+		if mt==Group then return "Group"
+		elseif mt==Effect then return "Effect"
+		else return "Card" end
+	else return t end
+end
+function cm.CheckGroupRecursive(c,sg,g,f,min,max,ext_params)
+	sg:AddCard(c)
+	local res=(#sg>=min and #sg<=max and f(sg,table.unpack(ext_params)))
+		or (#sg<max and g:IsExists(cm.CheckGroupRecursive,1,sg,sg,g,f,min,max,ext_params))
+	sg:RemoveCard(c)
+	return res
 end
 function cm.CheckGroup(g,f,cg,min,max,...)
-	if cg then Duel.SetSelectedCard(cg) end
-	return g:CheckSubGroup(f,min,max,...)
+	local min=min or 1
+	local max=max or #g
+	if min>max then return false end
+	local ext_params={...}
+	local sg=Group.CreateGroup()
+	if cg then sg:Merge(cg) end
+	if #sg>=min and #sg<=max and f(sg,...) then return true end
+	return g:IsExists(cm.CheckGroupRecursive,1,sg,sg,g,f,min,max,ext_params)
 end
 function cm.SelectGroupNew(tp,desc,cancelable,g,f,cg,min,max,...)
 	local min=min or 1
 	local max=max or #g
 	local ext_params={...}
-	if cg then Duel.SetSelectedCard(cg) end
-	Duel.Hint(tp,HINT_SELECTMSG,desc)
-	return g:SelectSubGroup(tp,f,cancelable,min,max,...)
+	local sg=Group.CreateGroup()
+	local cg=cg or Group.CreateGroup()
+	sg:Merge(cg)
+	local ag=g:Filter(cm.CheckGroupRecursive,sg,sg,g,f,min,max,ext_params)	
+	while #sg<max and #ag>0 do
+		local seg=sg:Clone()
+		seg:Sub(cg)
+		local finish=(#sg>=min and #sg<=max and f(sg,...))
+		local cancel=cancelable and not finish
+		local dmin=#sg
+		local dmax=math.min(max,#g)
+		local tc=nil
+		repeat
+			Duel.Hint(HINT_SELECTMSG,tp,desc)
+			tc=ag:SelectUnselect(sg,tp,finish,cancel,dmin,dmax)
+		until not tc or ag:IsContains(tc) or seg:IsContains(tc)
+		if not tc then
+			if not finish then return end
+			break
+		end
+		if sg:IsContains(tc) then
+			sg:RemoveCard(tc)
+		else
+			sg:AddCard(tc)
+		end
+		ag=g:Filter(cm.CheckGroupRecursive,sg,sg,g,f,min,max,ext_params)
+	end
+	return sg
 end
 function cm.SelectGroup(tp,desc,g,f,cg,min,max,...)
 	return cm.SelectGroupNew(tp,desc,false,g,f,cg,min,max,...)
@@ -917,14 +961,6 @@ function cm.Nanahira(c)
 	c:RegisterEffect(e2)
 end
 function cm.NanahiraPendulum(c)
-	if not PENDULUM_CHECKLIST then
-		PENDULUM_CHECKLIST=0
-		local ge1=Effect.GlobalEffect()
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_PHASE_START+PHASE_DRAW)
-		ge1:SetOperation(Auxiliary.PendulumReset)
-		Duel.RegisterEffect(ge1,0)
-	end
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
@@ -941,6 +977,7 @@ function cm.NanahiraPendulum(c)
 	e1:SetCode(EFFECT_SPSUMMON_PROC_G)
 	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
 	e1:SetRange(LOCATION_PZONE)
+	e1:SetCountLimit(1,10000000)
 	e1:SetCondition(cm.PendConditionNanahira())
 	e1:SetOperation(cm.PendOperationNanahira())
 	e1:SetValue(SUMMON_TYPE_PENDULUM)
@@ -983,7 +1020,7 @@ function cm.NanahiraExtraPendulum(c,scon)
 	end)
 	c:RegisterEffect(e2)
 end
-function cm.PConditionFilterNanahira(c,e,tp,lscale,rscale,f,tc,eset)
+function cm.PConditionFilterNanahira(c,e,tp,lscale,rscale,f,tc)
 	local lv=0
 	if c.pendulum_level then
 		lv=c.pendulum_level
@@ -992,15 +1029,12 @@ function cm.PConditionFilterNanahira(c,e,tp,lscale,rscale,f,tc,eset)
 	end
 	local bool=aux.PendulumSummonableBool(c)
 	return lv>lscale and lv<rscale and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_PENDULUM,tp,bool,bool)
-		and (PENDULUM_CHECKLIST&(0x1<<tp)==0 or aux.PConditionExtraFilter(c,e,tp,lscale,rscale,eset))
 		and not c:IsForbidden() and (not f or f(c,tc))
 end
 function cm.PendConditionNanahira()
 	return  function(e,c,og)
 				if c==nil then return true end
 				local tp=c:GetControler()
-				local eset={Duel.IsPlayerAffectedByEffect(tp,EFFECT_EXTRA_PENDULUM_SUMMON)}
-				if PENDULUM_CHECKLIST&(0x1<<tp)~=0 and #eset==0 then return false end
 				local rpz=cm.GetPendulumCard(tp,1)
 				if rpz==nil or c==rpz then return false end
 				local lscale=c:GetLeftScale()
@@ -1012,23 +1046,23 @@ function cm.PendConditionNanahira()
 				local eft=Duel.GetLocationCountFromEx(tp)
 				local g=nil
 				if og then
-					g=og:Filter(aux.PConditionFilter,1,nil,e,tp,lscale,rscale,eset)
+					g=og:Filter(aux.PConditionFilter,1,nil,e,tp,lscale,rscale)
 				else
-					g=Duel.GetMatchingGroup(aux.PConditionFilter,tp,LOCATION_HAND+LOCATION_EXTRA,0,nil,e,tp,lscale,rscale,eset)
+					g=Duel.GetMatchingGroup(aux.PConditionFilter,tp,LOCATION_HAND+LOCATION_EXTRA,0,nil,e,tp,lscale,rscale)
 				end
 				local ext1={c:IsHasEffect(37564541)}
 				local ext2={rpz:IsHasEffect(37564541)} 
 				for i,te in pairs(ext1) do
 					local t=cm.order_table[te:GetValue()]
 					if (t.location==LOCATION_EXTRA and eft>0) or (t.location~=LOCATION_EXTRA and mft>0) then
-						local exg=Duel.GetMatchingGroup(cm.PConditionFilterNanahira,tp,t.location,0,nil,e,tp,lscale,rscale,t.filter,te:GetHandler(),eset)
+						local exg=Duel.GetMatchingGroup(cm.PConditionFilterNanahira,tp,t.location,0,nil,e,tp,lscale,rscale,t.filter,te:GetHandler())
 						g:Merge(exg)
 					end
 				end
 				for i,te in pairs(ext2) do
 					local t=cm.order_table[te:GetValue()]
 					if (t.location==LOCATION_EXTRA and eft>0) or (t.location~=LOCATION_EXTRA and mft>0) then
-						local exg=Duel.GetMatchingGroup(cm.PConditionFilterNanahira,tp,t.location,0,nil,e,tp,lscale,rscale,t.filter,te:GetHandler(),eset)
+						local exg=Duel.GetMatchingGroup(cm.PConditionFilterNanahira,tp,t.location,0,nil,e,tp,lscale,rscale,t.filter,te:GetHandler())
 						g:Merge(exg)
 					end
 				end
@@ -1050,7 +1084,6 @@ function cm.PendOperationNanahira()
 				local lscale=c:GetLeftScale()
 				local rscale=rpz:GetRightScale()
 				if lscale>rscale then lscale,rscale=rscale,lscale end
-                                local eset={Duel.IsPlayerAffectedByEffect(tp,EFFECT_EXTRA_PENDULUM_SUMMON)}
 				local ft=Duel.GetUsableMZoneCount(tp)
 				local mft=Duel.GetMZoneCount(tp)
 				local eft=Duel.GetLocationCountFromEx(tp)
@@ -1064,14 +1097,14 @@ function cm.PendOperationNanahira()
 				if og then
 					tg=og:Filter(aux.PConditionFilter,1,nil,e,tp,lscale,rscale)
 				else
-					tg=Duel.GetMatchingGroup(aux.PConditionFilter,tp,LOCATION_HAND+LOCATION_EXTRA,0,nil,e,tp,lscale,rscale,eset)
+					tg=Duel.GetMatchingGroup(aux.PConditionFilter,tp,LOCATION_HAND+LOCATION_EXTRA,0,nil,e,tp,lscale,rscale)
 				end
 				local ext1={c:IsHasEffect(37564541)}
 				local ext2={rpz:IsHasEffect(37564541)}
 				for i,te in pairs(ext1) do
 					local t=cm.order_table[te:GetValue()]
 					if (t.location==LOCATION_EXTRA and eft>0) or (t.location~=LOCATION_EXTRA and mft>0) then
-						local exg=Duel.GetMatchingGroup(cm.PConditionFilterNanahira,tp,t.location,0,nil,e,tp,lscale,rscale,t.filter,te:GetHandler(),eset)
+						local exg=Duel.GetMatchingGroup(cm.PConditionFilterNanahira,tp,t.location,0,nil,e,tp,lscale,rscale,t.filter,te:GetHandler())
 						tg:Merge(exg)
 						local mct=t.max_count
 						if mct and mct>0 and mct<ft then
@@ -1082,7 +1115,7 @@ function cm.PendOperationNanahira()
 				for i,te in pairs(ext2) do
 					local t=cm.order_table[te:GetValue()]
 					if (t.location==LOCATION_EXTRA and eft>0) or (t.location~=LOCATION_EXTRA and mft>0) then
-						local exg=Duel.GetMatchingGroup(cm.PConditionFilterNanahira,tp,t.location,0,nil,e,tp,lscale,rscale,t.filter,te:GetHandler(),eset)
+						local exg=Duel.GetMatchingGroup(cm.PConditionFilterNanahira,tp,t.location,0,nil,e,tp,lscale,rscale,t.filter,te:GetHandler())
 						tg:Merge(exg)
 						local mct=t.max_count
 						if mct and mct>0 and mct<ft then
@@ -1099,37 +1132,7 @@ function cm.PendOperationNanahira()
 				else
 					maxlist[LOCATION_EXTRA]=ect
 				end
-				local ce=nil
-				local b1=PENDULUM_CHECKLIST&(0x1<<tp)==0
-				local b2=#eset>0
-				if b1 and b2 then
-					local options={1163}
-					for _,te in ipairs(eset) do
-						table.insert(options,te:GetDescription())
-					end
-					local op=Duel.SelectOption(tp,table.unpack(options))
-					if op>0 then
-						ce=eset[op]
-					end
-				elseif b2 and not b1 then
-					local options={}
-					for _,te in ipairs(eset) do
-						table.insert(options,te:GetDescription())
-					end
-					local op=Duel.SelectOption(tp,table.unpack(options))
-					ce=eset[op+1]
-				end
-				if ce then
-					tg=tg:Filter(aux.PConditionExtraFilterSpecific,nil,e,tp,lscale,rscale,ce)
-				end
-				local g=cm.SelectGroupWithCancel(tp,HINTMSG_SPSUMMON,tg,cm.PendCheckNanahira,nil,1,ft,mft,maxlist)
-				if not g then return end
-				if ce then
-					Duel.Hint(HINT_CARD,0,ce:GetOwner():GetOriginalCode())
-					ce:Reset()
-				else
-					PENDULUM_CHECKLIST=PENDULUM_CHECKLIST|(0x1<<tp)
-				end
+				local g=cm.SelectGroup(tp,HINTMSG_SPSUMMON,tg,cm.PendCheckNanahira,nil,1,ft,mft,maxlist)
 				sg:Merge(g)
 				Duel.HintSelection(Group.FromCards(c))
 				Duel.HintSelection(Group.FromCards(rpz))

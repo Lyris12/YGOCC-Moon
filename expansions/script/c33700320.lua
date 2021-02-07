@@ -4,7 +4,6 @@ function c33700320.initial_effect(c)
 	aux.EnablePendulumAttribute(c)
 	--con
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(33700320,0))
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetRange(LOCATION_PZONE)
@@ -32,7 +31,6 @@ function c33700320.initial_effect(c)
 	c:RegisterEffect(e4)
 	--tof
 	local e5=Effect.CreateEffect(c)
-	e5:SetDescription(aux.Stringid(33700320,1))
 	e5:SetType(EFFECT_TYPE_QUICK_O)
 	e5:SetCode(EVENT_DAMAGE)
 	e5:SetRange(LOCATION_HAND)
@@ -54,7 +52,7 @@ function c33700320.tfop(e,tp,eg,ep,ev,re,r,rp)
 	if ft<=0 then return end
 	local ct=math.min(2,ft)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
-	local tg=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(c33700320.filter),tp,LOCATION_GRAVE+LOCATION_DECK,0,1,ct,nil)
+	local tg=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(c33700320.cfilter),tp,LOCATION_GRAVE+LOCATION_DECK,0,ct,ct,nil)
 	if tg:GetCount()<=0 then return end
 	for tc in aux.Next(tg) do
 	   if Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true) then
@@ -62,7 +60,7 @@ function c33700320.tfop(e,tp,eg,ep,ev,re,r,rp)
 		  e1:SetCode(EFFECT_CHANGE_TYPE)
 		  e1:SetType(EFFECT_TYPE_SINGLE)
 		  e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		  e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET)
+		  e1:SetReset(RESET_EVENT+0x1fc0000)
 		  e1:SetValue(TYPE_SPELL+TYPE_CONTINUOUS)
 		  tc:RegisterEffect(e1)
 	   end
@@ -74,15 +72,14 @@ end
 function c33700320.adval(e,c)
 	return -1*(Duel.GetMatchingGroupCount(Card.IsType,tp,LOCATION_ONFIELD,0,nil,TYPE_SPELL+TYPE_TRAP)*200)
 end
-function c33700320.filter(c,tp)
-	return c:IsSetCard(0x1449) and c:IsType(TYPE_SPELL) and c:IsSSetable() and (c:IsType(TYPE_FIELD) or Duel.GetLocationCount(tp,LOCATION_SZONE)>0)
+function c33700320.filter(c)
+	return c:IsSetCard(0x1449) and c:IsType(TYPE_SPELL) and c:IsSSetable(false)
 end
 function c33700320.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and c33700320.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c33700320.filter,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,nil,tp) end
+	if chk==0 then return Duel.IsExistingTarget(c33700320.filter,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,nil) and Duel.GetLocationCount(tp,LOCATION_SZONE)>=1 end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
-	local g=Duel.SelectTarget(tp,aux.NecroValleyFilter(c33700320.filter),tp,LOCATION_GRAVE,LOCATION_GRAVE,1,1,nil,tp)
-	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,g,#g,0,0)
+	local g=Duel.SelectTarget(tp,c33700320.filter,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,1,nil)
 end
 function c33700320.op(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
@@ -92,7 +89,7 @@ function c33700320.op(e,tp,eg,ep,ev,re,r,rp)
 	   local e1=Effect.CreateEffect(e:GetHandler())
 	   e1:SetType(EFFECT_TYPE_SINGLE)
 	   e1:SetCode(EFFECT_CANNOT_TRIGGER)
-	   e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+	   e1:SetReset(RESET_EVENT+0x17a0000+RESET_PHASE+PHASE_END)
 	   tc:RegisterEffect(e1)
 	end
 end

@@ -1,5 +1,6 @@
 --Change Sentai - Blue
 function c249000059.initial_effect(c)
+	return
 	c:SetUniqueOnField(1,0,249000059)
 	--copy effect
 	local e1=Effect.CreateEffect(c)

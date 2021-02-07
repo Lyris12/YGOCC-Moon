@@ -1,5 +1,6 @@
 --Change Bazooka
 function c249000062.initial_effect(c)
+	return
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_DESTROY)

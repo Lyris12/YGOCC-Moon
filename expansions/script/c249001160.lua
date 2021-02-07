@@ -1,5 +1,6 @@
 --Change True Power of Masked HERO - Donning the Mask
 function c249001160.initial_effect(c)
+	return
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)

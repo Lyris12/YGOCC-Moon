@@ -1,5 +1,6 @@
 --Change Sentai - Pink
 function c249000060.initial_effect(c)
+	return
 	c:SetUniqueOnField(1,0,249000060)
 	--copy effect
 	local e1=Effect.CreateEffect(c)

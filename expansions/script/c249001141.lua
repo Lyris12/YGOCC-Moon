@@ -31,10 +31,10 @@ function c249001141.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c249001141.cfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x22C)
+	return (c:IsFaceup() or not c:IsLocation(LOCATION_MZONE)) and c:IsSetCard(0x22C)
 end
 function c249001141.syncon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(c249001141.cfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,0,1,nil)
+	return Duel.IsExistingMatchingCard(c249001141.cfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,0,1,e:GetHandler())
 end
 function c249001141.synfilter1(c,syncard,tuner,f)
 	return c:IsFaceup() and c:IsCanBeSynchroMaterial(syncard,tuner) and (f==nil or f(c,syncard))

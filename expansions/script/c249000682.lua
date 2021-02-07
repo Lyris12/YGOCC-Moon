@@ -9,15 +9,15 @@ function c249000682.initial_effect(c)
 	e1:SetCondition(c249000682.spcon)
 	e1:SetOperation(c249000682.spop)
 	c:RegisterEffect(e1)
-	--draw from summon
+	--search from summon
 	local e2=Effect.CreateEffect(c)
-	e2:SetCategory(CATEGORY_DRAW)
+	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e2:SetCode(EVENT_SUMMON_SUCCESS)
 	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e2:SetCountLimit(1,2490006821)
-	e2:SetTarget(c249000682.drtg)
-	e2:SetOperation(c249000682.drop)
+	e2:SetTarget(c249000682.thtg)
+	e2:SetOperation(c249000682.thop)
 	c:RegisterEffect(e2)
 	--draw
 	local e3=Effect.CreateEffect(c)
@@ -31,6 +31,12 @@ function c249000682.initial_effect(c)
 	e3:SetTarget(c249000682.drtg)
 	e3:SetOperation(c249000682.drop)
 	c:RegisterEffect(e3)
+	local e4=e2:Clone()
+	e4:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
+	c:RegisterEffect(e4)
+	local e5=e2:Clone()
+	e5:SetCode(EVENT_SPSUMMON_SUCCESS)
+	c:RegisterEffect(e5)
 end
 function c249000682.spfilter(c)
 	return c:IsSetCard(0x1E4) and c:IsAbleToRemoveAsCost()
@@ -45,6 +51,21 @@ function c249000682.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectMatchingCard(tp,c249000682.spfilter,tp,LOCATION_GRAVE,0,1,1,nil)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
+end
+function c249000682.thfilter(c)
+	return c:IsSetCard(0x1E4) and c:IsType(TYPE_SPELL) and c:IsAbleToHand()
+end
+function c249000682.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(c249000682.thfilter,tp,LOCATION_DECK,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+end
+function c249000682.thop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local g=Duel.SelectMatchingCard(tp,c249000682.thfilter,tp,LOCATION_DECK,0,1,1,nil)
+	if g:GetCount()>0 then
+		Duel.SendtoHand(g,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,g)
+	end
 end
 function c249000682.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

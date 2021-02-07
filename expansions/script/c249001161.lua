@@ -1,5 +1,6 @@
 --Change True Power of Vision HERO - Magic Vision
 function c249001161.initial_effect(c)
+	return
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)

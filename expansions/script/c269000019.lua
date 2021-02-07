@@ -19,22 +19,19 @@ function c269000019.initial_effect(c)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_RECOVER)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
-	e2:SetCode(EVENT_TO_GRAVE)
+	e2:SetCode(EVENT_LEAVE_FIELD)
 	e2:SetCondition(c269000019.spcon)
 	e2:SetTarget(c269000019.sptg)
 	e2:SetOperation(c269000019.spop)
 	c:RegisterEffect(e2)
-	local e3=e2:Clone()
-	e3:SetCode(EVENT_REMOVED)
-	c:RegisterEffect(e3)
 	--code
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE)
-	e4:SetCode(EFFECT_ADD_CODE)
-	e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e4:SetRange(LOCATION_GRAVE+LOCATION_EXTRA)
-	e4:SetValue(12744567)
-	c:RegisterEffect(e4)
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetCode(EFFECT_CHANGE_CODE)
+	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e3:SetRange(LOCATION_GRAVE+LOCATION_EXTRA)
+	e3:SetValue(12744567)
+	c:RegisterEffect(e3)
 end
 c269000019.xyz_number=101
 function c269000019.filter(c)
@@ -59,7 +56,8 @@ function c269000019.operation(e,tp,eg,ep,ev,re,r,rp)
 end
 function c269000019.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:IsReason(REASON_DESTROY) and c:IsPreviousLocation(LOCATION_MZONE) and c:GetOverlayCount()>0
+	return (c:IsReason(REASON_EFFECT) or c:IsReason(REASON_BATTLE)) and c:IsPreviousLocation(LOCATION_MZONE) and c:GetOverlayCount()>0
+		and c:IsLocation(LOCATION_GRAVE+LOCATION_REMOVED)
 end
 function c269000019.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

@@ -1,5 +1,6 @@
 --Change Super Armor
 function c249000778.initial_effect(c)
+	return
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_ATKCHANGE)

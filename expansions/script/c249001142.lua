@@ -27,14 +27,14 @@ function c249001142.spcon(e,c)
 	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0 and
 		Duel.IsExistingMatchingCard(c249001142.cfilter,c:GetControler(),LOCATION_MZONE,0,1,nil)
 end
-function c249001142.mfilter0(c)
+function c249001142.mfilter0(c,tp)
 	if not Duel.IsExistingMatchingCard(c249001142.cfilter,tp,LOCATION_MZONE,0,1,nil) then return false end
 	return c:IsType(TYPE_MONSTER) and c:IsCanBeFusionMaterial() and c:IsAbleToRemove()
 end
 function c249001142.mfilter1(c,e)
 	return not c:IsImmuneToEffect(e)
 end
-function c249001142.mfilter2(c,e)
+function c249001142.mfilter2(c,e,tp)
 	if not Duel.IsExistingMatchingCard(c249001142.cfilter,tp,LOCATION_MZONE,0,1,nil) then return false end
 	return c:IsType(TYPE_MONSTER) and c:IsCanBeFusionMaterial() and c:IsAbleToRemove() and not c:IsImmuneToEffect(e)
 end
@@ -52,7 +52,7 @@ function c249001142.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 		local mg1=Duel.GetFusionMaterial(tp)
 		local res=Duel.IsExistingMatchingCard(c249001142.spfilter1,tp,LOCATION_EXTRA,0,1,nil,e,tp,mg1,nil,chkf)
 		if res then return true end
-		local mg2=Duel.GetMatchingGroup(c249001142.mfilter0,tp,LOCATION_GRAVE,0,nil)
+		local mg2=Duel.GetMatchingGroup(c249001142.mfilter0,tp,LOCATION_GRAVE,0,nil,tp)
 		mg2:Merge(mg1)
 		res=Duel.IsExistingMatchingCard(c249001142.spfilter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,mg2,nil,chkf)
 		if not res then
@@ -73,7 +73,7 @@ function c249001142.spop(e,tp,eg,ep,ev,re,r,rp)
 	local chkf=tp
 	local mg1=Duel.GetFusionMaterial(tp):Filter(c249001142.mfilter1,nil,e)
 	local sg1=Duel.GetMatchingGroup(c249001142.spfilter1,tp,LOCATION_EXTRA,0,nil,e,tp,mg1,nil,chkf)
-	local mg2=Duel.GetMatchingGroup(c249001142.mfilter2,tp,LOCATION_GRAVE,0,nil,e)
+	local mg2=Duel.GetMatchingGroup(c249001142.mfilter2,tp,LOCATION_GRAVE,0,nil,e,tp)
 	mg2:Merge(mg1)
 	local sg2=Duel.GetMatchingGroup(c249001142.spfilter2,tp,LOCATION_EXTRA,0,nil,e,tp,mg2,nil,chkf)
 	sg1:Merge(sg2)

@@ -14,7 +14,7 @@ function cm.initial_effect(c)
 	c:RegisterEffect(e1)	  
 end
 function cm.desfilter(c)
-	return (c:IsSetCard(0x1449) or c:IsSetCard(0x3449)) and c:IsFaceup()
+	return c:IsSetCard(0x1449) and c:IsFaceup()
 end
 function cm.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cm.desfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,e:GetHandler()) and Duel.IsPlayerCanDraw(tp,3) end

@@ -1,5 +1,6 @@
 --Change True Power of Superquant - Magnus Union
 function c249001159.initial_effect(c)
+	return
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)

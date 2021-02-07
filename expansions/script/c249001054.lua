@@ -20,6 +20,13 @@ function c249001054.initial_effect(c)
 	e2:SetRange(LOCATION_HAND)
 	e2:SetCondition(c249001054.spcon)
 	c:RegisterEffect(e2)
+	--act limit
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e3:SetCode(EVENT_CHAINING)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetOperation(c249001054.chainop)
+	c:RegisterEffect(e3)
 end
 function c249001054.confilter(c)
 	return c:IsSetCard(0x225) and (c:IsFaceup() or c:IsLocation(LOCATION_GRAVE)) and not c:IsCode(249001054)
@@ -46,4 +53,13 @@ function c249001054.spcon(e,c)
 	if c==nil then return true end
 	return Duel.GetFieldGroupCount(c:GetControler(),LOCATION_MZONE,0,nil)==0
 		and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
+end
+function c249001054.chainop(e,tp,eg,ep,ev,re,r,rp)
+	local rc=re:GetHandler()
+	if rc:IsSetCard(0x225) and re:IsActiveType(TYPE_RITUAL) and re:IsActiveType(TYPE_SPELL) then
+		Duel.SetChainLimit(c249001054.chainlm)
+	end
+end
+function c249001054.chainlm(e,rp,tp)
+	return tp==rp
 end

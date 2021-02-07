@@ -61,11 +61,11 @@ end
 function c249000680.filter1(c,e,tp,ct)
 	local rk=c:GetRank()
 	return c:IsFaceup() and c:IsType(TYPE_XYZ)
-		and Duel.IsExistingMatchingCard(c249000680.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,c,rk+1,rk+1+ct,c:GetRace(),c:GetAttribute())
+		and Duel.IsExistingMatchingCard(c249000680.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,c,rk+1,rk+1+ct,c:GetRace())
 		and Duel.GetLocationCountFromEx(tp,tp,c)>0
 end
-function c249000680.filter2(c,e,tp,mc,rkmin,rkmax,race,att)
-	return c:GetRank()>=rkmin and c:GetRank()<=rkmax and mc:IsCanBeXyzMaterial(c) and (c:IsRace(race) or c:IsAttribute(att))
+function c249000680.filter2(c,e,tp,mc,rkmin,rkmax,race)
+	return c:GetRank()>=rkmin and c:GetRank()<=rkmax and mc:IsCanBeXyzMaterial(c) and c:IsRace(race)
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
 end
 function c249000680.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
@@ -79,6 +79,7 @@ function c249000680.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c249000680.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
+	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local ct=Duel.GetMatchingGroupCount(c249000680.sumfilter,tp,0,LOCATION_MZONE,nil)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<0 then return end
 	local tc=Duel.GetFirstTarget()
