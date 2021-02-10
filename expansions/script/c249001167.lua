@@ -37,7 +37,7 @@ function c249001167.initial_effect(c)
 	e3:SetTarget(c249001167.distg)
 	e3:SetOperation(c249001167.disop)
 	c:RegisterEffect(e3)
-	Duel.AddCustomActivityCounter(249001167,ACTIVITY_SPSUMMON,c249001163.counterfilter)
+	Duel.AddCustomActivityCounter(249001167,ACTIVITY_SPSUMMON,c249001167.counterfilter)
 end
 function c249001167.counterfilter(c)
 	return c:IsRace(RACE_CYBERSE) or c:IsRace(RACE_MACHINE)

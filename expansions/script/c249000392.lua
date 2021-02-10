@@ -42,7 +42,7 @@ function c249000392.matfilter2(c)
 	return c:IsLevelAbove(1) and c:IsAbleToRemove()
 end
 function c249000392.filter(c,e,tp,m)
-	if not c:IsType(TYPE_XYZ) or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false) then return false end
+	if not c:IsType(TYPE_XYZ) or c:GetRank()<5 or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false) then return false end
 	return m:CheckWithSumGreater(Card.GetLevel,math.floor(c:GetRank()*1.5),c)
 end
 function c249000392.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

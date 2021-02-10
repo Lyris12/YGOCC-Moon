@@ -28,7 +28,7 @@ function c249000391.cfilter2(c)
 	return c:IsSetCard(0x155) and (c:IsFaceup() or not c:IsLocation(LOCATION_REMOVED))
 end
 function c249000391.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-if chk==0 then return Duel.IsExistingMatchingCard(c249000391.cfilter,tp,LOCATION_HAND,0,1,nil) or Duel.IsExistingMatchingCard(c249000391.cfilter2,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,3,nil) end
+if chk==0 then return Duel.IsExistingMatchingCard(c249000391.cfilter,tp,LOCATION_HAND,0,1,c) or Duel.IsExistingMatchingCard(c249000391.cfilter2,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,3,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
 	local g1=Duel.GetMatchingGroup(c249000391.cfilter2,tp,LOCATION_GRAVE,0,nil)
 	if g1:GetCount() < 3 then
@@ -44,7 +44,7 @@ function c249000391.matfilter2(c)
 	return c:IsLevelAbove(1) and c:IsAbleToRemove()
 end
 function c249000391.filter(c,e,tp,m)
-	if not c:IsType(TYPE_XYZ) or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false) then return false end
+	if not c:IsType(TYPE_XYZ) or c:GetRank()<5 or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false) then return false end
 	return m:CheckWithSumGreater(Card.GetLevel,math.floor(c:GetRank()*1.5),c)
 end
 function c249000391.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

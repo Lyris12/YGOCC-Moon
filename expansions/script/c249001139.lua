@@ -5,7 +5,6 @@ function c249001139.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetHintTiming(TIMING_DAMAGE_STEP)
 	e1:SetTarget(c249001139.target)
 	e1:SetOperation(c249001139.activate)
 	c:RegisterEffect(e1)
@@ -53,13 +52,17 @@ function c249001139.activate(e,tp,eg,ep,ev,re,r,rp)
 		e3:SetType(EFFECT_TYPE_FIELD)
 		e3:SetCode(EFFECT_CANNOT_DISEFFECT)
 		e3:SetRange(LOCATION_MZONE)
-		e3:SetValue(c23299957.efilter)
+		e3:SetValue(c249001139.efilter)
 		e3:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e3,true)
 	end
 end
 function c249001139.valcon(e,re,r,rp)
 	return bit.band(r,REASON_BATTLE+REASON_EFFECT)~=0
+end
+function c249001139.efilter(e,ct)
+	local te=Duel.GetChainInfo(ct,CHAININFO_TRIGGERING_EFFECT)
+	return te:GetHandler()==e:GetHandler()
 end
 function c249001139.thfilter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x122B) and c:IsAbleToHand()

@@ -29,6 +29,23 @@ function c249000527.initial_effect(c)
 	e3:SetRange(LOCATION_HAND)
 	e3:SetCondition(c249000527.spcon)
 	c:RegisterEffect(e3)
+	--tohand
+	local e4=Effect.CreateEffect(c)
+	e4:SetDescription(aux.Stringid(75878039,0))
+	e4:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
+	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e4:SetCode(EVENT_SUMMON_SUCCESS)
+	e4:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
+	e4:SetCountLimit(1,249000527)
+	e4:SetTarget(c249000527.addtg)
+	e4:SetOperation(c249000527.addop)
+	c:RegisterEffect(e4)
+	local e5=e4:Clone()
+	e5:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
+	c:RegisterEffect(e5)
+	local e6=e4:Clone()
+	e6:SetCode(EVENT_SPSUMMON_SUCCESS)
+	c:RegisterEffect(e6)
 end
 function c249000527.cfilter(c)
 	return c:IsSetCard(0x1C8) and c:IsDiscardable()
@@ -46,7 +63,7 @@ function c249000527.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
 		e1:SetValue(1000)
-		e1:SetReset(RESET_EVENT+0x1ff0000)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_DISABLE)
 		c:RegisterEffect(e1)
 	end
 end
@@ -71,4 +88,19 @@ function c249000527.spcon(e,c)
 	return Duel.GetFieldGroupCount(c:GetControler(),LOCATION_MZONE,0)==0
 		and	Duel.GetFieldGroupCount(c:GetControler(),0,LOCATION_MZONE)>0
 		and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
+end
+function c249000527.addfilter(c)
+	return c:IsSetCard(0x1C8) and c:IsAbleToHand() and not c:IsCode(249000527)
+end
+function c249000527.addtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(c249000527.addfilter,tp,LOCATION_DECK,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+end
+function c249000527.addop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local g=Duel.SelectMatchingCard(tp,c249000527.addfilter,tp,LOCATION_DECK,0,1,1,nil)
+	if g:GetCount()>0 then
+		Duel.SendtoHand(g,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,g)
+	end
 end

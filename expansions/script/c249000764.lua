@@ -23,7 +23,7 @@ function c249000764.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c249000764.filter(c,e,tp)
-	return c:IsSetCard(0x1C8) and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
+	return c:IsSetCard(0x1C8) and c:IsCanBeSpecialSummoned(e,0,tp,true,false) and c:IsType(TYPE_MONSTER)
 end
 function c249000764.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and c249000764.filter(chkc,e,tp) end
