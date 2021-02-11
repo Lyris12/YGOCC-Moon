@@ -60,25 +60,25 @@ end
 function c249001167.spfilter1(c,e,tp,lvt)
 	local lv=c:GetLevel()
 	return c:IsLevelBelow(lvt) and c:IsSetCard(0x22D) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-		and Duel.IsExistingMatchingCard(c249001167.spfilter2,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,c,e,tp,lvt-lv)
+		and Duel.IsExistingMatchingCard(c249001167.spfilter2,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,c,e,tp,lvt-lv)
 end
 function c249001167.spfilter2(c,e,tp,lv)
 	return c:IsSetCard(0x22D) and c:IsLevel(lv) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c249001167.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(c249001167.spfilter1,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil,e,tp,e:GetHandler():GetOriginalLevel()) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_GRAVE)
+		and Duel.IsExistingMatchingCard(c249001167.spfilter1,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil,e,tp,e:GetHandler():GetOriginalLevel()) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE)
 end
 function c249001167.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<2 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g1=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(c249001167.spfilter1),tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil,e,tp,c:GetOriginalLevel())
+	local g1=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(c249001167.spfilter1),tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil,e,tp,c:GetOriginalLevel())
 	local tc1=g1:GetFirst()
 	if not tc1 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g2=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(c249001167.spfilter2),tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,tc1,e,tp,c:GetOriginalLevel()-tc1:GetLevel())
+	local g2=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(c249001167.spfilter2),tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,tc1,e,tp,c:GetOriginalLevel()-tc1:GetLevel())
 	g1:Merge(g2)
 	local tc=g1:GetFirst()
 	while tc do

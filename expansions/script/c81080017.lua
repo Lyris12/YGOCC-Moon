@@ -36,7 +36,7 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 --Filters
-function cid.thfilter1(c,e,tp)
+function cid.thfilter1(c,tp)
 	local cardtype=c:GetType()&0x7
 	return c:IsFaceup() and Duel.IsExistingMatchingCard(cid.thfilter2,tp,LOCATION_DECK,0,1,nil,cardtype)
 end
@@ -58,7 +58,7 @@ function cid.cttg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function cid.ctop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local c,tc=e:GetHandler(),Duel.GetFirstTarget()
+	local tc=Duel.GetFirstTarget()
 	local cardtype=tc:GetType()&0x7
 	if tc:IsRelateToEffect(e) and tc:IsFaceup() and Duel.Destroy(tc,REASON_EFFECT)~=0 then
 		local g=Duel.SelectMatchingCard(tp,cid.thfilter2,tp,LOCATION_DECK,0,1,1,nil,cardtype)
