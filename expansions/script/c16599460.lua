@@ -61,7 +61,7 @@ end
 --negate
 function c16599460.negcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsReason(REASON_COST) and re:IsHasType(0x7e0) and re:IsActiveType(TYPE_MONSTER)
-		and re:GetHandler():IsType(TYPE_SYNCHRO) and e:GetHandler():IsPreviousLocation(LOCATION_GRAVE)
+		and re:GetHandler():IsType(TYPE_SYNCHRO)
 end
 function c16599460.negcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then 
