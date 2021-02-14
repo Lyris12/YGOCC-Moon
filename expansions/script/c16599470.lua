@@ -130,15 +130,14 @@ function c16599470.scop(e,tp,eg,ep,ev,re,r,rp)
 	if not tc then return end
 	if Duel.SendtoHand(tc,nil,REASON_EFFECT)~=0 and tc:IsLocation(LOCATION_HAND) then
 		Duel.ConfirmCards(1-tp,tc)
-		e:GetHandler():CreateRelation(tc,RESET_EVENT+RESETS_STANDARD)
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_FIELD)
 		e1:SetCode(EFFECT_CANNOT_SUMMON)
 		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 		e1:SetTargetRange(1,0)
-		e1:SetCondition(c16599470.sumcon)
+		e1:SetLabel(tc:GetCode())
 		e1:SetTarget(c16599470.sumlimit)
-		e1:SetLabelObject(tc)
+		e1:SetReset(RESET_PHASE+PHASE_END)
 		Duel.RegisterEffect(e1,tp)
 		local e2=e1:Clone()
 		e2:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
@@ -155,7 +154,7 @@ function c16599470.sumcon(e)
 	return e:GetHandler():IsRelateToCard(e:GetLabelObject())
 end
 function c16599470.sumlimit(e,c)
-	return c:IsCode(e:GetLabelObject():GetOriginalCode())
+	return c:IsCode(e:GetLabel())
 end
 --synchro summon
 function c16599470.spcon(e,tp,eg,ep,ev,re,r,rp)
