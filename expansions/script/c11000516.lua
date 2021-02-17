@@ -19,8 +19,11 @@ function c11000516.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c11000516.condition(e,tp,eg,ep,ev,re,r,rp)
-	return (e:GetHandler():IsReason(REASON_COST) and re:GetHandler():IsSetCard(0x1FD)) or
-		(re:GetHandler():IsSetCard(0x1FD) and bit.band(r,REASON_EFFECT)~=0)
+	return (e:GetHandler():IsReason(REASON_COST)
+		and (re:GetHandler():IsSetCard(0x1FD) or re:GetHandler():IsCode(11000525)))
+		or ((re:GetHandler():IsSetCard(0x1FD) or re:GetHandler():IsCode(11000525)) 
+		and bit.band(r,REASON_EFFECT)~=0)
+		and not e:GetHandler():IsReason(REASON_BATTLE)
 end
 function c11000516.filter(c)
   return c:IsPosition(POS_FACEDOWN) and c:IsDestructable()

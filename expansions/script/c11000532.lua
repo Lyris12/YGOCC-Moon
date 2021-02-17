@@ -9,7 +9,7 @@ function c11000532.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(11000532,0))
 	e2:SetCategory(CATEGORY_DRAW)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_TO_GRAVE)
 	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e2:SetCountLimit(1,11000532)
@@ -29,8 +29,11 @@ function c11000532.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c11000532.condition(e,tp,eg,ep,ev,re,r,rp)
-	return (e:GetHandler():IsReason(REASON_COST) and re:GetHandler():IsSetCard(0x1FD)) or
-		(re:GetHandler():IsSetCard(0x1FD) and bit.band(r,REASON_EFFECT)~=0)
+	return (e:GetHandler():IsReason(REASON_COST)
+		and (re:GetHandler():IsSetCard(0x1FD) or re:GetHandler():IsCode(11000525)))
+		or ((re:GetHandler():IsSetCard(0x1FD) or re:GetHandler():IsCode(11000525)) 
+		and bit.band(r,REASON_EFFECT)~=0)
+		and not e:GetHandler():IsReason(REASON_BATTLE)
 end
 function c11000532.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,2) end
