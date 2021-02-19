@@ -36,11 +36,14 @@ end
 
 function Card.AddRuneslots(c,number)
 	if c:GetFlagEffect(80808881) == 0 then
-		c:RegisterFlagEffect(80808881,RESETS_STANDARD,0,1)
+		c:RegisterFlagEffect(80808881,RESETS_STANDARD+RESETS_REDIRECT,0,1)
 		c:SetFlagEffectLabel(80808881,0)
 	end
 	local current = c:GetFlagEffectLabel(80808881)
-	c:SetFlagEffectLabel(80808881,current+number)
+	if current < 1 then
+		aux.Add_Runeslots(c,0)
+	end
+	c:SetFlagEffectLabel(80808881,math.min(current+number,3))
 end
 	
 function Card.RemoveRuneslots(c,number)
@@ -55,22 +58,22 @@ function Auxiliary.Add_Runeslots(c,number)
 	c:SetFlagEffectLabel(1000,number)
 	local Runeslots=Effect.CreateEffect(c)
 	Runeslots:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	Runeslots:SetCode(EVENT_PREDRAW)
-	Runeslots:SetRange(LOCATION_DECK+LOCATION_GRAVE+LOCATION_HAND+LOCATION_REMOVED+LOCATION_EXTRA)
-	Runeslots:SetCountLimit(1)
+	Runeslots:SetCode(EVENT_ADJUST)
+	Runeslots:SetRange(LOCATION_DECK+LOCATION_EXTRA+LOCATION_GRAVE+LOCATION_REMOVED+LOCATION_HAND+LOCATION_OVERLAY)
 	Runeslots:SetOperation(Auxiliary.Runeslotsstart)
 	c:RegisterEffect(Runeslots)
 end
 
 function Auxiliary.Runeslotsstart(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
+	c:ResetFlagEffect(80808881)
+	c:SetFlagEffectLabel(80808881,0)
 	local number = c:GetFlagEffectLabel(1000)
 	if c:GetFlagEffect(80808881) == 0 then
 		c:RegisterFlagEffect(80808881,nil,0,1)
 		c:SetFlagEffectLabel(80808881,0)
 	end
-	local current = c:GetFlagEffectLabel(80808881)
-	c:SetFlagEffectLabel(80808881,current+number)
+	c:SetFlagEffectLabel(80808881,number)
 end
 
 function Auxiliary.Ability_Infused(c)
@@ -78,6 +81,7 @@ function Auxiliary.Ability_Infused(c)
 	INFUSED1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	INFUSED1:SetCode(EVENT_BE_MATERIAL)
 	INFUSED1:SetProperty(EFFECT_FLAG_EVENT_PLAYER)
+	INFUSED1:SetCountLimit(1,c:GetCode()*732)
 	INFUSED1:SetOperation(aux.INFUSED1op)
 	c:RegisterEffect(INFUSED1)
 	local INFUSED2=Effect.CreateEffect(c)
@@ -105,7 +109,6 @@ function Auxiliary.INFUSED2op(e,tp,eg,ep,ev,re,r,rp)
    if atk<0 then atk=0 end
    Duel.GainRP(tp,atk)
 end
-
 function Auxiliary.I_Am_Runic(c)
 	local RUNICS=Effect.CreateEffect(c)
 	RUNICS:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
@@ -119,7 +122,34 @@ function Auxiliary.runicbanish(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Exile(c,REASON_EFFECT)
 end 
 
+function Auxiliary.I_Am_Paragon(c)
+	local Paragon=Effect.CreateEffect(c)
+	Paragon:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	Paragon:SetRange(LOCATION_EXTRA)	
+	Paragon:SetCode(EVENT_ADJUST)
+	Paragon:SetCondition(Auxiliary.sdcon)
+	Paragon:SetOperation(Auxiliary.sdop)
+	c:RegisterEffect(Paragon)
+	local Paragon2=Effect.CreateEffect(c)
+	Paragon2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	Paragon2:SetRange(LOCATION_EXTRA)   
+	Paragon2:SetCode(EVENT_CUSTOM+80808880)
+	Paragon2:SetCondition(Auxiliary.sdcon)
+	Paragon2:SetOperation(Auxiliary.sdop)
+	c:RegisterEffect(Paragon2)
+end
 
+function Auxiliary.sdfilter(c)
+	return c:IsSetCard(0x8ff5)
+end
+
+function Auxiliary.sdcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsExistingMatchingCard(aux.sdfilter,e:GetHandlerPlayer(),LOCATION_EXTRA,0,2,nil)
+end
+
+function Auxiliary.sdop(e)
+	Duel.SendtoGrave(e:GetHandler(),REASON_RULE)
+end
 
 function Auxiliary.Normal_Runic_Attach(c)
 	local RUNICS2=Effect.CreateEffect(c)
@@ -132,8 +162,11 @@ function Auxiliary.Normal_Runic_Attach(c)
 end
 
 function Auxiliary.runicmatfilter(c)
+	Debug.Message(c:GetCode())
+	Debug.Message(c:GetRuneslots())
+	aux.Add_Runeslots(c,0)
 	c:AddRuneslots(0)
-	return c:IsFaceup() and c:GetRuneslots()>0 
+	return c:IsFaceup() and c:GetRuneslots()>=1 
 end
 
 function Auxiliary.runicmattg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

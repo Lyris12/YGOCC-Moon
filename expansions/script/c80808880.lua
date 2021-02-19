@@ -109,7 +109,11 @@ end
 
 
 function cid.skillop(e,tp,eg,ep,ev,re,r,rp,c)
-	local num = Duel.SelectOption(e:GetHandlerPlayer(),aux.Stringid(id,4),aux.Stringid(id,5),aux.Stringid(id,6))
+	local num = Duel.SelectOption(e:GetHandlerPlayer(),
+	aux.Stringid(id,4),
+	aux.Stringid(id,5),
+	aux.Stringid(id,6),
+	aux.Stringid(id,9))
 	
 	if (num == 0) then
 		Duel.Hint(HINT_CARD,0,id)
@@ -170,4 +174,26 @@ function cid.skillop(e,tp,eg,ep,ev,re,r,rp,c)
 			end
 		end
 	end
+
+	if (num == 3) then
+		Duel.Hint(HINT_CARD,0,id)
+		Duel.AnnounceNumber(e:GetHandlerPlayer(),Duel.GetRP(e:GetHandlerPlayer()))
+		cid.announce_filter={0x8ff5,OPCODE_ISSETCARD}
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CODE)
+		local ac=Duel.AnnounceCardFilter(tp,table.unpack(cid.announce_filter))
+		card=Duel.CreateToken(tp,ac)
+		local x = e:GetHandlerPlayer()
+		local runpow = Duel.GetRP(x)
+		if card:GetAttack() <= runpow then 
+			Duel.Remove(card,POS_FACEUP,REASON_RULE)
+			Duel.SendtoExtraP(card,tp,0,REASON_RULE)
+			Duel.PayRPCost(tp,card:GetAttack())
+		else if card:GetAttack() > runpow then
+			Duel.Hint(HINT_MESSAGE,e:GetHandlerPlayer(),aux.Stringid(m,3))
+			Duel.Exile(card,REASON_RULE)
+			end
+		end
+	end
+
+	Duel.RaiseEvent(c,EVENT_CUSTOM+80808880,re,0,0,p,0)
 end

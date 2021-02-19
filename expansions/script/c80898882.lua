@@ -43,7 +43,7 @@ end
 
 function cid.desop(e,tp,eg,ep,ev,re,r,rp)
 	local tp=e:GetHandlerPlayer()
-	local g=e:GetHandler():GetOverlayGroup()
+	local g=Duel.SelectMatchingCard(tp,cm.tgfilter,tp,LOCATION_EXTRA,0,1,1,nil)
 	if #g>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 		local tg=g:Select(tp,1,1,nil)
