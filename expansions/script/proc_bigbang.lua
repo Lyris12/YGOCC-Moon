@@ -129,7 +129,7 @@ function Auxiliary.BigbangCondition(...)
 				if c==nil then return true end
 				if (c:IsType(TYPE_PENDULUM) or c:IsType(TYPE_PANDEMONIUM)) and c:IsFaceup() then return false end
 				local tp=c:GetControler()
-				local mg=Duel.GetMatchingGroup(Card.IsCanBeBigbangMaterial,tp,LOCATION_MZONE,0,nil,c)
+				local mg=Duel.GetMatchingGroup(Card.IsCanBeBigbangMaterial,tp,LOCATION_MZONE,0,nil,c)-Duel.GetMatchingGroup(aux.NOT(Card.IsDestructable),tp,LOCATION_MZONE,0,nil,e)
 				local mg2=Duel.GetMatchingGroup(Auxiliary.BigbangExtraFilter,tp,0xff,0xff,nil,c,tp,table.unpack(funs))
 				if #mg2>0 then mg:Merge(mg2) end
 				local fg=aux.GetMustMaterialGroup(tp,EFFECT_MUST_BE_BIGBANG_MATERIAL)
@@ -199,7 +199,7 @@ function Auxiliary.BigbangTarget(...)
 	for i=1,#funs do min=min+funs[i][2] max=max+funs[i][3] end
 	if max>99 then max=99 end
 	return  function(e,tp,eg,ep,ev,re,r,rp,chk,c)
-				local mg=Duel.GetMatchingGroup(Card.IsCanBeBigbangMaterial,tp,LOCATION_MZONE,0,nil,c)
+				local mg=Duel.GetMatchingGroup(Card.IsCanBeBigbangMaterial,tp,LOCATION_MZONE,0,nil,c)-Duel.GetMatchingGroup(aux.NOT(Card.IsDestructable),tp,LOCATION_MZONE,0,nil,e)
 				local mg2=Duel.GetMatchingGroup(Auxiliary.BigbangExtraFilter,tp,0xff,0xff,nil,c,tp,table.unpack(funs))
 				if #mg2>0 then mg:Merge(mg2) end
 				local bg=Group.CreateGroup()
@@ -258,6 +258,6 @@ function Auxiliary.BigbangOperation(e,tp,eg,ep,ev,re,r,rp,c,smat,mg)
 			end
 		end end
 	end
-	Duel.SendtoGrave(dg,REASON_DESTROY+REASON_MATERIAL+REASON_BIGBANG)
+	Duel.Destroy(dg,REASON_MATERIAL+REASON_BIGBANG)
 	g:DeleteGroup()
 end

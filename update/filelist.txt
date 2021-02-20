@@ -6174,7 +6174,7 @@ expansions/script/c1020101.lua	c0bcdf91ddb831f22200bd2b7b7a6282
 expansions/script/c1020200.lua	7f173859effe2e3ecc1173659f41bd2f
 expansions/script/c1020961.lua	274c7137612dd5b2b8df25b417278115
 expansions/script/c102400000.lua	718533f23d7e3198907161f1ff497bc7
-expansions/script/c102400001.lua	0a67ef8df098c149b3b3de2865961ee1
+expansions/script/c102400001.lua	714c64f59d8f82138a0f1947844a3ec4
 expansions/script/c102400002.lua	5a2b163dc0e0eeec1eb13b6bb3b07206
 expansions/script/c102400003.lua	b7e60537b526c028146c8bd5600516d0
 expansions/script/c102400004.lua	f323ea1f33c75cf131538530ca8d0edc
@@ -11014,12 +11014,12 @@ expansions/script/c99998879.lua	75a21e8fbe12045a37582508c203bdc2
 expansions/script/c99998880.lua	1c40768c257090c4f997bc24f1b31c30
 expansions/script/c99999955.lua	3d30fa2241fb9e42edc38a615e4fe75b
 expansions/script/GLShortcuts.lua	6743700bf509cc48d8f596ff4a8fe5c0
-expansions/script/init.lua	031e7b063119162c750e16328bf2c163
+expansions/script/init.lua	84bbee8b5d4226956f9442dfd1346cef
 expansions/script/json.lua	d41a01cf67c76915b49c57d21ac471ee
 expansions/script/lap.lua	1325997ac4231550048dae57e7eb75b0
 expansions/script/proc_accent.lua	ef4bcfbf22f4c40f923aaa9c343a231f
 expansions/script/proc_annotee.lua	e417946e2d0ccf02609cfc522570e87f
-expansions/script/proc_bigbang.lua	b348df483ba1ea0c88cba263e7ad837f
+expansions/script/proc_bigbang.lua	d332226fb8a3dc005df6fa38831cc00d
 expansions/script/proc_bypath.lua	52c9484b28365833ffab7c760a17227a
 expansions/script/proc_chroma.lua	497692d76729d2406a17a0dca663f9a3
 expansions/script/proc_conjoint.lua	73b4306e063882fcb59786484763394c
@@ -11110,6 +11110,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	484a40a9f898da958980c94a21dedeca
+update/filelist.txt	cc00b1d34cb00497a9cac36498ad6aee
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	bf3d6f9c49dcf5024f828afd3acab69f
+update/version.txt	c6db2cb5decb332f372b01362f491890

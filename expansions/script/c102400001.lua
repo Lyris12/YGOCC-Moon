@@ -44,7 +44,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoHand(sg,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,sg)
 		local uc=sg:GetFirst()
-		if uc:IsLocation(LOCATION_HAND) then
+		if uc:IsLocation(LOCATION_HAND) and e:IsHasType(EFFECT_TYPE_ACTIVATE) then
 			local e1=Effect.CreateEffect(e:GetHandler())
 			e1:SetType(EFFECT_TYPE_FIELD)
 			e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
