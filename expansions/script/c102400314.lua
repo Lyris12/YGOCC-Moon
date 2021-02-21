@@ -3,6 +3,11 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
+	local e0=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e1:SetCode(EFFECT_NEGATIVE_LEVEL)
+	e1:SetValue(9)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_SPSUMMON_PROC)
@@ -29,7 +34,7 @@ function s.mnfilter2(c,mc,lv)
 	return c:GetLevel()-mc:GetLevel()==lv
 end
 function s.fselect(g,tp,sc)
-	return g:GetCount()==2 and g:IsExists(function(c) return c:IsType(TYPE_TUNER) and c:IsSetCard(0x600) end,1,nil) and g:IsExists(aux.NOT(Card.IsType),1,nil,TYPE_TUNER) and g:IsExists(s.mnfilter,1,nil,g,-sc:GetLevel()) and Duel.GetLocationCountFromEx(tp,tp,g,sc)>0
+	return g:GetCount()==2 and g:IsExists(function(c) return c:IsType(TYPE_TUNER) and c:IsSetCard(0x600) end,1,nil) and g:IsExists(aux.NOT(Card.IsType),1,nil,TYPE_TUNER) and g:IsExists(s.mnfilter,1,nil,g,sc:GetLevel()) and Duel.GetLocationCountFromEx(tp,tp,g,sc)>0
 end
 function s.sprcon(e,c)
 	if c==nil then return true end
