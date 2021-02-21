@@ -36,7 +36,7 @@ function c67864649.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.DiscardHand(tp,c67864649.cfilter,1,1,REASON_COST+REASON_DISCARD,nil)
 end
 function c67864649.spfilter(c,e,tp)
-	return c:IsSetCard(0x62a6) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and c:IsLevelAbove(6)
+	return c:IsSetCard(0x2a6) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and c:IsLevelAbove(6)
 end
 function c67864649.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c67864649.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp) end
@@ -50,7 +50,7 @@ function c67864649.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_FIELD)
-		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)	
+		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 		e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 		e1:SetReset(RESET_PHASE+PHASE_END)
 		e1:SetTargetRange(1,0)
@@ -60,4 +60,4 @@ function c67864649.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c67864649.splimit(e,c,sump,sumtype,sumpos,targetp,se)
 	return not c:IsSetCard(0x2a6)
-end	
+end
