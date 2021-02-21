@@ -18,7 +18,8 @@ function c11000525.initial_effect(c)
 	e2:SetDescription(aux.Stringid(11000525,1))
 	e2:SetCategory(CATEGORY_TOGRAVE)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e2:SetType(EFFECT_TYPE_IGNITION)
+	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1)
 	e2:SetCost(c11000525.cost)
@@ -62,6 +63,5 @@ function c11000525.tgop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=g:GetFirst()
 	if tc then
 		Duel.SendtoGrave(tc,REASON_EFFECT)
-		tc:RegisterFlagEffect(tc:IsSetCard(0x1FD),RESET_EVENT+0x1ff0000,0,0)
 	end
 end

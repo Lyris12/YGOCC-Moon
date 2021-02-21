@@ -19,8 +19,7 @@ function c11000501.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SYNCHRO
 end
 function c11000501.filter(c)
-	return c:IsLocation(LOCATION_GRAVE) and c:IsSetCard(0x1FD) 
-		and (c:IsType(TYPE_SPELL) or c:IsType(TYPE_TRAP))
+	return c:IsLocation(LOCATION_GRAVE) and c:IsSetCard(0x1FD)
 end
 function c11000501.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDiscardDeckAsCost(tp,2) end

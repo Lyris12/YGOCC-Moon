@@ -16,26 +16,23 @@ function c11000503.initial_effect(c)
 	--indes
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(11000503,1))
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetCode(EFFECT_INDESTRUCTABLE_COUNT)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCode(EVENT_FREE_CHAIN)
-	e2:SetCountLimit(1)
+	e2:SetTargetRange(LOCATION_MZONE,0)
 	e2:SetTarget(c11000503.indtg)
-	e2:SetOperation(c11000503.indop)
+	e2:SetValue(c11000503.indct)
 	c:RegisterEffect(e2)
 end
 function c11000503.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SYNCHRO
 end
 function c11000503.cfilter(c)
-	return c:IsSetCard(0x1FD) and c:IsType(TYPE_MONSTER) and c:IsAbleToGraveAsCost()
+	return c:IsSetCard(0x1FD) and c:IsType(TYPE_MONSTER) and c:IsDiscardable()
 end
 function c11000503.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c11000503.cfilter,tp,LOCATION_HAND,0,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g=Duel.SelectMatchingCard(tp,c11000503.cfilter,tp,LOCATION_HAND,0,1,1,e:GetHandler())
-	Duel.SendtoGrave(g,REASON_COST)
+	Duel.DiscardHand(tp,c11000503.cfilter,1,1,REASON_COST+REASON_DISCARD)
 end
 function c11000503.spfilter(c,e,tp)
 	return c:IsSetCard(0x1FD) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
@@ -53,28 +50,11 @@ function c11000503.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-function c11000503.filter(c)
-	return c:IsFaceup()
-end
 function c11000503.indtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_ONFIELD) and c11000503.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c11000503.filter,tp,LOCATION_ONFIELD,0,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	Duel.SelectTarget(tp,c11000503.filter,tp,LOCATION_ONFIELD,0,1,1,nil)
+	return c:IsSetCard(0x1FD,0x1F3)
 end
-function c11000503.indop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) then
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_INDESTRUCTABLE_COUNT)
-		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e1:SetCountLimit(1)
-		e1:SetValue(c11000503.valcon)
-		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
-		tc:RegisterEffect(e1)
-	end
-end
-function c11000503.valcon(e,re,r,rp)
-	return bit.band(r,REASON_BATTLE+REASON_EFFECT)~=0
+function c11000503.indct(e,re,r,rp)
+	if bit.band(r,REASON_BATTLE+REASON_EFFECT)~=0 then
+		return 1
+	else return 0 end
 end
