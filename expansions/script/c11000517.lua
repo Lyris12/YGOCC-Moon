@@ -8,7 +8,7 @@ function c11000517.initial_effect(c)
 	--can't atk
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(11000517,0))
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_TO_GRAVE)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e2:SetCountLimit(1,11000517)
