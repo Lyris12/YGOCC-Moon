@@ -74,7 +74,6 @@ function c53313933.initial_effect(c)
 	--level change
 	local e5=Effect.CreateEffect(c)
 	e5:SetDescription(aux.Stringid(53313933,3))
-	e5:SetCategory(CATEGORY_LVCHANGE)
 	e5:SetType(EFFECT_TYPE_IGNITION)
 	e5:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e5:SetRange(LOCATION_MZONE)

@@ -83,6 +83,7 @@ dofile("expansions/script/proc_impure.lua") --Impures
 dofile("expansions/script/proc_runic.lua") --Runic
 dofile("expansions/script/proc_magick.lua") --Magick
 dofile("expansions/script/proc_xros.lua") --Xroses
+dofile("expansions/script/muse_proc.lua") --"Muse"
 dofile("expansions/script/tables.lua") --Special Tables
 
 Card.IsReason=function(c,rs)

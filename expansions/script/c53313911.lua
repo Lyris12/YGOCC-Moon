@@ -22,7 +22,7 @@ function c53313911.initial_effect(c)
 	--mill top card
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(53313911,2))
-	e3:SetCategory(CATEGORY_LVCHANGE+CATEGORY_TOHAND+CATEGORY_REMOVE+CATEGORY_DECKDES)
+	e3:SetCategory(CATEGORY_TOHAND+CATEGORY_REMOVE+CATEGORY_DECKDES)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1)

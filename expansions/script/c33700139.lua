@@ -3,7 +3,6 @@ function c33700139.initial_effect(c)
 	 --lv up
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(33700139,0))
-	e1:SetCategory(CATEGORY_LVCHANGE)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)

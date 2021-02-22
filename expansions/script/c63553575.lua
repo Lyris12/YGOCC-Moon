@@ -27,7 +27,7 @@ function cid.initial_effect(c)
 	--spsummon
 	local p2=Effect.CreateEffect(c)
 	p2:SetDescription(aux.Stringid(id,1))
-	p2:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_LVCHANGE)
+	p2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	p2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	p2:SetProperty(EFFECT_FLAG_DELAY)
 	p2:SetRange(LOCATION_SZONE)

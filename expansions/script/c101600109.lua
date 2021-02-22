@@ -25,7 +25,6 @@ function cid.initial_effect(c)
 	--change level
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(id,1))
-	e4:SetCategory(CATEGORY_LVCHANGE)
 	e4:SetType(EFFECT_TYPE_IGNITION)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetTarget(cid.target)
@@ -53,7 +52,6 @@ end
 --CHANGE LEVEL
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return not e:GetHandler():IsLevel(4) end
-	Duel.SetOperationInfo(0,CATEGORY_LVCHANGE,e:GetHandler(),1,0,4)
 end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

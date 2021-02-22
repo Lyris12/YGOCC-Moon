@@ -33,7 +33,7 @@ function cid.initial_effect(c)
 	--lvchange
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
-	e3:SetCategory(CATEGORY_DEFCHANGE+CATEGORY_LVCHANGE)
+	e3:SetCategory(CATEGORY_DEFCHANGE)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1,id+100)
@@ -123,7 +123,6 @@ end
 function cid.lvtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():GetDefense()>=1000 and e:GetHandler():GetLevel()<12 end
 	Duel.SetOperationInfo(0,CATEGORY_DEFCHANGE,e:GetHandler(),1,0,-1000)
-	Duel.SetOperationInfo(0,CATEGORY_LVCHANGE,e:GetHandler(),1,0,1)
 end
 function cid.lvop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsFaceup() or not e:GetHandler():IsRelateToEffect(e) then return end
