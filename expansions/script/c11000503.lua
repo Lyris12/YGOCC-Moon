@@ -50,7 +50,7 @@ function c11000503.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-function c11000503.indtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function c11000503.indtg(e,c,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	return c:IsSetCard(0x1FD,0x1F3)
 end
 function c11000503.indct(e,re,r,rp)

@@ -29,23 +29,23 @@ function c11000519.drfilter(c)
 		and c:IsType(TYPE_MONSTER) and c:IsAbleToDeck()
 end
 function c11000519.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c11000519.drfilter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c11000519.drfilter,tp,LOCATION_GRAVE,0,1,nil)
-		and Duel.IsPlayerCanDraw(tp,1) end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c11000519.drfilter(chkc) end
+	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) and Duel.IsExistingTarget(c11000519.drfilter,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g=Duel.SelectTarget(tp,c11000519.drfilter,tp,LOCATION_GRAVE,0,1,1,nil)
-	Duel.SetTargetPlayer(tp)
-	Duel.SetTargetParam(1)
-	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,g:GetCount(),0,0)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end
 function c11000519.activate(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
-	local c=e:GetHandler()
-	local tc=Duel.GetFirstTarget()
-	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
-	if tc:IsRelateToEffect(e) and Duel.SendtoDeck(tc,nil,2,REASON_EFFECT)~=0 and c:IsRelateToEffect(e) then
-		Duel.Draw(p,d,REASON_EFFECT)
+	local tg=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
+	if not tg or tg:FilterCount(Card.IsRelateToEffect,nil,e)~=1 then return end
+	Duel.SendtoDeck(tg,nil,0,REASON_EFFECT)
+	local g=Duel.GetOperatedGroup()
+	if g:IsExists(Card.IsLocation,1,nil,LOCATION_DECK) then Duel.ShuffleDeck(tp) end
+	local ct=g:FilterCount(Card.IsLocation,nil,LOCATION_DECK+LOCATION_EXTRA)
+	if ct==1 then
+		Duel.BreakEffect()
+		Duel.Draw(tp,1,REASON_EFFECT)
 	end
 end
 function c11000519.filter(c,e,tp)
