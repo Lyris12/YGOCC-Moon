@@ -36,7 +36,7 @@ function s.matfilter(c)
 	return c:IsLinkType(TYPE_EFFECT) and not c:IsLinkType(TYPE_LINK)
 end
 function s.lcheck(g,lc)
-	return g:IsExists(Card.IsLinkType,1,nil,TYPE_PANDEMONIUM,lc,SUMMON_TYPE_LINK)
+	return g:IsExists(Card.IsLinkType,1,nil,TYPE_PANDEMONIUM)
 end
 function s.tefilter(c)
 	return c:IsType(TYPE_PANDEMONIUM) and c:IsSetCard(0x9b5) and not c:IsForbidden()
