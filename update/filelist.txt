@@ -1,4 +1,4 @@
-﻿expansions/cards-new.cdb	ccd0e983afb8ae96e11052b68e8632e0
+﻿expansions/cards-new.cdb	1a189097003417313fefa9e51317c876
 expansions/lflist.conf	a91a4fcfb8f18ce0265a6480911689cb
 expansions/strings.conf	4b454ad6955efe961ada799eee1ca248
 expansions/pics/100000710.jpg	5f925a97b1c60d7d69acb8f229938263
@@ -682,7 +682,7 @@ expansions/pics/102400167.png	a331a11c76e90f82f29d208220b6c0aa
 expansions/pics/102400168.png	1d34656399ee008f66fa28472c879047
 expansions/pics/102400169.png	449655dfc8b430693fba353c43cf02ac
 expansions/pics/102400170.png	10bd5e7c8d2ea5cc8055436aecb1359c
-expansions/pics/102400171.png	51120fe9f456935c00c52f3de0a4d2dd
+expansions/pics/102400171.png	d6e8bb81ecf430be66504aadbfaa813d
 expansions/pics/102400175.png	5486ddc8e8c30d19f9822c32b08e7744
 expansions/pics/102400176.png	41d31f0eaa57e407d453f627d5c29200
 expansions/pics/102400177.png	e22c56da7612f29caf4289c64ef87689
@@ -6395,7 +6395,7 @@ expansions/script/c102400167.lua	8e55da9b5478cbe3b869c857872ebc6c
 expansions/script/c102400168.lua	805286e1abb9d186c683c0bce7c548da
 expansions/script/c102400169.lua	b518c4eb5db7c4236a8b2c40a60bbaa8
 expansions/script/c102400170.lua	c8d2da46dc5fa207f696d4402568e56b
-expansions/script/c102400171.lua	f244cf67c56ca4b81ddf2947aa14d0cc
+expansions/script/c102400171.lua	69f5b137b631078a8e4dcba04aed9afd
 expansions/script/c102400175.lua	a5ff65bfafcc1875ed065c4e22b22a59
 expansions/script/c102400176.lua	2f924d77f3f43c68169c64d844303909
 expansions/script/c102400177.lua	bb4ec79cb7df3b95e1d31643c5aaee1b
@@ -11186,6 +11186,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	06823af18ae34588d5cc479635a8f8ac
+update/filelist.txt	de1f5407070e54c23b820759dcaf72a8
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	9d6035a7b39eec112da43a641343f6be
+update/version.txt	4ba53c36eac420812de1317de9afc10c
