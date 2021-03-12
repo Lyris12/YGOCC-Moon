@@ -118,17 +118,12 @@ end
 end
 	function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local ct=e:GetLabel()
-	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,0,LOCATION_MZONE,nil)
-	if #g>0 then
-	for tc in aux.Next(g) do
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_UPDATE_ATTACK)
-		e1:SetValue(ct*-300)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-		tc:RegisterEffect(e1)
-		end
-	end
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_UPDATE_ATTACK)
+	e1:SetTargetRange(0,LOCATION_MZONE)
+	e1:SetValue(ct*-300)
+	Duel.RegisterEffect(e1,tp)
 end
 	function s.cofilt(c)
 	return c:IsSetCard(0x83e) and c:IsAbleToRemoveAsCost()

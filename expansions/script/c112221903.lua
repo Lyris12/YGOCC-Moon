@@ -117,7 +117,7 @@ function s.equip(e,tp,eg,ep,ev,re,r,rp)
 	c:RegisterEffect(e1)
 end
 function s.count(e,tp,eg,ep,ev,re,r,rp)
-	local p=e:GetOwnerPlayer()
+	local p=e:GetOwner():GetControler()
 	local plp,clp=e:GetLabel(),Duel.GetLP(p)
 	e:SetLabel(clp)
 	if plp<=clp then return end

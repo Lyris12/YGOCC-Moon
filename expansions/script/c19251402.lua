@@ -52,7 +52,7 @@ function cm.splimit(e,c)
 	return not c:IsType(TYPE_SYNCHRO) and c:IsLocation(LOCATION_EXTRA)
 end
 function cm.thfilter(c)
-	return c:IsRace(RACE_PSYCHO) and c:IsFaceup()
+	return c:IsType(TYPE_SYNCHRO) and c:IsFaceup()
 end
 function cm.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return ep==tp and Duel.IsExistingMatchingCard(cm.thfilter,tp,LOCATION_MZONE,0,1,nil)

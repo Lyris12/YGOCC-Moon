@@ -13,7 +13,7 @@ local scard,s_id=getID()
 function scard.initial_effect(c)
 	Card.IsZHERO=Card.IsZHERO or (function(tc) return (tc:GetCode()>30400 and tc:GetCode()<30420) and tc:IsSetCard(0x8) end)
 	c:EnableReviveLimit()
-	aux.AddLinkProcedure(c,Card.IsZHERO,2,2)
+	aux.AddLinkProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x8),2,2)
 	--atkchange
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(s_id,0))
