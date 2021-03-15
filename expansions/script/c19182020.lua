@@ -15,7 +15,7 @@ function s.initial_effect(c)
 	e1:SetCode(EFFECT_SEND_REPLACE)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetTarget(s.reptg)
-	e1:SetValue(function(e,tc) return s.repfilter(tc) end)
+	e1:SetValue(function(e,tc) return s.repfilter(tc,LOCATION_ONFIELD) end)
 	c:RegisterEffect(e1)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
@@ -27,13 +27,13 @@ function s.initial_effect(c)
 	e1:SetOperation(s.op)
 	c:RegisterEffect(e1)
 end
-function s.repfilter(c)
-	return c:IsLocation(LOCATION_MZONE) and not c:IsForbidden()
+function s.repfilter(c,loc)
+	return c:IsLocation(loc) and not c:IsForbidden()
 end
 function s.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return eg:IsExists(s.repfilter,1,c) end
-	local g=eg:Filter(s.repfilter,c)
+	if chk==0 then return eg:IsExists(s.repfilter,1,c,LOCATION_MZONE) end
+	local g=eg:Filter(s.repfilter,c,LOCATION_MZONE)
 	for tc in aux.Next(g) do
 		if Duel.Equip(tp,tc,c,true,true) then
 			local e1=Effect.CreateEffect(c)

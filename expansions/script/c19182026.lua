@@ -18,7 +18,7 @@ function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g0=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_SZONE,0,nil,Card.IsSetCard,0xa88)
 	local g1=g0:Filter(Card.IsSetCard,nil,0x1a88)
 	local g2=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_SZONE,0,nil,Card.IsCode,id-3,id-1)
-	if chk==0 then return #g0>0 and #g1>0 and #g0-#g1>0
+	if chk==0 then return #g0>0 and #g1>0 and (#g0-#g1>0 or #g0>1 and #g1>1)
 		and g2:GetClassCount(Card.GetCode)>1 end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=g0:Select(tp,1,1,nil)
@@ -38,7 +38,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 			return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,nil,e,tp,LOCATION_GRAVE)
 		else
 			e:SetLabel(0)
-			return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_SZONE,0,1,nil,e,tp,LOCATION_SZONE+LOCATION_GRAVE)
+			return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,nil,e,tp,LOCATION_SZONE+LOCATION_GRAVE)
 		end
 	end
 	e:SetLabel(0)
