@@ -41,7 +41,7 @@ function s.initial_effect(c)
 end
 s.toss_coin=true
 s.toss_dice=true
-function s.cfilter(c)
+function s.cfilter(c,tp)
 	return c:IsSetCard(0xa44) and c:IsPreviousLocation(LOCATION_PZONE) and c:GetPreviousControler()==tp
 end
 function s.drcon(e,tp,eg,ep,ev,re,r,rp)
