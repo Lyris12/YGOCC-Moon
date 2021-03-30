@@ -1,4 +1,4 @@
---created & coded by Lyris, art from "Galaxy-Eyes Photon Dragon"
+--created & coded by Lyris, art found by meedogh
 --スターリ・アイズ・スぺーシュル・ドラゴン(アナザー宙)
 local s,id=GetID()
 function s.initial_effect(c)

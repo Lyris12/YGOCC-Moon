@@ -1,4 +1,4 @@
---created & coded by Lyris, art from "Galaxy-Eyes Photon Dragon"
+--created & coded by Lyris, art found by meedogh
 --スターリ・アイズ・スぺーシュル・ドラゴン
 local s,id=GetID()
 s.spt_other_space=id+1
