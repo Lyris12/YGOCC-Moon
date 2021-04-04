@@ -100,7 +100,7 @@ function cid.tgtg(e,c)
 end
 --ATKUP
 function cid.cfilter(c)
-	return c:IsFaceup and c:IsSetCard(0x96b) and c:IsType(TYPE_MONSTER)
+	return c:IsFaceup() and c:IsSetCard(0x96b) and c:IsType(TYPE_MONSTER)
 end
 function cid.atkval(e,c)
 	return e:GetHandler():GetMutualLinkedGroup():FilterCount(cid.cfilter,nil)*1000

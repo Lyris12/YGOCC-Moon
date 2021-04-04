@@ -75,7 +75,7 @@ function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 --NEGATE
 function cid.cfilter(c)
-	return c:IsFaceup and c:IsSetCard(0x96b) and c:IsType(TYPE_MONSTER)
+	return c:IsFaceup() and c:IsSetCard(0x96b) and c:IsType(TYPE_MONSTER)
 end
 function cid.discon(e,tp,eg,ep,ev,re,r,rp)
 	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and e:GetHandler():GetMutualLinkedGroup():IsExists(cid.cfilter,1,nil) and rp==1-tp
