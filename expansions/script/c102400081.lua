@@ -44,7 +44,7 @@ end
 function s.op(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_GRAVE,0,nil,e,tp)
-	if c:GetFlagEffect(id)==0 or #g==0
+	if c:GetFlagEffect(id)==0 or #g==0 or Duel.GetFlagEffect(tp,id)>0
 		or not Duel.SelectEffectYesNo(tp,c) then
 		c:ResetFlagEffect(id)
 		e:SetCountLimit(e:GetCountLimit()+1)
@@ -70,4 +70,5 @@ function s.op(e,tp,eg,ep,ev,re,r,rp)
 		Duel.BreakEffect()
 		Duel.SpecialSummon(tc,0,tp,p,false,false,POS_FACEUP_DEFENSE)
 	end
+	Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
 end

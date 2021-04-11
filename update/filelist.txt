@@ -1,4 +1,4 @@
-﻿expansions/cards-new.cdb	af56d7fb868c13154517b9ea64b720d2
+﻿expansions/cards-new.cdb	82783b2f106a6712c626be3c388c7791
 expansions/lflist.conf	8e1b9d7512e925ad2055b602aa5e4f4a
 expansions/strings.conf	4b454ad6955efe961ada799eee1ca248
 expansions/pics/100000710.jpg	5f925a97b1c60d7d69acb8f229938263
@@ -592,7 +592,7 @@ expansions/pics/102400077.png	fd09e36d179b9ee8f8ec6ea78330b62d
 expansions/pics/102400078.png	80295c8cc91ab318dab4b12f3f34d8d6
 expansions/pics/102400079.png	373c97dd1aea6fa7c6b9955bcb084232
 expansions/pics/102400080.png	0aa4c9d767a1856df1464f2cb0ba48aa
-expansions/pics/102400081.png	545d2403633accf60bc8a5a93c84d51d
+expansions/pics/102400081.png	48b0585cbc02e1d662a83fdc1e71d142
 expansions/pics/102400082.png	c29f65fefb40ab2aac315fee018a4e32
 expansions/pics/102400083.png	aff40bf3bda6b05818a3ee7c362febb0
 expansions/pics/102400084.png	086c9b38329c9d818d81e8836a1a9145
@@ -6258,7 +6258,7 @@ expansions/script/c102400077.lua	fafc7e284f2c8e64d6ef2be7678c9b6f
 expansions/script/c102400078.lua	ef500b77a03231ae4e255e6421322c27
 expansions/script/c102400079.lua	53e6de5511763802a266638179c3e7a7
 expansions/script/c102400080.lua	f4bdafc900d8c58921d005d2bee3c41a
-expansions/script/c102400081.lua	a587ee081143f4ff03ca0debd8767f0a
+expansions/script/c102400081.lua	5b596864474c6129af2d1c71705231b2
 expansions/script/c102400082.lua	220a57ffd1bccac13f69af66caf3c017
 expansions/script/c102400083.lua	d0bbfb78351900f9ed9eccab744ab73b
 expansions/script/c102400084.lua	649f70036ba734c96d15322126c3d480
@@ -11108,6 +11108,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	c113c7924ace237f6ef370a84b5a19d6
+update/filelist.txt	78acb74996782c149010e8a834c60f24
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	c1e9ea8e8a7bc4e6f2cb654423079a25
+update/version.txt	14f072b5ded8b84ee09832bb6e40ed20
