@@ -86,7 +86,7 @@ function c32904930.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
     Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
 function c32904930.spfilter(c,e,tp)
-    return c:IsFaceup() and c:IsRace(RACE_PSYCHO) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+    return c:IsFaceup() and c:IsSetCard(0xaa12) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c32904930.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
     if chkc then return chkc:IsLocation(LOCATION_REMOVED) and chkc:IsControler(tp) and c32904930.spfilter(chkc,e,tp) end
