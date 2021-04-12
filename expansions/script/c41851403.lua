@@ -91,7 +91,7 @@ function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=g:GetFirst()
 	if not (tc and Duel.Equip(tp,tc,c,false)) then return end
 	tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD,0,1)
-	e:GetLabelObject():AddCard(tc)
+	e:GetLabelObject():GetLabelObject():AddCard(tc)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_OWNER_RELATE)

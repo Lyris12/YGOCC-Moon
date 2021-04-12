@@ -94,7 +94,7 @@ end
 function s.acost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsSetCard,Card.IsAbleToDeckAsCost),tp,LOCATION_REMOVED,0,1,nil,0x106) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	Duel.SendtoDeck(Duel.SelectMatchingCard(tp,aux.AND(Card.IsFaceup,Card.IsSetCard,Card.IsAbleToDeckAsCost),tp,LOCATION_REMOVED,0,11,nil,0x106),nil,2,REASON_COST)
+	Duel.SendtoDeck(Duel.SelectMatchingCard(tp,aux.AND(Card.IsFaceup,Card.IsSetCard,Card.IsAbleToDeckAsCost),tp,LOCATION_REMOVED,0,1,1,nil,0x106),nil,2,REASON_COST)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local tc=e:GetLabelObject()

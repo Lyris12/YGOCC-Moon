@@ -20,13 +20,13 @@ function s.initial_effect(c)
 	e2:SetOperation(s.cop)
 	c:RegisterEffect(e2)
 end
-function s.filter(c,tp)
+function s.filter(c,e,tp)
 	return c:IsReleasableByEffect() and c:IsCanBeEffectTarget(e)
 		and Duel.IsPlayerCanSpecialSummonMonster(tp,id//10,0x106,0x4011,0,0,c:IsType(TYPE_XYZ) and c:GetRank() or c:IsLevelAbove(1) and c:GetLevel() or 8,RACE_ZOMBIE,ATTRIBUTE_DARK)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and s.filter(chkc,tp) end
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.CheckReleaseGroup(tp,s.filter,1,nil,tp) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and s.filter(chkc,e,tp) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.CheckReleaseGroup(tp,s.filter,1,nil,e,tp) end
 	local g=Duel.SelectReleaseGroup(tp,s.filter,1,1,nil,tp)
 	Duel.SetTargetCard(g)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
@@ -58,7 +58,7 @@ function s.ctg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.cop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if not (tc:IsRelateToEffect(e) and Duel.GetControl(tc,tp)) then return end
+	if not (tc and tc:IsRelateToEffect(e) and Duel.GetControl(tc,tp)) then return end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_CHANGE_CODE)
