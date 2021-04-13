@@ -51,10 +51,10 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		aux.GCheckAdditional=nil
 		if not mat or mat:GetCount()==0 then return end
 		tc:SetMaterial(mat)
-		local mat2=mat:Filter(Card.IsLocation,nil,LOCATION_GRAVE):Filter(Card.IsRace,nil,RACE_WARRIOR+RACE_FAIRY)
+		local mat2=mat:Filter(Card.IsLocation,nil,LOCATION_REMOVED):Filter(Card.IsRace,nil,RACE_ZOMBIE)
 		mat:Sub(mat2)
 		Duel.ReleaseRitualMaterial(mat)
-		Duel.SendtoDeck(mat2,nil,2,REASON_EFFECT+REASON_MATERIAL+REASON_RITUAL)
+		Duel.SendtoGrave(mat2,REASON_EFFECT+REASON_RETURN+REASON_MATERIAL+REASON_RITUAL)
 		Duel.BreakEffect()
 		Duel.SpecialSummon(tc,SUMMON_TYPE_RITUAL,tp,tp,false,true,POS_FACEUP)
 		tc:CompleteProcedure()
