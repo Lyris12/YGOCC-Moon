@@ -22,7 +22,7 @@ function s.cfilter(c,tp)
 	return c:IsFaceup() and c:GetSummonPlayer()==tp and c:IsSummonType(SUMMON_TYPE_RITUAL) and c:IsSetCard(0x106) and c:IsType(TYPE_RITUAL)
 end
 function s.filter(c,e,tp)
-	return c:IsFaceup() and not c:IsType(TYPE_RITUAL) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsFaceup() and not c:IsType(TYPE_RITUAL) and c:IsSetCard(0x106) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
