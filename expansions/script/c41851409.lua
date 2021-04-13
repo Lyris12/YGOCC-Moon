@@ -25,10 +25,10 @@ function s.filter(c,e,tp)
 		and Duel.IsPlayerCanSpecialSummonMonster(tp,id//10,0x106,0x4011,0,0,c:IsType(TYPE_XYZ) and c:GetRank() or c:IsLevelAbove(1) and c:GetLevel() or 8,RACE_ZOMBIE,ATTRIBUTE_DARK)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and s.filter(chkc,e,tp) end
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.CheckReleaseGroup(tp,s.filter,1,nil,e,tp) end
-	local g=Duel.SelectReleaseGroup(tp,s.filter,1,1,nil,tp)
-	Duel.SetTargetCard(g)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and s.filter(chkc,e,tp) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingTarget(s.filter,tp,0,LOCATION_MZONE,1,nil,e,tp) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
+	Duel.SelectTarget(tp,s.filter,tp,0,LOCATION_MZONE,1,1,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
