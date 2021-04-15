@@ -1,4 +1,4 @@
-﻿expansions/cards-new.cdb	2b2673ff44363d6e2514609bd9c1c304
+﻿expansions/cards-new.cdb	7f3f671c533660928e0db2b211f6bcef
 expansions/lflist.conf	8e1b9d7512e925ad2055b602aa5e4f4a
 expansions/strings.conf	4b454ad6955efe961ada799eee1ca248
 expansions/pics/100000710.jpg	5f925a97b1c60d7d69acb8f229938263
@@ -9677,14 +9677,14 @@ expansions/script/c4134.lua	e49afa633e7d5864fe5aeed91766f641
 expansions/script/c4138.lua	810f4184d78d9cc3d31664e8ba58d5bd
 expansions/script/c4140.lua	49ba3d995a1c81ec5ec40eb40c5342fd
 expansions/script/c4145.lua	a4e018069860b81951f4acb9cb2d2351
-expansions/script/c41851400.lua	99388138bd309e21b1c2c0e32c939425
-expansions/script/c41851401.lua	38ec28e6309e4dcc2ffd1e7c555b2b7c
+expansions/script/c41851400.lua	a36ef685aa88e86b23a06c8bd8ec542b
+expansions/script/c41851401.lua	4f26df7fe51f911a031accc72bbea68e
 expansions/script/c41851402.lua	10a9d54ee1bec9a4a3237073c5608e4d
 expansions/script/c41851403.lua	4738df35fc58c1f1484703f0c9a038c8
 expansions/script/c41851404.lua	3397e66462e396928903cdb6a0fa2755
-expansions/script/c41851405.lua	70a7aeedad282875da11758a9b7c8fde
+expansions/script/c41851405.lua	30694c7a05a71f6917f73ca91bd7f809
 expansions/script/c41851406.lua	32f41a4112f908f73a9d134b9b243b9f
-expansions/script/c41851407.lua	0f700a641c8e0598c812f0efbbd5e22b
+expansions/script/c41851407.lua	a5153a8f7958c38591858612dcb3025a
 expansions/script/c41851408.lua	078e6145f7eaa45a1f1ceaeb04e5d588
 expansions/script/c41851409.lua	cc56f4da6bc569969c0e36d6c8ce2dfe
 expansions/script/c4200100.lua	8189503211cc2c3e500c447e4e162fcd
@@ -11122,6 +11122,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	e3fbb9f7b64c253aab775bbb4e4d6cee
+update/filelist.txt	b1e5384ac0761f205e1746b1f7b6a6a1
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	c248d79f96ff6d19531f77f69e0825dd
+update/version.txt	3acde066051058372610048b2544b289
