@@ -781,6 +781,11 @@ expansions/pics/102400311.png	dc448e703d88696fc6d863d40b34915b
 expansions/pics/102400312.png	a69aa94777ceff882bef0a36ab7bf3f6
 expansions/pics/102400313.png	e3aa1b324c4b0fe115b60e7a62351728
 expansions/pics/102400314.png	9ff64436a8f5fbb65b931dfbc0c0ff3f
+expansions/pics/102400315.png	9a74d1301a1b725a8bd08e991c0d7acf
+expansions/pics/102400316.png	f48cff51a7e243c85836672cf511e61c
+expansions/pics/102400317.png	52bb25a16e8b79828635016dbe900daf
+expansions/pics/102400318.png	8e15006143a47a56082533bfc218ff4e
+expansions/pics/102400319.png	0c50fcb361ed803f6e56f1ae70f61740
 expansions/pics/10338863.jpg	5ad074b5f8dfb1a0a8aa65940d3a95b6
 expansions/pics/10505081.jpg	e5b298dfa74a6afefe5f25bc2e8720bb
 expansions/pics/10505082.jpg	e8fba6be510e32b12305c3d6dd470cc6
@@ -6460,6 +6465,11 @@ expansions/script/c102400311.lua	6af6984385a423803be394d7d492eebd
 expansions/script/c102400312.lua	639e16b2099b2ca917d088faef47f596
 expansions/script/c102400313.lua	42a6e89ef0998f643c4ff2c1e02ec622
 expansions/script/c102400314.lua	a83e776476413100fd36fc30d71d2418
+expansions/script/c102400315.lua	bddcd9bebbbb1b0bcadef55e912a0d09
+expansions/script/c102400316.lua	13e6328e0fd4e2ed3fb549e036f12852
+expansions/script/c102400317.lua	04b494dad266e44420c4494027c2894a
+expansions/script/c102400318.lua	d6398eb31ee5bb20460f454c6922ae60
+expansions/script/c102400319.lua	b2cec645fe5ead69d2ff2c13a47418e9
 expansions/script/c10338863.lua	18eac3b9569c8014384af2e995d1a9d4
 expansions/script/c10505081.lua	87f3a3bd1e7357070e9df985fae52783
 expansions/script/c10505082.lua	b16542bb35e005b8237c34485a66cdef
@@ -11128,6 +11138,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	0623845455d98c7121f74598005359c0
+update/filelist.txt	971809a7f69917e4a7da41f56ca0c601
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	b7dd9d8d2cf9d31b3cafe36cd86e05d2
+update/version.txt	8cde623ff9940c82a70f13ff38faed1b
