@@ -1,6 +1,7 @@
 --Mezodrives Huntress
 local cid,id=GetID()
 function cid.initial_effect(c)
+	c:EnableReviveLimit()
 	aux.AddOrigXrosType(c)
 	aux.AddXrosProc(c,nil,4,aux.TRUE,1,3)
 	--Once per turn: You can target 1 face-up monster on the field; it lose ATK equal to the difference of ATK between this card and that target.
@@ -66,7 +67,7 @@ function cid.repop(e,tp,eg,ep,ev,re,r,rp)
 end
 function cid.grcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return aux.XrosEffectCon(aux.TRUE)(e) and c:IsRelateToBattle() and c:GetBattleTarget():IsType(TYPE_MONSTER)
+	return aux.XrosEffectCon(Card.IsType,TYPE_EFFECT)(e) and c:IsRelateToBattle() and c:GetBattleTarget():IsType(TYPE_MONSTER)
 end
 function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
