@@ -38,13 +38,13 @@ function s.initial_effect(c)
 		local ge2=Effect.CreateEffect(c)
 		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		ge2:SetCode(EVENT_PHASE_START+PHASE_DRAW)
-		ge2:SetOperation(function(e,tp) s[tp]=0 s[1-tp]=0 end)
+		ge2:SetOperation(function(e,tp) s[0]=0 s[1]=0 end)
 		Duel.RegisterEffect(ge2,0)
 	end
 end
 function s.tg1(e,tp,eg,ep,ev,re,r,rp,chk)
 	local p=Duel.GetTurnPlayer()
-	if chk==0 then return Duel.GetMatchingGroupCount(p,0,LOCATION_MZONE)>=Duel.GetMatchingGroupCount(Card.IsAttackable,p,LOCATION_MZONE,0,1,nil) end
+	if chk==0 then return Duel.GetFieldGroupCount(p,0,LOCATION_MZONE)>=Duel.GetMatchingGroupCount(Card.IsAttackable,p,LOCATION_MZONE,0,1,nil) end
 	local g1=Duel.GetMatchingGroup(Card.IsAttackable,p,LOCATION_MZONE,0,nil)
 	local g2=Duel.GetFieldGroup(p,0,LOCATION_MZONE)
 	local ct1=#g1
@@ -92,10 +92,10 @@ function s.checkop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.tg3(e,tp,eg,ep,ev,re,r,rp,chk)
-	local tl=s[tp]+s[1-tp]
+	local tl=s[0]+s[1]
 	local ct1=Duel.GetDecktopGroup(tp,tl):FilterCount(Card.IsAbleToRemove,nil,tp,POS_FACEDOWN)
 	local ct2=Duel.GetDecktopGroup(1-tp,tl):FilterCount(Card.IsAbleToRemove,nil,1-tp,POS_FACEDOWN)
-	if chk==0 then return (s[tp]>0 or s[1-tp]>0) and Duel.IsPlayerCanDraw(tp,s[tp]) and Duel.IsPlayerCanDraw(1-tp,s[1-tp]) and ct1==tl and ct2==tl end
+	if chk==0 then return (s[0]>0 or s[1]>0) and Duel.IsPlayerCanDraw(tp,s[tp]) and Duel.IsPlayerCanDraw(1-tp,s[1-tp]) and ct1==tl and ct2==tl end
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,PLAYER_ALL,1)
 end
 function s.op3(e,tp,eg,ep,ev,re,r,rp)
