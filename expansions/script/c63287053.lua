@@ -99,9 +99,8 @@ function s.tg3(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,PLAYER_ALL,1)
 end
 function s.op3(e,tp,eg,ep,ev,re,r,rp)
-	local tl=Duel.Draw(tp,s[tp],REASON_EFFECT)+Duel.Draw(1-tp,s[1-tp],REASON_EFFECT)
-	local rg=Duel.GetDecktopGroup(tp,tl)
+	local rg=Duel.GetDecktopGroup(tp,Duel.Draw(tp,s[tp],REASON_EFFECT)+Duel.Draw(1-tp,s[1-tp],REASON_EFFECT))
 	Duel.BreakEffect()
 	Duel.DisableShuffleCheck()
-	Duel.Remove(tl,POS_FACEDOWN,REASON_EFFECT)
+	Duel.Remove(rg,POS_FACEDOWN,REASON_EFFECT)
 end
