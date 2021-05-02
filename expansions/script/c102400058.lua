@@ -97,7 +97,7 @@ function s.eqlimit(e,c)
 	return e:GetOwner()==c
 end
 function s.repval(e,re,r,rp)
-	return bit.band(r,REASON_BATTLE)~=0
+	return r&REASON_BATTLE>0
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	local g=eg:Filter(s.cfilter,nil)

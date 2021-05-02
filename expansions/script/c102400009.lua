@@ -67,7 +67,7 @@ function s.damop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,tp)
 end
 function s.val(e,re,dam,r,rp,rc)
-	if s[e:GetOwnerPlayer()]==1 or bit.band(r,REASON_EFFECT)~=0 then
+	if s[e:GetOwnerPlayer()]==1 or r&REASON_EFFECT>0 then
 		return 0
 	else return dam end
 end

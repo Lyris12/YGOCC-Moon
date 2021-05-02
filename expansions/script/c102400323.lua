@@ -1,13 +1,10 @@
-local s,id=GetID()
---Table Flipper
+local s,id=GetID()
 function s.initial_effect(c)
-	--Cannot be Special Summoned.
 	local e1=Effect.CreateEffect(c)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
 	c:RegisterEffect(e1)
-	--FLIP: Destroy all cards the turn player's opponent controls, then for each card destroyed by this effect, they add the bottom card of their GY to their hand, also the turn player skips their next Battle Phase this turn. (End the Battle Phase instead, if this effect was activated during the Battle Phase.)
 	local e2=Effect.CreateEffect(c)
 	e2:SetCategory(CATEGORY_DESTROY+CATEGORY_TOHAND)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_FLIP)

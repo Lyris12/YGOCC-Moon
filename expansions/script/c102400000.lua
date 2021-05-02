@@ -59,5 +59,5 @@ function s.atop(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.sdcon(e)
 	local c=e:GetHandler()
-	return c:GetFlagEffect(id)>0 and bit.band(c:GetFlagEffectLabel(id),0x3)==0x3
+	return c:GetFlagEffect(id)>0 and c:GetFlagEffectLabel(id)&0x3==0x3
 end

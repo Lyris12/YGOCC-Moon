@@ -42,7 +42,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function s.discon(e)
-	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and bit.band(Duel.GetCurrentPhase(),0x38)~=0
+	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and Duel.GetCurrentPhase()&0x38>0
 end
 function s.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetMatchingGroupCount(Card.IsFaceup,tp,0,LOCATION_MZONE,nil)>0 end
@@ -64,7 +64,7 @@ function s.regop(e,tp,eg,ep,ev,re,r,rp)
 	local pos=c:GetPreviousPosition()
 	if c:IsReason(REASON_BATTLE) then pos=c:GetBattlePosition() end
 	if rp==1-tp and c:GetPreviousControler()==tp and c:IsReason(REASON_DESTROY)
-		and c:IsPreviousLocation(LOCATION_ONFIELD) and bit.band(pos,POS_FACEUP)~=0 then
+		and c:IsPreviousLocation(LOCATION_ONFIELD) and pos&POS_FACEUP>0 then
 		c:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
 	end
 end

@@ -119,7 +119,7 @@ function s.SpatialTarget(e,tp,eg,ep,ev,re,r,rp,chk,c)
 	else return false end
 end
 function s.disable(e,c)
-	return (c:IsType(TYPE_EFFECT) or bit.band(c:GetOriginalType(),TYPE_EFFECT)==TYPE_EFFECT) and c:IsType(TYPE_SPATIAL)
+	return (c:IsType(TYPE_EFFECT) or c:GetOriginalType()&TYPE_EFFECT==TYPE_EFFECT) and c:IsType(TYPE_SPATIAL)
 end
 function s.tgfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x3c97)

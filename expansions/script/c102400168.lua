@@ -71,7 +71,7 @@ function s.eqlimit(e,c)
 	return e:GetOwner()==c
 end
 function s.repval(e,re,r,rp)
-	return bit.band(r,REASON_BATTLE)~=0
+	return r&REASON_BATTLE>0
 end
 function s.cfilter(c,tc)
 	return c:IsRace(RACE_MACHINE) and c:IsSetCard(0x4093) and c:IsAbleToGrave() and not c:IsCode(tc:GetCode())

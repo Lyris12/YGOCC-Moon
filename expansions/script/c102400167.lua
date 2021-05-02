@@ -30,18 +30,21 @@ end
 function s.filter(c)
 	return c:IsLevelBelow(3) and c:IsRace(RACE_DRAGON) and not c:IsForbidden()
 end
-function s.eqtg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and s.filter(chkc) end
 	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_EQUIP,nil,1,tp,LOCATION_DECK)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
+	local g=Duel.SelectTarget(tp,s.filter,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,1,nil)
+	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,g,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_EQUIP,g,1,0,0)
 end
 function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
-	local tc=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil):GetFirst()
-	if tc then
+	local tc=Duel.GetFirstTarget()
+	if tc and tc:IsRelateToEffect(e) then
 		local atk=tc:GetTextAttack()
 		if atk<0 then atk=0 end
-		if not Duel.Equip(tp,tc,c,true) then return end
+		if not Duel.Equip(tp,tc,c,false) then return end
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetProperty(EFFECT_FLAG_OWNER_RELATE)
@@ -68,7 +71,7 @@ function s.eqlimit(e,c)
 	return e:GetOwner()==c
 end
 function s.repval(e,re,r,rp)
-	return bit.band(r,REASON_BATTLE)~=0
+	return r&REASON_BATTLE>0
 end
 function s.thfilter(c)
 	return c:IsRace(RACE_MACHINE) and c:IsSetCard(0x4093) and c:IsAbleToHand()

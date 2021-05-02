@@ -129,9 +129,7 @@ function s.fdop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Remove(Duel.SelectMatchingCard(tp,s.trfilter,tp,LOCATION_DECK,0,1,1,nil),POS_FACEUP,REASON_EFFECT)
 		if c:GetFlagEffect(id)==0 then
 			c:RegisterFlagEffect(id,RESET_PHASE+PHASE_END,0,1,0x1)
-		else
-			c:SetFlagEffectLabel(id,bit.bor(c:GetFlagEffectLabel(id),0x1))
-		end
+		else c:SetFlagEffectLabel(id,c:GetFlagEffectLabel(id)|0x1) end
 	else
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 		local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil)

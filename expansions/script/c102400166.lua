@@ -73,7 +73,7 @@ function s.eqlimit(e,c)
 	return e:GetOwner()==c
 end
 function s.repval(e,re,r,rp)
-	return bit.band(r,REASON_BATTLE)~=0
+	return r&REASON_BATTLE>0
 end
 function s.cfilter(c)
 	return c:IsSetCard(0x4093) and (c:IsFaceup() or c:GetEquipTarget()) and c:IsType(TYPE_EQUIP) and c:IsAbleToGraveAsCost()
