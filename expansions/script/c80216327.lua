@@ -40,7 +40,7 @@ function s.checkop(e,tp,eg,ep,ev,re,r,rp)
 		local e1=Effect.CreateEffect(e:GetOwner())
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e1:SetCode(EVENT_CHAIN_SOLVED)
-		e1:SetOperation(function(e,tp,efg,ep,ev,re,r,rp) Duel.RaiseEvent(eg,EVENT_CUSTOM+id,re,r,rp,ep,v) end)
+		e1:SetOperation(function(e,tp,efg,ep,ev,ref,r,rp) if not ref:GetHandler():IsCode(id) then Duel.RaiseEvent(eg,EVENT_CUSTOM+id,ref,r,rp,ep,v) end end)
 		Duel.RegisterEffect(e1,tp)
 		Duel.RegisterFlagEffect(tp,id+1,RESET_CHAIN,0,1,i)
 	end
@@ -49,8 +49,7 @@ function s.cfilter(c)
 	return c:GetOverlayTarget():IsSetCard(0x2ead)
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return ev>0 and Duel.GetFlagEffect(tp,id)==0
+	return ev>0
 end
 function s.xfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0xead) and c:IsType(TYPE_XYZ)

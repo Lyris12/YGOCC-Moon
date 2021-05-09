@@ -14,6 +14,7 @@ local rssp  =   Stellar_Pearl
 local rsed  =   Epic_Dragon
 local rsdh  =   Devil_Hunter
 local rsds  =   Dark_Souls
+local rsca  =   Corona
 
 #Scl - Special Mode
 local rssm  =   Special_Mode
@@ -26,18 +27,19 @@ local rssmf =   Special_Mode_Fast_Duel
 local rssmm =   Special_Mode_Multiple_Duel
 local rssmu =   Special_Mode_Universal_Duel
 
-#Gale
+#Gale 1472676207
 local rsve  =   Voison
 local rsneov=   Neons
 local tfrsv =   T.Fairies
 local rsss  =   Star_Spirit
 
-#ChiJiang
+#ChiJiang 626386490
 local rsnm  =   Nightmare
 local rslf  =   Little_Fox 
 local rccv  =   Thermonuclear
+local rsfn  =   Fake_News
 
-#XiaoMi
+#XiaoMi 643865567
 local rssg  =   Sex_Gun
 local rsps  =   Pseudo_Soul
 local rsdcc =   Dragon_Chess_Corps
@@ -50,29 +52,60 @@ local rsik  =   Infernal_Knight
 local rsvw  =   Virus_Wrom
 local rsia  =   Indolent_Angel
 local rsso  =   Simulated_Organism
+local rstr  =   True_Ritual
+local rssww =   Sheng_Wo_Wang
 
-#NianBao
+#NianBao 583322404
 local rslap =   Lapin
+local rskh  =   Karehana
 
-#XiaoDaoHeng
+#XiaoDaoHeng 1614895649
 local rslrd =   Life_DeathRound_Dance
 
-#Huang
+#Huang 1184387005
 local rsts  =   Trinity_Sword
 
-#Luoxing
+#Luoxing 1151483512
 local rsdt  =   Dark_Tale
 local rsod  =   Order
+local rsyzt  =   YanZeTown
 
-#YunZeZhun
+#YunZeZhun 1587361112
 local rsphh =   Phantom_Thieves_Of_Hearts
 local rsgc  =   Guard_City
 
-#ZhenDong
+#ZhenDong 
 local rsfv  =   Fgo/Assassin
 
-#JingJing
-local rsba  =   BlueAngel
+#JingJing 1772438857
+local rsba  =   Blue_Angel
+
+#Akashic 3204027606
+local rszg  =   Zogu
+local rsgs  =   Gran_Sphere
+local rsoc  =   Oligocene_Civilization
+local rsgol =   Giant_of_Light
+local rssb  =   Space_Beasts
+
+#HeiBai 1172777968
+local rstm  =   Toaru_Majutsu_no_Index
+
+#2558566212
+local rsgod =   God
+
+#02 1164477469
+local rsva  =   VR_Aqua
+//local   =   Tian_Zhi
+local rswk =  White_Moon_Knight
+
+#ReiKai 2404873791
+local rsch  =   Churck
+
+#XueXiao 3234454893
+local rsmd  =   Mrs_Dice
+
+#HuangWu 1103516856
+local rsdc  =   Dragon_Caller
 
 --Set Code
 #Scl
@@ -120,7 +153,7 @@ local   =   0xc334
 local Oraclesmith =   0x3335
 local DevilHunter =   0x5335
 local DevilSlayer =   0x6335
-local DMC	  =   0x9335
+local DMC   =   0x9335
 local Ashenone  =   0xa335
 local Cinderlord  =   0xc335
 
