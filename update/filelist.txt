@@ -1,4 +1,4 @@
-﻿expansions/cards-new.cdb	684d4d067991fe78e89f06de43892b8b
+﻿expansions/cards-new.cdb	03ddc4474f4b356ed56594800cffaf1a
 expansions/lflist.conf	6d2e503b93cd9c623c6a6932292e7a08
 expansions/strings.conf	4b454ad6955efe961ada799eee1ca248
 expansions/pics/100000710.jpg	5f925a97b1c60d7d69acb8f229938263
@@ -772,7 +772,7 @@ expansions/pics/102400320.png	48428d1a374d8aa586733cd0f2cdb1b6
 expansions/pics/102400321.png	f81114074c3f8051ba5c40fb273779ef
 expansions/pics/102400322.png	1b9eebd7e28e8c341862b63289ca84c6
 expansions/pics/102400323.png	73eee971a6fc9deff637046be5829bed
-expansions/pics/102400324.png	e3f92aa7b1302407920aa167e04ff2ea
+expansions/pics/102400324.png	8fdd6044a6a4d0e042dbad4159c6e2d8
 expansions/pics/10338863.jpg	5ad074b5f8dfb1a0a8aa65940d3a95b6
 expansions/pics/10505081.jpg	e5b298dfa74a6afefe5f25bc2e8720bb
 expansions/pics/10505082.jpg	e8fba6be510e32b12305c3d6dd470cc6
@@ -6629,7 +6629,7 @@ expansions/script/c102400320.lua	7e7e22a830f4227d1bb8572cb19adaae
 expansions/script/c102400321.lua	6d5b1b90439226ae867db891044bd06f
 expansions/script/c102400322.lua	b8f828801bd92095eed8b981c01f5f5b
 expansions/script/c102400323.lua	242232969496ac7710fdcee74409636f
-expansions/script/c102400324.lua	12ffb9ba1222a860720c0424cfc27b20
+expansions/script/c102400324.lua	e9a62d3470100b9baad8c3e708e99358
 expansions/script/c10338863.lua	18eac3b9569c8014384af2e995d1a9d4
 expansions/script/c10505081.lua	87f3a3bd1e7357070e9df985fae52783
 expansions/script/c10505082.lua	b16542bb35e005b8237c34485a66cdef
@@ -11435,6 +11435,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	1a24c98a03dbe2b0aad1ef9858598143
+update/filelist.txt	56fc558f4976b61d607efdab7fb706b1
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	f11bb66d3e6b0b32467bc18e7b6a9a8e
+update/version.txt	b20aab5e5b6fdea779ea753445e33c15

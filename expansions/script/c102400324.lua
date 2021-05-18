@@ -19,6 +19,14 @@ function s.initial_effect(c)
 	e2:SetTarget(s.target)
 	e2:SetOperation(s.operation)
 	c:RegisterEffect(e2)
+	if not s.global_check then
+		s.global_check=true
+		local f=Card.IsLocation
+		Card.IsLocation=function(tc,loc)
+			if tc==c and c:GetFlagEffect(id)>0 then return loc&(tc:GetLocation()|LOCATION_ONFIELD)>0 or f(tc,loc)
+			else return f(tc,loc) end
+		end
+	end
 end
 function s.exmfilter(c)
 	return c:IsLocation(LOCATION_HAND) and c:IsCode(id)
@@ -42,20 +50,33 @@ function s.cfilter(c,e,tp)
 end
 function s.filter(c,e,tp)
 	local tc=e:GetHandler()
-	local g=Duel.GetMatchingGroup(s.LExtraFilter,tp,LOCATION_ONFIELD+LOCATION_HAND,LOCATION_ONFIELD,nil,c,tp)
-	if tc:IsCanBeLinkMaterial(c) and s.matval(e:GetLabelObject(),c,nil,tc,tp) then g:AddCard(tc) end
-	return tc:IsCanBeLinkMaterial(c) and c:IsRace(RACE_CYBERSE) and c:IsLinkSummonable(g,tc)
+	--local g=Duel.GetMatchingGroup(s.LExtraFilter,tp,LOCATION_ONFIELD+LOCATION_HAND,LOCATION_ONFIELD,nil,c,tp)
+	--if tc:IsCanBeLinkMaterial(c) and s.matval(e:GetLabelObject(),c,nil,tc,tp) then g:AddCard(tc) end
+	if not (tc:IsCanBeLinkMaterial(c) and c:IsRace(RACE_CYBERSE)) then return false end
+	tc:RegisterFlagEffect(id,0,0,1)
+	local res=c:IsLinkSummonable(nil,tc)
+	tc:ResetFlagEffect(id)
+	return res
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local chkc=e:GetLabel()~=0
-	if chk==0 then e:SetLabel(0) return chkc and Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_HAND,0,1,nil,e,tp) end
+	if chk==0 then e:SetLabel(0) return chkc and Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_HAND,0,1,e:GetHandler(),e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	Duel.Remove(Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_HAND,0,1,1,nil,e,tp),POS_FACEUP,REASON_COST)
+	Duel.Remove(Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_HAND,0,1,1,e:GetHandler(),e,tp),POS_FACEUP,REASON_COST)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect() then return end
+	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local tc=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp):GetFirst()
-	if tc then Duel.LinkSummon(tp,tc,nil) end
+	if tc then
+		c:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e1:SetCode(EVENT_SPSUMMON)
+		e1:SetOperation(function(ef,p,tg) if tg:GetFirst()~=tc then return end c:ResetFlagEffect(id) e1:Reset() end)
+		Duel.RegisterEffect(e1,tp)
+		Duel.LinkSummon(tp,tc,nil,c)
+	end
 end
