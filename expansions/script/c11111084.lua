@@ -1,4 +1,4 @@
---Maiden of the Shisune, Ahri
+--Gypssy of the Shisune, Jiuwei
 --Scripted by Yuno
 local function getID()
 	local str=string.match(debug.getinfo(2,'S')['source'],"c%d+%.lua")
@@ -84,7 +84,7 @@ function cid.tdtg(e, tp, eg, ep, ev, re, r, rp, chk)
 end
 function cid.tdop(e, tp, eg, ep, ev, re, r, rp)
     Duel.Hint(HINT_SELECTMSG, tp, HINTMSG_TODECK)
-    local g=Duel.SelectMatchingCard(tp, tdfilter, tp, LOCATION_GRAVE, 0, 1, 1, nil)
+    local g=Duel.SelectMatchingCard(tp, cid.tdfilter, tp, LOCATION_ONFIELD+LOCATION_GRAVE, 0, 1, 1, nil)
     if g:GetCount()==0 then return end
     if Duel.SendtoDeck(g, nil, 2, REASON_EFFECT)~=0 and g:GetFirst():IsLocation(LOCATION_DECK+LOCATION_EXTRA) then
         if g:GetFirst():IsLocation(LOCATION_DECK) then Duel.ShuffleDeck(tp) end
