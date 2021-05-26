@@ -49,7 +49,7 @@ function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckLPCost(tp,1000) and Duel.IsExistingMatchingCard(s.cfilter,tp,0,LOCATION_GRAVE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectMatchingCard(tp,s.cfilter,tp,0,LOCATION_GRAVE,1,1,nil)
-	e:SetLabel(math.min(0,g:GetFirst():GetTextAttack()))
+	e:SetLabel(math.max(0,g:GetFirst():GetTextAttack()))
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
 	Duel.PayLPCost(tp,1000)
 end

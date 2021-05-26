@@ -1,4 +1,5 @@
 --created & coded by Lyris, art from "Floral Shield"
+--ローズ・リバース
 local s,id=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)

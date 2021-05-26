@@ -1,4 +1,5 @@
 --created & coded by Lyris, art at https://www.zerochan.net/1995682
+--スターダスト・アンヴォイ
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()

@@ -1,3 +1,5 @@
+--created & coded by Lyris
+--コード・インポーター
 local s,id=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
@@ -50,8 +52,6 @@ function s.cfilter(c,e,tp)
 end
 function s.filter(c,e,tp)
 	local tc=e:GetHandler()
-	--local g=Duel.GetMatchingGroup(s.LExtraFilter,tp,LOCATION_ONFIELD+LOCATION_HAND,LOCATION_ONFIELD,nil,c,tp)
-	--if tc:IsCanBeLinkMaterial(c) and s.matval(e:GetLabelObject(),c,nil,tc,tp) then g:AddCard(tc) end
 	if not (tc:IsCanBeLinkMaterial(c) and c:IsRace(RACE_CYBERSE)) then return false end
 	tc:RegisterFlagEffect(id,0,0,1)
 	local res=c:IsLinkSummonable(nil,tc)

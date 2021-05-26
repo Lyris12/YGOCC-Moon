@@ -1,4 +1,5 @@
 --created & coded by Lyris, art uploaded by MayAries2009 of Fandom
+--薔薇の魔女
 local s,id=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)

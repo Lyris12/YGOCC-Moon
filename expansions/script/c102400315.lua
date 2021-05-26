@@ -1,4 +1,5 @@
 --created & coded by Lyris, art by BatMed of DeviantArt
+--薔薇侍女
 local s,id=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,5 @@
 --created & coded by Lyris, art at https://gnosticwarrior.com/wp-content/uploads/2016/04/Quote-in-the-beginning-was-the-word.jpg
+--スターダスト・ミディアム
 local s,id=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
