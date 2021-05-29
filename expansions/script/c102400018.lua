@@ -1,4 +1,4 @@
---created & coded by Lyris, art from "Form Change"
+--created & coded by Lyris, art from "Form Change", "Silver Wing", "Moon Mirror Shield", and "Dragunity Divine Lance"
 --インライトメント・アセンブリー
 local s,id=GetID()
 function s.initial_effect(c)

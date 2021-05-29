@@ -1,5 +1,5 @@
 --created & coded by Lyris, art at https://arlenepowers.files.wordpress.com/2011/11/wipraven2.jpg
---星なき夜のレイヴン
+--星なき夜レイヴン
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()

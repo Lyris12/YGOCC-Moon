@@ -1,4 +1,4 @@
---created & coded by Lyris, art from "Celestial Rage"
+--created & coded by Lyris, art from Shadowverse's "Lapis, Glorious Seraph"
 --剣主のアドバンテージ
 local s,id=GetID()
 function s.initial_effect(c)

@@ -1,4 +1,4 @@
---created & coded by Lyris, art from "Raidraptor" cards
+--created & coded by Lyris, art from Fleur-de-Lis
 --剣主のオース
 local s,id=GetID()
 function s.initial_effect(c)

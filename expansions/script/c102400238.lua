@@ -1,4 +1,4 @@
---created & coded by Lyris, art at ZeroChan
+--created & coded by Lyris, art on ZeroChan
 --ニュートリックス・カリー
 local s,id=GetID()
 function s.initial_effect(c)

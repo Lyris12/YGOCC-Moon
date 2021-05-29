@@ -1,4 +1,4 @@
---created & coded by Lyris, art from "Degenerate Circuit" & at http://www.elasmo-research.org/education/evolution/evol-image/c_taurus.jpg
+--created & coded by Lyris, art by Ray-V-Xyz of DeviantArt
 --サイバー・ダーク・ファング
 local s,id=GetID()
 function s.initial_effect(c)

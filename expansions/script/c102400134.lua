@@ -1,4 +1,4 @@
---created & coded by Lyris, art at http://www.uppicweb.com/x/i/it/.jpg
+--created & coded by Lyris, art by 匈歌ハトリ on Pixiv
 --襲雷大降り
 local s,id=GetID()
 function s.initial_effect(c)

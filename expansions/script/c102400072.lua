@@ -1,4 +1,4 @@
---created & coded by Lyris, art from "Solemn Strike"
+--created & coded by Lyris, art from The Heroic Legend of Arslân
 --剣主御注意
 local s,id=GetID()
 function s.initial_effect(c)

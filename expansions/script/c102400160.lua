@@ -1,4 +1,4 @@
---created & coded by Lyris
+--created & coded by Lyris, art from Shadowverse's "Lightning Blast"
 --襲雷弾
 local s,id=GetID()
 function s.initial_effect(c)

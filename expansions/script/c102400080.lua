@@ -1,4 +1,4 @@
---created & coded by Lyris, art from "Raidraptor - Call"
+--created & coded by Lyris, art from Magic the Gathering's "Seraph of Dawn"
 --天剣主翔
 local s,id=GetID()
 function s.initial_effect(c)
