@@ -10,7 +10,7 @@ local id,cid=getID()
 function cid.initial_effect(c)
 	--bigbang summon
 	aux.AddOrigBigbangType(c)
-	aux.AddBigbangProc(c,aux.AND(aux.FilterEqualFunction(Card.GetVibe,0)),aux.FilterBoolFunction(Card.IsSetCard,0x37e),1,aux.NOT(aux.FilterEqualFunction(Card.GetVibe,0)),2)
+	aux.AddBigbangProc(c,cid.mfilter,1,aux.NOT(aux.FilterEqualFunction(Card.GetVibe,0)),2)
 	c:EnableReviveLimit()
 	--cannot spsummon
 	local e0=Effect.CreateEffect(c)
@@ -50,12 +50,21 @@ function cid.initial_effect(c)
 	e3:SetOperation(cid.negop)
 	c:RegisterEffect(e3)
 end
+function cid.mfilter(c)
+	return c:IsSetCard(0x37e) and aux.FilterEqualFunction(Card.GetVibe,0)
+end
 function cid.splimit(e,se,sp,st)
 	return bit.band(st,SUMMON_TYPE_BIGBANG)==SUMMON_TYPE_BIGBANG
 end
 function cid.matcheck(e,c)
-	local ct=c:GetMaterial():GetClassCount(Card.GetOriginalAttribute)
-	e:SetLabel(ct)
+	local g=c:GetMaterial()
+	local att=0
+	local tc=g:GetFirst()
+	while tc do
+		att=bit.bor(att,tc:GetOriginalAttribute())
+		tc=g:GetNext()
+	end
+	e:SetLabel(att)
 end
 function cid.regcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_BIGBANG)

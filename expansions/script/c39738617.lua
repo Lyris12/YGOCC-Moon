@@ -10,7 +10,7 @@ local id,cid=getID()
 function cid.initial_effect(c)
 	--bigbang summon
 	aux.AddOrigBigbangType(c)
-	aux.AddBigbangProc(c,aux.AND(aux.FilterEqualFunction(Card.GetVibe,0)),aux.FilterBoolFunction(Card.IsSetCard,0x37e),1,aux.NOT(aux.FilterEqualFunction(Card.GetVibe,0)),1)
+	aux.AddBigbangProc(c,cid.mfilter,1,aux.NOT(aux.FilterEqualFunction(Card.GetVibe,0)),1)
 	c:EnableReviveLimit()
 	--cannot spsummon
 	local e0=Effect.CreateEffect(c)
@@ -40,11 +40,14 @@ function cid.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
 	e2:SetCode(EVENT_TO_GRAVE)
-	e2:SetCountLimit(1,id+100)
+	e2:SetCountLimit(1,id)
 	e2:SetCondition(cid.thcon)
 	e2:SetTarget(cid.thtg)
 	e2:SetOperation(cid.thop)
 	c:RegisterEffect(e2)
+end
+function cid.mfilter(c)
+	return c:IsSetCard(0x37e) and aux.FilterEqualFunction(Card.GetVibe,0)
 end
 function cid.splimit(e,se,sp,st)
 	return bit.band(st,SUMMON_TYPE_BIGBANG)==SUMMON_TYPE_BIGBANG
@@ -59,7 +62,7 @@ function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cid.tdfilter,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g=Duel.GetMatchingGroup(cid.tdfilter,tp,LOCATION_GRAVE,0,1,nil)
-	local tg=g:SelectSubGroup(tp,aux.dncheck,false,1,3)
+	local tg=g:SelectSubGroup(tp,aux.dabcheck,false,1,3)
 	e:SetLabel(Duel.SendtoDeck(tg,nil,2,REASON_COST))
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
