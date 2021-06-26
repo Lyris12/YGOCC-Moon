@@ -32,7 +32,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	if Duel.SpecialSummon(c:GetOverlayGroup():FilterSelect(tp,s.filter,1,1,nil,e,tp),0,tp,tp,false,false,POS_FACEUP)>0 and tc:IsRelateToEffect(e) then
+	if Duel.SpecialSummon(c:GetOverlayGroup():FilterSelect(tp,s.filter,1,1,nil,e,tp),0,tp,tp,false,false,POS_FACEUP)>0 and tc:IsRelateToEffect(e) and tc:IsControler(1-tp) then
 		Duel.BreakEffect()
 		Duel.Destroy(tc,REASON_EFFECT)
 	end

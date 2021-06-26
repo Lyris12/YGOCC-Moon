@@ -100,12 +100,11 @@ function s.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local tg=Duel.GetMatchingGroup(Card.IsDestructable,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
 	local dc=math.min(#tg,ct)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_OPPO)
-	local g=Duel.SelectTarget(Card.IsType,tp,0,LOCATION_ONFIELD,1,dc,nil,TYPE_SPELL+TYPE_TRAP)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,tg,#g,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,tg,#Duel.SelectTarget(tp,Card.IsType,tp,0,LOCATION_ONFIELD,1,dc,nil,TYPE_SPELL+TYPE_TRAP),0,0)
 end
 function s.op(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
-	local ct=#g
+	local ct=g:FilterCount(Card.IsType,nil,TYPE_SPELL+TYPE_TRAP)
 	local tg=Duel.GetFieldGroup(tp,LOCATION_MZONE,LOCATION_MZONE)
 	if ct>0 and ct>=#tg then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)

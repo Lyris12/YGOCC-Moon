@@ -67,7 +67,8 @@ end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local dir=Duel.GetAttackTarget()==nil
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) and (not dir or (tc:IsFaceup() and tc:GetAttack()>=1500)) and tc:IsControler(1-tp) then
+	if tc and tc:IsRelateToEffect(e) and (not dir and c:IsLocation(LOCATION_MZONE)
+		or tc:IsFaceup() and tc:GetAttack()>=1500) and tc:IsControler(1-tp) then
 		Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)
 	end
 end

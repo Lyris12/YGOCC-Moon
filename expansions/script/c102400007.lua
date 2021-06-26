@@ -49,7 +49,7 @@ function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,#g,0,0)
 end
 function s.desfilter(c,e,tp)
-	return c:IsRelateToEffect(e) and c:IsControler(tp)
+	return c:IsRelateToEffect(e) and c:IsControler(tp) and c:IsType(TYPE_SPELL+TYPE_TRAP)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)

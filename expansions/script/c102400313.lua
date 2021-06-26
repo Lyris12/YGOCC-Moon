@@ -33,7 +33,7 @@ function s.lvop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_UPDATE_LEVEL)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e1:SetValue(g:Filter(Card.IsRelateToEffect,nil,e):GetSum(Card.GetLevel))
+	e1:SetValue(g:Filter(Card.IsRelateToEffect,nil,e):Filter(Card.IsType,nil,TYPE_MONSTER):GetSum(Card.GetLevel))
 	e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 	c:RegisterEffect(e1)
 end

@@ -88,7 +88,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local g=e:GetHandler():GetEquipGroup():Filter(s.cfilter,nil)
 	if Duel.SendtoHand(g,nil,REASON_EFFECT)==0 or not g:IsExists(Card.IsLocation,1,nil,LOCATION_HAND) then return end
 	local tc=Duel.GetFirstTarget()
-	if not (tc and tc:IsRelateToEffect(e) and tc:IsControler(1-tp)) then return end
+	if not (tc and tc:IsRelateToEffect(e) and tc:IsControler(1-tp) and tc:IsLocation(LOCATION_MZONE)) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	local qc=Duel.SelectMatchingCard(tp,s.qfilter,tp,LOCATION_MZONE,0,1,1,nil):GetFirst()
 	if qc then

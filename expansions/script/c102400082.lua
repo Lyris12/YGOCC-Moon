@@ -52,7 +52,8 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if not dg or not cg then return end
 	local dc=dg:GetFirst()
 	local cc=cg:GetFirst()
-	if dc:IsRelateToEffect(e) and cc:IsRelateToEffect(e) and dc:IsDestructable() and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and s.spfilter(cc,e,tp) then
+	if dc:IsRelateToEffect(e) and cc:IsRelateToEffect(e) and dc:IsDestructable() and dc:IsType(TYPE_SPELL+TYPE_TRAP)
+		and dc:IsControler(tp) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and s.spfilter(cc,e,tp) then
 		Duel.Destroy(dc,REASON_EFFECT)
 		Duel.SpecialSummon(cc,0,tp,tp,false,false,POS_FACEUP)
 	end

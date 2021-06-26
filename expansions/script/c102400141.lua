@@ -32,7 +32,8 @@ end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local ex,g1=Duel.GetOperationInfo(0,CATEGORY_DESTROY)
 	local tc1=g1:GetFirst()
-	if not tc1:IsRelateToEffect(e) or tc1:IsFacedown() or not tc1:IsSetCard(0x7c4) or Duel.Destroy(tc1,REASON_EFFECT)==0 then return end
+	if not tc1:IsRelateToEffect(e) or tc1:IsFacedown() or not tc1:IsSetCard(0x7c4) or tc1:IsControler(1-tp)
+		or not tc:IsLocation(LOCATION_MZONE) or Duel.Destroy(tc1,REASON_EFFECT)==0 then return end
 	local ex,g2=Duel.GetOperationInfo(0,CATEGORY_SPECIAL_SUMMON)
 	local tc2=g2:GetFirst()
 	if tc2:IsRelateToEffect(e) and not tc2:IsCode(tc1:GetCode()) and tc2:IsSetCard(0x7c4) then

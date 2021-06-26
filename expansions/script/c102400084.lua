@@ -63,7 +63,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoGrave(Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil),REASON_EFFECT)
 	else
 		local tc=Duel.GetFirstTarget()
-		if tc and tc:IsRelateToEffect(e) then
+		if tc and tc:IsRelateToEffect(e) and s.thfilter(c) then
 			Duel.SendtoHand(tc,nil,REASON_EFFECT)
 		end
 	end

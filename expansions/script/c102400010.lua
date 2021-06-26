@@ -42,7 +42,7 @@ end
 function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 	local dir=Duel.GetAttackTarget()==nil
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) and tc:IsControler(1-tp) then
+	if tc and tc:IsRelateToEffect(e) and tc:IsControler(1-tp) and tc:IsLocation(LOCATION_MZONE) then
 		Duel.SendtoGrave(tc,REASON_EFFECT)
 	end
 	if not dir then return end

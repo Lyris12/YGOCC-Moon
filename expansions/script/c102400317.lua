@@ -34,7 +34,7 @@ end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	local g=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_GRAVE,0,nil)
-	if not tc:IsRelateToEffect(e) or c:IsLevelAbove(5) and not g:CheckWithSumEqual(Card.GetLevel,tc:GetLevel(),1,99)
+	if not tc:IsRelateToEffect(e) or not (s.cRose(tc) or tc:IsRace(RACE_PLANT)) or not c:IsLevelAbove(1) or tc:IsLevelAbove(5) and not g:CheckWithSumEqual(Card.GetLevel,tc:GetLevel(),1,99)
 		or Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)==0 then return end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_SINGLE)

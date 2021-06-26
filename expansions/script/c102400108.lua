@@ -75,7 +75,8 @@ function s.op(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsFaceup() then
 		if e:IsHasType(EFFECT_TYPE_FIELD) then atk=tc:GetDefense() else atk=tc:GetAttack() end
 	end
-	if tc:IsRelateToEffect(e) and Duel.Destroy(tc,REASON_EFFECT)~=0 then
+	if tc:IsRelateToEffect(e) and tc:IsLocation(LOCATION_MZONE) and tc:IsControler(1-tp)
+		and Duel.Destroy(tc,REASON_EFFECT)>0 then
 		Duel.BreakEffect()
 		Duel.Damage(1-tp,atk/2,REASON_EFFECT)
 	end

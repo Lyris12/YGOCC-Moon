@@ -42,7 +42,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) or not c:IsRelateToEffect(e)
-		or not tc or not tc:IsRelateToEffect(e) or Duel.SpecialSummon(Group.FromCards(c,tc),0,tp,tp,false,false,POS_FACEUP)<2 then return end
+		or not tc or not tc:IsRelateToEffect(e) or not s.spfilter(tc,e,tp) or Duel.SpecialSummon(Group.FromCards(c,tc),0,tp,tp,false,false,POS_FACEUP)<2 then return end
 	local sg=Duel.GetMatchingGroup(Card.IsSynchroSummonable,tp,LOCATION_EXTRA,0,1,nil,nil)
 	if #sg>0 and Duel.SelectYesNo(tp,1164) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)

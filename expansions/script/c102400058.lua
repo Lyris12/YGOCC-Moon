@@ -60,7 +60,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,s.filter3,tp,LOCATION_DECK,0,1,1,nil,tp,e)
 	local c=g:GetFirst()
 	local tc=Duel.GetFirstTarget()
-	if c and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 and tc and tc:IsRelateToEffect(e) and tc:IsRace(RACE_DRAGON) and tc:IsLevelBelow(3) and not tc:IsForbidden() then
+	if c and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 and tc and tc:IsRelateToEffect(e) and s.filter2(tc) and tc:IsType(TYPE_MONSTER) then
 		local atk=tc:GetTextAttack()
 		if atk<0 then atk=0 end
 		if not Duel.Equip(tp,tc,c) or not Duel.Equip(tp,e:GetHandler(),c) then return end

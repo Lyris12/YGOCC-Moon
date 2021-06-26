@@ -61,7 +61,8 @@ function s.op(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local lc=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_HAND,0,1,1,nil):GetFirst()
-	if not lc or Duel.Destroy(lc,REASON_EFFECT)==0 or not tc:IsRelateToEffect(e) or tc:IsFacedown() then return end
+	if not lc or Duel.Destroy(lc,REASON_EFFECT)==0 or not tc:IsRelateToEffect(e) or tc:IsControler(1-tp)
+		or not tc:IsLocation(LOCATION_MZONE) or not s.filter(tc) then return end
 	local op
 	local lv=lc:GetLevel()
 	if tc:IsLevelBelow(lv) then
