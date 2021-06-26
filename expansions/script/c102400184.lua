@@ -39,7 +39,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if not tc:IsRelateToEffect(e) or Duel.SendtoDeck(tc,nil,2,REASON_EFFECT)==0
 		or not tc:IsLocation(LOCATION_DECK+LOCATION_EXTRA) then return end
-	Duel.ShuffleDeck(tp)
+	if tc:IsLocation(LOCATION_DECK) then Duel.ShuffleDeck(tp) end
 	local g2=Duel.SelectMatchingCard(tp,s.filter2,tp,0,LOCATION_ONFIELD,1,1,nil)
 	local c=e:GetHandler()
 	local tc=g2:GetFirst()
