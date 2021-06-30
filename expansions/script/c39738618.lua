@@ -53,7 +53,7 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function cid.mfilter(c)
-	return c:IsSetCard(0x37e) and aux.FilterEqualFunction(Card.GetVibe,0)
+	return c:IsSetCard(0x37e) and c:GetVibe()==0
 end
 function cid.splimit(e,se,sp,st)
 	return bit.band(st,SUMMON_TYPE_BIGBANG)==SUMMON_TYPE_BIGBANG

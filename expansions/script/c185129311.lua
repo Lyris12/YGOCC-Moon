@@ -93,7 +93,7 @@ function s.efilter(e,re)
 	return e:GetOwnerPlayer()~=re:GetOwnerPlayer()
 end
 function s.cfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x1145)
+	return c:IsFaceup() and c:IsSetCard(0x4a79)
 end
 function s.discon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,e:GetHandler())

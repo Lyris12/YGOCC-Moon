@@ -47,7 +47,7 @@ function s.mfilter(c,xyzc)
 	return c:IsXyzLevel(xyzc,8)
 end
 function s.xyzcheck(g)
-	return g:IsExists(Card.IsSetCard,1,nil,0x1145)
+	return g:IsExists(Card.IsSetCard,1,nil,0x4a79)
 end
 function s.imcon(e)
 	return e:GetHandler():GetOverlayGroup():IsExists(Card.IsType,1,nil,TYPE_TRAP)
@@ -56,7 +56,7 @@ function s.tgcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_XYZ)
 end
 function s.tgfilter(c)
-	return c:IsSetCard(0x1145) and c:GetType()==TYPE_TRAP+TYPE_CONTINUOUS and c:IsAbleToGrave()
+	return c:IsSetCard(0x4a79) and c:GetType()==TYPE_TRAP+TYPE_CONTINUOUS and c:IsAbleToGrave()
 end
 function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then 
@@ -78,7 +78,7 @@ function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
 function s.setfilter(c)
-	return c:IsSetCard(0x1145) and c:GetType()==TYPE_TRAP+TYPE_CONTINUOUS and c:IsSSetable()
+	return c:IsSetCard(0x4a79) and c:GetType()==TYPE_TRAP+TYPE_CONTINUOUS and c:IsSSetable()
 end
 function s.settg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and s.setfilter(chkc) end

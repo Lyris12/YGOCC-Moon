@@ -40,7 +40,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SpecialSummon(c,SUMMON_VALUE_SELF,tp,tp,true,false,POS_FACEUP)
 end
 function s.setfilter(c)
-	return c:IsSetCard(0x1145) and c:GetType()==TYPE_TRAP+TYPE_CONTINUOUS and c:IsSSetable()
+	return c:IsSetCard(0x4a79) and c:GetType()==TYPE_TRAP+TYPE_CONTINUOUS and c:IsSSetable()
 end
 function s.settg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.setfilter,tp,LOCATION_DECK,0,1,nil) end

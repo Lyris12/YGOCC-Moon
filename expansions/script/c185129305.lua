@@ -35,7 +35,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SpecialSummon(c,SUMMON_VALUE_SELF,tp,tp,true,false,POS_FACEUP)
 end
 function s.cfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x1145) and c:IsType(TYPE_TRAP) and c:IsType(TYPE_CONTINUOUS)
+	return c:IsFaceup() and c:IsSetCard(0x4a79) and c:IsType(TYPE_TRAP) and c:IsType(TYPE_CONTINUOUS)
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()

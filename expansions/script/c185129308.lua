@@ -37,7 +37,7 @@ function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD)
 end
 function s.thfilter(c)
-	return c:IsSetCard(0x1145) and c:GetType()==TYPE_TRAP+TYPE_CONTINUOUS and c:IsAbleToHand() and not c:IsCode(id) 
+	return c:IsSetCard(0x4a79) and c:GetType()==TYPE_TRAP+TYPE_CONTINUOUS and c:IsAbleToHand() and not c:IsCode(id) 
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
