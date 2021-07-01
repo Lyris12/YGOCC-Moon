@@ -56,7 +56,7 @@ function cid.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_BIGBANG)
 end
 function cid.tdfilter(c)
-	 return c:IsSetCard(0x37e) and c:IsType(TYPE_MONSTER) and c:IsAbleToDeck() or c:IsAbleToExtra()
+	 return c:IsSetCard(0x37e) and c:IsType(TYPE_MONSTER) and c:IsAbleToDeckOrExtraAsCost()
 end
 function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cid.tdfilter,tp,LOCATION_GRAVE,0,1,nil) end
