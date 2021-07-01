@@ -104,6 +104,7 @@ function cid.regop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function cid.aclimit(e,re,tp)
+	if re:GetHandler()==e:GetHandler() then return false end
 	local att=e:GetLabelObject():GetLabel()
 	return bit.band(att,re:GetHandler():GetOriginalAttribute())~=0
 end

@@ -2,11 +2,11 @@
 --襲雷竜－銀河
 local s,id=GetID()
 function s.initial_effect(c)
-	local f1,f2,f3,f4,f5,f6=Duel.SendtoGrave,Duel.SendtoHand,Duel.SendtoDeck,Duel.SendtoExtraP,Duel.Remove,Duel.GetOperatedGroup
+	local f1,f2,f3,f4,f5,f6,f7=Duel.SendtoGrave,Duel.SendtoHand,Duel.SendtoDeck,Duel.SendtoExtraP,Duel.Remove,Duel.GetOperatedGroup,Duel.Release
 	local og=Group.CreateGroup()
 	og:KeepAlive()
 	Duel.SendtoGrave=function(tg,r)
-		local g=Group.CreateGroup()+tg
+		local g=tg:Clone()
 		local dg,fg=Group.CreateGroup(),Group.CreateGroup()
 		for tc in aux.Next(g) do
 			if tc:IsHasEffect(id) then dg:AddCard(tc)
@@ -17,7 +17,7 @@ function s.initial_effect(c)
 		return ct
 	end
 	Duel.SendtoHand=function(tg,tp,r)
-		local g=Group.CreateGroup()+tg
+		local g=tg:Clone()
 		local dg,fdg,fg=Group.CreateGroup(),Group.CreateGroup(),Group.CreateGroup()
 		for tc in aux.Next(g) do
 			if tc:IsHasEffect(id) then
@@ -30,7 +30,7 @@ function s.initial_effect(c)
 		return ct
 	end
 	Duel.SendtoDeck=function(tg,tp,seq,r)
-		local g=Group.CreateGroup()+tg
+		local g=tg:Clone()
 		local dg,fdg,fg=Group.CreateGroup(),Group.CreateGroup(),Group.CreateGroup()
 		for tc in aux.Next(g) do
 			if tc:IsHasEffect(id) then
@@ -43,7 +43,7 @@ function s.initial_effect(c)
 		return ct
 	end
 	Duel.Remove=function(tg,pos,r)
-		local g=Group.CreateGroup()+tg
+		local g=tg:Clone()
 		local dg,fdg,fg=Group.CreateGroup(),Group.CreateGroup(),Group.CreateGroup()
 		for tc in aux.Next(g) do
 			if tc:IsHasEffect(id) then
@@ -56,7 +56,7 @@ function s.initial_effect(c)
 		return ct
 	end
 	Duel.SendtoExtraP=function(tg,tp,r)
-		local g=Group.CreateGroup()+tg
+		local g=tg:Clone()
 		local dg,fdg,fg=Group.CreateGroup(),Group.CreateGroup(),Group.CreateGroup()
 		for tc in aux.Next(g) do
 			if tc:IsHasEffect(id) then
@@ -68,12 +68,24 @@ function s.initial_effect(c)
 		og:Merge((dg+fdg+fg):Filter(Card.IsLocation,nil,LOCATION_EXTRA))
 		return ct
 	end
+	Duel.Release=function(tg,r)
+		local g=tg:Clone()
+		local dg,fg=Group.CreateGroup(),Group.CreateGroup()
+		for tc in aux.Next(g) do
+			if tc:IsHasEffect(id) then dg:AddCard(tc)
+			else fg:AddCard(tc) end
+		end
+		local ct=f7(dg,r|REASON_DESTROY)+f7(fg,r)
+		og:Merge((dg+fg):Filter(function(tc) return not tc:IsLocation(tc:GetPreviousLocation()) end,nil))
+		return ct
+	end
 	Duel.GetOperatedGroup=function()
 		local g=f6()+og
 		og:Clear()
 		return g
 	end
 	if not s.global_check then
+		s.global_check=true
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e1:SetCode(EVENT_CHAIN_SOLVED)
