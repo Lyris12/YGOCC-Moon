@@ -47,18 +47,6 @@ function cid.sctg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function cid.scop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local e1b=Effect.CreateEffect(c)
-	e1b:SetType(EFFECT_TYPE_FIELD)
-	e1b:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-	e1b:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e1b:SetTargetRange(1,0)
-	e1b:SetTarget(cid.splimit)
-	e1b:SetReset(RESET_PHASE+PHASE_END)
-	Duel.RegisterEffect(e1b,tp)
-	local e2=e1b:Clone()
-	e2:SetCode(EFFECT_CANNOT_SUMMON)
-	Duel.RegisterEffect(e2,tp)
-	--
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_OPERATECARD)
 	local g=Duel.SelectMatchingCard(tp,cid.scfilter,tp,LOCATION_DECK,0,1,1,nil,tp)
 	if g:GetCount()<=0 then return end
@@ -102,9 +90,6 @@ function cid.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,cid.costfilter,tp,LOCATION_SZONE,0,2,2,nil)
 	Duel.SendtoGrave(g,REASON_COST)
-end
-function cid.splimit(e,c)
-	return not c:IsSetCard(0xd7c)
 end
 function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end

@@ -2,9 +2,17 @@
 --インライトメント・エルマ武器庫
 local s,id=GetID()
 function s.initial_effect(c)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_AVOID_BATTLE_DAMAGE)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetTargetRange(LOCATION_MZONE,0)
+	e1:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0xda6))
+	e1:SetValue(1)
+	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e2:SetCode(EVENT_ATTACK_ANNOUNCE)
+	e2:SetCode(EVENT_BATTLED)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1,id)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
@@ -39,7 +47,7 @@ end
 function s.operation(e,tp,eg,ep,ev,re,r,rp,chk)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	Duel.SpecialSummon(Duel.SelectMatchingCard(s.filter,tp,LOCATION_HAND+LOCATION_GRAVE,0,nil,e,tp),0,tp,tp,false,false,POS_FACEUP)
+	Duel.SpecialSummon(Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil,e,tp),0,tp,tp,false,false,POS_FACEUP)
 end
 function s.descon(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
@@ -54,11 +62,12 @@ function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		else return chkc==Duel.GetAttacker():GetBattleTarget() end
 	end
 	if chk==0 then return true end
-	local g=Group.FromCards(Duel.GetAttacker():GetBattleTarget())
-	if dir then
-		g=Duel.SelectMatchingCard(tp,Card.IsCanBeEffectTarget,tp,0,LOCATION_MZONE,1,1,nil,e)
-	end
-	Duel.SetTargetCard(g)
+	local a=Duel.GetAttacker()
+	local d=Duel.GetAttackTarget()
+	if d and d:IsControler(tp) then a,d=d,a end
+	local g=Group.FromCards(a)
+	if dir then g=Duel.SelectTarget(tp,nil,tp,0,LOCATION_MZONE,1,1,nil)
+	else Duel.SetTargetCard(a) end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,0,0)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)

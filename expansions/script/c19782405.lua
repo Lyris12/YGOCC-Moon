@@ -9,7 +9,6 @@ function cid.initial_effect(c)
 	e1:SetRange(LOCATION_HAND)
 	e1:SetCountLimit(1,id+EFFECT_COUNT_CODE_OATH)
 	e1:SetCondition(cid.spcon)
-	e1:SetOperation(cid.spop)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:GLString(2)
@@ -44,26 +43,8 @@ end
 function cid.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and (Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)>0
-		and not Duel.IsExistingMatchingCard(cid.cfilter,tp,LOCATION_MZONE,0,1,nil)
-		or not Duel.IsExistingMatchingCard(cid.cfilter2,tp,LOCATION_SZONE,0,1,nil))
-end
-function cid.spop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e1:SetTargetRange(1,0)
-	e1:SetTarget(cid.splimit)
-	e1:SetReset(RESET_PHASE+PHASE_END)
-	Duel.RegisterEffect(e1,tp)
-	local e2=e1:Clone()
-	e2:SetCode(EFFECT_CANNOT_SUMMON)
-	Duel.RegisterEffect(e2,tp)
-end
-function cid.splimit(e,c)
-	return not c:IsSetCard(0xd7c)
+	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and (Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0
+		or not Duel.IsExistingMatchingCard(cid.cfilter,tp,LOCATION_MZONE,0,1,nil))
 end
 function cid.prtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

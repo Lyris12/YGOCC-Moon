@@ -72,7 +72,7 @@ function c67864645.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c67864645.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
+	return e:GetHandler():IsPreviousLocation(LOCATION_MZONE)
 end
 function c67864645.spfilter(c,e,tp)
 	return c:IsSetCard(0x2a6) and not c:IsCode(67864645) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
