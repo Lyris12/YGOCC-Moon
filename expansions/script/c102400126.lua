@@ -83,7 +83,7 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.ffilter(c,fc,sub,mg,sg)
-	return c:IsSetCard(0x7c4) and (not sg or sg:FilterCount(aux.TRUE,c)==0 or sg:IsExists(s.fcheck,1,c,c:GetAttack()))
+	return c:IsFusionSetCard(0x7c4) and (not sg or sg:FilterCount(aux.TRUE,c)==0 or sg:IsExists(s.fcheck,1,c,c:GetAttack()))
 end
 function s.fcheck(c,atk)
 	local dif=math.abs(c:GetAttack()-atk)

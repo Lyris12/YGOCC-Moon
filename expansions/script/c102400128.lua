@@ -3,7 +3,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
-	aux.AddFusionProcFunRep(c,aux.AND(aux.FilterBoolFunction(Card.IsSetCard,0x7c4),aux.FilterBoolFunction(Card.IsAttackAbove,1600)),2,false)
+	aux.AddFusionProcFunRep(c,aux.AND(aux.FilterBoolFunction(Card.IsFusionSetCard,0x7c4),aux.FilterBoolFunction(Card.IsAttackAbove,1600)),2,false)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE)
 	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)

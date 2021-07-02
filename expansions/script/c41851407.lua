@@ -27,10 +27,10 @@ function s.initial_effect(c)
 end
 function s.cfilter(c,tp,mg)
 	return c:IsSetCard(0x106) and c:GetType()&0x81==0x81 and not c:IsPublic()
-		and mg:CheckSubGroup(s.check,1,99,tp,c:GetLevel())
+		and mg:CheckSubGroup(s.check,1,Duel.GetLocationCount(tp,LOCATION_MZONE),c:GetLevel())
 end
-function s.check(g,tp,lv)
-	return g:CheckWithSumEqual(Card.GetLevel,lv,#g,#g) and Duel.GetLocationCount(tp,LOCATION_MZONE)>=#g
+function s.check(g,lv)
+	return g:CheckWithSumEqual(Card.GetLevel,lv,#g,#g)
 end
 function s.filter(c,e,tp)
 	return c:IsLevelBelow(4) and c:IsSetCard(0x106) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
@@ -52,7 +52,7 @@ end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	for tc in aux.Next(Duel.GetMatchingGroup(aux.NecroValleyFilter(s.filter),tp,LOCATION_DECK+LOCATION_GRAVE,0,nil,e,tp):SelectSubGroup(tp,s.check,false,1,99,tp,e:GetLabel())) do
+	for tc in aux.Next(Duel.GetMatchingGroup(aux.NecroValleyFilter(s.filter),tp,LOCATION_DECK+LOCATION_GRAVE,0,nil,e,tp):SelectSubGroup(tp,s.check,false,1,Duel.GetLocationCount(tp,LOCATION_MZONE),e:GetLabel())) do
 		if Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP) then
 			aux.CannotBeEDMaterial(tc,s.limit(1-tp),LOCATION_MZONE,false,RESET_EVENT+RESETS_STANDARD)
 		end
