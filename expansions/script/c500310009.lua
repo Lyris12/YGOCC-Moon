@@ -2,7 +2,7 @@
 function c500310009.initial_effect(c)
 	   aux.AddOrigEvoluteType(c)
 	c:EnableReviveLimit()
-  aux.AddEvoluteProc(c,nil,6,c500310009.filter1,c500310009.filter2)
+  aux.AddEvoluteProc(c,nil,6,c500310009.filter1,2,2)
 	--disable search
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
@@ -29,9 +29,6 @@ function c500310009.initial_effect(c)
 	
 end
 function c500310009.filter1(c,ec,tp)
-	return c:IsRace(RACE_THUNDER) or c:IsAttribute(ATTRIBUTE_WIND)
-end
-function c500310009.filter2(c,ec,tp)
 	return c:IsRace(RACE_THUNDER) or c:IsAttribute(ATTRIBUTE_WIND)
 end
 

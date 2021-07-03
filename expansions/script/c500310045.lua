@@ -3,7 +3,7 @@ function c500310045.initial_effect(c)
 		 aux.AddOrigEvoluteType(c)
 	c:EnableReviveLimit()
 	c:SetSPSummonOnce(500310045)
- aux.AddEvoluteProc(c,nil,7,c500310045.filter1,c500310045.filter2)  
+ aux.AddEvoluteProc(c,nil,7,c500310045.filter1,2,2)  
 
 --spsummon proc
 	local e0=Effect.CreateEffect(c)
@@ -39,9 +39,6 @@ function c500310045.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c500310045.filter1(c,ec,tp)
-	return c:IsAttribute(ATTRIBUTE_DARK) or c:IsRace(RACE_CYBERSE)
-end
-function c500310045.filter2(c,ec,tp)
 	return c:IsAttribute(ATTRIBUTE_DARK) or c:IsRace(RACE_CYBERSE)
 end
 

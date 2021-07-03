@@ -3,7 +3,7 @@ local cid,id=GetID()
 function cid.initial_effect(c)
 	 aux.AddOrigEvoluteType(c)
 	c:EnableReviveLimit()
-  aux.AddEvoluteProc(c,nil,7,cid.filter1,aux.TRUE,2,99)  
+  aux.AddEvoluteProc(c,nil,7,cid.filter1,1,1,aux.TRUE,1)  
    --remove
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(500316141,0))
@@ -92,9 +92,6 @@ end
 
 
 function cid.filter1(c,ec,tp)
-	return c:IsRace(RACE_FAIRY) or c:IsAttribute(ATTRIBUTE_LIGHT)
-end
-function cid.filter2(c,ec,tp)
 	return c:IsRace(RACE_FAIRY) or c:IsAttribute(ATTRIBUTE_LIGHT)
 end
 function cid.cost2(e,tp,eg,ep,ev,re,r,rp,chk)

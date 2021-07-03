@@ -5,7 +5,7 @@ function cid.initial_effect(c)
 	--evolute procedure
 	aux.EnablePendulumAttribute(c)
 	aux.AddOrigEvoluteType(c)
-	aux.AddEvoluteProc(c,nil,4,cid.filter1,cid.filter2,2,99)
+	aux.AddEvoluteProc(c,nil,4,cid.filter1,1,cid.filter2,1)
 	c:EnableReviveLimit()
 	--PENDULUM EFFECTS
 	--active limit

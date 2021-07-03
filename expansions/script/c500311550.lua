@@ -35,10 +35,7 @@ function c500311550.initial_effect(c)
    
 end
 function c500311550.filter1(c,ec,tp)
-	return c:IsAttribute(ATTRIBUTE_WIND) or c:IsRace(RACE_PLANT+RACE_INSECT) 
-end
-function c500311550.filter2(c,ec,tp)
-	return c:IsAttribute(ATTRIBUTE_WIND) or  c:IsRace(RACE_PLANT+RACE_INSECT) 
+	return c:IsAttribute(ATTRIBUTE_WIND) or c:IsRace(RACE_PLANT) 
 end
 function c500311550.con(e,tp,eg,ep,ev,re,r,rp)
 	return  e:GetHandler():GetEC()==4

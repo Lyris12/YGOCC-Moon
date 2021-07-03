@@ -2,7 +2,7 @@
 function c160008888.initial_effect(c)   
 	 aux.AddOrigEvoluteType(c)
 	c:EnableReviveLimit()
-   aux.AddEvoluteProc(c,nil,4,c160008888.filter1,c160008888.filter2)
+   aux.AddEvoluteProc(c,nil,4,c160008888.filter1,2,2)
 	--spsummon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(160008888,0))
@@ -27,11 +27,7 @@ function c160008888.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c160008888.filter1(c,ec,tp)
-	return c:IsAttribute(ATTRIBUTE_DARK)
-end
-
-function c160008888.filter2(c,ec,tp)
-	return c:IsRace(RACE_FAIRY)
+	return c:IsAttribute(ATTRIBUTE_DARK) or c:IsRace(RACE_FAIRY)
 end
 function c160008888.val(e,c)
 	local r=c:GetAttribute()

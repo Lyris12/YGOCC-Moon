@@ -2,7 +2,7 @@
 local cid,id=GetID()
 function cid.initial_effect(c)
 	aux.AddOrigEvoluteType(c)
-aux.AddEvoluteProc(c,nil,7,aux.FilterBoolFunction(Card.IsRace,RACE_FAIRY),aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_LIGHT),cid.filter3,2,99)
+aux.AddEvoluteProc(c,nil,7,aux.FilterBoolFunction(Card.IsRace,RACE_FAIRY),aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_LIGHT),2,function(ec,tp,g) return g:FilterCount(cid.filter3,nil)==1 end)
 		--destroy replace
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)

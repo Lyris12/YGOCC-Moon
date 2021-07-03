@@ -2,7 +2,7 @@
 local cid,id=GetID()
 function cid.initial_effect(c)
 		aux.AddOrigEvoluteType(c)
-	aux.AddEvoluteProc(c,nil,10,cid.filter1,cid.filter1,3,99)
+	aux.AddEvoluteProc(c,nil,10,cid.filter1,3)
 	c:EnableReviveLimit() 
   --spsummon condition
 	local e0=Effect.CreateEffect(c)

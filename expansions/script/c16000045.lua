@@ -2,7 +2,7 @@
 local cid,id=GetID()
 function cid.initial_effect(c)
 	aux.AddOrigEvoluteType(c)
-  aux.AddEvoluteProc(c,nil,10,aux.FilterBoolFunction(Card.IsCode,16000020),cid.matfilter,3,3)
+  aux.AddEvoluteProc(c,nil,10,aux.FilterBoolFunction(Card.IsCode,16000020),1,1,cid.matfilter,2,2)
 	c:EnableReviveLimit() 
 	 local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,1))

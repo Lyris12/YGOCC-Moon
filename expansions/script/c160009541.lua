@@ -1,7 +1,7 @@
 --Carole, Queen of Fiber Vine #2 
 function c160009541.initial_effect(c)
    aux.AddOrigEvoluteType(c)
-  aux.AddEvoluteProc(c,nil,6,c160009541.filter1,c160009541.filter2,2,99)
+  aux.AddEvoluteProc(c,nil,6,c160009541.filter1,2)
 	c:EnableReviveLimit() 
 	--local e1=Effect.CreateEffect(c)
 	--e1:SetType(EFFECT_TYPE_SINGLE)
@@ -61,9 +61,6 @@ function c160009541.initial_effect(c)
 	c:RegisterEffect(e6)
 end
 function c160009541.filter1(c,ec,tp)
-	return c:IsAttribute(ATTRIBUTE_FIRE) or c:IsRace(RACE_PLANT) 
-end
-function c160009541.filter2(c,ec,tp)
 	return c:IsAttribute(ATTRIBUTE_FIRE) or c:IsRace(RACE_PLANT) 
 end
 --function c160009541.descon(e,tp,eg,ep,ev,re,r,rp)

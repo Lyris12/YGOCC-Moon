@@ -2,7 +2,7 @@
 function c500316921.initial_effect(c)
 	aux.AddOrigEvoluteType(c)
 	c:EnableReviveLimit()
-   aux.AddEvoluteProc(c,nil,6,c500316921.filter1,c500316921.filter2,1,99)
+   aux.AddEvoluteProc(c,nil,6,c500316921.filter1,1)
 	--remove
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(500316921,0))
@@ -18,12 +18,8 @@ function c500316921.initial_effect(c)
 	e1:SetOperation(c500316921.operation)
 	c:RegisterEffect(e1)
 end
-function c500316921.filter2(c,ec,tp)
-	return c:IsAttribute(ATTRIBUTE_EARTH)
-end
-
 function c500316921.filter1(c,ec,tp)
-	return c:IsRace(RACE_FIEND)
+	return c:IsRace(RACE_FIEND) or c:IsAttribute(ATTRIBUTE_EARTH)
 end
 function c500316921.discost(e,tp,eg,ep,ev,re,r,rp,chk)
 	 if chk==0 then return e:GetHandler():IsCanRemoveEC(tp,3,REASON_COST) end

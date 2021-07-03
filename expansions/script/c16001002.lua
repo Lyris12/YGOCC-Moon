@@ -2,7 +2,7 @@
 function c16001002.initial_effect(c)
    aux.AddOrigEvoluteType(c)
 	c:EnableReviveLimit()
-  aux.AddEvoluteProc(c,nil,4,c16001002.filter1,c16001002.filter2,1,99) 
+  aux.AddEvoluteProc(c,nil,4,c16001002.filter1,1) 
   --remove
 	local e4=Effect.CreateEffect(c)
 	e4:SetCategory(CATEGORY_REMOVE)
@@ -16,9 +16,6 @@ function c16001002.initial_effect(c)
 end
 function c16001002.filter1(c,ec,tp)
 	return c:IsRace(RACE_ZOMBIE) or c:IsAttribute(ATTRIBUTE_WATER)
-end
-function c16001002.filter2(c,ec,tp)
-		return c:IsRace(RACE_ZOMBIE) or c:IsAttribute(ATTRIBUTE_WATER)
 end
 
 function c16001002.rmcon(e,tp,eg,ep,ev,re,r,rp)

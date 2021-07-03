@@ -7,7 +7,7 @@ function ref.initial_effect(c)
 	c:SetSPSummonOnce(id)
 	aux.AddOrigEvoluteType(c)
 	c:EnableReviveLimit()
-	aux.AddEvoluteProc(c,'Convergent',0,ref.matfilter1,ref.matfilter2,2,99)
+	aux.AddEvoluteProc(c,'Convergent',0,ref.matfilter1,2)
 	--Effect 0
 	local e0=Effect.CreateEffect(c)
 	e0:SetCategory(CATEGORY_REMOVE)
@@ -31,10 +31,7 @@ function ref.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function ref.matfilter1(c)
-	return c:IsRace(RACE_PLANT)
-end
-function ref.matfilter2(c)
-	return c:IsSetCard(0x85a)
+	return c:IsRace(RACE_PLANT) or c:IsSetCard(0x85a)
 end
 
 function ref.rmfilter(c)

@@ -1,7 +1,7 @@
 --9arsa Greenie fly of Rose VINE
 function c50031569.initial_effect(c)
 		aux.AddOrigEvoluteType(c)
-  aux.AddEvoluteProc(c,nil,6,c50031569.filter1,c50031569.filter2)
+  aux.AddEvoluteProc(c,nil,6,c50031569.filter2,2,2,function(ec,tp,g) return g:FilterCount(c50031569.filter1,nil)==1 end)
 	c:EnableReviveLimit()
    --to hand
 	local e1=Effect.CreateEffect(c)

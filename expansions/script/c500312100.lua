@@ -3,7 +3,7 @@ local cid,id=GetID()
 function cid.initial_effect(c)
 	  aux.AddOrigEvoluteType(c)
 	c:EnableReviveLimit()
- aux.AddEvoluteProc(c,nil,7,cid.filter1,cid.filter2,3,99)
+ aux.AddEvoluteProc(c,nil,7,cid.filter1,2)
  --pierce
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -31,6 +31,9 @@ function cid.initial_effect(c)
 	e3:SetOperation(cid.hspop)
 	e3:SetValue(SUMMON_TYPE_SPECIAL+388)
 	c:RegisterEffect(e3)   
+end
+function cid.filter1(c)
+	return c:IsAttribute(ATTRIBUTE_LIGHT) or c:IsRace(RACE_DRAGON)
 end
 function cid.spfilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_EVOLUTE) and (c:GetStage()==5 or c:GetStage()==6 )

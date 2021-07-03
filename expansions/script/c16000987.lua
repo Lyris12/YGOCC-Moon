@@ -1,7 +1,7 @@
 --Dahija, Dahlia Archer of Rose VINE
 function c16000987.initial_effect(c)
 		 aux.AddOrigEvoluteType(c)
-  aux.AddEvoluteProc(c,nil,5,c16000987.filter1,c16000987.filter2)
+  aux.AddEvoluteProc(c,nil,5,c16000987.filter2,2,2,function(ec,tp,g) return g:FilterCount(c16000987.filter1,nil)==1 end)
 	c:EnableReviveLimit() 
  --immune
 	local e1=Effect.CreateEffect(c)

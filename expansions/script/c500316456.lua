@@ -4,7 +4,7 @@
 function c500316456.initial_effect(c)
 	 aux.AddOrigEvoluteType(c)
 	c:EnableReviveLimit()
-  aux.AddEvoluteProc(c,nil,6,c500316456.filter1,1,99)
+  aux.AddEvoluteProc(c,nil,6,c500316456.filter1,1)
 		--sp summon
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(500316456,1))
@@ -24,9 +24,6 @@ function c500316456.checku(sg,ec,tp)
 return sg:IsExists(Card.IsType,1,nil,TYPE_NORMAL)
 end
 function c500316456.filter1(c,ec,tp)
-	return c:IsAttribute(ATTRIBUTE_LIGHT) or c:IsRace(RACE_FAIRY)
-end
-function c500316456.filter2(c,ec,tp)
 	return c:IsAttribute(ATTRIBUTE_LIGHT) or c:IsRace(RACE_FAIRY)
 end
 function c500316456.filter(c,e,tp)

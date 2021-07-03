@@ -2,7 +2,7 @@
 function c500316971.initial_effect(c)
 	  aux.AddOrigEvoluteType(c)
 	c:EnableReviveLimit()
-  aux.AddEvoluteProc(c,nil,7,c500316971.filter1,c500316971.filter2,1,1)
+  aux.AddEvoluteProc(c,nil,7,c500316971.filter1,1,1)
 		--search
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(500316971,0))
@@ -76,10 +76,7 @@ function c500316971.initial_effect(c)
 end
 --filters
 function c500316971.filter1(c,ec,tp)
-	return c:IsType(TYPE_RITUAL)
-end
-function c500316971.filter2(c,ec,tp)
-	return c:IsRace(RACE_PLANT) or c:IsAttribute(ATTRIBUTE_EARTH)
+	return c:IsType(TYPE_RITUAL) and (c:IsRace(RACE_PLANT) or c:IsAttribute(ATTRIBUTE_EARTH))
 end
 function c500316971.xfilter(c,tp)
 	return c:IsSetCard(0x185a) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()  --and Duel.IsExistingMatchingCard(c500316971.xfilter2,tp,LOCATION_DECK,0,1,nil,c)

@@ -3,8 +3,8 @@ local cid,id=GetID()
 function cid.initial_effect(c)
 	   aux.AddOrigEvoluteType(c)
 	c:EnableReviveLimit()
-  aux.AddEvoluteProc(c,nil,2,cid.filter1,cid.filter1,1,99)
--attack up
+  aux.AddEvoluteProc(c,nil,2,cid.filter1,1)
+--attack up
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_CONTROL)
 	e1:SetDescription(aux.Stringid(id,0))

@@ -2,7 +2,7 @@
 function c16000989.initial_effect(c)
 	aux.AddOrigEvoluteType(c)
 	c:EnableReviveLimit()
-	aux.AddEvoluteProc(c,nil,5,c16000989.filter1,c16000989.filter1,1,99)  
+	aux.AddEvoluteProc(c,nil,5,c16000989.filter1,1)  
 	--Conjoint Procedure
 	aux.AddOrigConjointType(c)
 	aux.EnableConjointAttribute(c,5)

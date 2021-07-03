@@ -1,7 +1,7 @@
 --All-Rose Dragon of Rose VINE
 function c16000550.initial_effect(c)
 			aux.AddOrigEvoluteType(c)
-  aux.AddEvoluteProc(c,nil,8,c16000550.filter1,c16000550.filter2)
+  aux.AddEvoluteProc(c,nil,8,c16000550.filter2,2,2,function(ec,tp,g) return g:FilterCount(c16000550.filter1,nil)==1 end)
 	c:EnableReviveLimit() 
 	--equip
 	local e1=Effect.CreateEffect(c)

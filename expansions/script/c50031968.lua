@@ -3,7 +3,7 @@ local cid,id=GetID()
 function cid.initial_effect(c)
 	 aux.AddOrigEvoluteType(c)
 	c:EnableReviveLimit()
-	aux.AddEvoluteProc(c,nil,6,cid.filter1,cid.filter2,2,99)  
+	aux.AddEvoluteProc(c,nil,6,cid.mfilter,2,99)  
 	--Conjoint Procedure
 	aux.AddOrigConjointType(c)
 	aux.EnableConjointAttribute(c,2)  
@@ -25,11 +25,8 @@ local e2=Effect.CreateEffect(c)
 	e2:SetOperation(cid.rmop)
 	c:RegisterEffect(e2)
 end
-function cid.mtfilter1(c,e)
-   return c:IsRace(RACE_ZOMBIE) 
-end 
-function cid.mtfilter2(c,e)
-   return c:IsAttribute(ATTRIBUTE_LIGHT)
+function cid.mfilter(c,e)
+   return c:IsRace(RACE_ZOMBIE) or c:IsAttribute(ATTRIBUTE_LIGHT)
 end
 function cid.mtfilter(c)
 	return c:IsRace(RACE_ZOMBIE) and c:IsFaceup() and c:IsCanOverlay()

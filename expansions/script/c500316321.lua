@@ -3,7 +3,7 @@
 function cid.initial_effect(c)
 	 aux.AddOrigEvoluteType(c)
 	c:EnableReviveLimit()
-  aux.AddEvoluteProc(c,nil,6,cid.filter1,cid.filter1,1,99)  
+  aux.AddEvoluteProc(c,nil,6,cid.filter1,1)  
 		local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)

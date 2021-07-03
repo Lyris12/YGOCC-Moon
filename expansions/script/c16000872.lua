@@ -2,7 +2,7 @@
 function c16000872.initial_effect(c)
 		aux.AddOrigEvoluteType(c)
 	c:EnableReviveLimit()
-  aux.AddEvoluteProc(c,nil,3,c16000872.filter2,c16000872.filter2,1,99)
+  aux.AddEvoluteProc(c,nil,3,c16000872.filter2,1)
 	--to hand
 	--special summon
 	local e1=Effect.CreateEffect(c)

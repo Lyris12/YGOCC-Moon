@@ -2,7 +2,7 @@
 function c16000969.initial_effect(c)
 	 aux.AddOrigEvoluteType(c)
 	c:EnableReviveLimit()
-  aux.AddEvoluteProc(c,nil,8,c16000969.filter1,c16000969.filter2,2,99)  
+  aux.AddEvoluteProc(c,nil,8,c16000969.filter1,2)  
   --Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(16000969,0))
@@ -32,9 +32,6 @@ function c16000969.initial_effect(c)
 end
 function c16000969.filter1(c,ec,tp)
 	return c:IsRace(RACE_SPELLCASTER) or c:IsAttribute(ATTRIBUTE_EARTH)
-end
-function c16000969.filter2(c,ec,tp)
-	return  c:IsRace(RACE_SPELLCASTER) or c:IsAttribute(ATTRIBUTE_EARTH)
 end
 function c16000969.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -118,6 +115,6 @@ local tc=g:GetFirst()
 	e2:SetCode(EFFECT_REMOVE_SETCODE)
 	e2:SetTargetRange(0,LOCATION_MZONE)
 		e2:SetReset(RESET_PHASE+PHASE_END,2)
-	Duel.RegisterEffect(e2,tp)	
+	Duel.RegisterEffect(e2,tp)  
 	end
 end

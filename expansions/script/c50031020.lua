@@ -3,7 +3,7 @@ local cid,id=GetID()
 function cid.initial_effect(c)
 	aux.AddOrigEvoluteType(c)
 	c:EnableReviveLimit()
-	aux.AddEvoluteProc(c,nil,8,cid.filter1,cid.filter2,3,99,cid.checkfilter)
+	aux.AddEvoluteProc(c,nil,8,cid.filter1,3,cid.checkfilter)
 	--allow evolutes as materials
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE)
@@ -50,9 +50,6 @@ function cid.evofilter(e,c)
 end
 function cid.filter1(c,ec,tp)
 	return c:IsAttribute(ATTRIBUTE_DARK) and not c:IsType(TYPE_EVOLUTE)
-end
-function cid.filter2(c,ec,tp)
-	return c:IsRace(RACE_BEASTWARRIOR) and not c:IsType(TYPE_EVOLUTE)
 end
 function cid.cfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0xa34)

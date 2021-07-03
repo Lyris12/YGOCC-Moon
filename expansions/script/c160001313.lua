@@ -2,7 +2,7 @@
 function c160001313.initial_effect(c)
 	   aux.AddOrigEvoluteType(c)
 	c:EnableReviveLimit()
-  aux.AddEvoluteProc(c,nil,4,c160001313.filter1,c160001313.filter2,1,99)
+  aux.AddEvoluteProc(c,nil,4,c160001313.filter1,1)
   --act limit
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
@@ -39,9 +39,6 @@ function c160001313.chainlm(e,rp,tp)
 	return tp==rp
 end
 function c160001313.filter1(c,ec,tp)
-	return c:IsAttribute(ATTRIBUTE_EARTH) or c:IsRace(RACE_PLANT) 
-end
-function c160001313.filter2(c,ec,tp)
 	return c:IsAttribute(ATTRIBUTE_EARTH) or c:IsRace(RACE_PLANT) 
 end
 

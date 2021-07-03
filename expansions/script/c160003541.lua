@@ -1,6 +1,6 @@
 function c160003541.initial_effect(c)
 	   aux.AddOrigEvoluteType(c)
-  aux.AddEvoluteProc(c,nil,7,c160003541.filter1,c160003541.filter2,2,99)
+  aux.AddEvoluteProc(c,nil,7,c160003541.filter1,2)
 	c:EnableReviveLimit() 
 
 		--destroy
@@ -40,9 +40,6 @@ function c160003541.initial_effect(c)
 	c:RegisterEffect(e4) 
 end
 function c160003541.filter1(c,ec,tp)
-	return c:IsAttribute(ATTRIBUTE_EARTH) or c:IsRace(RACE_PLANT) 
-end
-function c160003541.filter2(c,ec,tp)
 	return c:IsAttribute(ATTRIBUTE_EARTH) or c:IsRace(RACE_PLANT) 
 end
 

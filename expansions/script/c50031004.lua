@@ -3,7 +3,7 @@ local cid,id=GetID()
 function cid.initial_effect(c)
 	aux.AddOrigEvoluteType(c)
 	c:EnableReviveLimit()
-	aux.AddEvoluteProc(c,nil,5,cid.filter1,cid.filter2,2,99)  
+	aux.AddEvoluteProc(c,nil,5,cid.filter1,2)  
 	--spsummon proc
 	local e0=Effect.CreateEffect(c)
 	e0:SetDescription(aux.Stringid(id,0))
@@ -30,10 +30,7 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function cid.filter1(c,ec,tp)
-	return c:IsAttribute(ATTRIBUTE_DARK)
-end
-function cid.filter2(c,ec,tp)
-	return c:IsRace(RACE_BEASTWARRIOR)
+	return c:IsAttribute(ATTRIBUTE_DARK) or c:IsRace(RACE_BEASTWARRIOR)
 end
 function cid.spfilter(c,ec,tp)
 	return c:IsFaceup() and c:IsCode(500310040) and c:IsCanBeEvoluteMaterial(ec)

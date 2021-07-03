@@ -1,7 +1,7 @@
 --Zombie Kid
 function c50031000.initial_effect(c)
 		aux.AddOrigEvoluteType(c)
-  aux.AddEvoluteProc(c,nil,6,c50031000.filter1,c50031000.filter2,2,99)
+  aux.AddEvoluteProc(c,nil,6,c50031000.filter1,2)
 	c:EnableReviveLimit()
   --to extra
 	local e1=Effect.CreateEffect(c)
@@ -46,9 +46,6 @@ function c50031000.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c50031000.filter1(c,ec,tp)
-	return c:IsRace(RACE_ZOMBIE) or c:IsAttribute(ATTRIBUTE_DARK)
-end
-function c50031000.filter2(c,ec,tp)
 	return c:IsRace(RACE_ZOMBIE) or c:IsAttribute(ATTRIBUTE_DARK)
 end
 function c50031000.tecon(e,tp,eg,ep,ev,re,r,rp)

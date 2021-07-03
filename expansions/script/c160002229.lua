@@ -2,7 +2,7 @@
 	local cid,id=GetID()
 function cid.initial_effect(c)
 		aux.AddOrigEvoluteType(c)
-	aux.AddEvoluteProc(c,nil,5,cid.filter1,cid.filter2,2,99)
+	aux.AddEvoluteProc(c,nil,5,cid.filter1,2)
 	c:EnableReviveLimit() 
 		--summon success
 	local e2=Effect.CreateEffect(c)
@@ -28,10 +28,7 @@ end
 
 
 function cid.filter1(c,ec,tp)
-	return c:IsAttribute(ATTRIBUTE_FIRE) 
-end
-function cid.filter2(c,ec,tp)
-	return  c:IsRace(RACE_PYRO) 
+	return c:IsAttribute(ATTRIBUTE_FIRE) or c:IsRace(RACE_PYRO) 
 end
 
 function cid.sumcon(e,tp,eg,ep,ev,re,r,rp)

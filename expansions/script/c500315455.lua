@@ -1,6 +1,6 @@
 function c500315455.initial_effect(c)
 	  aux.AddOrigEvoluteType(c)
-  aux.AddEvoluteProc(c,nil,7,c500315455.filter1,c500315455.filter2)
+  aux.AddEvoluteProc(c,nil,7,c500315455.filter1,2)
 	c:EnableReviveLimit() 
 --equip
 	local e1=Effect.CreateEffect(c)
@@ -38,9 +38,6 @@ function c500315455.initial_effect(c)
 end
 function c500315455.filter1(c,ec,tp)
 	return c:IsAttribute(ATTRIBUTE_FIRE) or c:IsRace(RACE_PLANT) 
-end
-function c500315455.filter2(c,ec,tp)
-	return   c:IsAttribute(ATTRIBUTE_FIRE) or c:IsRace(RACE_PLANT) 
 end
 
 function c500315455.discost(e,tp,eg,ep,ev,re,r,rp,chk)

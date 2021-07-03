@@ -2,7 +2,7 @@
 function c16000873.initial_effect(c)
 		aux.AddOrigEvoluteType(c)
 	c:EnableReviveLimit()
-  aux.AddEvoluteProc(c,nil,3,aux.FilterBoolFunction(Card.IsRace,RACE_PLANT),1,99)
+  aux.AddEvoluteProc(c,nil,3,aux.FilterBoolFunction(Card.IsRace,RACE_PLANT),1)
 	--to hand
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(16000873,0))

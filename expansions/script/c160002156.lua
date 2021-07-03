@@ -2,7 +2,7 @@
 function c160002156.initial_effect(c)
 	  aux.AddOrigEvoluteType(c)
 	c:EnableReviveLimit()
-  aux.AddEvoluteProc(c,nil,4,c160002156.filter1,c160002156.filter2)
+  aux.AddEvoluteProc(c,nil,4,c160002156.filter1,2,2)
 		--immune
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -37,10 +37,7 @@ function c160002156.initial_effect(c)
 	
 end
 function c160002156.filter1(c,ec,tp)
-	return c:IsAttribute(ATTRIBUTE_WIND) 
-end
-function c160002156.filter2(c,ec,tp)
-	return c:IsRace(RACE_SPELLCASTER) 
+	return c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsRace(RACE_PLANT) 
 end
 function c160002156.efilter(e,te)
 	return te:IsActiveType(TYPE_MONSTER)

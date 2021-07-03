@@ -3,7 +3,7 @@
 function cid.initial_effect(c)
 	   aux.AddOrigEvoluteType(c)
 	c:EnableReviveLimit()
-  aux.AddEvoluteProc(c,nil,7,cid.filter1,cid.filter2,1,99)
+  aux.AddEvoluteProc(c,nil,7,cid.filter,1,99)
 
 	--Conjoint Procedure
 	aux.AddOrigConjointType(c)
@@ -38,10 +38,7 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e7)
 end
 function cid.filter1(c,ec,tp)
-	return c:IsAttribute(ATTRIBUTE_DARK) 
-end
-function cid.filter2(c,ec,tp)
-	return c:IsRace(RACE_FIEND) 
+	return c:IsAttribute(ATTRIBUTE_DARK) or c:IsRace(RACE_FIEND) 
 end
 function cid.actcon(e)
 	local c=e:GetHandler()

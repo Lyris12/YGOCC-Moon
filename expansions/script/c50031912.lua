@@ -1,7 +1,7 @@
 --Shomesa, Sunflower  of Rose VINE
 function c50031912.initial_effect(c)
 		aux.AddOrigEvoluteType(c)
- aux.AddEvoluteProc(c,nil,9,c50031912.mfilter1,c50031912.mfilter2,c50031912.mfilter3,3,99)
+ aux.AddEvoluteProc(c,nil,9,c50031912.mfilter1,3,function(ec,tp,g) return g:FilterCount(c50031912.mfilter2,nil)==1 end)
 	c:EnableReviveLimit()
   --spsummon condition
 	local e1=Effect.CreateEffect(c)
@@ -41,9 +41,8 @@ end
 function c50031912.splimit(e,se,sp,st)
 	return st==SUMMON_TYPE_SPECIAL+388
 end
-function c50031912.mfilter1(c) return c:IsRace(RACE_PLANT) end
-function c50031912.mfilter2(c) return c:IsAttribute(ATTRIBUTE_FIRE) end
-function c50031912.mfilter3(c) 
+function c50031912.mfilter1(c) return c:IsRace(RACE_PLANT) or c:IsAttribute(ATTRIBUTE_FIRE) end
+function c50031912.mfilter2(c) 
 return c:IsType(TYPE_NORMAL) end
 function c50031912.check1(c,sg,tp)
 	return c:IsType(TYPE_NORMAL) and sg:IsExists(c50031912.check2,1,nil,sg)

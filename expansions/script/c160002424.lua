@@ -2,7 +2,7 @@
 function c160002424.initial_effect(c)
 	  --evolute procedure
 	aux.AddOrigEvoluteType(c)
-	aux.AddEvoluteProc(c,nil,6,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_LIGHT),2,99)
+	aux.AddEvoluteProc(c,nil,6,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_LIGHT),2)
 	c:EnableReviveLimit()
 
 --to deck

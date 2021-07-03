@@ -1,7 +1,7 @@
 --Romana, Princess of Rose VINE
 function c50031103.initial_effect(c)
 	aux.AddOrigEvoluteType(c)
-   aux.AddEvoluteProc(c,nil,4,c50031103.filter1,c50031103.filter2)
+   aux.AddEvoluteProc(c,nil,4,c50031103.filter2,2,2,function(ec,tp,g) return g:FilterCount(c50031103.filter1,nil)==1 end)
 	c:EnableReviveLimit()
 local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(50031103,0))

@@ -3,7 +3,7 @@ local cid,id=GetID()
 function cid.initial_effect(c)
 	 aux.AddOrigEvoluteType(c)
 	c:EnableReviveLimit()
- aux.AddEvoluteProc(c,nil,5,cid.filter1,cid.filter2,2,99)  
+ aux.AddEvoluteProc(c,nil,5,cid.filter1,cid.filter2,2)  
 
 --spsummon proc
 	local e0=Effect.CreateEffect(c)
@@ -55,10 +55,7 @@ function cid.econ(e)
 end
 
 function cid.filter1(c,ec,tp)
-	return c:IsAttribute(ATTRIBUTE_WATER)
-end
-function cid.filter2(c,ec,tp)
-	return c:IsRace(RACE_AQUA+RACE_FISH+RACE_SEASERPENT)
+	return c:IsAttribute(ATTRIBUTE_WATER) and c:IsRace(RACE_AQUA+RACE_FISH+RACE_SEASERPENT)
 end
 
 function cid.spfilter(c)

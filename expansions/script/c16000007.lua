@@ -2,7 +2,7 @@
 function c16000007.initial_effect(c)
 		 --evolute procedure
 	aux.AddOrigEvoluteType(c)
-	aux.AddEvoluteProc(c,nil,8,c16000007.filter1,c16000007.filter1,2,99)
+	aux.AddEvoluteProc(c,nil,8,c16000007.filter1,2)
 	c:EnableReviveLimit() 
   --atk up
 	local e2=Effect.CreateEffect(c)
@@ -56,7 +56,7 @@ end
 
 
 function c16000007.filter1(c,ec,tp)
-	return (c:IsAttribute(ATTRIBUTE_LIGHT) or c:IsAttribute(ATTRIBUTE_DARK)) or c:IsRace(RACE_FAIRY) 
+	return c:IsAttribute(ATTRIBUTE_LIGHT+ATTRIBUTE_DARK) and c:IsRace(RACE_CYBERSE) 
 end
 
 function c16000007.atkcon(e,tp,eg,ep,ev,re,r,rp)

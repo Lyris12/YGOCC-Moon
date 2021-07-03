@@ -3,7 +3,7 @@ function c160009933.initial_effect(c)
 	  --evolute procedure
 	aux.EnablePendulumAttribute(c)
 	aux.AddOrigEvoluteType(c)
-	aux.AddEvoluteProc(c,nil,4,c160009933.filter1,c160009933.filter1,1,99)
+	aux.AddEvoluteProc(c,nil,4,c160009933.filter1,1)
 	c:EnableReviveLimit()
 local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(160009933,0))

@@ -3,7 +3,7 @@
 function cid.initial_effect(c)
    aux.AddOrigEvoluteType(c)
 	c:EnableReviveLimit()
-  aux.AddEvoluteProc(c,nil,6,cid.filter1,cid.filter2,1,99)
+  aux.AddEvoluteProc(c,nil,6,cid.filter1,1)
   --recover
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(70780151,0))
@@ -32,9 +32,6 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function cid.filter1(c,ec,tp)
-	return c:IsRace(RACE_FAIRY) or c:IsAttribute(ATTRIBUTE_WIND)
-end
-function cid.filter2(c,ec,tp)
 	return c:IsRace(RACE_FAIRY) or c:IsAttribute(ATTRIBUTE_WIND)
 end
  

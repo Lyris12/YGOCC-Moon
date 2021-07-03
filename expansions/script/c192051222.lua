@@ -2,7 +2,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
-	aux.AddEvoluteProc(c,9,s.mfilter1,s.mfilter2)
+	aux.AddEvoluteProc(c,9,s.mfilter1,1,1,s.mfilter2,1,1)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_MATERIAL_CHECK)

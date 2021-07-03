@@ -2,7 +2,7 @@
 local cid,id=GetID()
 function cid.initial_effect(c)
 	aux.AddOrigEvoluteType(c)
-  aux.AddEvoluteProc(c,nil,8,cid.matfilter,cid.filter2)
+  aux.AddEvoluteProc(c,nil,8,aux.FilterBoolFunction(Card.IsCode,16000020),1,1,cid.filter2,1,1)
 	c:EnableReviveLimit() 
 	--Disable
 	local e1=Effect.CreateEffect(c)
@@ -37,12 +37,8 @@ function cid.initial_effect(c)
 	e6:SetCode(EVENT_TO_DECK)
 	c:RegisterEffect(e6)
 end
-function cid.matfilter(c,ec,tp)
-   return c:IsAttribute(ATTRIBUTE_LIGHT) 
-end
-
 function cid.filter2(c,ec,tp)
-	return   (c:IsType(TYPE_UNION) and c:IsRace(RACE_MACHINE)) or c:IsRace(RACE_PSYCHO)
+	return c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsType(TYPE_UNION) and c:IsRace(RACE_MACHINE)
 end
 function cid.atkfilter(e,c)
 	return bit.band(c:GetSummonType(),SUMMON_TYPE_SPECIAL)==SUMMON_TYPE_SPECIAL

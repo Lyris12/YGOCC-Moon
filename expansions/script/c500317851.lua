@@ -2,7 +2,7 @@
 function c500317851.initial_effect(c)
 aux.AddOrigEvoluteType(c)
 	c:EnableReviveLimit()
-	aux.AddEvoluteProc(c,nil,2,c500317851.filter1,c500317851.filter2,1,99)
+	aux.AddEvoluteProc(c,nil,2,c500317851.filter1,1)
 	--
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(500317851,0))
@@ -45,10 +45,7 @@ function c500317851.con(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SPECIAL+388
 end
 function c500317851.filter1(c,ec,tp)
-	return c:IsAttribute(ATTRIBUTE_LIGHT)
-end
-function c500317851.filter2(c,ec,tp)
-	return c:IsRace(RACE_FIEND) 
+	return c:IsAttribute(ATTRIBUTE_LIGHT) or c:IsRace(RACE_FIEND) 
 end
 function c500317851.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)>0 end

@@ -3,7 +3,7 @@ local cid,id=GetID()
 function cid.initial_effect(c)
 	 aux.AddOrigEvoluteType(c)
 	c:EnableReviveLimit()
- aux.AddEvoluteProc(c,nil,5,cid.filter1,cid.filter2,2,99)  
+ aux.AddEvoluteProc(c,nil,5,cid.filter1,2)  
 
 --spsummon proc
 	local e0=Effect.CreateEffect(c)
@@ -32,10 +32,7 @@ function cid.initial_effect(c)
    
 end
 function cid.filter1(c,ec,tp)
-	return c:IsAttribute(ATTRIBUTE_DARK)
-end
-function cid.filter2(c,ec,tp)
-	return c:IsRace(RACE_BEASTWARRIOR)
+	return c:IsAttribute(ATTRIBUTE_DARK) or c:IsRace(RACE_BEASTWARRIOR)
 end
 function cid.spfilter(c,ec,tp)
 	return c:IsFaceup() and c:IsCode(500310020) and c:IsCanBeEvoluteMaterial(ec)
@@ -50,7 +47,7 @@ end
 function cid.hspop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_MATERIAL)
 	local g=Duel.SelectMatchingCard(tp,cid.spfilter,tp,LOCATION_MZONE,0,1,1,nil,c,tp)
-    Duel.SendtoGrave(g,REASON_MATERIAL+0x10000000)
+	Duel.SendtoGrave(g,REASON_MATERIAL+0x10000000)
 	Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
 end
 

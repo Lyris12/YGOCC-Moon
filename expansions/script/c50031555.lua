@@ -2,7 +2,7 @@
 
 function c50031555.initial_effect(c)
 	 aux.AddOrigEvoluteType(c)
-  aux.AddEvoluteProc(c,nil,10,c50031555.filter1,c50031555.filter2,c50031555.filter3,3,99)
+  aux.AddEvoluteProc(c,nil,10,c50031555.mfilter1,3,function(ec,tp,g) return g:FilterCount(c50031555.mfilter2,nil)==1 end)
 	c:EnableReviveLimit()
   --spsummon condition
 	local e1=Effect.CreateEffect(c)
@@ -56,10 +56,8 @@ function c50031555.initial_effect(c)
 	e7:SetCode(EVENT_TO_DECK)
 	c:RegisterEffect(e7)
 end
-function c50031555.mfilter1(c) return c:IsRace(RACE_PLANT) end
-function c50031555.mfilter2(c) return c:IsAttribute(ATTRIBUTE_FIRE) end
-function c50031555.mfilter3(c) 
-return c:IsType(TYPE_NORMAL) end
+function c50031555.mfilter1(c) return c:IsRace(RACE_PLANT) or c:IsAttribute(ATTRIBUTE_FIRE) end
+function c50031555.mfilter2(c) return c:IsType(TYPE_NORMAL) end
 function c50031555.splimit(e,se,sp,st)
 	return st==SUMMON_TYPE_SPECIAL+388
 end

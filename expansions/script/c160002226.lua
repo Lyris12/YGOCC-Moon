@@ -2,7 +2,7 @@
 	local cid,id=GetID()
 function cid.initial_effect(c)
 		aux.AddOrigEvoluteType(c)
-	aux.AddEvoluteProc(c,nil,8,cid.filter1,cid.filter2,2,99)
+	aux.AddEvoluteProc(c,nil,8,cid.filter1,2)
 	c:EnableReviveLimit() 
 	--destroy
 	local e1=Effect.CreateEffect(c)
@@ -26,10 +26,7 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function cid.filter1(c,ec,tp)
-	return c:IsAttribute(ATTRIBUTE_DARK) 
-end
-function cid.filter2(c,ec,tp)
-	return  c:IsRace(RACE_ZOMBIE) 
+	return c:IsAttribute(ATTRIBUTE_DARK) or c:IsRace(RACE_ZOMBIE) 
 end
 
 function cid.descost(e,tp,eg,ep,ev,re,r,rp,chk)

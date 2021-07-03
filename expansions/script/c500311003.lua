@@ -1,7 +1,7 @@
 --Sarah The K , Pirncess of Gust Vine
 function c500311003.initial_effect(c)
 aux.AddOrigEvoluteType(c)
-	aux.AddEvoluteProc(c,nil,7,c500311003.filter1,c500311003.filter1,2,99)
+	aux.AddEvoluteProc(c,nil,7,c500311003.filter1,2)
 	c:EnableReviveLimit()
 		--cannot be target
 	   --atk up

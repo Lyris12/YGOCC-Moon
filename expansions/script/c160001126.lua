@@ -3,7 +3,7 @@
 function cid.initial_effect(c)
 	   aux.AddOrigEvoluteType(c)
 	c:EnableReviveLimit()
-  aux.AddEvoluteProc(c,nil,7,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_DARK),aux.FilterBoolFunction(Card.IsRace,RACE_FIEND),1,99)
+  aux.AddEvoluteProc(c,nil,7,function(tc) return tc:IsAttribute(ATTRIBUTE_DARK) or tc:IsRace(RACE_FIEND) end,1,99)
 
 	--Conjoint Procedure
 	aux.AddOrigConjointType(c)

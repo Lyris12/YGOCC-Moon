@@ -1,7 +1,7 @@
 --Overdriven
 function c160002126.initial_effect(c)
 		   aux.AddOrigEvoluteType(c)
-  aux.AddEvoluteProc(c,nil,11,c160002126.filter1,c160002126.filter2,3,99)
+  aux.AddEvoluteProc(c,nil,11,c160002126.filter1,3)
 			local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(160002126,0))
 	e1:SetCategory(CATEGORY_DRAW)
@@ -33,9 +33,6 @@ end
 
 function c160002126.filter1(c,ec,tp)
 	return c:IsRace(RACE_MACHINE) or c:IsAttribute(ATTRIBUTE_FIRE)
-end
-function c160002126.filter2(c,ec,tp)
-	return  c:IsRace(RACE_MACHINE) or c:IsAttribute(ATTRIBUTE_FIRE)
 end
 
 

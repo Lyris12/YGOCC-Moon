@@ -2,7 +2,7 @@
 function c500310066.initial_effect(c)
 		--evolute procedure
 	aux.AddOrigEvoluteType(c)
-	aux.AddEvoluteProc(c,nil,6,c500310066.filter1,c500310066.filter2,1,99)
+	aux.AddEvoluteProc(c,nil,6,c500310066.filter1,1)
 	c:EnableReviveLimit() 
    --CounterAdd
 	local e1=Effect.CreateEffect(c)
@@ -42,10 +42,7 @@ function c500310066.initial_effect(c)
 end
 
 function c500310066.filter1(c,ec,tp)
-	return c:IsAttribute(ATTRIBUTE_WATER) or c:IsRace(RACE_WARRIOR) 
-end
-function c500310066.filter2(c,ec,tp)
-	return  c:IsAttribute(ATTRIBUTE_WATER) or c:IsRace(RACE_WARRIOR)  
+	return c:IsAttribute(ATTRIBUTE_WATER) or c:IsRace(RACE_WARRIOR)   
 end
 
 function c500310066.atkcon(e,tp,eg,ep,ev,re,r,rp)
