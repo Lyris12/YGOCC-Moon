@@ -65,14 +65,14 @@ function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local a=Duel.GetAttacker()
 	local d=Duel.GetAttackTarget()
 	if d and d:IsControler(tp) then a,d=d,a end
-	local g=Group.FromCards(a)
+	local g=Group.FromCards(d)
 	if dir then g=Duel.SelectTarget(tp,nil,tp,0,LOCATION_MZONE,1,1,nil)
-	else Duel.SetTargetCard(a) end
+	else Duel.SetTargetCard(d) end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,0,0)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) and tc:IsControler(1-tp) and c:IsLocation(LOCATION_MZONE)
+	if tc and tc:IsRelateToEffect(e) and tc:IsControler(1-tp) and e:GetHandler():IsLocation(LOCATION_MZONE)
 		and (Duel.GetAttackTarget()==nil or tc:IsRelateToBattle()) then
 		Duel.Destroy(tc,REASON_EFFECT)
 	end

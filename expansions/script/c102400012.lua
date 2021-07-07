@@ -55,7 +55,7 @@ function s.descon(e,tp,eg,ep,ev,re,r,rp)
 	if d and d:IsControler(tp) then a,d=d,a end
 	return a:IsSetCard(0xda6) and a~=e:GetHandler()
 end
-function s.filter(c)
+function s.dfilter(c)
 	return c:IsFaceup() and c:GetAttack()>=1500 and c:IsAbleToRemove()
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
@@ -68,16 +68,15 @@ function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local a=Duel.GetAttacker()
 	local d=Duel.GetAttackTarget()
 	if d and d:IsControler(tp) then a,d=d,a end
-	local g=Group.FromCards(a)
-	if dir then g=Duel.SelectTarget(tp,nil,tp,0,LOCATION_MZONE,1,1,nil)
-	else Duel.SetTargetCard(a) end
-	Duel.SetTargetCard(g)
+	local g=Group.FromCards(d)
+	if dir then g=Duel.SelectTarget(tp,s.dfilter,tp,0,LOCATION_MZONE,1,1,nil)
+	else Duel.SetTargetCard(d) end
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,#g,0,0)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local dir=Duel.GetAttackTarget()==nil
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) and c:IsLocation(LOCATION_MZONE) and (not dir
+	if tc and tc:IsRelateToEffect(e) and e:GetHandler():IsLocation(LOCATION_MZONE) and (not dir
 		or tc:IsFaceup() and tc:GetAttack()>=1500) and tc:IsControler(1-tp) then
 		Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)
 	end
