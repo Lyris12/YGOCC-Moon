@@ -1,8 +1,6 @@
+--created by Meed, coded by Lyris
 local s,id=GetID()
---Weapon from the Rift
 function s.initial_effect(c)
-	--You can only use each effect of "Weapon from the Rift" once per turn.
-	--If this card is banished: You can Special Summon this card, and if you do, destroy 1 card your opponent controls.
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_REMOVE)
@@ -12,7 +10,6 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
-	--You can Tribute this card, then target 1 DARK monster with 1500 or less ATK that is banished or in your GY; add that target to your hand.
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
