@@ -46,7 +46,8 @@ function cid.con(e,tp,eg,ep,ev,re,r,rp)
         and Duel.GetFlagEffect(e:GetOwner():GetControler(),id)==0
 end
 function cid.repfilter(c,tp)
-    return c:IsFacedown() and c:IsControler(tp) and c:IsReason(REASON_EFFECT) and c:GetDestination()==LOCATION_GRAVE
+    return c:IsFacedown() and c:IsControler(tp) and c:IsReason(REASON_EFFECT)
+		and c:IsLocation(LOCATION_ONFIELD) and c:GetDestination()==LOCATION_GRAVE
 end
 function cid.repval(e,c)
     return cid.repfilter(c,e:GetOwner():GetControler())
