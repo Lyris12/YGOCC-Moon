@@ -77,7 +77,7 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 	local ex2,cg=Duel.GetOperationInfo(0,CATEGORY_TOGRAVE)
 	local dc=dg:GetFirst()
 	local cc=cg:GetFirst()
-	if dc:IsRelateToEffect(e) and Duel.ChangePosition(dc,POS_FACEUP_ATTACK+POS_FACEUP_DEFENSE)~=0 then
+	if dc:IsRelateToEffect(e) and Duel.ChangePosition(dc,POS_FACEUP_DEFENSE)~=0 then
 		if dc:IsType(TYPE_FLIP) then
 			Duel.SendtoGrave(cc,REASON_EFFECT)
 			if Duel.IsExistingMatchingCard(Card.IsFacedown,tp,LOCATION_MZONE,0,1,nil)
