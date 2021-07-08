@@ -35,7 +35,7 @@ end
 function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) and tc:IsFacedown() then
-		Duel.ChangePosition(tc,POS_FACEUP_ATTACK+POS_FACEUP_DEFENSE)
+		Duel.ChangePosition(tc,POS_FACEUP_DEFENSE)
 		if tc:IsSetCard(0x5855) then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
 			local g=Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil,e,tp)

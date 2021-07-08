@@ -50,7 +50,7 @@ function cid.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.ChangePosition(e:GetHandler(),POS_FACEUP_ATTACK+POS_FACEUP_DEFENSE)
+	Duel.ChangePosition(e:GetHandler(),POS_FACEUP_DEFENSE)
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end

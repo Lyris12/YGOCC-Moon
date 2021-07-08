@@ -50,7 +50,7 @@ end
 function cid.disop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,cid.negfilter,tp,LOCATION_MZONE,0,1,1,nil)
 	local tc=g:GetFirst()
-	local pos=Duel.SelectPosition(tp,tc,POS_FACEUP_ATTACK+POS_FACEUP_DEFENSE)
+	local pos=Duel.SelectPosition(tp,tc,POS_FACEUP)
 	if tc then
 		Duel.ChangePosition(tc,pos)
 		if tc:IsSetCard(0x5855) and Duel.NegateActivation(ev)

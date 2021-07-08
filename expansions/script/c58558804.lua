@@ -46,7 +46,7 @@ function cid.posop(e,tp,eg,ep,ev,re,r,rp,chk)
 		local g=Duel.SelectMatchingCard(tp,cid.filter2,tp,LOCATION_MZONE,0,1,1,nil)
 		local tc2=g:GetFirst()
 		if tc2 then
-			local pos2=Duel.SelectPosition(tp,tc2,POS_FACEUP_ATTACK+POS_FACEUP_DEFENSE)
+			local pos2=Duel.SelectPosition(tp,tc2,POS_FACEUP)
 			Duel.ChangePosition(tc2,pos2)
 		end
 	end
