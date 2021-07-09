@@ -96,7 +96,7 @@ function cid.activate(e, tp, eg, ep, ev, re, r, rp)
 end
 function cid.eqlimit(e, c)
 	if e:GetLabel()>0 then return e:GetOwner()==c
-	else c:IsControler(e:GetHandlerPlayer()) and c:IsSetCard(0x571) end
+	else return c:IsControler(e:GetHandlerPlayer()) and c:IsSetCard(0x571) end
 end
 --Update ATK&DEF/Untargetable
 function cid.attcon(e, c)
