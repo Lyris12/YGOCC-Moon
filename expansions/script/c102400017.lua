@@ -29,14 +29,14 @@ end
 function s.spfilter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xda6) and c:IsAbleToGraveAsCost()
 end
-function s.cfilter(c)
-	return c:IsCode(id-9)
+function s.cfilter(c,tp)
+	return c:IsCode(id-9) and Duel.GetMZoneCount(tp,c)>0
 end
 function s.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
 	return Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND,0,1,c)
-		and Duel.CheckReleaseGroup(tp,s.cfilter,1,nil)
+		and Duel.CheckReleaseGroup(tp,s.cfilter,1,nil,tp)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)

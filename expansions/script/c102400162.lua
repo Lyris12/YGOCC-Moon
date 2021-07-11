@@ -103,7 +103,7 @@ function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end
 function s.op(e,tp,eg,ep,ev,re,r,rp)
-	local mg=Duel.GetMatchingGroup(s.filter,tp,LOCATION_GRAVE+LOCATION_EXTRA,0,nil)
+	local mg=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.filter),tp,LOCATION_GRAVE+LOCATION_EXTRA,0,nil)
 	if #mg<3 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g=mg:Select(tp,3,3,nil)

@@ -67,7 +67,7 @@ end
 function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) then
-		c:AddCounter(0x83081,e:GetLabel())
+		c:AddCounter(0x81081,e:GetLabel())
 	end
 end
 --Transfer Counter

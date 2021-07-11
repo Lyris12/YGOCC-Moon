@@ -43,7 +43,7 @@ function s.filter(c,e,tp)
 end
 function s.op(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_GRAVE,0,nil,e,tp)
+	local g=Duel.GetMatchingGroup(aux.NecroValleyFilter(s.filter),tp,LOCATION_GRAVE,0,nil,e,tp)
 	if c:GetFlagEffect(id)==0 or #g==0 or Duel.GetFlagEffect(tp,id)>0
 		or not Duel.SelectEffectYesNo(tp,c) then
 		c:ResetFlagEffect(id)

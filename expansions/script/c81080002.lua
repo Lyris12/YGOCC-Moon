@@ -113,7 +113,7 @@ function cid.addop2(e,tp,eg,ep,ev,re,r,rp)
 		c=eg:GetNext()
 	end
 	if count>0 then
-		e:GetHandler():AddCounter(0x83081,count)
+		e:GetHandler():AddCounter(0x81081,count)
 	end
 end
 --Distribute Mana

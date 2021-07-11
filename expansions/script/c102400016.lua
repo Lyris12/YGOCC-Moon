@@ -78,7 +78,7 @@ function s.sgop(e,tp,eg,ep,ev,re,r,rp)
 	local dir=Duel.GetAttackTarget()==nil
 	local g=Duel.GetFieldGroup(tp,0,LOCATION_SZONE)
 	local ct=Duel.SendtoGrave(g,REASON_EFFECT)
-	local sg=Duel.GetOperatedGroup():Filter(Card.IsLocation,nil,LOCATION_GRAVE)
+	local sg=Duel.GetOperatedGroup():Filter(aux.NecroValleyFilter(Card.IsLocation),nil,LOCATION_GRAVE)
 	if ct>0 and #g>0 and dir then
 		Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
 	end

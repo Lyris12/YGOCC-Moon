@@ -73,7 +73,7 @@ function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoGrave(tc,REASON_EFFECT)
 	end
 	if not dir then return end
-	local g=Duel.SelectMatchingCard(tp,s.filter,tp,0,LOCATION_GRAVE,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.filter),tp,0,LOCATION_GRAVE,1,1,nil)
 	if #g>0 then
 		Duel.BreakEffect()
 		Duel.Remove(g,POS_FACEUP,REASON_EFFECT)

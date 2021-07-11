@@ -13,12 +13,12 @@ function s.initial_effect(c)
 	e0:SetOperation(s.spop)
 	c:RegisterEffect(e0)
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_CANNOT_SELECT_BATTLE_TARGET)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
-	e1:SetCondition(s.ccon)
-	e1:SetValue(aux.imval1)
+	e1:SetTargetRange(0,LOCATION_MZONE)
+	e1:SetCondition(function() return c:IsAttackPos() end)
+	e1:SetValue(function(e,tc) return tc~=c end)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
@@ -29,9 +29,6 @@ function s.initial_effect(c)
 end
 function s.cfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0xda6)
-end
-function s.ccon(e)
-	return Duel.GetMatchingGroupCount(s.cfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,e:GetHandler())>0
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp
@@ -60,9 +57,9 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsRelateToEffect(e) and Duel.SpecialSummon(e:GetHandler(),0,tp,tp,false,false,POS_FACEUP_ATTACK)~=0 then
 		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local g2=Duel.GetMatchingGroup(s.filter,tp,LOCATION_HAND+LOCATION_GRAVE,0,nil,e,tp):SelectSubGroup(tp,aux.dncheck,false,1,4)
+		local g2=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil,e,tp)
 		if #g2>0 then
-			Duel.BreakEffect() 
+			Duel.BreakEffect()
 			Duel.SpecialSummon(g2,0,tp,tp,false,false,POS_FACEUP)
 		end
 	end

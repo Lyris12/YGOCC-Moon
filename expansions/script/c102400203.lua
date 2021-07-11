@@ -31,6 +31,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 		return mg:IsExists(s.filter,1,nil,e,tp,mg)
 	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,0,LOCATION_GRAVE)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local mg=Duel.GetMatchingGroup(aux.AND(Card.IsCanBeFusionMaterial,Card.IsAbleToRemove),tp,LOCATION_GRAVE,LOCATION_GRAVE,nil)

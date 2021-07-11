@@ -66,11 +66,11 @@ end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local dir=Duel.GetAttackTarget()==nil
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
-	local sg=Duel.SelectMatchingCard(tp,s.thfilter,tp,0,LOCATION_ONFIELD,nil)
+	local sg=Duel.SelectMatchingCard(tp,s.thfilter,tp,0,LOCATION_ONFIELD,1,1,nil)
 	Duel.HintSelection(sg)
 	local ct=Duel.SendtoHand(sg,nil,REASON_EFFECT)
 	Duel.ShuffleHand(1-tp)
-	local mg=Duel.GetMatchingGroup(tp,Card.IsAbleToHand,tp,0,LOCATION_MZONE,1,1,nil)
+	local mg=Duel.GetMatchingGroup(Card.IsAbleToHand,tp,0,LOCATION_MZONE,nil)
 	if dir and #mg>0 and Duel.SelectEffectYesNo(tp,e:GetHandler(),aux.Stringid(id,0)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 		local g=mg:Select(tp,1,1,nil)
