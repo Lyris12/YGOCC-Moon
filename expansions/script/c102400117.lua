@@ -6,9 +6,8 @@ function s.initial_effect(c)
 	local og=Group.CreateGroup()
 	og:KeepAlive()
 	Duel.SendtoGrave=function(tg,r)
-		local g=tg:Clone()
 		local dg,fg=Group.CreateGroup(),Group.CreateGroup()
-		for tc in aux.Next(g) do
+		for tc in aux.Next(tg) do
 			if tc:IsHasEffect(id) then dg:AddCard(tc)
 			else fg:AddCard(tc) end
 		end
@@ -17,9 +16,8 @@ function s.initial_effect(c)
 		return ct
 	end
 	Duel.SendtoHand=function(tg,tp,r)
-		local g=tg:Clone()
 		local dg,fdg,fg=Group.CreateGroup(),Group.CreateGroup(),Group.CreateGroup()
-		for tc in aux.Next(g) do
+		for tc in aux.Next(tg) do
 			if tc:IsHasEffect(id) then
 				if tp~=1-tc:GetControler() then dg:AddCard(tc)
 				else fdg:AddCard(tc) end
@@ -30,9 +28,8 @@ function s.initial_effect(c)
 		return ct
 	end
 	Duel.SendtoDeck=function(tg,tp,seq,r)
-		local g=tg:Clone()
 		local dg,fdg,fg=Group.CreateGroup(),Group.CreateGroup(),Group.CreateGroup()
-		for tc in aux.Next(g) do
+		for tc in aux.Next(tg) do
 			if tc:IsHasEffect(id) then
 				if tp~=1-tc:GetControler() then dg:AddCard(tc)
 				else fdg:AddCard(tc) end
@@ -43,9 +40,8 @@ function s.initial_effect(c)
 		return ct
 	end
 	Duel.Remove=function(tg,pos,r)
-		local g=tg:Clone()
 		local dg,fdg,fg=Group.CreateGroup(),Group.CreateGroup(),Group.CreateGroup()
-		for tc in aux.Next(g) do
+		for tc in aux.Next(tg) do
 			if tc:IsHasEffect(id) then
 				if pos&POS_FACEUP>0 then dg:AddCard(tc)
 				else fdg:AddCard(tc) end
@@ -56,9 +52,8 @@ function s.initial_effect(c)
 		return ct
 	end
 	Duel.SendtoExtraP=function(tg,tp,r)
-		local g=tg:Clone()
 		local dg,fdg,fg=Group.CreateGroup(),Group.CreateGroup(),Group.CreateGroup()
-		for tc in aux.Next(g) do
+		for tc in aux.Next(tg) do
 			if tc:IsHasEffect(id) then
 				if tp~=1-tc:GetControler() then dg:AddCard(tc)
 				else fdg:AddCard(tc) end
@@ -69,9 +64,8 @@ function s.initial_effect(c)
 		return ct
 	end
 	Duel.Release=function(tg,r)
-		local g=tg:Clone()
 		local dg,fg=Group.CreateGroup(),Group.CreateGroup()
-		for tc in aux.Next(g) do
+		for tc in aux.Next(tg) do
 			if tc:IsHasEffect(id) then dg:AddCard(tc)
 			else fg:AddCard(tc) end
 		end
