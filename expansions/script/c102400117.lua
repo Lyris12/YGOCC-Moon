@@ -6,6 +6,7 @@ function s.initial_effect(c)
 	local og=Group.CreateGroup()
 	og:KeepAlive()
 	Duel.SendtoGrave=function(tg,r)
+		local tg=Group.CreateGroup()+tg
 		local dg,fg=Group.CreateGroup(),Group.CreateGroup()
 		for tc in aux.Next(tg) do
 			if tc:IsHasEffect(id) then dg:AddCard(tc)
@@ -16,6 +17,7 @@ function s.initial_effect(c)
 		return ct
 	end
 	Duel.SendtoHand=function(tg,tp,r)
+		local tg=Group.CreateGroup()+tg
 		local dg,fdg,fg=Group.CreateGroup(),Group.CreateGroup(),Group.CreateGroup()
 		for tc in aux.Next(tg) do
 			if tc:IsHasEffect(id) then
@@ -28,6 +30,7 @@ function s.initial_effect(c)
 		return ct
 	end
 	Duel.SendtoDeck=function(tg,tp,seq,r)
+		local tg=Group.CreateGroup()+tg
 		local dg,fdg,fg=Group.CreateGroup(),Group.CreateGroup(),Group.CreateGroup()
 		for tc in aux.Next(tg) do
 			if tc:IsHasEffect(id) then
@@ -40,6 +43,7 @@ function s.initial_effect(c)
 		return ct
 	end
 	Duel.Remove=function(tg,pos,r)
+		local tg=Group.CreateGroup()+tg
 		local dg,fdg,fg=Group.CreateGroup(),Group.CreateGroup(),Group.CreateGroup()
 		for tc in aux.Next(tg) do
 			if tc:IsHasEffect(id) then
@@ -52,6 +56,7 @@ function s.initial_effect(c)
 		return ct
 	end
 	Duel.SendtoExtraP=function(tg,tp,r)
+		local tg=Group.CreateGroup()+tg
 		local dg,fdg,fg=Group.CreateGroup(),Group.CreateGroup(),Group.CreateGroup()
 		for tc in aux.Next(tg) do
 			if tc:IsHasEffect(id) then
@@ -64,6 +69,7 @@ function s.initial_effect(c)
 		return ct
 	end
 	Duel.Release=function(tg,r)
+		local tg=Group.CreateGroup()+tg
 		local dg,fg=Group.CreateGroup(),Group.CreateGroup()
 		for tc in aux.Next(tg) do
 			if tc:IsHasEffect(id) then dg:AddCard(tc)
