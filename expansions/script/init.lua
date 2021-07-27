@@ -58,8 +58,8 @@ function GetID()
 	return scard,s_id
 end
 --overwrite functions
-local is_type, card_remcounter, duel_remcounter, effect_set_target_range, add_xyz_proc, add_xyz_proc_nlv, duel_overlay, duel_set_lp, duel_select_target, duel_banish, card_check_remove_overlay_card, is_reason, duel_check_tribute, select_tribute,card_sethighlander, card_is_facedown = 
-	Card.IsType, Card.RemoveCounter, Duel.RemoveCounter, Effect.SetTargetRange, Auxiliary.AddXyzProcedure, Auxiliary.AddXyzProcedureLevelFree, Duel.Overlay, Duel.SetLP, Duel.SelectTarget, Duel.Remove, Card.CheckRemoveOverlayCard, Card.IsReason, Duel.CheckTribute, Duel.SelectTribute, Card.SetUniqueOnField, Card.IsFacedown
+local is_type, card_remcounter, duel_remcounter, effect_set_target_range, effect_set_reset, add_xyz_proc, add_xyz_proc_nlv, duel_overlay, duel_set_lp, duel_select_target, duel_banish, card_check_remove_overlay_card, is_reason, duel_check_tribute, select_tribute,card_sethighlander, card_is_facedown = 
+	Card.IsType, Card.RemoveCounter, Duel.RemoveCounter, Effect.SetTargetRange, Effect.SetReset, Auxiliary.AddXyzProcedure, Auxiliary.AddXyzProcedureLevelFree, Duel.Overlay, Duel.SetLP, Duel.SelectTarget, Duel.Remove, Card.CheckRemoveOverlayCard, Card.IsReason, Duel.CheckTribute, Duel.SelectTribute, Card.SetUniqueOnField, Card.IsFacedown
 
 dofile("expansions/script/proc_evolute.lua") --Evolutes
 dofile("expansions/script/proc_conjoint.lua") --Conjoints
@@ -157,18 +157,24 @@ end
 	-- -- registereff(c,ex,forced)
 -- end
 Auxiliary.kaiju_procs={}
-target_range_table={}
+global_target_range_effect_table={}
 Effect.SetTargetRange=function(e,self,oppo)
-	if not target_range_table[e] then target_range_table[e]={} end
-	table.insert(target_range_table[e],self)
-	table.insert(target_range_table[e],oppo)
+	global_target_range_effect_table[e]={self,oppo}
 	if e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G then
 		if oppo==1 then
 			table.insert(Auxiliary.kaiju_procs,e)
 		end
 	end
-	effect_set_target_range(e,self,oppo)
+	return effect_set_target_range(e,self,oppo)
 end
+
+global_reset_effect_table={}
+Effect.SetReset=function(e,reset,rct)
+	local rct=rct or 1
+	global_reset_effect_table[e]={reset,rct}
+	return effect_set_reset(e,reset,rct)
+end
+
 Auxiliary.AddXyzProcedure=function(tc,f,lv,ct,alterf,desc,maxct,op)
 	add_xyz_proc(tc,f,lv,ct,alterf,desc,maxct,op)
 	local mt=getmetatable(tc)
@@ -656,30 +662,6 @@ function Auxiliary.RandomTargetFilter(c)
 	return c:GetFlagEffect(39759371)>0 and c:GetFlagEffectLabel(39759371)==999
 end
 
---Global Card Effect Table
-if not global_card_effect_table_global_check then
-	global_card_effect_table_global_check=true
-	global_card_effect_table={}
-	Card.register_global_card_effect_table = Card.RegisterEffect
-	function Card:RegisterEffect(e)
-		if not global_card_effect_table[self] then global_card_effect_table[self]={} end
-		table.insert(global_card_effect_table[self],e)
-		self.register_global_card_effect_table(self,e)
-	end
-end
-
---Global Card Effect Table (for Duel.RegisterEffect)
-if not global_duel_effect_table_global_check then
-	global_duel_effect_table_global_check=true
-	global_duel_effect_table={}
-	Duel.register_global_duel_effect_table = Duel.RegisterEffect
-	Duel.RegisterEffect = function(e,tp)
-							if not global_duel_effect_table[tp] then global_duel_effect_table[tp]={} end
-							table.insert(global_duel_effect_table[tp],e)
-							return Duel.register_global_duel_effect_table(e,tp)
-	end
-end
-
 --Hardcode AZW Phalanx Unicorn (39510) allow equipped monster to activate its effect without detaching
 local ocheck,oremove=Card.CheckRemoveOverlayCard,Card.RemoveOverlayCard
 function Card.CheckRemoveOverlayCard(c,p,ct,r)
@@ -699,19 +681,114 @@ function Card.RemoveOverlayCard(c,p,minct,maxct,r)
 	end
 end
 
---Glitchy's custom auxs and functions
---DO NOT USE THESE UNLESS YOU KNOW WHAT YOU'RE DOING
+----------------------------------------------------------------------------------------------------------------
+--AUXS AND FUNCTIONS PORTED FROM EDOPRO (CAN BE EXPANDED FOR FACILITATING SCRIPT COMPATIBILITY BETWEEN THE SIMS)
+----------------------------------------------------------------------------------------------------------------
+function Auxiliary.FilterBoolFunctionEx(f,value)
+	return	function(target,scard,sumtype,tp)
+				return f(target,value,scard,sumtype,tp)
+			end
+end
+function Auxiliary.FilterBoolFunctionEx2(f,...)
+	local params={...}
+	return	function(target,scard,sumtype,tp)
+				return f(target,scard,sumtype,tp,table.unpack(params))
+			end
+end
+function Auxiliary.GlobalCheck(s,func)
+	if not s.global_check then
+		s.global_check=true
+		func()
+	end
+end
+function Auxiliary.SelectUnselectLoop(c,sg,mg,e,tp,minc,maxc,rescon)
+	local res
+	if #sg>=maxc then return false end
+	sg:AddCard(c)
+	if rescon then
+		local _,stop=rescon(sg,e,tp,mg)
+		if stop then 
+			sg:RemoveCard(c)
+			return false
+		end
+	end
+	if #sg<minc then
+		res=mg:IsExists(Auxiliary.SelectUnselectLoop,1,sg,sg,mg,e,tp,minc,maxc,rescon)
+	elseif #sg<maxc then
+		res=(not rescon or rescon(sg,e,tp,mg)) or mg:IsExists(Auxiliary.SelectUnselectLoop,1,sg,sg,mg,e,tp,minc,maxc,rescon)
+	else
+		res=(not rescon or rescon(sg,e,tp,mg))
+	end
+	sg:RemoveCard(c)
+	return res
+end
+function Auxiliary.SelectUnselectGroup(g,e,tp,minc,maxc,rescon,chk,seltp,hintmsg,finishcon,breakcon,cancelable)
+	local minc=minc or 1
+	local maxc=maxc or #g
+	if chk==0 then return g:IsExists(Auxiliary.SelectUnselectLoop,1,nil,Group.CreateGroup(),g,e,tp,minc,maxc,rescon) end
+	local hintmsg=hintmsg and hintmsg or 0
+	local sg=Group.CreateGroup()
+	while true do
+		local finishable = #sg>=minc and (not finishcon or finishcon(sg,e,tp,g))
+		local mg=g:Filter(Auxiliary.SelectUnselectLoop,sg,sg,g,e,tp,minc,maxc,rescon)
+		if (breakcon and breakcon(sg,e,tp,mg)) or #mg<=0 or #sg>=maxc then break end
+		Duel.Hint(HINT_SELECTMSG,seltp,hintmsg)
+		local tc=mg:SelectUnselect(sg,seltp,finishable,finishable or (cancelable and #sg==0),minc,maxc)
+		if not tc then break end
+		if sg:IsContains(tc) then
+			sg:RemoveCard(tc)
+		else
+			sg:AddCard(tc)
+		end
+	end
+	return sg
+end
+--Checks whether the card is located at any of the sequences passed as arguments.
+function Card.IsSequence(c,...)
+	local arg={...}
+	local seq=c:GetSequence()
+	for _,v in ipairs(arg) do
+		if seq==v then return true end
+	end
+	return false
+end
+--Used for checking the zone of a card (zone is the zone, tp is referencial player)
+function Auxiliary.IsZone(c,zone,tp)
+	local rzone = c:IsControler(tp) and (1 <<c:GetSequence()) or (1 << (16+c:GetSequence()))
+	if c:IsSequence(5,6) then
+		rzone = rzone | (c:IsControler(tp) and (1 << (16 + 11 - c:GetSequence())) or (1 << (11 - c:GetSequence())))
+	end
+	return (rzone & zone) > 0
+end
+function Card.IsInMainMZone(c,tp)
+	return c:IsLocation(LOCATION_MZONE) and c:GetSequence()<5 and (not tp or c:IsControler(tp))
+end
+function Card.IsInExtraMZone(c,tp)
+	return c:IsLocation(LOCATION_MZONE) and c:GetSequence()>4 and (not tp or c:IsControler(tp))
+end
 
+function Duel.IsMainPhase()
+	return Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2
+end
+function Duel.GetTargetCards(e)
+	return Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
+end
+----------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------
+
+--Glitchy's custom auxs and functions
 if not glitchy_effect_table then glitchy_effect_table={} end
 if not glitchy_archetype_table then glitchy_archetype_table={} end
 
 --constant aliases
 RACE_PSYCHIC=RACE_PSYCHO
+RACE_WINGEDBEAST=RACE_WINDBEAST
 EFFECT_TYPE_TRIGGER=EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_TRIGGER_F
 EFFECT_TYPE_QUICK=EFFECT_TYPE_QUICK_O+EFFECT_TYPE_QUICK_F
 EFFECT_TYPE_CHAIN_STARTER=EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_TRIGGER_F+EFFECT_TYPE_QUICK_O+EFFECT_TYPE_QUICK_F+EFFECT_TYPE_ACTIVATE+EFFECT_TYPE_IGNITION
 
 --glitchy custom categories (apply with e:SetGlitchyCategory)
+GLCATEGORY_PLACE_SELF_AS_CONTINUOUS_TRAP=0x1
 GLCATEGORY_ED_DRAW=0x8000
 GLCATEGORY_ACTIVATE_LMARKER=0x10000
 GLCATEGORY_DEACTIVATE_LMARKER=0x20000
@@ -733,20 +810,68 @@ EVENT_DEACTIVATE_LINK_MARKER=9001
 --zone constants
 EXTRA_MONSTER_ZONE=0x60
 
-Auxiliary.GLSpecialInfos={}
-function Auxiliary.GLSetSpecialInfo(e,category,g,ct,p,loc)
+--Duel Effects without player target range
+DUEL_EFFECT_NOP={EFFECT_DISABLE_FIELD}
+
+if not Auxiliary.GLSpecialInfos then Auxiliary.GLSpecialInfos={} end
+function Duel.SetGLOperationInfo(e,category,g,ct,p,loc,fromloc)
 	if not g then
-		Auxiliary.GLSpecialInfos[e]={category,nil,ct,p,loc}
+		Auxiliary.GLSpecialInfos[e]={category,nil,ct,p,loc,fromloc}
 	else
-		Auxiliary.GLSpecialInfos[e]={category,g,ct,0,0}
+		Auxiliary.GLSpecialInfos[e]={category,g,ct,0,0,fromloc}
 	end
 end
-
-function Effect.SetGlitchyCategory(e,category)
-	if not glitchy_effect_table[e] then glitchy_effect_table[e]={0} end
-	glitchy_effect_table[1]=category
+function Auxiliary.GLSetSpecialInfo(e,category,g,ct,p,loc,fromloc)
+	Duel.SetGLOperationInfo(e,category,g,ct,p,loc,fromloc)
 end
-	
+function Auxiliary.SetGLOperationInfo(e,category,g,ct,p,loc,fromloc)
+	Duel.SetGLOperationInfo(e,category,g,ct,p,loc,fromloc)
+end
+
+function Effect.GLSetCategory(e,category)
+	if not glitchy_effect_table[e] then glitchy_effect_table[e]={0} end
+	glitchy_effect_table[e][1]=glitchy_effect_table[e][1]|category
+end
+function Effect.SetGlitchyCategory(e,category)
+	Effect.GLSetCategory(e,category)
+end
+
+function Effect.GLGetTargetRange(e)
+	if not global_target_range_effect_table[e] then return 0,0 end
+	local s=global_target_range_effect_table[e][1]
+	local o=global_target_range_effect_table[e][2]
+	return s,o
+end
+
+function Effect.GLGetReset(e)
+	if not global_reset_effect_table[e] then return 0,0 end
+	local reset=global_reset_effect_table[e][1]
+	local rct=global_reset_effect_table[e][2]
+	return reset,rct
+end
+
+function Auxiliary.SetOperationResultAsLabel(op)
+	return	function(e,tp,eg,ep,ev,re,r,rp)
+				local res=op(e,tp,eg,ep,ev,re,r,rp)
+				e:SetLabel(res)
+				return res
+			end
+end
+
+--Procs through numbers from 0 to ct and assigns a value depending on what number "i" is equal to.
+--{...}: For example, if i==0 then the function will assign the value inserted as the 1st {...} param, if i==1 the 2nd {...} param will be assigned and so on
+function Auxiliary.GLSetValueDependingOnNumber(i,ct,...)
+	local f={...}
+	if #f~=ct+1 then return 0 end
+	for k=0,ct do
+		if i==k then return f[k+1] end
+	end
+	return 0
+end	
+
+function Group.SelectUnselectCheck(g,e,tp,minc,maxc,rescon)
+	return g:IsExists(Auxiliary.SelectUnselectLoop,1,nil,Group.CreateGroup(),g,e,tp,minc,maxc,rescon)
+end
 
 function Card.GLIsAbleToDrawFromExtra(c,p)
 	return not Duel.IsPlayerAffectedByEffect(p,EFFECT_CANNOT_DRAW) and not c:IsHasEffect(EFFECT_CANNOT_TO_HAND)
@@ -835,10 +960,11 @@ function Card.IsHasNoArchetype(c)
 end
 
 function Card.GLGetLevel(c)
-	if c:IsType(TYPE_XYZ) then return c:GetRank()
-	elseif c:IsType(TYPE_LINK) then return c:GetLink()
-	elseif c:IsType(TYPE_EVOLUTE) then return c:GetStage()
-	elseif c:IsType(TYPE_TIMELEAP) then return c:GetFuture()
+	if c:GetOriginalType()&TYPE_XYZ~=0 then return c:GetRank()
+	elseif c:GetOriginalType()&TYPE_LINK~=0 then return c:GetLink()
+	elseif c:GetOriginalType()&TYPE_EVOLUTE~=0 then return c:GetStage()
+	elseif c:GetOriginalType()&TYPE_TIMELEAP~=0 then return c:GetFuture()
+	elseif c:GetOriginalType()&TYPE_SPATIAL~=0 then return c:GetDimensionNo()
 	else return c:GetLevel() end
 end
 
@@ -855,6 +981,132 @@ function Effect.GLString(e,id,...)
 	-- else
 		e:SetDescription(aux.Stringid(e:GetOwner():GetOriginalCode(),id))
 	--end
+end
+
+--Returns all the MMZ the arrows PRINTED on the card (c) point to, REGARDLESS of the card type (even if it is not an active Link Monster) or of the location it is in (MZONE/SZONE)
+--If f is set to true, the function only returns the available zones (usable and unoccupied)
+function Auxiliary.GLGetLinkedZoneManually(c,f)
+	if c:GetOriginalType()&TYPE_LINK==0 or not c:IsLocation(LOCATION_MZONE+LOCATION_SZONE) then return 0 end
+	local seq=c:GetSequence()
+	local tlchk,tchk,trchk=false,false,false
+	local xct=(seq>4) and true or false
+	if c:IsLocation(LOCATION_MZONE) then
+		if (seq>4 or seq==2 or seq==4) then tlchk=true end
+		if (seq>4 or seq==1 or seq==3) then tchk=true end
+		if (seq>4 or seq==0 or seq==2) then trchk=true end
+	end
+	local lk=(c:IsLocation(LOCATION_MZONE)) and c:GetLinkMarker() or c:GetOriginalLinkMarker()
+	local zone=0
+	local free=(f==true) and function(c,loc,sq,locp) local p=(locp~=nil) and 1-c:GetControler() or c:GetControler() local s=(locp~=nil and sq<5) and 4-sq or sq return Duel.CheckLocation(p,loc,s) end or false
+	
+	if lk&LINK_MARKER_BOTTOM_LEFT>0 and c:IsLocation(LOCATION_MZONE) and seq>0 then
+		if xct then xct=(seq==5) and 1 or 3 end
+		local base=(seq>4) and xct or seq
+		local loct=(seq>4) and 0 or 8
+		local floc=(seq>4) and LOCATION_MZONE or LOCATION_SZONE
+		if not free or free(c,floc,base-1) then
+			zone=zone|(0x1<<(base-1+loct))
+		end
+	end
+	if lk&LINK_MARKER_BOTTOM>0 and c:IsLocation(LOCATION_MZONE) then
+		if xct then xct=(seq==5) and 1 or 3 end
+		local base=(type(xct)=="number") and xct or seq
+		local loct=(seq>4) and 0 or 8
+		local floc=(seq>4) and LOCATION_MZONE or LOCATION_SZONE
+		if not free or free(c,floc,base) then
+			zone=zone|(0x1<<(base+loct))
+		end
+	end
+	if lk&LINK_MARKER_BOTTOM_RIGHT>0 and c:IsLocation(LOCATION_MZONE) and seq~=4 then
+		if xct then xct=(seq==5) and 1 or 3 end
+		local base=(type(xct)=="number") and xct or seq
+		local loct=(seq>4) and 0 or 8
+		local floc=(seq>4) and LOCATION_MZONE or LOCATION_SZONE
+		if not free or free(c,floc,base+1) then
+			zone=zone|(0x1<<(base+1+loct))
+		end
+	end
+	if lk&LINK_MARKER_LEFT>0 and seq<5 and seq~=0 then
+		local loct=(c:IsLocation(LOCATION_MZONE)) and 0 or 8
+		local floc=(c:IsLocation(LOCATION_MZONE)) and LOCATION_MZONE or LOCATION_SZONE
+		if not free or free(c,floc,seq-1) then
+			zone=zone|(0x1<<(seq-1+loct))
+		end
+	end
+	if lk&LINK_MARKER_RIGHT>0 and seq<5 and seq~=4 then
+		local loct=(c:IsLocation(LOCATION_MZONE)) and 0 or 8
+		local floc=(c:IsLocation(LOCATION_MZONE)) and LOCATION_MZONE or LOCATION_SZONE
+		if not free or free(c,floc,seq+1) then
+			zone=zone|(0x1<<(seq+1+loct))
+		end
+	end
+	if lk&LINK_MARKER_TOP_LEFT>0 and ((c:IsLocation(LOCATION_SZONE) and seq>0) or tlchk) then
+		local loct,locp
+		if xct then
+			xct=(seq==5) and 1 or 3
+			loct=16
+			locp=true
+		end
+		local base=(seq>4) and xct or seq
+		if not loct then
+			loct=0
+		end
+		local freeseq=(c:IsLocation(LOCATION_MZONE) and seq==2) and 5 or (c:IsLocation(LOCATION_MZONE) and seq==4) and 6 or base-1
+		if not free or free(c,LOCATION_MZONE,base-1,locp) then
+			if c:IsLocation(LOCATION_MZONE) and seq==2 then
+				zone=zone|0x20
+			elseif c:IsLocation(LOCATION_MZONE) and seq==4 then
+				zone=zone|0x40
+			else
+				zone=zone|(0x1<<(base-1+loct))
+			end
+		end
+	end
+	if lk&LINK_MARKER_TOP>0 and (c:IsLocation(LOCATION_SZONE) or tchk) then
+		local loct,locp
+		if xct then
+			xct=(seq==5) and 1 or 3
+			loct=16
+			locp=true
+		end
+		local base=(seq>4) and xct or seq
+		if not loct then
+			loct=0
+		end
+		local freeseq=(c:IsLocation(LOCATION_MZONE) and seq==1) and 5 or (c:IsLocation(LOCATION_MZONE) and seq==3) and 6 or base
+		if not free or free(c,LOCATION_MZONE,freeseq,locp) then
+			if c:IsLocation(LOCATION_MZONE) and seq==1 then
+				zone=zone|0x20
+			elseif c:IsLocation(LOCATION_MZONE) and seq==3 then
+				zone=zone|0x40
+			else
+				zone=zone|(0x1<<(base+loct))
+			end
+		end
+	end
+	if lk&LINK_MARKER_TOP_RIGHT>0 and ((c:IsLocation(LOCATION_SZONE) and seq~=4) or trchk) then
+		local loct,locp
+		if xct then
+			xct=(seq==5) and 1 or 3
+			loct=16
+			locp=true
+		end
+		local base=(seq>4) and xct or seq
+		if not loct then
+			loct=0
+		end
+		local freeseq=(c:IsLocation(LOCATION_MZONE) and seq==0) and 5 or (c:IsLocation(LOCATION_MZONE) and seq==2) and 6 or base+1
+		if not free or free(c,LOCATION_MZONE,freeseq,locp) then
+			if c:IsLocation(LOCATION_MZONE) and seq==0 then
+				zone=zone|0x20
+			elseif c:IsLocation(LOCATION_MZONE) and seq==2 then
+				zone=zone|0x40
+			else
+				zone=zone|(0x1<<(base+1+loct))
+			end
+		end
+	end
+	return zone
 end
 
 --Custom Synchro Table to enable multi-material effects
@@ -1224,4 +1476,40 @@ function Auxiliary.XSynMixOperation(f,minct,maxc,gc,...)
 				Duel.SendtoGrave(g,REASON_MATERIAL+REASON_SYNCHRO)
 				g:DeleteGroup()
 			end
+end
+-----------------
+
+--EFFECT TABLES
+--Global Card Effect Table
+if not global_card_effect_table_global_check then
+	global_card_effect_table_global_check=true
+	global_card_effect_table={}
+	Card.register_global_card_effect_table = Card.RegisterEffect
+	function Card:RegisterEffect(e)
+		if not global_card_effect_table[self] then global_card_effect_table[self]={} end
+		table.insert(global_card_effect_table[self],e)
+		if e:GetCode()==EFFECT_DISABLE_FIELD and e:GetLabel()==0 and e:GetOperation() then
+			local op=e:GetOperation()
+			e:SetOperation(Auxiliary.SetOperationResultAsLabel(op))
+		end
+		self.register_global_card_effect_table(self,e)
+	end
+end
+
+--Global Card Effect Table (for Duel.RegisterEffect)
+if not global_duel_effect_table_global_check then
+	global_duel_effect_table_global_check=true
+	global_duel_effect_table={}
+	Duel.register_global_duel_effect_table = Duel.RegisterEffect
+	Duel.RegisterEffect = function(e,tp)
+							if not global_duel_effect_table[tp] then global_duel_effect_table[tp]={} end
+							table.insert(global_duel_effect_table[tp],e)
+							local s,o=e:GLGetTargetRange()
+							if not e:IsHasProperty(EFFECT_FLAG_PLAYER_TARGET) and s==0 and o==0 then
+								for i=1,#DUEL_EFFECT_NOP do
+									if e:GetCode()==DUEL_EFFECT_NOP[i] then e:SetProperty(e:GetProperty()|EFFECT_FLAG_PLAYER_TARGET) e:SetTargetRange(1,0) end
+								end
+							end
+							return Duel.register_global_duel_effect_table(e,tp)
+	end
 end

@@ -128,9 +128,7 @@ end
 function c86433597.allowextragemini(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetFlagEffect(86433590)<=0
 end
-function c86433597.matval(e,c,mg)
-	return true
-end
+
 --Ability Gain
 function c86433597.lkcon(e,tp,eg,ep,ev,re,r,rp)
 	return r==REASON_LINK
@@ -392,6 +390,9 @@ end
 --link
 function c86433597.lkfilter(c,e,tp)
 	return c:IsType(TYPE_LINK) and c:IsCanBeSpecialSummoned(e,0,1-tp,true,true) and c:IsSpecialSummonable(SUMMON_TYPE_LINK)
+end
+function c86433597.matval(e,c,mg)
+	return true,true
 end
 function c86433597.linktg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

@@ -156,37 +156,33 @@ function c86433608.effectgain(e,tp,eg,ep,ev,re,r,rp)
 		if egroup~=nil then
 			for i=1,#egroup do
 				local ce=egroup[i]
-				if not ce or ce==nil or type(ce)~="userdata" or ce:GetType()==nil then
-					table.remove(egroup,i)
-				else
-					if ce:GetOwner()==tc then
-						local con=ce:GetCondition()
-						local _l,ctl,flagl=ce:GetCountLimit()
-						local e1=ce:Clone()
-						if con then
-							e1:SetCondition(aux.ModifyCon(con,c86433608.disabled))
-						else
-							e1:SetCondition(c86433608.disabled)
-						end
-						if ctl then
-							if flagl then
-								e1:SetCountLimit(ctl,flagl+1000)
-							else
-								e1:SetCountLimit(ctl)
-							end
-						end
-							
-						e:GetHandler():RegisterEffect(e1)
-						local reset=Effect.CreateEffect(e:GetHandler())
-						reset:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-						reset:SetCode(EVENT_ADJUST)
-						reset:SetLabel(tc:GetFlagEffectLabel(86433608))
-						reset:SetLabelObject(e1)
-						reset:SetCountLimit(1)
-						reset:SetCondition(c86433608.resetcon2)
-						reset:SetOperation(c86433608.reseteff)
-						Duel.RegisterEffect(reset,tp)
+				if ce and ce.SetLabelObject and ce:GetOwner()==tc then
+					local con=ce:GetCondition()
+					local _l,ctl,flagl=ce:GetCountLimit()
+					local e1=ce:Clone()
+					if con then
+						e1:SetCondition(aux.ModifyCon(con,c86433608.disabled))
+					else
+						e1:SetCondition(c86433608.disabled)
 					end
+					if ctl then
+						if flagl then
+							e1:SetCountLimit(ctl,flagl+1000)
+						else
+							e1:SetCountLimit(ctl)
+						end
+					end
+						
+					e:GetHandler():RegisterEffect(e1)
+					local reset=Effect.CreateEffect(e:GetHandler())
+					reset:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+					reset:SetCode(EVENT_ADJUST)
+					reset:SetLabel(tc:GetFlagEffectLabel(86433608))
+					reset:SetLabelObject(e1)
+					reset:SetCountLimit(1)
+					reset:SetCondition(c86433608.resetcon2)
+					reset:SetOperation(c86433608.reseteff)
+					Duel.RegisterEffect(reset,tp)
 				end
 			end
 		end
