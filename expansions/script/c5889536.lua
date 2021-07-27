@@ -59,7 +59,7 @@ end
 function s.disop(e,tp)
 	local c=e:GetHandler()
 	local zone=aux.GLGetLinkedZoneManually(c,true)
-	return zone--0x1f001f&zone
+	return 0x1f001f&zone
 end
 
 --SPSUMMON
