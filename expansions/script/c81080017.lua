@@ -44,7 +44,7 @@ function cid.thfilter2(c,cardtype)
 	return c:IsSetCard(0x8108) and c:IsAbleToHand() and not c:IsType(cardtype)
 end
 function cid.thfilter3(c)
-	return c:IsFaceup() and c:GetCounter(0x818)>0
+	return c:IsFaceup() and c:GetCounter(0x1818)>0
 end
 function cid.matfilter(c)
 	return (c:IsCode(21770262) or c:IsCode(21770263) or c:IsCode(21770264))
@@ -87,10 +87,10 @@ function cid.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local tc2=g:GetFirst()
 	if tc1==tc2 then tc2=g:GetNext() end
 	if tc1:IsFaceup() and tc1:IsRelateToEffect(e) then
-		local ct1=tc1:GetCounter(0x818)
+		local ct1=tc1:GetCounter(0x1818)
 		if tc2:IsFaceup() and tc2:IsRelateToEffect(e) then
-			tc1:RemoveCounter(tp,0x818,ct1,REASON_EFECT)
-			tc2:AddCounter(0x818,ct1)
+			tc1:RemoveCounter(tp,0x1818,ct1,REASON_EFECT)
+			tc2:AddCounter(0x1818,ct1)
 		end
 	end
 end

@@ -154,7 +154,7 @@ function cid.repfilter(c,tp)
 end
 ---------
 function cid.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return r&REASON_EFFECT~=0 and re and rp~=tp and and eg:IsExists(cid.repfilter,1,nil,tp)
+	if chk==0 then return r&REASON_EFFECT~=0 and re and rp~=tp and eg:IsExists(cid.repfilter,1,nil,tp)
 		and Duel.IsExistingMatchingCard(cid.rmfilter,tp,LOCATION_DECK,0,2,nil) 
 	end
 	if Duel.SelectEffectYesNo(tp,e:GetHandler(),96) then

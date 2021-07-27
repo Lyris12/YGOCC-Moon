@@ -8,7 +8,7 @@ local function getID()
 end
 local id,cid=getID()
 function cid.initial_effect(c)
-	c:EnableCounterPermit(0x818)
+	c:EnableCounterPermit(0x1818)
 	--add counters
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_COUNTER)
@@ -57,28 +57,28 @@ end
 --add counters
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_COUNTER,nil,5,0,0x818)
+	Duel.SetOperationInfo(0,CATEGORY_COUNTER,nil,5,0,0x1818)
 end
 function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) then
-		c:AddCounter(0x818,5)
+		c:AddCounter(0x1818,5)
 	end
 end
 --token spawn
 function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsPlayerCanSpecialSummonMonster(tp,21770262,0,0x4011,300,300,1,RACE_AQUA,ATTRIBUTE_WATER) and e:GetHandler():GetCounter(0x818)>2  end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsPlayerCanSpecialSummonMonster(tp,21770262,0,0x4011,300,300,1,RACE_AQUA,ATTRIBUTE_WATER) and e:GetHandler():GetCounter(0x1818)>2  end
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,0)
 end
 function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
-	if c:GetCounter(0x818)>=10 then
-		c:RemoveCounter(tp,0x818,3,REASON_EFFECT)
+	if c:GetCounter(0x1818)>=10 then
+		c:RemoveCounter(tp,0x1818,3,REASON_EFFECT)
 		local token=Duel.CreateToken(tp,21770264)
 		Duel.SpecialSummon(token,0,tp,tp,false,false,POS_FACEUP)
-		token:AddCounter(0x818,3)
+		token:AddCounter(0x1818,3)
 		--immune monsters
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_SINGLE)
@@ -94,11 +94,11 @@ function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetValue(aux.TargetBoolFunction(aux.NOT(Card.IsSetCard),0x8108))
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 		token:RegisterEffect(e1,true)
-	elseif c:GetCounter(0x818)>=6 then
-		c:RemoveCounter(tp,0x818,3,REASON_EFFECT)
+	elseif c:GetCounter(0x1818)>=6 then
+		c:RemoveCounter(tp,0x1818,3,REASON_EFFECT)
 		local token=Duel.CreateToken(tp,21770263)
 		Duel.SpecialSummon(token,0,tp,tp,false,false,POS_FACEUP)
-		token:AddCounter(0x818,3)
+		token:AddCounter(0x1818,3)
 		--immune monsters
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_SINGLE)
@@ -114,11 +114,11 @@ function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetValue(aux.TargetBoolFunction(aux.NOT(Card.IsSetCard),0x8108))
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 		token:RegisterEffect(e1,true)
-	elseif c:GetCounter(0x818)>=3 then
-		c:RemoveCounter(tp,0x818,3,REASON_EFFECT)
+	elseif c:GetCounter(0x1818)>=3 then
+		c:RemoveCounter(tp,0x1818,3,REASON_EFFECT)
 		local token=Duel.CreateToken(tp,21770262)
 		Duel.SpecialSummon(token,0,tp,tp,false,false,POS_FACEUP)
-		token:AddCounter(0x818,3)
+		token:AddCounter(0x1818,3)
 		--immune monsters
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_SINGLE)

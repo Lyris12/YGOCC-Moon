@@ -76,6 +76,6 @@ function cid.drop(e,tp,eg,ep,ev,re,r,rp)
 	local ct=g:GetCount()
 	if Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_ONFIELD,0,1,e:GetHandler()) then
 			local cc=Duel.SelectMatchingCard(tp,Card.IsFaceup,tp,LOCATION_ONFIELD,0,1,1,e:GetHandler())
-			cc:GetFirst():AddCounter(0x818,ct)
+			cc:GetFirst():AddCounter(0x1818,ct)
 	end
 end

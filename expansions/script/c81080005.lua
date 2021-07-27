@@ -52,8 +52,8 @@ function cid.ctcost2(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Release(g,nil,1,REASON_COST)
 end
 function cid.ctcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsCanRemoveCounter(tp,1,0,0x818,2,REASON_COST) end
-	Duel.RemoveCounter(tp,1,0,0x818,2,REASON_COST)
+	if chk==0 then return Duel.IsCanRemoveCounter(tp,1,0,0x1818,2,REASON_COST) end
+	Duel.RemoveCounter(tp,1,0,0x1818,2,REASON_COST)
 end
 function cid.cttg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cid.thfilter1,tp,LOCATION_GRAVE,0,1,nil) end

@@ -83,8 +83,8 @@ function cid.descost2(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Release(g,nil,1,REASON_COST)
 end
 function cid.descost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsCanRemoveCounter(tp,1,0,0x818,3,REASON_COST) end
-	Duel.RemoveCounter(tp,1,0,0x818,3,REASON_COST)
+	if chk==0 then return Duel.IsCanRemoveCounter(tp,1,0,0x1818,3,REASON_COST) end
+	Duel.RemoveCounter(tp,1,0,0x1818,3,REASON_COST)
 end
 function cid.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local ct=Duel.GetMatchingGroupCount(cid.dfilter,tp,LOCATION_MZONE,0,nil)

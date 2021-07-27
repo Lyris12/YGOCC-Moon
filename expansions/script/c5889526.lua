@@ -97,25 +97,27 @@ function s.pcop(e,tp,eg,ep,ev,re,r,rp)
 				e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET)
 				e1:SetValue(TYPE_TRAP+TYPE_CONTINUOUS)
 				gc:RegisterEffect(e1)
-				if gc:IsPreviousLocation(LOCATION_MZONE) and gc:GetPreviousSequence()<5 then
-					local zone=(gc:GetPreviousControler()==tp) and 0x1<<gc:GetPreviousSequence() or 0x1<<(gc:GetPreviousSequence()+16)
-					local e1=Effect.CreateEffect(c)
-					e1:SetType(EFFECT_TYPE_FIELD)
-					e1:SetCode(EFFECT_DISABLE_FIELD)
-					e1:SetLabel(zone)
-					e1:SetOperation(s.disop)
-					e1:SetReset(RESET_PHASE+PHASE_END)
-					Duel.RegisterEffect(e1,tp)
-				end
-				if gc~=c then
-					local e2=Effect.CreateEffect(c)
-					e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-					e2:SetCode(EVENT_PHASE+PHASE_END)
-					e2:SetReset(RESET_PHASE+PHASE_END)
-					e2:SetCountLimit(1)
-					e2:SetLabelObject(gc)
-					e2:SetOperation(s.retop)
-					Duel.RegisterEffect(e2,tp)
+				if gc:IsPreviousLocation(LOCATION_MZONE) then
+					if gc~=c and gc:IsLocation(LOCATION_SZONE) then
+						local e2=Effect.CreateEffect(c)
+						e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+						e2:SetCode(EVENT_PHASE+PHASE_END)
+						e2:SetReset(RESET_PHASE+PHASE_END)
+						e2:SetCountLimit(1)
+						e2:SetLabelObject(gc)
+						e2:SetOperation(s.retop)
+						Duel.RegisterEffect(e2,tp)
+					end
+					if gc:GetPreviousSequence()<5 then
+						local zone=(gc:GetPreviousControler()==tp) and 0x1<<gc:GetPreviousSequence() or 0x1<<(gc:GetPreviousSequence()+16)
+						local e1=Effect.CreateEffect(c)
+						e1:SetType(EFFECT_TYPE_FIELD)
+						e1:SetCode(EFFECT_DISABLE_FIELD)
+						e1:SetLabel(zone)
+						e1:SetOperation(s.disop)
+						e1:SetReset(RESET_PHASE+PHASE_END)
+						Duel.RegisterEffect(e1,tp)
+					end
 				end
 			end
 			gc=g:GetNext()

@@ -85,7 +85,7 @@ function cid.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e3,tp)
 end
 function cid.lpop(e,tp,eg,ep,ev,re,r,rp)
-	local count=Duel.GetCounter(tp,1,0,0x818)
+	local count=Duel.GetCounter(tp,1,0,0x1818)
 	Duel.Hint(HINT_CARD,0,id)
 	Duel.Recover(tp,count*25,REASON_EFFECT)
 end
