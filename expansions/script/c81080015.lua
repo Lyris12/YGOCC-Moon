@@ -38,7 +38,7 @@ function cid.spcfilter(c)
 	return c:IsType(TYPE_EFFECT) and c:IsFaceup()
 end
 function cid.filter1(c)
-	return c:IsFaceup() and c:GetCounter(0x81081)>0
+	return c:IsFaceup() and c:GetCounter(0x818)>0
 end
 function cid.filter2(c)
 	return c:IsFaceup()
@@ -80,10 +80,10 @@ function cid.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local tc2=g:GetFirst()
 	if tc1==tc2 then tc2=g:GetNext() end
 	if tc1:IsFaceup() and tc1:IsRelateToEffect(e) then
-		local ct1=tc1:GetCounter(0x81081)
+		local ct1=tc1:GetCounter(0x818)
 		if tc2:IsFaceup() and tc2:IsRelateToEffect(e) then
-			tc1:RemoveCounter(tp,0x81081,ct1,REASON_EFECT)
-			tc2:AddCounter(0x81081,ct1)
+			tc1:RemoveCounter(tp,0x818,ct1,REASON_EFECT)
+			tc2:AddCounter(0x818,ct1)
 		end
 	end
 end

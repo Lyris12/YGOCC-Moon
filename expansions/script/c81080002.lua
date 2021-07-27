@@ -8,7 +8,7 @@ local function getID()
 end
 local id,cid=getID()
 function cid.initial_effect(c)
-	c:EnableCounterPermit(0x81081)
+	c:EnableCounterPermit(0x818)
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
@@ -70,7 +70,7 @@ function cid.tffilter(c,tp)
 end
 --ATK boost
 function cid.atkval(e,c)
-	return e:GetHandler():GetCounter(0x81081)*50
+	return e:GetHandler():GetCounter(0x818)*50
 end
 function cid.atg(e,c)
 	return c:IsType(TYPE_TOKEN)
@@ -89,18 +89,18 @@ function cid.tfop(e,tp,eg,ep,ev,re,r,rp)
 		local tc=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(cid.tffilter),tp,LOCATION_GRAVE+LOCATION_DECK,0,1,1,nil,tp):GetFirst()
 		if tc then
 			Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
-			tc:AddCounter(0x81081,5)
+			tc:AddCounter(0x818,5)
 		end
 	end
 end
 --Destroy Replace
 function cid.desreptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return not e:GetHandler():IsReason(REASON_RULE)
-		and e:GetHandler():GetCounter(0x81081)>0 end
+		and e:GetHandler():GetCounter(0x818)>0 end
 	return Duel.SelectEffectYesNo(tp,e:GetHandler(),96)
 end
 function cid.desrepop(e,tp,eg,ep,ev,re,r,rp)
-	e:GetHandler():RemoveCounter(ep,0x81081,1,REASON_EFFECT)
+	e:GetHandler():RemoveCounter(ep,0x818,1,REASON_EFFECT)
 end
 --Recover Mana
 function cid.addop2(e,tp,eg,ep,ev,re,r,rp)
@@ -108,31 +108,31 @@ function cid.addop2(e,tp,eg,ep,ev,re,r,rp)
 	local c=eg:GetFirst()
 	while c~=nil do
 		if c~=e:GetHandler() and c:IsLocation(LOCATION_ONFIELD) and c:IsReason(REASON_DESTROY) then
-			count=count+c:GetCounter(0x81081)
+			count=count+c:GetCounter(0x818)
 		end
 		c=eg:GetNext()
 	end
 	if count>0 then
-		e:GetHandler():AddCounter(0x81081,count)
+		e:GetHandler():AddCounter(0x818,count)
 	end
 end
 --Distribute Mana
 function cid.ccost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsCanRemoveCounter(tp,0x81081,1,REASON_COST) end
+	if chk==0 then return e:GetHandler():IsCanRemoveCounter(tp,0x818,1,REASON_COST) end
 	local ct={}
-	local countmax=e:GetHandler():GetCounter(0x81081)
+	local countmax=e:GetHandler():GetCounter(0x818)
 	for i=countmax,1,-1 do
-		if e:GetHandler():IsCanRemoveCounter(tp,0x81081,i,REASON_COST)  then
+		if e:GetHandler():IsCanRemoveCounter(tp,0x818,i,REASON_COST)  then
 			table.insert(ct,i)
 		end
 	end
 	if #ct==1 then 
-		e:GetHandler():RemoveCounter(tp,0x81081,1,REASON_COST)
+		e:GetHandler():RemoveCounter(tp,0x818,1,REASON_COST)
 		e:SetLabel(1)
 	else
 		Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,2))
 		local ac=Duel.AnnounceNumber(tp,table.unpack(ct))
-		e:GetHandler():RemoveCounter(tp,0x81081,ac,REASON_COST)
+		e:GetHandler():RemoveCounter(tp,0x818,ac,REASON_COST)
 		e:SetLabel(ac)
 	end
 end
@@ -148,7 +148,7 @@ function cid.ccop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_COUNTER)
 		local ac=Duel.AnnounceNumber(tp,table.unpack(ct))
 		local sg=g:Select(tp,1,1,nil)
-		sg:GetFirst():AddCounter(0x81081,ac)
+		sg:GetFirst():AddCounter(0x818,ac)
 		count=count-ac
 	end
 end

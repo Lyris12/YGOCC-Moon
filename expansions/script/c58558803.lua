@@ -49,7 +49,7 @@ function cid.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.ChangePosition(e:GetHandler(),POS_FACEUP_DEFENSE)
+	Duel.ChangePosition(e:GetHandler(),POS_FACEUP_ATTACK+POS_FACEUP_DEFENSE)
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
@@ -60,7 +60,7 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetOperatedGroup():GetFirst()
 	Duel.ConfirmCards(1-tp,tc)
 	if tc:IsSetCard(0x5855) then
-		local st=Duel.SelectYesNo(p,aux.Stringid(id,0))
+		local st=Duel.SelectYesNo(tp,aux.Stringid(id,0))
 		local res=false
 		if st then
 			if tc:IsType(TYPE_MONSTER) then

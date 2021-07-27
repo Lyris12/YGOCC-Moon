@@ -43,16 +43,16 @@ function cid.atcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(g:GetCount())
 end
 function cid.cttg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return Duel.IsPlayerCanDraw(tp,1) and chkc:IsLocation(LOCATION_ONFIELD) and chkc:IsCanAddCounter(0x81081,1) end
-	if chk==0 then return Duel.IsExistingTarget(Card.IsCanAddCounter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil,0x81081,1) end
+	if chkc then return Duel.IsPlayerCanDraw(tp,1) and chkc:IsLocation(LOCATION_ONFIELD) and chkc:IsCanAddCounter(0x818,1) end
+	if chk==0 then return Duel.IsExistingTarget(Card.IsCanAddCounter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil,0x818,1) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	Duel.SelectTarget(tp,Card.IsCanAddCounter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,e:GetHandler(),0x81081,1)
+	Duel.SelectTarget(tp,Card.IsCanAddCounter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,e:GetHandler(),0x818,1)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end
 function cid.ctop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) then
-		tc:AddCounter(0x81081,e:GetLabel())
+		tc:AddCounter(0x818,e:GetLabel())
 		Duel.BreakEffect()
 		Duel.Draw(tp,1,REASON_EFFECT)
 	end
@@ -65,7 +65,7 @@ function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
-		e1:SetValue(100*Duel.GetCounter(tp,1,0,0x81081))
+		e1:SetValue(100*Duel.GetCounter(tp,1,0,0x818))
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e1)
 		tc=g:GetNext()

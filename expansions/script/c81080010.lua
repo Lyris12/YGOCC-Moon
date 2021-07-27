@@ -63,21 +63,21 @@ end
 function cid.ccost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	local ct={}
-	local countmax=Duel.GetCounter(tp,1,0,0x81081)
+	local countmax=Duel.GetCounter(tp,1,0,0x818)
 	e:SetLabel(0)
 	if Duel.SelectYesNo(tp,aux.Stringid(id,0)) then 
 		if countmax>0 then for i=countmax,1,-1 do
-			if Duel.IsCanRemoveCounter(tp,1,0,0x81081,i,REASON_COST)  then
+			if Duel.IsCanRemoveCounter(tp,1,0,0x818,i,REASON_COST)  then
 				table.insert(ct,i)
 			end
 		end end
 		if #ct==1 then 
-			Duel.RemoveCounter(tp,1,0,0x81081,1,REASON_COST)
+			Duel.RemoveCounter(tp,1,0,0x818,1,REASON_COST)
 			e:SetLabel(1)
 		else
 			Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,2))
 			local ac=Duel.AnnounceNumber(tp,table.unpack(ct))
-			Duel.RemoveCounter(tp,1,0,0x81081,ac,REASON_COST)
+			Duel.RemoveCounter(tp,1,0,0x818,ac,REASON_COST)
 			e:SetLabel(ac)
 		end
 	end

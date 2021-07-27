@@ -16,7 +16,7 @@ function cid.initial_effect(c)
 	e1:SetCategory(CATEGORY_DRAW)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetCode(EVENT_CHAINING)
-	e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
+	e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL+EFFECT_FLAG_DELAY)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCondition(cid.condition)
 	e1:SetCost(cid.cost)
@@ -55,11 +55,12 @@ function cid.condition(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
 	if not g or g:GetCount()<1 then return false end
 	local c=e:GetHandler()
-	return g:IsExists(cid.filter,1,c,tp) and c:IsFacedown() and not c:IsStatus(STATUS_BATTLE_DESTROYED)
+	local tg=g:IsExists(cid.filter,1,c,tp)
+	return tg and c:IsFacedown() and not c:IsStatus(STATUS_BATTLE_DESTROYED)
 end
 function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.ChangePosition(e:GetHandler(),POS_FACEUP_DEFENSE)
+	Duel.ChangePosition(e:GetHandler(),POS_FACEUP)
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end

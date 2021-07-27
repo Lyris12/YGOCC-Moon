@@ -16,7 +16,7 @@ function cid.initial_effect(c)
 	e1:SetCategory(CATEGORY_DISABLE)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetCode(EVENT_CHAINING)
-	e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL+EFFECT_FLAG_CARD_TARGET)
+	e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL+EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCondition(cid.condition)
 	e1:SetTarget(cid.target)
@@ -46,7 +46,7 @@ function cid.posop(e,tp,eg,ep,ev,re,r,rp,chk)
 		local g=Duel.SelectMatchingCard(tp,cid.filter2,tp,LOCATION_MZONE,0,1,1,nil)
 		local tc2=g:GetFirst()
 		if tc2 then
-			local pos2=Duel.SelectPosition(tp,tc2,POS_FACEUP)
+			local pos2=Duel.SelectPosition(tp,tc2,POS_FACEUP_ATTACK+POS_FACEUP_DEFENSE)
 			Duel.ChangePosition(tc2,pos2)
 		end
 	end
