@@ -4,6 +4,7 @@ function s.initial_effect(c)
 	--pendulum summon
 	aux.EnablePendulumAttribute(c,false)
 	--link summon
+	c:EnableReviveLimit()
 	aux.AddLinkProcedure(c,s.matfilter,2,2)
 	--atk/def up
 	local e1=Effect.CreateEffect(c)
