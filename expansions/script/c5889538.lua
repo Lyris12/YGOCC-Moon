@@ -29,7 +29,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function s.ffilter(c,fc,sumtype,tp,sub,mg,sg)
-	return c:GetType(fc,sumtype,tp)&0x20004==0x20004 and c:GetOriginalType(fc,sumtype,tp)&TYPE_MONSTER==TYPE_MONSTER and c:GetOriginalRace(fc,sumtype,tp)&RACE_BEAST==RACE_BEAST
+	return c:GetType()&0x20004==0x20004 and c:GetOriginalType()&TYPE_MONSTER==TYPE_MONSTER and c:GetOriginalRace()&RACE_BEAST==RACE_BEAST
 end
 --LIMIT
 function s.zcheck(c,i,tp)

@@ -1054,6 +1054,7 @@ function Auxiliary.GLGetLinkedZoneManually(c,f)
 		if not loct then
 			loct=0
 		end
+		local val=(seq>4) and 4-(base-1) or base-1
 		local freeseq=(c:IsLocation(LOCATION_MZONE) and seq==2) and 5 or (c:IsLocation(LOCATION_MZONE) and seq==4) and 6 or base-1
 		if not free or free(c,LOCATION_MZONE,base-1,locp) then
 			if c:IsLocation(LOCATION_MZONE) and seq==2 then
@@ -1061,7 +1062,7 @@ function Auxiliary.GLGetLinkedZoneManually(c,f)
 			elseif c:IsLocation(LOCATION_MZONE) and seq==4 then
 				zone=zone|0x40
 			else
-				zone=zone|(0x1<<(base-1+loct))
+				zone=zone|(0x1<<(val+loct))
 			end
 		end
 	end
@@ -1076,6 +1077,7 @@ function Auxiliary.GLGetLinkedZoneManually(c,f)
 		if not loct then
 			loct=0
 		end
+		local val=(seq>4) and 4-base or base
 		local freeseq=(c:IsLocation(LOCATION_MZONE) and seq==1) and 5 or (c:IsLocation(LOCATION_MZONE) and seq==3) and 6 or base
 		if not free or free(c,LOCATION_MZONE,freeseq,locp) then
 			if c:IsLocation(LOCATION_MZONE) and seq==1 then
@@ -1083,7 +1085,7 @@ function Auxiliary.GLGetLinkedZoneManually(c,f)
 			elseif c:IsLocation(LOCATION_MZONE) and seq==3 then
 				zone=zone|0x40
 			else
-				zone=zone|(0x1<<(base+loct))
+				zone=zone|(0x1<<(val+loct))
 			end
 		end
 	end
@@ -1098,6 +1100,7 @@ function Auxiliary.GLGetLinkedZoneManually(c,f)
 		if not loct then
 			loct=0
 		end
+		local val=(seq>4) and 4-(base+1) or base+1
 		local freeseq=(c:IsLocation(LOCATION_MZONE) and seq==0) and 5 or (c:IsLocation(LOCATION_MZONE) and seq==2) and 6 or base+1
 		if not free or free(c,LOCATION_MZONE,freeseq,locp) then
 			if c:IsLocation(LOCATION_MZONE) and seq==0 then
@@ -1105,7 +1108,7 @@ function Auxiliary.GLGetLinkedZoneManually(c,f)
 			elseif c:IsLocation(LOCATION_MZONE) and seq==2 then
 				zone=zone|0x40
 			else
-				zone=zone|(0x1<<(base+1+loct))
+				zone=zone|(0x1<<(val+loct))
 			end
 		end
 	end

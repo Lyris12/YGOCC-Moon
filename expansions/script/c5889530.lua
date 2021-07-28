@@ -105,8 +105,10 @@ function s.zntg(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 end
 function s.znop(e,tp,eg,ep,ev,re,r,rp)
+	local zone=0xff
 	if Duel.GetLocationCount(tp,LOCATION_MZONE,PLAYER_NONE,LOCATION_REASON_COUNT)>0 then
 		local dis=Duel.SelectDisableField(tp,1,LOCATION_MZONE,LOCATION_MZONE,EXTRA_MONSTER_ZONE)
+		zone=(~dis)
 		Duel.Hint(HINT_ZONE,tp,dis)
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_FIELD)
@@ -120,7 +122,7 @@ function s.znop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.pcfilter),tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,e:GetHandler(),e,tp,Duel.GetLocationCount(tp,LOCATION_SZONE))
 	if #g>0 then	
 		local tc=g:GetFirst()
-		local b1=(tc:IsCanBeSpecialSummoned(e,0,tp,false,false) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0)
+		local b1=(tc:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,tp,zone) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0)
 		local b2=(not tc:IsForbidden() and Duel.GetLocationCount(tp,LOCATION_SZONE)>0)
 		local op=0
 		if not tc or (not b1 and not b2) then return end
@@ -132,7 +134,7 @@ function s.znop(e,tp,eg,ep,ev,re,r,rp)
 			op=Duel.SelectOption(tp,aux.Stringid(id,3))+1
 		end
 		if op==0 then
-			Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
+			Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP,zone)
 		elseif op==1 and not g:GetFirst():IsImmuneToEffect(e) and Duel.MoveToField(g:GetFirst(),tp,tp,LOCATION_SZONE,POS_FACEUP,true) then
 			local e1=Effect.CreateEffect(e:GetHandler())
 			e1:SetCode(EFFECT_CHANGE_TYPE)
