@@ -99,7 +99,7 @@ function s.zntg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ct=Duel.GetLocationCount(tp,LOCATION_SZONE)
 	if e:IsHasType(EFFECT_TYPE_ACTIVATE) and not e:GetHandler():IsLocation(LOCATION_SZONE) then ct=ct-1 end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE,PLAYER_NONE,LOCATION_REASON_COUNT)+Duel.GetLocationCount(1-tp,LOCATION_MZONE,PLAYER_NONE,LOCATION_REASON_COUNT)>0 and Duel.IsExistingMatchingCard(s.pcfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,e:GetHandler(),e,tp,ct) end
-	local g=Duel.GetMatchingGroup(s.pcfilter,tp,LOCATION_GRAVE,0,nil,e,tp,ct)
+	local g=Duel.GetMatchingGroup(s.pcfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,e:GetHandler(),e,tp,ct)
 	if #g>0 then
 		Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,g,1,0,0)
 	end
@@ -133,7 +133,7 @@ function s.znop(e,tp,eg,ep,ev,re,r,rp)
 		end
 		if op==0 then
 			Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
-		elseif op==1 and Duel.MoveToField(g:GetFirst(),tp,tp,LOCATION_SZONE,POS_FACEUP,true) then
+		elseif op==1 and not g:GetFirst():IsImmuneToEffect(e) and Duel.MoveToField(g:GetFirst(),tp,tp,LOCATION_SZONE,POS_FACEUP,true) then
 			local e1=Effect.CreateEffect(e:GetHandler())
 			e1:SetCode(EFFECT_CHANGE_TYPE)
 			e1:SetType(EFFECT_TYPE_SINGLE)

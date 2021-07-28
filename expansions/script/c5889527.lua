@@ -124,7 +124,7 @@ function s.znop(e,tp,eg,ep,ev,re,r,rp)
 							tc:RegisterFlagEffect(id,reset,0,rct)
 							local ne=Effect.CreateEffect(ce:GetOwner())
 							ne:SetType(EFFECT_TYPE_FIELD)
-							ne:SetRange(ce:GLGetRange())
+							ne:SetRange(ce:GetRange())
 							ne:SetCode(EFFECT_DISABLE_FIELD)
 							ne:SetLabel(zone&(~en))
 							if ce:GetLabelObject() then ne:SetLabelObject(ce:GetLabelObject()) end
@@ -136,7 +136,7 @@ function s.znop(e,tp,eg,ep,ev,re,r,rp)
 							tc:RegisterFlagEffect(id,reset,0,rct)
 							local ne=Effect.CreateEffect(ce:GetOwner())
 							ne:SetType(EFFECT_TYPE_FIELD)
-							ne:SetRange(ce:GLGetRange())
+							ne:SetRange(ce:GetRange())
 							ne:SetCode(EFFECT_DISABLE_FIELD)
 							ne:SetLabel(~en)
 							if ce:GetLabelObject() then ne:SetLabelObject(ce:GetLabelObject()) end
@@ -234,6 +234,7 @@ end
 function s.disop2(op)
 	return	function(e,tp)
 				local zone=op(e,tp)
+				if not zone then return e:GetLabel() end
 				return zone&e:GetLabel()
 	end
 end
@@ -256,7 +257,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
 	if not c:IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
-	if Duel.MoveToField(c,tp,tp,LOCATION_SZONE,POS_FACEUP,true) then
+	if not c:IsImmuneToEffect(e) and Duel.MoveToField(c,tp,tp,LOCATION_SZONE,POS_FACEUP,true) then
 		local e1=Effect.CreateEffect(c)
 		e1:SetCode(EFFECT_CHANGE_TYPE)
 		e1:SetType(EFFECT_TYPE_SINGLE)

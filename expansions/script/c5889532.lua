@@ -143,7 +143,7 @@ function s.pcop(e,tp,eg,ep,ev,re,r,rp)
 	if #g>0 then
 		local tc=g:GetFirst()
 		while tc do
-			if Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true) then
+			if not tc:IsImmuneToEffect(e) and Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true) then
 				local e1=Effect.CreateEffect(e:GetHandler())
 				e1:SetCode(EFFECT_CHANGE_TYPE)
 				e1:SetType(EFFECT_TYPE_SINGLE)

@@ -86,10 +86,11 @@ function s.pcop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if not c or not tc:IsFaceup() or not c:IsRelateToEffect(e) or Duel.GetLocationCount(c:GetOwner(),LOCATION_SZONE)<0 then return end
 	if tc and tc:IsRelateToEffect(e) and s.pcfilter(tc,c) then
+		local fid=c:GetFieldID()
 		local g=Group.FromCards(c,tc)
 		local gc=g:GetFirst()
 		while gc do
-			if Duel.MoveToField(gc,tp,gc:GetOwner(),LOCATION_SZONE,POS_FACEUP,true) then
+			if not gc:IsImmuneToEffect(e) and Duel.MoveToField(gc,tp,gc:GetOwner(),LOCATION_SZONE,POS_FACEUP,true) then
 				local e1=Effect.CreateEffect(c)
 				e1:SetCode(EFFECT_CHANGE_TYPE)
 				e1:SetType(EFFECT_TYPE_SINGLE)
@@ -99,11 +100,13 @@ function s.pcop(e,tp,eg,ep,ev,re,r,rp)
 				gc:RegisterEffect(e1)
 				if gc:IsPreviousLocation(LOCATION_MZONE) then
 					if gc~=c and gc:IsLocation(LOCATION_SZONE) then
+						gc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SET_AVAILABLE,1,fid)
 						local e2=Effect.CreateEffect(c)
 						e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 						e2:SetCode(EVENT_PHASE+PHASE_END)
 						e2:SetReset(RESET_PHASE+PHASE_END)
 						e2:SetCountLimit(1)
+						e2:SetLabel(fid)
 						e2:SetLabelObject(gc)
 						e2:SetOperation(s.retop)
 						Duel.RegisterEffect(e2,tp)
@@ -129,7 +132,7 @@ function s.disop(e,tp)
 end
 function s.retop(e,tp,eg,ep,ev,re,r,rp)
 	local gc=e:GetLabelObject()
-	if Duel.GetLocationCount(1-tp,LOCATION_MZONE)<=0 or not Duel.MoveToField(gc,tp,1-tp,LOCATION_MZONE,POS_FACEUP,true) then
+	if not gc:IsLocation(LOCATION_SZONE) or gc:GetFlagEffectLabel(id)~=e:GetLabel() or Duel.GetLocationCount(1-tp,LOCATION_MZONE)<=0 or not Duel.MoveToField(gc,tp,1-tp,LOCATION_MZONE,POS_FACEUP,true) then
 		Duel.SendtoGrave(gc,REASON_EFFECT)
 	end
 end
