@@ -55,7 +55,8 @@ function s.zntg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return false end
 		local check={false,false}
-		for p=tp,1-tp do
+		local incr=(tp==0) and 1 or -1
+		for p=tp,1-tp,incr do
 			if check[p+1] then break end
 			for i=0,4 do
 				local index=(p==tp) and i or 4-i
@@ -68,7 +69,8 @@ function s.zntg(e,tp,eg,ep,ev,re,r,rp,chk)
 		return check[tp+1] or check[2-tp]
 	end
 	local zone=0
-	for p=tp,1-tp do
+	local incr=(tp==0) and 1 or -1
+	for p=tp,1-tp,incr do
 		local x=(p==tp) and 0 or 16
 		for i=0,4 do
 			local index=(p==tp) and i or 4-i

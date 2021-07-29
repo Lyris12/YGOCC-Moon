@@ -63,7 +63,8 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingTarget(s.spfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil,e,tp)
 	end
 	local ct=1
-	for p=tp,1-tp do
+	local incr=(tp==0) and 1 or -1
+	for p=tp,1-tp,incr do
 		for i=0,4 do
 			--local index=(p==tp) and i or 4-i
 			if not Duel.CheckLocation(p,LOCATION_MZONE,i) and not Duel.GetFieldGroup(p,LOCATION_MZONE,0):IsExists(s.zcheck,1,nil,i,p) then

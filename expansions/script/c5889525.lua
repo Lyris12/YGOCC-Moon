@@ -34,7 +34,8 @@ function s.pctg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return false end
 		local check=false
-		for p=tp,1-tp do
+		local incr=(tp==0) and 1 or -1
+		for p=tp,1-tp,incr do
 			if check then break end
 			for i=0,6 do
 				local index
@@ -67,7 +68,8 @@ function s.pcop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 or c:IsForbidden() then return end
 	local zone=0
-	for p=tp,1-tp do
+	local incr=(tp==0) and 1 or -1
+	for p=tp,1-tp,incr do
 		for i=0,6 do
 			local index
 			if i<5 then

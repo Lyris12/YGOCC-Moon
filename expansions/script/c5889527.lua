@@ -47,7 +47,8 @@ end
 function s.atkval(e,c)
 	local tp=e:GetHandlerPlayer()
 	local ct=0
-	for p=tp,1-tp do
+	local incr=(tp==0) and 1 or -1
+	for p=tp,1-tp,incr do
 		for i=0,4 do
 			local index=(p==tp) and i or 4-i
 			if not Duel.CheckLocation(p,LOCATION_MZONE,i) and not Duel.GetFieldGroup(p,LOCATION_MZONE,0):IsExists(s.zcheck,1,nil,i,p) then
@@ -145,7 +146,7 @@ function s.znop(e,tp,eg,ep,ev,re,r,rp)
 							tc:RegisterEffect(ne)
 							ce:SetCondition(s.zcond)
 						end
-					elseif ce:GetCode()==EFFECT_USE_EXTRA_MZONE then
+					elseif ce and ce.SetLabelObject and ce:GetCode()==EFFECT_USE_EXTRA_MZONE then
 						local val=ce:GetValue()
 						local zct=math.fmod(val,0x10)
 						local zone=bit.rshift(val-zct,16)
@@ -164,7 +165,8 @@ function s.znop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 	--handle duel effect
-	for p=tp,1-tp do
+	local incr=(tp==0) and 1 or -1
+	for p=tp,1-tp,incr do
 		local en=(p==tp) and e:GetLabel() or e:GetLabel()<<16
 		local t=global_duel_effect_table[p]
 		if t and #t>0 then
@@ -202,7 +204,6 @@ function s.znop(e,tp,eg,ep,ev,re,r,rp)
 			end
 		end
 	end
-	Duel.Readjust()
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp) and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
