@@ -233,8 +233,7 @@ function s.disop(e,tp)
 end
 function s.disop2(op)
 	return	function(e,tp)
-				local zone=op(e,tp)
-				if not zone then return e:GetLabel() end
+				local zone=(type(op)=="number") and op or op(e,tp)
 				return zone&e:GetLabel()
 	end
 end
