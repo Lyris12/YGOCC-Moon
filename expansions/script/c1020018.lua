@@ -4,7 +4,7 @@ function s.initial_effect(c)
 	--highlander
 	c:SetUniqueOnField(1,0,id,LOCATION_MZONE)
 	--fusion
-	aux.AddFusionProcFunFunRep(c,s.ffilter,aux.FilterBoolFunction(Card.IsFusionRace,RACE_MACHINE),2,2,true)
+	aux.AddFusionProcFunFunRep(c,s.ffilter,aux.FilterBoolFunction(Card.IsRace,RACE_MACHINE),2,2,true)
 	c:EnableReviveLimit()
 	--pendulum
 	aux.EnablePendulumAttribute(c,false)
