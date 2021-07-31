@@ -52,7 +52,7 @@ function s.cfilter(c)
 	return c:IsFaceup() and not c:IsAttack(c:GetBaseAttack())
 end
 function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetLinkedGroup():IsExists(cfilter,1,nil)
+	return e:GetHandler():GetLinkedGroup():IsExists(s.cfilter,1,nil)
 end
 function s.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
