@@ -1,4 +1,5 @@
 --Galactic Codeman: Linked Zero
+local s,id=GetID()
 function s.initial_effect(c)
 	aux.AddLinkProcedure(c,aux.FilterBoolFunction(Card.IsLinkRace,RACE_MACHINE),2,99,s.lcheck)
 	c:EnableReviveLimit()

@@ -94,19 +94,18 @@ function s.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
 	local a=Duel.GetAttacker()
 	local d=Duel.GetAttackTarget()
 	if not a or not d then return end
 	if a:IsControler(1-tp) then a,d=d,a end
 	if a:IsFaceup() and a:IsSetCard(0xded) and a:IsRelateToBattle() and d:IsFaceup() and d:IsRelateToBattle() then
-		local e2=Effect.CreateEffect(c)
+		local e2=Effect.CreateEffect(e:GetHandler())
 		e2:SetType(EFFECT_TYPE_SINGLE)
 		e2:SetCode(EFFECT_SET_ATTACK_FINAL)
-		e2:SetValue(math.ceil(c:GetAttack()/2))
+		e2:SetValue(math.ceil(a:GetAttack()/2))
 		e2:SetReset(RESET_EVENT+RESETS_STANDARD)
-		c:RegisterEffect(e2)
-		local e1=Effect.CreateEffect(c)
+		a:RegisterEffect(e2)
+		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
 		e1:SetValue(1)

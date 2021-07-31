@@ -78,12 +78,15 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
+function s.atkfilter(c,e,g)
+	return c:IsFaceup() and c:IsCanBeEffectTarget(e) and g:IsExists(Card.IsFaceup,1,c)
+end
 function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local lg=e:GetHandler():GetLinkedGroup()
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() and lg:IsContains(c) end
-	if chk==0 then return lg:IsExists(aux.AND(Card.IsFaceup,Card.IsCanBeEffectTarget),1,nil,e) end
+	if chk==0 then return lg:IsExists(s.atkfilter,1,nil,e,lg) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	local g=lg:FilterSelect(tp,aux.AND(Card.IsFaceup,Card.IsCanBeEffectTarget),1,1,nil,e)
+	local g=lg:FilterSelect(tp,s.atkfilter,1,1,nil,e,lg)
 	Duel.SetTargetCard(g)
 end
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
