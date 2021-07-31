@@ -21,7 +21,6 @@ function s.initial_effect(c)
 	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_ATKCHANGE)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCondition(s.thcon)
 	e2:SetTarget(s.thtg)
 	e2:SetOperation(s.thop)
 	e2:SetCountLimit(1,id+100+EFFECT_COUNT_CODE_OATH)
@@ -42,25 +41,13 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
 	Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP_DEFENSE)
 end
-function s.cfilter(c)
-	local bool=false
-	for _,etype in ipairs({EFFECT_UPDATE_ATTACK,EFFECT_SET_ATTACK,EFFECT_SET_ATTACK_FINAL,EFFECT_SWAP_AD}) do
-		for _,re in ipairs({c:IsHasEffect(etype)}) do
-			if re:GetOwner():IsSetCard(0xded) or re:GetOwner():IsType(TYPE_QUICKPLAY) then
-				bool=true
-				break
-			end
-		end
-		if bool then break end
-	end
-	return c:IsFaceup() and c:IsSetCard(0xded) and bool and not c:IsAttack(c:GetBaseAttack())
-end
-function s.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,nil)
-end
 function s.atkfilter(c,tp)
 	return c:IsSetCard(0xded) and c:IsLevelAbove(1)
-		-- and Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil,c)
+		and Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil,c)
+end
+function s.thfilter(c,tc)
+	return c:IsRace(RACE_MACHINE) and c:IsType(TYPE_MONSTER) and c:IsLevel(tc:GetLevel()) and not c:IsCode(tc:GetCode())
+		and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -69,10 +56,6 @@ function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATKDEF)
 	local g=Duel.SelectTarget(tp,s.atkfilter,tp,LOCATION_MZONE,0,1,1,c,tp)
 	Duel.SetOperationInfo(0,CATEGORY_ATKCHANGE,g,1,0,-math.floor(tc:GetAttack()/2))
-end
-function s.thfilter(c,tc)
-	return c:IsRace(RACE_MACHINE) and c:IsType(TYPE_MONSTER) and c:IsLevel(tc:GetLevel()) and not c:IsCode(tc:GetCode())
-		and c:IsAbleToHand()
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
