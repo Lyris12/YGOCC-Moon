@@ -1,113 +1,153 @@
 --Coded-Eyes Renegade Dragon
-function c1020030.initial_effect(c)
-	Auxiliary.AddFusionProcFunRep(c,aux.FilterBoolFunction(Card.IsSetCard,0xded),2,true)
+local s,id=GetID()
+function s.initial_effect(c)
+	--fusion
+	aux.AddFusionProcFun2(c,aux.FilterBoolFunction(Card.IsFusionSetCard,0x2ded),aux.FilterBoolFunction(Card.IsFusionSetCard,0xded),true)
+	c:EnableReviveLimit()
 	--effect
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(1020030,0))
-	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
-	e1:SetType(EFFECT_TYPE_TRIGGER_F+EFFECT_TYPE_SINGLE)
+	e1:SetDescription(aux.Stringid(id,0))
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e1:SetCondition(c1020030.con)
-	e1:SetTarget(c1020030.tg)
-	e1:SetOperation(c1020030.op)
+	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
+	e1:SetCondition(s.con)
+	e1:SetTarget(s.tg)
+	e1:SetOperation(s.op)
+	e1:SetCountLimit(1,id+EFFECT_COUNT_CODE_OATH)
 	c:RegisterEffect(e1)
-	--destroy
-	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(1020030,0))
-	e2:SetCategory(CATEGORY_DESTROY)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e2:SetCode(EVENT_TO_GRAVE)
-	e2:SetCondition(c1020030.descon)
-	e2:SetTarget(c1020030.destg)
-	e2:SetOperation(c1020030.desop)
-	c:RegisterEffect(e2)
-	local e3=e2:Clone()
-	e3:SetCode(EVENT_REMOVE)
-	c:RegisterEffect(e3)
-	local e4=e2:Clone()
-	e4:SetCode(EVENT_TO_DECK)
-	c:RegisterEffect(e4)
+	--damage
+	local e1=Effect.CreateEffect(c)
+	e1:SetCategory(CATEGORY_DAMAGE)
+	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetCost(s.damcost)
+	e1:SetTarget(s.damtg)
+	e1:SetOperation(s.damop)
+	e1:SetCountLimit(1,id+EFFECT_COUNT_CODE_OATH)
+	c:RegisterEffect(e1)
+	Duel.AddCustomActivityCounter(id,ACTIVITY_ATTACK,s.counterfilter)
 end
-function c1020030.con(e)
+function s.counterfilter(c)
+	return not c:IsLevelAbove(8)
+end
+function s.con(e)
+	return e:GetHandler():GetSummonType()&SUMMON_TYPE_FUSION==SUMMON_TYPE_FUSION
+end
+function s.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return e:GetLabel()==1 and aux.NegateMonsterFilter(chkc) and chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) end
+	local a=not (Duel.GetCurrentPhase()>=PHASE_DAMAGE and Duel.GetCurrentPhase()<=PHASE_DAMAGE_CAL)
+	local b=Duel.IsExistingTarget(aux.NegateMonsterFilter,tp,0,LOCATION_MZONE,1,nil)
+	if chk==0 then return a or b end
+	local op=0
+	if a and b then
+		op=Duel.SelectOption(tp,aux.Stringid(id,0),aux.Stringid(id,1))
+	else
+		op=a and 0 or 1
+	end
+	e:SetLabel(op)
+	if op==0 then
+		e:SetCategory(0)
+		e:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
+	elseif op==1 then
+		e:SetCategory(CATEGORY_DISABLE+CATEGORY_ATKCHANGE)
+		e:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_CARD_TARGET)
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
+		local g=Duel.SelectTarget(tp,aux.NegateMonsterFilter,tp,0,LOCATION_MZONE,1,1,nil)
+		Duel.SetOperationInfo(0,CATEGORY_DISABLE,g,1,0,0)
+		Duel.SetOperationInfo(0,CATEGORY_ATKCHANGE,e:GetHandler(),1,0,g:GetFirst():GetAttack())
+	end
+end
+function s.op(e,tp,eg,ep,ev,re,r,rp)
+	local op=e:GetLabel()
+	if op==0 then
+		--atk
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetDescription(aux.Stringid(84569886,0))
+		e1:SetCategory(CATEGORY_ATKCHANGE)
+		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+		e1:SetCode(EVENT_BATTLE_CONFIRM)
+		e1:SetRange(LOCATION_MZONE)
+		e1:SetCondition(s.atkcon)
+		e1:SetOperation(s.atkop)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+		e:GetHandler():RegisterEffect(e1)
+	elseif op==1 then
+		local tc=Duel.GetFirstTarget()
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_UPDATE_ATTACK)
+		e1:SetValue(tc:GetAttack())
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+		e:GetHandler():RegisterEffect(e1)
+		Duel.AdjustInstantly(e:GetHandler())
+		if not e:GetHandler():IsImmuneToEffect(e1) then
+			local e1=Effect.CreateEffect(e:GetHandler())
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetCode(EFFECT_DISABLE)
+			e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+			tc:RegisterEffect(e1)
+			local e2=Effect.CreateEffect(e:GetHandler())
+			e2:SetType(EFFECT_TYPE_SINGLE)
+			e2:SetCode(EFFECT_DISABLE_EFFECT)
+			e2:SetValue(RESET_TURN_SET)
+			e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+			tc:RegisterEffect(e2)
+		end
+	end
+end
+function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
+	local a=Duel.GetAttacker()
+	local d=a:GetBattleTarget()
+	if a:IsControler(1-tp) then a,d=d,a end
+	return a and d and a:IsFaceup() and a:IsRelateToBattle() and a:IsSetCard(0xded)
+		and d:IsFaceup() and d:IsRelateToBattle() and d:GetAttack()>0 and a:GetControler()~=d:GetControler()
+		and d:GetSummonLocation()&LOCATION_EXTRA==LOCATION_EXTRA
+end
+function s.atkop(e,tp,ep,ev,re,r,rp)
+	local a=Duel.GetAttacker()
+	local d=a:GetBattleTarget()
+	if a:IsControler(1-tp) then a,d=d,a end
+	if e:GetHandler():IsRelateToEffect(e)
+		and d:IsFaceup() and d:IsRelateToBattle() then
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_UPDATE_ATTACK)
+		e1:SetValue(-1000)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+		d:RegisterEffect(e1)
+	end
+end
+function s.damcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	return c:GetSummonType()==SUMMON_TYPE_FUSION
+	if chk==0 then return Duel.GetCustomActivityCount(id,tp,ACTIVITY_ATTACK)==0 and c:GetFlagEffect(id)==0 end
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_CANNOT_ATTACK)
+	e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_OATH)
+	e1:SetTargetRange(LOCATION_MZONE,0)
+	e1:SetTarget(aux.TargetBoolFunction(Card.IsLevelAbove,8))
+	e1:SetReset(RESET_PHASE+PHASE_END)
+	Duel.RegisterEffect(e1,tp)
+	c:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
 end
-function c1020030.ctfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x2ded)
+function s.cfilter(c)
+	return c:IsFaceup() and (c:IsLevelAbove(1) or c:IsRankAbove(1))
 end
-function c1020030.ctfilter1(c)
-	return c:IsFaceup() and c:IsSetCard(0x1ded)
+function s.damtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc~=e:GetHandler() and s.cfilter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(s.cfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,e:GetHandler()) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
+	local g=Duel.SelectTarget(tp,s.cfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,e:GetHandler())
+	local tc=g:GetFirst()
+	local val=math.max(tc:GetLevel(),tc:GetRank())*200
+	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,0,0,PLAYER_ALL,val)
 end
-function c1020030.desfilter(c)
-	return c:IsType(TYPE_SPELL+TYPE_TRAP) or c:IsLocation(LOCATION_SZONE)
-end
-function c1020030.desfilter1(c)
-	return c:IsType(TYPE_MONSTER)
-end
-function c1020030.tg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then
-		local ct=Duel.GetMatchingGroupCount(c1020030.ctfilter,tp,LOCATION_MZONE,0,nil)
-		local ct1=Duel.GetMatchingGroupCount(c1020030.ctfilter1,tp,LOCATION_MZONE,0,nil)
-		local sel=0
-		if ct>0 and Duel.IsExistingMatchingCard(c1020030.desfilter,tp,0,LOCATION_ONFIELD,1,nil) then sel=sel+1 end
-		if ct1>0 and Duel.IsExistingMatchingCard(c1020030.desfilter1,tp,0,LOCATION_MZONE,1,nil) then sel=sel+2 end
-		e:SetLabel(sel)
-		return sel~=0
-	end
-	local sel=e:GetLabel()
-	if sel==3 then
-		Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(1020030,0))
-		sel=Duel.SelectOption(tp,aux.Stringid(1020030,1),aux.Stringid(1020030,2))+1
-	elseif sel==1 then
-		Duel.SelectOption(tp,aux.Stringid(1020030,1))
-	else
-		Duel.SelectOption(tp,aux.Stringid(1020030,2))
-	end
-	e:SetLabel(sel)
-	if sel==1 then
-		local g=Duel.GetMatchingGroup(c1020030.desfilter,tp,0,LOCATION_SZONE,nil)
-		e:SetCategory(CATEGORY_DESTROY)
-		Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
-	else
-		local g=Duel.GetMatchingGroup(c1020030.desfilter1,tp,0,LOCATION_MZONE,nil)
-		e:SetCategory(CATEGORY_DESTROY)
-		Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
-	end
-end
-function c1020030.op(e,tp,eg,ep,ev,re,r,rp)
-	local sel=e:GetLabel()
-	if sel==1 then
-		local ct=Duel.GetMatchingGroupCount(c1020030.ctfilter,tp,LOCATION_MZONE,0,nil)
-		local g=Duel.GetMatchingGroup(c1020030.desfilter,tp,0,LOCATION_SZONE,nil)
-		if ct>0 and g:GetCount()>0 then
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-			local dg=g:Select(tp,1,ct,nil)
-			Duel.HintSelection(dg)
-			Duel.Destroy(dg,REASON_EFFECT)
-		end
-	else
-		local ct=Duel.GetMatchingGroupCount(c1020030.ctfilter1,tp,LOCATION_MZONE,0,nil)
-		local g=Duel.GetMatchingGroup(c1020030.desfilter1,tp,0,LOCATION_MZONE,nil)
-		if ct>0 and g:GetCount()>0 then
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-			local dg=g:Select(tp,1,ct,nil)
-			Duel.HintSelection(dg)
-			Duel.Destroy(dg,REASON_EFFECT)
-		end
-	end
-end
-function c1020030.descon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsPreviousPosition(POS_FACEUP) and e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
-end
-function c1020030.damfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0xded)
-end
-function c1020030.destg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	local g=Duel.GetMatchingGroup(c1020030.damfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
-	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,g:GetCount()*300,0,0)
-end
-function c1020030.desop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(c1020030.damfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
-	Duel.Damage(1-tp,g:GetCount()*300,REASON_EFFECT)
+function s.damop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local tc=Duel.GetFirstTarget()
+	if tc:IsFacedown() or not tc:IsRelateToEffect(e) then return end
+	local val=math.max(tc:GetLevel(),tc:GetRank())*200
+	Duel.Damage(Duel.GetTurnPlayer(),val,REASON_EFFECT)
+	Duel.Damage(1-Duel.GetTurnPlayer(),val,REASON_EFFECT)
 end

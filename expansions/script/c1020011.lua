@@ -1,99 +1,114 @@
---Codeman: Zero the ~~Hero~~ Warrior
-function c1020011.initial_effect(c)
-	--pendulum summon
-	aux.EnablePendulumAttribute(c)
-	--splimit
+--CODEMAN: Prototype Z3R0
+local s,id=GetID()
+function s.initial_effect(c)
+	for _,code in ipairs({EFFECT_CANNOT_BE_FUSION_MATERIAL,EFFECT_CANNOT_BE_SYNCHRO_MATERIAL,EFFECT_CANNOT_BE_XYZ_MATERIAL,EFFECT_CANNOT_BE_LINK_MATERIAL,EFFECT_CANNOT_BE_ACCENTED_MATERIAL,EFFECT_CANNOT_BE_ANNOTEE_MATERIAL,EFFECT_CANNOT_BE_BIGBANG_MATERIAL,EFFECT_CANNOT_BE_BYPATH_MATERIAL,EFFECT_CANNOT_BE_EVOLUTE_MATERIAL,EFFECT_CANNOT_BE_HARMONIZED_MATERIAL,EFFECT_CANNOT_BE_IMPURE_MATERIAL,EFFECT_CANNOT_BE_MAGICK_MATERIAL,EFFECT_CANNOT_BE_PERDITION_MATERIAL,EFFECT_CANNOT_BE_POLARITY_MATERIAL,EFFECT_CANNOT_BE_SPACE_MATERIAL,EFFECT_CANNOT_BE_TIMELEAP_MATERIAL,EFFECT_CANNOT_BE_XROS_MATERIAL})	do
+		--material limit
+		local e0=Effect.CreateEffect(c)
+		e0:SetType(EFFECT_TYPE_SINGLE)
+		e0:SetCode(code)
+		e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+		e0:SetValue(function(e) return e:GetHandler():IsLocation(LOCATION_MZONE) end)
+		c:RegisterEffect(e0)
+	end
+	--special summon
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetRange(LOCATION_PZONE)
-	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CANNOT_NEGATE)
-	e1:SetTargetRange(1,0)
-	e1:SetTarget(c1020011.splimit)
+	e1:SetDescription(aux.Stringid(62968263,0))
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetRange(LOCATION_HAND)
+	e1:SetCondition(s.spcon1)
+	e1:SetTarget(s.sptg1)
+	e1:SetOperation(s.spop1)
+	e1:SetCountLimit(1,id+EFFECT_COUNT_CODE_OATH)
 	c:RegisterEffect(e1)
-	--Recover
+	--disable
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e2:SetRange(LOCATION_PZONE)
-	e2:SetCondition(c1020011.indcon)
-	e2:SetOperation(c1020011.indop)
+	e2:SetDescription(aux.Stringid(22423493,0))
+	e2:SetCategory(CATEGORY_DISABLE)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e2:SetType(EFFECT_TYPE_IGNITION)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1)
+	e2:SetTarget(s.distg)
+	e2:SetOperation(s.disop)
 	c:RegisterEffect(e2)
-	--chain attack
+	--remove (experimental)
 	local e3=Effect.CreateEffect(c)
-	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e3:SetCountLimit(1,1020011)
-	e3:SetCode(EVENT_BATTLE_DESTROYING)
-	e3:SetCondition(c1020011.atcon)
-	e3:SetTarget(c1020011.attg)
-	e3:SetOperation(c1020011.atop)
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e3:SetCode(EVENT_ADJUST)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetCondition(s.adjcon)
+	e3:SetOperation(s.adjop)
 	c:RegisterEffect(e3)
 end
-function c1020011.splimit(e,c,sump,sumtype,sumpos,targetp)
-	return not (c:GetLevel()>=7) and bit.band(sumtype,SUMMON_TYPE_PENDULUM)==SUMMON_TYPE_PENDULUM
+function s.cfilter(c)
+	return c:IsFaceup() and c:IsSetCard(RACE_MACHINE)
 end
-function c1020011.cfilter(c,e,tp)
-	return c:IsSetCard(0xded) and c:GetSummonPlayer()==tp and c:GetSummonType()==SUMMON_TYPE_PENDULUM
-		and (not e or c:IsRelateToEffect(e))
+function s.spcon1(e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_MZONE,0,nil)
+	return #g>=2 and g:IsExists(aux.NOT(Card.IsAttack),1,nil,Card.GetBaseAttack)
 end
-function c1020011.indcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c1020011.cfilter,1,nil,nil,tp) and Duel.IsExistingMatchingCard(c1020011.filter,tp,LOCATION_GRAVE,0,1,nil)
+function s.sptg1(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
-function c1020011.filter(c)
-	return c:IsSetCard(0xded) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
-end
-function c1020011.indop(e,tp,eg,ep,ev,re,r,rp)
+function s.spop1(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) or Duel.Destroy(c,REASON_EFFECT)==0 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,c1020011.filter,tp,LOCATION_GRAVE,0,1,1,nil)
-	if g:GetCount()>0 then
-		Duel.SendtoHand(g,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,g)
+	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP_DEFENSE)>0 then
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e1:SetReset(RESET_EVENT+RESETS_REDIRECT)
+		e1:SetValue(LOCATION_REMOVED)
+		c:RegisterEffect(e1,true)
 	end
 end
-
-function c1020011.atcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local bc=c:GetBattleTarget()
-	return c==Duel.GetAttacker() and c:IsRelateToBattle() and c:IsStatus(STATUS_OPPO_BATTLE) 
-		and bc:IsType(TYPE_MONSTER)
+function s.distg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return false end
+	if chk==0 then return Duel.IsExistingTarget(aux.disfilter1,tp,LOCATION_ONFIELD,0,1,e:GetHandler())
+		and Duel.IsExistingTarget(aux.disfilter1,tp,0,LOCATION_ONFIELD,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SELF)
+	Duel.SelectTarget(tp,aux.disfilter1,tp,LOCATION_ONFIELD,0,1,1,e:GetHandler())
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_OPPO)
+	Duel.SelectTarget(tp,aux.disfilter1,tp,0,LOCATION_ONFIELD,1,1,nil)
 end
-function c1020011.attg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0
-		and Duel.GetAttackTarget():IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE,1-tp) end
-	Duel.GetAttackTarget():CreateEffectRelation(e)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,Duel.GetAttackTarget(),1,0,0)
-end
-function c1020011.atop(e,tp,eg,ep,ev,re,r,rp)
+function s.disop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local bc=Duel.GetAttackTarget()
-	if not bc:IsRelateToEffect(e) then return end
-	if Duel.SpecialSummon(bc,0,tp,1-tp,false,false,POS_FACEUP_DEFENSE) then
-		if bc and bc:IsFaceup() and c:IsFaceup() and c:IsRelateToEffect(e) then
-			local e1=Effect.CreateEffect(c)
-			e1:SetLabelObject(bc)
-			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-			e1:SetCode(EFFECT_EXTRA_ATTACK)
-			e1:SetCondition(c1020011.con)
-			e1:SetValue(1)
-			e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
-			c:RegisterEffect(e1)
-			local e2=Effect.CreateEffect(c)
-			e2:SetLabelObject(bc)
-			e2:SetType(EFFECT_TYPE_SINGLE)
-			e2:SetCode(EFFECT_PIERCE)
-			e2:SetCondition(c1020011.con)
-			e2:SetValue(1)
-			e2:SetReset(RESET_EVENT+0x1fe0000)
-			c:RegisterEffect(e2)
-			bc:RegisterFlagEffect(1020011,RESET_EVENT+0x1fe0000,0,1)
+	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
+	if #g~=2 then return end
+	for tc in aux.Next(g) do
+		Duel.NegateRelatedChain(tc,RESET_TURN_SET)
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e1:SetCode(EFFECT_DISABLE)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+		tc:RegisterEffect(e1)
+		local e2=Effect.CreateEffect(c)
+		e2:SetType(EFFECT_TYPE_SINGLE)
+		e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e2:SetCode(EFFECT_DISABLE_EFFECT)
+		e2:SetValue(RESET_TURN_SET)
+		e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+		tc:RegisterEffect(e2)
+		if tc:IsType(TYPE_TRAPMONSTER) then
+			local e3=Effect.CreateEffect(c)
+			e3:SetType(EFFECT_TYPE_SINGLE)
+			e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+			e3:SetCode(EFFECT_DISABLE_TRAPMONSTER)
+			e3:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+			tc:RegisterEffect(e3)
 		end
 	end
 end
-function c1020011.con(e,tp,eg,ep,ev,re,r,rp)
-	local bc=e:GetLabelObject()
-	return bc:GetFlagEffect(1020011)==1
+function s.adjfilter(c)
+	return c:IsFaceup() and c:IsSetCard(0x1ded)
+end
+function s.adjcon(e,tp)
+	return not Duel.IsExistingMatchingCard(s.adjfilter,tp,LOCATION_MZONE,0,1,e:GetHandler())
+end
+function s.adjop(e)
+	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_EFFECT)
 end

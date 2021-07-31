@@ -1,118 +1,145 @@
 --Codeman: Zero
---Automate ID
-local function getID()
-	local str=string.match(debug.getinfo(2,'S')['source'],"c%d+%.lua")
-	str=string.sub(str,1,string.len(str)-4)
-	local scard=_G[str]
-	local s_id=tonumber(string.sub(str,2))
-	return scard,s_id
-end
-
-local scard,s_id=getID()
-
-function scard.initial_effect(c)
+local s,id=GetID()
+function s.initial_effect(c)
 	--Special Summon
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(s_id,0))
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_QUICK_O)
-	e1:SetCode(EVENT_SUMMON_SUCCESS)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e1:SetRange(LOCATION_HAND)
-	e1:SetCondition(scard.condition)
-	e1:SetTarget(scard.target)
-	e1:SetOperation(scard.operation)
+	e1:SetDescription(1075)
+	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
+	e1:SetRange(LOCATION_HAND+LOCATION_GRAVE)
+	e1:SetCondition(s.condition)
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.operation)
+	e1:SetCountLimit(1,id+EFFECT_COUNT_CODE_OATH)
 	c:RegisterEffect(e1)
-	local e2=e1:Clone()
-	e2:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
+	--atk
+	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,0))
+	e1:SetCategory(CATEGORY_ATKCHANGE)
+	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetTarget(s.atktg)
+	e1:SetOperation(s.atkop1)
+	e1:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
+	c:RegisterEffect(e1)
+	--atk
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,1))
+	e2:SetCategory(CATEGORY_ATKCHANGE)
+	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetCode(EVENT_FREE_CHAIN)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetCondition(s.atkcon)
+	e2:SetOperation(s.atkop2)
+	e2:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
 	c:RegisterEffect(e2)
-	local e3=e1:Clone()
-	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
-	c:RegisterEffect(e3)
-	--act limit
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e4:SetCode(EVENT_SUMMON_SUCCESS)
-	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e4:SetOperation(scard.limop)
-	c:RegisterEffect(e4)
-	local e0=Effect.CreateEffect(c)
-	e0:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e0:SetRange(LOCATION_MZONE)
-	e0:SetCode(EVENT_CHAIN_END)
-	e0:SetOperation(scard.limop2)
-	c:RegisterEffect(e0)
 end
-function scard.condition(e,tp,eg,ep,ev,re,r,rp)
-	if tp==ep or eg:GetCount()~=1 or eg:GetFirst():GetSummonPlayer()==tp then return false end
-	if Duel.GetMatchingGroupCount(scard.filter2,tp,LOCATION_MZONE,0,nil)>0 then
-		local c=eg:GetFirst()
-		local g=Duel.GetMatchingGroup(scard.filter,tp,LOCATION_MZONE,0,nil)
-		local tg=g:GetMinGroup(Card.GetAttack)
-		return c:GetBaseAttack()>tg:GetFirst():GetAttack()
-	end
-end
-function scard.filter(c)
-	return c:IsFaceup()
-end
-function scard.filter2(c)
-	return c:IsFaceup() and c:IsRace(RACE_MACHINE)
-end
-function scard.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	if chk==0 then return c:GetFlagEffect(s_id)==0 end
+function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
-	e:SetLabel(tc:GetAttack())
-	local g=Duel.GetMatchingGroup(scard.filter2,tp,LOCATION_MZONE,0,nil)
+	if eg:GetCount()~=1 or (tc and tc:GetSummonPlayer()==tp) then return false end
+	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,0,nil)
+	if #g==0 then return false end
 	local tg=g:GetMinGroup(Card.GetAttack)
-	if tg:GetCount()>1 then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
+	return tc:GetBaseAttack()>tg:GetFirst():GetAttack()
+end
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return false end
+	local c=e:GetHandler()
+	local tc=eg:GetFirst()
+	if chk==0 then return tc:IsCanBeEffectTarget(e) and c:GetFlagEffect(id)==0 end
+	e:SetLabel(tc:GetAttack())
+	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,0,nil)
+	local tg=g:GetMinGroup(Card.GetAttack)
+	if #tg>1 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 		local sg=tg:Select(tp,1,1,nil)
 		local tg=sg:GetFirst()
 		Duel.SetTargetCard(tg)
-	else Duel.SetTargetCard(tg)
+	else
+		Duel.SetTargetCard(tg)
 	end
 	Duel.SetTargetCard(eg)
 	e:SetLabelObject(tg:GetFirst())
 end
-function scard.operation(e,tp,eg,ep,ev,re,r,rp)
-	local tc=e:GetLabelObject()
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) or not c:IsCanBeSpecialSummoned(e,0,tp,false,false) then return end
 	local tg=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	local lc=tg:GetFirst()
+	local tc=e:GetLabelObject()
 	if lc==tc then lc=tg:GetNext() end
-	local ta=tc:GetAttack()
+	local atk=math.abs(tc:GetAttack()-lc:GetAttack())
+	Duel.SendtoGrave(Group.FromCards(tc,lc),REASON_EFFECT)
+	local og=Duel.GetOperatedGroup()
+	if not og:IsExists(Card.IsLocation,2,nil,LOCATION_GRAVE) then return end
+	if Duel.SpecialSummonStep(c,0,tp,tp,false,false,POS_FACEUP) then
+		--atk
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+		e1:SetRange(LOCATION_MZONE)
+		e1:SetCode(EFFECT_UPDATE_ATTACK)
+		e1:SetValue(atk)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+		c:RegisterEffect(e1)
+	end
+	Duel.SpecialSummonComplete()
+	Duel.BreakEffect()
+end
+function s.atkfilter(c,tc)
+	return c:IsFaceup() and math.abs(c:GetAttack()-tc:GetAttack())>0
+end
+function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
-	if Duel.Release(tc,REASON_EFFECT)>0 then
-		if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 and eg and ta then
-			local atk=eg:GetFirst():GetAttack()
-			local chg=atk-ta
-			if chg<0 then chg=0 end
-			--atk
-			local e1=Effect.CreateEffect(c)
-			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-			e1:SetRange(LOCATION_MZONE)
-			e1:SetCode(EFFECT_UPDATE_ATTACK)
-			e1:SetValue(chg)
-			e1:SetReset(RESET_EVENT+0x1ff0000)
-			c:RegisterEffect(e1)
-			c:RegisterFlagEffect(s_id,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
-		end
+	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and s.atkfilter(chkc,c) and c~=chkc end
+	if chk==0 then return Duel.IsExistingTarget(s.atkfilter,tp,LOCATION_MZONE,0,1,nil,c) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
+	Duel.SelectTarget(tp,s.atkfilter,tp,LOCATION_MZONE,0,1,1,nil,c)
+end
+function s.atkop1(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	local tc=Duel.GetFirstTarget()
+	if c:IsRelateToEffect(e) and c:IsFaceup() and tc:IsRelateToEffect(e) and tc:IsFaceup()
+		and math.abs(c:GetAttack()-tc:GetAttack())>0 then
+		--atk
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_UPDATE_ATTACK)
+		e1:SetValue(math.abs(c:GetAttack()-tc:GetAttack()))
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+		tc:RegisterEffect(e1)
 	end
 end
-function scard.limop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetCurrentChain()==0 then
-		Duel.SetChainLimitTillChainEnd(scard.chlimit)
-	elseif Duel.GetCurrentChain()==1 then
-		e:GetHandler():RegisterFlagEffect(s_id+100,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
-	end
+function s.cfilter(c)
+	return c:IsFaceup() and not c:IsAttack(c:GetBaseAttack())
 end
-function scard.chlimit(e,rp,tp)
-	if e:GetHandler():GetFlagEffect(s_id)==0 then return end
-	return rp==tp
+function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,e:GetHandler())
 end
-function scard.limop2(e,tp,eg,ep,ev,re,r,rp)
-	if e:GetHandler():GetFlagEffect(s_id+100)~=0 then
-		Duel.SetChainLimitTillChainEnd(scard.chlimit)
-	end
-	e:GetHandler():ResetFlagEffect(s_id+100)
+function s.atkop2(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsFaceup() then return end
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_SET_ATTACK_FINAL)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+	e1:SetValue(e:GetHandler():GetAttack()*2)
+	e:GetHandler():RegisterEffect(e1)
+	local e3=Effect.CreateEffect(e:GetHandler())
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e3:SetCode(EVENT_PHASE+PHASE_END)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetCountLimit(1)
+	e3:SetOperation(s.atkdown)
+	e3:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+	e:GetHandler():RegisterEffect(e3)
+end
+function s.atkdown(e,tp,eg,ep,ev,re,r,rp)
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_SET_ATTACK_FINAL)
+	e1:SetValue(e:GetHandler():GetBaseAttack())
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+	e:GetHandler():RegisterEffect(e1,true)
 end

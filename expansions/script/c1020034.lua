@@ -1,69 +1,114 @@
---オッドアイズ・フュージョン
-function c1020034.initial_effect(c)
-	aux.AddLinkProcedure(c,c1020034.lkcheck,3,3,c1020034.lcheck)
+--Coded-Eyes Cybernetic Dragon
+local s,id=GetID()
+function s.initial_effect(c)
+	c:SetUniqueOnField(1,0,id)
+	--link summon
+	aux.AddLinkProcedure(c,s.matfilter,2,99,s.lcheck)
 	c:EnableReviveLimit()
+	--atk down
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(1020034,0))
-	e1:SetCategory(CATEGORY_DESTROY)
-	e1:SetType(EFFECT_TYPE_IGNITION)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e1:SetDescription(aux.Stringid(46895036,0))
+	e1:SetCategory(CATEGORY_ATKCHANGE)
+	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
+	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetCountLimit(1,1020034)
-	e1:SetCost(c1020034.cost)
-	e1:SetTarget(c1020034.target)
-	e1:SetOperation(c1020034.operation)
+	e1:SetCondition(s.condition)
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
-	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(1020034,1))
-	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
-	e2:SetCode(EVENT_DESTROYED)
-	e2:SetTarget(c1020034.rettg)
-	e2:SetOperation(c1020034.retop)
-	c:RegisterEffect(e2)
+	--Activate
+	local e1=Effect.CreateEffect(c)
+	e1:SetCategory(CATEGORY_ATKCHANGE)
+	e1:SetType(EFFECT_TYPE_QUICK_O)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetHintTiming(TIMING_DAMAGE_STEP)
+	e1:SetTarget(s.atktg)
+	e1:SetOperation(s.atkop)
+	e1:SetCountLimit(1,id+EFFECT_COUNT_CODE_OATH)
+	c:RegisterEffect(e1)
 end
-function c1020034.lkcheck(c)
-	return c:IsSetCard(0xded)
+function s.matfilter(c)
+	return (c:IsLinkSetCard(0xded) or c:IsRace(RACE_MACHINE)) and not c:IsLinkType(TYPE_TOKEN)
 end
-function c1020034.lcheck(g,lc)
-	return g:GetClassCount(Card.GetCode)==g:GetCount()
+function s.lcheck(g,lc)
+	return g:GetClassCount(Card.GetLinkCode)==g:GetCount()
 end
-function c1020034.cfilter(c,g)
-	return g:IsContains(c)
-end
-function c1020034.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	local lg=e:GetHandler():GetLinkedGroup()
-	if chk==0 then return Duel.CheckReleaseGroup(tp,c1020034.cfilter,1,nil,lg) end
-	local g=Duel.SelectReleaseGroup(tp,c1020034.cfilter,1,1,nil,lg)
-	Duel.Release(g,REASON_COST)
-end
-function c1020034.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDestructable,tp,0,LOCATION_ONFIELD,1,nil,e) end
-	local g=Duel.GetMatchingGroup(Card.IsDestructable,tp,0,LOCATION_ONFIELD,nil,e)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
-end
-function c1020034.operation(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectMatchingCard(tp,Card.IsDestructable,tp,0,LOCATION_ONFIELD,1,1,nil,e)
-	if g:GetCount()>0 then
-		Duel.HintSelection(g)
-		Duel.Destroy(g,REASON_EFFECT)
+function s.cfilter(c,ec)
+	if c:IsLocation(LOCATION_MZONE) then
+		return ec:GetLinkedGroup():IsContains(c)
+	else
+		return (ec:GetLinkedZone(c:GetPreviousControler())&(1<<c:GetPreviousSequence()))~=0
 	end
 end
-function c1020034.filter(c,e,tp)
-	return c:IsSetCard(0xded) and (not c:IsCode(1020034)) and c:IsType(TYPE_MONSTER)
-		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+function s.condition(e,tp,eg,ep,ev,re,r,rp)
+	if eg:IsContains(e:GetHandler()) then return true end
+	for tc in aux.Next(Duel.GetMatchingGroup(Card.IsType,tp,LOCATION_MZONE,LOCATION_MZONE,nil,TYPE_LINK)) do
+		if eg:IsExists(s.cfilter,1,nil,tc) then
+			return (Duel.GetCurrentPhase()~=PHASE_DAMAGE) and (Duel.GetCurrentPhase()~=PHASE_DAMAGE_CALC)
+		end
+	end
+	return false
 end
-function c1020034.rettg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c1020034.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c1020034.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,0)
+function s.addfilter(c)
+	return c:IsFaceup() and c:IsAttack(c:GetBaseAttack())
 end
-function c1020034.retop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,c1020034.filter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
-	if g:GetCount()>0 then
-		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsFaceup() and chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) end
+	if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_MZONE,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
+	Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_MZONE,0,1,1,nil)
+	if Duel.IsExistingMatchingCard(s.addfilter,tp,0,LOCATION_MZONE,1,nil) then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
+		Duel.SelectTarget(tp,Card.IsFaceup,tp,0,LOCATION_MZONE,0,1,nil)
+	end
+end
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
+	for tc in aux.Next(g) do
+		if tc:IsFaceup() then
+			local e1=Effect.CreateEffect(e:GetHandler())
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetCode(EFFECT_SET_ATTACK_FINAL)
+			e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+			e1:SetValue(math.ceil(tc:GetAttack()/2))
+			tc:RegisterEffect(e1)
+		end
+	end
+end
+function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	local lg=e:GetHandler():GetLinkedGroup()
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() and lg:IsContains(c) end
+	if chk==0 then return lg:IsExists(aux.AND(Card.IsFaceup,Card.IsCanBeEffectTarget),1,nil,e) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
+	local g=lg:FilterSelect(tp,aux.AND(Card.IsFaceup,Card.IsCanBeEffectTarget),1,1,nil,e)
+	Duel.SetTargetCard(g)
+end
+function s.atkop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) then return end
+	local g=c:GetLinkedGroup()
+	local tc=Duel.GetFirstTarget()
+	if not tc:IsRelateToEffect(e) then return end
+	g:RemoveCard(tc)
+	g:AddCard(c)
+	local atk=tc:GetAttack()
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_SET_ATTACK_FINAL)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+	e1:SetValue(math.ceil(atk/2))
+	tc:RegisterEffect(e1)
+	if not tc:IsImmuneToEffect(e1) then
+		for oc in aux.Next(g) do
+			local e2=Effect.CreateEffect(e:GetHandler())
+			e2:SetType(EFFECT_TYPE_SINGLE)
+			e2:SetCode(EFFECT_UPDATE_ATTACK)
+			e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+			e2:SetValue(math.floor(atk/2))
+			oc:RegisterEffect(e2)
+		end
 	end
 end

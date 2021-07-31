@@ -1,50 +1,43 @@
---Codeman Interference
---Automate ID
-local function getID()
-	local str=string.match(debug.getinfo(2,'S')['source'],"c%d+%.lua")
-	str=string.sub(str,1,string.len(str)-4)
-	local scard=_G[str]
-	local s_id=tonumber(string.sub(str,2))
-	return scard,s_id
+--Zero Arrival
+local s,id=GetID()
+function s.initial_effect(c)
+	--spsummon
+	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(1150)
+	e1:SetCategory(CATEGORY_ATKCHANGE+CATEGORY_SPECIAL_SUMMON)
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetHintTiming(0,TIMING_END_PHASE)
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.operation)
+	e1:SetCountLimit(1,EFFECT_COUNT_CODE_OATH)
+	c:RegisterEffect(e1)
 end
-
-local scard,s_id=getID()
-
-function scard.initial_effect(c)
-	--Recover
-	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(s_id,2))
-	e4:SetType(EFFECT_TYPE_ACTIVATE)
-	e4:SetCode(EVENT_LEAVE_FIELD)
-	e4:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
-	e4:SetCondition(scard.con)
-	e4:SetOperation(scard.op)
-	e4:SetCountLimit(1,s_id+EFFECT_COUNT_CODE_OATH)
-	c:RegisterEffect(e4)
+function s.spfilter(c,e,tp)
+	return c:IsSetCard(0x1ded) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function scard.recfilter(c)
-	return c:IsPreviousPosition(POS_FACEUP) and c:IsSetCard(0xded) and c:IsType(TYPE_MONSTER)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_REMOVED+LOCATION_GRAVE+LOCATION_HAND,0,1,nil,e,tp) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_REMOVED+LOCATION_GRAVE+LOCATION_HAND)
 end
-function scard.spfilter(c,e,tp)
-	return c:IsSetCard(0xded) and c:IsType(TYPE_MONSTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE)
-end
-function scard.con(e,tp,eg,ep,ev,re,r,rp)
-	local g=eg:Filter(scard.recfilter,nil)
-	return g:GetCount()>0 and Duel.IsExistingMatchingCard(scard.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp)
-end
-function scard.op(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.SelectMatchingCard(tp,scard.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
-	if Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP_DEFENSE)>0 then
-		local c=g:GetFirst()
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
-		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e1:SetValue(1)
-		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
-		c:RegisterEffect(e1)
-		local e2=e1:Clone()
-		e2:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-		c:RegisterEffect(e2)
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local c=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.spfilter),tp,LOCATION_REMOVED+LOCATION_GRAVE+LOCATION_HAND,0,1,1,nil,e,tp):GetFirst()
+	if c and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
+		local g=Duel.GetMatchingGroup(aux.AND(aux.NOT(Card.IsAttack),Card.IsFaceup),tp,0,LOCATION_MZONE,nil,c:GetAttack())
+		if #g>0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_OPPO)
+			local tg=g:Select(tp,1,1,nil)
+			Duel.HintSelection(tg)
+			local tc=tg:GetFirst()
+			local e1=Effect.CreateEffect(e:GetHandler())
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetCode(EFFECT_UPDATE_ATTACK)
+			e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+			e1:SetValue(-math.abs(tc:GetAttack()-c:GetAttack()))
+			c:RegisterEffect(e1)
+		end
 	end
 end
