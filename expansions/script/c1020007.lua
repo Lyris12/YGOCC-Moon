@@ -44,7 +44,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function s.cfilter(c)
-	return c:IsFaceup() and c:IsSetCard(RACE_MACHINE)
+	return c:IsFaceup() and c:IsRace(RACE_MACHINE)
 end
 function s.spcon1(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_MZONE,0,nil)

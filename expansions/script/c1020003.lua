@@ -26,7 +26,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 		op=Duel.SelectOption(tp,1075)
 	elseif b then
 		op=Duel.SelectOption(tp,1191)+1
-	else
+	end
 	if op==0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local g=Duel.SelectTarget(tp,s.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
