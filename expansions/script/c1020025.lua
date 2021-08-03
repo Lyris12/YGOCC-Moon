@@ -16,7 +16,7 @@ function s.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetTarget(s.tg)
 	e2:SetOperation(s.op)
-	-- e2:SetCountLimit(1)
+	e2:SetCountLimit(1)
 	c:RegisterEffect(e2)
 end
 function s.filter(c)
@@ -79,6 +79,6 @@ function s.op(e,tp,eg,ep,ev,re,r,rp)
 	else
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 		local g=Duel.SelectMatchingCard(tp,s.addfilter,tp,LOCATION_DECK,0,1,1,nil,tc:GetLevel())
-		if #g>0 then Duel.SendtoHand(g,nil,REASON_EFFECT) end
+		if #g>0 then Duel.SendtoHand(g,nil,REASON_EFFECT) Duel.ConfirmCards(1-tp,g) end
 	end
 end
