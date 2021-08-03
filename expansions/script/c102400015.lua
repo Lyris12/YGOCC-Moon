@@ -17,14 +17,6 @@ function s.initial_effect(c)
 	e2:SetCondition(s.spcon)
 	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
-	e3:SetCategory(CATEGORY_EQUIP)
-	e3:SetTarget(s.eqtg)
-	e3:SetOperation(s.eqop)
-	c:RegisterEffect(e3)
 	local e5=Effect.CreateEffect(c)
 	e5:SetType(EFFECT_TYPE_SINGLE)
 	e5:SetCode(EFFECT_DIRECT_ATTACK)
@@ -32,6 +24,7 @@ function s.initial_effect(c)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e4:SetCode(EVENT_BATTLED)
+	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e4:SetCategory(CATEGORY_DAMAGE)
 	e4:SetDescription(1122)
 	e4:SetTarget(s.target)
@@ -58,45 +51,13 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.SendtoDeck(dg,nil,2,REASON_COST)
 	Duel.Release(g,REASON_COST)
 end
-function s.eqfilter(c,tp)
-	return c:IsFaceup() and c:IsType(TYPE_MONSTER) and c:CheckUniqueOnField(tp) and not c:IsForbidden()
-end
-function s.eqtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
-		and Duel.IsExistingTarget(s.eqfilter,tp,0,LOCATION_GRAVE+LOCATION_REMOVED,1,nil,tp) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
-	Duel.SetOperationInfo(0,CATEGORY_EQUIP,Duel.SelectTarget(tp,s.eqfilter,tp,0,LOCATION_GRAVE+LOCATION_REMOVED,1,1,nil,tp),1,0,0)
-end
-function s.eqop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 or c:IsFacedown() or not c:IsRelateToEffect(e) then return end
-	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) then
-		if not Duel.Equip(tp,tc,c,true) then return end
-		tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD,0,0)
-		local e1=Effect.CreateEffect(c)
-		e1:SetProperty(EFFECT_FLAG_COPY_INHERIT+EFFECT_FLAG_OWNER_RELATE)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_EQUIP_LIMIT)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-		e1:SetValue(s.eqlimit)
-		tc:RegisterEffect(e1)
-	end
-end
-function s.eqlimit(e,c)
-	return e:GetOwner()==c
-end
-function s.filter(c)
-	return c:GetFlagEffect(id)~=0
-end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	local eqc=e:GetHandler():GetEquipGroup():Filter(s.filter,nil):GetFirst()
-	if eqc then Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,eqc:GetTextAttack()/2) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
+	local tc=Duel.SelectTarget(tp,Card.IsAttackAbove,tp,0,LOCATION_GRAVE+LOCATION_REMOVED,1,1,nil,1):GetFirst()
+	if tc then Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,tc:GetAttack()//2) end
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
-	local eqc=e:GetHandler():GetEquipGroup():Filter(s.filter,nil):GetFirst()
-	if eqc then
-		Duel.Damage(1-tp,eqc:GetTextAttack()/2,REASON_EFFECT)
-	end
+	local tc=Duel.GetFirstTarget()
+	if tc and tc:IsRelateToEffect(e) then Duel.Damage(1-tp,tc:GetAttack()//2,REASON_EFFECT) end
 end

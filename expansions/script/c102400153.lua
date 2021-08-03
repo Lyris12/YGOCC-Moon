@@ -2,6 +2,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	aux.AddXyzProcedureLevelFree(c,aux.FilterBoolFunction(Card.IsXyzLevel,c,5),aux.drccheck,3,3,s.ovfilter,aux.Stringid(id,0))
+	aux.EnableExtraDeckSummonCountLimit()
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetCode(EVENT_FREE_CHAIN)

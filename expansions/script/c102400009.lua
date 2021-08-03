@@ -16,7 +16,7 @@ function s.initial_effect(c)
 	e2:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetTargetRange(LOCATION_MZONE,0)
-	e2:SetTarget(function(e,c) return c:IsSetCard(0xda6) and c~=e:GetHandler() end)
+	e2:SetTarget(function(e,tc) return tc:IsSetCard(0xda6) and tc~=c end)
 	e2:SetValue(1)
 	c:RegisterEffect(e2)
 	local e2=Effect.CreateEffect(c)
@@ -68,7 +68,7 @@ function s.damop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,tp)
 end
 function s.val(e,re,dam,r,rp,rc)
-	if s[e:GetOwnerPlayer()]==1 or r&REASON_EFFECT>0 then
+	if s[e:GetOwnerPlayer()]==1 or r&REASON_BATTLE>0 then
 		return 0
 	else return dam end
 end

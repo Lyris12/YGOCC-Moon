@@ -5,15 +5,13 @@ function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddFusionProcFun2(c,aux.FilterBoolFunction(Card.IsSetCard,0x7c4),aux.AND(aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_LIGHT),aux.FilterBoolFunction(Card.IsRace,RACE_DRAGON)),true)
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e1:SetCode(EVENT_DESTROYED)
+	e1:SetType(EFFECT_TYPE_QUICK_O)
+	e1:SetCode(EVENT_CHAINING)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
-	e1:SetCondition(function(e,tp,eg,ep,ev,re,r,rp) return eg:IsExists(s.cfilter,1,nil,tp) end)
-	e1:SetCategory(CATEGORY_DESTROY+CATEGORY_DRAW)
-	e1:SetCost(s.cost)
-	e1:SetTarget(s.tg)
-	e1:SetOperation(s.op)
+	e1:SetCountLimit(1)
+	e1:SetCost(s.chcost)
+	e1:SetTarget(s.chtg)
+	e1:SetOperation(s.chop)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
@@ -86,23 +84,36 @@ function s.etarget(e,re)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	return g and g:IsContains(e:GetHandler())
 end
-function s.cfilter(c,tp)
-	return c:IsPreviousLocation(LOCATION_MZONE) and (c:IsPreviousPosition(POS_FACEUP) or c:GetPreviousControler()==tp) and c:IsSetCard(0x7c4) and c:IsType(TYPE_MONSTER)
+function s.chcon(e,tp,eg,ep,ev,re,r,rp)
+	return rp~=tp
 end
-function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return eg:IsExists(aux.AND(s.cfilter,aux.FilterBoolFunction(Card.IsAbleToRemoveAsCost)),1,nil,tp) end
-	local g=eg:Filter(aux.AND(s.cfilter,aux.FilterBoolFunction(Card.IsAbleToRemoveAsCost)),nil,tp)
-	Duel.Remove(g,POS_FACEUP,REASON_COST)
+function s.cfilter(c)
+	return c:IsSetCard(0x7c4) and c:IsType(TYPE_PENDULUM) and (c:IsLocation(LOCATION_GRAVE) or c:IsFaceup()) and c:IsAbleToDeckAsCost()
 end
-function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,Duel.GetDecktopGroup(tp,1),1,0,0)
+function s.chcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_EXTRA+LOCATION_GRAVE,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+	local g=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_EXTRA+LOCATION_GRAVE,0,1,1,nil)
+	Duel.SendtoDeck(g,nil,2,REASON_COST)
 end
-function s.op(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetDecktopGroup(tp,1)
-	local tc=g:GetFirst()
+function s.chtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>1
+		and Duel.GetFieldGroupCount(tp,0,LOCATION_DECK)>1 end
+end
+function s.chop(e,tp,eg,ep,ev,re,r,rp)
+	local dg=Group.CreateGroup()
+	for i=1,ev do
+		local te,tgp=Duel.GetChainInfo(i,CHAININFO_TRIGGERING_EFFECT,CHAININFO_TRIGGERING_PLAYER)
+		if tgp~=tp then
+			Duel.ChangeTargetCard(ev,Group.CreateGroup())
+			Duel.ChangeChainOperation(ev,s.repop)
+		end
+	end
+end
+function s.repop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.DisableShuffleCheck()
-	if Duel.Destroy(g,REASON_EFFECT)~=0 then
-		if tc:IsType(TYPE_MONSTER) and tc:IsSetCard(0x7c4) then Duel.Draw(tp,1,REASON_EFFECT) end
-	else Duel.ConfirmDecktop(tp,1) end
+	if Duel.Destroy(Duel.GetDecktopGroup(1-tp,2)
+		,REASON_EFFECT)==0 then
+		Duel.ConfirmDecktop(1-tp,2)
+	end
 end

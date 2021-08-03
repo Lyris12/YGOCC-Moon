@@ -72,15 +72,17 @@ function s.condition(e)
 end
 function s.sgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	local g=Duel.GetFieldGroup(tp,0,LOCATION_SZONE)
+	local g=Duel.GetMatchingGroup(Card.IsType,tp,0,LOCATION_ONFIELD,nil,TYPE_SPELL+TYPE_TRAP)
+	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,#g*800)
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g,#g,0,0)
 end
 function s.sgop(e,tp,eg,ep,ev,re,r,rp)
 	local dir=Duel.GetAttackTarget()==nil
-	local g=Duel.GetFieldGroup(tp,0,LOCATION_SZONE)
+	local g=Duel.GetMatchingGroup(Card.IsType,tp,0,LOCATION_ONFIELD,nil,TYPE_SPELL+TYPE_TRAP)
 	local ct=Duel.SendtoGrave(g,REASON_EFFECT)
-	local sg=Duel.GetOperatedGroup():Filter(aux.NecroValleyFilter(Card.IsLocation),nil,LOCATION_GRAVE)
-	if ct>0 and #g>0 and dir then
-		Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
+	local sg=Duel.GetMatchingGroup(aux.NecroValleyFilter(Card.IsType),tp,0,LOCATION_GRAVE,nil,TYPE_SPELL+TYPE_TRAP)
+	if ct>0 and #sg>0 and dir then
+		Duel.BreakEffect()
+		Duel.Remove(sg,POS_FACEUP,REASON_EFFECT)
 	end
 end
