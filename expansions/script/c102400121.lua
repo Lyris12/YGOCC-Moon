@@ -64,7 +64,7 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and Duel.Destroy(c,REASON_EFFECT)~=0 then
 		if Duel.GetTurnPlayer()~=tp then
-			if Duel.GetAttacker() then Duel.NegateAttack()
+			if Duel.GetAttacker() then if Duel.SelectEffectYesNo(tp,e:GetOwner()) then Duel.NegateAttack() end
 			else
 				local e1=Effect.CreateEffect(e:GetHandler())
 				e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
@@ -81,8 +81,10 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.disop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_CARD,0,id)
-	Duel.NegateAttack()
+	if Duel.SelectEffectYesNo(tp,e:GetOwner()) then
+		Duel.Hint(HINT_CARD,0,id)
+		Duel.NegateAttack()
+	end
 end
 function s.tgfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x7c4) and c:IsLevelBelow(5)
