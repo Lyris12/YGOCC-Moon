@@ -8,7 +8,7 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetCode(EVENT_CHAINING)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetCountLimit(1)
+	e1:SetCondition(s.chcon)
 	e1:SetCost(s.chcost)
 	e1:SetTarget(s.chtg)
 	e1:SetOperation(s.chop)
@@ -87,7 +87,10 @@ function s.etarget(e,re)
 	return g and g:IsContains(e:GetHandler())
 end
 function s.chcon(e,tp,eg,ep,ev,re,r,rp)
-	return rp~=tp
+	for i=1,ev do
+		if Duel.GetChainInfo(i,CHAININFO_TRIGGERING_EFFECT,CHAININFO_TRIGGERING_PLAYER)~=tp then return true end
+	end
+	return false
 end
 function s.cfilter(c)
 	return c:IsSetCard(0x7c4) and c:IsType(TYPE_PENDULUM) and (c:IsLocation(LOCATION_GRAVE) or c:IsFaceup()) and c:IsAbleToDeckAsCost()
@@ -95,27 +98,23 @@ end
 function s.chcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_EXTRA+LOCATION_GRAVE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_EXTRA+LOCATION_GRAVE,0,1,1,nil)
-	Duel.SendtoDeck(g,nil,2,REASON_COST)
+	Duel.SendtoDeck(Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_EXTRA+LOCATION_GRAVE,0,1,1,nil),nil,2,REASON_COST)
 end
 function s.chtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
 	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>1
-		and Duel.GetFieldGroupCount(tp,0,LOCATION_DECK)>1 end
+		and Duel.GetFieldGroupCount(tp,0,LOCATION_DECK)>1 and c:GetFlagEffect(id)==0 end
+	c:RegisterFlagEffect(id,RESET_CHAIN,0,1)
 end
 function s.chop(e,tp,eg,ep,ev,re,r,rp)
 	local dg=Group.CreateGroup()
-	for i=1,ev do
-		local te,tgp=Duel.GetChainInfo(i,CHAININFO_TRIGGERING_EFFECT,CHAININFO_TRIGGERING_PLAYER)
-		if tgp~=tp then
-			Duel.ChangeTargetCard(ev,Group.CreateGroup())
-			Duel.ChangeChainOperation(ev,s.repop)
-		end
-	end
+	for i=ev,1,-1 do if Duel.GetChainInfo(i,CHAININFO_TRIGGERING_PLAYER)~=tp then
+		Duel.ChangeTargetCard(ev,Group.CreateGroup())
+		Duel.ChangeChainOperation(ev,s.repop)
+	end end
 end
 function s.repop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.DisableShuffleCheck()
-	if Duel.Destroy(Duel.GetDecktopGroup(1-tp,2)
-		,REASON_EFFECT)==0 then
-		Duel.ConfirmDecktop(1-tp,2)
-	end
+	Duel.Destroy(Duel.GetDecktopGroup(1-tp,2)
+		,REASON_EFFECT)
 end

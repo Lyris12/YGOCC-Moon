@@ -1,4 +1,4 @@
-﻿expansions/cards-new.cdb	4afe70958209ca6ca2388daa001f5a96
+﻿expansions/cards-new.cdb	53d7c58ac6dccc816f26631ff65d0e22
 expansions/lflist.conf	25d9d7cd951e7f7fb7ab027c8e92fcdd
 expansions/strings.conf	05122cac528f3050c22b0006abb55d4c
 expansions/pics/100000710.jpg	5f925a97b1c60d7d69acb8f229938263
@@ -605,7 +605,7 @@ expansions/pics/102400118.png	1a0b0b20a5d04a4e8c6f4b6fd8db79e5
 expansions/pics/102400119.png	d77a1c22e99f77c8230caf1c3244efed
 expansions/pics/102400120.png	8635d16f79da7bff7338dfa97d2dc4a1
 expansions/pics/102400121.png	ea363d90a177c06fb0bbac7a93dac4fe
-expansions/pics/102400122.png	6d0267e81ac7831c4caf8b3f23b4cbea
+expansions/pics/102400122.png	28515e35f7ab90c1385cb672afba8c00
 expansions/pics/102400123.png	2ce7949575466ae97f3c16000cd3697e
 expansions/pics/102400124.png	ca2105d4e42824f511f59af1ebc9ea37
 expansions/pics/102400125.png	0fe3c0cec05cfe3154b0dd697cfe5822
@@ -6544,7 +6544,7 @@ expansions/script/c102400118.lua	82127aa42021650cef14e3f5f6587f33
 expansions/script/c102400119.lua	9e754ea11906178d319ce0b971ddb73e
 expansions/script/c102400120.lua	c19ea2df8c256bdb83ba960c6be0d793
 expansions/script/c102400121.lua	10d39deb32979fb59bbf640b248e7581
-expansions/script/c102400122.lua	f25ea17aa34aa0eb9df7b54d919df5a9
+expansions/script/c102400122.lua	ffadfce121ca16cd49d23c5306fb21d1
 expansions/script/c102400123.lua	41e6c91d436489a299da559adf262492
 expansions/script/c102400124.lua	16b2e6d638e212fc95abce6426392d09
 expansions/script/c102400125.lua	e55f8cb41f452db16bb72f02c9ff5c9c
@@ -11604,6 +11604,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	295c83b36df314a4854b5cc189f022e3
+update/filelist.txt	f5cc5b7b68d11b9ec76755434655cd24
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	5e981dbebbc3979c64720765af3cec1a
+update/version.txt	a25319fb56adb8082b6fbcf251e28dab
