@@ -47,7 +47,7 @@ function cid.cfilter(c,rtype)
 end
 function cid.clfilter(c)
 	return c:IsSetCard(0x3ff)
-		and c:IsType(TYPE_SPELL) and (c:IsLocation(LOCATION_HAND) or c:IsFaceup()) and c:IsAbleToGraveAsCost()
+		and (c:IsLocation(LOCATION_HAND) or c:IsFaceup()) and c:IsAbleToGraveAsCost()
 end
 function cid.cfilter1(c)
 	return c:IsFaceup() and c:IsSetCard(0x3ff)

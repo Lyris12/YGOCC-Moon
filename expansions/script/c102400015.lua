@@ -3,12 +3,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e1:SetValue(aux.FALSE)
-	c:RegisterEffect(e1)
+	aux.AddCodeList(c,id-10)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_SPSUMMON_PROC)
@@ -32,8 +27,8 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
 	c:SetUniqueOnField(1,0,aux.FilterBoolFunction(Card.IsSetCard,0x1da6),LOCATION_MZONE)
 end
-function s.spfilter(c)
-	return c:IsCode(id-10)
+function s.spfilter(c,tp)
+	return c:IsCode(id-10) and Duel.GetMZoneCount(tp,c)>0
 end
 function s.cfilter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xda6) and c:IsAbleToDeckAsCost()
@@ -41,13 +36,13 @@ end
 function s.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	return Duel.CheckReleaseGroup(tp,s.spfilter,1,nil)
+	return Duel.CheckReleaseGroup(tp,s.spfilter,1,nil,tp)
 		and Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_GRAVE,0,3,nil)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local dg=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_GRAVE,0,3,3,nil)
-	local g=Duel.SelectReleaseGroup(tp,s.spfilter,1,1,nil)
+	local g=Duel.SelectReleaseGroup(tp,s.spfilter,1,1,nil,tp)
 	Duel.SendtoDeck(dg,nil,2,REASON_COST)
 	Duel.Release(g,REASON_COST)
 end
