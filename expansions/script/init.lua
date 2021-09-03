@@ -1,11 +1,15 @@
 --Not yet finalized values
 --Custom constants
+self_reference_effect				= nil
+
 EFFECT_DEFAULT_CALL					=31993443
 EFFECT_EXTRA_GEMINI					=86433590
 EFFECT_AVAILABLE_LMULTIPLE			=86433612
 EFFECT_MULTIPLE_LMATERIAL			=86433613
 EFFECT_RANDOM_TARGET				=39759371
-EFFECT_CANNOT_BANISH_FD_EFFECT		=856
+EFFECT_CANNOT_BANISH				=1500
+EFFECT_CANNOT_BANISH_AS_COST		=1501
+EFFECT_CANNOT_ADD_TO_HAND			=1502
 TYPE_CUSTOM							=0
 
 CTYPE_CUSTOM						=0
@@ -58,8 +62,14 @@ function GetID()
 	return scard,s_id
 end
 --overwrite functions
-local is_type, card_remcounter, duel_remcounter, effect_set_target_range, effect_set_reset, add_xyz_proc, add_xyz_proc_nlv, duel_overlay, duel_set_lp, duel_select_target, duel_banish, card_check_remove_overlay_card, is_reason, duel_check_tribute, select_tribute,card_sethighlander, card_is_facedown = 
-	Card.IsType, Card.RemoveCounter, Duel.RemoveCounter, Effect.SetTargetRange, Effect.SetReset, Auxiliary.AddXyzProcedure, Auxiliary.AddXyzProcedureLevelFree, Duel.Overlay, Duel.SetLP, Duel.SelectTarget, Duel.Remove, Card.CheckRemoveOverlayCard, Card.IsReason, Duel.CheckTribute, Duel.SelectTribute, Card.SetUniqueOnField, Card.IsFacedown
+local is_type, card_remcounter, duel_remcounter, effect_set_target_range, effect_set_reset, add_xyz_proc, add_xyz_proc_nlv, duel_overlay, duel_set_lp, duel_select_target, duel_banish, card_check_remove_overlay_card, is_reason, duel_check_tribute, select_tribute,card_sethighlander,
+	card_is_facedown, card_is_able_to_remove, card_is_able_to_remove_as_cost, card_is_able_to_hand, card_is_can_be_ssed = 
+	
+	Card.IsType, Card.RemoveCounter, Duel.RemoveCounter, Effect.SetTargetRange, Effect.SetReset, Auxiliary.AddXyzProcedure, Auxiliary.AddXyzProcedureLevelFree, Duel.Overlay, Duel.SetLP, Duel.SelectTarget, Duel.Remove, Card.CheckRemoveOverlayCard, Card.IsReason, Duel.CheckTribute, Duel.SelectTribute, Card.SetUniqueOnField,
+	Card.IsFacedown, Card.IsAbleToRemove, Card.IsAbleToRemoveAsCost, Card.IsAbleToHand, Card.IsCanBeSpecialSummoned
+
+
+
 
 dofile("expansions/script/proc_evolute.lua") --Evolutes
 dofile("expansions/script/proc_conjoint.lua") --Conjoints
@@ -138,23 +148,37 @@ Duel.RemoveCounter=function(p,s,o,typ,ct,r,rp)
 end
 -- Card.RegisterEffect=function(c,e,forced)
 	-- if c:IsStatus(STATUS_INITIALIZING) and not e then return end
-	-- registereff(c,e,forced)
-	-- local m=_G["c"..c:GetOriginalCode()]
-	-- if not m then return false end
-	-- if not m.default_call_table then
-		-- m.default_call_table={}
+	-- local cost,tg,op=e:GetCost,e:GetTarget,e:GetOperation()
+	-- if cost then
+		-- local newcost =	function(e,tp,eg,ep,ev,re,r,rp,chk)
+							-- if chk==0 then
+								-- self_reference_effect=e
+								-- return cost(e,tp,eg,ep,ev,re,r,rp,chk)
+							-- end
+							-- self_reference_effect=e
+							-- cost(e,tp,eg,ep,ev,re,r,rp,chk)
+						-- end
+		-- e:SetCost(newcost)
 	-- end
-	-- local etable=m.default_call_table
-	-- table.insert(etable,e)
-	-- -- local prop=EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE
-	-- -- if e:IsHasProperty(EFFECT_FLAG_UNCOPYABLE) then prop=prop|EFFECT_FLAG_UNCOPYABLE end
-	-- -- local ex=Effect.CreateEffect(c)
-	-- -- ex:SetType(EFFECT_TYPE_SINGLE)
-	-- -- ex:SetProperty(prop)
-	-- -- ex:SetCode(EFFECT_DEFAULT_CALL)
-	-- -- ex:SetLabelObject(e)
-	-- -- ex:SetLabel(c:GetOriginalCode())
-	-- -- registereff(c,ex,forced)
+	-- if tg then
+		-- local newtg =	function(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+							-- if chk==0 then
+								-- self_reference_effect=e
+								-- return cost(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+							-- end
+							-- self_reference_effect=e
+							-- tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+						-- end
+		-- e:SetTarget(newtg)
+	-- end
+	-- if op then
+		-- local newop =	function(e,tp,eg,ep,ev,re,r,rp)
+							-- self_reference_effect=e
+							-- op(e,tp,eg,ep,ev,re,r,rp)
+						-- end
+		-- e:SetOperation(op)
+	-- end
+	-- registereff(c,e,forced)
 -- end
 Auxiliary.kaiju_procs={}
 global_target_range_effect_table={}
@@ -271,21 +295,27 @@ Duel.SelectTarget=function(actp,func,self,loc1,loc2,cmin,cmax,exc,...)
 		return duel_select_target(actp,func,self,loc1,loc2,cmin,cmax,exc,table.unpack(extras))
 	end
 end
-Duel.Remove=function(cc,pos,r)
+Duel.Remove=function(cc,pos,r,...)
+	local x={...}
+	local checkp=#x>0 and x[1] or self_reference_effect:GetHandlerPlayer()
+	
 	local cc=Group.CreateGroup()+cc
 	local tg=cc:Clone()
 	for c in aux.Next(tg) do
-		if (not pos or pos&POS_FACEDOWN~=0) and r&REASON_EFFECT~=0 then
-			local ef={c:IsHasEffect(EFFECT_CANNOT_BANISH_FD_EFFECT)}
+		if c:IsHasEffect(EFFECT_CANNOT_BANISH) then
+			local ef={c:IsHasEffect(EFFECT_CANNOT_BANISH)}
 			for _,te1 in ipairs(ef) do
 				local cf=te1:GetValue()
 				local typ=aux.GetValueType(cf)
-				if typ=="function" then
-					if cf(te1,c:GetReasonEffect(),c:GetReasonPlayer()) then 
-						cc=cc-c 
+				if not cf and r&REASON_EFFECT>0 then
+					cc=cc-c
+				elseif (typ=="number" and cf==pos) and r&REASON_EFFECT>0 then
+					cc=cc-c
+				elseif typ=="function" then
+					local checkpos,func=cf()
+					if (not checkpos or checkpos==pos) and (not func or func(c,self_reference_effect,r,checkp)) then
+						return false
 					end
-				elseif cf>0 then 
-					cc=cc-c 
 				end
 			end
 		end
@@ -297,7 +327,7 @@ Duel.Remove=function(cc,pos,r)
 			end
 		end
 	end
-	return duel_banish(cc,pos,r)
+	return duel_banish(cc,pos,r,table.unpack(x))
 end
 Card.CheckRemoveOverlayCard=function(c,tp,ct,r)
 	if Duel.IsPlayerAffectedByEffect(tp,25149863) and bit.band(r,REASON_COST)~=0 then
@@ -360,7 +390,103 @@ Card.IsFacedown=function(c)
 		return card_is_facedown(c)
 	end
 end
-
+Card.IsAbleToRemove=function(c,...)
+	local x={...}
+	local checkp=#x>0 and x[1] or self_reference_effect:GetHandlerPlayer()
+	local checkpos=#x>1 and x[2] or POS_FACEUP
+	local checkr=#x>2 and x[3] or REASON_EFFECT
+	if c:IsHasEffect(EFFECT_CANNOT_BANISH) then
+		local ef={c:IsHasEffect(EFFECT_CANNOT_BANISH)}
+		for _,te1 in ipairs(ef) do
+			local cf=te1:GetValue()
+			local typ=aux.GetValueType(cf)
+			if not cf and checkr&REASON_EFFECT>0 then
+				return false
+			elseif (typ=="number" and cf==checkpos) and checkr&REASON_EFFECT>0 then
+				return false
+			elseif typ=="function" then
+				local checkpos2,func=cf()
+				if (not checkpos2 or checkpos2==checkpos) and (not func or func(c,self_reference_effect,checkr,checkp)) then
+					return false
+				end
+			end
+		end
+	end
+	return card_is_able_to_remove(c,table.unpack(x))
+end
+Card.IsAbleToRemoveAsCost=function(c,...)
+	local x={...}
+	local checkpos=#x>0 and x[1] or POS_FACEUP
+	local checkp=#x>1 and x[2] or self_reference_effect:GetHandlerPlayer()
+	
+	if c:IsHasEffect(EFFECT_CANNOT_BANISH_AS_COST) then
+		local ef={c:IsHasEffect(EFFECT_CANNOT_BANISH_AS_COST)}
+		for _,te1 in ipairs(ef) do
+			local cf=te1:GetValue()
+			local typ=aux.GetValueType(cf)
+			if not cf then
+				return false
+			elseif (typ=="number" and cf==checkpos) then
+				return false
+			elseif typ=="function" then
+				local checkpos2,func=cf()
+				if (not checkpos2 or checkpos2==checkpos) and (not func or func(c,self_reference_effect,REASON_COST,checkp)) then
+					return false
+				end
+			end
+		end
+	end
+	return card_is_able_to_remove_as_cost(c,table.unpack(x))
+end
+Card.IsAbleToHand=function(c,...)
+	local x={...}
+	local checkp=#x>0 and x[1] or self_reference_effect:GetHandlerPlayer()
+	local checkrp=#x>1 and x[2] or x[1]
+	if c:IsHasEffect(EFFECT_CANNOT_ADD_TO_HAND) then
+		local ef={c:IsHasEffect(EFFECT_CANNOT_ADD_TO_HAND)}
+		for _,te1 in ipairs(ef) do
+			local cf=te1:GetValue()
+			local typ=aux.GetValueType(cf)
+			if not cf then
+				return false
+			elseif (typ=="number" and cf==checkp) then
+				return false
+			elseif typ=="function" then
+				local checkp2,func=cf()
+				if (not checkp2 or checkp2==checkp) and (not func or func(c,self_reference_effect,REASON_EFFECT,checkrp)) then
+					return false
+				end
+			end
+		end
+	end
+	return card_is_able_to_hand(c,table.unpack(x))
+end
+Card.IsCanBeSpecialSummoned=function(c,e,sumtype,sump,nocheck,nolimit,...)
+	local x={...}
+	local pos0=#x>0 and x[1] or POS_FACEUP
+	local toplayer0=#x>1 and x[2] or sump
+	if c:IsLocation(LOCATION_REMOVED) and c:IsFacedown() then
+		if c:IsHasEffect(EFFECT_CANNOT_SPECIAL_SUMMON) then
+			return false
+		end
+		if Duel.IsPlayerAffectedByEffect(sump,EFFECT_CANNOT_SPECIAL_SUMMON) then
+			local ef={Duel.IsPlayerAffectedByEffect(sump,EFFECT_CANNOT_SPECIAL_SUMMON)}
+			for _,te1 in ipairs(ef) do
+				local cf,tg=te1:GetValue(),te1:GetTarget()
+				local typ1,typ2=aux.GetValueType(cf),aux.GetValueType(tg)
+				if not tg and not cf then
+					return false
+				elseif typ2=="number" or not tg and typ1=="number" then
+					return false
+				elseif typ2=="function" and tg(te1,c,sump,sumtype,pos0,toplayer0,e) or not tg and typ1=="function" and cf(te1,c,sump,sumtype,pos0,toplayer0,e) then
+					return false
+				end
+			end
+		end
+		return Duel.IsPlayerCanSpecialSummonMonster(sump,c:GetCode(),c:GLGetSetCard(),c:GetType(),c:GetAttack(),c:GetDefense(),c:GLGetLevel(),c:GetRace(),c:GetAttribute(),pos0,toplayer0,sumtype)
+	end
+	return card_is_can_be_ssed(c,e,sumtype,sump,nocheck,nolimit,table.unpack(x))
+end
 
 --Custom Functions
 function Auxiliary.TribCheckRecursive(c,tp,mg,sg,sc,ct,min,max,p,zone)
@@ -1491,14 +1617,44 @@ if not global_card_effect_table_global_check then
 	global_card_effect_table_global_check=true
 	global_card_effect_table={}
 	Card.register_global_card_effect_table = Card.RegisterEffect
-	function Card:RegisterEffect(e)
+	function Card:RegisterEffect(e,forced)
 		if not global_card_effect_table[self] then global_card_effect_table[self]={} end
 		table.insert(global_card_effect_table[self],e)
 		if e:GetCode()==EFFECT_DISABLE_FIELD and e:GetLabel()==0 and e:GetOperation() then
 			local op=e:GetOperation()
 			e:SetOperation(Auxiliary.SetOperationResultAsLabel(op))
 		end
-		self.register_global_card_effect_table(self,e)
+		local condition,cost,tg,op=e:GetCondition(),e:GetCost(),e:GetTarget(),e:GetOperation()
+		if cost and not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE) then
+			local newcost =	function(e,tp,eg,ep,ev,re,r,rp,chk)
+								if chk==0 then
+									self_reference_effect=e
+									return cost(e,tp,eg,ep,ev,re,r,rp,chk)
+								end
+								self_reference_effect=e
+								cost(e,tp,eg,ep,ev,re,r,rp,chk)
+							end
+			e:SetCost(newcost)
+		end
+		if tg and not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE) then
+			local newtg =	function(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+								if chk==0 then
+									self_reference_effect=e
+									return tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+								end
+								self_reference_effect=e
+								tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+							end
+			e:SetTarget(newtg)
+		end
+		if op and not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE) then
+			local newop =	function(e,tp,eg,ep,ev,re,r,rp)
+								self_reference_effect=e
+								op(e,tp,eg,ep,ev,re,r,rp)
+							end
+			e:SetOperation(newop)
+		end
+		return self.register_global_card_effect_table(self,e,forced)
 	end
 end
 
@@ -1516,6 +1672,38 @@ if not global_duel_effect_table_global_check then
 									if e:GetCode()==DUEL_EFFECT_NOP[i] then e:SetProperty(e:GetProperty()|EFFECT_FLAG_PLAYER_TARGET) e:SetTargetRange(1,0) end
 								end
 							end
+							local condition,cost,tg,op=e:GetCondition(),e:GetCost(),e:GetTarget(),e:GetOperation()
+							if cost and not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE) then
+								local newcost =	function(e,tp,eg,ep,ev,re,r,rp,chk)
+													if chk==0 then
+														self_reference_effect=e
+														return cost(e,tp,eg,ep,ev,re,r,rp,chk)
+													end
+													self_reference_effect=e
+													cost(e,tp,eg,ep,ev,re,r,rp,chk)
+												end
+								e:SetCost(newcost)
+							end
+							if tg and not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE) then
+								local newtg =	function(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+													if chk==0 then
+														self_reference_effect=e
+														return tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+													end
+													self_reference_effect=e
+													tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+												end
+								e:SetTarget(newtg)
+							end
+							if op and not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE) then
+								local newop =	function(e,tp,eg,ep,ev,re,r,rp)
+													self_reference_effect=e
+													op(e,tp,eg,ep,ev,re,r,rp)
+												end
+								e:SetOperation(newop)
+							end
 							return Duel.register_global_duel_effect_table(e,tp)
 	end
 end
+
+--dofile("expansions/script/Glitchy.lua")
