@@ -11564,7 +11564,7 @@ expansions/script/proc_spatial.lua	f5059d229779b94f123eb689be2f82d8
 expansions/script/proc_timeleap.lua	abec2ca29cc5d68fb423decba89c2e36
 expansions/script/proc_toxia.lua	b39ef13b4f30f236b7b320cefbcb4276
 expansions/script/proc_xros.lua	9982446aad22376953052c36d9fb6ea8
-expansions/script/tables.lua	6481bcc70e9ffabd6f49fe6b59ba013c
+expansions/script/tables.lua	7db6dfc38f2fe2210134344bb10d9c60
 sound/BGM/custom/akarihasarrived.mp3	3833294a82eeb5fb18a46893f95d1b4f
 sound/BGM/custom/Bad Apple.mp3	d311848fb68c40452d5a19b65b35f47d
 sound/BGM/custom/BudCrannMor.mp3	7ea22651d385024cc1b0fcfd9c8470e4
@@ -11635,6 +11635,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	ce39f0b6ae8928d7b89e6f2c9d51fdaf
+update/filelist.txt	ee6e92cddc97fef557ff11734fd31689
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	9177343a5ca478bf1e7fe2e9618719c1
+update/version.txt	73c05687f25e90d9493dbb91e7db14dc
