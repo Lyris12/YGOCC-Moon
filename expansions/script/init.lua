@@ -636,7 +636,8 @@ table.insert(Auxiliary.CannotBeEDMatCodes,EFFECT_CANNOT_BE_FUSION_MATERIAL)
 table.insert(Auxiliary.CannotBeEDMatCodes,EFFECT_CANNOT_BE_SYNCHRO_MATERIAL)
 table.insert(Auxiliary.CannotBeEDMatCodes,EFFECT_CANNOT_BE_XYZ_MATERIAL)
 table.insert(Auxiliary.CannotBeEDMatCodes,EFFECT_CANNOT_BE_LINK_MATERIAL)
-function Auxiliary.CannotBeEDMaterial(c,f,range,isrule,reset)
+function Auxiliary.CannotBeEDMaterial(c,f,range,isrule,reset,owner)
+	if not owner then owner=c end
 	local property = 0
 	if (isrule == nil or isrule == true) then
 		property = property+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE
@@ -645,7 +646,7 @@ function Auxiliary.CannotBeEDMaterial(c,f,range,isrule,reset)
 		property = property+EFFECT_FLAG_SINGLE_RANGE
 	end
 	for _,val in ipairs(Auxiliary.CannotBeEDMatCodes) do
-		local restrict = Effect.CreateEffect(c)
+		local restrict = Effect.CreateEffect(owner)
 		restrict:SetType(EFFECT_TYPE_SINGLE)
 		restrict:SetCode(val)
 		if (property ~= 0) then
@@ -807,101 +808,6 @@ function Card.RemoveOverlayCard(c,p,minct,maxct,r)
 	end
 end
 
-----------------------------------------------------------------------------------------------------------------
---AUXS AND FUNCTIONS PORTED FROM EDOPRO (CAN BE EXPANDED FOR FACILITATING SCRIPT COMPATIBILITY BETWEEN THE SIMS)
-----------------------------------------------------------------------------------------------------------------
-function Auxiliary.FilterBoolFunctionEx(f,value)
-	return	function(target,scard,sumtype,tp)
-				return f(target,value,scard,sumtype,tp)
-			end
-end
-function Auxiliary.FilterBoolFunctionEx2(f,...)
-	local params={...}
-	return	function(target,scard,sumtype,tp)
-				return f(target,scard,sumtype,tp,table.unpack(params))
-			end
-end
-function Auxiliary.GlobalCheck(s,func)
-	if not s.global_check then
-		s.global_check=true
-		func()
-	end
-end
-function Auxiliary.SelectUnselectLoop(c,sg,mg,e,tp,minc,maxc,rescon)
-	local res
-	if #sg>=maxc then return false end
-	sg:AddCard(c)
-	if rescon then
-		local _,stop=rescon(sg,e,tp,mg)
-		if stop then 
-			sg:RemoveCard(c)
-			return false
-		end
-	end
-	if #sg<minc then
-		res=mg:IsExists(Auxiliary.SelectUnselectLoop,1,sg,sg,mg,e,tp,minc,maxc,rescon)
-	elseif #sg<maxc then
-		res=(not rescon or rescon(sg,e,tp,mg)) or mg:IsExists(Auxiliary.SelectUnselectLoop,1,sg,sg,mg,e,tp,minc,maxc,rescon)
-	else
-		res=(not rescon or rescon(sg,e,tp,mg))
-	end
-	sg:RemoveCard(c)
-	return res
-end
-function Auxiliary.SelectUnselectGroup(g,e,tp,minc,maxc,rescon,chk,seltp,hintmsg,finishcon,breakcon,cancelable)
-	local minc=minc or 1
-	local maxc=maxc or #g
-	if chk==0 then return g:IsExists(Auxiliary.SelectUnselectLoop,1,nil,Group.CreateGroup(),g,e,tp,minc,maxc,rescon) end
-	local hintmsg=hintmsg and hintmsg or 0
-	local sg=Group.CreateGroup()
-	while true do
-		local finishable = #sg>=minc and (not finishcon or finishcon(sg,e,tp,g))
-		local mg=g:Filter(Auxiliary.SelectUnselectLoop,sg,sg,g,e,tp,minc,maxc,rescon)
-		if (breakcon and breakcon(sg,e,tp,mg)) or #mg<=0 or #sg>=maxc then break end
-		Duel.Hint(HINT_SELECTMSG,seltp,hintmsg)
-		local tc=mg:SelectUnselect(sg,seltp,finishable,finishable or (cancelable and #sg==0),minc,maxc)
-		if not tc then break end
-		if sg:IsContains(tc) then
-			sg:RemoveCard(tc)
-		else
-			sg:AddCard(tc)
-		end
-	end
-	return sg
-end
---Checks whether the card is located at any of the sequences passed as arguments.
-function Card.IsSequence(c,...)
-	local arg={...}
-	local seq=c:GetSequence()
-	for _,v in ipairs(arg) do
-		if seq==v then return true end
-	end
-	return false
-end
---Used for checking the zone of a card (zone is the zone, tp is referencial player)
-function Auxiliary.IsZone(c,zone,tp)
-	local rzone = c:IsControler(tp) and (1 <<c:GetSequence()) or (1 << (16+c:GetSequence()))
-	if c:IsSequence(5,6) then
-		rzone = rzone | (c:IsControler(tp) and (1 << (16 + 11 - c:GetSequence())) or (1 << (11 - c:GetSequence())))
-	end
-	return (rzone & zone) > 0
-end
-function Card.IsInMainMZone(c,tp)
-	return c:IsLocation(LOCATION_MZONE) and c:GetSequence()<5 and (not tp or c:IsControler(tp))
-end
-function Card.IsInExtraMZone(c,tp)
-	return c:IsLocation(LOCATION_MZONE) and c:GetSequence()>4 and (not tp or c:IsControler(tp))
-end
-
-function Duel.IsMainPhase()
-	return Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2
-end
-function Duel.GetTargetCards(e)
-	return Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
-end
-----------------------------------------------------------------------------------------------------------------
-----------------------------------------------------------------------------------------------------------------
-
 --Glitchy's custom auxs and functions
 if not glitchy_effect_table then glitchy_effect_table={} end
 if not glitchy_archetype_table then glitchy_archetype_table={} end
@@ -941,6 +847,20 @@ RESETS_STANDARD_DISABLE=RESETS_STANDARD|RESET_DISABLE
 
 --Duel Effects without player target range
 DUEL_EFFECT_NOP={EFFECT_DISABLE_FIELD}
+
+function Group.Includes(g1,g2)
+	if #g1==0 or #g1<#g2 then return false end
+	local check=true
+	if #g2>0 then
+		for tc in aux.Next(g2) do
+			if not g1:IsContains(tc) then
+				check=false
+				break
+			end
+		end
+	end
+	return check
+end
 
 if not Auxiliary.GLSpecialInfos then Auxiliary.GLSpecialInfos={} end
 function Duel.SetGLOperationInfo(e,category,g,ct,p,loc,fromloc)
@@ -1706,4 +1626,179 @@ if not global_duel_effect_table_global_check then
 	end
 end
 
---dofile("expansions/script/Glitchy.lua")
+
+----------------------------------------------------------------------------------------------------------------
+--AUXS AND FUNCTIONS PORTED FROM EDOPRO (CAN BE EXPANDED FOR FACILITATING SCRIPT COMPATIBILITY BETWEEN THE SIMS)
+----------------------------------------------------------------------------------------------------------------
+function Auxiliary.FilterBoolFunctionEx(f,value)
+	return	function(target,scard,sumtype,tp)
+				return f(target,value,scard,sumtype,tp)
+			end
+end
+function Auxiliary.FilterBoolFunctionEx2(f,...)
+	local params={...}
+	return	function(target,scard,sumtype,tp)
+				return f(target,scard,sumtype,tp,table.unpack(params))
+			end
+end
+function Auxiliary.GlobalCheck(s,func)
+	if not s.global_check then
+		s.global_check=true
+		func()
+	end
+end
+function Auxiliary.SelectUnselectLoop(c,sg,mg,e,tp,minc,maxc,rescon)
+	local res
+	if #sg>=maxc then return false end
+	sg:AddCard(c)
+	if rescon then
+		local _,stop=rescon(sg,e,tp,mg)
+		if stop then 
+			sg:RemoveCard(c)
+			return false
+		end
+	end
+	if #sg<minc then
+		res=mg:IsExists(Auxiliary.SelectUnselectLoop,1,sg,sg,mg,e,tp,minc,maxc,rescon)
+	elseif #sg<maxc then
+		res=(not rescon or rescon(sg,e,tp,mg)) or mg:IsExists(Auxiliary.SelectUnselectLoop,1,sg,sg,mg,e,tp,minc,maxc,rescon)
+	else
+		res=(not rescon or rescon(sg,e,tp,mg))
+	end
+	sg:RemoveCard(c)
+	return res
+end
+function Auxiliary.SelectUnselectGroup(g,e,tp,minc,maxc,rescon,chk,seltp,hintmsg,finishcon,breakcon,cancelable)
+	local minc=minc or 1
+	local maxc=maxc or #g
+	if chk==0 then return g:IsExists(Auxiliary.SelectUnselectLoop,1,nil,Group.CreateGroup(),g,e,tp,minc,maxc,rescon) end
+	local hintmsg=hintmsg and hintmsg or 0
+	local sg=Group.CreateGroup()
+	while true do
+		local finishable = #sg>=minc and (not finishcon or finishcon(sg,e,tp,g))
+		local mg=g:Filter(Auxiliary.SelectUnselectLoop,sg,sg,g,e,tp,minc,maxc,rescon)
+		if (breakcon and breakcon(sg,e,tp,mg)) or #mg<=0 or #sg>=maxc then break end
+		Duel.Hint(HINT_SELECTMSG,seltp,hintmsg)
+		local tc=mg:SelectUnselect(sg,seltp,finishable,finishable or (cancelable and #sg==0),minc,maxc)
+		if not tc then break end
+		if sg:IsContains(tc) then
+			sg:RemoveCard(tc)
+		else
+			sg:AddCard(tc)
+		end
+	end
+	return sg
+end
+--Checks whether the card is located at any of the sequences passed as arguments.
+function Card.IsSequence(c,...)
+	local arg={...}
+	local seq=c:GetSequence()
+	for _,v in ipairs(arg) do
+		if seq==v then return true end
+	end
+	return false
+end
+--Used for checking the zone of a card (zone is the zone, tp is referencial player)
+function Auxiliary.IsZone(c,zone,tp)
+	local rzone = c:IsControler(tp) and (1 <<c:GetSequence()) or (1 << (16+c:GetSequence()))
+	if c:IsSequence(5,6) then
+		rzone = rzone | (c:IsControler(tp) and (1 << (16 + 11 - c:GetSequence())) or (1 << (11 - c:GetSequence())))
+	end
+	return (rzone & zone) > 0
+end
+function Card.IsInMainMZone(c,tp)
+	return c:IsLocation(LOCATION_MZONE) and c:GetSequence()<5 and (not tp or c:IsControler(tp))
+end
+function Card.IsInExtraMZone(c,tp)
+	return c:IsLocation(LOCATION_MZONE) and c:GetSequence()>4 and (not tp or c:IsControler(tp))
+end
+
+function Duel.IsMainPhase()
+	return Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2
+end
+function Duel.GetTargetCards(e)
+	return Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
+end
+function Auxiliary.ReleaseCostFilter(c,f,...)
+	return c:IsFaceup() and c:IsReleasable() and c:IsHasEffect(59160188) 
+		and (not f or f(c,table.unpack({...})))
+end
+function Auxiliary.ReleaseCheckSingleUse(sg,tp,exg)
+	return #sg-#(sg-exg)<=1
+end
+function Auxiliary.ReleaseCheckMMZ(sg,tp)
+	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		or sg:IsExists(aux.FilterBoolFunction(Card.IsInMainMZone,tp),1,nil)
+end
+function Auxiliary.ReleaseCheckTarget(sg,tp,exg,dg)
+	return dg:IsExists(aux.TRUE,1,sg)
+end
+function Auxiliary.RelCheckRecursive(c,tp,sg,mg,exg,mustg,ct,minc,specialchk,...)
+	sg:AddCard(c)
+	ct=ct+1
+	local res=Auxiliary.RelCheckGoal(tp,sg,exg,mustg,ct,minc,specialchk,table.unpack({...})) 
+		or (ct<minc and mg:IsExists(Auxiliary.RelCheckRecursive,1,sg,tp,sg,mg,exg,mustg,ct,minc,specialchk,table.unpack({...})))
+	sg:RemoveCard(c)
+	ct=ct-1
+	return res
+end		
+function Auxiliary.RelCheckGoal(tp,sg,exg,mustg,ct,minc,specialchk,...)
+	return ct>=minc and (not specialchk or specialchk(sg,tp,exg,table.unpack({...}))) and sg:Includes(mustg)
+end
+function Duel.CheckReleaseGroupCost(tp,f,ct,use_hand,specialchk,ex,...)
+	local params={...}
+	if not ex then ex=Group.CreateGroup() end
+	if not specialchk then specialchk=Auxiliary.ReleaseCheckSingleUse else specialchk=Auxiliary.AND(specialchk,Auxiliary.ReleaseCheckSingleUse) end
+	local g=Duel.GetReleaseGroup(tp,use_hand)
+	if f then
+		g=g:Filter(f,ex,table.unpack(params))
+	else
+		g=g-ex
+	end
+	local exg=Duel.GetMatchingGroup(Auxiliary.ReleaseCostFilter,tp,0,LOCATION_MZONE,g+ex,f,table.unpack(params))
+	local mustg=g:Filter(function(c,tp)return c:IsHasEffect(EFFECT_EXTRA_RELEASE) and c:IsControler(1-tp)end,nil,tp)
+	local mg=g+exg
+	local sg=Group.CreateGroup()
+	return mg:Includes(mustg) and mg:IsExists(Auxiliary.RelCheckRecursive,1,nil,tp,sg,mg,exg,mustg,0,ct,specialchk,table.unpack({...}))
+end
+function Duel.SelectReleaseGroupCost(tp,f,minc,maxc,use_hand,specialchk,ex,...)
+	local params={...}
+	if not ex then ex=Group.CreateGroup() end
+	if not specialchk then specialchk=Auxiliary.ReleaseCheckSingleUse else specialchk=Auxiliary.AND(specialchk,Auxiliary.ReleaseCheckSingleUse) end
+	local g=Duel.GetReleaseGroup(tp,use_hand)
+	if f then
+		g=g:Filter(f,ex,table.unpack(params))
+	else
+		g=g-ex
+	end
+	local exg=Duel.GetMatchingGroup(Auxiliary.ReleaseCostFilter,tp,0,LOCATION_MZONE,g+ex,f,table.unpack(params))
+	local mg=g+exg
+	local mustg=g:Filter(function(c,tp)return c:IsHasEffect(EFFECT_EXTRA_RELEASE) and c:IsControler(1-tp)end,nil,tp)
+	local sg=Group.CreateGroup()
+	local cancel=false
+	sg:Merge(mustg)
+	while #sg<maxc do
+		local cg=mg:Filter(Auxiliary.RelCheckRecursive,sg,tp,sg,mg,exg,mustg,#sg,minc,specialchk,table.unpack({...}))
+		if #cg==0 then break end
+		cancel=#sg>=minc and #sg<=maxc and Auxiliary.RelCheckGoal(tp,sg,exg,mustg,#sg,minc,specialchk,table.unpack({...}))
+		local tc=Group.SelectUnselect(cg,sg,tp,cancel,cancel,1,1)
+		if not tc then break end
+		if #mustg==0 or not mustg:IsContains(tc) then
+			if not sg:IsContains(tc) then
+				sg=sg+tc
+			else
+				sg=sg-tc
+			end
+		end
+	end
+	if #sg==0 then return sg end
+	if #sg~=#(sg-exg) then
+		--LoD is reset for the rest of the turn
+		local fc=Duel.GetFieldCard(tp,LOCATION_SZONE,5)
+		Duel.Hint(HINT_CARD,0,fc:GetCode())
+		fc:RegisterFlagEffect(59160188,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,0)
+	end
+	return sg
+end
+----------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------

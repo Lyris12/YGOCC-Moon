@@ -26,7 +26,7 @@ function s.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetCode(EVENT_SUMMON_SUCCESS)
 	e3:SetCountLimit(1,id+2000)
-	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
+	e3:SetProperty(EFFECT_FLAG_DELAY)
 	e3:SetCategory(CATEGORY_TOGRAVE)
 	e3:SetTarget(s.tgtg)
 	e3:SetOperation(s.tgop)
@@ -67,8 +67,7 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	if c:IsRelateToEffect(e) then Duel.Destroy(c,REASON_EFFECT) end
 end
 function s.tgfilter(c)
-	return c:IsFaceup() and c:IsType(TYPE_PANDEMONIUM+TYPE_PENDULUM) and c:IsAbleToGrave()
-		and c:IsRace(RACE_REPTILE)
+	return c:IsType(TYPE_MONSTER) and c:IsFaceup() and c:IsAbleToGrave() and c:IsRace(RACE_REPTILE)
 end
 function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.tgfilter,tp,LOCATION_EXTRA,0,1,nil) end
@@ -76,7 +75,10 @@ function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	Duel.SendtoGrave(Duel.SelectMatchingCard(tp,s.tgfilter,tp,LOCATION_EXTRA,0,1,1,nil),REASON_EFFECT)
+	local g=Duel.SelectMatchingCard(tp,s.tgfilter,tp,LOCATION_EXTRA,0,1,1,nil)
+	if #g>0 then
+		Duel.SendtoGrave(g,REASON_EFFECT)
+	end
 end
 function s.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
@@ -84,7 +86,7 @@ function s.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		and chkc:IsAbleToHand() and chkc~=c end
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectTarget(tp,aux.AND(Card.IsSetCard,Card.IsAbleToHand),tp,LOCATION_GRAVE,0,1,1,c,0x9fa)
+	local g=Duel.SelectTarget(tp,aux.NecroValleyFilter(aux.AND(Card.IsSetCard,Card.IsAbleToHand)),tp,LOCATION_GRAVE,0,1,1,c,0x9fa)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,#g,0,0)
 end
 function s.op(e,tp,eg,ep,ev,re,r,rp)

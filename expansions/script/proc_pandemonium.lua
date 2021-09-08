@@ -643,41 +643,61 @@ function Auxiliary.PandSSetFilter(tc,...)
 				return (not tc or tc(c,e,tp,eg,ep,ev,re,r,rp)) and Auxiliary.PandSSetCon(c,nil,table.unpack(eparams))(nil,e,tp,eg,ep,ev,re,r,rp)
 			end
 end
+function Auxiliary.GetOriginalPandemoniumType(c)
+	return c:GetFlagEffectLabel(1074)
+end
 function Auxiliary.PandSSet(tc,reason,tpe)
-	if not tpe then tpe=TYPE_EFFECT end
 	return  function(e,tp,eg,ep,ev,re,r,rp,c)
 				if pcall(Group.GetFirst,tc) then
+					local mixedset=false
+					local sg=Group.CreateGroup()
+					sg:KeepAlive()
 					local tg=tc:Clone()
 					for cc in aux.Next(tg) do
-						local hand_chk=true
-						if not cc:IsLocation(LOCATION_HAND) then
-							hand_chk=false
-							cc:SetCardData(CARDDATA_TYPE,TYPE_TRAP+TYPE_CONTINUOUS)
+						if cc:IsType(TYPE_PANDEMONIUM) or cc:GetFlagEffect(706)>0 then	
+							if not cc:IsLocation(LOCATION_HAND) then
+								cc:SetCardData(CARDDATA_TYPE,TYPE_TRAP+TYPE_CONTINUOUS)
+							end
+							local e1=Effect.CreateEffect(cc)
+							e1:SetType(EFFECT_TYPE_SINGLE)
+							e1:SetCode(EFFECT_MONSTER_SSET)
+							e1:SetValue(TYPE_TRAP+TYPE_CONTINUOUS)
+							e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+							cc:RegisterEffect(e1,true)
+							if cc:IsLocation(LOCATION_SZONE) then
+								--if cc:IsCanTurnSet() then
+									Duel.ChangePosition(cc,POS_FACEDOWN_ATTACK)
+									Duel.RaiseEvent(cc,EVENT_SSET,e,reason,tp,tp,0)
+									cc:RegisterFlagEffect(706,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SET_AVAILABLE,1)
+									e1:Reset()
+								--end
+							else								
+								sg:AddCard(cc)
+							end
+						elseif cc:IsType(TYPE_SPELL+TYPE_TRAP) and cc:GetFlagEffect(706)<=0 then
+							if not mixedset then mixedset=true end
+							sg:AddCard(cc)
 						end
-						local e1=Effect.CreateEffect(cc)
-						e1:SetType(EFFECT_TYPE_SINGLE)
-						e1:SetCode(EFFECT_MONSTER_SSET)
-						e1:SetValue(TYPE_TRAP+TYPE_CONTINUOUS)
-						e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD)
-						cc:RegisterEffect(e1,true)
-						if cc:IsLocation(LOCATION_SZONE) then
-							--if cc:IsCanTurnSet() then
-								Duel.ChangePosition(cc,POS_FACEDOWN_ATTACK)
-								Duel.RaiseEvent(cc,EVENT_SSET,e,reason,cc:GetControler(),cc:GetControler(),0)
+					end
+					if #sg>0 then
+						Duel.SSet(tp,sg,tp,false)
+						for cc in aux.Next(sg) do
+							local tpe=tpe or aux.GetOriginalPandemoniumType(cc)
+							if cc:IsType(TYPE_PANDEMONIUM) then
 								cc:RegisterFlagEffect(706,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SET_AVAILABLE,1)
-							--end
-						else Duel.SSet(cc:GetControler(),cc,cc:GetControler(),false) cc:RegisterFlagEffect(706,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SET_AVAILABLE,1) end
-						e1:Reset()
-						if hand_chk then
-							cc:SetCardData(CARDDATA_TYPE,TYPE_TRAP+TYPE_CONTINUOUS)
-						end
-						if not cc:IsLocation(LOCATION_SZONE) then
-							local edcheck=0
-							if cc:IsLocation(LOCATION_EXTRA) then edcheck=TYPE_PENDULUM end
-							cc:SetCardData(CARDDATA_TYPE,TYPE_MONSTER+tpe+edcheck)
+								if cc:IsPreviousLocation(LOCATION_HAND) then
+									cc:SetCardData(CARDDATA_TYPE,TYPE_TRAP+TYPE_CONTINUOUS)
+								end
+								if not cc:IsLocation(LOCATION_SZONE) then
+									local edcheck=0
+									if cc:IsLocation(LOCATION_EXTRA) then edcheck=TYPE_PENDULUM end
+									cc:SetCardData(CARDDATA_TYPE,TYPE_MONSTER+tpe+edcheck)
+								end
+							end
 						end
 					end
 				else
+					local tpe=tpe or aux.GetOriginalPandemoniumType(tc)
 					local hand_chk=true
 					if not tc:IsLocation(LOCATION_HAND) then
 						hand_chk=false
@@ -692,10 +712,13 @@ function Auxiliary.PandSSet(tc,reason,tpe)
 					if tc:IsLocation(LOCATION_SZONE) then
 						if tc:IsCanTurnSet() then
 							Duel.ChangePosition(tc,POS_FACEDOWN_ATTACK)
-							Duel.RaiseEvent(tc,EVENT_SSET,e,reason,tc:GetControler(),tc:GetControler(),0)
+							Duel.RaiseEvent(tc,EVENT_SSET,e,reason,tp,tp,0)
 							tc:RegisterFlagEffect(706,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SET_AVAILABLE,1)
 						end
-					else Duel.SSet(tc:GetControler(),tc,tc:GetControler(),false) tc:RegisterFlagEffect(706,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SET_AVAILABLE,1) end
+					else
+						Duel.SSet(tp,tc,tp,false)
+						tc:RegisterFlagEffect(706,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SET_AVAILABLE,1)
+					end
 					e1:Reset()
 					if hand_chk then
 						tc:SetCardData(CARDDATA_TYPE,TYPE_TRAP+TYPE_CONTINUOUS)
@@ -825,9 +848,6 @@ function Auxiliary.PandAct(tc,...)
 				end
 				tc:RegisterFlagEffect(726,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CANNOT_DISABLE,1)
 			end
-end
-function Auxiliary.GetOriginalPandemoniumType(c)
-	return c:GetFlagEffectLabel(1074)
 end
 
 ----------EFFECT_PANDEPEND_SCALE-------------
