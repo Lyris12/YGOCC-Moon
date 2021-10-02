@@ -12,20 +12,21 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetCountLimit(1)
+	e1:SetCountLimit(1,id)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.op)
 	c:RegisterEffect(e1)
-	--recycle
+	--banish
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetCategory(CATEGORY_TOHAND)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e2:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
-	e2:SetCode(EVENT_LEAVE_FIELD)
-	e2:SetCondition(s.spcon)
-	e2:SetTarget(s.sptg)
-	e2:SetOperation(s.spop)
+	e2:SetDescription(aux.Stringid(id,0))
+	e2:SetCategory(CATEGORY_REMOVE)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e2:SetCode(EVENT_TO_HAND)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1,id+500)
+	e2:SetCondition(s.ddcon)
+	e2:SetTarget(s.ddtg)
+	e2:SetOperation(s.ddop)
 	c:RegisterEffect(e2)
 end 
 	function s.filter(c)
@@ -66,24 +67,35 @@ end
 	Duel.Remove(tc1,POS_FACEUP,REASON_EFFECT)
 	e:Reset()
 end
-	function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return (c:IsReason(REASON_BATTLE) or (c:GetReasonPlayer()==1-tp and c:IsReason(REASON_EFFECT)))
-		and c:IsPreviousLocation(LOCATION_MZONE) and c:IsSummonType(SUMMON_TYPE_FUSION)
+	function s.ddcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetCurrentPhase()~=PHASE_DRAW
 end
-	function s.addfilter(c)
-	return c:IsType(TYPE_EQUIP) and c:IsAbleToHand()
+	function s.ddfilter(c,tp)
+	return c:IsControler(1-tp)
 end
-	function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_GRAVE)
+	function s.filter(c)
+	return c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsAbleToRemove()
 end
-	function s.spop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.addfilter),tp,LOCATION_GRAVE,0,1,1,nil)
-	if g:GetCount()>0 then
-		Duel.SendtoHand(g,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,g)
+	function s.ddtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local g=eg:Filter(s.ddfilter,nil,tp)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_GRAVE,0,1,nil) and #g>0 end
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,#g,0,0)
+end
+	function s.ddop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+	local g1=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_GRAVE,0,1,1,nil)
+		if #g1>0 then 
+			if Duel.Remove(g1,POS_FACEUP,REASON_EFFECT) then
+			if not e:GetHandler():IsRelateToEffect(e) then return end
+			local g=eg:Filter(s.ddfilter,nil,tp)
+				if #g>0 then
+				Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
+			end
+		end
 	end
 end
+
+
+
+
 

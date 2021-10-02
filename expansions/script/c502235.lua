@@ -12,12 +12,12 @@ function s.initial_effect(c)
 		e1:SetTarget(s.sptg)
 		e1:SetOperation(s.spop)
 		c:RegisterEffect(e1)
-		--boost
+		--send light
 		local e2=Effect.CreateEffect(c)
-		e2:SetCategory(CATEGORY_ATKCHANGE+CATEGORY_DEFCHANGE)
+		e2:SetCategory(CATEGORY_TOGRAVE)
 		e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+		e2:SetCode(EVENT_REMOVE)
 		e2:SetProperty(EFFECT_FLAG_DELAY)
-		e2:SetCode(EVENT_BE_MATERIAL)
 		e2:SetCountLimit(1,id+500)
 		e2:SetCondition(s.condition)
 		e2:SetTarget(s.target)
@@ -25,7 +25,7 @@ function s.initial_effect(c)
 		c:RegisterEffect(e2)
 end
 	function s.spfilter(c)
-	return c:IsCode(502233) and not c:IsPublic()
+	return (c:IsCode(502233) or c:IsCode(49306994)) and not c:IsPublic()
 end
 	function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -56,30 +56,19 @@ end
 	end 
 end
 	function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsLocation(LOCATION_GRAVE) and r==REASON_FUSION
+	return e:GetHandler():IsReason(REASON_COST) and re:IsActivated() and re:IsActiveType(TYPE_MONSTER) and re:GetHandler():IsType(TYPE_FUSION)
 end
-	function s.filter(c)
-	return c:IsFaceup() and c:IsType(TYPE_FUSION)
+	function s.tgfilter(c)
+	return c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsAbleToGrave()
 end
 	function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_MZONE,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.tgfilter,tp,LOCATION_DECK,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
 end
 	function s.operation(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_MZONE,0,nil)
-	local tc=g:GetFirst()
-	while tc do
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_UPDATE_ATTACK)
-		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e1:SetValue(800)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-		tc:RegisterEffect(e1)
-		tc=g:GetNext()
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+	local g=Duel.SelectMatchingCard(tp,s.tgfilter,tp,LOCATION_DECK,0,1,1,nil)
+	if #g>0 then
+		Duel.SendtoGrave(g,REASON_EFFECT)
 	end
 end
-
-
-
-
