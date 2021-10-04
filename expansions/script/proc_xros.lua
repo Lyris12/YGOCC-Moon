@@ -232,7 +232,7 @@ function Duel.GetCoreGroup(tp,s,o,typ)
 	local g=duel_overlay_group(tp,s,o):Filter(function(c) return Auxiliary.Xroses[c:GetOverlayTarget()] end,nil)
 	local t={["Main"]=g:Filter(function(c) return c:GetMaterial():IsContains(c) end,nil),
 	["Extra"]=g:Filter(function(c) return not c:GetMaterial():IsContains(c) end,nil)}
-	return not typ and g or t[typ]
+	return typ and t[typ] or g
 end
 function Duel.GetCoreCount(tp,s,o,typ)
 	return #Duel.GetCoreGroup(tp,s,o,typ)
@@ -327,7 +327,7 @@ function Auxiliary.AddOrigXrosType(c,isxyz)
 	Auxiliary.Xroses[c]=function() return isxyz end
 end
 function Auxiliary.AddXrosProc(c,xscheck,gd,...)
-	--xscheck - extra check after everything is settled, djn - Xros "level"
+	--xscheck - extra check after everything is settled, gd - Xros "level"
 	--... format - material filter, minimum-of, maximum-of; use aux.TRUE for generic materials
 	if c:IsStatus(STATUS_COPYING_EFFECT) then return end
 	local t={...}

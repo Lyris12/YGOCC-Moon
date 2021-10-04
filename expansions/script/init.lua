@@ -1,4 +1,4 @@
--- --Not yet finalized values
+--Not yet finalized values
 --Custom constants
 self_reference_effect				= nil
 
@@ -64,12 +64,8 @@ end
 --overwrite functions
 local is_type, card_remcounter, duel_remcounter, effect_set_target_range, effect_set_reset, add_xyz_proc, add_xyz_proc_nlv, duel_overlay, duel_set_lp, duel_select_target, duel_banish, card_check_remove_overlay_card, is_reason, duel_check_tribute, select_tribute,card_sethighlander,
 	card_is_facedown, card_is_able_to_remove, card_is_able_to_remove_as_cost, card_is_able_to_hand, card_is_can_be_ssed = 
-	
 	Card.IsType, Card.RemoveCounter, Duel.RemoveCounter, Effect.SetTargetRange, Effect.SetReset, Auxiliary.AddXyzProcedure, Auxiliary.AddXyzProcedureLevelFree, Duel.Overlay, Duel.SetLP, Duel.SelectTarget, Duel.Remove, Card.CheckRemoveOverlayCard, Card.IsReason, Duel.CheckTribute, Duel.SelectTribute, Card.SetUniqueOnField,
 	Card.IsFacedown, Card.IsAbleToRemove, Card.IsAbleToRemoveAsCost, Card.IsAbleToHand, Card.IsCanBeSpecialSummoned
-
-
-
 
 dofile("expansions/script/proc_evolute.lua") --Evolutes
 dofile("expansions/script/proc_conjoint.lua") --Conjoints
@@ -82,12 +78,12 @@ dofile("expansions/script/proc_deckmaster.lua") --Deck Masters
 dofile("expansions/script/proc_bigbang.lua") --Bigbangs
 dofile("expansions/script/proc_timeleap.lua") --Time Leaps
 dofile("expansions/script/proc_relay.lua") --Relays
-dofile("expansions/script/proc_harmony.lua") --Harmonies
-dofile("expansions/script/proc_accent.lua") --Accents
-dofile("expansions/script/proc_bypath.lua") --Bypaths
-dofile("expansions/script/proc_toxia.lua") --Toxias
-dofile("expansions/script/proc_annotee.lua") --Annotees
-dofile("expansions/script/proc_chroma.lua") --Chromas
+-- dofile("expansions/script/proc_harmony.lua") --Harmonies
+-- dofile("expansions/script/proc_accent.lua") --Accents
+-- dofile("expansions/script/proc_bypath.lua") --Bypaths
+-- dofile("expansions/script/proc_toxia.lua") --Toxias
+-- dofile("expansions/script/proc_annotee.lua") --Annotees
+-- dofile("expansions/script/proc_chroma.lua") --Chromas
 dofile("expansions/script/proc_perdition.lua") --Perditions
 dofile("expansions/script/proc_impure.lua") --Impures
 dofile("expansions/script/proc_runic.lua") --Runic
@@ -95,6 +91,7 @@ dofile("expansions/script/proc_magick.lua") --Magick
 dofile("expansions/script/proc_xros.lua") --Xroses
 dofile("expansions/script/muse_proc.lua") --"Muse"
 dofile("expansions/script/tables.lua") --Special Tables
+dofile("expansions/script/proc_evolve.lua") --Evolve
 
 Card.IsReason=function(c,rs)
 	local cusrs=rs>>32

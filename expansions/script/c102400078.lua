@@ -67,14 +67,7 @@ function s.disop(e,tp,eg,ep,ev,re,r,rp)
 		local g=Duel.SelectMatchingCard(tp,s.filter,tp,0,LOCATION_MZONE,1,1,nil)
 		Duel.HintSelection(g)
 		local tc=g:GetFirst()
-		if tc and Duel.ChangePosition(tc,POS_FACEDOWN_DEFENSE)~=0 then
-			local e1=Effect.CreateEffect(c)
-			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetCode(EFFECT_CANNOT_CHANGE_POSITION)
-			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_COPY_INHERIT)
-			e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-			tc:RegisterEffect(e1)
-		end
+		if tc then Duel.ChangePosition(tc,POS_FACEUP_DEFENSE) end
 	end
 end
 function s.sfilter(c,e,tp)
