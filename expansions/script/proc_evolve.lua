@@ -24,7 +24,7 @@ TYPE_EXTRA								= TYPE_EXTRA | TYPE_EVOLVE
 local getType, getOrigType, getPrevTypeField, isRankBelow = Card.GetType, Card.GetOriginalType, Card.GetPreviousTypeOnField, Card.IsRankBelow
 
 Card.GetType = function(c, scard, sumtype, p)
-	local tpe = scard and get_type(c, scard, sumtype, p) or get_type(c)
+	local tpe = scard and getType(c, scard, sumtype, p) or getType(c)
 	if Auxiliary.Evolves[c] then
 		tpe = tpe | TYPE_EVOLVE
 		if not Auxiliary.Evolves[c]() then
@@ -34,7 +34,7 @@ Card.GetType = function(c, scard, sumtype, p)
 	return tpe
 end
 Card.GetOriginalType = function(c)
-	local tpe = get_orig_type(c)
+	local tpe = getOrigType(c)
 	if Auxiliary.Evolves[c] then
 		tpe = tpe | TYPE_EVOLVE
 		if not Auxiliary.Evolves[c]() then
@@ -44,7 +44,7 @@ Card.GetOriginalType = function(c)
 	return tpe
 end
 Card.GetPreviousTypeOnField = function(c)
-	local tpe = get_prev_type_field(c)
+	local tpe = getPrevTypeField(c)
 	if Auxiliary.Evolves[c] then
 		tpe = tpe | TYPE_EVOLVE
 		if not Auxiliary.Evolves[c]() then
@@ -55,7 +55,7 @@ Card.GetPreviousTypeOnField = function(c)
 end
 Card.IsRankBelow = function(c, rk)
 	if Auxiliary.Evolves[c] and not Auxiliary.Evolves[c]() then return false end
-	return is_rank_below(c, rk)
+	return isRankBelow(c, rk)
 end
 
 --Custom Functions
