@@ -26,7 +26,7 @@ function s.filter(c,tp)
 	return c:IsFaceup() and c:IsRace(RACE_DINOSAUR) and Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_DECK,0,1,nil,{c:GetCode()})
 end
 function s.cfilter(c,t)
-	return c:IsAbleToGrave() and c:IsSetCard(0x9b5) and not c:IsCode(table.unpack(t))
+	return c:IsAbleToGrave() and c:IsSetCard(0x9b5) and c:IsType(TYPE_MONSTER) and not c:IsCode(table.unpack(t))
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.filter(chkc,tp) end
@@ -59,7 +59,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetReset(RESET_PHASE+PHASE_END)
 		Duel.RegisterEffect(e2,tp)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-		local g=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_DECK,0,1,1,nil,tc:GetCode())
+		local g=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_DECK,0,1,1,nil,{tc:GetCode()})
 		if #g>0 then
 			Duel.BreakEffect()
 			Duel.SendtoGrave(g,REASON_EFFECT)
