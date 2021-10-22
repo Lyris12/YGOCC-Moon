@@ -18,7 +18,6 @@ function s.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e2:SetCode(EVENT_CHAIN_SOLVING)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCountLimit(1,id)
 	e2:SetOperation(s.disop)
 	c:RegisterEffect(e2)
 	--to 0, also banish
@@ -134,8 +133,8 @@ end
 	local rc=re:GetHandler()
 	if ep==tp then return end
 	if Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION)==LOCATION_REMOVED then return false end
-		if rp==1-tp and re:IsActiveType(TYPE_MONSTER) and rc:IsRelateToEffect(re) and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
+		if rp==1-tp and re:IsActiveType(TYPE_MONSTER) and rc:IsRelateToEffect(re) and e:GetHandler():GetFlagEffect(502239)==0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
 		Duel.Remove(rc,POS_FACEUP,REASON_EFFECT)
+		e:GetHandler():RegisterFlagEffect(502239,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
 	end
 end
-	

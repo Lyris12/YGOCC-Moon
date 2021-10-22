@@ -25,7 +25,7 @@ function s.initial_effect(c)
 		e3:SetTarget(s.reptg)
 		e3:SetValue(s.repval)
 		e3:SetOperation(s.repop)
-		c:RegisterEffect(e3)
+		c:RegisterEffect(e3)	
 end
 	function s.thcfilter(c)
 	return c:IsFacedown() or c:IsAttribute(ATTRIBUTE_WIND+ATTRIBUTE_DARK+ATTRIBUTE_DIVINE+ATTRIBUTE_EARTH+ATTRIBUTE_FIRE+ATTRIBUTE_WATER)
@@ -38,7 +38,7 @@ end
 	return c:IsCode(502233) and c:IsAbleToHand()
 end
 	function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
 	function s.thop(e,tp,eg,ep,ev,re,r,rp)
@@ -84,11 +84,7 @@ end
 	if not c then return false end
 	return c:IsControler(e:GetHandlerPlayer()) and c:IsCanBeRitualMaterial()
 end
-	function s.repfilter(c,tp)
-	return c:IsFaceup() and c:IsControler(tp) and c:IsLocation(LOCATION_MZONE) and c:IsType(TYPE_FUSION)
-		and (c:IsReason(REASON_BATTLE) or c:IsReason(REASON_EFFECT)) and not c:IsReason(REASON_REPLACE)
-end
-function s.desfilter(c,tp)
+	function s.desfilter(c,tp)
 	return c:IsControler(tp) and c:IsLocation(LOCATION_SZONE) and c:IsFaceup() and c:GetCode()==49306994
 end
 	function s.repfilter(c,tp)

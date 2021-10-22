@@ -47,6 +47,9 @@ end
 	function s.negcfilter(c,tp)
 	return c:IsLocation(LOCATION_MZONE) and c:IsType(TYPE_FUSION) and c:GetEquipGroup():IsExists(Card.IsCode,1,nil,49306994)
 end
+	function s.rmfilter(c)
+	return c:IsType(TYPE_MONSTER) and c:IsAbleToRemove()
+end
 	function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return rp~=tp and re:IsActiveType(TYPE_MONSTER) and Duel.IsChainNegatable(ev) and Duel.IsExistingMatchingCard(s.negcfilter,tp,LOCATION_MZONE,0,1,nil)
 end
@@ -56,10 +59,10 @@ end
 end
 	function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.NegateActivation(ev) then
-		if Duel.IsExistingMatchingCard(aux.TRUE,tp,0,LOCATION_GRAVE,1,nil) and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+		if Duel.IsExistingMatchingCard(s.rmfilter,tp,0,LOCATION_GRAVE,1,nil) and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
 		Duel.BreakEffect()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-		local tc=Duel.SelectMatchingCard(tp,aux.TRUE,tp,0,LOCATION_GRAVE,1,1,nil)
+		local tc=Duel.SelectMatchingCard(tp,s.rmfilter,tp,0,LOCATION_GRAVE,1,1,nil)
 		Duel.HintSelection(tc)
 		Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)
 		end
