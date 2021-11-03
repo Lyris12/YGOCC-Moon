@@ -126,25 +126,23 @@ function cid.eftg(e, c)
         return e:GetHandler():GetEquipTarget()==c
     end
 end
-function cid.thfilter(c)
+function cid.thfilter(c,tp)
 	return c:IsFaceup() and c:IsType(TYPE_EQUIP) and c:IsAbleToHand()
-	    and Duel.IsExistingTarget(cid.eqfilter, tp, LOCATION_GRAVE, 0, 1, nil, c:GetCode())
+	    and Duel.IsExistingTarget(cid.eqfilter, tp, LOCATION_GRAVE, 0, 1, nil, c:GetCode(),tp)
 end
-function cid.eqfilter(c, code)
-	return c:IsType(TYPE_EQUIP) and not c:IsCode(code)
+function cid.eqfilter(c, code,tp)
+	return c:IsType(TYPE_EQUIP) and not c:IsCode(code) and not c:IsForbidden() and c:CheckUniqueOnField(tp)
 end
 function cid.thtg(e, tp, eg, ep, ev, re, r, rp, chk, chkc)
 	if chkc then return false end
-	if chk==0 then return Duel.IsExistingTarget(cid.thfilter, tp, LOCATION_SZONE, 0, 1, nil)
-		and Duel.IsExistingTarget(cid.eqfilter, tp, LOCATION_GRAVE, 0, 1, nil) end
+	if chk==0 then return Duel.IsExistingTarget(cid.thfilter, tp, LOCATION_SZONE, 0, 1, nil,tp) end
 	Duel.Hint(HINT_SELECTMSG, tp, HINTMSG_RTOHAND)
-	local g1=Duel.SelectTarget(tp, cid.thfilter, tp, LOCATION_SZONE, 0, 1, 1, nil)
+	local g1=Duel.SelectTarget(tp, cid.thfilter, tp, LOCATION_SZONE, 0, 1, 1, nil,tp)
 	local tc1=g1:GetFirst()
 	e:SetLabelObject(tc1)
 	Duel.Hint(HINT_SELECTMSG, tp, HINTMSG_EQUIP)
-	local g2=Duel.SelectTarget(tp, cid.eqfilter, tp, LOCATION_GRAVE, 0, 1, 1, nil, tc1:GetCode())
+	Duel.SelectTarget(tp, aux.NecroValleyFilter(cid.eqfilter), tp, LOCATION_GRAVE, 0, 1, 1, nil, tc1:GetCode(),tp)
 	Duel.SetOperationInfo(0, CATEGORY_TOHAND, g1, 1, 0, 0)
-	Duel.SetOperationInfo(0, CATEGORY_EQUIP, g2, 1, 0, 0)
 end
 function cid.thop(e, tp, eg, ep, ev, re, r, rp)
 	local c=e:GetHandler()
@@ -152,8 +150,8 @@ function cid.thop(e, tp, eg, ep, ev, re, r, rp)
 	local g=Duel.GetChainInfo(0, CHAININFO_TARGET_CARDS)
 	local tc2=g:GetFirst()
 	if tc2==tc1 then tc2=g:GetNext() end
-	if tc1:IsRelateToEffect(e) and tc1:IsFaceup() and Duel.SendtoHand(tc1, nil, REASON_EFFECT)~=0 then
-		Duel.Equip(tp, tc2, c)
+	if tc1:IsRelateToEffect(e) and tc1:IsFaceup() and Duel.SendtoHand(tc1, nil, REASON_EFFECT)~=0 and tc2:IsRelateToEffect(e) and tc:CheckUniqueOnField(tp) and c:IsRelateToEffect(e) and c:IsFaceup() and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then 
+		Duel.Equip(tp, tc2, c)	
 	end
 end
 --Destroy this card during your standby phase
