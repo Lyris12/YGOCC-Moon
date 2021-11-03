@@ -128,10 +128,10 @@ function cid.eftg(e, c)
 end
 function cid.thfilter(c,tp)
 	return c:IsFaceup() and c:IsType(TYPE_EQUIP) and c:IsAbleToHand()
-	    and Duel.IsExistingTarget(cid.eqfilter, tp, LOCATION_GRAVE, 0, 1, nil, c:GetCode(),tp)
+	    and Duel.IsExistingTarget(cid.eqfilter, tp, LOCATION_GRAVE, 0, 1, nil, c:GetCode())
 end
-function cid.eqfilter(c, code,tp)
-	return c:IsType(TYPE_EQUIP) and not c:IsCode(code) and not c:IsForbidden() and c:CheckUniqueOnField(tp)
+function cid.eqfilter(c, code)
+	return c:IsType(TYPE_EQUIP) and not c:IsCode(code)
 end
 function cid.thtg(e, tp, eg, ep, ev, re, r, rp, chk, chkc)
 	if chkc then return false end
@@ -141,7 +141,7 @@ function cid.thtg(e, tp, eg, ep, ev, re, r, rp, chk, chkc)
 	local tc1=g1:GetFirst()
 	e:SetLabelObject(tc1)
 	Duel.Hint(HINT_SELECTMSG, tp, HINTMSG_EQUIP)
-	Duel.SelectTarget(tp, aux.NecroValleyFilter(cid.eqfilter), tp, LOCATION_GRAVE, 0, 1, 1, nil, tc1:GetCode(),tp)
+	Duel.SelectTarget(tp, aux.NecroValleyFilter(cid.eqfilter), tp, LOCATION_GRAVE, 0, 1, 1, nil, tc1:GetCode())
 	Duel.SetOperationInfo(0, CATEGORY_TOHAND, g1, 1, 0, 0)
 end
 function cid.thop(e, tp, eg, ep, ev, re, r, rp)
@@ -150,7 +150,7 @@ function cid.thop(e, tp, eg, ep, ev, re, r, rp)
 	local g=Duel.GetChainInfo(0, CHAININFO_TARGET_CARDS)
 	local tc2=g:GetFirst()
 	if tc2==tc1 then tc2=g:GetNext() end
-	if tc1:IsRelateToEffect(e) and tc1:IsFaceup() and Duel.SendtoHand(tc1, nil, REASON_EFFECT)~=0 and tc2:IsRelateToEffect(e) and tc:CheckUniqueOnField(tp) and c:IsRelateToEffect(e) and c:IsFaceup() and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then 
+	if tc1:IsRelateToEffect(e) and tc1:IsFaceup() and Duel.SendtoHand(tc1, nil, REASON_EFFECT)~=0 and tc2:IsRelateToEffect(e) and tc2:CheckUniqueOnField(tp) and not tc2:IsForbidden() and c:IsRelateToEffect(e) and c:IsFaceup() and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then 
 		Duel.Equip(tp, tc2, c)	
 	end
 end
