@@ -1542,7 +1542,7 @@ if not global_card_effect_table_global_check then
 			e:SetOperation(Auxiliary.SetOperationResultAsLabel(op))
 		end
 		local condition,cost,tg,op=e:GetCondition(),e:GetCost(),e:GetTarget(),e:GetOperation()
-		if cost and not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE) then
+		if cost and not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()&EFFECT_TYPE_GRANT~=0) then
 			local newcost =	function(e,tp,eg,ep,ev,re,r,rp,chk)
 								self_reference_effect=e
 								if chk==0 then
@@ -1552,7 +1552,7 @@ if not global_card_effect_table_global_check then
 							end
 			e:SetCost(newcost)
 		end
-		if tg and not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE) then
+		if tg and not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()&EFFECT_TYPE_GRANT~=0) then
 			if e:GetCode()==EFFECT_DESTROY_REPLACE or e:GetCode()==EFFECT_SEND_REPLACE then
 				local newtg =	function(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 									self_reference_effect=e
@@ -1573,7 +1573,7 @@ if not global_card_effect_table_global_check then
 				e:SetTarget(newtg)
 			end
 		end
-		if op and not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE) then
+		if op and not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()&EFFECT_TYPE_GRANT~=0) then
 			local newop =	function(e,tp,eg,ep,ev,re,r,rp)
 								self_reference_effect=e
 								op(e,tp,eg,ep,ev,re,r,rp)
@@ -1599,7 +1599,7 @@ if not global_duel_effect_table_global_check then
 								end
 							end
 							local condition,cost,tg,op=e:GetCondition(),e:GetCost(),e:GetTarget(),e:GetOperation()
-							if cost and not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE) then
+							if cost and not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()&EFFECT_TYPE_GRANT~=0) then
 								local newcost =	function(e,tp,eg,ep,ev,re,r,rp,chk)
 													self_reference_effect=e
 													if chk==0 then
@@ -1609,7 +1609,7 @@ if not global_duel_effect_table_global_check then
 												end
 								e:SetCost(newcost)
 							end
-							if tg and not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE) then
+							if tg and not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()&EFFECT_TYPE_GRANT~=0) then
 								if e:GetCode()==EFFECT_DESTROY_REPLACE or e:GetCode()==EFFECT_SEND_REPLACE then
 									local newtg =	function(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 														self_reference_effect=e
@@ -1630,7 +1630,7 @@ if not global_duel_effect_table_global_check then
 									e:SetTarget(newtg)
 								end
 							end
-							if op and not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE) then
+							if op and not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()&EFFECT_TYPE_GRANT~=0) then
 								local newop =	function(e,tp,eg,ep,ev,re,r,rp)
 													self_reference_effect=e
 													op(e,tp,eg,ep,ev,re,r,rp)

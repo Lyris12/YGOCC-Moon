@@ -150,7 +150,7 @@ function cid.thop(e, tp, eg, ep, ev, re, r, rp)
 	local g=Duel.GetChainInfo(0, CHAININFO_TARGET_CARDS)
 	local tc2=g:GetFirst()
 	if tc2==tc1 then tc2=g:GetNext() end
-	if tc1:IsRelateToEffect(e) and tc1:IsFaceup() and Duel.SendtoHand(tc1, nil, REASON_EFFECT)~=0 and tc2:IsRelateToEffect(e) and tc2:CheckUniqueOnField(tp) and not tc2:IsForbidden() and c:IsRelateToEffect(e) and c:IsFaceup() and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then 
+	if tc1:IsRelateToEffect(e) and tc1:IsFaceup() and Duel.SendtoHand(tc1, nil, REASON_EFFECT)~=0 and tc2:IsRelateToEffect(e) and tc2:CheckUniqueOnField(tp) and tc2:CheckEquipTarget(c) and not tc2:IsForbidden() and c:IsRelateToEffect(e) and c:IsFaceup() and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then 
 		Duel.Equip(tp, tc2, c)	
 	end
 end
