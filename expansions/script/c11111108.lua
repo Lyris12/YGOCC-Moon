@@ -1,5 +1,5 @@
 --Grey Blood Crisis Claw - Insanity
---Scripted by Yuno
+--Scripted by Yuno, overhauled by Swag
 local function getID()
 	local str=string.match(debug.getinfo(2,'S')['source'],"c%d+%.lua")
 	str=string.sub(str,1,string.len(str)-4)
@@ -11,9 +11,7 @@ local id,cid=getID()
 function cid.initial_effect(c)
 	c:EnableReviveLimit()
 	c:SetSPSummonOnce(id)
-	aux.AddOrigEvoluteType(c)
-	--Evolute material
-	aux.AddEvoluteProc(c, nil, 4, cid.matfilter, 1, 1)
+	aux.AddFusionProcMixRep(c,false,true,cid.matfilter,1,1)
 	--Cannot be destroyed by card effects
 	local e1=Effect.CreateEffect(c)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
@@ -50,14 +48,29 @@ function cid.initial_effect(c)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetCountLimit(1)
 	e4:SetCondition(cid.descon)
-	e4:SetCost(cid.descost)
 	e4:SetTarget(cid.destg)
 	e4:SetOperation(cid.desop)
 	c:RegisterEffect(e4)
+	--Summon Condition
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_SINGLE)
+	e5:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e5:SetCode(EFFECT_SPSUMMON_CONDITION)
+	e5:SetValue(cid.splimit)
+	c:RegisterEffect(e5)
+	--Actually summoning the fucking thing
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_FIELD)
+	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e3:SetCode(EFFECT_SPSUMMON_PROC)
+	e3:SetRange(LOCATION_EXTRA)
+	e3:SetCondition(cid.hspcon)
+	e3:SetOperation(cid.hspop)
+	c:RegisterEffect(e3)
 end
---Evolute material
-function cid.matfilter(c)
-	return c:IsSetCard(0x571) and c:GetEquipCount()>0
+--Material
+function cid.matfilter(c,fc,sub,mg,sg)
+    return c:IsFusionSetCard(0x571) and c:GetEquipGroup():IsExists(Card.IsType,1,nil,TYPE_EQUIP)
 end
 --Attribute change
 function cid.attcon(e)
@@ -106,10 +119,6 @@ end
 function cid.descon(e, tp, eg, ep, ev, re, r, rp)
 	return eg:IsExists(cid.cfilter, 1, nil, e:GetHandler(), tp)
 end
-function cid.descost(e, tp, eg, ep, ev, re, r, rp, chk)
-	if chk==0 then return e:GetHandler():IsCanRemoveEC(tp, 2, REASON_COST) end
-	e:GetHandler():RemoveEC(tp, 2, REASON_COST)
-end
 function cid.destg(e, tp, eg, ep, ev, re, r, rp, chk, chkc)
 	if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(LOCATION_ONFIELD) end
 	if chk==0 then return Duel.IsExistingTarget(nil, tp, 0, LOCATION_ONFIELD, 1, nil) end
@@ -122,4 +131,16 @@ function cid.desop(e, tp, eg, ep, ev, re, r, rp)
 	if tc and tc:IsRelateToEffect(e) then
 		Duel.Destroy(tc, REASON_EFFECT)
 	end
+end
+function cid.splimit(e,se,sp,st)
+	return e:GetHandler():GetLocation()~=LOCATION_EXTRA
+end
+function cid.hspcon(e,c)
+	if c==nil then return true end
+	return Duel.CheckReleaseGroup(c:GetControler(),cid.matfilter,1,nil,c:GetControler(),c)
+end
+function cid.hspop(e,tp,eg,ep,ev,re,r,rp,c)
+	local g=Duel.SelectReleaseGroup(tp,cid.matfilter,1,1,nil,tp,c)
+	c:SetMaterial(g)
+	Duel.Release(g,REASON_COST)
 end
