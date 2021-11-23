@@ -1,4 +1,5 @@
---created by Meed, coded by Lyris
+--created by Walrus of Discord, coded by Lyris
+--割れ目よりの武器
 local s,id=GetID()
 function s.initial_effect(c)
 	c:SetUniqueOnField(1,0,id)

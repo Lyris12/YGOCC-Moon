@@ -1,4 +1,4 @@
---created & coded by Lyris, art from "Moon Mirror Shield"
+--created & coded by Lyris, art based on "Moon Mirror Shield"
 --インライトメント・ムーン盾
 local s,id=GetID()
 function s.initial_effect(c)

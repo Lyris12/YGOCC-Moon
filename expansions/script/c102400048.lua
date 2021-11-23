@@ -1,4 +1,5 @@
 --created & coded by Lyris, art from Cardfight!! Vanguard V's "Masked Magician, Harri"
+--エニグマフォーモスト・ハーリエ
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()

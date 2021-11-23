@@ -1,4 +1,5 @@
 --created & coded by Lyris, art from Cardfight!! Vanguard's "Hades Hypnotist"
+--エニグマフォーマー・ヒプノラ
 local s,id=GetID()
 function s.initial_effect(c)
 	local e4=Effect.CreateEffect(c)

@@ -1,4 +1,5 @@
 --created & coded by Lyris, art from Cardfight! Vanguard's "Nightmare Doll, Alice"
+--エニグマフォーマー・アリスナ
 local s,id=GetID()
 function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)

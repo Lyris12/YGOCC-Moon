@@ -24,8 +24,9 @@ table.insert(aux.CannotBeEDMatCodes,EFFECT_CANNOT_BE_EVOLUTE_MATERIAL)
 TYPE_EXTRA							=TYPE_EXTRA|TYPE_EVOLUTE
 
 --overwrite functions
-local get_rank, get_orig_rank, prev_rank_field, is_rank, is_rank_below, is_rank_above, get_type, get_orig_type, get_prev_type_field = 
-	Card.GetRank, Card.GetOriginalRank, Card.GetPreviousRankOnField, Card.IsRank, Card.IsRankBelow, Card.IsRankAbove, Card.GetType, Card.GetOriginalType, Card.GetPreviousTypeOnField
+local get_rank, get_orig_rank, prev_rank_field, is_rank, is_rank_below, is_rank_above, get_level, get_syn_level, get_rit_level, get_orig_level, is_xyz_level, get_prev_level_field, is_level, is_level_below, is_level_above, get_type, get_orig_type, get_prev_type_field = 
+	Card.GetRank, Card.GetOriginalRank, Card.GetPreviousRankOnField, Card.IsRank, Card.IsRankBelow, Card.IsRankAbove, Card.GetLevel,
+	Card.GetSynchroLevel, Card.GetRitualLevel, Card.GetOriginalLevel, Card.IsXyzLevel, Card.GetPreviousLevelOnField, Card.IsLevel, Card.IsLevelBelow, Card.IsLevelAbove, Card.GetType, Card.GetOriginalType, Card.GetPreviousTypeOnField
 
 Card.GetRank=function(c)
 	if Auxiliary.Evolutes[c] then return 0 end
@@ -55,6 +56,46 @@ end
 Card.IsRankAbove=function(c,rk)
 	if Auxiliary.Evolutes[c] and not Auxiliary.Evolutes[c]() then return false end
 	return is_rank_above(c,rk)
+end
+Card.GetLevel=function(c)
+	if Auxiliary.Evolutes[c] and not Auxiliary.Evolutes[c]() then if c:GetEC()>0 then return 0 else return c:GetOriginalStage() end end
+	return get_level(c)
+end
+Card.GetSynchroLevel=function(c,sc)
+	if Auxiliary.Evolutes[c] and not Auxiliary.Evolutes[c]() then if c:GetEC()>0 then return 0 else return c:GetOriginalStage() end end
+	return get_syn_level(c,sc)
+end
+Card.GetRitualLevel=function(c,rc)
+	if Auxiliary.Evolutes[c] and not Auxiliary.Evolutes[c]() then if c:GetEC()>0 then return 0 else return c:GetOriginalStage() end end
+	return get_rit_level(c,rc)
+end
+Card.GetOriginalLevel=function(c)
+	if Auxiliary.Evolutes[c] and not Auxiliary.Evolutes[c]() then if c:GetEC()>0 then return 0 else return c:GetOriginalStage() end end
+	return get_orig_level(c)
+end
+Card.IsXyzLevel=function(c,xyz,lv)
+	if Auxiliary.Evolutes[c] and not Auxiliary.Evolutes[c]() then if c:GetEC()>0 then return false else return c:GetOriginalStage()==lv end end
+	return is_xyz_level(c,xyz,lv)
+end
+Card.GetPreviousLevelOnField=function(c)
+	if Auxiliary.Evolutes[c] and not Auxiliary.Evolutes[c]() then if c:GetEC()>0 then return 0 else return c:GetOriginalStage() end end
+	return get_prev_level_field(c)
+end
+Card.IsLevel=function(c,...)
+	if Auxiliary.Evolutes[c] and not Auxiliary.Evolutes[c]() then if c:GetEC()>0 then return false end end
+	local funs={...}
+	for key,value in pairs(funs) do
+		if c:GetLevel()==value then return true end
+	end
+	return false
+end
+Card.IsLevelBelow=function(c,lv)
+	if Auxiliary.Evolutes[c] and not Auxiliary.Evolutes[c]() then if c:GetEC()>0 then return false else return c:GetLevel()<=lv end end
+	return is_level_below(c,lv)
+end
+Card.IsLevelAbove=function(c,lv)
+	if Auxiliary.Evolutes[c] and not Auxiliary.Evolutes[c]() then if c:GetEC()>0 then return false else return c:GetLevel()>=lv end end
+	return is_level_above(c,lv)
 end
 Card.GetType=function(c,scard,sumtype,p)
 	local tpe=scard and get_type(c,scard,sumtype,p) or get_type(c)
@@ -88,8 +129,17 @@ Card.GetPreviousTypeOnField=function(c)
 end
 
 --Custom Functions
-function Card.GetStage(c)
+function Card.GetOriginalStage(c)
 	if not Auxiliary.Evolutes[c] then return 0 end
+	local te=c:IsHasEffect(EFFECT_STAGE)
+	if type(te:GetValue())=='function' then
+		return te:GetValue()(te,c)
+	else
+		return te:GetValue()
+	end
+end
+function Card.GetStage(c)
+	if not Auxiliary.Evolutes[c] or c:GetEC()==0 then return 0 end
 	local te=c:IsHasEffect(EFFECT_STAGE)
 	if type(te:GetValue())=='function' then
 		return te:GetValue()(te,c)

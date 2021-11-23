@@ -1,4 +1,4 @@
---created & coded by Lyris, art from "Rod of the Mind's Eye"
+--created & coded by Lyris, art based on "Rod of the Mind's Eye"
 --インライトメント・クレアボイアント笏
 local s,id=GetID()
 function s.initial_effect(c)

@@ -1,4 +1,4 @@
---created & coded by Lyris, art from "Vylon Element" & at https://us.123rf.com/450wm/racener/racener1605/racener160500001/56306432-abstract-blue-luminous-sound-waves-background-for-parties-clubs-discos-and-concerts-.jpg?ver=6
+--created & coded by Lyris, art based on "Vylon Element" & at https://us.123rf.com/450wm/racener/racener1605/racener160500001/56306432-abstract-blue-luminous-sound-waves-background-for-parties-clubs-discos-and-concerts-.jpg?ver=6
 --インライトメント・金色ヘッドホン
 local s,id=GetID()
 function s.initial_effect(c)

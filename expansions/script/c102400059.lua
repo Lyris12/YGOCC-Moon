@@ -85,13 +85,13 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 			Duel.BreakEffect()
 			if Duel.SpecialSummon(sc,SUMMON_TYPE_FUSION,tp,tp,false,false,POS_FACEUP)~=0 then
 				sc:CompleteProcedure()
-				if ct>3 or not Duel.SelectYesNo(tp,1113) then return end
+				if not Duel.SelectYesNo(tp,1113) then return end
+				Duel.BreakEffect()
 				if e:IsHasType(EFFECT_TYPE_ACTIVATE) then
 					local e2=Effect.CreateEffect(e:GetHandler())
 					e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 					e2:SetCode(EVENT_PHASE+PHASE_END)
 					e2:SetCountLimit(1)
-					e2:SetLabel(sc:GetBaseAttack())
 					e2:SetLabelObject(sc)
 					e2:SetReset(RESET_PHASE+PHASE_END)
 					e2:SetOperation(s.damop)
@@ -99,7 +99,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 				end
 				local e0=Effect.CreateEffect(e:GetHandler())
 				e0:SetType(EFFECT_TYPE_FIELD)
-				e0:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)
+				e0:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 				e0:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 				e0:SetReset(RESET_PHASE+PHASE_END)
 				e0:SetTargetRange(1,0)
@@ -107,8 +107,9 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 				Duel.RegisterEffect(e0,tp)
 				local e1=Effect.CreateEffect(e:GetHandler())
 				e1:SetType(EFFECT_TYPE_SINGLE)
-				e1:SetCode(EFFECT_SET_ATTACK_FINAL)
-				e1:SetValue(sc:GetAttack()*2)
+				e1:SetCode(EFFECT_UPDATE_ATTACK)
+				e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+				e1:SetValue(3400)
 				e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 				sc:RegisterEffect(e1)
 			end
@@ -119,9 +120,7 @@ function s.splimit(e,c,sump,sumtype,sumpos,targetp,se)
 	return c:GetRace()~=RACE_MACHINE
 end
 function s.damop(e,tp,eg,ep,ev,re,r,rp)
-	local dam,ec=e:GetLabel(),e:GetLabelObject()
-	local atk=ec:GetAttack()
-	if atk>dam and atk>=ec:GetBaseAttack()*2 then
-		Duel.Damage(tp,dam,REASON_EFFECT)
-	end
+	local ec=e:GetLabelObject()
+	local base,curr=ec:GetBaseAttack(),ec:GetAttack()
+	if curr>base then Duel.Damage(tp,curr-base,REASON_EFFECT) end
 end

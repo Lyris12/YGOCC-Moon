@@ -1,4 +1,5 @@
 --created by Meed, coded by Lyris
+--大死神
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()

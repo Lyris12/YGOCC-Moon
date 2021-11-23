@@ -1,4 +1,4 @@
---created & coded by Lyris, art from "Dragunity Divine Lance"
+--created & coded by Lyris, art based on "Dragunity Divine Lance"
 --インライトメント・ディヴァイン槍
 local s,id=GetID()
 function s.initial_effect(c)

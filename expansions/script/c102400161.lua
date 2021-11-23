@@ -101,31 +101,5 @@ end
 function s.op(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local sc=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp):GetFirst()
-	if not sc or Duel.SpecialSummon(sc,0,tp,tp,false,false,POS_FACEUP)==0 or not sc:IsCanBeEffectTarget()
-		or Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
-	local tc=Duel.SelectMatchingCard(tp,s.eqfilter,tp,LOCATION_GRAVE,0,1,1,nil,tp):GetFirst()
-	if not tc then return end
-	local te=tc:GetActivateEffect()
-	local condition=te:GetCondition()
-	local cost=te:GetCost()
-	local target=te:GetTarget()
-	local operation=te:GetOperation()
-	if te:IsActivatable(tp,true) and sc:IsCanBeEffectTarget(te)
-		and (not condition or condition(te,tp,eg,ep,ev,re,r,rp))
-		and (not cost or cost(te,tp,eg,ep,ev,re,r,rp,0)) then
-		Duel.ClearTargetCard()
-		e:SetProperty(te:GetProperty())
-		Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
-		tc:CreateEffectRelation(te)
-		if cost then cost(te,tp,eg,ep,ev,re,r,rp,1) end
-		Duel.SetTargetCard(sc)
-		Duel.BreakEffect()
-		local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-		for tg in aux.Next(g) do tg:CreateEffectRelation(te) end
-		if operation then operation(te,tp,eg,ep,ev,re,r,rp) end
-		tc:ReleaseEffectRelation(te)
-		for tg in aux.Next(g) do tg:ReleaseEffectRelation(te) end
-	end
+	Duel.SpecialSummon(Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp),0,tp,tp,false,false,POS_FACEUP)
 end

@@ -1,4 +1,5 @@
---created by Meed, coded by Lyris
+--created by Walrus of Discord, coded by Lyris
+--ファンタズム・オブ・カオス
 local s,id=GetID()
 function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---created & coded by Lyris, art from "Take Flight" Action Card
+--created & coded by Lyris, art based on "Take Flight" Action Card
 --インライトメント・アセンション
 local s,id=GetID()
 function s.initial_effect(c)

@@ -1,4 +1,4 @@
---created & coded by Lyris, art from "Amnesia" in Yu-Gi-Oh! Arc-V Episode 32
+--created & coded by Lyris, art from tumblr's Anonymous User icon & "Amnesia" in Yu-Gi-Oh! Arc-V Episode 32
 --アノニマイズ
 local s,id=GetID()
 function s.initial_effect(c)

@@ -1,4 +1,5 @@
 --created & coded by Lyris, art from Cardfight!! Vanguard's "Crimson Beast Tamer"
+--エニグマフォーマー・クリムゾンテイマー
 local s,id=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
@@ -37,7 +38,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
-		e1:SetValue(function() return Duel.GetOverlayGroup(tc:GetControler(),1,0):Filter(Card.IsSetCard,nil,0xc74):GetClassCount(Card.GetCode)*400 end)
+		e1:SetValue(function() return Duel.GetOverlayGroup(tp,1,0):Filter(Card.IsSetCard,nil,0xc74):GetClassCount(Card.GetCode)*400 end)
 		tc:RegisterEffect(e1)
 		local e2=e1:Clone()
 		e2:SetCode(EFFECT_UPDATE_DEFENSE)

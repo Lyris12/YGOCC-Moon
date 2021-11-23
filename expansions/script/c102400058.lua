@@ -11,23 +11,12 @@ function s.initial_effect(c)
 	e1:SetTarget(s.cost)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e2:SetRange(LOCATION_SZONE)
-	e2:SetCountLimit(1,id)
-	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
-	e2:SetCategory(CATEGORY_EQUIP)
-	e2:SetCondition(s.condition)
-	e2:SetTarget(s.target)
-	e2:SetOperation(s.operation)
-	c:RegisterEffect(e2)
-	local e3=e2:Clone()
-	e3:SetCode(EVENT_SUMMON_SUCCESS)
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_EQUIP)
+	e3:SetCode(EFFECT_DESTROY_REPLACE)
+	e3:SetTarget(s.destg)
+	e3:SetOperation(s.desop)
 	c:RegisterEffect(e3)
-	local e4=e2:Clone()
-	e4:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
-	c:RegisterEffect(e4)
 end
 function s.cfilter(c)
 	return c:IsFaceup() and c:IsRace(RACE_MACHINE) and c:IsSetCard(0x4093)
@@ -99,69 +88,13 @@ end
 function s.repval(e,re,r,rp)
 	return r&REASON_BATTLE>0
 end
-function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	local g=eg:Filter(s.cfilter,nil)
-	e:SetLabelObject(g:GetFirst())
-	return #g==1
+function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	local tc=c:GetEquipTarget()
+	if chk==0 then return c:IsDestructable(e) and not c:IsStatus(STATUS_DESTROY_CONFIRMED)
+		and tc and not tc:IsReason(REASON_REPLACE) end
+	return Duel.SelectEffectYesNo(tp,c,96)
 end
-function s.filter(c,ec,tp)
-	return c:IsRace(RACE_DRAGON) and not c:IsForbidden()
-		and (ec:IsType(TYPE_FUSION) or Duel.IsExistingTarget(s.filter2,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,c))
-end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	local ec=e:GetLabelObject()
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and s.filter(chkc,ec,tp) end
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and Duel.IsExistingTarget(s.filter,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,nil,ec,tp) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
-	local g=Duel.SelectTarget(tp,s.filter,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,1,nil,ec,tp)
-	if not c:IsType(TYPE_FUSION) then
-		local tc=g:GetFirst()
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
-		g=Duel.SelectTarget(tp,s.filter,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,1,tc,ec,tp)
-	end
-	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,g,1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_EQUIP,g,1,0,0)
-end
-function s.operation(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
-	local tg=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e):Filter(Card.IsRace,nil,RACE_DRAGON):Filter(aux.NOT(Card.IsForbidden),nil)
-	for ec in aux.Next(tg) do
-		if #tg==1 then break end
-		tg:RemoveCard(ec)
-	end
-	local c=e:GetLabelObject()
-	if not c:IsType(TYPE_FUSION) then tg=tg:Filter(Card.IsLevelBelow,nil,3) end
-	for i=1,Duel.GetCurrentChain() do
-		local te=Duel.GetChainInfo(i,CHAININFO_TRIGGERING_EFFECT)
-		if te:GetHandler()==c and te:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then
-			Duel.ChangeTargetCard(i,tg)
-			return
-		end
-	end
-	local tc=tg:GetFirst()
-	if c:IsFaceup() and tc then
-		local atk=tc:GetTextAttack()
-		if not Duel.Equip(tp,tc,c,false) then return end
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetProperty(EFFECT_FLAG_OWNER_RELATE)
-		e1:SetCode(EFFECT_EQUIP_LIMIT)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-		e1:SetValue(s.eqlimit)
-		tc:RegisterEffect(e1)
-		local e2=Effect.CreateEffect(c)
-		e2:SetType(EFFECT_TYPE_EQUIP)
-		e2:SetProperty(EFFECT_FLAG_OWNER_RELATE+EFFECT_FLAG_IGNORE_IMMUNE)
-		e2:SetCode(EFFECT_UPDATE_ATTACK)
-		e2:SetReset(RESET_EVENT+RESETS_STANDARD)
-		e2:SetValue(math.max(atk,0))
-		tc:RegisterEffect(e2)
-		if c:IsCode(18967507) then return end
-		local e3=Effect.CreateEffect(c)
-		e3:SetType(EFFECT_TYPE_EQUIP)
-		e3:SetCode(EFFECT_DESTROY_SUBSTITUTE)
-		e3:SetReset(RESET_EVENT+RESETS_STANDARD)
-		e3:SetValue(s.repval)
-		tc:RegisterEffect(e3)
-	end
+function s.desop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Destroy(e:GetHandler(),REASON_EFFECT+REASON_REPLACE)
 end

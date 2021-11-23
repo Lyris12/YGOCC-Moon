@@ -1,4 +1,4 @@
---created & coded by Lyris, art from "Degenerate Circuit"
+--created & coded by Lyris
 --サイバー・ダーク・コンダクター
 local s,id=GetID()
 function s.initial_effect(c)
