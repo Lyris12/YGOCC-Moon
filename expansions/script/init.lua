@@ -120,6 +120,21 @@ Card.IsType=function(c,tpe,scard,sumtype,p)
 	if custpe<=0 then return false end
 	return c:IsCustomType(custpe,scard,sumtype,p)
 end
+Card.IsRitualType=function(c,typ)
+	return c:IsType(tpe)
+end
+Card.IsFusionType=function(c,typ)
+	return c:IsType(tpe)
+end
+Card.IsSynchroType=function(c,typ)
+	return c:IsType(tpe)
+end
+Card.IsXyzType=function(c,typ)
+	return c:IsType(tpe)
+end
+Card.IsLinkType=function(c,typ)
+	return c:IsType(tpe)
+end
 Card.RemoveCounter=function(c,p,typ,ct,r)
 	local n=c:GetCounter(typ)
 	card_remcounter(c,p,typ,ct,r)

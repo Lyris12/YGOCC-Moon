@@ -272,6 +272,25 @@ local ls=[[
 52653092 0 --Number S0: Utopic ZEXAL
 88581108 0 --True King of All Calamities
 77235086 1 --Cyber Angel Benten
+--							New 7/1/2021
+86148577 0 --Guardragon Elpy
+48905153 0 --Zoodiac Drident
+38572779 1 --Miscellaneousaurus
+40318957 1 --Performapal Skullcrobat Joker
+73539069 1 --Striker Dragon
+87327776 1 --Salamangreat Miragestallio
+63166095 1 --Sky Striker Mobilize - Engage!
+49684352 2 --Double Iris Magician
+45305419 3 --Symbol of Heritage
+--							New 10/1/2021
+46060017 0 --Zoodiac Barrage
+40177746 1 --Eva
+25725326 1 --Prank-Kids Meow-Meow-Mu
+57103969 1 --Fire Formation - Tenki
+70711847 2 --Danger! Nessie!
+40318957 2 --Performapal Skullcrobat Joker
+57103969 2 --Emergency Teleport
+49684352 3 --Double Iris Magician
 ]]
 for id in ls:sub(ls:find("!"),ls:find("!",ls:find("!")+1) and ls:find("!",ls:find("!")+1)-1 or -1):gmatch("([0-9]+) 0") do
 	banned_list_table[tonumber(id)]=true
