@@ -30,7 +30,6 @@ function s.initial_effect(c)
 	e0:SetType(EFFECT_TYPE_QUICK_O)
 	e0:SetRange(LOCATION_MZONE)
 	e0:SetCode(EVENT_FREE_CHAIN)
-	e0:SetCountLimit(1)
 	e0:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_ATTACK)
 	e0:SetCondition(s.descon)
 	e0:SetTarget(s.destg)
@@ -75,12 +74,12 @@ function s.chcon(e,tp,eg,ep,ev,re,r,rp)
 	return false
 end
 function s.cfilter(c)
-	return c:IsSetCard(0x7c4) and c:IsType(TYPE_PENDULUM) and (c:IsLocation(LOCATION_GRAVE) or c:IsFaceup()) and c:IsAbleToDeckAsCost()
+	return c:IsSetCard(0x7c4) and c:IsType(TYPE_PENDULUM) and c:IsFaceup() and c:IsAbleToDeckAsCost()
 end
 function s.chcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_EXTRA+LOCATION_GRAVE,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_EXTRA,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	Duel.SendtoDeck(Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_EXTRA+LOCATION_GRAVE,0,1,1,nil),nil,2,REASON_COST)
+	Duel.SendtoDeck(Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_EXTRA,0,1,1,nil),nil,2,REASON_COST)
 end
 function s.chtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -97,6 +96,5 @@ function s.chop(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.repop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.DisableShuffleCheck()
-	Duel.Destroy(Duel.GetDecktopGroup(1-tp,2)
-		,REASON_EFFECT)
+	Duel.Destroy(Duel.GetDecktopGroup(1-tp,2),REASON_EFFECT)
 end
