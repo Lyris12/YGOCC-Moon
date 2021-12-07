@@ -154,9 +154,19 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 			end
 		end
 		if not check and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
-			local g=Duel.GetMatchingGroup(s.rmfilter,tp,0,LOCATION_ONFIELD+LOCATION_HAND,nil)
+			local g=Duel.GetMatchingGroup(s.rmfilter,tp,0,LOCATION_ONFIELD,nil)
 			if #g>0 then
 				Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
+			end
+			local h=Duel.GetFieldGroup(tp,0,LOCATION_HAND)
+			if #h>0 then
+				Duel.ConfirmCards(tp,h)
+				if h:IsExists(s.rmfilter,1,nil) then
+					local hc=h:FilterSelect(tp,s.rmfilter,1,1,nil):GetFirst()
+					if hc then
+						Duel.Remove(hc,POS_FACEUP,REASON_EFFECT)
+					end
+				end
 			end
 		end
 	end

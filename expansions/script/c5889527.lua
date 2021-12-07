@@ -116,12 +116,12 @@ function s.znop(e,tp,eg,ep,ev,re,r,rp)
 				local fixct=#t
 				for i=1,fixct do
 					local ce=t[i]
-					local reset,rct=ce:GLGetReset()
-					if not rct then rct=1 end
-					reset=(reset&(~(RESET_EVENT+RESETS_STANDARD_DISABLE)))|(RESET_EVENT+RESETS_STANDARD_DISABLE)
 					if ce and ce.SetLabelObject and ce:GetCode()==EFFECT_DISABLE_FIELD then
+						local reset,rct=ce:GLGetReset()
+						if not rct then rct=1 end
+						reset=(reset&(~(RESET_EVENT+RESETS_STANDARD_DISABLE)))|(RESET_EVENT+RESETS_STANDARD_DISABLE)
 						local zone=ce:GetLabel()
-						if zone~=0 and zone&en>0 then
+						if type(zone)~=nil and zone~=0 and zone&en>0 then
 							tc:RegisterFlagEffect(id,reset,0,rct)
 							local ne=Effect.CreateEffect(ce:GetOwner())
 							ne:SetType(EFFECT_TYPE_FIELD)
@@ -147,6 +147,9 @@ function s.znop(e,tp,eg,ep,ev,re,r,rp)
 							ce:SetCondition(s.zcond)
 						end
 					elseif ce and ce.SetLabelObject and ce:GetCode()==EFFECT_USE_EXTRA_MZONE then
+						local reset,rct=ce:GLGetReset()
+						if not rct then rct=1 end
+						reset=(reset&(~(RESET_EVENT+RESETS_STANDARD_DISABLE)))|(RESET_EVENT+RESETS_STANDARD_DISABLE)
 						local val=ce:GetValue()
 						local zct=math.fmod(val,0x10)
 						local zone=bit.rshift(val-zct,16)

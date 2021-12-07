@@ -4,7 +4,7 @@ local s,id=GetID()
 
 function s.initial_effect(c)
 	c:EnableReviveLimit()
-	aux.AddXyzProcedureLevelFree(c,s.mfilter,s.xyzcheck,2,2)
+	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_BEAST),2,2)
 	--attach
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
@@ -25,12 +25,6 @@ function s.initial_effect(c)
 	e2:SetTarget(s.target)
 	e2:SetOperation(s.operation)
 	c:RegisterEffect(e2)
-end
-function s.mfilter(c,xyzc)
-	return c:IsXyzType(TYPE_MONSTER) and c:IsXyzLevel(xyzc,2) and c:IsRace(RACE_BEAST)
-end
-function s.xyzcheck(g,tp,xyz)
-	return g:GetClassCount(Card.GetAttribute)==#g
 end
 --ATTACH
 function s.xyzfilter(c)
