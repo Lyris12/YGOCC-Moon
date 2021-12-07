@@ -167,6 +167,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 						Duel.Remove(hc,POS_FACEUP,REASON_EFFECT)
 					end
 				end
+				Duel.ShuffleHand(1-tp)
 			end
 		end
 	end
