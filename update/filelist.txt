@@ -1,4 +1,4 @@
-﻿expansions/cards-new.cdb	46e0d3bcc83de6d4ed921d995ed49517
+﻿expansions/cards-new.cdb	f8823713db7c1aeccf9d1c051c963232
 expansions/lflist.conf	7b089bd4466d53e3746d405c6929d3ff
 expansions/strings.conf	c9fdbc494d185d3f576fccd69db21cc9
 expansions/pics/100000710.jpg	5f925a97b1c60d7d69acb8f229938263
@@ -1257,7 +1257,7 @@ expansions/pics/13653988.png	97d42c69310f09a38b248662c36fd037
 expansions/pics/13653989.png	ef7ed01fc8c6cebaca621f0733f64ede
 expansions/pics/13653990.png	ce0ad36a639080f6c984a57388eec596
 expansions/pics/13653991.png	fe228fe0a33a1ab465273922d8ceeeea
-expansions/pics/13653992.png	5146d38b604c831d216e66b27f751902
+expansions/pics/13653992.jpg	d4313f6b7c95b07d087e9fff83c10457
 expansions/pics/13653993.png	909801c671db1f23d13b569132f53224
 expansions/pics/13653994.png	e48cb538cb5430da2c5adf7cc4ef0a07
 expansions/pics/13653995.png	f8570de13d7ef56783c6b5d501ee41d5
@@ -11695,8 +11695,6 @@ sound/custom/cerval_eff024.wav	d1da638b74b1d2e9c0440c00077fe0f1
 sound/custom/cerval_summon.wav	f03f83af5246e76908fad76f23d1a240
 sound/custom/danza_battle.wav	229ebbc78ac149c2f7df96514c121aaf
 sound/custom/danza_summon.wav	8eddef7f93b92c34ba45009c372fb356
-sound/custom/destrac.wav	af1edf478956099643285e37d42cf33c
-sound/custom/destruc.wav	ca63e1abcfedd2d0051499d28764557b
 sound/custom/genbu_attack.wav	7d14a18bd18944eecb5f6e6a2f69087e
 sound/custom/genbu_effe01.wav	4a050316c7ff581e8fd099515aea0c1a
 sound/custom/genbu_effe02.wav	70aea6c227feb5740ae7e6a8e7d6b6ec
@@ -11730,6 +11728,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	b67084845a4e8a2dea09c865d269ccda
+update/filelist.txt	c428366b1ae79e73302609e96736664f
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	07a8c47fcb0655138d793d17e6b36d83
+update/version.txt	b120228746c599ea99cf80a2a26c3262
