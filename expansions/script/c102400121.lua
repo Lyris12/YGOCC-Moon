@@ -10,8 +10,7 @@ function s.initial_effect(c)
 	e0:SetType(EFFECT_TYPE_QUICK_O)
 	e0:SetRange(LOCATION_MZONE)
 	e0:SetCode(EVENT_FREE_CHAIN)
-	e0:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_ATTACK)
-	e0:SetCondition(s.descon)
+	e0:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_BATTLE_START)
 	e0:SetTarget(s.destg)
 	e0:SetOperation(s.desop)
 	c:RegisterEffect(e0)
@@ -46,9 +45,6 @@ end
 function s.fcheck(c,atk)
 	local dif=math.abs(c:GetAttack()-atk)
 	return dif>0 and dif<=400
-end
-function s.descon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsAbleToEnterBP() or (Duel.GetCurrentPhase()>=PHASE_BATTLE_START and Duel.GetCurrentPhase()<=PHASE_BATTLE)
 end
 function s.desfilter(c,e,tp)
 	return c:IsLevelBelow(5) and c:IsSetCard(0x7c4) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
