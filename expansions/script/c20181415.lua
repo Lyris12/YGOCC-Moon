@@ -23,10 +23,10 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function s.filter(c,tp)
-	return c:IsFaceup() and c:IsRace(RACE_DINOSAUR) and Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_DECK,0,1,nil,{c:GetCode()})
+	return c:IsFaceup() and c:IsRace(RACE_DINOSAUR) and Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_DECK,0,1,nil,c:GetCode())
 end
-function s.cfilter(c,t)
-	return c:IsAbleToGrave() and c:IsSetCard(0x9b5) and not c:IsCode(table.unpack(t))
+function s.cfilter(c,...)
+	return c:IsAbleToGrave() and c:IsSetCard(0x9b5) and not c:IsCode(table.unpack{...})
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.filter(chkc,tp) end
@@ -52,7 +52,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetCategory(CATEGORY_DAMAGE)
 		e2:SetLabelObject(tc)
 		e2:SetDescription(1122)
-		e2:SetCountLimit(1,id-11)
+		e2:SetCountLimit(1,id+100)
 		e2:SetCondition(s.shcon)
 		e2:SetTarget(s.shtg)
 		e2:SetOperation(s.shop)
