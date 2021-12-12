@@ -32,14 +32,11 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(1-tp,sg)
 	end
 end
-function s.cfilter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x1ded) and c:IsAbleToDeckOrExtraAsCost()
-end
 function s.spfilter(c,e,tp,lv)
 	return c:IsSetCard(0x2ded) and not c:IsLevel(lv) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.addfilter(c,lv)
-	return c:IsSetCard(0x1ded) and not c:IsLevel(lv) and c:IsAbleToHand()
+	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x1ded) and not c:IsLevel(lv) and c:IsAbleToHand()
 end
 function s.tgfilter(c,e,tp)
 	if not c:IsFaceup() or not c:IsSetCard(0xded) or c:IsAttack(c:GetBaseAttack()) then return false end

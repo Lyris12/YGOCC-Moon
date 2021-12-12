@@ -10,6 +10,7 @@ function s.initial_effect(c)
 	e0:SetType(EFFECT_TYPE_QUICK_O)
 	e0:SetRange(LOCATION_MZONE)
 	e0:SetCode(EVENT_FREE_CHAIN)
+	e0:SetCountLimit(1)
 	e0:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_BATTLE_START)
 	e0:SetTarget(s.destg)
 	e0:SetOperation(s.desop)
@@ -90,8 +91,11 @@ function s.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,eg,ct,tp,LOCATION_GRAVE)
 end
 function s.negop(e,tp,eg,ep,ev,re,r,rp)
+	local rc=re:GetHandler()
 	local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_GRAVE,0,nil)
-	if #g>0 and Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then
+	if #g>0 and Duel.NegateActivation(ev) and rc:IsRelateToEffect(re) then
+		rc:CancelToGrave()
+		if not rc:IsAbleToDeck() then return end
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 		local dg=g:Select(tp,1,1,nil)
 		Duel.SendtoDeck(eg+dg,nil,2,REASON_EFFECT)
