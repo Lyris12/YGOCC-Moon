@@ -62,7 +62,7 @@ function s.lolcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return c:GetFlagEffect(id)==0 end
 	c:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
 end
-function s.filter(c)
+function s.cfilter(c)
 	return c:IsFaceup() and c:IsRace(RACE_MACHINE)
 end
 function s.bancon(e,tp,eg,ep,ev,re,r,rp)
