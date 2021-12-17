@@ -35,7 +35,7 @@ function s.initial_effect(c)
 	e4:SetRange(LOCATION_SZONE)
 	e4:SetCountLimit(1)
 	e4:SetLabel(3)
-	e4:SetCondition(aux.AND(s.con,function(e,tp) return Duel.GetTurnPlayer()~=tp end))
+	e4:SetCondition(aux.AND(s.con,function(e,tp) return Duel.GetTurnPlayer()~=tp and Duel.GetFlagEffect(tp,id)==0 end))
 	e4:SetOperation(s.operation)
 	c:RegisterEffect(e4)
 	local e5=Effect.CreateEffect(c)
@@ -63,11 +63,11 @@ function s.atktarget(e,c)
 	return Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsSetCard),e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil,0xb2)
 end
 function s.costchk(e,te_or_c,tp)
-	return Duel.CheckLPCost(tp,2000)
+	return Duel.CheckLPCost(tp,1000)
 end
 function s.costop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_CARD,0,id)
-	Duel.PayLPCost(tp,1000)
+	Duel.PayLPCost(tp,500)
 end
 function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -90,8 +90,10 @@ function s.filter(c)
 	return c:IsSetCard(0xb2) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToHand()
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
+	Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_STANDBY,0,1)
 	local tc=Duel.GetDecktopGroup(1-tp,1):GetFirst()
 	if tc:IsAbleToRemove() and Duel.SelectOption(1-tp,1102,aux.Stringid(id,0))==0 then
+		Duel.DisableShuffleCheck()
 		Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)
 		local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_DECK,0,nil)
 		if #g==0 or not Duel.SelectYesNo(tp,1109) then return end
