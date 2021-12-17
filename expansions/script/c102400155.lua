@@ -30,26 +30,24 @@ function s.filter3(c,sc,f)
 	return c:IsCanBeXyzMaterial(sc) and (not f or f(c))
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCountFromEx(tp,tp,nil,TYPE_XYZ)<=0 then return end
+	local c=e:GetHandler()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g1=Duel.SelectMatchingCard(tp,s.filter1,tp,LOCATION_EXTRA,0,1,1,nil,e,tp)
 	local tc1=g1:GetFirst()
-	local mt=getmetatable(tc1)
-	local mg=Duel.SelectXyzMaterial(tp,tc1,aux.FilterBoolFunction(s.filter3,tc1,mt.material_filter),tc1:GetRank(),mt.material_minct,mt.material_maxct)
-	local sg=Group.CreateGroup()
-	local tc=mg:GetFirst()
-	while tc do
-		local sg1=tc:GetOverlayGroup()
-		sg:Merge(sg1)
-		tc=mg:GetNext()
-	end
-	Duel.SendtoGrave(sg,REASON_RULE)
-	tc1:SetMaterial(mg)
-	Duel.Overlay(tc1,mg)
-	if tc1 and Duel.SpecialSummon(tc1,SUMMON_TYPE_XYZ,tp,tp,false,false,POS_FACEUP)~=0 then
-		tc1:CompleteProcedure()
-		if Duel.GetLocationCountFromEx(tp,tp,tc1)<=0 then return end
-		if not aux.MustMaterialCheck(tc1,tp,EFFECT_MUST_BE_XMATERIAL) then return end
+	if not tc1 then return end
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_CANNOT_DISABLE_SPSUMMON)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD)
+	tc1:RegisterEffect(e1,true)
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e2:SetOperation(function()
+		e2:Reset()
+		if Duel.GetLocationCountFromEx(tp,tp,tc1)<=0 or not aux.MustMaterialCheck(tc1,tp,EFFECT_MUST_BE_XMATERIAL) then return end
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local g2=Duel.SelectMatchingCard(tp,s.filter2,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,tc1,tc1:GetRace(),tc1:GetAttribute())
 		local tc2=g2:GetFirst()
@@ -60,9 +58,12 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 				Duel.Overlay(tc2,xmg)
 			end
 			tc2:SetMaterial(g1)
-			Duel.Overlay(tc2,g1)
+			Duel.Overlay(tc2,tc1)
 			Duel.SpecialSummon(tc2,SUMMON_TYPE_XYZ,tp,tp,false,false,POS_FACEUP)
 			tc2:CompleteProcedure()
 		end
-	end
+	end)
+	e2:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD)
+	tc1:RegisterEffect(e2,true)
+	Duel.XyzSummon(tp,tc1,nil)
 end
