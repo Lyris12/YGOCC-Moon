@@ -66,15 +66,12 @@ function s.etarget(e,re)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	return g and g:IsContains(e:GetHandler())
 end
-function s.cfilter(c,tp)
-	return c:IsPreviousLocation(LOCATION_MZONE) and (c:IsPreviousPosition(POS_FACEUP) or c:GetPreviousControler()==tp) and c:IsSetCard(0x7c4) and c:IsType(TYPE_MONSTER)
-end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return eg:IsExists(aux.AND(s.cfilter,aux.FilterBoolFunction(Card.IsAbleToRemoveAsCost)),1,nil,tp) end
-	Duel.Remove(eg:Filter(aux.AND(s.cfilter,aux.FilterBoolFunction(Card.IsAbleToRemoveAsCost)),nil,tp),POS_FACEUP,REASON_COST)
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToRemoveAsCost,tp,LOCATION_GRAVE+LOCATION_HAND,0,1,nil,POS_FACEDOWN) end
+	Duel.Remove(Duel.SelectMatchingCard(tp,Card.IsAbleToRemoveAsCost,tp,LOCATION_GRAVE+LOCATION_HAND,0,1,1,nil,POS_FACEDOWN),POS_FACEDOWN,REASON_COST)
 end
 function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
+	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0 end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,Duel.GetDecktopGroup(tp,1),1,0,0)
 end
 function s.op(e,tp,eg,ep,ev,re,r,rp)
