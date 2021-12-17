@@ -66,6 +66,9 @@ function s.etarget(e,re)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	return g and g:IsContains(e:GetHandler())
 end
+function s.cfilter(c,tp)
+	return c:GetOriginalType()&TYPE_MONSTER~=0 and (c:IsPreviousPosition(POS_FACEUP) or c:GetPreviousControler()==tp) and c:IsSetCard(0x7c4)
+end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToRemoveAsCost,tp,LOCATION_GRAVE+LOCATION_HAND,0,1,nil,POS_FACEDOWN) end
 	Duel.Remove(Duel.SelectMatchingCard(tp,Card.IsAbleToRemoveAsCost,tp,LOCATION_GRAVE+LOCATION_HAND,0,1,1,nil,POS_FACEDOWN),POS_FACEDOWN,REASON_COST)

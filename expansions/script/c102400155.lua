@@ -46,7 +46,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e2:SetOperation(function()
-		e2:Reset()
+		e1:Reset() e2:Reset()
 		if Duel.GetLocationCountFromEx(tp,tp,tc1)<=0 or not aux.MustMaterialCheck(tc1,tp,EFFECT_MUST_BE_XMATERIAL) then return end
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local g2=Duel.SelectMatchingCard(tp,s.filter2,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,tc1,tc1:GetRace(),tc1:GetAttribute())
