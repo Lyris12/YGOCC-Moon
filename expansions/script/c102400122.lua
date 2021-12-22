@@ -83,6 +83,6 @@ function s.op(e,tp,eg,ep,ev,re,r,rp)
 	local tc=g:GetFirst()
 	Duel.DisableShuffleCheck()
 	if Duel.Destroy(g,REASON_EFFECT)~=0 then
-		if tc:IsType(TYPE_MONSTER) and tc:IsSetCard(0x7c4) then Duel.Draw(tp,1,REASON_EFFECT) end
+		if not (tc:IsType(TYPE_MONSTER) and tc:IsSetCard(0x7c4)) then Duel.Draw(tp,1,REASON_EFFECT) end
 	else Duel.ConfirmDecktop(tp,1) end
 end
