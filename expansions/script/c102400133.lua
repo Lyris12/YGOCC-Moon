@@ -33,7 +33,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function s.hdval(e,re,dam,r,rp,rc)
-	if Duel.GetFieldGroupCount(e:GetHandlerPlayer(),LOCATION_MZONE,0)==0 and Duel.GetFieldGroupCount(e:GetHandlerPlayer(),0,LOCATION_MZONE)>0 then
+	if Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsSetCard),tp,LOCATION_EXTRA,0,1,nil,0x7c4) then
 		return dam/2
 	else return dam end
 end
@@ -64,8 +64,8 @@ function s.repfilter(c)
 	return (c:IsFaceup() or not c:IsOnField()) and c:IsSetCard(0x7c4) and c:IsType(TYPE_MONSTER) and not c:IsReason(REASON_REPLACE+REASON_MATERIAL)
 end
 function s.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return eg:IsExists(s.repfilter,1,nil) and not (re and re:GetHandler():IsCode(id)) end
-	return Duel.IsExistingMatchingCard(aux.AND(s.filter1,aux.FilterBoolFunction(Card.IsDestructable,e),aux.NOT(Card.IsStatus)),tp,LOCATION_DECK,0,1,nil,STATUS_DESTROY_CONFIRMED)
+	if chk==0 then return eg:IsExists(s.repfilter,1,nil) and Duel.IsExistingMatchingCard(aux.AND(s.filter1,aux.FilterBoolFunction(Card.IsDestructable,e),aux.NOT(Card.IsStatus),Card.IsFaceup),tp,LOCATION_EXTRA,0,1,nil,STATUS_DESTROY_CONFIRMED) end
+	return Duel.SelectEffectYesNo(tp,e:GetHandler(),96)
 end
 function s.repval(e,c)
 	return s.repfilter(c)
@@ -73,6 +73,5 @@ end
 function s.repop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_CARD,0,id)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectMatchingCard(tp,aux.AND(s.filter1,aux.FilterBoolFunction(Card.IsDestructable,e),aux.NOT(Card.IsStatus)),tp,LOCATION_DECK,0,1,1,nil,STATUS_DESTROY_CONFIRMED)
-	Duel.Destroy(g,REASON_EFFECT+REASON_REPLACE)
+	Duel.Destroy(Duel.SelectMatchingCard(tp,aux.AND(s.filter1,aux.FilterBoolFunction(Card.IsDestructable,e),aux.NOT(Card.IsStatus),Card.IsFaceup),tp,LOCATION_EXTRA,0,1,1,nil,STATUS_DESTROY_CONFIRMED),REASON_EFFECT+REASON_REPLACE)
 end
