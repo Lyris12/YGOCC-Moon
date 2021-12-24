@@ -94,7 +94,7 @@ function s.pslimit(e,c,sump,sumtype,sumpos,targetp)
 	return bit.band(sumtype,SUMMON_TYPE_PANDEMONIUM)==SUMMON_TYPE_PANDEMONIUM
 end
 function s.cfilter(c)
-	return c:IsAbleToGraveAsCost() and c:IsSetCard(0x9b5) and c:IsType(TYPE_MONSTER) and (c:IsFaceup() and c:IsType(TYPE_PANDEMONIUM+TYPE_PENDULUM) or c:IsLocation(LOCATION_HAND))
+	return c:IsAbleToGraveAsCost() and c:IsType(TYPE_MONSTER) and c:IsType(TYPE_PANDEMONIUM) and (c:IsFaceup() or c:IsLocation(LOCATION_HAND))
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_EXTRA+LOCATION_HAND,0,1,nil) end
