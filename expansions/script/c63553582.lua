@@ -33,7 +33,7 @@ function cid.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e2:SetCountLimit(1,id+100)
+	e2:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
 	e2:SetCondition(cid.effcon)
 	e2:SetTarget(cid.tdtg)
 	e2:SetOperation(cid.tdop)
@@ -41,7 +41,7 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e2)
 	local e2x=e2:Clone()
 	e2x:SetDescription(aux.Stringid(id,3))
-	e2x:SetCountLimit(1,id+200)
+	e2x:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
 	e2x:SetTarget(cid.tdtg2)
 	e2x:SetOperation(cid.tdop2)
 	e2x:SetLabel(100)
@@ -49,7 +49,7 @@ function cid.initial_effect(c)
 	local e3=e2:Clone()
 	e3:SetDescription(aux.Stringid(id,4))
 	e3:SetCategory(CATEGORY_DESTROY)
-	e3:SetCountLimit(1,id+300)
+	e3:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
 	e3:SetTarget(cid.drytg)
 	e3:SetOperation(cid.dryop)
 	e3:SetLabel(TYPE_FUSION)
@@ -58,21 +58,21 @@ function cid.initial_effect(c)
 	e4:SetDescription(aux.Stringid(id,5))
 	e4:SetCategory(CATEGORY_DRAW)
 	e4:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e4:SetCountLimit(1,id+400)
+	e4:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
 	e4:SetTarget(cid.drtg)
 	e4:SetOperation(cid.drawop)
 	e4:SetLabel(TYPE_SYNCHRO)
 	c:RegisterEffect(e4)
 	local e5=e2:Clone()
 	e5:SetDescription(aux.Stringid(id,6))
-	e5:SetCountLimit(1,id+500)
+	e5:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
 	e5:SetTarget(cid.xyztg)
 	e5:SetOperation(cid.xyzop)
 	e5:SetLabel(TYPE_XYZ)
 	c:RegisterEffect(e5)
 	local e6=e2:Clone()
 	e6:SetDescription(aux.Stringid(id,7))
-	e6:SetCountLimit(1,id+600)
+	e6:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
 	e6:SetTarget(cid.linktg)
 	e6:SetOperation(cid.linkop)
 	e6:SetLabel(TYPE_LINK)
@@ -133,15 +133,13 @@ function cid.mfilter(c,tp,typ)
 	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x7a4) and c:IsControler(tp) and c:IsType(typ)
 end
 function cid.effcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetFlagEffect(id)==0 and eg:IsExists(cid.mfilter,1,nil,tp,e:GetLabel())
+	return eg:IsExists(cid.mfilter,1,nil,tp,e:GetLabel())
 end
 function cid.tdfilter(c,typ)
 	return c:IsSetCard(0x7a4) and c:IsType(typ) and c:IsAbleToHand()
 end
 function cid.tdtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cid.tdfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil,TYPE_SPELL+TYPE_PENDULUM) end
-	e:GetHandler():RegisterFlagEffect(id,RESET_CHAIN,0,1)
-	e:GetHandler():RegisterFlagEffect(id+100,RESET_PHASE+PHASE_END,0,1)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE)
 end
 function cid.tdop(e,tp,eg,ep,ev,re,r,rp)
@@ -152,14 +150,9 @@ function cid.tdop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
 	end
-	if e:GetHandler():GetFlagEffect(id+100)>1 then
-		Duel.Destroy(e:GetHandler(),REASON_EFFECT)
-	end
 end
 function cid.tdtg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cid.tdfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil,TYPE_TRAP+TYPE_PANDEMONIUM) end
-	e:GetHandler():RegisterFlagEffect(id,RESET_CHAIN,0,1)
-	e:GetHandler():RegisterFlagEffect(id+100,RESET_PHASE+PHASE_END,0,1)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE)
 end
 function cid.tdop2(e,tp,eg,ep,ev,re,r,rp)
@@ -170,16 +163,11 @@ function cid.tdop2(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
 	end
-	if e:GetHandler():GetFlagEffect(id+100)>1 then
-		Duel.Destroy(e:GetHandler(),REASON_EFFECT)
-	end
 end
 ------
 function cid.drytg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(nil,tp,0,LOCATION_ONFIELD,nil)
 	if chk==0 then return #g>0 end
-	e:GetHandler():RegisterFlagEffect(id,RESET_CHAIN,0,1)
-	e:GetHandler():RegisterFlagEffect(id+100,RESET_PHASE+PHASE_END,0,1)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 end
 function cid.dryop(e,tp,eg,ep,ev,re,r,rp)
@@ -190,15 +178,10 @@ function cid.dryop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.HintSelection(g)
 		Duel.Destroy(g,REASON_EFFECT)
 	end
-	if e:GetHandler():GetFlagEffect(id+100)>1 then
-		Duel.Destroy(e:GetHandler(),REASON_EFFECT)
-	end
 end
 ------
 function cid.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
-	e:GetHandler():RegisterFlagEffect(id,RESET_CHAIN,0,1)
-	e:GetHandler():RegisterFlagEffect(id+100,RESET_PHASE+PHASE_END,0,1)
 	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(1)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
@@ -207,9 +190,6 @@ function cid.drawop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	Duel.Draw(p,d,REASON_EFFECT)
-	if e:GetHandler():GetFlagEffect(id+100)>1 then
-		Duel.Destroy(e:GetHandler(),REASON_EFFECT)
-	end
 end
 -------
 function cid.xyzfilter(c,e)
@@ -220,8 +200,6 @@ function cid.xyzfilter2(c)
 end
 function cid.xyztg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cid.xyzfilter,tp,0,LOCATION_HAND+LOCATION_MZONE,1,nil,e) and eg:IsExists(Card.IsType,1,nil,TYPE_XYZ) end
-	e:GetHandler():RegisterFlagEffect(id,RESET_CHAIN,0,1)
-	e:GetHandler():RegisterFlagEffect(id+100,RESET_PHASE+PHASE_END,0,1)
 end
 function cid.xyzop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
@@ -237,9 +215,6 @@ function cid.xyzop(e,tp,eg,ep,ev,re,r,rp)
 	if g:GetCount()>0 then
 		Duel.Overlay(tc,g)
 	end
-	if e:GetHandler():GetFlagEffect(id+100)>1 then
-		Duel.Destroy(e:GetHandler(),REASON_EFFECT)
-	end
 end
 --------
 function cid.gfilter(c)
@@ -247,8 +222,6 @@ function cid.gfilter(c)
 end
 function cid.linktg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	e:GetHandler():RegisterFlagEffect(id,RESET_CHAIN,0,1)
-	e:GetHandler():RegisterFlagEffect(id+100,RESET_PHASE+PHASE_END,0,1)
 end
 function cid.linkop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
@@ -260,7 +233,4 @@ function cid.linkop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetValue(1000)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
-	if e:GetHandler():GetFlagEffect(id+100)>1 then
-		Duel.Destroy(e:GetHandler(),REASON_EFFECT)
-	end
 end
