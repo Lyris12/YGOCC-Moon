@@ -95,9 +95,9 @@ function cid.atk(val)--(e3,e4 con)
 	end
 end
 function cid.atkcon(e,tp,eg,ep,ev,re,r,rp)
-    --return function(e)
+	--return function(e)
 	--return e:GetHandler():IsAttackAbove(2300) end
-    local a=Duel.GetAttacker()
+	local a=Duel.GetAttacker()
 	local d=Duel.GetAttackTarget()
 	if not d then return false end
 	if a:IsStatus(STATUS_OPPO_BATTLE) and d:IsControler(tp) then a,d=d,a end
@@ -110,31 +110,31 @@ end
 function cid.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetLabelObject()
 	if tc:IsFaceup() and tc:IsControler(tp) and tc:IsRelateToBattle() and Duel.GetFlagEffect(tp,id)==0 then
-	    local e1=Effect.CreateEffect(e:GetHandler())
-	    e1:SetType(EFFECT_TYPE_SINGLE)
-	    e1:SetCode(EFFECT_CANNOT_DIRECT_ATTACK)
-	    e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	    e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_BATTLE)
-	    tc:RegisterEffect(e1)
-	    Duel.RegisterFlagEffect(tp,id,0x1fe0000+RESET_PHASE+PHASE_BATTLE,0,1)
-	    local e2=e1:Clone()
-	    e2:SetCode(EFFECT_EXTRA_ATTACK)
-	    e2:SetValue(1)
-	    tc:RegisterEffect(e2)
-	    --atkup
-	    --local e3=e1:Clone()
-	    --e3:SetCode(EFFECT_UPDATE_ATTACK)
-	    --e3:SetValue(300)
-	    --tc:RegisterEffect(e3)
-	    Duel.SetChainLimit(aux.FALSE)
-    end
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_CANNOT_DIRECT_ATTACK)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_BATTLE)
+		tc:RegisterEffect(e1)
+		Duel.RegisterFlagEffect(tp,id,0x1fe0000+RESET_PHASE+PHASE_BATTLE,0,1)
+		local e2=e1:Clone()
+		e2:SetCode(EFFECT_EXTRA_ATTACK)
+		e2:SetValue(1)
+		tc:RegisterEffect(e2)
+		--atkup
+		--local e3=e1:Clone()
+		--e3:SetCode(EFFECT_UPDATE_ATTACK)
+		--e3:SetValue(300)
+		--tc:RegisterEffect(e3)
+		Duel.SetChainLimit(aux.FALSE)
+	end
 end
 function cid.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsOnField() and chkc:IsFaceup() end
-	if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,0,LOCATION_ONFIELD,1,nil) end
+	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) end
+	if chk==0 then return Duel.IsExistingTarget(nil,tp,0,LOCATION_ONFIELD,1,nil) end
 	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectTarget(tp,Card.IsFaceup,tp,0,LOCATION_ONFIELD,1,1,nil)
+	local g=Duel.SelectTarget(tp,nil,tp,0,LOCATION_ONFIELD,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 end
 function cid.desop(e,tp,eg,ep,ev,re,r,rp)
