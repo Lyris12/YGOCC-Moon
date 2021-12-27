@@ -33,7 +33,8 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function s.hdval(e,re,dam,r,rp,rc)
-	if Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsSetCard),tp,LOCATION_EXTRA,0,1,nil,0x7c4) then
+	local tp=e:GetHandlerPlayer()
+	if Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0 and Duel.GetFieldGroupCount(tp,0,LOCATION_MZONE)>0 then
 		return dam/2
 	else return dam end
 end
