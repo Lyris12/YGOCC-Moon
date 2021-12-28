@@ -64,8 +64,11 @@ end
 function s.repfilter(c)
 	return (c:IsFaceup() or not c:IsOnField()) and c:IsSetCard(0x7c4) and c:IsType(TYPE_MONSTER) and not c:IsReason(REASON_REPLACE+REASON_MATERIAL)
 end
+function s.pfilter(c,e)
+	return c:IsFaceup() and c:IsType(TYPE_PENDULUM) and not c:IsStatus(STATUS_DESTROY_CONFIRMED) and c:IsDestructable(e)
+end
 function s.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return eg:IsExists(s.repfilter,1,nil) and Duel.IsExistingMatchingCard(aux.AND(s.filter1,aux.FilterBoolFunction(Card.IsDestructable,e),aux.NOT(Card.IsStatus),Card.IsFaceup),tp,LOCATION_EXTRA,0,1,nil,STATUS_DESTROY_CONFIRMED) end
+	if chk==0 then return eg:IsExists(s.repfilter,1,nil) and Duel.IsExistingMatchingCard(aux.AND(s.filter1,s.pfilter),tp,LOCATION_EXTRA,0,1,nil,e) end
 	return Duel.SelectEffectYesNo(tp,e:GetHandler(),96)
 end
 function s.repval(e,c)
@@ -74,5 +77,5 @@ end
 function s.repop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_CARD,0,id)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	Duel.Destroy(Duel.SelectMatchingCard(tp,aux.AND(s.filter1,aux.FilterBoolFunction(Card.IsDestructable,e),aux.NOT(Card.IsStatus),Card.IsFaceup),tp,LOCATION_EXTRA,0,1,1,nil,STATUS_DESTROY_CONFIRMED),REASON_EFFECT+REASON_REPLACE)
+	Duel.Destroy(Duel.SelectMatchingCard(tp,aux.AND(s.filter1,s.pfilter),tp,LOCATION_EXTRA,0,1,1,nil,e),REASON_EFFECT+REASON_REPLACE)
 end
