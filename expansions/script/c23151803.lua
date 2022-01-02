@@ -63,7 +63,6 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) then Duel.Destroy(c,REASON_EFFECT) end
 end
---
 function s.tdfilter(c)
 	return c:IsSetCard(0x9fa) and c:IsAbleToDeck()
 end
