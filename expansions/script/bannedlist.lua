@@ -289,7 +289,7 @@ local ls=[[
 57103969 1 --Fire Formation - Tenki
 70711847 2 --Danger! Nessie!
 40318957 2 --Performapal Skullcrobat Joker
-57103969 2 --Emergency Teleport
+67723438 2 --Emergency Teleport
 49684352 3 --Double Iris Magician
 ]]
 for id in ls:sub(ls:find("!"),ls:find("!",ls:find("!")+1) and ls:find("!",ls:find("!")+1)-1 or -1):gmatch("([0-9]+) 0") do
