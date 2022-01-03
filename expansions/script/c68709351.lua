@@ -1,8 +1,8 @@
 --IF, Awakened Flame
 function c68709351.initial_effect(c)
 	--link summon
-    aux.AddLinkProcedure(c,c68709351.lfilter,1,1)
-    c:EnableReviveLimit()
+	aux.AddLinkProcedure(c,c68709351.lfilter,1,1)
+	c:EnableReviveLimit()
 	--move
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(68709351,0))
@@ -27,7 +27,7 @@ function c68709351.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c68709351.lfilter(c)
-    return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xf08)
+	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xf08)
 end
 function c68709351.mvcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_LINK)
