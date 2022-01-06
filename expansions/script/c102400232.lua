@@ -1,13 +1,6 @@
 --Swaggy, YC.Org Scion of Terradication
 --Scripted by: XGlitchy30
-local function getID()
-	local str=string.match(debug.getinfo(2,'S')['source'],"c%d+%.lua")
-	str=string.sub(str,1,string.len(str)-4)
-	local cod=_G[str]
-	local id=tonumber(string.sub(str,2))
-	return id,cod
-end
-local id,cid=getID()
+local cid,id=GetID()
 function cid.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddLinkProcedure(c,aux.AND(aux.FilterBoolFunction(Card.IsSetCard,0x96b,0x9b5),aux.NOT(aux.FilterBoolFunction(Card.IsLinkType,TYPE_LINK))),1,1)

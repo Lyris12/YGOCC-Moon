@@ -1,13 +1,6 @@
 --Shogun Scintillante Puntodifuoco
 --Script by XGlitchy30
-local function getID()
-	local str=string.match(debug.getinfo(2,'S')['source'],"c%d+%.lua")
-	str=string.sub(str,1,string.len(str)-4)
-	local cod=_G[str]
-	local id=tonumber(string.sub(str,2))
-	return id,cod
-end
-local id,cid=getID()
+local cid,id=GetID()
 function cid.initial_effect(c)
 	--custom fusion summon (methods #1 and #2)
 	local fun={(function(c,fc,sub,mg,sg) return cid.mfilter2(c,fc,sub,mg,sg) and not c:IsHasEffect(6205579) end),(function(c,fc,sub,mg,sg) return cid.mfilter1(c,fc,sub,mg,sg) and not c:IsHasEffect(6205579) end)}

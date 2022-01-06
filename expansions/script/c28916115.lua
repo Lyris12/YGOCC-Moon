@@ -1,12 +1,5 @@
 --Sacrifice Weaver
-local function getID()
-	local str=string.match(debug.getinfo(2,'S')['source'],"c%d+%.lua")
-	str=string.sub(str,1,string.len(str)-4)
-	local cod=_G[str]
-	local id=tonumber(string.sub(str,2))
-	return id,cod
-end
-local id,ref=getID()
+local ref,id=GetID()
 function ref.initial_effect(c)
 	local magick=Effect.CreateEffect(c)
 	magick:SetDescription(aux.Stringid(id,0))

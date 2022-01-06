@@ -1,14 +1,7 @@
 --Mantra Dog
 --Automate ID
-local function getID()
-	local str=string.match(debug.getinfo(2,'S')['source'],"c%d+%.lua")
-	str=string.sub(str,1,string.len(str)-4)
-	local scard=_G[str]
-	local s_id=tonumber(string.sub(str,2))
-	return scard,s_id
-end
 
-local scard,s_id=getID()
+local scard,s_id=GetID()
 
 function scard.initial_effect(c)
 	Card.IsMantra=Card.IsMantra or (function(tc) return tc:GetCode()>30200 and tc:GetCode()<30230 end)

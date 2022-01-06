@@ -1,12 +1,5 @@
 --Blastrizer Neptune Dragon
-local function getID()
-	local str=string.match(debug.getinfo(2,'S')['source'],"c%d+%.lua")
-	str=string.sub(str,1,string.len(str)-4)
-	local cid=_G[str]
-	local id=tonumber(string.sub(str,2))
-	return id,cid
-end
-local id,cid=getID()
+local cid,id=GetID()
 function cid.initial_effect(c)
 	--bigbang summon
 	aux.AddOrigBigbangType(c)

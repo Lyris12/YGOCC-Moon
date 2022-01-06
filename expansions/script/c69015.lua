@@ -1,15 +1,4 @@
---Automate ID
-local function getID()
-	local str=string.match(debug.getinfo(2,'S')['source'],"c%d+%.lua")
-	str=string.sub(str,1,string.len(str)-4)
-	local scard=_G[str]
-	local s_id=tonumber(string.sub(str,2))
-	return scard,s_id
-end
-
-local s,id=getID()
-
-function s.initial_effect(c)
+--Automate IDlocal s,id=GetID()function s.initial_effect(c)
     local e1=Effect.CreateEffect(c)
     e1:SetDescription(aux.Stringid(69001,0))
     e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_IGNITION)

@@ -6,15 +6,8 @@
 You can only Special Summon "Shiranui Samuraipsyche" once per turn. Once per turn: You can shuffle all of your banished "Shiranui" monsters into the Deck, and if 3 or more cards are returned this way, draw 1 card. If this card is banished: You can send 1 "Shiranui Spectralsword" from your Deck to the Graveyard; Special Summon 1 "Shiranui" monster from your Deck.
 --]]
 
-local function getID()
-	local str=string.match(debug.getinfo(2,'S')['source'],"c%d+%.lua")
-	str=string.sub(str,1,string.len(str)-4)
-	local scard=_G[str]
-	local s_id=tonumber(string.sub(str,2))
-	return scard,s_id
-end
 
-local scard,s_id=getID()
+local scard,s_id=GetID()
 
 function scard.initial_effect(c)
 	c:SetSPSummonOnce(s_id)

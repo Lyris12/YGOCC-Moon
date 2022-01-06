@@ -5,15 +5,8 @@
 Target 2 of your banished Zombie-Type monsters (1 Tuner and 1 non-Tuner); shuffle them into the Deck, and Special Summon 1 Synchro Monster from your Extra Deck with Level equal to the total Levels of those returned cards. (This Special Summon is treated as a Synchro Summon.) You can banish this card from your Graveyard and 1 card from your hand; Add 1 "Shiranui" card from your Deck to your hand, except "Shiranui Style Seven Stars". You can only use 1 effect of "Shiranui Style Seven Stars" per turn, and only once that turn.
 --]]
 
-local function getID()
-	local str=string.match(debug.getinfo(2,'S')['source'],"c%d+%.lua")
-	str=string.sub(str,1,string.len(str)-4)
-	local scard=_G[str]
-	local s_id=tonumber(string.sub(str,2))
-	return scard,s_id
-end
 
-local scard,s_id=getID()
+local scard,s_id=GetID()
 
 function scard.initial_effect(c)
 	--Activate

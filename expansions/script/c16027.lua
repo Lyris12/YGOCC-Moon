@@ -1,1 +1,72 @@
---[[Paracyclis Poisonous Sting]]--[[\n]]--[[Automate ID]]--[[\n]]local function getID()--[[\n]]--[[\t]]local str=string.match(debug.getinfo(2,'S')['source'],"c%d+%.lua")--[[\n]]--[[\t]]str=string.sub(str,1,string.len(str)-4)--[[\n]]--[[\t]]local scard=_G[str]--[[\n]]--[[\t]]local s_id=tonumber(string.sub(str,2))--[[\n]]--[[\t]]return scard,s_id--[[\n]]end--[[\n]]--[[\n]]local s,id=getID()--[[\n]]--[[\n]]function s.initial_effect(c)--[[\n]]--[[\t]]--[[Activate]]--[[\n]]--[[\t]]local e1=Effect.CreateEffect(c)--[[\n]]--[[\t]]e1:SetCategory(CATEGORY_POSITION)--[[\n]]--[[\t]]e1:SetType(EFFECT_TYPE_ACTIVATE)--[[\n]]--[[\t]]e1:SetCode(EVENT_FREE_CHAIN)--[[\n]]--[[\t]]e1:SetProperty(EFFECT_FLAG_CARD_TARGET)--[[\n]]--[[\t]]e1:SetHintTiming(TIMING_BATTLE_PHASE,TIMINGS_CHECK_MONSTER+TIMING_BATTLE_PHASE)--[[\n]]--[[\t]]e1:SetCondition(s.condition)--[[\n]]--[[\t]]e1:SetTarget(s.target)--[[\n]]--[[\t]]e1:SetOperation(s.activate)--[[\n]]--[[\t]]e1:SetCountLimit(1,id)--[[\n]]--[[\t]]c:RegisterEffect(e1)--[[\n]]--[[\t]]--[[Activate]]--[[\n]]--[[\t]]local e1=Effect.CreateEffect(c)--[[\n]]--[[\t]]e1:SetCategory(CATEGORY_TOHAND)--[[\n]]--[[\t]]e1:SetType(EFFECT_TYPE_ACTIVATE)--[[\n]]--[[\t]]e1:SetCode(EVENT_BATTLE_DESTROYED)--[[\n]]--[[\t]]e1:SetCondition(s.thcon)--[[\n]]--[[\t]]e1:SetTarget(s.thtg)--[[\n]]--[[\t]]e1:SetOperation(s.thop)--[[\n]]--[[\t]]e1:SetCountLimit(1,id+100)--[[\n]]--[[\t]]c:RegisterEffect(e1)--[[\n]]end--[[\n]]function s.conf(c)--[[\n]]--[[\t]]return c:IsFaceup() and c:IsSetCard(0x308)--[[\n]]end--[[\n]]function s.condition(e,tp,eg,ep,ev,re,r,rp)--[[\n]]--[[\t]]return Duel.IsExistingMatchingCard(s.conf,tp,LOCATION_MZONE,0,1,nil)--[[\n]]end--[[\n]]function s.filter(c)--[[\n]]--[[\t]]return c:IsFaceup() and c:IsCanTurnSet()--[[\n]]end--[[\n]]function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)--[[\n]]--[[\t]]if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and s.filter(chkc) end--[[\n]]--[[\t]]if chk==0 then return Duel.IsExistingTarget(s.filter,tp,0,LOCATION_MZONE,1,nil) end--[[\n]]--[[\t]]Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)--[[\n]]--[[\t]]local g=Duel.SelectTarget(tp,s.filter,tp,0,LOCATION_MZONE,1,1,nil)--[[\n]]--[[\t]]Duel.SetOperationInfo(0,CATEGORY_POSITION,g,1,0,0)--[[\n]]end--[[\n]]function s.activate(e,tp,eg,ep,ev,re,r,rp)--[[\n]]--[[\t]]local tc=Duel.GetFirstTarget()--[[\n]]--[[\t]]if tc:IsRelateToEffect(e) and tc:IsFaceup() then--[[\n]]--[[\t]]--[[\t]]if Duel.ChangePosition(tc,POS_FACEDOWN_DEFENSE)~=0 then--[[\n]]--[[\t]]--[[\t]]--[[\t]]local e1=Effect.CreateEffect(e:GetHandler())--[[\n]]--[[\t]]--[[\t]]--[[\t]]e1:SetType(EFFECT_TYPE_SINGLE)--[[\n]]--[[\t]]--[[\t]]--[[\t]]e1:SetCode(EFFECT_CANNOT_CHANGE_POSITION)--[[\n]]--[[\t]]--[[\t]]--[[\t]]e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)--[[\n]]--[[\t]]--[[\t]]--[[\t]]e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END+RESET_SELF_TURN,1)--[[\n]]--[[\t]]--[[\t]]--[[\t]]tc:RegisterEffect(e1)--[[\n]]--[[\t]]--[[\t]]end--[[\n]]--[[\t]]end--[[\n]]end--[[\n]]function s.cfilter(c,tp)--[[\n]]--[[\t]]return c:IsPreviousPosition(POS_DEFENSE) and c:IsPreviousControler(tp)--[[\n]]end--[[\n]]function s.thcon(e,tp,eg,ep,ev,re,r,rp)--[[\n]]--[[\t]]return eg:IsExists(s.cfilter,1,nil,1-tp)--[[\n]]end--[[\n]]function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)--[[\n]]--[[\t]]if chk==0 then return e:GetHandler():IsAbleToHand() end--[[\n]]--[[\t]]Duel.SetOperationInfo(0,CATEGORY_TOHAND,e:GetHandler(),1,0,0)--[[\n]]end--[[\n]]function s.thop(e,tp,eg,ep,ev,re,r,rp)--[[\n]]--[[\t]]local c=e:GetHandler()--[[\n]]--[[\t]]if c:IsRelateToEffect(e) then--[[\n]]--[[\t]]--[[\t]]Duel.SendtoHand(c,nil,REASON_EFFECT)--[[\n]]--[[\t]]--[[\t]]Duel.ConfirmCards(1-tp,c)--[[\n]]--[[\t]]end--[[\n]]end--[[\n]]
+--Paracyclis Poisonous Sting
+local s,id=GetID()
+function s.initial_effect(c)
+	--Activate
+	local e1=Effect.CreateEffect(c)
+	e1:SetCategory(CATEGORY_POSITION)
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetHintTiming(TIMING_BATTLE_PHASE,TIMINGS_CHECK_MONSTER+TIMING_BATTLE_PHASE)
+	e1:SetCondition(s.condition)
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.activate)
+	e1:SetCountLimit(1,id)
+	c:RegisterEffect(e1)
+	--Activate
+	local e1=Effect.CreateEffect(c)
+	e1:SetCategory(CATEGORY_TOHAND)
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetCode(EVENT_BATTLE_DESTROYED)
+	e1:SetCondition(s.thcon)
+	e1:SetTarget(s.thtg)
+	e1:SetOperation(s.thop)
+	e1:SetCountLimit(1,id+100)
+	c:RegisterEffect(e1)
+end
+function s.conf(c)
+	return c:IsFaceup() and c:IsSetCard(0x308)
+end
+function s.condition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsExistingMatchingCard(s.conf,tp,LOCATION_MZONE,0,1,nil)
+end
+function s.filter(c)
+	return c:IsFaceup() and c:IsCanTurnSet()
+end
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and s.filter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(s.filter,tp,0,LOCATION_MZONE,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
+	local g=Duel.SelectTarget(tp,s.filter,tp,0,LOCATION_MZONE,1,1,nil)
+	Duel.SetOperationInfo(0,CATEGORY_POSITION,g,1,0,0)
+end
+function s.activate(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.GetFirstTarget()
+	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
+		if Duel.ChangePosition(tc,POS_FACEDOWN_DEFENSE)~=0 then
+			local e1=Effect.CreateEffect(e:GetHandler())
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetCode(EFFECT_CANNOT_CHANGE_POSITION)
+			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+			e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END+RESET_SELF_TURN,1)
+			tc:RegisterEffect(e1)
+		end
+	end
+end
+function s.cfilter(c,tp)
+	return c:IsPreviousPosition(POS_DEFENSE) and c:IsPreviousControler(tp)
+end
+function s.thcon(e,tp,eg,ep,ev,re,r,rp)
+	return eg:IsExists(s.cfilter,1,nil,1-tp)
+end
+function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():IsAbleToHand() end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,e:GetHandler(),1,0,0)
+end
+function s.thop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if c:IsRelateToEffect(e) then
+		Duel.SendtoHand(c,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,c)
+	end
+end

@@ -1,12 +1,5 @@
 --Will of the Phantomb Lord
-local function getID()
-	local str=string.match(debug.getinfo(2,'S')['source'],"c%d+%.lua")
-	str=string.sub(str,1,string.len(str)-4)
-	local cod=_G[str]
-	local id=tonumber(string.sub(str,2))
-	return id,cod
-end
-local id,ref=getID()
+local ref,id=GetID()
 function ref.initial_effect(c)
 	--aux.AddRitualProcUltimate(c,ref.ritfilter,Card.GetRitualLevel,"Greater",LOCATION_HAND+LOCATION_DECK+LOCATION_EXTRA,nil,nil)
 	--Auxiliary.AddRitualProcUltimate(c,filter,level_function,greater_or_equal,summon_location,grave_filter,mat_filter)

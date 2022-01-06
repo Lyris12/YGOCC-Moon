@@ -2,15 +2,8 @@
 --  Idea: Alastar Rainford
 --  Script: Shad3
 --  Editor: Keddy
-local function getID()
-	local str=string.match(debug.getinfo(2,'S')['source'],"c%d+%.lua")
-	str=string.sub(str,1,string.len(str)-4)
-	local scard=_G[str]
-	local s_id=tonumber(string.sub(str,2))
-	return scard,s_id
-end
 
-local scard,s_id=getID()
+local scard,s_id=GetID()
 local sc_id=0xa8d
 
 function scard.initial_effect(c)
