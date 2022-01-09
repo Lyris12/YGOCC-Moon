@@ -8,6 +8,7 @@ bigbang_force_mats_operation = nil
 EFFECT_CANNOT_BE_BIGBANG_MATERIAL	=624
 EFFECT_MUST_BE_BIGBANG_MATERIAL		=625
 EFFECT_EXTRA_BIGBANG_MATERIAL		=626
+EFFECT_IGNORE_BIGBANG_SUMREQ		=627
 TYPE_BIGBANG						=0x8000000000
 TYPE_CUSTOM							=TYPE_CUSTOM|TYPE_BIGBANG
 CTYPE_BIGBANG						=0x80
@@ -192,7 +193,7 @@ function Auxiliary.BigbangCheckGoal(tp,sg,bc,ct,...)
 		if not sg:IsExists(funs[i][1],funs[i][2],nil) then return false end
 		min=min+funs[i][2]
 	end
-	return ct>=min and Duel.GetLocationCountFromEx(tp,tp,sg,bc)>0 and sg:CheckWithSumGreater(Card.GetBigbangAttack,bc:GetAttack()) and sg:CheckWithSumGreater(Card.GetBigbangDefense,bc:GetDefense())
+	return ct>=min and Duel.GetLocationCountFromEx(tp,tp,sg,bc)>0 and (bc:IsHasEffect(EFFECT_IGNORE_BIGBANG_SUMREQ) or (sg:CheckWithSumGreater(Card.GetBigbangAttack,bc:GetAttack()) and sg:CheckWithSumGreater(Card.GetBigbangDefense,bc:GetDefense())))
 		and not sg:IsExists(Auxiliary.BigbangUncompatibilityFilter,1,nil,sg,bc,tp)
 end
 function Auxiliary.BigbangUncompatibilityFilter(c,sg,lc,tp)

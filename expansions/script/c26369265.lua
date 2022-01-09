@@ -81,7 +81,15 @@ function s.BigbangCondition(e,c,matg,mustg)
 	local tp=c:GetControler()
 	local list={{{s.proton,1,1},{s.electron,1,99}},{{s.mat1,1,1},{s.mat2,1,1}}}
 	
-	for _,plist in ipairs(list) do
+	for i,plist in ipairs(list) do
+		local e1
+		if i==2 then
+			e1=Effect.CreateEffect(c)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+			e1:SetCode(EFFECT_IGNORE_BIGBANG_SUMREQ)
+			c:RegisterEffect(e1)
+		end
 		local mg,mg2
 		if matg and aux.GetValueType(matg)=="Group" then
 			mg=matg:Filter(Card.IsCanBeBigbangMaterial,nil,c)
@@ -97,7 +105,12 @@ function s.BigbangCondition(e,c,matg,mustg)
 		end
 		if fg:IsExists(aux.MustMaterialCounterFilter,1,nil,mg) then return false end
 		Duel.SetSelectedCard(fg)
-		if mg:IsExists(Auxiliary.BigbangRecursiveFilter,1,nil,tp,Group.CreateGroup(),mg,c,0,table.unpack(plist)) then
+		local res=mg:IsExists(Auxiliary.BigbangRecursiveFilter,1,nil,tp,Group.CreateGroup(),mg,c,0,table.unpack(plist))
+		if res then
+			if i==2 then
+				e1:Reset()
+				e1=nil
+			end
 			return true
 		end
 	end
@@ -120,14 +133,31 @@ function s.BigbangTarget(e,tp,eg,ep,ev,re,r,rp,chk,c)
 		end
 	end
 	
+	local e1
 	local list={{{s.proton,1,1},{s.electron,1,99}},{{s.mat1,1,1},{s.mat2,1,1}}}
 	local ops=0
-	if aux.BigbangCondition(table.unpack(list[1]))(e,c) and aux.BigbangCondition(table.unpack(list[2]))(e,c) then
+	local res1=aux.BigbangCondition(table.unpack(list[1]))(e,c)
+	e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e1:SetCode(EFFECT_IGNORE_BIGBANG_SUMREQ)
+	c:RegisterEffect(e1)
+	local res2=aux.BigbangCondition(table.unpack(list[2]))(e,c)
+	e1:Reset()
+	e1=nil
+	if res1 and res2 then
 		ops=Duel.SelectOption(tp,aux.Stringid(id,0),aux.Stringid(id,1))+1
-	elseif aux.BigbangCondition(table.unpack(list[1]))(e,c) then
+	elseif res1 then
 		ops=1
 	else
 		ops=2
+	end
+	if ops==2 then
+		e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+		e1:SetCode(EFFECT_IGNORE_BIGBANG_SUMREQ)
+		c:RegisterEffect(e1)
 	end
 	
 	local funs=list[ops]
@@ -190,6 +220,10 @@ function s.BigbangTarget(e,tp,eg,ep,ev,re,r,rp,chk,c)
 			bigbang_force_mats_operation:Reset()
 			bigbang_force_mats_operation=nil
 		end
+		if e1 then
+			e1:Reset()
+			e1=nil
+		end
 		return true
 	else
 		if bigbang_limit_mats_operation and bigbang_limit_mats_operation.SetLabelObject then
@@ -199,6 +233,10 @@ function s.BigbangTarget(e,tp,eg,ep,ev,re,r,rp,chk,c)
 		if bigbang_force_mats_operation and bigbang_force_mats_operation.SetLabelObject then
 			bigbang_force_mats_operation:Reset()
 			bigbang_force_mats_operation=nil
+		end
+		if e1 then
+			e1:Reset()
+			e1=nil
 		end
 		return false
 	end
