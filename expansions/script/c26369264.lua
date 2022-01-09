@@ -72,8 +72,8 @@ function s.indtg(e,c)
 	return e:GetHandler()==c or (c:IsRace(RACE_PSYCHO) and e:GetHandler():GetLinkedGroup():IsContains(c))
 end
 
-function s.actcon(e,tp)
-	return Duel.GetTurnPlayer()==1-tp
+function s.actcon(e)
+	return Duel.GetTurnPlayer()==1-e:GetHandlerPlayer()
 end
 
 function s.setcon(e,tp,eg,ep,ev,re,r,rp)
