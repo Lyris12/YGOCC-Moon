@@ -66,7 +66,7 @@ local is_type, card_remcounter, duel_remcounter, effect_set_target_range, effect
 	Card.IsFacedown, Card.IsAbleToRemove, Card.IsAbleToRemoveAsCost, Card.IsAbleToHand, Card.IsCanBeSpecialSummoned, Card.GetLevel, Card.GetPreviousLevelOnField, Card.IsLevel, Card.IsLevelBelow, Card.IsLevelAbove, Card.IsDestructable
 
 dofile("expansions/script/proc_evolute.lua") --Evolutes
-dofile("expansions/script/proc_conjoint.lua") --Conjoints
+dofile("expansions/script/proc_conjoin.lua") --Conjoints
 dofile("expansions/script/proc_pandemonium.lua") --Pandemoniums
 dofile("expansions/script/proc_polarity.lua") --Polarities
 dofile("expansions/script/proc_spatial.lua") --Spatials
