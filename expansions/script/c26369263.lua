@@ -111,7 +111,7 @@ function s.bbfilter(c,e,tp,mg)
 	return false
 end
 function s.bbcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsMainPhase(1-tp) and aux.PandActCheck(e)
+	return Duel.IsMainPhase(1-tp)
 end
 function s.bbtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
