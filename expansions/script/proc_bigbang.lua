@@ -312,6 +312,6 @@ function Auxiliary.BigbangOperation(e,tp,eg,ep,ev,re,r,rp,c,smat,mg)
 			end
 		end end
 	end
-	Duel.Destroy(dg,REASON_MATERIAL+REASON_BIGBANG)
+	Duel.Destroy(dg,REASON_RULE+REASON_MATERIAL+REASON_BIGBANG+REASON_REPLACE)
 	g:DeleteGroup()
 end
