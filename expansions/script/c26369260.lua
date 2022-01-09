@@ -319,7 +319,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if sc:IsType(TYPE_SYNCHRO) then
 		Duel.SynchroSummon(tp,sc,nil,mg)
 	elseif sc:IsType(TYPE_XYZ) then
-		Duel.XyzSummon(tp,sc,sg)
+		Duel.XyzSummon(tp,sc,mg)
 	elseif sc:IsType(TYPE_LINK) then
 		Duel.LinkSummon(tp,sc,mg,nil,2,2)
 	elseif sc:IsType(TYPE_BIGBANG) then
@@ -336,7 +336,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetLabel(eid)
 		e1:SetValue(1)
 		bigbang_limit_mats_operation = e1
-		Duel.SpecialSummonRule(tp,sg:GetFirst())
+		Duel.SpecialSummonRule(tp,sc)
 		if Duel.SetSummonCancelable then Duel.SetSummonCancelable(false) end
 	end
 end
