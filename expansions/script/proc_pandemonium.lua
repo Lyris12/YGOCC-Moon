@@ -566,7 +566,11 @@ function Auxiliary.PandDisableFUInED(tc,tpe)
 			end
 end
 function Auxiliary.PandSSetCon(tc,player,...)
-	local params,loc1,loc2={...},0xff,0xff
+	local params,loc1,loc2,neglect_zone={...},0xff,0xff,false
+	if type(params[#params])=='boolean' then
+		neglect_zone=params[#params]
+		table.remove(params)
+	end
 	if type(params[#params])=='number' then
 		loc1=params[#params]
 		if #params-1>0 and type(params[#params-1])=='number' then
@@ -611,7 +615,7 @@ function Auxiliary.PandSSetCon(tc,player,...)
 							tsg=sg:GetNext()
 						end
 						if ct==#sg then check=false end
-					elseif tc and tg(te,tc) then
+					elseif tc and tg(te,tc,ttp) then
 						check=false
 					else
 						if not tc then
@@ -619,7 +623,7 @@ function Auxiliary.PandSSetCon(tc,player,...)
 						end
 					end
 				end
-				return Duel.GetLocationCount(ttp,LOCATION_SZONE)>0 and check
+				return (neglect_zone or Duel.GetLocationCount(ttp,LOCATION_SZONE)>0) and check
 			end
 end	
 function Auxiliary.PandSSetFilter(tc,...)
@@ -848,6 +852,92 @@ function Auxiliary.PandAct(tc,...)
 				end
 				tc:RegisterFlagEffect(726,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CANNOT_DISABLE,1)
 			end
+end
+
+function Card.IsPandemoniumActivatable(c,tp,fp,neglect_loc,neglect_cond,neglect_cost,neglect_targ,eg,ep,ev,re,r,rp)
+	if not fp then fp=tp end
+	local e=c:GetActivateEffect()
+	if not c:IsType(TYPE_PANDEMONIUM) then return false end
+	
+	c:AssumeProperty(ASSUME_TYPE,TYPE_TRAP+TYPE_CONTINUOUS)
+	if c:IsForbidden() or c:IsHasEffect(EFFECT_CANNOT_TRIGGER) then return false end
+	if not c:CheckUniqueOnField(fp) then return false end
+	
+	for _,pe in ipairs({Duel.IsPlayerAffectedByEffect(tp,EFFECT_CANNOT_ACTIVATE)}) do
+		local value=pe:GetValue()
+		if not value or type(value)=="number" then
+			return false
+		elseif type(value)=="function" and value(pe,e,tp) then
+			return false
+		end
+	end
+	if not e:CheckCountLimit(tp) or e:GetHandlerPlayer()~=tp then return false end
+	
+	local ph=Duel.GetCurrentPhase()
+	if ph==PHASE_DAMAGE then
+		if (e:GetCode()<EVENT_BATTLE_START or e:GetCode()>=EVENT_TOSS_DICE) and not e:IsHasProperty(EFFECT_FLAG_DAMAGE_STEP) then return false end
+	elseif ph==PHASE_DAMAGE_CAL then
+		if (e:GetCode()<EVENT_PRE_DAMAGE_CALCULATE or e:GetCode()>EVENT_PRE_BATTLE_DAMAGE) and not e:IsHasProperty(EFFECT_FLAG_DAMAGE_CAL) then return false end
+	end
+	
+	local zone=0xff
+	local zonechk=true
+	if e:IsHasProperty(EFFECT_FLAG_LIMIT_ZONE) then
+		local zfun=e:GetValue()
+		if type(zfun)=="function" then
+			zone=zfun(e,tp,eg,ep,ev,re,r,rp)
+		elseif type(zfun)=="number" then
+			zone=zfun
+		end
+		if c:IsLocation(LOCATION_SZONE) then
+			local z = (fp==self_reference_effect:GetHandlerPlayer()) and 0x1<<c:GetSequence() or 0x1<<(c:GetSequence()+16)
+			zonechk = zone&z>0
+		end
+	end
+	local ecode=0
+	if c:IsLocation(LOCATION_SZONE) then
+		if c:IsFaceup() or c:GetEquipTarget() or not zonechk then return false end
+		if c:IsStatus(STATUS_SET_TURN) then
+			ecode=EFFECT_TRAP_ACT_IN_SET_TURN
+		end
+	elseif c:IsLocation(LOCATION_HAND) and not neglect_loc then
+		ecode=EFFECT_TRAP_ACT_IN_HAND
+	end
+	if ecode>0 then
+		local available=false
+		for _,ce in ipairs{c:IsHasEffect(ecode)} do
+			if ce:CheckCountLimit(tp) and (not ce:GetCondition() or ce:GetCondition()(ce)) then
+				available=true
+				break
+			end
+		end
+		if not available then
+			return false
+		end
+	end
+	
+	for _,pe in ipairs({Duel.IsPlayerAffectedByEffect(tp,EFFECT_ACTIVATE_COST)}) do
+		local acpcost,acptg=pe:GetCost(),pe:GetTarget()
+		if not acptg or not acptg(pe,e,tp) then
+			return false
+		end
+		if not acpcost or not acpcost(pe,e,tp) then
+			return false
+		end
+	end
+	
+	local cond,cost,targ=e:GetCondition(),e:GetCost(),e:GetTarget()
+	if not neglect_cond and cond and not cond(e,tp,eg,ep,ev,re,r,rp) then
+		return false
+	end
+	if not neglect_cost and cost and not cost(e,tp,eg,ep,ev,re,r,rp,0) then
+		return false
+	end
+	if not neglect_targ and targ and not targ(e,tp,eg,ep,ev,re,r,rp,0) then
+		return false
+	end
+	
+	return true
 end
 
 ----------EFFECT_PANDEPEND_SCALE-------------

@@ -10,8 +10,12 @@ EFFECT_RANDOM_TARGET				=39759371
 EFFECT_CANNOT_BANISH				=1500
 EFFECT_CANNOT_BANISH_AS_COST		=1501
 EFFECT_CANNOT_ADD_TO_HAND			=1502
-TYPE_CUSTOM							=0
+EFFECT_GRANT_LEVEL					=1503
+EFFECT_REMEMBER_GRANTED_LEVEL		=1504
+EFFECT_REMEMBER_XYZ_HOLDER			=1505
+EFFECT_INDESTRUCTABLE_COST			=1506
 
+TYPE_CUSTOM							=0
 CTYPE_CUSTOM						=0
 
 EVENT_XYZATTACH						=EVENT_CUSTOM+9966607
@@ -54,14 +58,22 @@ end
 function Card.IsCustomReason(c,rs)
 	return (c:GetReason()>>32)&rs>0
 end
+function GetID()
+	local str=string.match(debug.getinfo(2,'S')['source'],"c%d+%.lua")
+	str=string.sub(str,1,string.len(str)-4)
+	local scard=_G[str]
+	local s_id=tonumber(string.sub(str,2))
+	return scard,s_id
+end
 --overwrite functions
 local is_type, card_remcounter, duel_remcounter, effect_set_target_range, effect_set_reset, add_xyz_proc, add_xyz_proc_nlv, duel_overlay, duel_set_lp, duel_select_target, duel_banish, card_check_remove_overlay_card, is_reason, duel_check_tribute, select_tribute,card_sethighlander,
-	card_is_facedown, card_is_able_to_remove, card_is_able_to_remove_as_cost, card_is_able_to_hand, card_is_can_be_ssed = 
+	card_is_facedown, card_is_able_to_remove, card_is_able_to_remove_as_cost, card_is_able_to_hand, card_is_can_be_ssed, card_get_level, card_get_previous_level, card_is_level, card_is_level_below, card_is_level_above, card_is_destructable = 
+	
 	Card.IsType, Card.RemoveCounter, Duel.RemoveCounter, Effect.SetTargetRange, Effect.SetReset, Auxiliary.AddXyzProcedure, Auxiliary.AddXyzProcedureLevelFree, Duel.Overlay, Duel.SetLP, Duel.SelectTarget, Duel.Remove, Card.CheckRemoveOverlayCard, Card.IsReason, Duel.CheckTribute, Duel.SelectTribute, Card.SetUniqueOnField,
-	Card.IsFacedown, Card.IsAbleToRemove, Card.IsAbleToRemoveAsCost, Card.IsAbleToHand, Card.IsCanBeSpecialSummoned
+	Card.IsFacedown, Card.IsAbleToRemove, Card.IsAbleToRemoveAsCost, Card.IsAbleToHand, Card.IsCanBeSpecialSummoned, Card.GetLevel, Card.GetPreviousLevelOnField, Card.IsLevel, Card.IsLevelBelow, Card.IsLevelAbove, Card.IsDestructable
 
 dofile("expansions/script/proc_evolute.lua") --Evolutes
-dofile("expansions/script/proc_conjoin.lua") --Conjoints
+dofile("expansions/script/proc_conjoint.lua") --Conjoints
 dofile("expansions/script/proc_pandemonium.lua") --Pandemoniums
 dofile("expansions/script/proc_polarity.lua") --Polarities
 dofile("expansions/script/proc_spatial.lua") --Spatials
@@ -151,40 +163,6 @@ Duel.RemoveCounter=function(p,s,o,typ,ct,r,rp)
 		return n-Duel.GetCounter(p,0,o,typ)
 	end
 end
--- Card.RegisterEffect=function(c,e,forced)
-	-- if c:IsStatus(STATUS_INITIALIZING) and not e then return end
-	-- local cost,tg,op=e:GetCost,e:GetTarget,e:GetOperation()
-	-- if cost then
-		-- local newcost =	function(e,tp,eg,ep,ev,re,r,rp,chk)
-							-- if chk==0 then
-								-- self_reference_effect=e
-								-- return cost(e,tp,eg,ep,ev,re,r,rp,chk)
-							-- end
-							-- self_reference_effect=e
-							-- cost(e,tp,eg,ep,ev,re,r,rp,chk)
-						-- end
-		-- e:SetCost(newcost)
-	-- end
-	-- if tg then
-		-- local newtg =	function(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-							-- if chk==0 then
-								-- self_reference_effect=e
-								-- return cost(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-							-- end
-							-- self_reference_effect=e
-							-- tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-						-- end
-		-- e:SetTarget(newtg)
-	-- end
-	-- if op then
-		-- local newop =	function(e,tp,eg,ep,ev,re,r,rp)
-							-- self_reference_effect=e
-							-- op(e,tp,eg,ep,ev,re,r,rp)
-						-- end
-		-- e:SetOperation(op)
-	-- end
-	-- registereff(c,e,forced)
--- end
 Auxiliary.kaiju_procs={}
 global_target_range_effect_table={}
 Effect.SetTargetRange=function(e,self,oppo)
@@ -227,6 +205,26 @@ Duel.Overlay=function(xyz,mat)
 	duel_overlay(xyz,mat)
 	if oct and xyz:GetOverlayCount()>oct then
 		Duel.RaiseEvent(mat,EVENT_XYZATTACH,nil,0,0,xyz:GetControler(),xyz:GetOverlayCount()-oct)
+	end
+	local mg=Group.CreateGroup()
+	if aux.GetValueType(mat)=="Card" then
+		mg:AddCard(mat)
+	else
+		mg:Merge(mat)
+	end
+	for mc in aux.Next(mg) do
+		if not mc:IsHasEffect(EFFECT_REMEMBER_XYZ_HOLDER) then
+			local e1=Effect.CreateEffect(mc)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_UNCOPYABLE)
+			e1:SetCode(EFFECT_REMEMBER_XYZ_HOLDER)
+			e1:SetLabelObject(xyz)
+			mc:RegisterEffect(e1)
+		else
+			local ef={mc:IsHasEffect(EFFECT_REMEMBER_XYZ_HOLDER)}
+			local e1=ef[1]
+			e1:SetLabelObject(xyz)
+		end
 	end
 end
 Duel.SetLP=function(p,setlp,...)
@@ -491,6 +489,130 @@ Card.IsCanBeSpecialSummoned=function(c,e,sumtype,sump,nocheck,nolimit,...)
 		return Duel.IsPlayerCanSpecialSummonMonster(sump,c:GetCode(),c:GLGetSetCard(),c:GetType(),c:GetAttack(),c:GetDefense(),c:GLGetLevel(),c:GetRace(),c:GetAttribute(),pos0,toplayer0,sumtype)
 	end
 	return card_is_can_be_ssed(c,e,sumtype,sump,nocheck,nolimit,table.unpack(x))
+end
+
+Card.GetLevel=function(c)
+	if card_get_level(c)==0 and c:IsHasEffect(EFFECT_GRANT_LEVEL) then
+		local ef={c:IsHasEffect(EFFECT_GRANT_LEVEL)}
+		local te1=ef[#ef]
+		local cf=te1:GetValue()
+		local typ=aux.GetValueType(cf)
+		if not cf then
+			return 0
+		elseif typ=="number" then
+			return cf
+		elseif typ=="function" then
+			return cf(self_reference_effect,c)
+		end
+	end
+	return card_get_level(c)
+end
+
+Card.GetPreviousLevelOnField=function(c)
+	if card_get_previous_level(c)==0 and c:IsHasEffect(EFFECT_REMEMBER_GRANTED_LEVEL) then
+		local ef={c:IsHasEffect(EFFECT_REMEMBER_GRANTED_LEVEL)}
+		local te1=ef[#ef]
+		local cf=te1:GetValue()
+		local typ=aux.GetValueType(cf)
+		if not cf then
+			return 0
+		elseif typ=="number" then
+			return cf
+		elseif typ=="function" then
+			return cf(self_reference_effect,c)
+		end
+	end
+	return card_get_previous_level(c)
+end
+
+Card.IsLevel=function(c,...)
+	local lvs={...}
+	local alternative_level = false
+	if c:IsHasEffect(EFFECT_GRANT_LEVEL) then
+		local ef={c:IsHasEffect(EFFECT_GRANT_LEVEL)}
+		local te1=ef[#ef]
+		local cf=te1:GetValue()
+		local typ=aux.GetValueType(cf)
+		local level
+		if not cf then
+			level = 0
+		elseif typ=="number" then
+			level = cf
+		elseif typ=="function" then
+			level = cf(self_reference_effect,c)
+		end
+		for i=1,#lvs do
+			if lvs[i]==level then
+				alternative_level = true
+				break
+			end
+		end
+	end
+	return card_is_level(c,table.unpack(lvs)) or alternative_level
+end
+
+Card.IsLevelBelow=function(c,lv)
+	local alternative_level = false
+	if c:IsHasEffect(EFFECT_GRANT_LEVEL) then
+		local ef={c:IsHasEffect(EFFECT_GRANT_LEVEL)}
+		local te1=ef[#ef]
+		local cf=te1:GetValue()
+		local typ=aux.GetValueType(cf)
+		local level
+		if not cf then
+			level = 0
+		elseif typ=="number" then
+			level = cf
+		elseif typ=="function" then
+			level = cf(self_reference_effect,c)
+		end
+		if level<=lv then
+			alternative_level = true
+		end
+	end
+	return card_is_level_below(c,lv) or alternative_level
+end
+
+Card.IsLevelAbove=function(c,lv)
+	local alternative_level = false
+	if c:IsHasEffect(EFFECT_GRANT_LEVEL) then
+		local ef={c:IsHasEffect(EFFECT_GRANT_LEVEL)}
+		local te1=ef[#ef]
+		local cf=te1:GetValue()
+		local typ=aux.GetValueType(cf)
+		local level
+		if not cf then
+			level = 0
+		elseif typ=="number" then
+			level = cf
+		elseif typ=="function" then
+			level = cf(self_reference_effect,c)
+		end
+		if level>=lv then
+			alternative_level = true
+		end
+	end
+	return card_is_level_above(c,lv) or alternative_level
+end
+
+Card.IsDestructable=function(c,...)
+	local x={...}
+	local e=x[1]
+	local r=x[2]
+	local tp=x[3]
+	if r and r&REASON_COST>0 then
+		for _,ce in ipairs({c:IsHasEffect(EFFECT_INDESTRUCTABLE_COST)}) do
+			local val=ce:GetValue()
+			if val and type(val)=="number" then
+				return false
+			elseif type(val)=="function" and val(ce,e,tp) then
+				return false
+			end
+		end
+		return true
+	else
+		return card_is_destructable(c,table.unpack(x))
+	end
 end
 
 --Custom Functions
@@ -824,6 +946,8 @@ EFFECT_TYPE_TRIGGER=EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_TRIGGER_F
 EFFECT_TYPE_QUICK=EFFECT_TYPE_QUICK_O+EFFECT_TYPE_QUICK_F
 EFFECT_TYPE_CHAIN_STARTER=EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_TRIGGER_F+EFFECT_TYPE_QUICK_O+EFFECT_TYPE_QUICK_F+EFFECT_TYPE_ACTIVATE+EFFECT_TYPE_IGNITION
 
+TYPE_ST = TYPE_SPELL+TYPE_TRAP
+
 --glitchy custom categories (apply with e:SetGlitchyCategory)
 GLCATEGORY_PLACE_SELF_AS_CONTINUOUS_TRAP=0x1
 GLCATEGORY_ED_DRAW=0x8000
@@ -836,9 +960,11 @@ EFFECT_CANNOT_ACTIVATE_LMARKER=8000
 EFFECT_CANNOT_DEACTIVATE_LMARKER=8001
 EFFECT_PRE_LOCATION=8002
 EFFECT_NO_ARCHETYPE=8003
+
 EFFECT_BECOME_HOPT=99977755
 EFFECT_SYNCHRO_MATERIAL_EXTRA=26134837
 EFFECT_SYNCHRO_MATERIAL_MULTIPLE=26134838
+EFFECT_REVERSE_WHEN_IF=48928491
 
 --glitchy's custom events
 EVENT_ACTIVATE_LINK_MARKER=9000
@@ -1035,6 +1161,22 @@ function Effect.GLString(e,id,...)
 	-- else
 		e:SetDescription(aux.Stringid(e:GetOwner():GetOriginalCode(),id))
 	--end
+end
+
+function Duel.IsMainPhase(tp)
+	return (not tp or Duel.GetTurnPlayer()==tp) and (Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2)
+end
+function Duel.IsBattlePhase(tp)
+	local ph=Duel.GetCurrentPhase()
+	return (not tp or Duel.GetTurnPlayer()==tp) and ph>=PHASE_BATTLE_START and ph<=PHASE_BATTLE
+end
+
+function Auxiliary.ActivateST(c)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	c:RegisterEffect(e1)
+	return e1
 end
 
 --Returns all the MMZ the arrows PRINTED on the card (c) point to, REGARDLESS of the card type (even if it is not an active Link Monster) or of the location it is in (MZONE/SZONE)
@@ -1736,12 +1878,10 @@ function Card.IsInExtraMZone(c,tp)
 	return c:IsLocation(LOCATION_MZONE) and c:GetSequence()>4 and (not tp or c:IsControler(tp))
 end
 
-function Duel.IsMainPhase()
-	return Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2
-end
 function Duel.GetTargetCards(e)
 	return Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
 end
+
 function Auxiliary.ReleaseCostFilter(c,f,...)
 	return c:IsFaceup() and c:IsReleasable() and c:IsHasEffect(59160188) 
 		and (not f or f(c,table.unpack({...})))
