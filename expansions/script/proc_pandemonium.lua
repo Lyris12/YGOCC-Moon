@@ -743,7 +743,20 @@ end
 function Auxiliary.PandActTarget(forced,...)
 	local fx={...}
 	return  function(e,tp,eg,ep,ev,re,r,rp,chk)
-				if chk==0 then return true end
+				if chk==0 then
+					if not forced then
+						return true
+					else
+						if #fx==0 then return true end
+						for i,xe in ipairs(fx) do
+							local tg=xe:GetTarget()
+							if tg and tg(e,tp,eg,ep,ev,re,r,rp,0) then
+								return true
+							end
+						end
+						return false
+					end
+				end
 				local c=e:GetHandler()
 				c:RegisterFlagEffect(726,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CANNOT_DISABLE,1)
 				if #fx==0 then

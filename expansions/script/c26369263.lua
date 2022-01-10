@@ -75,7 +75,9 @@ end
 function s.sctg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp) and Duel.IsExistingMatchingCard(Card.IsAbleToDeck,tp,0,LOCATION_HAND,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CARDTYPE)
-	e:SetLabel(Duel.AnnounceType(tp))
+	local typ=Duel.AnnounceType(tp)
+	local truetype=(typ==0) and TYPE_MONSTER or (typ==1) and TYPE_SPELL or TYPE_TRAP
+	e:SetLabel(truetype)
 	Duel.SetTargetPlayer(1-tp)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,1,1-tp,LOCATION_HAND)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,1-tp,0)
@@ -92,8 +94,8 @@ function s.scop(e,tp,eg,ep,ev,re,r,rp)
 	local g=h:Filter(s.tdfilter,nil,typ)
 	if g:GetCount()==0 then return end
 	local ct=Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
-	Duel.ShuffleDeck(p)
 	if ct==0 then return end
+	Duel.ShuffleDeck(p)
 	Duel.BreakEffect()
 	Duel.Draw(p,ct,REASON_EFFECT)
 end
