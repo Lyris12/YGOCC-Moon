@@ -926,7 +926,7 @@ Card.IsXyzLevel=function(c,sc,lv)
 end
 
 function Auxiliary.XyzMaterialComplete(c,sc,lv,tp)
-	if not c:IsCanBeXyzMaterial(sc) or not c:IsXyzLevel(sc,lv) then return false end
+	if not c:IsCanBeXyzMaterial(sc) then return false end
 	if c:IsLocation(LOCATION_MZONE) then
 		return c:IsFaceup() and (c:IsControler(tp) or c:IsHasEffect(EFFECT_XYZ_MATERIAL))
 	else
@@ -948,12 +948,12 @@ Duel.CheckXyzMaterial=function(sc,f,lv,min,max,mg)
 	if res then
 		return true
 	else
-		local extramats=Duel.GetMatchingGroup(Auxiliary.XyzMaterialComplete,0,0xff,0xff,nil,sc,lv,self_reference_effect:GetHandlerPlayer())
+		local extramats=Duel.GetMatchingGroup(Auxiliary.XyzMaterialComplete,0,0xff,0xff,nil,sc,lv,sc:GetControler())
 		return duel_check_xyz_mat(sc,f,lv,min,max,extramats)
 	end
 end
 Duel.SelectXyzMaterial=function(p,sc,f,lv,min,max,mg)
-	local extramats=Duel.GetMatchingGroup(Auxiliary.XyzMaterialComplete,0,0xff,0xff,nil,sc,lv,self_reference_effect:GetHandlerPlayer())
+	local extramats=Duel.GetMatchingGroup(Auxiliary.XyzMaterialComplete,0,0xff,0xff,nil,sc,lv,p)
 	return duel_select_xyz_mat(p,sc,f,lv,min,max,extramats)
 end
 
