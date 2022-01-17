@@ -27,8 +27,7 @@ function c88567312.chop(e,tp,eg,ep,ev,re,r,rp)
   Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
   local sg=g:Select(tp,3,3,nil)
   Duel.ConfirmCards(1-tp,sg)
-  Duel.ShuffleDeck(tp)
-  local tg=sg:Select(1-tp,1,1,nil)
+  local tg=sg:RandomSelect(1-tp,1)
   Duel.SendtoHand(tg,nil,REASON_EFFECT)
   end
 end
