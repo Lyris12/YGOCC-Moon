@@ -16,7 +16,7 @@ function s.initial_effect(c)
 	p1:SetTarget(s.acttg)
 	p1:SetOperation(s.actop)
 	c:RegisterEffect(p1)
-	aux.EnablePandemoniumAttribute(c,p1,true,TYPE_PANDEMONIUM+TYPE_EFFECT,false,false,1,false,true)
+	aux.EnablePandemoniumAttribute(c,p1,true,TYPE_PANDEMONIUM+TYPE_EFFECT+TYPE_TUNER,false,false,1,false,true)
 	--set
 	local p2=Effect.CreateEffect(c)
 	p2:GLString(1)
@@ -81,15 +81,15 @@ function s.actcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.acttg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsPlayerCanSpecialSummonMonster(tp,id,0x2c2,TYPE_MONSTER+TYPE_EFFECT+TYPE_PANDEMONIUM,1200,1750,3,RACE_PSYCHO,ATTRIBUTE_LIGHT)
+		and Duel.IsPlayerCanSpecialSummonMonster(tp,id,0x2c2,TYPE_MONSTER+TYPE_EFFECT+TYPE_PANDEMONIUM+TYPE_TUNER,1200,1750,3,RACE_PSYCHO,ATTRIBUTE_LIGHT)
 	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
 function s.actop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_MZONE)<=0
-	or not Duel.IsPlayerCanSpecialSummonMonster(tp,id,0x2c2,TYPE_MONSTER+TYPE_EFFECT+TYPE_PANDEMONIUM,1200,1750,3,RACE_PSYCHO,ATTRIBUTE_LIGHT) then return end
-	c:AddMonsterAttribute(TYPE_EFFECT+TYPE_PANDEMONIUM)
+	or not Duel.IsPlayerCanSpecialSummonMonster(tp,id,0x2c2,TYPE_MONSTER+TYPE_EFFECT+TYPE_PANDEMONIUM+TYPE_TUNER,1200,1750,3,RACE_PSYCHO,ATTRIBUTE_LIGHT) then return end
+	c:AddMonsterAttribute(TYPE_EFFECT+TYPE_PANDEMONIUM+TYPE_TUNER)
 	Duel.SpecialSummon(c,0,tp,tp,true,false,POS_FACEUP)
 end
 

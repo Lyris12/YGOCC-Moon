@@ -71,7 +71,7 @@ function s.setcon(e,tp,eg,ep,ev,re,r,rp)
 	return ct>0
 end
 function s.setfilter(c)
-	return c:IsSetCard(0x2c2) and c:IsSSetable() and not c:IsForbidden() and not c:IsCode(id)
+	return c:IsType(TYPE_TRAP) and c:IsSetCard(0x2c2) and c:IsSSetable() and not c:IsForbidden() and not c:IsCode(id)
 end
 function s.settg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
