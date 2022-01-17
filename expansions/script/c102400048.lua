@@ -1,6 +1,6 @@
 --created & coded by Lyris, art from Cardfight!! Vanguard V's "Masked Magician, Harri"
---エニグマフォーモスト・ハーリエ
-local s,id=GetID()
+--エニグマフォーマスター・ハーリエ
+local s,id,off=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0xc74),4,2,nil,nil,99)

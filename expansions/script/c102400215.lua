@@ -1,6 +1,6 @@
 --created by LeonDuvall of Discord, coded by Lyris
 --YC.Orgのアーキテクト・レオン
-local s,id=GetID()
+local s,id,off=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddLinkProcedure(c,aux.FilterBoolFunction(Card.IsLinkSetCard,0x96b),1,1,aux.FilterBoolFunction(aux.NOT(Group.IsExists),Card.IsLinkCode,1,nil,id))

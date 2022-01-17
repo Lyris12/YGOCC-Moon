@@ -1,6 +1,6 @@
 --created & coded by Lyris, art by GENZOMAN of DeviantArt
 --襲雷神ズース
-local s,id=GetID()
+local s,id,off=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)

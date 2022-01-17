@@ -1,6 +1,6 @@
 --created & coded by Lyris, art by Xeno aka Code Coral of Discord
 --サイバー・エンジェル・カラニ
-local s,id=GetID()
+local s,id,off=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddLinkProcedure(c,aux.FilterBoolFunction(Card.IsLinkRace,RACE_FAIRY),2,2)

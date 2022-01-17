@@ -1,6 +1,6 @@
 --created by NovaTsukimori, coded by Lyris, art from Sailor Moon R Episode 9
 --襲雷サンサーラ･ボルト
-local s,id=GetID()
+local s,id,off=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)

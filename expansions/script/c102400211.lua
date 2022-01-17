@@ -1,6 +1,6 @@
 --created & coded by Lyris
 --ローマ・キー・XV
-local s,id=GetID()
+local s,id,off=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	local e1=Effect.CreateEffect(c)

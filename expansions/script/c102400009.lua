@@ -1,6 +1,6 @@
---created & coded by Lyris, art based on "Moon Mirror Shield"
+--created & coded by Lyris, art from "Moon Mirror Shield"
 --インライトメント・ムーン盾
-local s,id=GetID()
+local s,id,off=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(1109)

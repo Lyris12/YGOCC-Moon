@@ -1,6 +1,6 @@
 --created & coded by Lyris, art at http://i.ytimg.com/vi/2tvp5emvTzc/0.jpg
 --剣主トレーニング
-local s,id=GetID()
+local s,id,off=GetID()
 function s.initial_effect(c)
 	c:SetUniqueOnField(1,0,id)
 	local e0=Effect.CreateEffect(c)

@@ -1,6 +1,6 @@
 --created by LionHeartKIng, coded by Lyris, art from Dragon Story
 --機光襲雷竜－プランク
-local s,id=GetID()
+local s,id,off=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddLinkProcedure(c,aux.FilterBoolFunction(Card.IsLinkSetCard,0x7c4),2,2)

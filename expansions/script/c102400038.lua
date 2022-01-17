@@ -1,6 +1,6 @@
 --created & coded by Lyris
 --スピード・ストライプ・リーレ・ドラゴン
-local s,id=GetID()
+local s,id,off=GetID()
 function s.initial_effect(c)
 	aux.AddOrigRelayType(c)
 	aux.AddRelayProc(c)

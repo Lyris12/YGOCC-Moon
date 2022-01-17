@@ -1,6 +1,6 @@
 --created & coded by Lyris
 --鎧刻竜－サイバー・ダーク・ドラゴンストライク
-local s,id=GetID()
+local s,id,off=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddFusionProcCode2(c,id-5,id-4,true,true)

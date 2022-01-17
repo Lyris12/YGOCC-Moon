@@ -1,6 +1,6 @@
 --created by LeonDuvall of Discord, coded by Lyris, art from Cardfight!! Vanguard's "Quaking Heavenly Dragon, Astraios Dragon"
 --YC.Orgの襲雷タクティシャン・ライリス
-local s,id=GetID()
+local s,id,off=GetID()
 function s.initial_effect(c)
 	aux.EnablePendulumAttribute(c)
 	local e0=Effect.CreateEffect(c)

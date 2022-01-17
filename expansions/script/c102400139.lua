@@ -1,6 +1,6 @@
 --created & coded by Lyris
 --襲雷降雨
-local s,id=GetID()
+local s,id,off=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)

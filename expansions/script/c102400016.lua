@@ -1,6 +1,6 @@
 --created & coded by Lyris, art from Yu-Gi-Oh! Duel Monsters Episode 156
 --インライトメント・アルティマ ケースト
-local s,id=GetID()
+local s,id,off=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddCodeList(c,id-9)

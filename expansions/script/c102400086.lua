@@ -1,6 +1,6 @@
 --created & coded by Lyris, art from Naruto Episode 33
 --RUM呪わらし剣主
-local s,id=GetID()
+local s,id,off=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)

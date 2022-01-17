@@ -1,6 +1,6 @@
---created & coded by Lyris
+--created & coded by Lyris, art from "Degenerate Circuit"
 --サイバー・ダーク・コンダクター
-local s,id=GetID()
+local s,id,off=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(1068)

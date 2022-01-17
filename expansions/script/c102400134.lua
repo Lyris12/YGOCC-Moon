@@ -1,6 +1,6 @@
 --created & coded by Lyris, art by 匈歌ハトリ on Pixiv
 --襲雷大降り
-local s,id=GetID()
+local s,id,off=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)

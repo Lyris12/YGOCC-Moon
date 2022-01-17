@@ -1,6 +1,6 @@
 --created & coded by Lyris, art at http://blog-imgs-65.fc2.com/m/a/t/matome2chmatome2ch/dbd0e7f2-s.jpg
 --襲雷属性－地球
-local s,id=GetID()
+local s,id,off=GetID()
 function s.initial_effect(c)
 	aux.EnablePendulumAttribute(c)
 	local e1=Effect.CreateEffect(c)

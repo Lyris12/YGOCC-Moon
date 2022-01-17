@@ -1,6 +1,6 @@
 --created & coded by Lyris, art from Cardfight!! Vanguard's "Dragonic Waterfall"
 --ハートブレイカー・ドラゴン
-local s,id=GetID()
+local s,id,off=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)

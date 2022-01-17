@@ -1,6 +1,6 @@
 --created & coded by Lyris, art at http://safebooru.org/images/745/74311c251b3ed100874bb04f02927debddd05beb.jpg
 --襲雷ストアイク
-local s,id=GetID()
+local s,id,off=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)

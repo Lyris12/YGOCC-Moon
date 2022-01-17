@@ -1,6 +1,6 @@
 --created by NovaTsukimori, coded by Lyris, art by Meerin of DeviantArt
---襲雷メカドラゴン･イーチー
-local s,id=GetID()
+--襲雷メカドラゴン・イーチー
+local s,id,off=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)

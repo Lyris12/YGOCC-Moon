@@ -1,6 +1,6 @@
 --created & coded by Lyris, art at http://www.thesmartgirlstravelguide.com/wp-content/uploads/2013/05/fin5675.jpg
 --十二分虹－ザ・クローマ・キー
-local s,id=GetID()
+local s,id,off=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)

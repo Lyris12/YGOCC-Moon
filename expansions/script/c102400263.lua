@@ -1,6 +1,6 @@
 --created & coded by Lyris, art at http://deepseahydrothermal.weebly.com/uploads/6/0/1/8/60182675/830685177.jpg
 --アーマリンの公助
-local s,id=GetID()
+local s,id,off=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)

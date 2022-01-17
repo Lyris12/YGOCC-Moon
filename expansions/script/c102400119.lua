@@ -1,6 +1,6 @@
 --created by NovaTsukimori, coded by Lyris, art at https://www.zerochan.net/632949
---襲雷メカドラゴン･ニ
-local s,id=GetID()
+--襲雷メカドラゴン・ニ
+local s,id,off=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)

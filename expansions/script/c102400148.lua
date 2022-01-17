@@ -1,6 +1,6 @@
 --created & coded by Lyris, art from Cardfight!! Vanguard's "Sword Magician, Sarah"
---エニグマフォーモスト・サラーフ
-local s,id=GetID()
+--エニグマフォーマスター・サラーフ
+local s,id,off=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddXyzProcedureLevelFree(c,aux.FilterBoolFunction(Card.IsXyzLevel,c,4),aux.drccheck,2,2)

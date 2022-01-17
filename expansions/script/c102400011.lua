@@ -1,6 +1,6 @@
---created & coded by Lyris, art based on "Crystal Beast Cobalt Eagle"
+--created & coded by Lyris
 --インライトメント・眼光炯々ゲイザー
-local s,id=GetID()
+local s,id,off=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddOrigEvolveType(c)

@@ -1,6 +1,6 @@
 --created & coded by Lyris, art from Cardfight!! Vanguard's "Ice Crest Goddess, Svava"
 --雪の妖精 キオニ
-local s,id=GetID()
+local s,id,off=GetID()
 function s.initial_effect(c)
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)

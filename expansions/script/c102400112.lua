@@ -1,6 +1,6 @@
 --created & coded by Lyris, art by Takayama Toshiaki
 --襲雷属性－PSYph
-local s,id=GetID()
+local s,id,off=GetID()
 function s.initial_effect(c)
 	aux.EnablePendulumAttribute(c)
 	local e1=Effect.CreateEffect(c)

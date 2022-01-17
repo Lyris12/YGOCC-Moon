@@ -1,6 +1,6 @@
 --created & coded by Lyris, art by Akira-san on MiniTokyo.net
 --天剣主九ナコ
-local s,id=GetID()
+local s,id,off=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0xbb2),4,2)

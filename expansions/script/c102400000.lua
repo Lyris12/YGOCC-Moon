@@ -1,6 +1,6 @@
 --created & coded by Lyris, art from Cardfight!! Vanguard's Soul Charge
 --ソウル・リチャージ
-local s,id=GetID()
+local s,id,off=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
@@ -29,6 +29,7 @@ function s.initial_effect(c)
 end
 function s.checkop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=re:GetHandler()
+	e:SetLabelObject(tc)
 	return re:IsActiveType(TYPE_XYZ) and tc:IsLocation(LOCATION_ONFIELD) and tc:IsControler(e:GetLabel())
 end
 function s.attg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -36,14 +37,14 @@ function s.attg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local p=rp
 	if tp~=0 then p=1-p end
 	Duel.Hint(HINT_OPSELECTED,0,aux.Stringid(id,p))
-	local tc=Group.FromCards(re:GetHandler())
+	local tc=Group.FromCards(re:GetHandler(),e:GetLabelObject())
 	Duel.HintSelection(tc)
 	Duel.SetTargetCard(tc)
 end
 function s.atop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if not c:IsRelateToEffect(e) or not tc:IsRelateToEffect(e) or not tc:IsType(TYPE_XYZ) then return end
+	if not c:IsRelateToEffect(e) or not tc or not tc:IsRelateToEffect(e) or not tc:IsType(TYPE_XYZ) then return end
 	local p=e:GetLabel()
 	local g=Duel.GetDecktopGroup(p,1)
 	if #g==0 then return end

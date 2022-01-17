@@ -1,6 +1,6 @@
 --created & coded by Lyris, art by pamansazz of DeviantArt
 --機光襲雷竜－ニューン
-local s,id=GetID()
+local s,id,off=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddFusionProcFun2(c,aux.FilterBoolFunction(Card.IsSetCard,0x7c4),aux.AND(aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_LIGHT),aux.FilterBoolFunction(Card.IsRace,RACE_DRAGON)),true)

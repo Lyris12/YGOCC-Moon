@@ -1,6 +1,6 @@
 --created by LionHeartKIng, coded by Lyris
 --フェイトヒーロー・フュージョン
-local s,id=GetID()
+local s,id,off=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON)

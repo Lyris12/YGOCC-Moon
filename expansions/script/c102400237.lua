@@ -1,6 +1,6 @@
 --created & coded by Lyris, art at https://78.media.tumblr.com/e349861ac74f1e6d72f42fa7ad8cd8f7/tumblr_p2oxlkOMsG1w0w6bio1_1280.jpg
 --ニュートリックス・ホリー
-local s,id=GetID()
+local s,id,off=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_QUICK_O)

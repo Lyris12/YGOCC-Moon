@@ -1,6 +1,6 @@
 --created & coded by Lyris, art at http://www.zerochan.net/613024
 --襲雷属性－水
-local s,id=GetID()
+local s,id,off=GetID()
 function s.initial_effect(c)
 	aux.EnablePendulumAttribute(c)
 	local e1=Effect.CreateEffect(c)

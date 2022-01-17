@@ -1,6 +1,6 @@
 --created & coded by Lyris, art from Cardfight!! Vanguard's "Mistress Hurricane"
---エニグマフォーモスト・ハリケン
-local s,id=GetID()
+--エニグマフォーマスター・ハリケン
+local s,id,off=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0xc74),5,3,s.ovfilter,aux.Stringid(id,0))

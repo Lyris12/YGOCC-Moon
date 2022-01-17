@@ -1,6 +1,6 @@
 --created & coded by Lyris, art by Southern-Panda of DeviantArt
 --ニュートリックス・キャンディ
-local s,id=GetID()
+local s,id,off=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddLinkProcedure(c,aux.FilterBoolFunction(Card.IsLinkType,TYPE_LINK),1,1,aux.FilterBoolFunction(aux.NOT(Group.IsExists),Card.IsLinkCode,1,nil,id))

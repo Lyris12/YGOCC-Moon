@@ -1,6 +1,6 @@
 --created & coded by Lyris, art from Three Kingdoms
 --剣主アレ四ゃンド王
-local s,id=GetID()
+local s,id,off=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0xbb2),4,2)

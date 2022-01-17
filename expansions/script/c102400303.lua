@@ -1,6 +1,6 @@
 --created by Walrus of Discord, coded by Lyris
---割れ目よりの武器
-local s,id=GetID()
+--カオス・コール
+local s,id,off=GetID()
 function s.initial_effect(c)
 	c:SetUniqueOnField(1,0,id)
 	local e1=Effect.CreateEffect(c)

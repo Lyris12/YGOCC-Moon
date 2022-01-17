@@ -1,6 +1,6 @@
 --created & coded by Lyris, art by xTheDragonRebornx of DeviantArt
 --襲雷竜－銀河
-local s,id=GetID()
+local s,id,off=GetID()
 function s.initial_effect(c)
 	if not s.global_check then
 		s.global_check=true
@@ -64,7 +64,7 @@ function s.initial_effect(c)
 				if tc:IsHasEffect(id) then dg:AddCard(tc)
 				else fg:AddCard(tc) end
 			end
-			local ct=f7(dg,r|REASON_DESTROY)+f7(fg,r)
+			local ct=Duel.Destroy (dg,r|REASON_RELEASE)+f7(fg,r)
 			og:Merge((dg+fg):Filter(function(tc) return not tc:IsLocation(tc:GetPreviousLocation()) end,nil))
 			return ct
 		end

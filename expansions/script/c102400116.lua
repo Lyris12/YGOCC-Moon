@@ -1,6 +1,6 @@
 --created & coded by Lyris
 --襲雷竜－オブシディアン
-local s,id=GetID()
+local s,id,off=GetID()
 function s.initial_effect(c)
 	aux.EnablePendulumAttribute(c)
 	local e1=Effect.CreateEffect(c)

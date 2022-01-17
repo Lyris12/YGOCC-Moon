@@ -1,6 +1,6 @@
 --created & coded by Lyris
 --機光襲雷竜－ビッグバン
-local s,id=GetID()
+local s,id,off=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddFusionProcFunRep(c,s.ffilter,2,true)

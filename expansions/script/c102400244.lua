@@ -1,6 +1,6 @@
 --created & coded by Lyris, art by florainbloom of DeviantArt
 --ニュートリックス・ダルスィー
-local s,id=GetID()
+local s,id,off=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddLinkProcedure(c,nil,2,99,s.lcheck)

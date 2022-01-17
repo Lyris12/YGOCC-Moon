@@ -1,6 +1,6 @@
 --created & coded by Lyris, art by CoolCatFlora of DeviantArt
 --ニュートリックス・アイスィー
-local s,id=GetID()
+local s,id,off=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddLinkProcedure(c,nil,3,99,s.lcheck)

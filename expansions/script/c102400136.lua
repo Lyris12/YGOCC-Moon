@@ -1,6 +1,6 @@
 --created by LionHeartKIng, coded by Lyris, art at http://nicolelbates.com/wp-content/uploads/2012/07/Lightning-Bolt-by-Todd-Secki.jpg
 --襲雷ラッシュ
-local s,id=GetID()
+local s,id,off=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_DESTROY+CATEGORY_DRAW)
