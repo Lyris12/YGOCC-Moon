@@ -14,6 +14,7 @@ EFFECT_GRANT_LEVEL					=1503
 EFFECT_REMEMBER_GRANTED_LEVEL		=1504
 EFFECT_REMEMBER_XYZ_HOLDER			=1505
 EFFECT_INDESTRUCTABLE_COST			=1506
+EFFECT_EXTRA_XYZ_MATERIAL			=1507
 
 TYPE_CUSTOM							=0
 CTYPE_CUSTOM						=0
@@ -60,10 +61,12 @@ function Card.IsCustomReason(c,rs)
 end
 --overwrite functions
 local is_type, card_remcounter, duel_remcounter, effect_set_target_range, effect_set_reset, add_xyz_proc, add_xyz_proc_nlv, duel_overlay, duel_set_lp, duel_select_target, duel_banish, card_check_remove_overlay_card, is_reason, duel_check_tribute, select_tribute,card_sethighlander,
-	card_is_facedown, card_is_able_to_remove, card_is_able_to_remove_as_cost, card_is_able_to_hand, card_is_can_be_ssed, card_get_level, card_get_previous_level, card_is_level, card_is_level_below, card_is_level_above, card_is_destructable = 
+	card_is_facedown, card_is_able_to_remove, card_is_able_to_remove_as_cost, card_is_able_to_hand, card_is_can_be_ssed, card_get_level, card_get_previous_level, card_is_level, card_is_level_below, card_is_level_above, card_is_destructable, card_get_syn_level, card_get_rit_level, card_is_xyz_level,
+	duel_check_xyz_mat, duel_select_xyz_mat = 
 	
 	Card.IsType, Card.RemoveCounter, Duel.RemoveCounter, Effect.SetTargetRange, Effect.SetReset, Auxiliary.AddXyzProcedure, Auxiliary.AddXyzProcedureLevelFree, Duel.Overlay, Duel.SetLP, Duel.SelectTarget, Duel.Remove, Card.CheckRemoveOverlayCard, Card.IsReason, Duel.CheckTribute, Duel.SelectTribute, Card.SetUniqueOnField,
-	Card.IsFacedown, Card.IsAbleToRemove, Card.IsAbleToRemoveAsCost, Card.IsAbleToHand, Card.IsCanBeSpecialSummoned, Card.GetLevel, Card.GetPreviousLevelOnField, Card.IsLevel, Card.IsLevelBelow, Card.IsLevelAbove, Card.IsDestructable
+	Card.IsFacedown, Card.IsAbleToRemove, Card.IsAbleToRemoveAsCost, Card.IsAbleToHand, Card.IsCanBeSpecialSummoned, Card.GetLevel, Card.GetPreviousLevelOnField, Card.IsLevel, Card.IsLevelBelow, Card.IsLevelAbove, Card.IsDestructable, Card.GetSynchroLevel, Card.GetRitualLevel, Card.IsXyzLevel,
+	Duel.CheckXyzMaterial, Duel.SelectXyzMaterial
 
 dofile("expansions/script/proc_evolute.lua") --Evolutes
 dofile("expansions/script/proc_conjoin.lua") --Conjoints
@@ -485,24 +488,58 @@ Card.IsCanBeSpecialSummoned=function(c,e,sumtype,sump,nocheck,nolimit,...)
 end
 
 Card.GetLevel=function(c)
-	if card_get_level(c)==0 and c:IsHasEffect(EFFECT_GRANT_LEVEL) then
+	if (card_get_level(c)==0 or not card_get_level(c)) and c:IsHasEffect(EFFECT_GRANT_LEVEL) then
 		local ef={c:IsHasEffect(EFFECT_GRANT_LEVEL)}
 		local te1=ef[#ef]
 		local cf=te1:GetValue()
 		local typ=aux.GetValueType(cf)
+		local level
 		if not cf then
-			return 0
+			level=0
 		elseif typ=="number" then
-			return cf
+			level=cf
 		elseif typ=="function" then
-			return cf(self_reference_effect,c)
+			level=cf(te1,c)
 		end
+		
+		if c:IsHasEffect(EFFECT_UPDATE_LEVEL) or c:IsHasEffect(EFFECT_CHANGE_LEVEL) then
+			local l={}
+			if c:IsHasEffect(EFFECT_UPDATE_LEVEL) then
+				for _,v in ipairs({c:IsHasEffect(EFFECT_UPDATE_LEVEL)}) do
+				   table.insert(l,v)
+				end
+			end
+			if c:IsHasEffect(EFFECT_CHANGE_LEVEL) then
+				for _,v in ipairs({c:IsHasEffect(EFFECT_CHANGE_LEVEL)}) do
+				   table.insert(l,v)
+				end
+			end
+			table.sort(l, function(a,b) return a:GetFieldID() < b:GetFieldID() end)
+			for _,ce in ipairs(l) do
+				if ce:GetCode()==EFFECT_UPDATE_LEVEL then
+					local val=ce:GetValue()
+					if aux.GetValueType(val)=="number" then
+						level=level+val
+					else
+						level=level+val(ce,c)
+					end
+				else
+					local val=ce:GetValue()
+					if aux.GetValueType(val)=="number" then
+						level=val
+					else
+						level=val(ce,c)
+					end
+				end
+			end
+		end
+		return level
 	end
 	return card_get_level(c)
 end
 
 Card.GetPreviousLevelOnField=function(c)
-	if card_get_previous_level(c)==0 and c:IsHasEffect(EFFECT_REMEMBER_GRANTED_LEVEL) then
+	if (card_get_previous_level(c)==0 or not card_get_previous_level(c)) and c:IsHasEffect(EFFECT_REMEMBER_GRANTED_LEVEL) then
 		local ef={c:IsHasEffect(EFFECT_REMEMBER_GRANTED_LEVEL)}
 		local te1=ef[#ef]
 		local cf=te1:GetValue()
@@ -512,7 +549,7 @@ Card.GetPreviousLevelOnField=function(c)
 		elseif typ=="number" then
 			return cf
 		elseif typ=="function" then
-			return cf(self_reference_effect,c)
+			return cf(te1,c)
 		end
 	end
 	return card_get_previous_level(c)
@@ -520,8 +557,7 @@ end
 
 Card.IsLevel=function(c,...)
 	local lvs={...}
-	local alternative_level = false
-	if c:IsHasEffect(EFFECT_GRANT_LEVEL) then
+	if (card_get_level(c)==0 or not card_get_level(c)) and c:IsHasEffect(EFFECT_GRANT_LEVEL) then
 		local ef={c:IsHasEffect(EFFECT_GRANT_LEVEL)}
 		local te1=ef[#ef]
 		local cf=te1:GetValue()
@@ -532,21 +568,53 @@ Card.IsLevel=function(c,...)
 		elseif typ=="number" then
 			level = cf
 		elseif typ=="function" then
-			level = cf(self_reference_effect,c)
+			level = cf(te1,c)
 		end
-		for i=1,#lvs do
-			if lvs[i]==level then
-				alternative_level = true
-				break
+		
+		if c:IsHasEffect(EFFECT_UPDATE_LEVEL) or c:IsHasEffect(EFFECT_CHANGE_LEVEL) then
+			local l={}
+			if c:IsHasEffect(EFFECT_UPDATE_LEVEL) then
+				for _,v in ipairs({c:IsHasEffect(EFFECT_UPDATE_LEVEL)}) do
+				   table.insert(l,v)
+				end
+			end
+			if c:IsHasEffect(EFFECT_CHANGE_LEVEL) then
+				for _,v in ipairs({c:IsHasEffect(EFFECT_CHANGE_LEVEL)}) do
+				   table.insert(l,v)
+				end
+			end
+			table.sort(l, function(a,b) return a:GetFieldID() < b:GetFieldID() end)
+			for _,ce in ipairs(l) do
+				if ce:GetCode()==EFFECT_UPDATE_LEVEL then
+					local val=ce:GetValue()
+					if aux.GetValueType(val)=="number" then
+						level=level+val
+					else
+						level=level+val(ce,c)
+					end
+				else
+					local val=ce:GetValue()
+					if aux.GetValueType(val)=="number" then
+						level=val
+					else
+						level=val(ce,c)
+					end
+				end
 			end
 		end
+				
+		for i=1,#lvs do
+			if lvs[i]==level then
+				return true
+			end
+		end
+		return false
 	end
-	return card_is_level(c,table.unpack(lvs)) or alternative_level
+	return card_is_level(c,table.unpack(lvs))
 end
 
 Card.IsLevelBelow=function(c,lv)
-	local alternative_level = false
-	if c:IsHasEffect(EFFECT_GRANT_LEVEL) then
+	if (card_get_level(c)==0 or not card_get_level(c)) and c:IsHasEffect(EFFECT_GRANT_LEVEL) then
 		local ef={c:IsHasEffect(EFFECT_GRANT_LEVEL)}
 		local te1=ef[#ef]
 		local cf=te1:GetValue()
@@ -557,18 +625,51 @@ Card.IsLevelBelow=function(c,lv)
 		elseif typ=="number" then
 			level = cf
 		elseif typ=="function" then
-			level = cf(self_reference_effect,c)
+			level = cf(te1,c)
 		end
+		
+		if c:IsHasEffect(EFFECT_UPDATE_LEVEL) or c:IsHasEffect(EFFECT_CHANGE_LEVEL) then
+			local l={}
+			if c:IsHasEffect(EFFECT_UPDATE_LEVEL) then
+				for _,v in ipairs({c:IsHasEffect(EFFECT_UPDATE_LEVEL)}) do
+				   table.insert(l,v)
+				end
+			end
+			if c:IsHasEffect(EFFECT_CHANGE_LEVEL) then
+				for _,v in ipairs({c:IsHasEffect(EFFECT_CHANGE_LEVEL)}) do
+				   table.insert(l,v)
+				end
+			end
+			table.sort(l, function(a,b) return a:GetFieldID() < b:GetFieldID() end)
+			for _,ce in ipairs(l) do
+				if ce:GetCode()==EFFECT_UPDATE_LEVEL then
+					local val=ce:GetValue()
+					if aux.GetValueType(val)=="number" then
+						level=level+val
+					else
+						level=level+val(ce,c)
+					end
+				else
+					local val=ce:GetValue()
+					if aux.GetValueType(val)=="number" then
+						level=val
+					else
+						level=val(ce,c)
+					end
+				end
+			end
+		end
+		
 		if level<=lv then
-			alternative_level = true
+			return true
 		end
+		return false
 	end
-	return card_is_level_below(c,lv) or alternative_level
+	return card_is_level_below(c,lv)
 end
 
 Card.IsLevelAbove=function(c,lv)
-	local alternative_level = false
-	if c:IsHasEffect(EFFECT_GRANT_LEVEL) then
+	if (card_get_level(c)==0 or not card_get_level(c)) and c:IsHasEffect(EFFECT_GRANT_LEVEL) then
 		local ef={c:IsHasEffect(EFFECT_GRANT_LEVEL)}
 		local te1=ef[#ef]
 		local cf=te1:GetValue()
@@ -579,13 +680,47 @@ Card.IsLevelAbove=function(c,lv)
 		elseif typ=="number" then
 			level = cf
 		elseif typ=="function" then
-			level = cf(self_reference_effect,c)
+			level = cf(te1,c)
 		end
+		
+		if c:IsHasEffect(EFFECT_UPDATE_LEVEL) or c:IsHasEffect(EFFECT_CHANGE_LEVEL) then
+			local l={}
+			if c:IsHasEffect(EFFECT_UPDATE_LEVEL) then
+				for _,v in ipairs({c:IsHasEffect(EFFECT_UPDATE_LEVEL)}) do
+				   table.insert(l,v)
+				end
+			end
+			if c:IsHasEffect(EFFECT_CHANGE_LEVEL) then
+				for _,v in ipairs({c:IsHasEffect(EFFECT_CHANGE_LEVEL)}) do
+				   table.insert(l,v)
+				end
+			end
+			table.sort(l, function(a,b) return a:GetFieldID() < b:GetFieldID() end)
+			for _,ce in ipairs(l) do
+				if ce:GetCode()==EFFECT_UPDATE_LEVEL then
+					local val=ce:GetValue()
+					if aux.GetValueType(val)=="number" then
+						level=level+val
+					else
+						level=level+val(ce,c)
+					end
+				else
+					local val=ce:GetValue()
+					if aux.GetValueType(val)=="number" then
+						level=val
+					else
+						level=val(ce,c)
+					end
+				end
+			end
+		end
+		
 		if level>=lv then
-			alternative_level = true
+			return true
 		end
+		return false
 	end
-	return card_is_level_above(c,lv) or alternative_level
+	return card_is_level_above(c,lv)
 end
 
 Card.IsDestructable=function(c,...)
@@ -607,6 +742,221 @@ Card.IsDestructable=function(c,...)
 		return card_is_destructable(c,table.unpack(x))
 	end
 end
+
+Card.GetSynchroLevel=function(c,sc)
+	local synlv=card_get_syn_level(c,sc)
+	local level=false
+	if (card_get_level(c)==0 or not card_get_level(c)) and c:IsHasEffect(EFFECT_GRANT_LEVEL) then
+		local ef={c:IsHasEffect(EFFECT_GRANT_LEVEL)}
+		for _,te1 in ipairs(ef) do
+			local cf=te1:GetValue()
+			local typ=aux.GetValueType(cf)
+			local templv
+			if not cf then
+				level = 0
+			elseif typ=="number" then
+				level = cf
+			elseif typ=="function" then
+				templv,sumtyp = cf(te1,c,sc)
+				if not sumtyp or sumtyp&TYPE_SYNCHRO>0 then
+					level=templv
+				else
+					level=0
+				end
+			end
+		end
+		if c:IsHasEffect(EFFECT_UPDATE_LEVEL) or c:IsHasEffect(EFFECT_CHANGE_LEVEL) then
+			local l={}
+			if c:IsHasEffect(EFFECT_UPDATE_LEVEL) then
+				for _,v in ipairs({c:IsHasEffect(EFFECT_UPDATE_LEVEL)}) do
+				   table.insert(l,v)
+				end
+			end
+			if c:IsHasEffect(EFFECT_CHANGE_LEVEL) then
+				for _,v in ipairs({c:IsHasEffect(EFFECT_CHANGE_LEVEL)}) do
+				   table.insert(l,v)
+				end
+			end
+			table.sort(l, function(a,b) return a:GetFieldID() < b:GetFieldID() end)
+			for _,ce in ipairs(l) do
+				if ce:GetCode()==EFFECT_UPDATE_LEVEL then
+					local val=ce:GetValue()
+					if aux.GetValueType(val)=="number" then
+						level=level+val
+					else
+						level=level+val(ce,c)
+					end
+				else
+					local val=ce:GetValue()
+					if aux.GetValueType(val)=="number" then
+						level=val
+					else
+						level=val(ce,c)
+					end
+				end
+			end
+		end
+	end
+	if level then
+		if synlv then
+			synlv=level*65536+synlv
+		else
+			synlv=level
+		end
+	end
+	return synlv
+end
+Card.GetRitualLevel=function(c,sc)
+	local synlv=card_get_rit_level(c,sc)
+	local level=false
+	if (card_get_level(c)==0 or not card_get_level(c)) and c:IsHasEffect(EFFECT_GRANT_LEVEL) then
+		local ef={c:IsHasEffect(EFFECT_GRANT_LEVEL)}
+		for _,te1 in ipairs(ef) do
+			local cf=te1:GetValue()
+			local typ=aux.GetValueType(cf)
+			local templv
+			if not cf then
+				level = 0
+			elseif typ=="number" then
+				level = cf
+			elseif typ=="function" then
+				templv,sumtyp = cf(te1,c,sc)
+				if not sumtyp or sumtyp&TYPE_RITUAL>0 then
+					level=templv
+				else
+					level=0
+				end
+			end
+		end
+		if c:IsHasEffect(EFFECT_UPDATE_LEVEL) or c:IsHasEffect(EFFECT_CHANGE_LEVEL) then
+			local l={}
+			if c:IsHasEffect(EFFECT_UPDATE_LEVEL) then
+				for _,v in ipairs({c:IsHasEffect(EFFECT_UPDATE_LEVEL)}) do
+				   table.insert(l,v)
+				end
+			end
+			if c:IsHasEffect(EFFECT_CHANGE_LEVEL) then
+				for _,v in ipairs({c:IsHasEffect(EFFECT_CHANGE_LEVEL)}) do
+				   table.insert(l,v)
+				end
+			end
+			table.sort(l, function(a,b) return a:GetFieldID() < b:GetFieldID() end)
+			for _,ce in ipairs(l) do
+				if ce:GetCode()==EFFECT_UPDATE_LEVEL then
+					local val=ce:GetValue()
+					if aux.GetValueType(val)=="number" then
+						level=level+val
+					else
+						level=level+val(ce,c)
+					end
+				else
+					local val=ce:GetValue()
+					if aux.GetValueType(val)=="number" then
+						level=val
+					else
+						level=val(ce,c)
+					end
+				end
+			end
+		end
+	end
+	if level then
+		synlv=level*65536+synlv
+	end
+	return synlv
+end
+Card.IsXyzLevel=function(c,sc,lv)
+	if (card_get_level(c)==0 or not card_get_level(c)) and c:IsHasEffect(EFFECT_GRANT_LEVEL) then
+		local ef={c:IsHasEffect(EFFECT_GRANT_LEVEL)}
+		local te1=ef[#ef]
+		local cf=te1:GetValue()
+		local typ=aux.GetValueType(cf)
+		local level
+		if not cf then
+			level = 0
+		elseif typ=="number" then
+			level = cf
+		elseif typ=="function" then
+			templv,sumtyp = cf(te1,c,sc)
+			if not sumtyp or sumtyp&TYPE_XYZ>0 then
+				level=templv
+			else
+				level=0
+			end
+		end
+		
+		if c:IsHasEffect(EFFECT_UPDATE_LEVEL) or c:IsHasEffect(EFFECT_CHANGE_LEVEL) then
+			local l={}
+			if c:IsHasEffect(EFFECT_UPDATE_LEVEL) then
+				for _,v in ipairs({c:IsHasEffect(EFFECT_UPDATE_LEVEL)}) do
+				   table.insert(l,v)
+				end
+			end
+			if c:IsHasEffect(EFFECT_CHANGE_LEVEL) then
+				for _,v in ipairs({c:IsHasEffect(EFFECT_CHANGE_LEVEL)}) do
+				   table.insert(l,v)
+				end
+			end
+			table.sort(l, function(a,b) return a:GetFieldID() < b:GetFieldID() end)
+			for _,ce in ipairs(l) do
+				if ce:GetCode()==EFFECT_UPDATE_LEVEL then
+					local val=ce:GetValue()
+					if aux.GetValueType(val)=="number" then
+						level=level+val
+					else
+						level=level+val(ce,c)
+					end
+				else
+					local val=ce:GetValue()
+					if aux.GetValueType(val)=="number" then
+						level=val
+					else
+						level=val(ce,c)
+					end
+				end
+			end
+		end
+		
+		if lv==level then
+			return true
+		end
+		return false
+	end
+	return card_is_xyz_level(c,sc,lv) 
+end
+
+function Auxiliary.XyzMaterialComplete(c,sc,lv,tp)
+	if not c:IsCanBeXyzMaterial(sc) or not c:IsXyzLevel(sc,lv) then return false end
+	if c:IsLocation(LOCATION_MZONE) then
+		return c:IsFaceup() and (c:IsControler(tp) or c:IsHasEffect(EFFECT_XYZ_MATERIAL))
+	else
+		if not c:IsHasEffect(EFFECT_EXTRA_XYZ_MATERIAL) then return false end
+		for _,ce in ipairs({c:IsHasEffect(EFFECT_EXTRA_XYZ_MATERIAL)}) do
+			local val=ce:GetValue()
+			if not val or aux.GetValueType(val)=="number" then
+				return true
+			elseif aux.GetValueType(val)=="function" then
+				return val(ce,c,sc)
+			else
+				return false
+			end
+		end
+	end
+end
+Duel.CheckXyzMaterial=function(sc,f,lv,min,max,mg)
+	local res=duel_check_xyz_mat(sc,f,lv,min,max,mg)
+	if res then
+		return true
+	else
+		local extramats=Duel.GetMatchingGroup(Auxiliary.XyzMaterialComplete,0,0xff,0xff,nil,sc,lv,self_reference_effect:GetHandlerPlayer())
+		return duel_check_xyz_mat(sc,f,lv,min,max,extramats)
+	end
+end
+Duel.SelectXyzMaterial=function(p,sc,f,lv,min,max,mg)
+	local extramats=Duel.GetMatchingGroup(Auxiliary.XyzMaterialComplete,0,0xff,0xff,nil,sc,lv,self_reference_effect:GetHandlerPlayer())
+	return duel_select_xyz_mat(p,sc,f,lv,min,max,extramats)
+end
+
 
 --Custom Functions
 function Auxiliary.TribCheckRecursive(c,tp,mg,sg,sc,ct,min,max,p,zone)
@@ -630,7 +980,7 @@ function Auxiliary.AddEquipProcedure(c,p,f,eqlimit,cost,tg,op,con,ctlimit)
 	e1:SetCategory(CATEGORY_EQUIP)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_CONTINUOUS_TARGET)
 	if ctlimit~=nil then
 		e1:SetCountLimit(1,c:GetCode()+EFFECT_COUNT_CODE_OATH)
 	end
@@ -1172,6 +1522,33 @@ function Auxiliary.ActivateST(c)
 	return e1
 end
 
+function Auxiliary.GetExceptionReset(loc)
+	if loc&LOCATION_ONFIELD>0 then
+		return RESET_TOFIELD
+	elseif loc&LOCATION_GRAVE>0 then
+		return RESET_TOGRAVE
+	elseif loc&LOCATION_REMOVED>0 then
+		return RESET_REMOVE+RESET_TEMP_REMOVE
+	elseif loc&(LOCATION_DECK+LOCATION_EXTRA)>0 then
+		return RESET_TODECK
+	elseif loc&LOCATION_HAND>0 then
+		return RESET_TOHAND
+	else
+		return 0
+	end
+end
+
+function Auxiliary.DeckControlerFilter(c,p)
+	return c:IsLocation(LOCATION_DECK) and c:IsControler(p)
+end
+function Auxiliary.ShuffleCheck(g)
+	for p=0,1 do
+		if g:IsExists(aux.DeckControlerFilter,1,nil,p) then
+			Duel.ShuffleDeck(p)
+		end
+	end
+end
+
 --Returns all the MMZ the arrows PRINTED on the card (c) point to, REGARDLESS of the card type (even if it is not an active Link Monster) or of the location it is in (MZONE/SZONE)
 --If f is set to true, the function only returns the available zones (usable and unoccupied)
 function Auxiliary.GLGetLinkedZoneManually(c,f)
@@ -1685,7 +2062,7 @@ if not global_card_effect_table_global_check then
 			e:SetOperation(Auxiliary.SetOperationResultAsLabel(op))
 		end
 		local condition,cost,tg,op=e:GetCondition(),e:GetCost(),e:GetTarget(),e:GetOperation()
-		if cost and not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()&EFFECT_TYPE_GRANT~=0) then
+		if cost and not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()==EFFECT_TYPE_XMATERIAL or e:GetType()==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or e:GetType()&EFFECT_TYPE_GRANT~=0) then
 			local newcost =	function(e,tp,eg,ep,ev,re,r,rp,chk)
 								self_reference_effect=e
 								if chk==0 then
@@ -1695,7 +2072,7 @@ if not global_card_effect_table_global_check then
 							end
 			e:SetCost(newcost)
 		end
-		if tg and not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()&EFFECT_TYPE_GRANT~=0) then
+		if tg and not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()==EFFECT_TYPE_XMATERIAL or e:GetType()==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or e:GetType()&EFFECT_TYPE_GRANT~=0) then
 			if e:GetCode()==EFFECT_DESTROY_REPLACE or e:GetCode()==EFFECT_SEND_REPLACE then
 				local newtg =	function(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 									self_reference_effect=e
@@ -1716,7 +2093,7 @@ if not global_card_effect_table_global_check then
 				e:SetTarget(newtg)
 			end
 		end
-		if op and not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()&EFFECT_TYPE_GRANT~=0) then
+		if op and not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()==EFFECT_TYPE_XMATERIAL or e:GetType()==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or e:GetType()&EFFECT_TYPE_GRANT~=0) then
 			local newop =	function(e,tp,eg,ep,ev,re,r,rp)
 								self_reference_effect=e
 								op(e,tp,eg,ep,ev,re,r,rp)
