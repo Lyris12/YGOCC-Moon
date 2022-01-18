@@ -948,7 +948,7 @@ Duel.CheckXyzMaterial=function(sc,f,lv,min,max,mg)
 	if res then
 		return true
 	else
-		local extramats=Duel.GetMatchingGroup(Auxiliary.XyzMaterialComplete,0,0xff,0xff,nil,sc,lv,sc:GetControler())
+		local extramats=Duel.GetMatchingGroup(Auxiliary.XyzMaterialComplete,0,0xff,0xff,nil,sc,lv,self_reference_effect:GetHandlerPlayer())
 		return duel_check_xyz_mat(sc,f,lv,min,max,extramats)
 	end
 end
@@ -2062,41 +2062,39 @@ if not global_card_effect_table_global_check then
 			e:SetOperation(Auxiliary.SetOperationResultAsLabel(op))
 		end
 		local condition,cost,tg,op=e:GetCondition(),e:GetCost(),e:GetTarget(),e:GetOperation()
-		if cost and not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()==EFFECT_TYPE_XMATERIAL or e:GetType()==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or e:GetType()&EFFECT_TYPE_GRANT~=0) then
-			local newcost =	function(e,tp,eg,ep,ev,re,r,rp,chk)
+		if condition and ((e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G) or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()==EFFECT_TYPE_XMATERIAL or e:GetType()==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or e:GetType()&EFFECT_TYPE_GRANT~=0)) then	
+			local newcon =	function(...)
 								self_reference_effect=e
-								if chk==0 then
-									return cost(e,tp,eg,ep,ev,re,r,rp,chk)
-								end
-								cost(e,tp,eg,ep,ev,re,r,rp,chk)
+								return condition(...)
+							end
+			e:SetCondition(newcon)
+		end
+		if cost and not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()==EFFECT_TYPE_XMATERIAL or e:GetType()==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or e:GetType()&EFFECT_TYPE_GRANT~=0) then
+			local newcost =	function(...)
+								self_reference_effect=e
+								return cost(...)
 							end
 			e:SetCost(newcost)
 		end
-		if tg and not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()==EFFECT_TYPE_XMATERIAL or e:GetType()==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or e:GetType()&EFFECT_TYPE_GRANT~=0) then
-			if e:GetCode()==EFFECT_DESTROY_REPLACE or e:GetCode()==EFFECT_SEND_REPLACE then
-				local newtg =	function(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+		if tg then
+			if e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G then
+				local newtg =	function(...)
 									self_reference_effect=e
-									if chk==0 then
-										return tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-									end
-									return tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+									return tg(...)
 								end
 				e:SetTarget(newtg)
-			else
-				local newtg =	function(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+			elseif not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()==EFFECT_TYPE_XMATERIAL or e:GetType()==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or e:GetType()&EFFECT_TYPE_GRANT~=0) then
+				local newtg =	function(...)
 									self_reference_effect=e
-									if chk==0 then
-										return tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-									end
-									tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+									return tg(...)
 								end
 				e:SetTarget(newtg)
 			end
 		end
-		if op and not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()==EFFECT_TYPE_XMATERIAL or e:GetType()==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or e:GetType()&EFFECT_TYPE_GRANT~=0) then
-			local newop =	function(e,tp,eg,ep,ev,re,r,rp)
+		if op and ((e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G) or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()==EFFECT_TYPE_XMATERIAL or e:GetType()==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or e:GetType()&EFFECT_TYPE_GRANT~=0)) then
+			local newop =	function(...)
 								self_reference_effect=e
-								op(e,tp,eg,ep,ev,re,r,rp)
+								return op(...)
 							end
 			e:SetOperation(newop)
 		end
@@ -2119,41 +2117,39 @@ if not global_duel_effect_table_global_check then
 								end
 							end
 							local condition,cost,tg,op=e:GetCondition(),e:GetCost(),e:GetTarget(),e:GetOperation()
-							if cost and not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()&EFFECT_TYPE_GRANT~=0) then
-								local newcost =	function(e,tp,eg,ep,ev,re,r,rp,chk)
+							if condition and ((e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G) or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()&EFFECT_TYPE_GRANT~=0)) then
+								local newcon =	function(...)
 													self_reference_effect=e
-													if chk==0 then
-														return cost(e,tp,eg,ep,ev,re,r,rp,chk)
-													end
-													cost(e,tp,eg,ep,ev,re,r,rp,chk)
+													return condition(...)
+												end
+								e:SetCondition(newcon)
+							end
+							if cost and ((e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G) or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()&EFFECT_TYPE_GRANT~=0)) then
+								local newcost =	function(...)
+													self_reference_effect=e
+													return cost(...)
 												end
 								e:SetCost(newcost)
 							end
-							if tg and not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()&EFFECT_TYPE_GRANT~=0) then
-								if e:GetCode()==EFFECT_DESTROY_REPLACE or e:GetCode()==EFFECT_SEND_REPLACE then
-									local newtg =	function(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+							if tg then
+								if e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G then
+									local newtg =	function(...)
 														self_reference_effect=e
-														if chk==0 then
-															return tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-														end
-														return tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+														return tg(...)
 													end
 									e:SetTarget(newtg)
-								else
-									local newtg =	function(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+								elseif not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()&EFFECT_TYPE_GRANT~=0) then
+									local newtg =	function(...)
 														self_reference_effect=e
-														if chk==0 then
-															return tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-														end
-														tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+														return tg(...)
 													end
 									e:SetTarget(newtg)
 								end
 							end
-							if op and not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()&EFFECT_TYPE_GRANT~=0) then
-								local newop =	function(e,tp,eg,ep,ev,re,r,rp)
+							if op and ((e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G) or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()&EFFECT_TYPE_GRANT~=0)) then
+								local newop =	function(...)
 													self_reference_effect=e
-													op(e,tp,eg,ep,ev,re,r,rp)
+													return op(...)
 												end
 								e:SetOperation(newop)
 							end

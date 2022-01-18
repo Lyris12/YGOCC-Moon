@@ -122,7 +122,7 @@ function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g1=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_GRAVE,0,1,1,nil,tp,sg)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g2=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_GRAVE,0,1,1,sg,tp,sg)
+	local g2=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_GRAVE,0,1,1,g1,tp,sg)
 	g1:Merge(g2)
 	if #g1>0 then
 		Duel.Remove(g1,POS_FACEUP,REASON_COST)
@@ -167,7 +167,8 @@ function s.rcon(e,tp,eg,ep,ev,re,r,rp)
 		and Duel.IsCanRemoveCounter(tp,1,0,0x127a,ev,REASON_COST)
 end
 function s.rop(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.RemoveCounter(tp,1,0,0x127a,ev,REASON_COST)
+	Duel.RemoveCounter(tp,1,0,0x127a,ev,REASON_COST)
+	return ev
 end
 
 function s.xyzval(e,c,xyzc)
