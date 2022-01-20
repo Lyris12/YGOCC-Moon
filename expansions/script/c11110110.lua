@@ -2,7 +2,7 @@ local m=11110110
 local cm=_G["c"..m]
 cm.name="Alegra, Skydian Scholar of Ichyaltas"
 function cm.initial_effect(c)
-	aux.AddLinkProcedure(c,aux.FilterBoolFunction(Card.IsLinkRace,RACE_WARRIOR),2,2)
+	aux.AddLinkProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_WARRIOR),2,2,cm.lcheck)
 	c:EnableReviveLimit()
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_TOGRAVE)
@@ -27,6 +27,9 @@ function cm.initial_effect(c)
 	e3:SetTarget(cm.rltg)
 	e3:SetOperation(cm.rlop)
 	c:RegisterEffect(e3)
+end
+function cm.lcheck(g,lc)
+	return g:IsExists(Card.IsSetCard,1,nil,0x528) or  g:IsExists(Card.IsSetCard,1,nil,0x223) or  g:IsExists(Card.IsSetCard,1,nil,0x2a7)	or  g:IsExists(Card.IsSetCard,1,nil,0xd0a1)
 end
 function cm.rlcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_LINK)

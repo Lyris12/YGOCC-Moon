@@ -3,7 +3,7 @@
 local cid,id=GetID()
 function cid.initial_effect(c)
 	c:EnableReviveLimit()
-	aux.AddLinkProcedure(c,cid.mfilter,2,2)
+	aux.AddLinkProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_WARRIOR),2,2,cid.lcheck)
 	--retrieve
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
@@ -29,8 +29,8 @@ function cid.initial_effect(c)
 	e3:SetOperation(cid.rmop)
 	c:RegisterEffect(e3)
 end
-function cid.mfilter(c)
-	return c:IsLinkRace(RACE_WARRIOR)
+function cid.lcheck(g,lc)
+	return g:IsExists(Card.IsSetCard,1,nil,0x528) or  g:IsExists(Card.IsSetCard,1,nil,0x223) or  g:IsExists(Card.IsSetCard,1,nil,0x2a7)	or  g:IsExists(Card.IsSetCard,1,nil,0xd0a1)
 end
 function cid.mfilter2(c)
 	return (c:IsSetCard(0x528) or c:IsSetCard(0x223)) and c:IsAbleToHand()

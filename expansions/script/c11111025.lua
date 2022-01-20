@@ -24,10 +24,9 @@ function cid.initial_effect(c)
     c:RegisterEffect(e2)
 end
 
---Special Summon from hand if you control no monsters
-
-function cid.spcon(e, tp, eg, ep, ev, re, r, rp)
-    return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0
+--Special Summon from hand if you control no monsters, but opp does
+function cid.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0 and Duel.GetFieldGroupCount(1-tp,LOCATION_MZONE,0)>0
 end
 function cid.sptg(e, tp, eg, ep, ev, re, r, rp, chk)
     if chk==0 then return e:GetHandler():IsCanBeSpecialSummoned(e, 0, tp, false, false)
