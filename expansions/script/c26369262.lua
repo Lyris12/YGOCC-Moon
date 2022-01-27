@@ -90,11 +90,12 @@ function s.negop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if tc and ((tc:IsFaceup() and not tc:IsDisabled()) or tc:IsType(TYPE_TRAPMONSTER)) and tc:IsRelateToEffect(e) then
+		local ct=(Duel.GetTurnPlayer()==tp and Duel.GetCurrentPhase()==PHASE_END) and 2 or 1
 		Duel.NegateRelatedChain(tc,RESET_TURN_SET)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_DISABLE)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END+RESET_SELF_TURN,ct)
 		tc:RegisterEffect(e1)
 		local e2=e1:Clone()
 		e2:SetCode(EFFECT_DISABLE_EFFECT)
@@ -108,7 +109,6 @@ function s.negop(e,tp,eg,ep,ev,re,r,rp)
 		local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,0,LOCATION_MZONE,nil)
 		if #g==0 then return end
 		local tc=g:GetFirst()
-		local ct=(Duel.GetTurnPlayer()==tp and Duel.GetCurrentPhase()==PHASE_END) and 2 or 1
 		for tc in aux.Next(g) do
 			local e1=Effect.CreateEffect(e:GetHandler())
 			e1:SetType(EFFECT_TYPE_SINGLE)
@@ -146,7 +146,7 @@ function s.indop(e,tp,eg,ep,ev,re,r,rp)
 		e2:GLString(4)
 		e2:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
 		tc:RegisterEffect(e2)
-		if c:IsRelateToEffect(e) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and c:IsPandemoniumActivatable(tp,tp,true,false,false,false,eg,ep,ev,re,r,rp) and r&REASON_EFFECT==0 then
+		if c:IsRelateToEffect(e) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and c:IsPandemoniumActivatable(tp,tp,true,false,false,false,eg,ep,ev,re,r,rp,true) and r&REASON_EFFECT==0 then
 			Duel.BreakEffect()
 			aux.PandAct(c)(e,tp,eg,ep,ev,re,r,rp)
 			local te=c:GetActivateEffect()

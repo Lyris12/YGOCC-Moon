@@ -180,7 +180,7 @@ function s.spop2(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectMatchingCard(tp,aux.TRUE,tp,0,LOCATION_ONFIELD,1,1,nil)
 	if #g>0 and Duel.Destroy(g,REASON_EFFECT)>0
-	and e:GetHandler():IsRelateToEffect(e) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and e:GetHandler():IsPandemoniumActivatable(tp,tp,true,false,false,false,eg,ep,ev,re,r,rp) and r&REASON_EFFECT==0
+	and e:GetHandler():IsRelateToEffect(e) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and e:GetHandler():IsPandemoniumActivatable(tp,tp,true,false,false,false,eg,ep,ev,re,r,rp,true) and r&REASON_EFFECT==0
     and Duel.SelectYesNo(tp,aux.Stringid(id,4))	then
 		Duel.BreakEffect()
 		aux.PandAct(e:GetHandler())(e,tp,eg,ep,ev,re,r,rp)

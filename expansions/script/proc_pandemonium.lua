@@ -868,7 +868,11 @@ function Auxiliary.PandAct(tc,...)
 			end
 end
 
-function Card.IsPandemoniumActivatable(c,tp,fp,neglect_loc,neglect_cond,neglect_cost,neglect_targ,eg,ep,ev,re,r,rp)
+function Card.IsPandemoniumActivatable(c,tp,fp,neglect_loc,neglect_cond,neglect_cost,neglect_targ,eg,ep,ev,re,r,rp,...)
+	local x={...}
+	local neglect_dstep = #x>0 and x[1]
+	local neglect_dcal = #x>1 and x[2]
+	
 	if not fp then fp=tp end
 	local e=c:GetActivateEffect()
 	if not c:IsType(TYPE_PANDEMONIUM) then return false end
@@ -888,9 +892,9 @@ function Card.IsPandemoniumActivatable(c,tp,fp,neglect_loc,neglect_cond,neglect_
 	if not e:CheckCountLimit(tp) or e:GetHandlerPlayer()~=tp then return false end
 	
 	local ph=Duel.GetCurrentPhase()
-	if ph==PHASE_DAMAGE then
+	if not neglect_dstep and ph==PHASE_DAMAGE then
 		if (e:GetCode()<EVENT_BATTLE_START or e:GetCode()>=EVENT_TOSS_DICE) and not e:IsHasProperty(EFFECT_FLAG_DAMAGE_STEP) then return false end
-	elseif ph==PHASE_DAMAGE_CAL then
+	elseif not neglect_dcal and ph==PHASE_DAMAGE_CAL then
 		if (e:GetCode()<EVENT_PRE_DAMAGE_CALCULATE or e:GetCode()>EVENT_PRE_BATTLE_DAMAGE) and not e:IsHasProperty(EFFECT_FLAG_DAMAGE_CAL) then return false end
 	end
 	

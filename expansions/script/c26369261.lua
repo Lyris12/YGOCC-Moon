@@ -184,7 +184,7 @@ function s.spop2(e,tp,eg,ep,ev,re,r,rp)
 				Duel.RaiseEvent(tc,4179255,te,0,tp,tp,Duel.GetCurrentChain())
 			end
 			local c=e:GetHandler()
-			if c:IsRelateToEffect(e) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and c:IsPandemoniumActivatable(tp,tp,true,false,false,false,eg,ep,ev,re,r,rp) and r&REASON_EFFECT==0
+			if c:IsRelateToEffect(e) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and c:IsPandemoniumActivatable(tp,tp,true,false,false,false,eg,ep,ev,re,r,rp,true) and r&REASON_EFFECT==0
 			and Duel.SelectYesNo(tp,aux.Stringid(id,4)) then
 				Duel.BreakEffect()
 				aux.PandAct(c)(e,tp,eg,ep,ev,re,r,rp)
