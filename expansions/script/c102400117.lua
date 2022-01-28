@@ -2,83 +2,6 @@
 --襲雷竜－銀河
 local s,id,off=GetID()
 function s.initial_effect(c)
-	if not s.global_check then
-		s.global_check=true
-		local f1,f2,f3,f4,f5,f6,f7=Duel.SendtoGrave,Duel.SendtoHand,nil,Duel.SendtoExtraP,Duel.Remove,Duel.GetOperatedGroup,Duel.Release
-		local og=Group.CreateGroup()
-		og:KeepAlive()
-		Duel.SendtoGrave=function(tg,r)
-			local tg=Group.CreateGroup()+tg
-			local dg,fg=Group.CreateGroup(),Group.CreateGroup()
-			for tc in aux.Next(tg) do
-				if tc:IsHasEffect(id) then dg:AddCard(tc)
-				else fg:AddCard(tc) end
-			end
-			local ct=Duel.Destroy(dg,r)+f1(fg,r)
-			og:Merge((dg+fg):Filter(Card.IsLocation,nil,LOCATION_GRAVE+LOCATION_EXTRA))
-			return ct
-		end
-		Duel.SendtoHand=function(tg,tp,r)
-			local tg=Group.CreateGroup()+tg
-			local dg,fdg,fg=Group.CreateGroup(),Group.CreateGroup(),Group.CreateGroup()
-			for tc in aux.Next(tg) do
-				if tc:IsHasEffect(id) then
-					if tp~=1-tc:GetControler() then dg:AddCard(tc)
-					else fdg:AddCard(tc) end
-				else fg:AddCard(tc) end
-			end
-			local ct=Duel.Destroy(dg,r,LOCATION_HAND)+f2(fdg,tp,r|REASON_DESTROY)+f2(fg,tp,r)
-			og:Merge((dg+fdg+fg):Filter(Card.IsLocation,nil,LOCATION_HAND))
-			return ct
-		end
-		Duel.Remove=function(tg,pos,r)
-			local tg=Group.CreateGroup()+tg
-			local dg,fdg,fg=Group.CreateGroup(),Group.CreateGroup(),Group.CreateGroup()
-			for tc in aux.Next(tg) do
-				if tc:IsHasEffect(id) then
-					if pos&POS_FACEUP>0 then dg:AddCard(tc)
-					else fdg:AddCard(tc) end
-				else fg:AddCard(tc) end
-			end
-			local ct=Duel.Destroy(dg,r,LOCATION_REMOVED)+f5(fdg,pos,r|REASON_DESTROY)+f5(fg,pos,r)
-			og:Merge((dg+fdg+fg):Filter(Card.IsLocation,nil,LOCATION_REMOVED))
-			return ct
-		end
-		Duel.SendtoExtraP=function(tg,tp,r)
-			local tg=Group.CreateGroup()+tg
-			local dg,fdg,fg=Group.CreateGroup(),Group.CreateGroup(),Group.CreateGroup()
-			for tc in aux.Next(tg) do
-				if tc:IsHasEffect(id) then
-					if tp~=1-tc:GetControler() then dg:AddCard(tc)
-					else fdg:AddCard(tc) end
-				else fg:AddCard(tc) end
-			end
-			local ct=Duel.Destroy(dg,r,LOCATION_EXTRA)+f4(fdg,tp,r|REASON_DESTROY)+f4(fg,tp,r)
-			og:Merge((dg+fdg+fg):Filter(Card.IsLocation,nil,LOCATION_EXTRA))
-			return ct
-		end
-		Duel.Release=function(tg,r)
-			local tg=Group.CreateGroup()+tg
-			local dg,fg=Group.CreateGroup(),Group.CreateGroup()
-			for tc in aux.Next(tg) do
-				if tc:IsHasEffect(id) then dg:AddCard(tc)
-				else fg:AddCard(tc) end
-			end
-			local ct=Duel.Destroy (dg,r|REASON_RELEASE)+f7(fg,r)
-			og:Merge((dg+fg):Filter(function(tc) return not tc:IsLocation(tc:GetPreviousLocation()) end,nil))
-			return ct
-		end
-		Duel.GetOperatedGroup=function()
-			local g=f6()+og
-			og:Clear()
-			return g
-		end
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e1:SetCode(EVENT_CHAIN_SOLVED)
-		e1:SetOperation(function() og:Clear() end)
-		Duel.RegisterEffect(e1,0)
-	end
 	aux.EnablePendulumAttribute(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -131,12 +54,38 @@ end
 function s.op(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
-		local e5=Effect.CreateEffect(c)
-		e5:SetType(EFFECT_TYPE_FIELD)
-		e5:SetCode(id)
-		e5:SetTargetRange(LOCATION_MZONE,0)
-		e5:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x7c4))
-		e5:SetReset(RESET_PHASE+PHASE_END)
-		Duel.RegisterEffect(e5,tp)
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e1:SetCode(EFFECT_SEND_REPLACE)
+		e1:SetTarget(s.rtg)
+		e1:SetValue(aux.TargetBoolFunction(s.rfilter))
+		e1:SetReset(RESET_PHASE+PHASE_END)
+		Duel.RegisterEffect(e1,tp)
+		local e3=Effect.CreateEffect(c)
+		e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e3:SetCode(EVENT_CHAIN_SOLVED)
+		e3:SetOperation(function() for tc in aux.Next(Duel.GetMatchingGroup(s.reset,tp,0xff,0xff,nil)) do while s.reset(tc) do tc:ResetFlagEffect(id) end end end)
+		e3:SetReset(RESET_PHASE+PHASE_END)
+		Duel.RegisterEffect(e3,tp)
+		local e4=e3:Clone()
+		e4:SetCode(EVENT_ADJUST)
+		Duel.RegisterEffect(e4,tp)
 	end
+end
+function s.reset(c)
+	return c:GetFlagEffect(id)>0
+end
+function s.rfilter(c)
+	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x7c4) and c:GetDestination()&LOCATION_DECK==0 and (c:IsOnField() or c:GetFlagEffect(id)>0)
+end
+function s.rchk(c)
+	return not c:IsReason(REASON_DESTROY)
+end
+function s.rtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return eg:IsExists(aux.AND(s.rfilter,s.rchk),1,nil) end
+	for tc in aux.Next(eg:Filter(s.rfilter,nil)) do
+		Duel.Destroy(tc,r,tc:GetDestination())
+		tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
+	end
+	return true
 end
