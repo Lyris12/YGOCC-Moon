@@ -36,11 +36,17 @@ function c97569819.initial_effect(c)
 	e4:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e4:SetType(EFFECT_TYPE_IGNITION)
 	e4:SetRange(LOCATION_MZONE)
-	e4:SetCountLimit(1)
+	e4:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
 	e4:SetCost(c97569819.thcost)
 	e4:SetTarget(c97569819.thtg)
 	e4:SetOperation(c97569819.thop)
 	c:RegisterEffect(e4)
+	local e5=e4:Clone()
+	e5:SetType(EFFECT_TYPE_QUICK_O)
+	e5:SetCode(EVENT_FREE_CHAIN)
+	e5:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
+	e5:SetCondition(c97569819.con)
+	c:RegisterEffect(e5)
 end
 function c97569819.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_XYZ)
@@ -93,6 +99,9 @@ function c97569819.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c97569819.thfilter(c)
 	return c:IsSetCard(0xd0a2) and c:IsAbleToHand()
+end
+function c97569819.con(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():GetEquipGroup():IsExists(Card.IsCode,1,nil,97569840)
 end
 function c97569819.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c97569819.thfilter,tp,LOCATION_DECK,0,1,nil) end

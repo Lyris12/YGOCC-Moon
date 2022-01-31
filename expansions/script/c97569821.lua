@@ -20,15 +20,25 @@ function c97569821.initial_effect(c)
     e2:SetCategory(CATEGORY_DESTROY)
     e2:SetType(EFFECT_TYPE_IGNITION)
     e2:SetRange(LOCATION_MZONE)
-    e2:SetCountLimit(1)
+    e2:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
     e2:SetCost(c97569821.descost)
     e2:SetTarget(c97569821.destg)
     e2:SetOperation(c97569821.desop)
     c:RegisterEffect(e2)
+    local e5=e2:Clone()
+	e5:SetType(EFFECT_TYPE_QUICK_O)
+	e5:SetCode(EVENT_FREE_CHAIN)
+	e5:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
+	e5:SetCondition(c97569821.con)
+	c:RegisterEffect(e5)
+end
+function c97569821.con(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():GetEquipGroup():IsExists(Card.IsCode,1,nil,97569840)
 end
 function c97569821.condition(e,tp,eg,ep,ev,re,r,rp)
     return e:GetHandler():IsSummonType(SUMMON_TYPE_XYZ)
 end
+
 function c97569821.filter(c,e,tp,ec)
     return c:IsSetCard(0xd0a2) and c:IsCanBeEffectTarget(e) and c:CheckUniqueOnField(tp) and c:CheckEquipTarget(ec)
 end
