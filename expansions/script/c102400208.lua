@@ -47,7 +47,7 @@ function s.filter(c,e,tp,mg)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
-		local mg=Duel.GetFusionMaterial(tp)
+		local mg=Duel.GetFusionMaterial(tp)-e:GetHandler()
 		return mg:IsExists(s.filter,1,nil,e,tp,mg)
 	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
