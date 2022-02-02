@@ -1,4 +1,4 @@
-﻿expansions/cards-new.cdb	a84e086129b934c2f68b15ef7dcb90d2
+﻿expansions/cards-new.cdb	2291a129628a3ee9500f9d2239facdb6
 expansions/lflist.conf	7c2e61802cf5a4a1c953775dcff67bfa
 expansions/strings.conf	9d6dbdace911c7b240ffc979f6beeeb8
 expansions/pics/100000710.jpg	5f925a97b1c60d7d69acb8f229938263
@@ -6663,9 +6663,9 @@ expansions/script/c102400206.lua	098de896ca830e079d0fd270cbdf4ff8
 expansions/script/c102400207.lua	85462c1cd8b5e129b4c167e1376bd6f3
 expansions/script/c102400208.lua	06c24d051b4f8ebe94f1ecef58eff38f
 expansions/script/c102400209.lua	93292bbc6f3fe5ede96fbf285a3cd9bb
-expansions/script/c102400210.lua	e29a6d301228c319019e98a5b7105dbf
-expansions/script/c102400211.lua	b840f5ec54e65ba14aac279ace91f882
-expansions/script/c102400212.lua	31f3f4ff58d2cd89ba29ef09a8a4b0f1
+expansions/script/c102400210.lua	8feaf638f8f53440e7c191346e7e646a
+expansions/script/c102400211.lua	c327ed4474bffd1189283eca10dbeb59
+expansions/script/c102400212.lua	f1623185b78f3a6831fe40a0181d8676
 expansions/script/c102400213.lua	d5057c7170a12a3ec09c10eb3c0a5575
 expansions/script/c102400214.lua	33872e96767a60a487e60ec00b45e392
 expansions/script/c102400215.lua	16d9017794d739e6aadeb79b813b0f78
@@ -11467,7 +11467,7 @@ expansions/script/c97569836.lua	d1cc68a587292ee872f17b1a8b71b355
 expansions/script/c97569837.lua	2325215f42fd029344526b1970d0848f
 expansions/script/c97569838.lua	b04641bdff23555072d05cdae4d5d308
 expansions/script/c97569839.lua	448390d116a70cfe186039ae650b8721
-expansions/script/c97569840.lua	25255b336b223c323e2bffc6706f4adb
+expansions/script/c97569840.lua	f2c4306be452945f3a2ef3ea03eed372
 expansions/script/c97671885.lua	1fdccadf9c844158e786c69fdd58e471
 expansions/script/c97671886.lua	a09ec1208d4be17e55c530bf69272f08
 expansions/script/c97671887.lua	969ef72e7357e353866e061548e60f1e
@@ -11760,6 +11760,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	616c167f129ef21fec2cf134a24fb754
+update/filelist.txt	b3dcb8c3690df8ce0c04cf5669b221bf
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	1eec14e0503472775e811eb05870822f
+update/version.txt	ab2112ae59606d1d069b213ae2291d45
