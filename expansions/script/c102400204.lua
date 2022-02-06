@@ -46,10 +46,11 @@ function s.costop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	Duel.SendtoDeck(Duel.SelectMatchingCard(tp,aux.AND(s.filter,Card.IsAbleToDeck),tp,LOCATION_GRAVE,0,1,5,nil),nil,2,REASON_EFFECT)
 	local tg=Duel.GetOperatedGroup()
-	if tg:FilterCount(Card.IsLocation,nil,LOCATION_DECK)>0 then Duel.ShuffleDeck(tp) end
-	if #tg>=3 then Duel.Draw(tp,1,REASON_EFFECT) end
+	local g=tg:Filter(Card.IsLocation,nil,LOCATION_DECK)
+	if #g>0 then Duel.ShuffleDeck(tp) end
+	if #g>=3 then Duel.Draw(tp,1,REASON_EFFECT) end
 	local sg=Duel.GetMatchingGroup(aux.AND(s.filter,Card.IsAbleToHand),tp,LOCATION_DECK,0,nil)
-	if #tg>=5 and #sg>0 then
+	if #g>=5 and #sg>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 		local hg=sg:Select(tp,1,1,nil)
 		Duel.SendtoHand(hg,nil,REASON_EFFECT)
