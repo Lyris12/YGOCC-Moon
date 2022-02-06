@@ -54,7 +54,7 @@ function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetOperation(cid.tdop)
 		e2:SetReset(RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN,2)
 		e2:SetCountLimit(1)
-		Duel.RegisterEffect(e2,true)
+		Duel.RegisterEffect(e2,tp)
 	end
 	Duel.SpecialSummonComplete()
 end

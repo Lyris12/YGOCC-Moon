@@ -63,7 +63,7 @@ function cm.operation(e,tp,eg,ep,ev,re,r,rp)
 		e3:SetCondition(cm.tgcon)
 		e3:SetOperation(cm.tgop)
 		e3:SetReset(RESET_EVENT+RESETS_STANDARD)
-		Duel.RegisterEffect(e3)
+		Duel.RegisterEffect(e3,tp)
 	end
 end
 function cm.tgcon(e,tp,eg,ep,ev,re,r,rp)
