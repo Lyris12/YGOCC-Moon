@@ -92,7 +92,7 @@ function scard.indop(e,tp,eg,ep,ev,re,r,rp)
 	e2:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_OWNER_RELATE+EFFECT_FLAG_IGNORE_IMMUNE)
 	e2:SetValue(scard.profilter)
-	Duel.RegisterEffect(e2,true)
+	Duel.RegisterEffect(e2,tp)
 end
 function scard.profilter(e,tp,eg,ep,ev,re,r,rp)
 	return aux.TargetBoolFunction(Card.IsMantra)
