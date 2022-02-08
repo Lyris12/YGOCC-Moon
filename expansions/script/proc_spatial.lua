@@ -134,7 +134,7 @@ function Card.IsDimensionNoBelow(c,djn)
 	return dim>0 and dim<=djn
 end
 function Card.IsCanBeSpaceMaterial(c,sptc)
-	if c:IsOnField() and c:IsFacedown() then return false end
+	if not c:IsAbleToRemove() or c:IsOnField() and c:IsFacedown() then return false end
 	local tef={c:IsHasEffect(EFFECT_CANNOT_BE_SPACE_MATERIAL)}
 	for _,te in ipairs(tef) do
 		if (type(te:GetValue())=="function" and te:GetValue()(te,sptc)) or te:GetValue()==1 then return false end
