@@ -121,6 +121,7 @@ end
 
 --Custom Functions
 function Card.IsCanBeTimeleapMaterial(c,ec,...)
+	if not c:IsAbleToRemove() then return false end
 	local funs={...}
 	local exctyp=funs[1]
 	if not exctyp then
