@@ -22,7 +22,7 @@ function ref.initial_effect(c)
 		ge2:SetRange(LOCATION_SZONE)
 		ge2:SetCondition(ref.regcon)
 		ge2:SetOperation(ref.regop)
-		Duel.RegisterEffect(ge2,tp)
+		Duel.RegisterEffect(ge2,0)
 	end
 	--Can't disable Link Summon if Counterattack is active
 	local e2=Effect.CreateEffect(c)
