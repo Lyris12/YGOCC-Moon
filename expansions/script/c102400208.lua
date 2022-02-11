@@ -37,13 +37,16 @@ end
 function s.spfilter(c,e,tp)
 	return c:IsSetCard(0xeeb) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,true,false)
 end
+function s.chk(g,e,tp,tg)
+	local ft=Duel.GetLocationCountFromEx(tp,tp,tg,TYPE_FUSION)
+	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then ft=1 end
+	return g:GetSum(Card.GetLevel)<=tg:GetSum(Card.GetLevel) and Duel.GetLocationCountFromEx(tp,tp,tg+e:GetHandler(),TYPE_FUSION)>#g
+end
 function s.filter(c,e,tp,mg)
 	if (c:IsOnField() and c:IsFacedown()) or not aux.MustMaterialCheck(c,tp,EFFECT_MUST_BE_FMATERIAL)
 		or c:GetLevel()<=0 or not c:IsSetCard(0xeeb) then return false end
 	local sg=Duel.GetMatchingGroup(s.spfilter,tp,LOCATION_EXTRA,0,nil,e,tp)
-	local ft=Duel.GetLocationCountFromEx(tp,tp,nil,TYPE_FUSION)
-	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then ft=1 end
-	return #sg>0 and mg:CheckSubGroup(function(tg) return sg:CheckSubGroup(function(g) return g:GetSum(Card.GetLevel)<=tg:GetSum(Card.GetLevel) end,1,ft) end)
+	return #sg>0 and mg:CheckSubGroup(function(tg) return sg:CheckSubGroup(s.chk,1,6,e,tp,tg) end)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
