@@ -5,14 +5,14 @@ function cid.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddOrigBigbangType(c)
 	aux.AddBigbangProc(c,cid.sfilter,1)
-    --cannot be equip spell target
-    local e1=Effect.CreateEffect(c)
-    e1:SetType(EFFECT_TYPE_SINGLE)
-    e1:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
-    e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-    e1:SetRange(LOCATION_MZONE)
-    e1:SetValue(cid.efilter)
-    c:RegisterEffect(e1)
+	--cannot be equip spell target
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
+	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetValue(cid.efilter)
+	c:RegisterEffect(e1)
 	--Special summon from grave
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_IGNITION)
@@ -49,7 +49,7 @@ function cid.sfilter(c)
 	return c:IsSetCard(0x777) and aux.FilterEqualFunction(Card.GetVibe,1)
 end
 function cid.efilter(e,re,rp)
-    return re:GetHandler():IsType(TYPE_EQUIP) and not re:GetHandler():IsSetCard(0x777)
+	return re:GetHandler():IsType(TYPE_EQUIP) and not re:GetHandler():IsSetCard(0x777)
 end
 function cid.atkcond(val)
 	return function(e)
@@ -58,7 +58,7 @@ function cid.atkcond(val)
 end
 function cid.spfilter(c,e,tp)
 	return c:IsSetCard(0x777) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_ATTACK)
-		and c:IsCanBeEffectTarget(e)
+		and c:IsSummonableCard()
 end
 function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end

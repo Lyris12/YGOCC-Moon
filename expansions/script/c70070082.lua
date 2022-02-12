@@ -70,7 +70,7 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 	local tc1=Duel.GetFirstTarget()
 	if not tc1:IsRelateToEffect(e) or tc1:IsFacedown() or not Duel.IsExistingMatchingCard(cid.desfilter,tp,0,LOCATION_MZONE,1,nil,tc1:GetAttack())
-		or not Duel.SelectYesNo(tp,1101) then return end
+		or Duel.GetTurnPlayer()~=tp or not Duel.SelectYesNo(tp,1101) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local tc2=Duel.SelectMatchingCard(tp,cid.desfilter,tp,0,LOCATION_MZONE,1,1,nil,tc1:GetAttack())
 	Duel.HintSelection(tc2)

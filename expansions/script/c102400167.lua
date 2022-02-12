@@ -79,11 +79,18 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,Duel.SelectTarget(tp,s.thfilter,tp,LOCATION_GRAVE,0,1,1,nil),1,0,0)
 end
+function s.nfilter(c,code)
+	return c:IsCode(code) and c:IsSummonable(true,nil)
+end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and Duel.SendtoHand(tc,nil,REASON_EFFECT)>0 and tc:IsLocation(LOCATION_HAND)
-		and tc:IsSummonable(true,nil) and Duel.SelectYesNo(tp,1151) then
-		Duel.BreakEffect()
-		Duel.Summon(tp,tc,true,nil)
+	if tc:IsRelateToEffect(e) and Duel.SendtoHand(tc,nil,REASON_EFFECT)>0 and tc:IsLocation(LOCATION_HAND) then
+		local g=Duel.GetMatchingGroup(s.nfilter,tp,LOCATION_HAND+LOCATION_MZONE,0,nil,tc:GetCode())
+		if #g>0 and Duel.SelectYesNo(tp,1151) then
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SUMMON)
+			local sc=g:Select(tp,1,1,nil):GetFirst()
+			Duel.BreakEffect()
+			Duel.Summon(tp,sc,true,nil)
+		end
 	end
 end

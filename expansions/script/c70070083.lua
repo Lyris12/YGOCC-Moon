@@ -52,7 +52,7 @@ function cid.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_LINK)
 end
 function cid.pcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetAttack()>=2800
+	return e:GetHandler():GetAttack()>=2800 and not Duel.IsExistingMatchingCard(aux.OR(Card.IsFacedown,aux.NOT(Card.IsSetCard)),tp,LOCATION_MZONE,0,1,nil,0x777)
 end
 function cid.cfilter(c,e,tp)
 	return c:IsSetCard(0x777) and c:IsAbleToRemoveAsCost()
