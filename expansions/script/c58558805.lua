@@ -15,7 +15,7 @@ function cid.initial_effect(c)
 	e1:SetCategory(CATEGORY_TODECK)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetCode(EVENT_CHAINING)
-	e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL+EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
+	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL+EFFECT_FLAG_CARD_TARGET)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCondition(cid.condition)
 	e1:SetTarget(cid.target)
@@ -78,7 +78,6 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 	local ct=g:FilterCount(Card.IsLocation,nil,LOCATION_DECK+LOCATION_EXTRA)
 	if ct==3 then
 		Duel.BreakEffect()
-		local pos=Duel.SelectPosition(tp,c,POS_FACEDOWN_DEFENSE)
-		Duel.ChangePosition(c,pos)
+		Duel.ChangePosition(c,POS_FACEDOWN_DEFENSE)
 	end
 end
