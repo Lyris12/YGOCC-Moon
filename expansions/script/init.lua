@@ -37,6 +37,7 @@ CARD_NEBULA_TOKEN					=218201917
 CARD_DRAGON_EGG_TOKEN				=20157305
 CARD_BLACK_GARDEN					=71645242
 CARD_EVIL_DRAGON_ANANTA				=8400623
+CARD_ANONYMIZE						=102400157
 
 --Effect Aliases
 -- EFFECT_MUST_BE_SYNCHRO_MATERIAL = EFFECT_MUST_BE_SMATERIAL
@@ -1194,15 +1195,16 @@ function Auxiliary.ResetEffectFunc(effect,functype,func,...)
 	end
 end
 --Custom Link Procedures Auxiliaries
-Auxiliary.LCheckGoal=function(sg,tp,lc,gf)
+local l_check_goal = aux.LCheckGoal
+
+Auxiliary.LCheckGoal=function(sg,tp,lc,gf,lmat)
 	if lc:IsHasEffect(EFFECT_AVAILABLE_LMULTIPLE) then
 		return sg:CheckWithSumEqual(Auxiliary.GetMultipleLinkCount,lc:GetLink(),#sg,#sg,lc)
 			and Duel.GetLocationCountFromEx(tp,tp,sg,lc)>0 and (not gf or gf(sg))
-			and not sg:IsExists(Auxiliary.LUncompatibilityFilter,1,nil,sg,lc)
+			and not sg:IsExists(Auxiliary.LUncompatibilityFilter,1,nil,sg,lc,tp)
+			and (not lmat or sg:IsContains(lmat))
 	else
-		return sg:CheckWithSumEqual(Auxiliary.GetLinkCount,lc:GetLink(),#sg,#sg)
-			and Duel.GetLocationCountFromEx(tp,tp,sg,lc)>0 and (not gf or gf(sg))
-			and not sg:IsExists(Auxiliary.LUncompatibilityFilter,1,nil,sg,lc)
+		return l_check_goal(sg,tp,lc,gf,lmat)
 	end
 end
 function Auxiliary.GetMultipleLinkCount(c,lc)
