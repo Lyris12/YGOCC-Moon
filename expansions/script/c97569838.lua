@@ -6,14 +6,13 @@ function c97569838.initial_effect(c)
 	aux.EnablePendulumAttribute(c)
 	--Redirect Equip
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_EQUIP)
-	e1:SetType(EFFECT_TYPE_QUICK_O)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCategory(CATEGORY_TO_HAND)
+	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_PZONE)
 	e1:SetCountLimit(1,97569838)
-	e1:SetTarget(c97569838.eqtg)
-	e1:SetOperation(c97569838.eqop)
+	e1:SetCost(c97569838.thcost)
+	e1:SetTarget(c97569838.thtg)
+	e1:SetOperation(c97569838.thop)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -25,35 +24,24 @@ function c97569838.initial_effect(c)
 	e2:SetOperation(c97569838.spop)
 	c:RegisterEffect(e2)
 end
-function c97569838.filter1(c,tp)
-	return c:IsFaceup() and c:GetEquipTarget()
-		and Duel.IsExistingTarget(c97569838.filter2,tp,LOCATION_MZONE,LOCATION_MZONE,1,c:GetEquipTarget(),c)
+function c97569838.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
+	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
 end
-function c97569838.filter2(c,eqc)
-	return c:IsFaceup() and eqc:CheckEquipTarget(c)
+function c97569838.filter1(c)
+	return c:IsSetCard(0xd0a2) and c:IsType(TYPE_EQUIP) and c:IsAbleToHand()
 end
-function c97569838.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return false end
-	if chk==0 then return Duel.IsExistingTarget(c97569838.filter1,tp,LOCATION_SZONE,0,1,nil,tp) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	local g1=Duel.SelectTarget(tp,c97569838.filter1,tp,LOCATION_SZONE,0,1,1,nil,tp)
-	local eqc=g1:GetFirst()
-	e:SetLabelObject(eqc)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
-	local g2=Duel.SelectTarget(tp,c97569838.filter2,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,eqc:GetEquipTarget(),eqc)
-	Duel.SetOperationInfo(0,CATEGORY_EQUIP,g1,1,0,0)
+function c97569838.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(c97569838.filter1,tp,LOCATION_DECK,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
-function c97569838.eqop(e,tp,eg,ep,ev,re,r,rp)
-	local eqc=e:GetLabelObject()
-	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	local tc=g:GetFirst()
-	if tc==eqc then tc=g:GetNext() end
-	if not eqc:IsRelateToEffect(e) then return end
-	if tc:IsFacedown() or not tc:IsRelateToEffect(e) then
-		Duel.SendtoGrave(eqc,REASON_EFFECT)
-		return
+function c97569838.thop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local g=Duel.SelectMatchingCard(tp,c97569838.filter1,tp,LOCATION_DECK,0,1,1,nil)
+	if g:GetCount()>0 then
+		Duel.SendtoHand(g,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,g)
 	end
-	Duel.Equip(tp,eqc,tc)
 end
 function c97569838.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsReleasable() end

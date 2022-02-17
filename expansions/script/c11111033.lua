@@ -95,19 +95,19 @@ function cid.operation(e, tp, eg, ep, ev, re, r, rp)
 		if tc:IsType(TYPE_MONSTER) then
 			Duel.GetControl(tc, tp, PHASE_END, tct)
 		else
-			s.takest(tp, tc)
+			cid.takest(tp, tc)
 			local pct=Duel.GetTurnCount()
 			local e1=Effect.CreateEffect(e:GetHandler())
 			e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 			e1:SetCode(EVENT_PHASE+PHASE_END)
 			e1:SetCountLimit(1)
-			e1:SetOperation(function() if Duel.GetTurnCount()-pct==tct then s.takest(tc:GetOwner(), tc) end end)
-			e1:SetReset(RESET_PHASE+PHASE_END, tct)
-			Duel.RegisterEffect(e1, tp)
+			e1:SetOperation(function() if Duel.GetTurnCount()-pct==tct then cid.takest(tc:GetOwner(), tc) end end)
+			e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END, tct)
+			tc:RegisterEffect(e1, tp)
 		end
 	end
 end
-function s.takest(tp,tc)
+function cid.takest(tp,tc)
 	local loc=LOCATION_SZONE
 	if tc:IsType(TYPE_FIELD) then loc=LOCATION_FZONE
 	elseif tc:IsType(TYPE_PENDULUM) then loc=LOCATION_PZONE end

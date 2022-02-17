@@ -46,7 +46,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if not c:IsRelateToEffect(e) then return end
 	if c:GetColumnGroup(1,1):Filter(s.filter,nil)==0 then Duel.Destroy(c,REASON_EFFECT) end
 	local pt,t=0,{[-1]=LINK_MARKER_TOP_LEFT,[0]=LINK_MARKER_TOP,[1]=LINK_MARKER_TOP_RIGHT,}
-	for i=-1,1 do if c:GetColumnGroup(i,-i):FilterCount(s.filter,nil)>0 then pt=pt|t[i] end end
+	for i=-1,1 do if c:GetColumnGroup(i):FilterCount(s.filter,nil)>0 then pt=pt|t[i] end end
 	if pt==0 then Duel.Destroy(c,REASON_EFFECT)
 	else e:SetLabel(pt) end
 end
