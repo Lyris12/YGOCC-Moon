@@ -39,12 +39,12 @@ function cm.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,cm.filter,tp,LOCATION_DECK,0,1,1,nil)
 	local tc=g:GetFirst()
 	if g:GetCount()>0 then
-		local fc=Duel.GetFieldCard(tp,LOCATION_SZONE,5)
+		local fc=Duel.GetFieldCard(tp,LOCATION_FZONE,5)
 		if fc then
 			Duel.SendtoGrave(fc,REASON_RULE)
 			Duel.BreakEffect()
-		end		
-		Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
+		end	 
+		Duel.MoveToField(tc,tp,tp,LOCATION_FZONE,POS_FACEUP,true)
 	end
 end
 
