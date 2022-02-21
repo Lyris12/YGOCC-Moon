@@ -4,7 +4,7 @@ local cid,id=GetID()
 function cid.initial_effect(c)
 	--time leap procedure
 	aux.AddOrigTimeleapType(c,false)
-	aux.AddTimeleapProc(c,8,cid.sumcon,cid.tlfilter,Duel.SendToDeck,nil,2,REASON_MATERIAL)
+	aux.AddTimeleapProc(c,8,cid.sumcon,cid.tlfilter,cid.tlcustomop)
 	c:EnableReviveLimit()
 	--Toadally Gaiaemperor.
 	local e1=Effect.CreateEffect(c)
@@ -37,13 +37,18 @@ function cid.initial_effect(c)
 	e3:SetOperation(cid.damop)
 	c:RegisterEffect(e3)
 end
+function cid.tlcustomop(e,tp,eg,ep,ev,re,r,rp,c,g)
+	Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_MATERIAL+REASON_TIMELEAP)
+	aux.TimeleapHOPT(tp)
+end
+
 function cid.sumcon(e,c)
 	if c==nil then return true end
 	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0 and
 		Duel.GetMatchingGroupCount(Card.IsSetCard,c:GetControler(),LOCATION_GRAVE,0,nil,0x9b5)>=5
 end
 	function cid.tlfilter(c,e,mg)
-	return c:IsCode(20184107) and c:GetLevel()==e:GetHandler():GetFuture()-1
+	return c:IsCode(20184107) and c:GetLevel()==e:GetHandler():GetFuture()-1 and c:IsAbleToDeck()
 end
 function cid.actfilter(c,tp)
 	return c:GetType()&TYPE_PANDEMONIUM==TYPE_PANDEMONIUM and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and c:IsSetCard(0x9b5) and (c:IsLocation(LOCATION_GRAVE) or (c:IsLocation(LOCATION_HAND) or (c:IsLocation(LOCATION_GRAVE) (c:IsLocation(LOCATION_EXTRA) and c:IsFaceup()))))

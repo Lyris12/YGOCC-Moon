@@ -1,4 +1,4 @@
---created by Swag, coded by Lyris
+--created by Swag, coded by Glitchy, edited by Lyris
 --Not yet finalized values
 --Custom constants
 EFFECT_CANNOT_BE_TIMELEAP_MATERIAL	=825
