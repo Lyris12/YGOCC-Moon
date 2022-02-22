@@ -16,22 +16,22 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e1)
 	-- Is This Ivory?
 	local e2=Effect.CreateEffect(c)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e2:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e2:SetCountLimit(1,20181417)
+	e2:SetCountLimit(1,id)
 	e2:SetCondition(cid.actcon)
 	e2:SetTarget(cid.acttg)
 	e2:SetOperation(cid.actop)
 	c:RegisterEffect(e2)
 	-- GAUNTLET HA-DUMBASS!
-		local e3=Effect.CreateEffect(c)
+	local e3=Effect.CreateEffect(c)
 	e3:SetCategory(CATEGORY_DAMAGE)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e3:SetRange(LOCATION_MZONE)
-	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e3:SetCode(EVENT_BATTLE)
-	e3:SetCountLimit(1,20181417+1000)
+	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_DELAY)
+	e3:SetCode(EVENT_BATTLE_DESTROYED)
+	e3:SetCountLimit(1,id+1000)
 	e3:SetCondition(cid.bdogcon)
 	e3:SetTarget(cid.damtg)
 	e3:SetOperation(cid.damop)
@@ -42,17 +42,18 @@ function cid.tlcustomop(e,tp,eg,ep,ev,re,r,rp,c,g)
 	aux.TimeleapHOPT(tp)
 end
 
+function cid.confilter(c)
+	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x9b5)
+end
 function cid.sumcon(e,c)
-	if c==nil then return true end
-	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0 and
-		Duel.GetMatchingGroupCount(Card.IsSetCard,c:GetControler(),LOCATION_GRAVE,0,nil,0x9b5)>=5
+	return Duel.GetMatchingGroupCount(cid.confilter,c:GetControler(),LOCATION_GRAVE,0,nil)>=5
 end
-	function cid.tlfilter(c,e,mg)
-	return c:IsCode(20184107) and c:GetLevel()==e:GetHandler():GetFuture()-1 and c:IsAbleToDeck()
+function cid.tlfilter(c,e,mg)
+	return c:IsCode(20181407) and c:GetLevel()==e:GetHandler():GetFuture()-1 and c:IsAbleToDeck()
 end
-function cid.actfilter(c,tp)
-	return c:GetType()&TYPE_PANDEMONIUM==TYPE_PANDEMONIUM and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and c:IsSetCard(0x9b5) and (c:IsLocation(LOCATION_GRAVE) or (c:IsLocation(LOCATION_HAND) or (c:IsLocation(LOCATION_GRAVE) (c:IsLocation(LOCATION_EXTRA) and c:IsFaceup()))))
-		and not c:IsForbidden() and not Duel.IsExistingMatchingCard(cid.excfilter,tp,LOCATION_SZONE,0,1,c)
+function cid.actfilter(c,tp,eg,ep,ev,re,r,rp)
+	return c:GetType()&TYPE_PANDEMONIUM==TYPE_PANDEMONIUM and c:IsSetCard(0x9b5)
+		and (not c:IsLocation(LOCATION_EXTRA) or c:IsFaceup()) and c:IsPandemoniumActivatable(tp,tp,true,false,false,false,eg,ep,ev,re,r,rp)
 end
 function cid.excfilter(c)
 	return c:GetType()&TYPE_PANDEMONIUM==TYPE_PANDEMONIUM and c:IsFaceup()
@@ -61,53 +62,49 @@ end
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_TIMELEAP)
 end
 function cid.acttg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(cid.actfilter,tp,LOCATION_GRAVE+LOCATION_HAND+LOCATION_DECK+LOCATION_EXTRA,0,1,nil,tp) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
+		and Duel.IsExistingMatchingCard(cid.actfilter,tp,LOCATION_GRAVE+LOCATION_HAND+LOCATION_DECK+LOCATION_EXTRA,0,1,nil,tp,eg,ep,ev,re,r,rp)
+	end
 end
 function cid.actop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
-	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(cid.actfilter),tp,LOCATION_GRAVE+LOCATION_HAND+LOCATION_DECK+LOCATION_EXTRA,0,1,1,nil,tp)
+	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(cid.actfilter),tp,LOCATION_GRAVE+LOCATION_HAND+LOCATION_DECK+LOCATION_EXTRA,0,1,1,nil,tp,eg,ep,ev,re,r,rp)
 	local tc=g:GetFirst()
 	if tc then
-		Duel.HintSelection(g)
-		Card.SetCardData(tc,CARDDATA_TYPE,TYPE_TRAP+TYPE_CONTINUOUS)
-		Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
-		if not tc:IsLocation(LOCATION_SZONE) then
-			local edcheck=0
-			if tc:IsLocation(LOCATION_EXTRA) then edcheck=TYPE_PENDULUM end
-			Card.SetCardData(tc,CARDDATA_TYPE,TYPE_MONSTER+TYPE_EFFECT+edcheck+aux.GetOriginalPandemoniumType(tc))
-		else
-			tc:RegisterFlagEffect(726,RESET_EVENT+0x1fe0000,EFFECT_FLAG_CANNOT_DISABLE,1)
-			tc:RegisterFlagEffect(725,RESET_PHASE+PHASE_END,EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE,1)
-		end
+		aux.PandAct(tc)(e,tp,eg,ep,ev,re,r,rp)
+		local te=tc:GetActivateEffect()
+		te:UseCountLimit(tp,1,true)
+		local tep=tc:GetControler()
+		local cost=te:GetCost()
+		if cost then cost(te,tep,eg,ep,ev,re,r,rp,1) end
 	end
 end
 function cid.dmgfilter(c,tp)
-return c:GetType()&TYPE_PANDEMONIUM==TYPE_PANDEMONIUM and c:IsFaceup() and c:IsSetCard(0x9b5)
+	local rc=c:GetReasonCard()
+	return c:GetPreviousControler()==1-tp and c:IsPreviousLocation(LOCATION_MZONE)
+		and rc and rc:IsType(TYPE_PANDEMONIUM) and rc:IsSetCard(0x9b5) and rc:IsControler(tp) and rc:IsRelateToBattle()
 end
 function cid.bdogcon(e,tp,eg,ep,ev,re,r,rp)
-	local a=Duel.GetAttacker()
-	local d=Duel.GetAttackTarget()
-	if not d then return false end
-	if d:IsControler(tp) then a,d=d,a end
-	return (a:IsType(TYPE_PANDEMONIUM) and a:IsSetCard(0x9b5)) and d:IsStatus(STATUS_BATTLE_DESTROYED)
+	return eg:IsExists(cid.dmgfilter,1,nil,tp) 
 end
 function cid.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	local bc=e:GetHandler():GetBattleTarget()
-	Duel.SetTargetCard(bc)
-	local dam=bc:GetBaseAttack()
+	local g=eg:Filter(cid.dmgfilter,nil,tp)
+	local tc
+	if #g==1 then
+		tc=g:GetFirst()
+	else
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
+		tc=g:Select(tp,1,1,nil)
+	end
+	local dam=tc:GetPreviousAttackOnField()
 	if dam<0 then dam=0 end
 	Duel.SetTargetPlayer(1-tp)
 	Duel.SetTargetParam(dam)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,dam)
 end
 function cid.damop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) then
-		local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
-		local dam=tc:GetBaseAttack()
-		if dam<0 then dam=0 end
-		Duel.Damage(p,dam,REASON_EFFECT)
-	end
+	local p,dam=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
+	Duel.Damage(p,dam,REASON_EFFECT)
 end
