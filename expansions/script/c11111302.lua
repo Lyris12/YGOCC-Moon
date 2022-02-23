@@ -39,7 +39,8 @@ function c11111302.penop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c11111302.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return r==REASON_FUSION
+    local rc=e:GetHandler():GetReasonCard()
+    return rc:IsType(TYPE_FUSION)
 end
 function c11111302.filter(c)
 	return c:IsSetCard(0x5a3) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToHand()

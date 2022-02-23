@@ -39,7 +39,8 @@ function c11111301.penop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c11111301.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return r==REASON_FUSION
+    local rc=e:GetHandler():GetReasonCard()
+    return rc:IsType(TYPE_FUSION)
 end
 function c11111301.filter(c)
 	return c:IsSetCard(0x5a3) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToHand()
