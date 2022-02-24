@@ -48,6 +48,7 @@ function c213160.initial_effect(c)
 	e7:SetOperation(c213160.wthop)
 	c:RegisterEffect(e7)
 end
+c213160.counter_add_list={0x100e}
 function c213160.afilter(c)
 	return c:IsSetCard(0xc)
 end

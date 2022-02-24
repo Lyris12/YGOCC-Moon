@@ -69,6 +69,7 @@ end
 function c213170.aatkval(e,c)
 	return c:GetCounter(0x100e)*-300
 end
+c213170.counter_add_list={0x100e}
 function c213170.acfilter(c,tp)
 	return c:GetSummonPlayer()==tp
 end
