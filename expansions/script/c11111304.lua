@@ -44,6 +44,9 @@ function c11111304.setop(e,tp,eg,ep,ev,re,r,rp)
 			e1:SetCode(EFFECT_QP_ACT_IN_SET_TURN)
 			e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 			tc:RegisterEffect(e1)
+			local e2=e1:Clone()
+			e2:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
+			tc:RegisterEffect(e2)
 		end
 	end
 function c11111304.copyfilter(c)
