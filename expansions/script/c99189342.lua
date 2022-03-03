@@ -113,7 +113,7 @@ function cid.dryop(e,tp,eg,ep,ev,re,r,rp)
 end
 --search
 function cid.sccon(e,tp,eg,ep,ev,re,r,rp)
-	return bit.band(e:GetHandler():GetPreviousLocation(),LOCATION_ONFIELD)~=0 and e:GetHandler():IsPreviousPosition(POS_FACEUP)
+	return bit.band(e:GetHandler():GetPreviousLocation(),LOCATION_ONFIELD)~=0
 end
 function cid.sctg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cid.scfilter,tp,LOCATION_DECK,0,1,nil) end
