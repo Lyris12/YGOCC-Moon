@@ -26,7 +26,7 @@ function c68709339.lfilter(c)
     return c:IsType(TYPE_MONSTER) and (c:IsSetCard(0xf08) or c:IsSetCard(0xf09))
 end
 function c68709339.filter(c)
-	return c:IsType(TYPE_MONSTER) and (c:IsSetCard(0xf08) or c:IsSetCard(0xf09))
+	return c:IsType(TYPE_MONSTER) and (c:IsSetCard(0xf08))
 end
 function c68709339.atkval(e,c)
     local g=Duel.GetMatchingGroup(c68709339.filter,c:GetControler(),LOCATION_GRAVE,0,nil)
