@@ -32,13 +32,14 @@ function s.repfilter(c,loc)
 end
 function s.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return eg:IsExists(s.repfilter,1,c,LOCATION_MZONE) end
 	local g=eg:Filter(s.repfilter,c,LOCATION_MZONE)
+	if chk==0 then return #g>0 and Duel.GetLocationCount(tp,LOCATION_SZONE)>=#g end
 	for tc in aux.Next(g) do
 		if Duel.Equip(tp,tc,c,true,true) then
 			local e1=Effect.CreateEffect(c)
 			e1:SetType(EFFECT_TYPE_SINGLE)
 			e1:SetCode(EFFECT_EQUIP_LIMIT)
+			e1:SetProperty(EFFECT_FLAG_COPY_INHERIT+EFFECT_FLAG_OWNER_RELATE)
 			e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 			e1:SetValue(s.eqlimit)
 			tc:RegisterEffect(e1)
