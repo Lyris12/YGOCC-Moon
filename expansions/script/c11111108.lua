@@ -28,7 +28,6 @@ function cid.initial_effect(c)
 	e3:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e3:SetCondition(cid.eqcon)
 	e3:SetTarget(cid.eqtg)
 	e3:SetOperation(cid.eqop)
 	c:RegisterEffect(e3)
@@ -63,16 +62,13 @@ function cid.initial_effect(c)
 end
 --Material
 function cid.matfilter(c,fc,sub,mg,sg)
-    return c:IsFusionSetCard(0x571) and c:GetEquipGroup():IsExists(Card.IsType,1,nil,TYPE_EQUIP)
+	return c:IsFusionSetCard(0x571) and c:GetEquipGroup():IsExists(Card.IsType,1,nil,TYPE_EQUIP)
 end
 --Attribute change
 function cid.attcon(e)
 	return e:GetHandler():GetEquipGroup():IsExists(Card.IsSetCard, 1, nil, 0x571)
 end
 --shuffle and equip
-function cid.eqcon(e, tp, eg, ep, ev, re, r, rp)
-	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SPECIAL+388
-end
 function cid.tdfilter(c, tp)
 	return c:IsSetCard(0x571) and c:IsType(TYPE_EQUIP) and c:IsAbleToDeck()
 		and Duel.IsExistingMatchingCard(cid.eqfilter, tp, LOCATION_DECK, 0, 1, nil, c:GetCode())
