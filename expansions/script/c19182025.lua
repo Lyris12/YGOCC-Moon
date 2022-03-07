@@ -13,7 +13,7 @@ function s.initial_effect(c)
 	local e6=Effect.CreateEffect(c)
 	e6:SetType(EFFECT_TYPE_IGNITION)
 	e6:SetRange(LOCATION_GRAVE)
-	e6:SetCountLimit(1,id-1)
+	e6:SetCountLimit(1,id+1000)
 	e6:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e6:SetCost(s.cost)
 	e6:SetTarget(s.tg)
@@ -29,7 +29,7 @@ function s.initial_effect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e4:SetCode(EVENT_TO_GRAVE)
 	e4:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
-	e4:SetCountLimit(1,id+1)
+	e4:SetCountLimit(1,id+2000)
 	e4:SetCondition(s.con)
 	e4:SetCategory(CATEGORY_EQUIP)
 	e4:SetTarget(s.eqtg)
@@ -115,7 +115,7 @@ function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return c:IsSummonType(SUMMON_TYPE_SPECIAL) and c:IsAbleToRemove() and not c:IsReason(REASON_REPLACE) end
+	if chk==0 then return c:IsSummonType(SUMMON_TYPE_SPECIAL) and c:IsLocation(LOCATION_MZONE) and not c:IsReason(REASON_REPLACE) end
 	if Duel.Remove(c,POS_FACEDOWN,r|REASON_REPLACE) then
 		c:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_SET_AVAILABLE,1)
 		local de=Effect.CreateEffect(c)
@@ -141,9 +141,9 @@ function s.descon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_CARD,0,id)
-	local tc=e:GetOwner()
-	if Duel.GetTurnCount()~=e:GetLabel() and e:GetLabelObject():GetFlagEffect(id)~=0 then
+	local tc=e:GetLabelObject()
+	if Duel.GetTurnCount()~=e:GetLabel() and tc:GetFlagEffect(id)~=0 then
+		Duel.Hint(HINT_CARD,0,id)
 		Duel.SendtoDeck(tc,nil,2,REASON_EFFECT)
 	end
 end
