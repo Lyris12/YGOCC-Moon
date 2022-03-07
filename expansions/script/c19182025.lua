@@ -138,10 +138,12 @@ function s.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	return true
 end
 function s.descon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()==tp and Duel.GetTurnCount()~=e:GetLabel() and e:GetLabelObject():GetFlagEffect(id)~=0
+	return Duel.GetTurnPlayer()==tp
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_CARD,0,id)
-	local tc=e:GetLabelObject()
-	Duel.SendtoDeck(tc,nil,2,REASON_EFFECT)
+	local tc=e:GetOwner()
+	if Duel.GetTurnCount()~=e:GetLabel() and e:GetLabelObject():GetFlagEffect(id)~=0 then
+		Duel.SendtoDeck(tc,nil,2,REASON_EFFECT)
+	end
 end

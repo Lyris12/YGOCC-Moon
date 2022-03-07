@@ -61,7 +61,7 @@ function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return c:GetEquipGroup():IsExists(Card.IsAbleToRemoveAsCost,5,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	Duel.Remove(c:GetEquipGroup():FilterSelect(tp,Card.IsAbleToRemoveAsCost,5,5,nil),REASON_COST)
+	Duel.Remove(c:GetEquipGroup():FilterSelect(tp,Card.IsAbleToRemoveAsCost,5,5,nil),POS_FACEUP,REASON_COST)
 end
 function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local h=Duel.GetFieldGroupCount(tp,LOCATION_HAND,LOCATION_HAND)
