@@ -15,6 +15,7 @@ EFFECT_REMEMBER_GRANTED_LEVEL		=1504
 EFFECT_REMEMBER_XYZ_HOLDER			=1505
 EFFECT_INDESTRUCTABLE_COST			=1506
 EFFECT_EXTRA_XYZ_MATERIAL			=1507
+EFFECT_CHANGE_RECOVER				=1508
 
 TYPE_CUSTOM							=0
 CTYPE_CUSTOM						=0
@@ -29,8 +30,6 @@ FLAG_FACEDOWN_BANISH=21932999
 FLAG_FAKE_FU_BANISH=21933000
 
 --Commonly used cards
-CARD_BLUEEYES_SPIRIT				=59822133
-CARD_CYBER_DRAGON					=70095154
 CARD_PYRO_CLOCK						=1082946
 CARD_INLIGHTENED_PSYCHIC_HELMET		=102400006
 CARD_NEBULA_TOKEN					=218201917
@@ -38,6 +37,94 @@ CARD_DRAGON_EGG_TOKEN				=20157305
 CARD_BLACK_GARDEN					=71645242
 CARD_EVIL_DRAGON_ANANTA				=8400623
 CARD_ANONYMIZE						=102400157
+
+CARD_ALBAZ                  = 68468459
+CARD_ARGYRO_SYSTEM          = 21887075
+CARD_ASSAULT_MODE           = 80280737
+CARD_BLACK_ROSE_DRAGON      = 73580471
+CARD_BLUEEYES_SPIRIT        = 59822133
+CARD_BLUEEYES_W_DRAGON      = 89631139
+CARD_CLOCK_LIZARD           = 51476410
+CARD_CYBER_DRAGON           = 70095154
+CARD_DARK_FUSION            = 94820406
+CARD_DARK_MAGICIAN          = 46986414
+CARD_DARK_MAGICIAN_GIRL     = 38033121
+CARD_DARK_SANCTUARY         = 16625614
+CARD_DESTINY_BOARD          = 94212438
+CARD_DREAM_MIRROR_JOY       = 74665651
+CARD_DREAM_MIRROR_TERROR    = 1050355
+CARD_EHERO_BLAZEMAN         = 63060238
+CARD_EVIL_EYE_SELENE        = 44133040
+CARD_FIRE_FIST_EAGLE        = 46241344
+CARD_FOSSIL_FUSION          = 59419719
+CARD_GAIA_CHAMPION          = 66889139
+CARD_GALAXYEYES_P_DRAGON    = 93717133
+CARD_GOLDEN_LORD            = 95440946
+CARD_HARPIE_LADY            = 76812113
+CARD_HARPIE_LADY_SISTERS    = 12206212
+CARD_JACK_KNIGHT            = 90876561
+CARD_JINZO                  = 77585513
+CARD_KING_KNIGHT            = 64788463
+CARD_KURIBOH                = 40640057
+CARD_MAGICAL_MIDBREAKER     = 71650854
+CARD_MIRRORMASTER_ICEBARRIER= 18319762
+CARD_MONSTER_REBORN         = 83764718
+CARD_MYUTANT_ARSENAL        = 7574904
+CARD_MYUTANT_BEAST          = 34695290
+CARD_MYUTANT_MIST           = 61089209
+CARD_NECROVALLEY            = 47355498
+CARD_NEOS                   = 89943723
+CARD_NUMERON_NETWORK        = 41418852
+CARD_ORCUSTRATED_BABEL      = 90351981
+CARD_POLYMERIZATION         = 24094653
+CARD_PSYFRAME_DRIVER        = 49036338
+CARD_PSYFRAME_LAMBDA        = 8802510
+CARD_QUEEN_KNIGHT           = 25652259
+CARD_RA                     = 10000010
+CARD_REDEYES_B_DRAGON       = 74677422
+CARD_RICE_SUSHIP            = 24639891
+CARD_SALAMANGREAT_SANCTUARY = 1295111
+CARD_SANCTUARY_SKY          = 56433456
+CARD_SECURITYFORCE_CHASE    = 55049722
+CARD_SKULL_SERVANT          = 32274490
+CARD_SPIRIT_ELIMINATION     = 69832741
+CARDS_SPIRIT_MESSAGE        = {31893528,67287533,94772232,30170981}
+CARD_STARDUST_DRAGON        = 44508094
+CARD_STROMBERG              = 72283691
+CARD_SUMMON_GATE            = 29724053
+CARD_SUMMONED_SKULL         = 70781052
+CARD_UMI                    = 22702055
+CARD_URSARCTIC_BIG_DIPPER   = 89264428
+CARD_URSARCTIC_DRYTRON      = 89771220
+CARD_VALIANTS_KOENIGWISSEN  = 100427112
+CARD_VALIANTS_SHINRABANSHO  = 100427111
+CARD_VIJAM                  = 15610297
+CARD_VISAS_STAFROST         = 56099748
+
+--Commonly used Tokens
+TOKEN_BRAVE                         = 3285552
+TOKEN_MECHA_PHANTOM_BEAST           = 31533705
+TOKEN_MECHA_PHANTOM_BEAST_TETHERWOLF= 67922703
+TOKEN_MECHA_PHANTOM_BEAST_DRACOSSACK= 22110648
+TOKEN_MECHA_PHANTOM_BEAST_HARRLIARD = 20368764
+TOKEN_ENGINE                        = 82556059
+TOKEN_FIREBALL                      = 23116809
+TOKEN_HIPPO                         = 11050416
+TOKEN_IGNISTER                      = 11738490
+TOKEN_INSECT_MONSTER                = 91512836
+TOKEN_KURIBOH                       = 40703223
+TOKEN_LINK                          = 48068379
+TOKEN_OPTION                        = 93130022
+TOKEN_REPTILIANNE                   = 21179144
+TOKEN_ROSE                          = 71645243
+TOKEN_SHINOBIRD                     = 52900001
+TOKEN_SLIME                         = 21770261
+TOKEN_SWORDSOUL                     = 20001444
+TOKEN_TRICKSTAR                     = 51208047
+TOKEN_WORLD_LEGACY                  = 46647145
+TOKEN_DUAL_AVATAR_SPIRIT            = 87669905
+TOKEN_OJAMA                         = 29843092
+TOKEN_OJAMA_DUO                     = 14470846
 
 --Effect Aliases
 -- EFFECT_MUST_BE_SYNCHRO_MATERIAL = EFFECT_MUST_BE_SMATERIAL
@@ -60,15 +147,8 @@ end
 function Card.IsCustomReason(c,rs)
 	return (c:GetReason()>>32)&rs>0
 end
---overwrite functions
-local is_type, card_remcounter, duel_remcounter, effect_set_target_range, effect_set_reset, add_xyz_proc, add_xyz_proc_nlv, duel_overlay, duel_set_lp, duel_select_target, duel_banish, card_check_remove_overlay_card, is_reason, duel_check_tribute, select_tribute,card_sethighlander,
-	card_is_facedown, card_is_able_to_remove, card_is_able_to_remove_as_cost, card_is_able_to_hand, card_is_can_be_ssed, card_get_level, card_get_previous_level, card_is_level, card_is_level_below, card_is_level_above, card_is_destructable, card_get_syn_level, card_get_rit_level, card_is_xyz_level,
-	duel_check_xyz_mat, duel_select_xyz_mat = 
-	
-	Card.IsType, Card.RemoveCounter, Duel.RemoveCounter, Effect.SetTargetRange, Effect.SetReset, Auxiliary.AddXyzProcedure, Auxiliary.AddXyzProcedureLevelFree, Duel.Overlay, Duel.SetLP, Duel.SelectTarget, Duel.Remove, Card.CheckRemoveOverlayCard, Card.IsReason, Duel.CheckTribute, Duel.SelectTribute, Card.SetUniqueOnField,
-	Card.IsFacedown, Card.IsAbleToRemove, Card.IsAbleToRemoveAsCost, Card.IsAbleToHand, Card.IsCanBeSpecialSummoned, Card.GetLevel, Card.GetPreviousLevelOnField, Card.IsLevel, Card.IsLevelBelow, Card.IsLevelAbove, Card.IsDestructable, Card.GetSynchroLevel, Card.GetRitualLevel, Card.IsXyzLevel,
-	Duel.CheckXyzMaterial, Duel.SelectXyzMaterial
 
+dofile("expansions/script/glitchylib.lua") --Glitchy
 dofile("expansions/script/proc_evolute.lua") --Evolutes
 dofile("expansions/script/proc_conjoin.lua") --Conjoints
 dofile("expansions/script/proc_pandemonium.lua") --Pandemoniums
@@ -94,6 +174,15 @@ dofile("expansions/script/proc_xros.lua") --Xroses
 dofile("expansions/script/muse_proc.lua") --"Muse"
 dofile("expansions/script/tables.lua") --Special Tables
 dofile("expansions/script/proc_evolve.lua") --Evolve
+
+--overwrite functions
+local is_type, card_remcounter, duel_remcounter, effect_set_target_range, effect_set_reset, add_xyz_proc, add_xyz_proc_nlv, duel_overlay, duel_set_lp, duel_select_target, duel_banish, card_check_remove_overlay_card, is_reason, duel_check_tribute, select_tribute,card_sethighlander,
+	card_is_facedown, card_is_able_to_remove, card_is_able_to_remove_as_cost, card_is_able_to_hand, card_is_can_be_ssed, card_get_level, card_get_previous_level, card_is_level, card_is_level_below, card_is_level_above, card_is_destructable, card_get_syn_level, card_get_rit_level, card_is_xyz_level,
+	duel_check_xyz_mat, duel_select_xyz_mat, duel_recover, duel_damage = 
+	
+	Card.IsType, Card.RemoveCounter, Duel.RemoveCounter, Effect.SetTargetRange, Effect.SetReset, Auxiliary.AddXyzProcedure, Auxiliary.AddXyzProcedureLevelFree, Duel.Overlay, Duel.SetLP, Duel.SelectTarget, Duel.Remove, Card.CheckRemoveOverlayCard, Card.IsReason, Duel.CheckTribute, Duel.SelectTribute, Card.SetUniqueOnField,
+	Card.IsFacedown, Card.IsAbleToRemove, Card.IsAbleToRemoveAsCost, Card.IsAbleToHand, Card.IsCanBeSpecialSummoned, Card.GetLevel, Card.GetPreviousLevelOnField, Card.IsLevel, Card.IsLevelBelow, Card.IsLevelAbove, Card.IsDestructable, Card.GetSynchroLevel, Card.GetRitualLevel, Card.IsXyzLevel,
+	Duel.CheckXyzMaterial, Duel.SelectXyzMaterial, Duel.Recover, Duel.Damage
 
 Card.IsReason=function(c,rs)
 	local cusrs=rs>>32
@@ -298,7 +387,6 @@ end
 Duel.Remove=function(cc,pos,r,...)
 	local x={...}
 	local checkp=#x>0 and x[1] or self_reference_effect:GetHandlerPlayer()
-	
 	local cc=Group.CreateGroup()+cc
 	local tg=cc:Clone()
 	for c in aux.Next(tg) do
@@ -958,6 +1046,36 @@ Duel.SelectXyzMaterial=function(p,sc,f,lv,min,max,mg)
 	return duel_select_xyz_mat(p,sc,f,lv,min,max,extramats)
 end
 
+Duel.Recover = function(p,v,r,...)
+	if Duel.IsPlayerAffectedByEffect(p,EFFECT_CHANGE_RECOVER) then
+		for _,e in ipairs({Duel.IsPlayerAffectedByEffect(p,EFFECT_CHANGE_RECOVER)}) do
+			local val=e:GetValue()
+			if val and (aux.GetValueType(val)=="number" or val(e,r,v)) then
+				if aux.GetValueType(val)~="number" then
+					val=val(e,r,v)
+				end
+				return duel_recover(p,val,r,...)
+			end
+		end
+	else
+		return duel_recover(p,v,r,...)
+	end
+end
+Duel.Damage = function(p,v,r,...)
+	if Duel.IsPlayerAffectedByEffect(p,EFFECT_REVERSE_DAMAGE) and Duel.IsPlayerAffectedByEffect(p,EFFECT_CHANGE_RECOVER) then
+		for _,e in ipairs({Duel.IsPlayerAffectedByEffect(p,EFFECT_CHANGE_RECOVER)}) do
+			local val=e:GetValue()
+			if val and (aux.GetValueType(val)=="number" or val(e,r|REASON_RDAMAGE,v)) then
+				if aux.GetValueType(val)~="number" then
+					val=val(e,r|REASON_RDAMAGE,v)
+				end
+				return duel_damage(p,val,r,...)
+			end
+		end
+	else
+		return duel_damage(p,v,r,...)
+	end
+end
 
 --Custom Functions
 function Auxiliary.TribCheckRecursive(c,tp,mg,sg,sc,ct,min,max,p,zone)
@@ -1301,15 +1419,7 @@ GLCATEGORY_DEACTIVATE_LMARKER=0x20000
 GLCATEGORY_SYNCHRO_SUMMON=0x40000
 
 --glitchy's custom effects
-EFFECT_CANNOT_ACTIVATE_LMARKER=8000
-EFFECT_CANNOT_DEACTIVATE_LMARKER=8001
-EFFECT_PRE_LOCATION=8002
-EFFECT_NO_ARCHETYPE=8003
 
-EFFECT_BECOME_HOPT=99977755
-EFFECT_SYNCHRO_MATERIAL_EXTRA=26134837
-EFFECT_SYNCHRO_MATERIAL_MULTIPLE=26134838
-EFFECT_REVERSE_WHEN_IF=48928491
 
 --glitchy's custom events
 EVENT_ACTIVATE_LINK_MARKER=9000
@@ -2059,11 +2169,38 @@ if not global_card_effect_table_global_check then
 	function Card:RegisterEffect(e,forced)
 		if not global_card_effect_table[self] then global_card_effect_table[self]={} end
 		table.insert(global_card_effect_table[self],e)
+		
+		if #global_card_effect_table[self]==1 then
+			local mt=getmetatable(self)
+			local cid=self:GetOriginalCode()
+			if LISTED_NAMES[cid] and not self.checked_card_code_list then
+				if self.card_code_list==nil then
+					mt.card_code_list={}
+					for _,code in ipairs(LISTED_NAMES[cid]) do
+						if code==0 then
+							mt.card_code_list[cid]=true
+						else
+							mt.card_code_list[code]=true
+						end
+					end
+				else
+					for _,code in ipairs(LISTED_NAMES[cid]) do
+						if code==0 then
+							self.card_code_list[cid]=true
+						else
+							self.card_code_list[code]=true
+						end
+					end
+				end
+				mt.checked_card_code_list=true
+			end
+		end
+		
 		if e:GetCode()==EFFECT_DISABLE_FIELD and e:GetLabel()==0 and e:GetOperation() then
 			local op=e:GetOperation()
 			e:SetOperation(Auxiliary.SetOperationResultAsLabel(op))
 		end
-		local condition,cost,tg,op=e:GetCondition(),e:GetCost(),e:GetTarget(),e:GetOperation()
+		local condition,cost,tg,op,val=e:GetCondition(),e:GetCost(),e:GetTarget(),e:GetOperation(),e:GetValue()
 		if condition and ((e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G) or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()==EFFECT_TYPE_XMATERIAL or e:GetType()==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or e:GetType()&EFFECT_TYPE_GRANT~=0)) then	
 			local newcon =	function(...)
 								self_reference_effect=e
@@ -2100,6 +2237,24 @@ if not global_card_effect_table_global_check then
 							end
 			e:SetOperation(newop)
 		end
+		if val then
+			if type(val)=="function" and ((e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G) or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()==EFFECT_TYPE_XMATERIAL or e:GetType()==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or e:GetType()&EFFECT_TYPE_GRANT~=0)) then
+				local newval =	function(...)
+									self_reference_effect=e
+									return val(...)
+								end
+				e:SetValue(newval)
+				
+			elseif (e:GetCode()==EFFECT_CHANGE_CODE or e:GetCode()==EFFECT_CHANGE_CODE) and e:GetOwner():IsHasEffect(EFFECT_GLITCHY_HACK_CODE) then
+				local ceg={e:GetOwner():IsHasEffect(EFFECT_GLITCHY_HACK_CODE)}
+				local ce=ceg[#ceg]
+				local val=ce:GetValue()
+				local re=ce:GetLabelObject()
+				if val and (not re or re and self_reference_effect and self_reference_effect==re) then
+					e:SetValue(val)
+				end
+			end
+		end
 		return self.register_global_card_effect_table(self,e,forced)
 	end
 end
@@ -2118,7 +2273,7 @@ if not global_duel_effect_table_global_check then
 									if e:GetCode()==DUEL_EFFECT_NOP[i] then e:SetProperty(e:GetProperty()|EFFECT_FLAG_PLAYER_TARGET) e:SetTargetRange(1,0) end
 								end
 							end
-							local condition,cost,tg,op=e:GetCondition(),e:GetCost(),e:GetTarget(),e:GetOperation()
+							local condition,cost,tg,op,val=e:GetCondition(),e:GetCost(),e:GetTarget(),e:GetOperation(),e:GetValue()
 							if condition and ((e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G) or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()&EFFECT_TYPE_GRANT~=0)) then
 								local newcon =	function(...)
 													self_reference_effect=e
@@ -2154,6 +2309,24 @@ if not global_duel_effect_table_global_check then
 													return op(...)
 												end
 								e:SetOperation(newop)
+							end
+							if val then
+								if type(val)=="function" and ((e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G) or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()&EFFECT_TYPE_GRANT~=0)) then
+									local newval =	function(...)
+														self_reference_effect=e
+														return val(...)
+													end
+									e:SetValue(newval)
+								
+								elseif (e:GetCode()==EFFECT_CHANGE_CODE or e:GetCode()==EFFECT_CHANGE_CODE) and e:GetOwner():IsHasEffect(EFFECT_GLITCHY_HACK_CODE) then
+									local ceg={e:GetOwner():IsHasEffect(EFFECT_GLITCHY_HACK_CODE)}
+									local ce=ceg[#ceg]
+									local val=ce:GetValue()
+									local re=ce:GetLabelObject()
+									if val and (not re or re and self_reference_effect and self_reference_effect==re) then
+										e:SetValue(val)
+									end
+								end
 							end
 							return Duel.register_global_duel_effect_table(e,tp)
 	end
