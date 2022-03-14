@@ -25,9 +25,10 @@ TYPE_EXTRA							=TYPE_EXTRA|TYPE_TIMELEAP
 
 --overwrite functions
 local get_type, get_orig_type, get_prev_type_field, get_level, get_syn_level, get_rit_level, get_orig_level, is_xyz_level, 
-	get_prev_level_field, is_level, is_level_below, is_level_above, get_reason, syn_target = 
+	get_prev_level_field, is_level, is_level_below, is_level_above, get_reason, syn_target, get_fusion_type, get_synchro_type, get_xyz_type, get_link_type, get_ritual_type = 
 	Card.GetType, Card.GetOriginalType, Card.GetPreviousTypeOnField, Card.GetLevel, 
-	Card.GetSynchroLevel, Card.GetRitualLevel, Card.GetOriginalLevel, Card.IsXyzLevel, Card.GetPreviousLevelOnField, Card.IsLevel, Card.IsLevelBelow, Card.IsLevelAbove, Card.GetReason, Auxiliary.SynTarget
+	Card.GetSynchroLevel, Card.GetRitualLevel, Card.GetOriginalLevel, Card.IsXyzLevel, Card.GetPreviousLevelOnField, Card.IsLevel, Card.IsLevelBelow, Card.IsLevelAbove, Card.GetReason, Auxiliary.SynTarget,
+	Card.GetFusionType, Card.GetSynchroType, Card.GetXyzType, Card.GetLinkType, Card.GetRitualType
 
 Card.GetType=function(c,scard,sumtype,p)
 	local tpe=scard and get_type(c,scard,sumtype,p) or get_type(c)
@@ -117,6 +118,56 @@ Auxiliary.SynTarget=function(f1,f2,minc,maxc)
 				end
 				return res
 	end
+end
+Card.GetFusionType=function(c)
+	local tpe=get_fusion_type(c)
+	if Auxiliary.Timeleaps[c] then
+		tpe=tpe|TYPE_TIMELEAP
+		if not Auxiliary.Timeleaps[c]() then
+			tpe=tpe&~TYPE_SYNCHRO
+		end
+	end
+	return tpe
+end
+Card.GetSynchroType=function(c)
+	local tpe=get_synchro_type(c)
+	if Auxiliary.Timeleaps[c] then
+		tpe=tpe|TYPE_TIMELEAP
+		if not Auxiliary.Timeleaps[c]() then
+			tpe=tpe&~TYPE_SYNCHRO
+		end
+	end
+	return tpe
+end
+Card.GetXyzType=function(c)
+	local tpe=get_xyz_type(c)
+	if Auxiliary.Timeleaps[c] then
+		tpe=tpe|TYPE_TIMELEAP
+		if not Auxiliary.Timeleaps[c]() then
+			tpe=tpe&~TYPE_SYNCHRO
+		end
+	end
+	return tpe
+end
+Card.GetLinkType=function(c)
+	local tpe=get_link_type(c)
+	if Auxiliary.Timeleaps[c] then
+		tpe=tpe|TYPE_TIMELEAP
+		if not Auxiliary.Timeleaps[c]() then
+			tpe=tpe&~TYPE_SYNCHRO
+		end
+	end
+	return tpe
+end
+Card.GetRitualType=function(c)
+	local res=get_ritual_type(c)
+	if Auxiliary.Timeleaps[c] then
+		tpe=tpe|TYPE_TIMELEAP
+		if not Auxiliary.Timeleaps[c]() then
+			tpe=tpe&~TYPE_SYNCHRO
+		end
+	end
+	return tpe
 end
 
 --Custom Functions

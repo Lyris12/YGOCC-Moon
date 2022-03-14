@@ -20,8 +20,8 @@ SUMMON_TYPE_PANDEMONIUM					=SUMMON_TYPE_SPECIAL+726
 Auxiliary.Pandemoniums={} --number as index = card, card as index = function() is_pendulum
 
 --overwrite functions
-local get_type, get_orig_type, get_prev_type_field, get_left_scale, get_right_scale = 
-	Card.GetType, Card.GetOriginalType, Card.GetPreviousTypeOnField, Card.GetLeftScale, Card.GetRightScale
+local get_type, get_orig_type, get_prev_type_field, get_left_scale, get_right_scale, get_fusion_type, get_synchro_type, get_xyz_type, get_link_type, get_ritual_type = 
+	Card.GetType, Card.GetOriginalType, Card.GetPreviousTypeOnField, Card.GetLeftScale, Card.GetRightScale, Card.GetFusionType, Card.GetSynchroType, Card.GetXyzType, Card.GetLinkType, Card.GetRitualType
 
 Card.GetType=function(c,scard,sumtype,p)
 	local tpe=scard and get_type(c,scard,sumtype,p) or get_type(c)
@@ -98,6 +98,56 @@ Card.GetRightScale=function(c)
 		end
 	end
 	return scale
+end
+Card.GetFusionType=function(c)
+	local tpe=get_fusion_type(c)
+	if Auxiliary.Pandemoniums[c] then
+		tpe=tpe|TYPE_PANDEMONIUM
+		if not Auxiliary.Pandemoniums[c]() then
+			tpe=tpe&~TYPE_PENDULUM
+		end
+	end
+	return tpe
+end
+Card.GetSynchroType=function(c)
+	local tpe=get_synchro_type(c)
+	if Auxiliary.Pandemoniums[c] then
+		tpe=tpe|TYPE_PANDEMONIUM
+		if not Auxiliary.Pandemoniums[c]() then
+			tpe=tpe&~TYPE_PENDULUM
+		end
+	end
+	return tpe
+end
+Card.GetXyzType=function(c)
+	local tpe=get_xyz_type(c)
+	if Auxiliary.Pandemoniums[c] then
+		tpe=tpe|TYPE_PANDEMONIUM
+		if not Auxiliary.Pandemoniums[c]() then
+			tpe=tpe&~TYPE_PENDULUM
+		end
+	end
+	return tpe
+end
+Card.GetLinkType=function(c)
+	local tpe=get_link_type(c)
+	if Auxiliary.Pandemoniums[c] then
+		tpe=tpe|TYPE_PANDEMONIUM
+		if not Auxiliary.Pandemoniums[c]() then
+			tpe=tpe&~TYPE_PENDULUM
+		end
+	end
+	return tpe
+end
+Card.GetRitualType=function(c)
+	local res=get_ritual_type(c)
+	if Auxiliary.Pandemoniums[c] then
+		tpe=tpe|TYPE_PANDEMONIUM
+		if not Auxiliary.Pandemoniums[c]() then
+			tpe=tpe&~TYPE_PENDULUM
+		end
+	end
+	return tpe
 end
 
 --Custom Functions

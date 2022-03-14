@@ -147,6 +147,12 @@ end
 function Card.IsCustomReason(c,rs)
 	return (c:GetReason()>>32)&rs>0
 end
+function Card.GetRitualType(c)
+	if c:IsLocation(LOCATION_SZONE) and c:GetOriginalType()&TYPE_MONSTER>0 then
+		return c:GetOriginalType()
+	end
+	return c:GetType()
+end
 
 dofile("expansions/script/glitchylib.lua") --Glitchy
 dofile("expansions/script/proc_evolute.lua") --Evolutes
@@ -211,21 +217,22 @@ Card.IsType=function(c,tpe,scard,sumtype,p)
 	if custpe<=0 then return false end
 	return c:IsCustomType(custpe,scard,sumtype,p)
 end
--- Card.IsRitualType=function(c,typ)
-	-- return c:IsType(typ)
--- end
--- Card.IsFusionType=function(c,typ)
-	-- return c:IsType(typ)
--- end
--- Card.IsSynchroType=function(c,typ)
-	-- return c:IsType(typ)
--- end
--- Card.IsXyzType=function(c,typ)
-	-- return c:IsType(typ)
--- end
--- Card.IsLinkType=function(c,typ)
-	-- return c:IsType(typ)
--- end
+Card.IsRitualType=function(c,typ)
+	return (c:GetRitualType(c)&typ)>0
+end
+Card.IsFusionType=function(c,typ)
+	return (c:GetFusionType(c)&typ)>0
+end
+Card.IsSynchroType=function(c,typ)
+	return (c:GetSynchroType(c)&typ)>0
+end
+Card.IsXyzType=function(c,typ)
+	return (c:GetXyzType(c)&typ)>0
+end
+Card.IsLinkType=function(c,typ)
+	return (c:GetLinkType(c)&typ)>0
+end
+
 Card.RemoveCounter=function(c,p,typ,ct,r)
 	local n=c:GetCounter(typ)
 	card_remcounter(c,p,typ,ct,r)

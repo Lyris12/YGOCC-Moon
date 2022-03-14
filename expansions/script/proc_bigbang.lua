@@ -26,8 +26,8 @@ table.insert(aux.CannotBeEDMatCodes,EFFECT_CANNOT_BE_BIGBANG_MATERIAL)
 TYPE_EXTRA							=TYPE_EXTRA|TYPE_BIGBANG
 
 --overwrite functions
-local get_type, get_orig_type, get_prev_type_field, get_reason = 
-	Card.GetType, Card.GetOriginalType, Card.GetPreviousTypeOnField, Card.GetReason
+local get_type, get_orig_type, get_prev_type_field, get_reason, get_fusion_type, get_synchro_type, get_xyz_type, get_link_type, get_ritual_type =
+	Card.GetType, Card.GetOriginalType, Card.GetPreviousTypeOnField, Card.GetReason, Card.GetFusionType, Card.GetSynchroType, Card.GetXyzType, Card.GetLinkType, Card.GetRitualType
 
 Card.GetType=function(c,scard,sumtype,p)
 	local tpe=scard and get_type(c,scard,sumtype,p) or get_type(c)
@@ -66,6 +66,56 @@ Card.GetReason=function(c)
 		rs=rs|REASON_BIGBANG
 	end
 	return rs
+end
+Card.GetFusionType=function(c)
+	local tpe=get_fusion_type(c)
+	if Auxiliary.Bigbangs[c] then
+		tpe=tpe|TYPE_BIGBANG
+		if not Auxiliary.Bigbangs[c]() then
+			tpe=tpe&~TYPE_SYNCHRO
+		end
+	end
+	return tpe
+end
+Card.GetSynchroType=function(c)
+	local tpe=get_synchro_type(c)
+	if Auxiliary.Bigbangs[c] then
+		tpe=tpe|TYPE_BIGBANG
+		if not Auxiliary.Bigbangs[c]() then
+			tpe=tpe&~TYPE_SYNCHRO
+		end
+	end
+	return tpe
+end
+Card.GetXyzType=function(c)
+	local tpe=get_xyz_type(c)
+	if Auxiliary.Bigbangs[c] then
+		tpe=tpe|TYPE_BIGBANG
+		if not Auxiliary.Bigbangs[c]() then
+			tpe=tpe&~TYPE_SYNCHRO
+		end
+	end
+	return tpe
+end
+Card.GetLinkType=function(c)
+	local tpe=get_link_type(c)
+	if Auxiliary.Bigbangs[c] then
+		tpe=tpe|TYPE_BIGBANG
+		if not Auxiliary.Bigbangs[c]() then
+			tpe=tpe&~TYPE_SYNCHRO
+		end
+	end
+	return tpe
+end
+Card.GetRitualType=function(c)
+	local res=get_ritual_type(c)
+	if Auxiliary.Bigbangs[c] then
+		tpe=tpe|TYPE_BIGBANG
+		if not Auxiliary.Bigbangs[c]() then
+			tpe=tpe&~TYPE_SYNCHRO
+		end
+	end
+	return tpe
 end
 
 --Custom Functions

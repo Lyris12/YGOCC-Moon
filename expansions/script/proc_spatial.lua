@@ -21,8 +21,8 @@ table.insert(aux.CannotBeEDMatCodes,EFFECT_CANNOT_BE_SPACE_MATERIAL)
 TYPE_EXTRA						=TYPE_EXTRA|TYPE_SPATIAL
 
 --overwrite functions
-local get_rank, get_orig_rank, prev_rank_field, is_rank, is_rank_below, is_rank_above, get_type, get_orig_type, get_prev_type_field, change_position = 
-	Card.GetRank, Card.GetOriginalRank, Card.GetPreviousRankOnField, Card.IsRank, Card.IsRankBelow, Card.IsRankAbove, Card.GetType, Card.GetOriginalType, Card.GetPreviousTypeOnField, Duel.ChangePosition
+local get_rank, get_orig_rank, prev_rank_field, is_rank, is_rank_below, is_rank_above, get_type, get_orig_type, get_prev_type_field, change_position, get_fusion_type, get_synchro_type, get_xyz_type, get_link_type, get_ritual_type = 
+	Card.GetRank, Card.GetOriginalRank, Card.GetPreviousRankOnField, Card.IsRank, Card.IsRankBelow, Card.IsRankAbove, Card.GetType, Card.GetOriginalType, Card.GetPreviousTypeOnField, Duel.ChangePosition, Card.GetFusionType, Card.GetSynchroType, Card.GetXyzType, Card.GetLinkType, Card.GetRitualType
 
 Card.GetRank=function(c)
 	if Auxiliary.Spatials[c] then return 0 end
@@ -96,6 +96,56 @@ Duel.ChangePosition=function(cc, au, ad, du, dd)
 		end
 	end
 	return change_position(cc,au,ad,du,dd)+ct
+end
+Card.GetFusionType=function(c)
+	local tpe=get_fusion_type(c)
+	if Auxiliary.Spatials[c] then
+		tpe=tpe|TYPE_SPATIAL
+		if not Auxiliary.Spatials[c]() then
+			tpe=tpe&~TYPE_XYZ
+		end
+	end
+	return tpe
+end
+Card.GetSynchroType=function(c)
+	local tpe=get_synchro_type(c)
+	if Auxiliary.Spatials[c] then
+		tpe=tpe|TYPE_SPATIAL
+		if not Auxiliary.Spatials[c]() then
+			tpe=tpe&~TYPE_XYZ
+		end
+	end
+	return tpe
+end
+Card.GetXyzType=function(c)
+	local tpe=get_xyz_type(c)
+	if Auxiliary.Spatials[c] then
+		tpe=tpe|TYPE_SPATIAL
+		if not Auxiliary.Spatials[c]() then
+			tpe=tpe&~TYPE_XYZ
+		end
+	end
+	return tpe
+end
+Card.GetLinkType=function(c)
+	local tpe=get_link_type(c)
+	if Auxiliary.Spatials[c] then
+		tpe=tpe|TYPE_SPATIAL
+		if not Auxiliary.Spatials[c]() then
+			tpe=tpe&~TYPE_XYZ
+		end
+	end
+	return tpe
+end
+Card.GetRitualType=function(c)
+	local res=get_ritual_type(c)
+	if Auxiliary.Spatials[c] then
+		tpe=tpe|TYPE_SPATIAL
+		if not Auxiliary.Spatials[c]() then
+			tpe=tpe&~TYPE_XYZ
+		end
+	end
+	return tpe
 end
 
 --Custom Functions

@@ -32,12 +32,6 @@ function s.initial_effect(c)
 	e1:SetOperation(s.sprop)
 	e1:SetValue(SUMMON_TYPE_FUSION)
 	c:RegisterEffect(e1)
-	local e6=Effect.CreateEffect(c)
-	e6:SetType(EFFECT_TYPE_SINGLE)
-	e6:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e6:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e6:SetValue(s.splimit)
-	c:RegisterEffect(e6)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
@@ -85,9 +79,6 @@ function s.sprop(e,tp,eg,ep,ev,re,r,rp,c)
 	local g=Duel.SelectFusionMaterial(tp,c,mg,nil,tp)
 	c:SetMaterial(g)
 	Duel.Release(g,REASON_COST)
-end
-function s.splimit(e,se,sp,st)
-	return e:GetHandler():GetLocation()~=LOCATION_EXTRA
 end
 function s.pslimit(e,c,sump,sumtype,sumpos,targetp)
 	if c:IsRace(RACE_DINOSAUR) then return false end
