@@ -1,6 +1,6 @@
 --created & coded by Lyris, art at http://www.zerochan.net/247572
 --襲雷属性－エアー
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	aux.EnablePendulumAttribute(c)
 	local e1=Effect.CreateEffect(c)

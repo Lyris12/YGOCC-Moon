@@ -1,6 +1,6 @@
 --created & coded by Lyris
 --ローマ・キー・VI
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)

@@ -1,6 +1,6 @@
 --created & coded by Lyris, art at https://i.pinimg.com/originals/d1/ba/09/d1ba09e4f3cdb0618f8cbdc4055e1b1a.jpg
 --DT－レイヴン・フード
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)

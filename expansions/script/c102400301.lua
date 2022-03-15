@@ -1,6 +1,6 @@
 --created by Walrus of Discord, coded by Lyris
 --ファンタズム・オブ・カオス
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)

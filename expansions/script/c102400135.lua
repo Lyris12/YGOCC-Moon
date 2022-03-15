@@ -1,6 +1,6 @@
 --created & coded by Lyris, art from Chaotic's "Oiponts Claws"
 --集いし襲雷
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	local e0=Effect.CreateEffect(c)
 	e0:SetCategory(CATEGORY_DRAW)

@@ -1,6 +1,6 @@
 --created & coded by Lyris
 --機光襲雷竜－イグニスター
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddFusionProcFunRep(c,aux.AND(aux.FilterBoolFunction(Card.IsFusionSetCard,0x7c4),aux.FilterBoolFunction(Card.IsAttackAbove,1600)),2,false)

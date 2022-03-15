@@ -1,6 +1,6 @@
 --created by silverdimension of Discord, coded by Lyris
 --アバター・オブ・インライトメント
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddFusionProcFunRep(c,aux.FilterBoolFunction(Card.IsFusionSetCard,0xda6),5,true)

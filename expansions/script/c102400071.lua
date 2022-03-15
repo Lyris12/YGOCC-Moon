@@ -1,6 +1,6 @@
 --created & coded by Lyris, art from Black Crow
 --剣主コール
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)

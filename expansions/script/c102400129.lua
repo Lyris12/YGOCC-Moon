@@ -1,6 +1,6 @@
 --created & coded by Lyris, art by The-SixthLeafClover of DeviantArt
 --機光襲雷竜－ホウロウ
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddLinkProcedure(c,aux.FilterBoolFunction(Card.IsLinkSetCard,0x7c4),2,2,function(g) return g:GetClassCount(Card.GetLinkAttribute)==#g end)

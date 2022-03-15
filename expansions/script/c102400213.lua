@@ -1,6 +1,6 @@
 --created & coded by Lyris
 --ローマ・キー・XXVII
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddFusionProcFunFunRep(c,aux.FilterBoolFunction(Card.IsSetCard,0xeeb),aux.FilterBoolFunction(Card.IsLevelAbove,1),0,63,false)

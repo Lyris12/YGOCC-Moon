@@ -1,6 +1,6 @@
 --created & coded by Lyris, art by cows-love-clover of DeviantArt
 --極神皇フレイル
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x42),aux.NonTuner(nil),2)
 	local e1=Effect.CreateEffect(c)

@@ -1,6 +1,6 @@
 --created & coded by Lyris, art from Assassin's Creed: Memories' Genghis Khan
 --CX復剣主王テムジン
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddXyzProcedure(c,nil,5,3)

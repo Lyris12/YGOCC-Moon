@@ -1,6 +1,6 @@
 --created & coded by Lyris, art from Final Fantasy VII's "Bahamut"
 --機夜光襲雷－ダスク
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	aux.EnablePendulumAttribute(c)
 	local e1=Effect.CreateEffect(c)

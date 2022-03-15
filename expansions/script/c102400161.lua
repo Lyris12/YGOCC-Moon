@@ -1,6 +1,6 @@
 --created & coded by Lyris, art by Dino-master of DeviantArt
 --銀河眼の固体光子竜
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	local e0=Effect.CreateEffect(c)

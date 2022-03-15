@@ -1,6 +1,6 @@
 --created & coded by Lyris, art from "Neo Space" & Cardfight!! Vanguard's "Barrier Star-vader, Promethium"
 --ネオスペース・バリアー
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_QUICK_O)

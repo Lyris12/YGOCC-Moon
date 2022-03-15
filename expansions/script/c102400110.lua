@@ -1,6 +1,6 @@
 --created & coded by Lyris, art by TwilightSaint of DeviantArt
 --襲雷竜－太陽
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	aux.EnablePendulumAttribute(c)
 	local e1=Effect.CreateEffect(c)

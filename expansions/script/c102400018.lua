@@ -1,6 +1,6 @@
 --created & coded by Lyris, art from "Form Change", "Silver Wing", "Moon Mirror Shield", and "Dragunity Divine Lance"
 --インライトメント・アセンブリー
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)

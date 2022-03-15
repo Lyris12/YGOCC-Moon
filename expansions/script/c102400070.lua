@@ -1,6 +1,6 @@
 --created & coded by Lyris, art from Swordsman
 --剣主ツ五シ
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0xbb2),4,2)
 	local e0=Effect.CreateEffect(c)

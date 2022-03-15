@@ -1,6 +1,6 @@
 --created & coded by Lyris, art from Fate/Apocrypha's Saber of "Black"
 --復剣主サイフリード
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE)

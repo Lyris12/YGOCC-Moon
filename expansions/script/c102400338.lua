@@ -1,6 +1,6 @@
 --created & coded by Lyris
 --リージル・リキャント
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetCategory(CATEGORY_NEGATE+CATEGORY_CONTROL)

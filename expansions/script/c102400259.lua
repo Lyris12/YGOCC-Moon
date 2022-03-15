@@ -1,6 +1,6 @@
 --created & coded by Lyris, art from Cardfight!! Vanguard's "Blue Storm Marine General, Milos"
 --アーマリン・サファイアー・セーラー
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	aux.AddOrigRelayType(c)
 	aux.AddRelayProc(c)

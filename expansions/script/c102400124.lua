@@ -1,6 +1,6 @@
 --created & coded by Lyris
 --機夜光襲雷竜－モーニング
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddFusionProcFunRep(c,aux.FilterBoolFunction(Card.IsFusionSetCard,0x7c4),2,true)

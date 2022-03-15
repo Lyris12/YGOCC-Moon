@@ -1,6 +1,6 @@
 --created & coded by Lyris, art by Idouyouichi on Pixiv
 --機夜光襲雷竜－ミッドナイト
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddFusionProcFun2(c,aux.FilterBoolFunction(Card.IsSetCard,0x7c4),aux.AND(aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_DARK),aux.FilterBoolFunction(Card.IsRace,RACE_DRAGON)),true)

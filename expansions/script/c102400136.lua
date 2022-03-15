@@ -1,6 +1,6 @@
 --created by LionHeartKIng, coded by Lyris, art at http://nicolelbates.com/wp-content/uploads/2012/07/Lightning-Bolt-by-Todd-Secki.jpg
 --襲雷ラッシュ
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_DESTROY+CATEGORY_DRAW)
@@ -15,11 +15,9 @@ function s.filter(c)
 	return c:IsSetCard(0x7c4) and c:IsType(TYPE_PENDULUM) and c:IsFaceup()
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_EXTRA,0,nil)
-	local pg=Duel.GetFieldGroup(tp,LOCATION_PZONE,0)
+	local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_EXTRA,0,nil)+Duel.GetFieldGroup(tp,LOCATION_PZONE,0)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,2)
-		and g:GetClassCount(Card.GetCode)>=3-pg:FilterCount(Card.IsSetCard,nil,0x7c4) end
-	g:Merge(pg)
+		and g:Filter(Card.IsSetCard,nil,0x7c4):GetClassCount(Card.GetCode)>=3 end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,3,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,2)
 end

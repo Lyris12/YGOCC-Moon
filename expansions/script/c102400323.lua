@@ -1,6 +1,6 @@
 --created & coded by Lyris, art from "Flipping the Table"
 --ちゃぶ台返者
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)

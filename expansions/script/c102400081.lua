@@ -1,6 +1,6 @@
 --created & coded by Lyris, art by Sinad Jaruartjanapat
 --天剣主女王十
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddLinkProcedure(c,aux.FilterBoolFunction(Card.IsLinkSetCard,0xbb2),2,2)

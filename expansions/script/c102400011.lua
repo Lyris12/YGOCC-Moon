@@ -1,6 +1,6 @@
 --created & coded by Lyris
 --インライトメント・眼光炯々ゲイザー
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddOrigEvolveType(c)

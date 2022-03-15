@@ -1,6 +1,6 @@
 --created & coded by Lyris, art by emryswolf of DeviantArt
 --襲雷竜－闇
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	aux.EnablePendulumAttribute(c)
 	local e0=Effect.CreateEffect(c)

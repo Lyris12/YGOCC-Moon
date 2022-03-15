@@ -1,6 +1,6 @@
 --created & coded by Lyris, art from Shadowverse's "Mist Dragon"
 --ヒート・ブレイカー・ドラゴン
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_QUICK_O)

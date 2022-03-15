@@ -1,6 +1,6 @@
 --created & coded by Lyris, art by FanDragonBrigitha of DeviantArt
 --襲雷竜－スパーク津波
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddFusionProcFunRep(c,aux.OR(aux.FilterBoolFunction(Card.IsFusionAttribute,ATTRIBUTE_LIGHT),aux.FilterBoolFunction(Card.IsFusionSetCard,0x7c4)),2,true)

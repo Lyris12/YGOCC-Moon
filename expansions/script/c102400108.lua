@@ -1,6 +1,6 @@
 --created & coded by Lyris, art by windfalcon of DeviantArt
 --襲雷属性－フレイム
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	aux.EnablePendulumAttribute(c)
 	local e1=Effect.CreateEffect(c)

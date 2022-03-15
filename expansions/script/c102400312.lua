@@ -1,6 +1,6 @@
 --created & coded by Lyris, art at https://www.zerochan.net/1995682
 --スターダスト・アンヴォイ
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(nil),1)

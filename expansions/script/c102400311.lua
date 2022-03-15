@@ -1,6 +1,6 @@
 --created & coded by Lyris, art at https://i.pinimg.com/originals/9e/96/c4/9e96c4cf5a360581e0d8ef7b1e738844.jpg
 --スターダスト・アストロノマー
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)

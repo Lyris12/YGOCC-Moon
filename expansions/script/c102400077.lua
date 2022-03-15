@@ -1,6 +1,6 @@
 --created & coded by Lyris, art from Magic the Gathering's "Serra Angel"
 --天剣主レイ八
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE)

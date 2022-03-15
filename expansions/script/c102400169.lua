@@ -1,6 +1,6 @@
---created & coded by Lyris, art from "Degenerate Circuit", "Loop of Destruction", & "Cyberdark Inferno"
+--created & coded by Lyris, art by Ray-V-Xyz of DeviantArt
 --サイバーダークネス・ドグマ
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_ACTIVATE)

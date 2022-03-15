@@ -1,6 +1,6 @@
---created & coded by Lyris
+--created & coded by Lyris, art by Ray-V-Xyz of DeviantArt
 --鎧刻竜－サイバー・ダーク・ドラゴンストライク
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddFusionProcCode2(c,id-5,id-4,true,true)

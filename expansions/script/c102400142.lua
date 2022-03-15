@@ -1,6 +1,6 @@
 --created by NovaTsukimori, coded by Lyris, art from Yu-Gi-Oh! 5D's Episode 5
 --襲原野
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_ACTIVATE)

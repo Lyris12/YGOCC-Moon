@@ -1,6 +1,6 @@
 --created & coded by Lyris, art by Ali Rauf
 --襲雷渦動
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))

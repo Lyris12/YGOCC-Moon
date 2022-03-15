@@ -1,6 +1,6 @@
 --created & coded by Lyris, art at https://gizmodo.com/720850?_escaped_fragment_=
 --襲雷のアーティレリ
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetCategory(CATEGORY_DAMAGE)

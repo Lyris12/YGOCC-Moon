@@ -1,6 +1,6 @@
 --created & coded by Lyris, art at https://i.ytimg.com/vi/O50o1aWbDZk/hqdefault.jpg
 --スプラッシュ
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)

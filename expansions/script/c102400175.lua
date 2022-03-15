@@ -1,6 +1,6 @@
 --created by Nadège, coded by Lyris, art from "Angel O7"; Creator's family name withheld for privacy reasons
 --エンジェルO8
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)

@@ -1,6 +1,6 @@
 --created & coded by Lyris, art from Shadowverse's "Spinaria, Keeper of Enigmas"
 --謎の管理者スフィネ
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)

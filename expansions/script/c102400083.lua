@@ -1,6 +1,6 @@
 --created & coded by Lyris, art by Animekidky of DeviantArt
 --復剣主ティべリウス
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE)

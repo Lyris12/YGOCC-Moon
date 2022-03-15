@@ -1,6 +1,6 @@
 --created & coded by Lyris, art from Shadowverse's "Lightning Blast"
 --襲雷弾
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	local gmg,gmgct,gfg,gfgct,iemc,smc,iet,selt,get_type,get_orig_type,get_prev_type_field=Duel.GetMatchingGroup,Duel.GetMatchingGroupCount,Duel.GetFieldGroup,Duel.GetFieldGroupCount,Duel.IsExistingMatchingCard,Duel.SelectMatchingCard,Duel.IsExistingTarget,Duel.SelectTarget,Card.GetType,Card.GetOriginalType,Card.GetPreviousTypeOnField
 	Card.GetType=function(tc,scard,sumtype,p)

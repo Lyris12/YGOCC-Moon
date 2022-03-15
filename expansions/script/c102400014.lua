@@ -1,6 +1,6 @@
 --created & coded by Lyris, art from "Rod of the Mind's Eye"
 --インライトメント・クレアボイアント笏
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)

@@ -1,6 +1,6 @@
 --created by NovaTsukimori, coded by Lyris
 --襲雷竜－サイバー・ドラゴン
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_MACHINE),5,2)

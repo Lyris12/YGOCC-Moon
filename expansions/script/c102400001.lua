@@ -1,6 +1,6 @@
 --created & coded by Lyris, art from Yu-Gi-Oh! Duel Monsters Episode 86
 --早すぎた決断
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_TOGRAVE+CATEGORY_SEARCH+CATEGORY_TOHAND)

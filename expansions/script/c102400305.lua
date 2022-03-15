@@ -1,6 +1,6 @@
 --created by Walrus of Discord, coded by Lyris
 --マーク・オブ・カオス
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	c:SetUniqueOnField(1,0,id)
 	local e1=Effect.CreateEffect(c)

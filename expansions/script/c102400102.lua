@@ -1,6 +1,6 @@
 --created & coded by Lyris, art by Jessada-Art of DeviantArt
 --機光襲雷－ドーン
-local s,id,off=GetID()
+local s,id,o=GetID()
 function s.initial_effect(c)
 	aux.EnablePendulumAttribute(c)
 	local e1=Effect.CreateEffect(c)
