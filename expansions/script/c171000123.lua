@@ -1,4 +1,5 @@
 --Amethyst-Wing Brilliance Dragon
+local ref=_G['c'..171000123]
 function c171000123.initial_effect(c)
 	--Pendulum
 	aux.EnablePendulumAttribute(c)
@@ -52,7 +53,7 @@ function c171000123.penfilter(c)
 end
 function c171000123.pentg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return (Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,1))
-		and Duel.IsExistingMatchingCard(c171000112.penfilter,tp,LOCATION_DECK,0,1,nil) 
+		and Duel.IsExistingMatchingCard(c171000123.penfilter,tp,LOCATION_DECK,0,1,nil) 
 	end
 end
 function c171000123.penop(e,tp,eg,ep,ev,re,r,rp)
@@ -61,7 +62,7 @@ function c171000123.penop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,c171000123.penfilter,tp,LOCATION_DECK,0,1,1,nil)
 	local tc=g:GetFirst()
 	if tc then
-		Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
+		Duel.MoveToField(tc,tp,tp,LOCATION_PZONE,POS_FACEUP,true)
 	end
 end
 function c171000123.pdtg(e,c)

@@ -28,7 +28,7 @@ function c171000118.initial_effect(c)
 	e2x:SetType(EFFECT_TYPE_QUICK_O)
 	e2x:SetCode(EVENT_FREE_CHAIN)
 	e2x:SetRange(LOCATION_PZONE)
-	e2x:SetCountLimit(1,171000119)
+	e2x:SetCountLimit(1,171000118)
 	e2x:SetTarget(c171000118.sptg)
 	e2x:SetOperation(c171000118.spop)
 	c:RegisterEffect(e2x)
@@ -47,24 +47,24 @@ function c171000118.initial_effect(c)
 	c:RegisterEffect(e5)
 	--swap attack target
 	local e7=Effect.CreateEffect(c)
-	e7:SetDescription(aux.Stringid(84013237,0))
+	e7:SetDescription(aux.Stringid(171000118,0))
 	e7:SetCategory(CATEGORY_ATKCHANGE+CATEGORY_DEFCHANGE)
 	e7:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e7:SetRange(LOCATION_MZONE)
 	e7:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e7:SetCode(EVENT_BE_BATTLE_TARGET)
-	e7:SetCountLimit(1,271000118)
+	e7:SetCountLimit(1,171000118)
 	e7:SetTarget(ref.attgtg)
 	e7:SetOperation(ref.attgop)
 	c:RegisterEffect(e7)
 	--Negate own attack
 	local e8=Effect.CreateEffect(c)
 	e8:SetCategory(CATEGORY_ATKCHANGE+CATEGORY_DEFCHANGE)
-	e8:SetDescription(aux.Stringid(84013237,0))
+	e8:SetDescription(aux.Stringid(171000118,0))
 	e8:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e8:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e8:SetCode(EVENT_ATTACK_ANNOUNCE)
-	e8:SetCountLimit(1,271000118)
+	e8:SetCountLimit(1,171000118)
 	e8:SetCondition(ref.atcon)
 	e8:SetTarget(ref.attg)
 	e8:SetOperation(ref.atop)
@@ -92,7 +92,7 @@ function c171000118.penfilter(c)
 end
 function c171000118.pentg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return (Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,1))
-		and Duel.IsExistingMatchingCard(c171000112.penfilter,tp,LOCATION_DECK,0,1,nil) 
+		and Duel.IsExistingMatchingCard(c171000118.penfilter,tp,LOCATION_DECK,0,1,nil) 
 	end
 end
 function c171000118.penop(e,tp,eg,ep,ev,re,r,rp)
@@ -101,7 +101,7 @@ function c171000118.penop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,c171000118.penfilter,tp,LOCATION_DECK,0,1,1,nil)
 	local tc=g:GetFirst()
 	if tc then
-		Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
+		Duel.MoveToField(tc,tp,tp,LOCATION_PZONE,POS_FACEUP,true)
 	end
 end
 function c171000118.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -129,7 +129,7 @@ function ref.attgtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and ref.rdfilter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(ref.rdfilter,tp,LOCATION_MZONE,0,1,c) end
 	Duel.SelectTarget(tp,ref.rdfilter,tp,LOCATION_MZONE,0,1,1,c)
-	c:RegisterFlagEffect(171000119,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
+	c:RegisterFlagEffect(171000118,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
 end
 function ref.attgop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
@@ -168,7 +168,7 @@ function ref.attg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.NegateAttack()
 	local ac=Duel.SelectTarget(tp,ref.rdfilter,tp,LOCATION_MZONE,0,1,1,c)
 	Duel.GetAttackTarget():RegisterFlagEffect(171000118,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_BATTLE_START,0,1)
-	c:RegisterFlagEffect(171000119,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
+	c:RegisterFlagEffect(171000118,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
 end
 function ref.atkfilter(c)
 	return c:GetFlagEffect(171000118)~=0 and c:IsFaceup()
@@ -196,7 +196,7 @@ function ref.atop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function ref.sdcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetFlagEffect(171000119)>0
+	return e:GetHandler():GetFlagEffect(171000118)>0
 end
 function ref.sdop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Destroy(e:GetHandler(),REASON_EFFECT)

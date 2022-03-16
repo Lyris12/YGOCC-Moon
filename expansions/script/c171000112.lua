@@ -1,4 +1,5 @@
 --Amethyst-Wing Dragon
+local ref=_G['c'..171000112]
 function c171000112.initial_effect(c)
 	--pendulum summon
 	aux.EnablePendulumAttribute(c)
@@ -18,7 +19,7 @@ function c171000112.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e2:SetRange(LOCATION_PZONE)
-	e2:SetCountLimit(1,171000113)
+	e2:SetCountLimit(1,171000112)
 	e2:SetCondition(c171000112.atkcon)
 	e2:SetOperation(c171000112.atkop)
 	c:RegisterEffect(e2)
@@ -64,7 +65,7 @@ function c171000112.penop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,c171000112.penfilter,tp,LOCATION_DECK,0,1,1,nil)
 	local tc=g:GetFirst()
 	if tc then
-		Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
+		Duel.MoveToField(tc,tp,tp,LOCATION_PZONE,POS_FACEUP,true)
 	end
 end
 --gain atk
