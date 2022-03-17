@@ -51,7 +51,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	for p=0,1 do
-		if Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
+		if Duel.SelectYesNo(p,aux.Stringid(id,1)) then
 			Duel.Hint(HINT_SELECTMSG,p,HINTMSG_SPSUMMON)
 			local g=Duel.SelectMatchingCard(p,Card.IsAbleToHand,p,LOCATION_DECK,0,1,1,nil)
 			if #g>0 and Duel.SendtoHand(g,nil,REASON_EFFECT)>0 and g:GetFirst():IsLocation(LOCATION_HAND) then
@@ -77,8 +77,8 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 					Duel.SetLP(p,lp)
 				elseif code<e:GetLabel() and Duel.IsExistingMatchingCard(Card.IsFaceup,p,LOCATION_ONFIELD,0,1,nil) then
 					getmetatable(e:GetHandler()).announce_filter={TYPE_TOKEN,OPCODE_ISTYPE,OPCODE_NOT}
-					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CODE)
-					local ac=Duel.AnnounceCard(tp,table.unpack(getmetatable(e:GetHandler()).announce_filter))
+					Duel.Hint(HINT_SELECTMSG,p,HINTMSG_CODE)
+					local ac=Duel.AnnounceCard(p,table.unpack(getmetatable(e:GetHandler()).announce_filter))
 					Duel.Hint(HINT_SELECTMSG,p,HINTMSG_FACEUP)
 					local sg=Duel.SelectMatchingCard(p,Card.IsFaceup,p,LOCATION_ONFIELD,0,1,1,nil)
 					if #sg>0 then

@@ -56,7 +56,6 @@ function s.lfilter(c,mg)
 	return c:IsLinkSummonable(mg)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	Debug.Message(e:GetLabel())
 	local chkf=tp
 	local mg1=Duel.GetFusionMaterial(tp):Filter(s.filter1,nil)
 	local res_fus=Duel.IsExistingMatchingCard(s.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,mg1,nil,chkf)
