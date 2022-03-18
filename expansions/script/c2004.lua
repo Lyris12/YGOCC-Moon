@@ -88,8 +88,13 @@ end
 function s.chainop(e,tp,eg,ep,ev,re,r,rp)
 	local rc=re:GetHandler()
 	if rc and rc:GetOriginalCode()<e:GetLabel() then
-		Duel.SetChainLimit(aux.FALSE)
+		Duel.SetChainLimit(s.limit(e:GetLabel()))
 	end
+end
+function s.limit(val)
+	return	function (e,lp,tp)
+				return e:GetHandler():GetOriginalCode()<=val
+			end
 end
 
 function s.condition2(e,tp,eg,ep,ev,re,r,rp)
