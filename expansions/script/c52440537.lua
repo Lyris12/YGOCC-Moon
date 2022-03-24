@@ -14,7 +14,6 @@ function s.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e2:SetCode(EVENT_DESTROYED)
 	e2:SetCountLimit(1,id)
-	e2:SetCondition(s.shcon)
 	e2:SetTarget(s.shtg)
 	e2:SetOperation(s.shop)
 	c:RegisterEffect(e2)
@@ -26,9 +25,6 @@ function s.spcon(e,c)
 	if c==nil then return true end
 	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(s.cfilter,c:GetControler(),LOCATION_MZONE,0,1,nil)
-end
-function s.shcon(e,tp,eg,ep,ev,re,r,rp)
-	return bit.band(r,REASON_EFFECT+REASON_BATTLE)~=0
 end
 function s.filter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xCF11) and c:IsAbleToHand() and not c:IsCode(id)

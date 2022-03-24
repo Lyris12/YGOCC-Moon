@@ -1,4 +1,14 @@
---New PROPERTIES
+Single, Field = {}, {}
+sng, fld = Single, Field
+
+--New ACTIONS
+ACTION_DESTROY		=	1
+ACTION_BANISH		=	2
+ACTION_BANISH_FD	=	3
+ACTION_TOHAND		=	4
+ACTION_TOGRAVE		=	5
+ACTION_TODECK		=	6
+ACTION_TOEXTRA		=	7
 
 --New EFFECTS
 EFFECT_CANNOT_ACTIVATE_LMARKER=8000
@@ -10,6 +20,7 @@ EFFECT_GLITCHY_EXTRA_LINK_MATERIAL	    = 8005
 EFFECT_GLITCHY_EXTRA_MATERIAL_FLAG		= 8006
 EFFECT_GLITCHY_HACK_CODE 				= 8007
 EFFECT_NAME_DECLARED					= 8008
+EFFECT_GLITCHY_CANNOT_DISABLE			= 8009
 
 EFFECT_BECOME_HOPT=99977755
 EFFECT_SYNCHRO_MATERIAL_EXTRA=26134837
@@ -24,7 +35,129 @@ ARCHE_FUSION	= 0x46
 RESET_TURN_SELF = RESET_SELF_TURN
 RESET_TURN_OPPO = RESET_OPPO_TURN
 
---Card Operation Functions
+-----------------------------------------------------------------------
+-------------------------------NEGATES---------------------------------
+local _IsChainDisablable, _NegateEffect = Duel.IsChainDisablable, Duel.NegateEffect
+
+Duel.IsChainDisablable = function(ct)
+	local te=Duel.GetChainInfo(ct,CHAININFO_TRIGGERING_EFFECT)
+	if te and aux.GetValueType(te:GetHandler())=="Card" and te:GetHandler():IsHasEffect(EFFECT_GLITCHY_CANNOT_DISABLE) then
+		local egroup={te:GetHandler():IsHasEffect(EFFECT_GLITCHY_CANNOT_DISABLE)}
+		for _,ce in ipairs(egroup) do
+			if ce and ce.GetLabel then
+				local val=ce:GetValue()
+				if not val or type(val)=="number" or val(ce,self_reference_effect) then
+					return false
+				end
+			end
+		end
+	end
+	return _IsChainDisablable(ct)
+end
+Duel.NegateEffect = function(ct)
+	local te=Duel.GetChainInfo(ct,CHAININFO_TRIGGERING_EFFECT)
+	if te and aux.GetValueType(te:GetHandler())=="Card" and te:GetHandler():IsHasEffect(EFFECT_GLITCHY_CANNOT_DISABLE) then
+		local egroup={te:GetHandler():IsHasEffect(EFFECT_GLITCHY_CANNOT_DISABLE)}
+		for _,ce in ipairs(egroup) do
+			if ce and ce.GetLabel then
+				local val=ce:GetValue()
+				if not val or type(val)=="number" or val(ce,self_reference_effect) then
+					return false
+				end
+			end
+		end
+	end
+	return _NegateEffect(ct)
+end
+
+function Auxiliary.GlitchyCannotDisableCon(f)
+	return	function(e)
+				local egroup={e:GetHandler():IsHasEffect(EFFECT_GLITCHY_CANNOT_DISABLE)}
+				for _,ce in ipairs(egroup) do
+					if ce and ce.GetLabel then
+						local val=ce:GetValue()
+						if not val or type(val)=="number" or val(ce,e) then
+							return false
+						end
+					end
+				end
+				return not f or f(e)
+			end
+end
+function Auxiliary.GlitchyCannotDisable(f)
+	return	function(e,c)
+				local egroup={c:IsHasEffect(EFFECT_GLITCHY_CANNOT_DISABLE)}
+				for _,ce in ipairs(egroup) do	
+					if ce and ce.GetLabel then
+						local val=ce:GetValue()
+						if not val or type(val)=="number" or val(ce,e) then
+							return false
+						end
+					end
+				end
+				return not f or f(e,c)
+			end
+end
+
+-----------------------------------------------------------------------
+-------------------------------SELECTION-------------------------------
+function Duel.IsExisting(target,f,loc1,loc2,min,...)
+	if type(target)~="boolean" then return false end
+	local func = (target==true) and Duel.IsExistingTarget or Duel.IsExistingMatchingCard
+	
+	return func(f,tp,loc1,loc2,min,nil,...)
+end
+
+function Duel.Select(target,hint,f,loc1,loc2,min,max,...)
+	if type(target)~="boolean" then return false end
+	local func = (target==true) and Duel.SelectTarget or Duel.SelectMatchingCard
+	local hint = hint or HINTMSG_TARGET
+	
+	Duel.Hint(HINT_SELECTMSG,tp,hint)
+	local g=func(tp,f,tp,loc1,loc2,min,max,nil,...)
+	return g
+end
+
+------------------------------------------------------------------------
+------------------------CARD OPERATION FUNCTIONS------------------------
+function Auxiliary.BanishFilter(f,r,actp,pos)
+	if not r or r==REASON_EFFECT then
+		return	function(c,...)
+					return (not f or f(c,...)) and c:IsAbleToRemove(actp,pos)
+				end
+	else
+		return	function(c,...)
+					return (not f or f(c,...)) and c:IsAbleToRemoveAsCost(pos)
+				end
+	end
+end
+function Auxiliary.DiscardFilter(f,r)
+	return	function(c,...)
+				return (not f or f(c,...)) and c:IsDiscardable(r)
+			end
+end
+function Auxiliary.SearchFilter(f,r)
+	local check=(not r or r==REASON_EFFECT) and Card.IsAbleToHand or Card.IsAbleToHandAsCost
+	return	function(c,...)
+				return (not f or f(c,...)) and check(c)
+			end
+end
+function Auxiliary.SettingFilter(f)
+	return	function(c,...)
+				return (not f or f(c,...)) and c:IsSSetable()
+			end
+end
+function Auxiliary.SPSummonFilter(f,e,sumtype,sump,ign1,ign2,pos)
+	return	function(c,...)
+				return (not f or f(c,...)) and c:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos)
+			end
+end
+
+function Auxiliary.ActionCategory(act)
+	local t={[1]=CATEGORY_DESTROY, [2]=CATEGORY_REMOVE, [3]=CATEGORY_REMOVE, [4]=CATEGORY_TOHAND, [5]=CATEGORY_TOGRAVE, [6]=CATEGORY_TODECK, [7]=CATEGORY_TOEXTRA}
+	return t[act]
+end
+
 function Duel.Search(g,tp)
 	local ct=Duel.SendtoHand(g,nil,REASON_EFFECT)
 	Duel.ConfirmCards(1-tp,g)
@@ -71,7 +204,77 @@ function Auxiliary.SpecialSummonButBanish(c,e,tp,loc)
 	end
 end
 
---CONDITION
+-----------------------------------------------------------------------------
+-------------------------------PASSIVE EFFECTS-------------------------------
+function Effect.Single(c,code,val,range,prop,m)
+	if not prop then prop=0 end
+	if range then prop=prop|EFFECT_FLAG_SINGLE_RANGE end
+	local etyp=(not m or m==0) and EFFECT_TYPE_SINGLE or (m==1) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_XMATERIAL
+	
+	local e=Effect.CreateEffect(c)
+	e:SetType(EFFECT_TYPE_SINGLE)
+	e:SetCode(code)
+	e:SetValue(val)
+	if prop then
+		e:SetProperty(prop)
+	end
+	if range then
+		e:SetRange(range)
+	end
+	c:RegisterEffect(e)
+	return e
+end
+function Effect.Field(c,code,val,range,loc1,loc2,tg,prop)
+	if not prop then prop=0 end
+	
+	local e=Effect.CreateEffect(c)
+	e:SetType(EFFECT_TYPE_FIELD)
+	e:SetCode(code)
+	e:SetValue(val)
+	e:SetRange(range)
+	e:SetTargetRange(loc1,loc2)
+	if tg then
+		e:SetTarget(tg)
+	end
+	if prop then
+		e:SetProperty(prop)
+	end
+	c:RegisterEffect(e)
+	return e
+end
+function Effect.PlayerField(c,code,val,range,p1,p2,prop)
+	if p1 then p1=1 else p1=0 end
+	if p2 then p2=1 else p2=0 end
+	if prop&EFFECT_FLAG_PLAYER_TARGET==0 then prop=prop|EFFECT_FLAG_PLAYER_TARGET end
+
+	return Effect.Field(c,code,val,range,p1,p2,prop)
+end
+
+--Update ATK/DEF of the card
+function Single.UpdateStats(c,m,atk,def)
+	local range=(not m or m==0) and LOCATION_MZONE or nil
+	local e1,e2
+	if atk then
+		e1=Effect.Single(c,EFFECT_UPDATE_ATTACK,atk,range,0,m)
+	end
+	if def then
+		e2=Effect.Single(c,EFFECT_UPDATE_DEFENSE,def,range,0,m)
+	end
+	return e1,e2
+end
+function Field.UpdateStats(c,range,loc1,loc2,tg,atk,def)
+	local e1,e2
+	if atk then
+		e1=Effect.Field(c,EFFECT_UPDATE_ATTACK,atk,range,loc1,loc2,tg)
+	end
+	if def then
+		e2=Effect.Field(c,EFFECT_UPDATE_DEFENSE,def,range,loc1,loc2,tg)
+	end
+	return e1,e2
+end
+
+----------------------------------------------------------------------------------
+-------------------------------CARD REMOVAL EFFECTS-------------------------------
 function Effect.Trigger(e,forced,miss_timing,code)
 	local etyp=(forced) and EFFECT_TYPE_TRIGGER_F or EFFECT_TYPE_TRIGGER_O
 	e:SetType(EFFECT_TYPE_SINGLE+etyp)
@@ -80,6 +283,7 @@ function Effect.Trigger(e,forced,miss_timing,code)
 	end
 	e:SetCode(code)
 end
+--CONDITION
 
 --When this card is used as material for the (reason) Summon of (f)
 function Auxiliary.UsedAsMaterialCond(reason,f)
@@ -1059,38 +1263,6 @@ function Auxiliary.AfterShuffle(g)
 	end
 end
 
-function Auxiliary.BanishFilter(f,r,actp,pos)
-	if not r or r==REASON_EFFECT then
-		return	function(c,...)
-					return (not f or f(c,...)) and c:IsAbleToRemove(actp,pos)
-				end
-	else
-		return	function(c,...)
-					return (not f or f(c,...)) and c:IsAbleToRemoveAsCost(pos)
-				end
-	end
-end
-function Auxiliary.DiscardFilter(f,r)
-	return	function(c,...)
-				return (not f or f(c,...)) and c:IsDiscardable(r)
-			end
-end
-function Auxiliary.SearchFilter(f,r)
-	local check=(not r or r==REASON_EFFECT) and Card.IsAbleToHand or Card.IsAbleToHandAsCost
-	return	function(c,...)
-				return (not f or f(c,...)) and check(c)
-			end
-end
-function Auxiliary.SettingFilter(f)
-	return	function(c,...)
-				return (not f or f(c,...)) and c:IsSSetable()
-			end
-end
-function Auxiliary.SPSummonFilter(f,e,sumtype,sump,ign1,ign2,pos)
-	return	function(c,...)
-				return (not f or f(c,...)) and c:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos)
-			end
-end
 
 --CARD MOVEMENT FUNCTIONS
 

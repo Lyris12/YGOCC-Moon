@@ -37,6 +37,7 @@ CARD_DRAGON_EGG_TOKEN				=20157305
 CARD_BLACK_GARDEN					=71645242
 CARD_EVIL_DRAGON_ANANTA				=8400623
 CARD_ANONYMIZE						=102400157
+CARD_LIMIERRE						=19936278
 
 CARD_ALBAZ                  = 68468459
 CARD_ARGYRO_SYSTEM          = 21887075
@@ -1173,6 +1174,7 @@ function Auxiliary.EquipEquip(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Equip(tp,c,tc)
 	end
 end
+
 --Fusion Summon shorthand
 --Effect, player, filter for Fusion Monster, materials (optional), monster that must be used as material (optional)
 function Auxiliary.IsCanFusionSummon(f,e,tp,mg1,gc)
@@ -1424,6 +1426,7 @@ GLCATEGORY_ED_DRAW=0x8000
 GLCATEGORY_ACTIVATE_LMARKER=0x10000
 GLCATEGORY_DEACTIVATE_LMARKER=0x20000
 GLCATEGORY_SYNCHRO_SUMMON=0x40000
+GLCATEGORY_SELF_DAMAGE_ONLY=0x80000
 
 --glitchy's custom effects
 
@@ -2176,10 +2179,10 @@ if not global_card_effect_table_global_check then
 	function Card:RegisterEffect(e,forced)
 		if not global_card_effect_table[self] then global_card_effect_table[self]={} end
 		table.insert(global_card_effect_table[self],e)
+		local cid=self:GetOriginalCode()
 		
 		if #global_card_effect_table[self]==1 then
 			local mt=getmetatable(self)
-			local cid=self:GetOriginalCode()
 			if LISTED_NAMES[cid] and not self.checked_card_code_list then
 				if self.card_code_list==nil then
 					mt.card_code_list={}
@@ -2200,6 +2203,24 @@ if not global_card_effect_table_global_check then
 					end
 				end
 				mt.checked_card_code_list=true
+			end
+		end
+		
+		if e:GetCode()==EFFECT_DISABLE or e:GetCode()==EFFECT_DISABLE_EFFECT or e:GetCode()==EFFECT_DISABLE_CHAIN or e:GetCode()==EFFECT_DISABLE_TRAPMONSTER then
+			if e:GetType()==EFFECT_TYPE_SINGLE then
+				local cond=e:GetCondition()
+				if not cond then
+					e:SetCondition(aux.GlitchyCannotDisableCon())
+				else
+					e:SetCondition(aux.GlitchyCannotDisableCon(con))
+				end
+			elseif e:GetType()==EFFECT_TYPE_FIELD then
+				local tg=e:GetTarget()
+				if not tg then
+					e:SetTarget(aux.GlitchyCannotDisable())
+				else
+					e:SetTarget(aux.GlitchyCannotDisable(tg))
+				end
 			end
 		end
 		
