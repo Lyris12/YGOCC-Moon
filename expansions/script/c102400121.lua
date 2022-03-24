@@ -93,7 +93,7 @@ end
 function s.negop(e,tp,eg,ep,ev,re,r,rp)
 	local rc=re:GetHandler()
 	local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_GRAVE,0,nil)
-	if #g>0 and Duel.NegateActivation(ev) and rc:IsRelateToEffect(re) and rc:IsAbleToDeck() then
+	if #g>0 and Duel.NegateActivation(ev) and rc:IsRelateToEffect(re) and (re:IsHasType(EFFECT_TYPE_ACTIVATE) or rc:IsAbleToDeck()) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 		local dg=g:Select(tp,1,1,nil)
 		rc:CancelToGrave()
