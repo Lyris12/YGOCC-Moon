@@ -207,15 +207,15 @@ function s.nameop(e,tp,eg,ep,ev,re,r,rp)
 	local b2=((#{tc:GetCode()}>1 or not tc:IsCode(CARD_ANONYMIZE)) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(s.spf,tp,LOCATION_DECK,0,1,nil,e,tp,tc:GetOriginalCode()))
 	if not b1 and not b2 then return end
 	if b1 then
-		table.insert(desc,aux.Stringid(id,3))
+		table.insert(desc,aux.Stringid(id,4))
 		table.insert(opt,0)
 	end
 	if b2 then
-		table.insert(desc,aux.Stringid(id,4))
+		table.insert(desc,aux.Stringid(id,3))
 		table.insert(opt,1)
 	end
 	local op=opt[Duel.SelectOption(tp,table.unpack(desc))+1]
-	if op==0 then
+	if op==1 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local sc=Duel.SelectMatchingCard(tp,s.spf,tp,LOCATION_DECK,0,1,1,nil,e,tp,tc:GetOriginalCode()):GetFirst()
 		if sc and Duel.SpecialSummon(sc,0,tp,tp,false,false,POS_FACEUP) then
