@@ -117,7 +117,7 @@ function s.nameop(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e1)
 		--ALSO
 		if not tc:IsCode(CARD_ANONYMIZE) and check and Duel.IsExistingMatchingCard(aux.SearchFilter(Card.IsCode),tp,LOCATION_DECK,0,1,nil,CARD_ANONYMIZE) and Duel.SelectYesNo(tp,aux.Stringid(id,3)) then
-			return aux.Search(Card.IsCode,1,1,nil,CARD_ANONYMIZE)(e,tp)
+			return aux.Search(Card.IsCode,1,1,nil,tp,tp,CARD_ANONYMIZE)(e,tp)
 		end
 	end
 end

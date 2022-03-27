@@ -78,7 +78,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		c:RegisterEffect(e1)
 	end
 	Duel.SpecialSummonComplete()
-	if step and Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(Card.IsCanBeSpecialSummoned,tp,0,LOCATION_HAND,1,nil,e,0,tp,false,false) then
+	if step and Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(Card.IsCanBeSpecialSummoned,tp,0,LOCATION_HAND,1,nil,e,0,1-tp,false,false) then
 		Duel.BreakEffect()
 		local res,g=aux.SPSummonStep(nil,0,LOCATION_HAND,1,1,1-tp)(e,tp,eg,ep,ev,re,r,rp)
 		if res>0 then
