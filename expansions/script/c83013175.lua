@@ -45,25 +45,25 @@ function cod.initial_effect(c)
 	c:RegisterEffect(e4)
 	--Destroy Replace
 	local e5=Effect.CreateEffect(c)
-    e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-    e5:SetCode(EFFECT_DESTROY_REPLACE)
-    e5:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
-    e5:SetRange(LOCATION_SZONE)
-    e5:SetCountLimit(1)
+	e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e5:SetCode(EFFECT_DESTROY_REPLACE)
+	e5:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
+	e5:SetRange(LOCATION_SZONE)
+	e5:SetCountLimit(1)
 	e5:SetTarget(cod.reptg)
 	e5:SetValue(cod.repval)
 	e5:SetOperation(cod.repop)
-    c:RegisterEffect(e5)
-    --Special Summon
-    local e6=Effect.CreateEffect(c)
-    e6:SetDescription(aux.Stringid(id,3))
-    e6:SetCategory(CATEGORY_SPECIAL_SUMMON)
-    e6:SetType(EFFECT_TYPE_IGNITION)
-    e6:SetRange(LOCATION_HAND)
-    e6:SetCost(cod.spcost)
-    e6:SetTarget(cod.sptg2)
-    e6:SetOperation(cod.spop)
-    c:RegisterEffect(e6)
+	c:RegisterEffect(e5)
+	--Special Summon
+	local e6=Effect.CreateEffect(c)
+	e6:SetDescription(aux.Stringid(id,3))
+	e6:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e6:SetType(EFFECT_TYPE_IGNITION)
+	e6:SetRange(LOCATION_HAND)
+	e6:SetCost(cod.spcost)
+	e6:SetTarget(cod.sptg2)
+	e6:SetOperation(cod.spop)
+	c:RegisterEffect(e6)
 end
 
 --Equip
@@ -121,7 +121,7 @@ end
 
 --Destroy Replace
 function cod.repfilter(c,tp)
-    return c:IsFaceup() and c:IsControler(tp) and c:IsLocation(LOCATION_SZONE) and c:IsSetCard(0x33F) and c:GetEquipTarget()
+	return c:IsFaceup() and c:IsControler(tp) and c:IsLocation(LOCATION_SZONE) and c:IsSetCard(0x33F) and c:GetEquipTarget()
 end
 function cod.desfilter(c,e,tp)
 	return c:IsControler(tp) and c:IsLocation(LOCATION_HAND) and c:IsAttributed(ATTRIBUTE_WATER)
@@ -151,13 +151,13 @@ end
 
 --Special Summon
 function cod.cfilter(c)
-    return c:IsSetCard(0x33F) and c:IsDestructable() and c:GetEquipTarget()
+	return c:IsSetCard(0x33F) and c:IsDestructable() and c:GetEquipTarget()
 end
 function cod.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-    if chk==0 then return Duel.IsExistingMatchingCard(cod.cfilter,tp,LOCATION_SZONE,0,1,nil) end
-    Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-    local g=Duel.SelectMatchingCard(tp,cod.cfilter,tp,LOCATION_SZONE,0,1,1,nil)
-    Duel.Destroy(g,REASON_EFFECT)
+	if chk==0 then return Duel.IsExistingMatchingCard(cod.cfilter,tp,LOCATION_SZONE,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+	local g=Duel.SelectMatchingCard(tp,cod.cfilter,tp,LOCATION_SZONE,0,1,1,nil)
+	Duel.Destroy(g,REASON_COST)
 end
 function cod.sptg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

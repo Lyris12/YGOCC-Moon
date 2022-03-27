@@ -155,13 +155,13 @@ end
 
 --Special Summon 2
 function cod.cfilter(c)
-    return c:IsSetCard(0x33F) and c:IsDestructable() and c:GetEquipTarget()
+	return c:IsSetCard(0x33F) and c:IsDestructable() and c:GetEquipTarget()
 end
 function cod.spcost2(e,tp,eg,ep,ev,re,r,rp,chk)
-    if chk==0 then return Duel.IsExistingMatchingCard(cod.cfilter,tp,LOCATION_SZONE,0,2,nil) end
-    Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-    local g=Duel.SelectMatchingCard(tp,cod.cfilter,tp,LOCATION_SZONE,0,2,2,nil)
-    Duel.Destroy(g,REASON_EFFECT)
+	if chk==0 then return Duel.IsExistingMatchingCard(cod.cfilter,tp,LOCATION_SZONE,0,2,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+	local g=Duel.SelectMatchingCard(tp,cod.cfilter,tp,LOCATION_SZONE,0,2,2,nil)
+	Duel.Destroy(g,REASON_COST)
 end
 function cod.sptg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

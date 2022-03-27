@@ -44,36 +44,36 @@ function cod.initial_effect(c)
 	e4:SetValue(cod.eqlimit)
 	c:RegisterEffect(e4)
 	--Destroy
-    local e5=Effect.CreateEffect(c)
-    e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-    e5:SetCategory(CATEGORY_DESTROY)
-    e5:SetCode(EVENT_BATTLE_START)
-    e5:SetRange(LOCATION_SZONE)
-    e5:SetCondition(cod.descon)
-    e5:SetTarget(cod.destg)
-    e5:SetOperation(cod.desop)
-    c:RegisterEffect(e5)
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
+	e5:SetCategory(CATEGORY_DESTROY)
+	e5:SetCode(EVENT_BATTLE_START)
+	e5:SetRange(LOCATION_SZONE)
+	e5:SetCondition(cod.descon)
+	e5:SetTarget(cod.destg)
+	e5:SetOperation(cod.desop)
+	c:RegisterEffect(e5)
 	--Equip 2
 	local e6=Effect.CreateEffect(c)
-    e6:SetDescription(aux.Stringid(id,2))
-    e6:SetCategory(CATEGORY_TOHAND+CATEGORY_EQUIP)
-    e6:SetType(EFFECT_TYPE_IGNITION)
-    e6:SetProperty(EFFECT_FLAG_CARD_TARGET)
-    e6:SetRange(LOCATION_MZONE)
-    e6:SetCountLimit(1,id)
-    e6:SetTarget(cod.eqtg2)
-    e6:SetOperation(cod.eqop2)
-    c:RegisterEffect(e6)
+	e6:SetDescription(aux.Stringid(id,2))
+	e6:SetCategory(CATEGORY_TOHAND+CATEGORY_EQUIP)
+	e6:SetType(EFFECT_TYPE_IGNITION)
+	e6:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e6:SetRange(LOCATION_MZONE)
+	e6:SetCountLimit(1,id)
+	e6:SetTarget(cod.eqtg2)
+	e6:SetOperation(cod.eqop2)
+	c:RegisterEffect(e6)
    --Special Summon 2
-    local e7=Effect.CreateEffect(c)
-    e7:SetDescription(aux.Stringid(id,3))
-    e7:SetCategory(CATEGORY_SPECIAL_SUMMON)
-    e7:SetType(EFFECT_TYPE_IGNITION)
-    e7:SetRange(LOCATION_HAND)
-    e7:SetCost(cod.spcost)
-    e7:SetTarget(cod.sptg2)
-    e7:SetOperation(cod.spop)
-    c:RegisterEffect(e7)
+	local e7=Effect.CreateEffect(c)
+	e7:SetDescription(aux.Stringid(id,3))
+	e7:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e7:SetType(EFFECT_TYPE_IGNITION)
+	e7:SetRange(LOCATION_HAND)
+	e7:SetCost(cod.spcost)
+	e7:SetTarget(cod.sptg2)
+	e7:SetOperation(cod.spop)
+	c:RegisterEffect(e7)
 end
 
 --Equip
@@ -131,23 +131,23 @@ end
 
 --Destroy
 function cod.descon(e,tp,eg,ep,ev,re,r,rp)
-    local tg=e:GetHandler():GetEquipTarget()
-    return tg and (Duel.GetAttacker()==tg or Duel.GetAttackTarget()==tg)
+	local tg=e:GetHandler():GetEquipTarget()
+	return tg and (Duel.GetAttacker()==tg or Duel.GetAttackTarget()==tg)
 end
 function cod.destg(e,tp,eg,ep,ev,re,r,rp,chk)
-    local c=e:GetHandler()
-    local tc=c:GetEquipTarget():GetBattleTarget()
-    if chk==0 then return tc and tc:IsControler(1-tp) end
-    local g=Group.FromCards(tc,c)
-    Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
+	local c=e:GetHandler()
+	local tc=c:GetEquipTarget():GetBattleTarget()
+	if chk==0 then return tc and tc:IsControler(1-tp) end
+	local g=Group.FromCards(tc,c)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 end
 function cod.desop(e,tp,eg,ep,ev,re,r,rp)
-    local c=e:GetHandler()
-    if not c:IsRelateToEffect(e) then return end
-    local tc=c:GetEquipTarget():GetBattleTarget()
-    if tc:IsRelateToBattle() then
-    	Duel.Destroy(tc,REASON_EFFECT)
-    end
+	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) then return end
+	local tc=c:GetEquipTarget():GetBattleTarget()
+	if tc:IsRelateToBattle() then
+		Duel.Destroy(tc,REASON_EFFECT)
+	end
 end
 
 --Swap
@@ -187,13 +187,13 @@ end
 
 --Special Summon 2
 function cod.cfilter(c)
-    return c:IsSetCard(0x33F) and c:IsDestructable() and c:GetEquipTarget()
+	return c:IsSetCard(0x33F) and c:IsDestructable() and c:GetEquipTarget()
 end
 function cod.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-    if chk==0 then return Duel.IsExistingMatchingCard(cod.cfilter,tp,LOCATION_SZONE,0,1,nil) end
-    Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-    local g=Duel.SelectMatchingCard(tp,cod.cfilter,tp,LOCATION_SZONE,0,1,1,nil)
-    Duel.Destroy(g,REASON_EFFECT)
+	if chk==0 then return Duel.IsExistingMatchingCard(cod.cfilter,tp,LOCATION_SZONE,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+	local g=Duel.SelectMatchingCard(tp,cod.cfilter,tp,LOCATION_SZONE,0,1,1,nil)
+	Duel.Destroy(g,REASON_COST)
 end
 function cod.sptg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

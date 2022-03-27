@@ -31,19 +31,22 @@ end
 function s.cfilter2(c)
 	return c:IsSetCard(0x89f) and c:IsDestructable()
 end
+function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return c:IsDestructable() and Duel.IsExistingMatchingCard(s.cfilter2,tp,LOCATION_HAND,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+	Duel.Destroy(Duel.SelectMatchingCard(tp,s.cfilter2,tp,LOCATION_HAND,0,1,1,nil)+c,REASON_COST)
+end
 function s.ptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)>1 and c:IsDestructable() and Duel.IsExistingMatchingCard(s.cfilter2,tp,LOCATION_HAND,0,1,nil) end
+	if chk==0 then return Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)>1 end
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,2,1-tp,LOCATION_HAND)
 end
 function s.filter(c)
 	return c:IsSetCard(0x89f) and c:IsAbleToHand()
 end
 function s.pop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectMatchingCard(tp,s.cfilter2,tp,LOCATION_HAND,0,1,1,nil)+c
-	if Duel.Destroy(g,REASON_EFFECT)<2 or Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)<2 then return end
+	if Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)<2 then return end
 	local g=Duel.GetFieldGroup(tp,0,LOCATION_HAND):RandomSelect(tp,2)
 	if Duel.SendtoDeck(g,nil,2,REASON_EFFECT)<2 or g:FilterCount(Card.IsLocation,nil,LOCATION_DECK)<2 then return end
 	local dg=Duel.GetMatchingGroup(s.filter,tp,LOCATION_DECK,0,nil)

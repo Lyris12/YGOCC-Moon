@@ -29,14 +29,17 @@ function s.cfilter(c,ec)
 end
 function s.pcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(9)
-	if chk==0 then return Duel.GetActivityCount(tp,ACTIVITY_ATTACK)==0 end
-	local e1=Effect.CreateEffect(e:GetHandler())
+	local c=e:GetHandler()
+	if chk==0 then return Duel.GetActivityCount(tp,ACTIVITY_ATTACK)==0 and c:IsDestructable() and Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_HAND+LOCATION_ONFIELD,0,1,nil,c) end
+	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_ATTACK)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)
 	e1:SetTargetRange(1,0)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+	Duel.Destroy(Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_HAND+LOCATION_ONFIELD,0,1,1,c,c)+c,REASON_COST)
 end
 function s.ptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
@@ -46,7 +49,7 @@ function s.ptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 			e:SetLabel(0)
 			if not Duel.IsExistingTarget(Card.IsAbleToDeck,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) then return false end
 		end
-		return Duel.IsPlayerCanDraw(tp,2) and c:IsDestructable() and Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_HAND+LOCATION_ONFIELD,0,1,nil,c)
+		return Duel.IsPlayerCanDraw(tp,2)
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g=Duel.SelectTarget(tp,Card.IsAbleToDeck,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
@@ -54,10 +57,6 @@ function s.ptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,2)
 end
 function s.pop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_HAND+LOCATION_ONFIELD,0,1,1,c,c)+c
-	if Duel.Destroy(g,REASON_EFFECT)<2 then return end
 	local tc=Duel.GetFirstTarget()
 	if not tc:IsRelateToEffect(e) or Duel.SendtoDeck(tc,nil,2,REASON_EFFECT)==0 or not tc:IsLocation(LOCATION_DECK) then return end
 	Duel.ShuffleDeck(tp)

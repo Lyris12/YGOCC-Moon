@@ -53,18 +53,20 @@ function s.desfilter(c,tp)
 	local ec=c:GetEquipTarget()
 	return ec and ec:IsType(TYPE_BIGBANG) and c:IsDestructable() and Duel.IsExistingMatchingCard(nil,tp,LOCATION_HAND+LOCATION_ONFIELD,LOCATION_HAND+LOCATION_ONFIELD,1,c)
 end
-function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	e:SetLabel(1)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.desfilter,tp,LOCATION_SZONE,LOCATION_SZONE,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	Duel.Destroy(Duel.SelectMatchingCard(tp,s.desfilter,tp,LOCATION_SZONE,LOCATION_SZONE,1,1,nil,tp),REASON_COST)
+end
+function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local l=e:GetLabel()==1
+	if chk==0 then e:SetLabel(0) return l or Duel.GetFieldGroupCount(tp,LOCATION_HAND+LOCATION_ONFIELD,LOCATION_HAND+LOCATION_ONFIELD)>0 end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,1,0,LOCATION_ONFIELD+LOCATION_HAND)
 end
 function s.op(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local tg=Duel.SelectMatchingCard(tp,nil,tp,LOCATION_HAND+LOCATION_ONFIELD,LOCATION_HAND+LOCATION_ONFIELD,1,1,nil)
-	if #tg>0 then
-		Duel.HintSelection(tg)
-		Duel.BreakEffect()
-		Duel.Destroy(tg,REASON_EFFECT)
-	end
+	Duel.HintSelection(tg)
+	Duel.Destroy(tg,REASON_EFFECT)
 end

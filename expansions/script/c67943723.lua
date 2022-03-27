@@ -20,6 +20,7 @@ function s.initial_effect(c)
 	e2:SetCountLimit(1)
 	e2:SetCategory(CATEGORY_DESTROY+CATEGORY_TOHAND)
 	e2:SetDescription(1124)
+	e2:SetCost(s.cost)
 	e2:SetTarget(s.dtg)
 	e2:SetOperation(s.dop)
 	c:RegisterEffect(e2)
@@ -64,11 +65,15 @@ end
 function s.thfilter(c)
 	return c:IsSetCard(0xcf11) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
-function s.dtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local g,dg=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_SZONE,0,nil),Duel.GetFieldGroup(tp,0,LOCATION_ONFIELD)
-	if chk==0 then return #g>0 and #dg>0 end
+function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	local g=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_SZONE,0,nil)
+	if chk==0 then return #g>0 end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	Duel.Destroy(g:Select(tp,1,1,nil),REASON_COST)
+end
+function s.dtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local dg=Duel.GetFieldGroup(tp,0,LOCATION_ONFIELD)
+	if chk==0 then return #dg>0 end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,dg,1,0,0)
 end
 function s.dop(e,tp,eg,ep,ev,re,r,rp)
