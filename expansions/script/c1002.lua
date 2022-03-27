@@ -49,12 +49,12 @@ function s.initial_effect(c)
 	Duel.AddCustomActivityCounter(id,ACTIVITY_CHAIN,s.chainfilter)
 end
 function s.counterfilter(c)
-	local code,code2=c:GetCode()
-	return code<10000 or code2 and code2<10000 or c:IsOriginalCodeRule(CARD_ANONYMIZE)
+	local code=c:GetOriginalCode()
+	return code<10000 or c:IsOriginalCodeRule(CARD_ANONYMIZE)
 end
 function s.chainfilter(re,tp,cid)
-	local code,code2=re:GetHandler():GetCode()
-	return code<10000 or code2 and code2<10000 or re:GetHandler():IsOriginalCodeRule(CARD_ANONYMIZE)
+	local code=re:GetHandler():GetOriginalCode()
+	return code<10000 or re:GetHandler():IsOriginalCodeRule(CARD_ANONYMIZE)
 end
 
 function s.sprfilter(c)
