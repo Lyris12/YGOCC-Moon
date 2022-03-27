@@ -174,10 +174,10 @@ function s.aclimit(e,re,tp)
 end
 function s.filter(c,e,tp)
 	if not c:IsFaceup() then return false end
-	if c:IsCode(CARD_ANONYMIZE) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(s.spf,tp,LOCATION_DECK,0,1,nil,e,tp,c:GetOriginalCode()) then
+	if c:IsCode(CARD_ANONYMIZE) and c:IsAbleToDeck() then
 		return true
 	end
-	return (#{c:GetCode()}>1 or not c:IsCode(CARD_ANONYMIZE)) and c:IsAbleToDeck() 
+	return (#{c:GetCode()}>1 or not c:IsCode(CARD_ANONYMIZE)) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(s.spf,tp,LOCATION_DECK,0,1,nil,e,tp,c:GetOriginalCode())
 end
 function s.spf(c,e,tp,code)
 	return c:IsType(TYPE_MONSTER) and c:GetOriginalCode()<code and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
@@ -192,9 +192,9 @@ function s.nametg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		local code,code2=tc:GetCode()
 		if not code2 then
 			if code==CARD_ANONYMIZE then
-				Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
-			else
 				Duel.SetOperationInfo(0,CATEGORY_TODECK,g,#g,tc:GetControler(),tc:GetLocation())
+			else
+				Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 			end
 		end
 	end
@@ -203,8 +203,8 @@ function s.nameop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if not tc or not tc:IsRelateToEffect(e) or not tc:IsFaceup() then return end
 	local desc,opt={},{}
-	local b1=(tc:IsCode(CARD_ANONYMIZE) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(s.spf,tp,LOCATION_DECK,0,1,nil,e,tp,tc:GetOriginalCode()))
-	local b2=((#{tc:GetCode()}>1 or not tc:IsCode(CARD_ANONYMIZE)) and tc:IsAbleToDeck())
+	local b1=(tc:IsCode(CARD_ANONYMIZE) and tc:IsAbleToDeck()) 
+	local b2=((#{tc:GetCode()}>1 or not tc:IsCode(CARD_ANONYMIZE)) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(s.spf,tp,LOCATION_DECK,0,1,nil,e,tp,tc:GetOriginalCode()))
 	if not b1 and not b2 then return end
 	if b1 then
 		table.insert(desc,aux.Stringid(id,3))

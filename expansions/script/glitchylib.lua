@@ -376,7 +376,7 @@ function Auxiliary.SPSummonRestr(act,f)
 	local prop=EFFECT_FLAG_PLAYER_TARGET
 	if act then prop=EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH end
 	return	function(e,tp,eg,ep,ev,re,r,rp,chk)
-				if chk==0 then return Duel.GetCustomActivityCount(id,tp,ACTIVITY_SPSUMMON)==0 end
+				if chk==0 then return Duel.GetCustomActivityCount(e:GetHandler():GetOriginalCode(),tp,ACTIVITY_SPSUMMON)==0 end
 				local e1=Effect.CreateEffect(e:GetHandler())
 				e1:SetType(EFFECT_TYPE_FIELD)
 				e1:SetProperty(prop)
