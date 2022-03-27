@@ -562,10 +562,7 @@ Card.CheckFusionMaterial = function(c,...)
 	local chkf = #x>2 and x[3] or PLAYER_NONE
 	local not_material = #x>3 and x[4]
 	
-	local res=false
-	if aux.GetValueType(matg)=="Group" then
-		res=_CheckFusionMaterial(c,matg,cg,chkf,not_material)
-	end
+	local res=_CheckFusionMaterial(c,matg,cg,chkf,not_material)
 	local tp=self_reference_effect:GetHandlerPlayer()
 	if Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL) then
 		local egroup={Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)}
