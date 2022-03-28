@@ -55,9 +55,9 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if Duel.IsPlayerCanDraw(tp,3) then
 		typ=typ|TYPE_TRAP
 	end
-	if chk==0 then return Duel.IsExistingTarget(s.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,e:GetHandler(),typ) end
+	if chk==0 then return Duel.IsExistingTarget(s.filter,tp,LOCATION_ONFIELD+LOCATION_GRAVE,LOCATION_ONFIELD+LOCATION_GRAVE,1,e:GetHandler(),typ) end
 	e:SetLabel(0)
-	local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,e:GetHandler(),typ,e)
+	local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_ONFIELD+LOCATION_GRAVE,LOCATION_ONFIELD+LOCATION_GRAVE,e:GetHandler(),typ,e)
 	local sg=aux.SelectUnselectGroup(g,e,tp,1,3,s.rescon,1,tp,HINTMSG_TARGET)
 	local lb=0
 	for tc in aux.Next(sg) do

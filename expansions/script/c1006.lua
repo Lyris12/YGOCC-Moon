@@ -31,7 +31,7 @@ end
 s.expired_names={}
 --FILTERS
 function s.counterfilter(c)
-	return c:IsSetCard(0xca4)
+	return not c:IsType(TYPE_LINK) or c:IsSetCard(0xca4)
 end
 function s.scf(c)
 	return c:IsCode(1011) and c:IsAbleToHand()

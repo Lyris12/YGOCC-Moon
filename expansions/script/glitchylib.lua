@@ -563,48 +563,50 @@ Card.CheckFusionMaterial = function(c,...)
 	local not_material = #x>3 and x[4]
 	
 	local res=_CheckFusionMaterial(c,matg,cg,chkf,not_material)
-	local tp=self_reference_effect:GetHandlerPlayer()
-	if Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL) then
-		local egroup={Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)}
-		local all_mats=Group.CreateGroup()
-		for _,ce in ipairs(egroup) do
-			if ce and ce.GetLabel then
-				local id=ce:GetLabel()
-				local chk_fus=ce:GetValue()
-				if aux.GetValueType(chk_fus)=="function" then
-					chk_fus,_=chk_fus(ce,c,tp)
-				end
-				if chk_fus then
-					local mats=Duel.GetMatchingGroup(aux.ExtraFusionFilter0,tp,0xff,0xff,nil,ce,ce:GetTarget())
-					if #mats>0 then
-						for ec1 in aux.Next(mats) do
-							if ec1:GetFlagEffect(1005)>0 then
-								if ec1:GetFlagEffect(1006)<=0 then
-									ec1:RegisterFlagEffect(1006,RESET_CHAIN,0,1)
+	if self_reference_effect then
+		local tp=self_reference_effect:GetHandlerPlayer()
+		if Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL) then
+			local egroup={Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)}
+			local all_mats=Group.CreateGroup()
+			for _,ce in ipairs(egroup) do
+				if ce and ce.GetLabel then
+					local id=ce:GetLabel()
+					local chk_fus=ce:GetValue()
+					if aux.GetValueType(chk_fus)=="function" then
+						chk_fus,_=chk_fus(ce,c,tp)
+					end
+					if chk_fus then
+						local mats=Duel.GetMatchingGroup(aux.ExtraFusionFilter0,tp,0xff,0xff,nil,ce,ce:GetTarget())
+						if #mats>0 then
+							for ec1 in aux.Next(mats) do
+								if ec1:GetFlagEffect(1005)>0 then
+									if ec1:GetFlagEffect(1006)<=0 then
+										ec1:RegisterFlagEffect(1006,RESET_CHAIN,0,1)
+									end
+									local flag=Effect.CreateEffect(ce:GetHandler())
+									flag:SetType(EFFECT_TYPE_SINGLE)
+									flag:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+									flag:SetCode(EFFECT_GLITCHY_EXTRA_MATERIAL_FLAG)
+									flag:SetValue(id)
+									flag:SetReset(RESET_CHAIN)
+									ec1:RegisterEffect(flag)
 								end
-								local flag=Effect.CreateEffect(ce:GetHandler())
-								flag:SetType(EFFECT_TYPE_SINGLE)
-								flag:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-								flag:SetCode(EFFECT_GLITCHY_EXTRA_MATERIAL_FLAG)
-								flag:SetValue(id)
-								flag:SetReset(RESET_CHAIN)
-								ec1:RegisterEffect(flag)
 							end
+							all_mats:Merge(mats)
 						end
-						all_mats:Merge(mats)
 					end
 				end
 			end
-		end
-		all_mats:Merge(matg)
-		res=_CheckFusionMaterial(c,all_mats,cg,chkf,not_material)
-		for ec2 in aux.Next(all_mats) do
-			if ec2:GetFlagEffect(1006)>0 then
-				ec2:ResetFlagEffect(1006)
-			end
-			for _,flag in ipairs({ec2:IsHasEffect(EFFECT_GLITCHY_EXTRA_MATERIAL_FLAG)}) do
-				if flag and flag.GetLabel then
-					flag:Reset()
+			all_mats:Merge(matg)
+			res=_CheckFusionMaterial(c,all_mats,cg,chkf,not_material)
+			for ec2 in aux.Next(all_mats) do
+				if ec2:GetFlagEffect(1006)>0 then
+					ec2:ResetFlagEffect(1006)
+				end
+				for _,flag in ipairs({ec2:IsHasEffect(EFFECT_GLITCHY_EXTRA_MATERIAL_FLAG)}) do
+					if flag and flag.GetLabel then
+						flag:Reset()
+					end
 				end
 			end
 		end

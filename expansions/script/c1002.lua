@@ -44,9 +44,6 @@ function s.initial_effect(c)
 	local e3x=e3:Clone()
 	e3x:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e3x)
-	--activity counters
-	Duel.AddCustomActivityCounter(id,ACTIVITY_SPSUMMON,s.counterfilter)
-	Duel.AddCustomActivityCounter(id,ACTIVITY_CHAIN,s.chainfilter)
 end
 function s.counterfilter(c)
 	local code=c:GetOriginalCode()
@@ -143,34 +140,10 @@ function s.namecon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetFlagEffect(tp,id)<=0
 end
 function s.namecost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetCustomActivityCount(id,tp,ACTIVITY_SPSUMMON)==0 and Duel.GetCustomActivityCount(id,tp,ACTIVITY_CHAIN)==0 end
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)
-	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-	e1:SetReset(RESET_PHASE+PHASE_END)
-	e1:SetTargetRange(1,0)
-	e1:SetLabelObject(e)
-	e1:SetTarget(s.splimit)
-	Duel.RegisterEffect(e1,tp)
-	local e2=Effect.CreateEffect(e:GetHandler())
-	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT)
-	e2:SetDescription(aux.Stringid(id,2))
-	e2:SetCode(EFFECT_CANNOT_ACTIVATE)
-	e2:SetTargetRange(1,0)
-	e2:SetValue(s.aclimit)
-	e2:SetReset(RESET_PHASE+PHASE_END)
-	Duel.RegisterEffect(e2,tp)
+	if chk==0 then return true end
 	if e:IsHasType(EFFECT_TYPE_ACTIONS) and e:GetHandler():IsCode(id) then
 		Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,2)
 	end
-end
-function s.splimit(e,c,sump,sumtype,sumpos,targetp,se)
-	return not s.counterfilter(c)
-end
-function s.aclimit(e,re,tp)
-	return not s.chainfilter(re)
 end
 function s.filter(c,e,tp)
 	if not c:IsFaceup() then return false end

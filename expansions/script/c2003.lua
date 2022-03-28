@@ -54,7 +54,7 @@ function s.econ(e)
 end
 function s.efilter(e,re,rp)
 	local rc=re:GetHandler()
-	return rc and rc:GetOriginalCode()<e:GetLabel()
+	return rc and rc:GetOriginalCode()>e:GetLabel()
 end
 function s.countop(e)
 	if e:GetHandler():IsSummonType(SUMMON_TYPE_FUSION) then

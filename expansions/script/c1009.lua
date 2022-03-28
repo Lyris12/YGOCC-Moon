@@ -67,22 +67,29 @@ function s.nametg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and s.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(s.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) and e:GetHandler():IsSSetable() end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	Duel.SelectTarget(tp,s.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
+	Duel.SelectTarget(tp,s.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,2,nil)
 end
 function s.nameop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) and tc:IsFaceup() then
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e1:SetCode(EFFECT_CHANGE_CODE)
-		e1:SetValue(CARD_ANONYMIZE)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_OVERLAY)
-		tc:RegisterEffect(e1)
-		if tc:IsCode(CARD_ANONYMIZE) and c:IsRelateToEffect(e) and c:IsSSetable() then
-			Duel.SSet(tp,c)
+	local g=Duel.GetTargetCards(e)
+	local check=false
+	for tc in aux.Next(g) do
+		if tc and tc:IsRelateToEffect(e) and tc:IsFaceup() then
+			local e1=Effect.CreateEffect(c)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+			e1:SetCode(EFFECT_CHANGE_CODE)
+			e1:SetValue(CARD_ANONYMIZE)
+			e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_OVERLAY)
+			tc:RegisterEffect(e1)
+			if tc:IsCode(CARD_ANONYMIZE) then
+				check=true
+			end
 		end
+	end
+	if check and c:IsRelateToEffect(e) and c:IsSSetable() then
+		Duel.BreakEffect()
+		Duel.SSet(tp,c)
 	end
 end
 function s.nf(c)
