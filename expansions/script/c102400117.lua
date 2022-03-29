@@ -63,13 +63,10 @@ function s.op(e,tp,eg,ep,ev,re,r,rp)
 		Duel.RegisterEffect(e1,tp)
 		local e3=Effect.CreateEffect(c)
 		e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e3:SetCode(EVENT_CHAIN_SOLVED)
+		e3:SetCode(EVENT_ADJUST)
 		e3:SetOperation(function() for tc in aux.Next(Duel.GetMatchingGroup(s.reset,tp,0xff,0xff,nil)) do while s.reset(tc) do tc:ResetFlagEffect(id) end end end)
 		e3:SetReset(RESET_PHASE+PHASE_END)
 		Duel.RegisterEffect(e3,tp)
-		local e4=e3:Clone()
-		e4:SetCode(EVENT_ADJUST)
-		Duel.RegisterEffect(e4,tp)
 	end
 end
 function s.reset(c)
@@ -82,10 +79,29 @@ function s.rchk(c)
 	return not c:IsReason(REASON_DESTROY)
 end
 function s.rtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return eg:IsExists(aux.AND(s.rfilter,s.rchk),1,nil) end
-	for tc in aux.Next(eg:Filter(s.rfilter,nil)) do
-		Duel.Destroy(tc,r,tc:GetDestination())
-		tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
-	end
+	local g=eg:Filter(aux.AND(s.rfilter,s.rchk),nil)
+	if chk==0 then return #g>0 end
+	local dt,ct,mode={},0
+	if g:GetClassCount(Card.GetDestination)>1 then
+		for tc in aux.Next(g) do
+			local d=tc:GetDestination()
+			if dt[d] then dt[d]=dt[d]+1 else dt[d]=1 end
+			if dt[d]>ct then
+				ct=dt[d]
+				mode=d
+			end
+		end
+		local gt={}
+		for i=0,5 do gt[0x2<<i]=Group.CreateGroup() end
+		for tc in aux.Next(g) do
+			g:RemoveCard(tc)
+			gt[tc:GetDestination()]:AddCard(tc)
+		end
+		gt[mode]:DeleteGroup()
+		gt[mode]=nil
+		for d,tg in ipairs(gt) do Duel.Destroy(tg,r,d) end
+	else mode=g:GetFirst():GetDestination() end
+	Duel.Destroy(g,r,mode)
+	for tc in aux.Next(g) do tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_CHAIN,0,1) end
 	return true
 end
