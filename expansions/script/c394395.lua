@@ -63,7 +63,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 			b2=Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsPlayerCanSpecialSummonMonster(tp,394400,0xd04,TYPES_TOKEN_MONSTER,-2,-2,1,RACE_FIEND,ATTRIBUTE_FIRE) and s.damchk(2000)(e,tp)
 			b3=Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(s.spf,tp,LOCATION_HAND,0,1,nil,e,tp,g:GetFirst():GetCode()) and s.damchk(3000)(e,tp)
 		end
-		if b2 and flag>0 or Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+		if b2 and flag>0 and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
 			Duel.BreakEffect()
 			local token=Duel.CreateToken(tp,394400)
 			local e1=Effect.CreateEffect(c)
