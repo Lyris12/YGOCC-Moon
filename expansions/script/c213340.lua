@@ -41,7 +41,7 @@ function c213340.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c213340.lcheck(g,lc)
-	return g:IsExists(Card.IsLinkType,1,nil,TYPE_RITUAL)
+	return g:IsExists(Card.IsLevel,1,nil,1)
 end
 function c213340.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_LINK)
