@@ -1,8 +1,7 @@
+--created by LeonDuvall of Discord, coded by XGlitchy30 of Discord
 --Kyrie, YC.Org Naval Gear Admiral
---Scripted by: XGlitchy30
-local cid,id=GetID()
-function cid.initial_effect(c)
-	--pendulum
+local s,id,o=GetID()
+function s.initial_effect(c)
 	if not aux.PendulumChecklist then
 		aux.PendulumChecklist=0
 		local ge1=Effect.GlobalEffect()
@@ -21,15 +20,13 @@ function cid.initial_effect(c)
 	e1:SetOperation(aux.PendOperation())
 	e1:SetValue(SUMMON_TYPE_PENDULUM)
 	c:RegisterEffect(e1)
-	--pendulum custom activation
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(1160)
 	e2:SetType(EFFECT_TYPE_ACTIVATE)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_HAND)
-	e2:SetTarget(cid.target)
+	e2:SetTarget(s.target)
 	c:RegisterEffect(e2)
-	--ss
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -38,12 +35,11 @@ function cid.initial_effect(c)
 	e3:SetRange(LOCATION_PZONE)
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e3:SetCountLimit(1,id)
-	e3:SetCondition(cid.spcon)
-	e3:SetCost(cid.spcost)
-	e3:SetTarget(cid.sptg2)
-	e3:SetOperation(cid.spop2)
+	e3:SetCondition(s.spcon)
+	e3:SetCost(s.spcost)
+	e3:SetTarget(s.sptg2)
+	e3:SetOperation(s.spop2)
 	c:RegisterEffect(e3)
-	--activate
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(id,2))
 	e4:SetCategory(CATEGORY_LEAVE_GRAVE)
@@ -51,21 +47,21 @@ function cid.initial_effect(c)
 	e4:SetProperty(EFFECT_FLAG_DELAY)
 	e4:SetCode(EVENT_BE_MATERIAL)
 	e4:SetCountLimit(1,id+100)
-	e4:SetCondition(cid.pzcon)
-	e4:SetTarget(cid.pztg)
-	e4:SetOperation(cid.pzop)
+	e4:SetCondition(s.pzcon)
+	e4:SetTarget(s.pztg)
+	e4:SetOperation(s.pzop)
 	c:RegisterEffect(e4)
 end
-function cid.tffilter(c)
+function s.tffilter(c)
 	return c:IsSetCard(0x96b,0x700) and c:IsType(TYPE_MONSTER) and not c:IsForbidden()
 end
-function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	if Duel.GetFlagEffect(tp,id)<=0 and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and Duel.IsExistingMatchingCard(cid.tffilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil) and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
+	if Duel.GetFlagEffect(tp,id)<=0 and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and Duel.IsExistingMatchingCard(s.tffilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil) and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
 		Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
 		e:SetCategory(CATEGORY_LEAVE_GRAVE)
-		e:SetOperation(cid.activate)
-		if Duel.IsExistingMatchingCard(cid.tffilter,tp,LOCATION_GRAVE,0,1,nil) then
+		e:SetOperation(s.activate)
+		if Duel.IsExistingMatchingCard(s.tffilter,tp,LOCATION_GRAVE,0,1,nil) then
 			Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,nil,1,tp,LOCATION_GRAVE)
 		end
 	else
@@ -73,11 +69,11 @@ function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 		e:SetOperation(nil)
 	end
 end
-function cid.activate(e,tp,eg,ep,ev,re,r,rp)
+function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
-	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(cid.tffilter),tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.tffilter),tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil)
 	if g:GetCount()>0 then
 		local tc=g:GetFirst()
 		Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
@@ -91,12 +87,11 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 
---SS
-function cid.spcon(e,tp,eg,ep,ev,re,r,rp)
+function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local ec=eg:GetFirst()
 	return #eg==1 and ec:IsFaceup() and ec:IsSetCard(0x96b,0x700) and ec:IsSummonType(SUMMON_TYPE_LINK) and ec:GetSummonPlayer()==tp
 end
-function cid.cfilter(c,e,tp,ft,ec)
+function s.cfilter(c,e,tp,ft,ec)
 	local ok=false
 	for p=0,1 do
 		local zone=ec:GetLinkedZone(p)&0xff
@@ -105,13 +100,13 @@ function cid.cfilter(c,e,tp,ft,ec)
 	return ((c:IsLocation(LOCATION_MZONE) and c:IsFaceup() and (ft>0 or (c:IsControler(tp) and (c:GetSequence()<5 and (ok or ec:GetLinkedGroup():IsContains(c)))))) or c:IsLocation(LOCATION_SZONE) and ft>0) and (c:IsControler(tp) or c:IsFaceup())
 		and c:IsType(TYPE_SPELL) and c:IsSetCard(0x96b,0x700)
 end
-function cid.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if chk==0 then return ft>-1 and Duel.CheckReleaseGroup(tp,cid.cfilter,1,nil,e,tp,ft,eg:GetFirst()) end
-	local g=Duel.SelectReleaseGroup(tp,cid.cfilter,1,1,nil,e,tp,ft,eg:GetFirst())
+	if chk==0 then return ft>-1 and Duel.CheckReleaseGroup(tp,s.cfilter,1,nil,e,tp,ft,eg:GetFirst()) end
+	local g=Duel.SelectReleaseGroup(tp,s.cfilter,1,1,nil,e,tp,ft,eg:GetFirst())
 	Duel.Release(g,REASON_COST)
 end
-function cid.spfilter3(c,e,tp,ec)
+function s.spfilter3(c,e,tp,ec)
 	if not c:IsSetCard(0x96b,0x700) then return false end
 	local ok=false
 	for p=0,1 do
@@ -120,15 +115,15 @@ function cid.spfilter3(c,e,tp,ec)
 	end
 	return ok
 end
-function cid.sptg2(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.sptg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c,ec=e:GetHandler(),eg:GetFirst()
 	local zone={}
 	zone[0]=ec:GetLinkedZone(0)
 	zone[1]=ec:GetLinkedZone(1)
-	if chk==0 then return Duel.IsExistingMatchingCard(cid.spfilter3,tp,LOCATION_DECK,0,1,nil,e,tp,ec) end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.spfilter3,tp,LOCATION_DECK,0,1,nil,e,tp,ec) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end
-function cid.spop2(e,tp,eg,ep,ev,re,r,rp)
+function s.spop2(e,tp,eg,ep,ev,re,r,rp)
 	local c,ec=e:GetHandler(),eg:GetFirst()
 	if not c:IsRelateToEffect(e) or not ec:IsRelateToEffect(e) or ec:IsFacedown() then return end
 	local zone={}
@@ -139,7 +134,7 @@ function cid.spop2(e,tp,eg,ep,ev,re,r,rp)
 		flag[p]=(~flag_tmp)&0x7f
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,cid.spfilter3,tp,LOCATION_DECK,0,1,1,nil,e,tp,ec)
+	local g=Duel.SelectMatchingCard(tp,s.spfilter3,tp,LOCATION_DECK,0,1,1,nil,e,tp,ec)
 	local sc=g:GetFirst()
 	if sc then
 		local ava_zone=0
@@ -161,12 +156,11 @@ function cid.spop2(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 
---ACTIVATE
-function cid.pzcon(e,tp,eg,ep,ev,re,r,rp)
+function s.pzcon(e,tp,eg,ep,ev,re,r,rp)
 	local rc=e:GetHandler():GetReasonCard()
 	return r&REASON_LINK>0 and rc and rc:IsFaceup() and rc:IsType(TYPE_LINK) and rc:IsSetCard(0x96b,0x700)
 end
-function cid.pztg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.pztg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	e:SetCategory(0)
 	if chk==0 then return c:GetActivateEffect():IsActivatable(tp) and not c:IsForbidden() and (Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,0)) end
@@ -175,7 +169,7 @@ function cid.pztg(e,tp,eg,ep,ev,re,r,rp,chk)
 		Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,c,1,0,0)
 	end
 end
-function cid.pzop(e,tp,eg,ep,ev,re,r,rp)
+function s.pzop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) or not ((Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,0))) then return end
 	Duel.MoveToField(tc,tp,tp,LOCATION_PZONE,POS_FACEUP,true)
