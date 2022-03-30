@@ -16,7 +16,8 @@ function s.initial_effect(c)
 	e0x:SetType(EFFECT_TYPE_FIELD)
 	e0x:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e0x:SetCode(EFFECT_SPSUMMON_PROC)
-	e0x:SetRange(LOCATION_HAND)
+	e0x:SetRange(LOCATION_HAND+LOCATION_GRAVE)
+	e0x:SetCountLimit(1,id+EFFECT_COUNT_CODE_OATH)
 	e0x:SetCondition(s.sprcon)
 	e0x:SetOperation(s.sprop)
 	c:RegisterEffect(e0x)
@@ -105,12 +106,13 @@ end
 function s.sprcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
+	if c:IsHasEffect(EFFECT_NECRO_VALLEY) then return false end
 	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(s.sprfilter,tp,LOCATION_GRAVE,0,3,nil)
+		and Duel.IsExistingMatchingCard(s.sprfilter,tp,LOCATION_GRAVE,0,3,c)
 end
 function s.sprop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=Duel.SelectMatchingCard(tp,s.sprfilter,tp,LOCATION_GRAVE,0,3,3,nil)
+	local g=Duel.SelectMatchingCard(tp,s.sprfilter,tp,LOCATION_GRAVE,0,3,3,c)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
 
