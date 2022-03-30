@@ -1,5 +1,5 @@
 --created by LeonDuvall of Discord, coded by Lyris
---YC.Orgのパイロット・ストラターラムラム
+--Stratauramram, YC.Org Pilot
 local s,id,o=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)

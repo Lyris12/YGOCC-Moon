@@ -1,5 +1,5 @@
 --created by LeonDuvall of Discord, coded by Lyris
---YC.Orgのスパイマスター・ミステリアス・ミード
+--Disstonant Meed, YC.Org Spymaster
 local s,id,o=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)

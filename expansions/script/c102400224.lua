@@ -1,5 +1,5 @@
 --created by LeonDuvall of Discord, coded by Lyris
---YC.Orgのリサーチャー・アーキオロジー
+--YC.Org Researcher - Archeology
 local s,id,o=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
