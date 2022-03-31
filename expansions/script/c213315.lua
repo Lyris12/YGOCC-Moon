@@ -43,7 +43,7 @@ function c213315.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c213315.mfilter(c)
-	return c:IsLocation(LOCATION_MZONE) and c:IsLevel(1) and c:IsFaceup()
+	return c:IsLocation(LOCATION_MZONE) and aux.IsCodeListed(c,213355) and c:IsFaceup()
 end
 function c213315.exmfilter(c)
 	return c:IsLocation(LOCATION_HAND) and c:IsCode(213315)
