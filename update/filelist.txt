@@ -1,4 +1,4 @@
-﻿expansions/cards-new.cdb	5545e5195570c938fb371c84a2fcc630
+﻿expansions/cards-new.cdb	d3599525b671db2dd391cb776c24f5f5
 expansions/lflist.conf	07cb0c4a0da39c1c64940e2e04027137
 expansions/strings.conf	0f9ff973f56a77eab12ab74d2fdf27ab
 expansions/pics/100000714.jpg	74ec20749932cad0249671d71e6d672b
@@ -5766,7 +5766,7 @@ expansions/script/c11110111.lua	4ee65c4074b6c22595bd8fa76b405ff0
 expansions/script/c11110112.lua	b0e2f6191bfd20bac864f15c71a2a533
 expansions/script/c11110113.lua	c37c01aca9e14f4f0aecbe36d8e99d8d
 expansions/script/c11110114.lua	f088affecb0bea9640126573b3e216fe
-expansions/script/c11110115.lua	e6bcbb43cbd9f905314bbf3fcb9f4f7c
+expansions/script/c11110115.lua	3afc16c3092074d82e4383b106ced655
 expansions/script/c11110116.lua	87f3e539b8d81968a40b66446022eae0
 expansions/script/c11111001.lua	3ff9f3d839ca2e1d75f024ca28fa67bf
 expansions/script/c11111002.lua	1586ac3817b343a401e869a85a661751
@@ -8438,7 +8438,7 @@ expansions/script/c39416.lua	9b6c5658d2b1fac6f18b5f91b2c12f91
 expansions/script/c39417.lua	78e1311a1347b60f119d0181a4f616be
 expansions/script/c39418.lua	07964d2b752c8b87d78149ac0d67086a
 expansions/script/c39419.lua	2f935b8cf64ef57029ea1df74e933e83
-expansions/script/c394386.lua	6e0ccdf74d24810834d4cea3b7123fa5
+expansions/script/c394386.lua	25ffbdb6e6c987923ca32bc183fb698c
 expansions/script/c394387.lua	3aeadc8089aa16414f9d6919143aadd5
 expansions/script/c394388.lua	37bb017ab2419d3e1c03a42bf5358efa
 expansions/script/c394389.lua	ff929c5377993d58e922d65693a97a9c
@@ -10222,6 +10222,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	268d66f952f17366659aa1944b10dfe4
+update/filelist.txt	db862b70068940416334b497319e27dd
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	d17e7be80064f6e42869e6f843a9dbf5
+update/version.txt	b631c853a31308545d9fe66e50c77b0c
