@@ -9,25 +9,36 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 	--recall
 	local e2=Effect.CreateEffect(c)
-	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SPECIAL_SUMMON)
+	e2:SetCategory(CATEGORY_TOHAND)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e2:SetCode(EVENT_BATTLED)
 	e2:SetCondition(s.rccon)
 	e2:SetOperation(s.rcop)
-	e2:SetCountLimit(1,56132152)
 	c:RegisterEffect(e2)
 	--spproc
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_DESTROY)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e3:SetTarget(s.destar)
 	e3:SetCondition(s.sppcon)
 	e3:SetOperation(s.destop)
 	e3:SetCountLimit(1,56132153)
 	c:RegisterEffect(e3)
+
+	local e4=Effect.CreateEffect(c)
+	e4:SetDescription(aux.Stringid(id,0))
+	e4:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_SINGLE)
+	e4:SetProperty(EFFECT_FLAG_DAMAGE_STEP+ EFFECT_FLAG_DELAY)
+	e4:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e4:SetCode(EVENT_LEAVE_FIELD)
+	e4:SetCondition(s.leavcon)
+	e4:SetTarget(s.leavtar)
+	e4:SetOperation(s.leavop)
+	e4:SetCountLimit(1,56132152)
+	c:RegisterEffect(e4)
 end
 function s.rccon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -38,12 +49,7 @@ function s.spfilter(c,e)
 end
 function s.rcop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if Duel.SendtoHand(c,tp,REASON_EFFECT)~=0 and Duel.IsExistingMatchingCard(s.spfilter, tp, LOCATION_HAND, 0, 1, nil,e) then
-		if Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
-			local tc=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_HAND,0,1,1,nil,e)
-			Duel.SpecialSummon(tc,SUMMON_TYPE_SPECIAL,tp,tp,false,false,POS_FACEUP)
-		end
-	end
+	Duel.SendtoHand(c,tp,REASON_EFFECT)
 end
 function s.sppcon(e,tp,eg,ep,ev,re,r,rp)
 	return re and re:GetHandler():IsSetCard(0x8af)
@@ -60,4 +66,15 @@ end
 function s.destop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	Duel.Destroy(tc,REASON_EFFECT)
+end
+function s.leavcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():IsPreviousPosition(POS_FACEUP) and e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
+end
+function s.leavtar(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.spfilter, tp, LOCATION_HAND, 0, 1, nil,e) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
+end
+function s.leavop(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_HAND,0,1,1,nil,e)
+	Duel.SpecialSummon(tc,SUMMON_TYPE_SPECIAL,tp,tp,false,false,POS_FACEUP)
 end

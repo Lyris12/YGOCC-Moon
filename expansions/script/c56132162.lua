@@ -1,4 +1,4 @@
---Night Assault - Back To Action
+--Night Assault - Decoy
 --Script by APurpleApple
 local s,id=GetID()
 function s.initial_effect(c)
@@ -12,7 +12,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function s.filter(c)
-	return c:IsSetCard(0x8af) and c:IsType(TYPE_MONSTER)
+	return c:IsFaceup() and c:IsType(TYPE_MONSTER)
 end
 function s.tar(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingTarget(s.filter, tp, LOCATION_ONFIELD,0,1,nil) end
@@ -29,10 +29,11 @@ function s.op(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EVENT_DESTROYED)
 		e1:SetOperation(s.res)
 		e1:SetReset(RESET_PHASE+PHASE_END)
-		e1:SetCountLimit(1);
+		e1:SetCountLimit(1)
 		tc:RegisterEffect(e1)
 	end
 end
 function s.res(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SpecialSummon(e:GetHandler(),SUMMON_TYPE_SPECIAL,tp,tp,false,false,POS_FACEUP)
+	e:Reset()
 end

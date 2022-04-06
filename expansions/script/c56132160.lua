@@ -24,24 +24,21 @@ function s.initial_effect(c)
 	e2:SetCountLimit(1,56132160)
 	c:RegisterEffect(e2)
 end
-function s.sfilter(c)
-	return c:IsSetCard(0x8af) and c:IsType(TYPE_MONSTER)
-end
 function s.star(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.sfilter, tp, LOCATION_DECK,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.filter, tp, LOCATION_DECK,0,1,nil) end
 	Duel.SetOperationInfo(0, CATEGORY_TOHAND, nil,1,nil,nil)
 end
 function s.sop(e,tp,eg,ep,ev,re,r,rp)
-	local tg=Duel.SelectMatchingCard(tp,s.sfilter,tp,LOCATION_DECK,0,1,1,nil)
+	local tg=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil)
 	Duel.SendtoHand(tg,tp,REASON_EFFECT)
 end
-function s.gyfilter(c)
+function s.filter(c)
 	return c:IsSetCard(0x8af) and c:IsType(TYPE_SPELL+TYPE_TRAP)
 end
 function s.gytar(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chk==0 then return Duel.IsExistingTarget(s.gyfilter,tp,LOCATION_GRAVE,0,1,e:GetHandler()) end
+	if chk==0 then return Duel.IsExistingTarget(s.filter,tp,LOCATION_GRAVE,0,1,e:GetHandler()) end
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) end
-	local tg=Duel.SelectTarget(tp,s.gyfilter,tp,LOCATION_GRAVE,0,1,1,e:GetHandler())
+	local tg=Duel.SelectTarget(tp,s.filter,tp,LOCATION_GRAVE,0,1,1,e:GetHandler())
 	Duel.SetOperationInfo(0, CATEGORY_TOHAND, nil,1,nil,nil)
 end
 function s.gyop(e,tp,eg,ep,ev,re,r,rp)
