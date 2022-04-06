@@ -11,7 +11,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function s.cfilter(c,e,tp)
-	return c:IsFaceup() and c:IsDestructable(e) and c:IsSetCard(0xcf11) and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_EXTRA,0,1,c,c,e,tp)
+	return c:IsFaceup() and c:IsDestructable() and c:IsSetCard(0xcf11) and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_EXTRA,0,1,c,c,e,tp)
 end
 function s.filter(c,mc,e,tp)
 	return c:IsType(TYPE_BIGBANG) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_BIGBANG,tp,false,false)
