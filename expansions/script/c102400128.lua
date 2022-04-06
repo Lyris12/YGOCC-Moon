@@ -49,7 +49,7 @@ function s.desfilter(c,e,tp)
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return Duel.GetMZoneCount(tp,c)>0
+	if chk==0 then return Duel.GetMZoneCount(tp,c)>0 and Duel.GetTurnPlayer()~=tp and aux.bpcon()
 		and Duel.IsExistingMatchingCard(s.desfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,e:GetHandler(),1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_GRAVE)
@@ -57,17 +57,15 @@ end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and Duel.Destroy(c,REASON_EFFECT)~=0 then
-		if Duel.GetTurnPlayer()~=tp then
-			if Duel.GetAttacker() then if Duel.SelectEffectYesNo(tp,e:GetOwner()) then Duel.NegateAttack() end
-			else
-				local e1=Effect.CreateEffect(e:GetHandler())
-				e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-				e1:SetCode(EVENT_ATTACK_ANNOUNCE)
-				e1:SetReset(RESET_PHASE+PHASE_END)
-				e1:SetCountLimit(1)
-				e1:SetOperation(s.disop)
-				Duel.RegisterEffect(e1,tp)
-			end
+		if Duel.GetAttacker() then Duel.NegateAttack()
+		else
+			local e1=Effect.CreateEffect(c)
+			e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+			e1:SetCode(EVENT_ATTACK_ANNOUNCE)
+			e1:SetReset(RESET_PHASE+PHASE_END)
+			e1:SetCountLimit(1)
+			e1:SetOperation(function() Duel.Hint(HINT_CARD,0,id) Duel.NegateAttack() end)
+			Duel.RegisterEffect(e1,tp)
 		end
 		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
@@ -91,7 +89,7 @@ function s.etarget(e,re)
 	return g and g:IsContains(e:GetHandler())
 end
 function s.cfilter(c,tp)
-	return c:GetOriginalType()&TYPE_MONSTER~=0 and (c:IsPreviousPosition(POS_FACEUP) or c:GetPreviousControler()==tp) and c:IsSetCard(0x7c4)
+	return c:IsPreviousLocation(LOCATION_MZONE) and (c:IsPreviousPosition(POS_FACEUP) or c:GetPreviousControler()==tp) and c:IsPreviousSetCard(0x7c4)
 end
 function s.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
