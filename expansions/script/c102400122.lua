@@ -44,7 +44,7 @@ function s.desfilter(c,e,tp)
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return Duel.GetMZoneCount(tp,c)>0
+	if chk==0 then return Duel.GetMZoneCount(tp,c)>0 and Duel.GetTurnPlayer()~=tp and aux.bpcon()
 		and Duel.IsExistingMatchingCard(s.desfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,e:GetHandler(),1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_GRAVE)
@@ -52,6 +52,16 @@ end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and Duel.Destroy(c,REASON_EFFECT)~=0 then
+		if Duel.GetAttacker() then Duel.NegateAttack()
+		else
+			local e1=Effect.CreateEffect(e:GetHandler())
+			e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+			e1:SetCode(EVENT_ATTACK_ANNOUNCE)
+			e1:SetReset(RESET_PHASE+PHASE_END)
+			e1:SetCountLimit(1)
+			e1:SetOperation(s.disop)
+			Duel.RegisterEffect(e1,tp)
+		end
 		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		Duel.SpecialSummon(Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.desfilter),tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil,e,tp),0,tp,tp,false,false,POS_FACEUP)
@@ -68,11 +78,11 @@ function s.etarget(e,re)
 	return g and g:IsContains(e:GetHandler())
 end
 function s.cfilter(c,tp)
-	return c:GetOriginalType()&TYPE_MONSTER~=0 and (c:IsPreviousPosition(POS_FACEUP) or c:GetPreviousControler()==tp) and c:IsSetCard(0x7c4)
+	return c:IsPreviousLocation(LOCATION_MZONE) and (c:IsPreviousPosition(POS_FACEUP) or c:GetPreviousControler()==tp) and c:IsPreviousSetCard(0x7c4)
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToRemoveAsCost,tp,LOCATION_GRAVE+LOCATION_HAND,0,1,nil,POS_FACEDOWN) end
-	Duel.Remove(Duel.SelectMatchingCard(tp,Card.IsAbleToRemoveAsCost,tp,LOCATION_GRAVE+LOCATION_HAND,0,1,1,nil,POS_FACEDOWN),POS_FACEDOWN,REASON_COST)
+	if chk==0 then return eg:IsExists(aux.AND(s.cfilter,aux.FilterBoolFunction(Card.IsAbleToRemoveAsCost)),eg:FilterCount(s.cfilter,nil,tp),nil,tp) end
+	Duel.Remove(eg:Filter(aux.AND(s.cfilter,aux.FilterBoolFunction(Card.IsAbleToRemoveAsCost)),nil,tp),POS_FACEUP,REASON_COST)
 end
 function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0 end
@@ -83,6 +93,6 @@ function s.op(e,tp,eg,ep,ev,re,r,rp)
 	local tc=g:GetFirst()
 	Duel.DisableShuffleCheck()
 	if Duel.Destroy(g,REASON_EFFECT)~=0 then
-		if not (tc:IsType(TYPE_MONSTER) and tc:IsSetCard(0x7c4)) then Duel.Draw(tp,1,REASON_EFFECT) end
+		if tc:IsType(TYPE_MONSTER) and tc:IsSetCard(0x7c4) then Duel.Draw(tp,1,REASON_EFFECT) end
 	else Duel.ConfirmDecktop(tp,1) end
 end
