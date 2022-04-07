@@ -30,5 +30,6 @@ function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.op(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	Duel.SpecialSummon(Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_EXTRA,0,1,1,nil,e:GetLabelObject(),e,tp),SUMMON_TYPE_BIGBANG,tp,tp,false,false,POS_FACEUP)
+	local tc=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_EXTRA,0,1,1,nil,e:GetLabelObject(),e,tp):GetFirst()
+	if tc and Duel.SpecialSummon(tc,SUMMON_TYPE_BIGBANG,tp,tp,false,false,POS_FACEUP)>0 then tc:CompleteProcedure() end
 end
