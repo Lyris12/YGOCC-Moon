@@ -81,7 +81,7 @@ function s.stg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.sop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) then Duel.SpecialSummon(e,SUMMON_VALUE_SELF,tp,tp,false,false,POS_FACEUP) end
+	if c:IsRelateToEffect(e) then Duel.SpecialSummon(c,SUMMON_VALUE_SELF,tp,tp,false,false,POS_FACEUP) end
 end
 function s.con(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():GetFlagEffect(id)==0 then return false end

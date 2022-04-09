@@ -81,7 +81,7 @@ function s.stg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.sop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) then Duel.SpecialSummon(e,0,tp,tp,false,false,POS_FACEUP) end
+	if c:IsRelateToEffect(e) then Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP) end
 end
 function s.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0xe1f) and c:GetEffectCount(EFFECT_EXTRA_ATTACK)==0

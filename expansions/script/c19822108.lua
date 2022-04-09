@@ -41,7 +41,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function s.nfilter(c,lv)
-	if c:IsType(TYPE_LINK) or c:IsDisabled() or not c:IsAbleToDeck() then return false
+	if c:IsType(TYPE_LINK) or not aux.NegateEffectMonsterFilter(c) or not c:IsAbleToDeck() then return false
 	elseif c:IsType(TYPE_XYZ) then return c:GetRank()<lv
 	else return c:GetLevel()<lv end
 end
