@@ -1,4 +1,4 @@
-﻿expansions/cards-new.cdb	b061da9bb0fed1fa9891f17989b06c66
+﻿expansions/cards-new.cdb	42a1265a7a71147fe82df7972fec3781
 expansions/lflist.conf	07cb0c4a0da39c1c64940e2e04027137
 expansions/strings.conf	3f9607cf4523e4e009786c4c3c919f64
 expansions/pics/100000714.jpg	74ec20749932cad0249671d71e6d672b
@@ -638,6 +638,8 @@ expansions/pics/11111309.jpg	5caedfc1cd94dc04b460d2534de6789a
 expansions/pics/11111310.jpg	aa1761d426ed78d6f026578888bb8846
 expansions/pics/11111311.jpg	43ede7405e90817f53e8459fdffd9a2c
 expansions/pics/11111312.jpg	de85003cb5f000e67810afdfeedf76c0
+expansions/pics/11111901.jpg	71c902c7ac3efee854336208135f2ff7
+expansions/pics/11111902.jpg	0a5d06dcce733be0a2cf4efb5909ab8a
 expansions/pics/111218300.jpg	88f7d8398d3abdefe7e9c912da996463
 expansions/pics/111218301.jpg	c32c21c4141169213d6617a3aeaab4a0
 expansions/pics/111218302.jpg	65676f79e4472f364df836fa380cc70b
@@ -5867,6 +5869,8 @@ expansions/script/c11111309.lua	7150bf6286a11f7fa21de681aa84fe5e
 expansions/script/c11111310.lua	c5e743580aeb57d580c23804c4191f22
 expansions/script/c11111311.lua	1a0b42386483556e5096c6d7f19386d5
 expansions/script/c11111312.lua	5b205dac95ede912184fe28cdcb79cc4
+expansions/script/c11111901.lua	45083f3c76a97ebe815b797e58f141c7
+expansions/script/c11111902.lua	175a5f11bc0b6b94b7954d7d2d67bfd1
 expansions/script/c111218300.lua	d273ba6c67c7eebefde55a64c4487418
 expansions/script/c111218301.lua	3d4a35129fcf4a3267dfc5fef3f98729
 expansions/script/c111218302.lua	80f42d41967170f6adc47912b11750bc
@@ -10150,7 +10154,7 @@ expansions/script/c99998880.lua	1c40768c257090c4f997bc24f1b31c30
 expansions/script/c99999955.lua	50a1ca34993761ed523c3513173fe6da
 expansions/script/glitchylib.lua	b4f2164e3e35e30c5b19f351a7d3e553
 expansions/script/GLShortcuts.lua	6743700bf509cc48d8f596ff4a8fe5c0
-expansions/script/init.lua	6fcedce8dbcbc4a19cf9746938ded52e
+expansions/script/init.lua	dafce9f413d135ccd94df7bf48c84018
 expansions/script/json.lua	d41a01cf67c76915b49c57d21ac471ee
 expansions/script/lap.lua	1325997ac4231550048dae57e7eb75b0
 expansions/script/muse_proc.lua	a66cf99f7a3cfa4630e806d0df693765
@@ -10248,6 +10252,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	ffb57a6511fb7796f30ccd179e4552aa
+update/filelist.txt	91c331349f33cd07392d57e90b9ddc8b
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	5ea6fbd8997d973753bb73e5724bc452
+update/version.txt	b15261bdbb09d050fbd96abd5a27ebf8

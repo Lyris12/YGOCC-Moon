@@ -156,8 +156,8 @@ function Card.GetRitualType(c)
 end
 
 dofile("expansions/script/glitchylib.lua") --Glitchy
-dofile("expansions/script/proc_evolute.lua") --Evolutes
-dofile("expansions/script/proc_conjoin.lua") --Conjoints
+-- dofile("expansions/script/proc_evolute.lua") --Evolutes
+-- dofile("expansions/script/proc_conjoin.lua") --Conjoints
 dofile("expansions/script/proc_pandemonium.lua") --Pandemoniums
 dofile("expansions/script/proc_polarity.lua") --Polarities
 dofile("expansions/script/proc_spatial.lua") --Spatials
