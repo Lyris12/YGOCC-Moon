@@ -23,7 +23,7 @@ function s.initial_effect(c)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e3:SetOperation(function() c:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_DISABLE,0,1) end)
+	e3:SetOperation(function() c:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_DISABLE,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(id,0)) end)
 	c:RegisterEffect(e3)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_FIELD)
@@ -31,7 +31,7 @@ function s.initial_effect(c)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetTargetRange(LOCATION_MZONE,0)
 	e4:SetCondition(function() return c:GetFlagEffect(id)>0 end)
-	e4:SetTarget(aux.FilterBoolFunction(Card.IsSetCard,0xe1f))
+	e4:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0xe1f))
 	e4:SetValue(500)
 	c:RegisterEffect(e4)
 	local e5=e4:Clone()
@@ -85,12 +85,12 @@ function s.sop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) then Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP) end
 end
-function s.filter(c)
-	local m=_G["c"..c:GetOriginalCode()]
-	if not m then return end
+function s.filter(c,tp)
+	if not (c:IsFaceup() and c:IsSetCard(0xe1f) and c:IsAbleToHand() and Duel.IsExistingTarget(aux.AND(Card.IsFaceup,Card.IsSetCard),tp,LOCATION_MZONE,0,1,c,0xe1f))
+	local m=getmetatable(c)
+	if not m then return false end
 	local t=m.spsum_effects
-	return c:IsFaceup() and c:IsSetCard(0xe1f) and c:IsAbleToHand() and t and #t>0
-		and Duel.IsExistingTarget(aux.AND(Card.IsFaceup,Card.IsSetCard),tp,LOCATION_MZONE,0,1,c,0xe1f)
+	return t and #t>0
 end
 function s.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end

@@ -108,7 +108,7 @@ end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g=Duel.GetMatchingGroup(tp,s.filter,tp,LOCATION_GRAVE,0,c):SelectSubGroup(tp,aux.dncheck,false,3,3)
+	local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_GRAVE,0,c):SelectSubGroup(tp,aux.dncheck,false,3,3)
 	if g and Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)==3
 		and not g:IsExists(aux.NOT(Card.IsLocation),1,nil,LOCATION_DECK+LOCATION_EXTRA)
 		and c:IsRelateToEffect(e) then
