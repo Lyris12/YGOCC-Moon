@@ -52,7 +52,7 @@ function s.initial_effect(c)
 	end
 end
 function s.con(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsChainNegatable(ev) and re:IsHasCategory(CATEGORY_SPECIAL_SUMMON) and Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsSetCard),tp,LOCATION_MZONE,0,1,nil,0xe1f)
+	return rp~=tp and Duel.IsChainNegatable(ev) and re:IsHasCategory(CATEGORY_SPECIAL_SUMMON) and Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsSetCard),tp,LOCATION_MZONE,0,1,nil,0xe1f)
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

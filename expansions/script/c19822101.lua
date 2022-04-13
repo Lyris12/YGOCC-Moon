@@ -86,7 +86,7 @@ function s.sop(e,tp,eg,ep,ev,re,r,rp)
 	if c:IsRelateToEffect(e) then Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP) end
 end
 function s.filter(c,tp)
-	if not (c:IsFaceup() and c:IsSetCard(0xe1f) and c:IsAbleToHand() and Duel.IsExistingTarget(aux.AND(Card.IsFaceup,Card.IsSetCard),tp,LOCATION_MZONE,0,1,c,0xe1f))
+	if not (c:IsFaceup() and c:IsSetCard(0xe1f) and c:IsAbleToHand() and Duel.IsExistingTarget(aux.AND(Card.IsFaceup,Card.IsSetCard),tp,LOCATION_MZONE,0,1,c,0xe1f)) then return false end
 	local m=getmetatable(c)
 	if not m then return false end
 	local t=m.spsum_effects
