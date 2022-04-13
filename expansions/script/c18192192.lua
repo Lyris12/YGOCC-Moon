@@ -1,0 +1,65 @@
+--created by RespectBlindfolds, coded by Lyris
+--Extraterrestrial Battleship Yamato
+local s,id,o=GetID()
+function s.initial_effect(c)
+	c:EnableReviveLimit()
+	aux.AddOrigBigbangType(c)
+	aux.AddBigbangProc(c,aux.FilterEqualFunction(Card.GetVibe,1),1,aux.FilterEqualFunction(Card.GetVibe,-1),1)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e1:SetCode(EFFECT_CANNOT_BE_BIGBANG_MATERIAL)
+	e1:SetValue(1)
+	c:RegisterEffect(e1)
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetCode(EFFECT_PIERCE)
+	c:RegisterEffect(e2)
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e3:SetCode(EVENT_BATTLE_DAMAGE)
+	e3:SetCountLimit(1,id)
+	e3:SetProperty(EFFECT_FLAG_DELAY)
+	e3:SetCategory(CATEGORY_DESTROY+CATEGORY_DRAW)
+	e3:SetCondition(function(e,tp,eg,ep) return ep~=tp end)
+	e3:SetTarget(s.tg)
+	e3:SetOperation(s.op)
+	c:RegisterEffect(e3)
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e4:SetCode(EVENT_TO_GRAVE)
+	e4:SetCountLimit(1,id+o)
+	e4:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
+	e4:SetCategory(CATEGORY_TOHAND)
+	e4:SetCondition(function() return c:GetReason()&0x61>1 end)
+	e4:SetTarget(s.thtg)
+	e4:SetOperation(s.thop)
+	c:RegisterEffect(e4)
+end
+function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetFieldGroup(tp,LOCATION_MZONE,0)>0 and Duel.IsPlayerCanDraw(tp,1) end
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,1,tp,LOCATION_MZONE)
+	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
+end
+function s.op(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+	local g=Duel.GetFieldGroup(tp,LOCATION_MZONE,0):Select(tp,1,1,nil)
+	Duel.HintSelection(g)
+	if Duel.Destroy(g,REASON_EFFECT)>0 then
+		Duel.BreakEffect()
+		Duel.Draw(tp,1,REASON_EFFECT)
+	end
+end
+function s.filter(c)
+	return c:GetVibe()>0 and c:IsAbleToHand()
+end
+function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_GRAVE,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_GRAVE)
+end
+function s.thop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_GRAVE,0,1,1,nil)
+	Duel.SendtoHand(g,nil,REASON_EFFECT)
+	Duel.ConfirmCards(1-tp,g)
+end
