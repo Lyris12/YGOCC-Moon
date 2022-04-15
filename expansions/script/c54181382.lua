@@ -52,7 +52,7 @@ function s.initial_effect(c)
 end
 function s.splimit(e,c)
 	return not c:IsRace(RACE_DRAGON)
-
+end
 function s.desfilter1(c,tp)
 	return c:IsFaceup() and Duel.GetMZoneCount(tp,c)>0 and not c:IsCode(id)
 end
