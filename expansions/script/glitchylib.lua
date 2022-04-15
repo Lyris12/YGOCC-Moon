@@ -32,8 +32,14 @@ TYPE_ST			= TYPE_SPELL+TYPE_TRAP
 
 ARCHE_FUSION	= 0x46
 
+LOCATION_ALL = LOCATION_DECK+LOCATION_HAND+LOCATION_MZONE+LOCATION_SZONE+LOCATION_GRAVE+LOCATION_REMOVED+LOCATION_EXTRA	
+
 RESET_TURN_SELF = RESET_SELF_TURN
 RESET_TURN_OPPO = RESET_OPPO_TURN
+
+function Card.IsMonster(c,typ)
+	return c:IsType(TYPE_MONSTER) and (not typ or c:IsType(typ))
+end
 
 -----------------------------------------------------------------------
 -------------------------------NEGATES---------------------------------
