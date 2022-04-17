@@ -51,7 +51,7 @@ function s.actcon(e)
 end
 
 function s.cfilter(c,tp)
-	return c:IsPreviousSetCard(0xb48) and c:GetPreviousTypeOnField()&0x2001==0x2001 and c:IsPreviousPosition(POS_FACEUP) and c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousControler(tp)
+	return c:IsPreviousSetCard(0xb48) and c:GetPreviousTypeOnField()&TYPE_MONSTER==TYPE_MONSTER and c:IsPreviousPosition(POS_FACEUP) and c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousControler(tp)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.cfilter,1,nil,tp)
