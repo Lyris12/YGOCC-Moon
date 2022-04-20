@@ -103,14 +103,14 @@ function s.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function s.op(e,tp,eg,ep,ev,re,r,rp)
 	local ex,tc=Duel.GetOperationInfo(0,CATEGORY_TOHAND)
-	if not (tc and tc:IsRelateToEffect(e) and Duel.SendtoHand(tc,nil,REASON_EFFECT)>0 and tc:IsLocation(LOCATION_HAND)) then return end
+	if not (ex and tc and tc:IsRelateToEffect(e) and Duel.SendtoHand(tc,nil,REASON_EFFECT)>0 and tc:IsLocation(LOCATION_HAND)) then return end
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	if not g or #g<2 then return end
 	local pc=(g-tc):GetFirst()
-	if tc:IsFaceup() and tc:IsRelateToEffect(e) then for ef in ipairs(_G["c"..tc:GetCode()]) do
+	if pc:IsFaceup() and pc:IsRelateToEffect(e) then for ef in ipairs(_G["c"..tc:GetCode()]) do
 		local e1=ef:Clone()
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-		tc:RegisterEffect(e1)
-		tc:RegisterFlagEffect(tc:GetCode(),RESET_EVENT+RESETS_STANDARD,0,1)
+		pc:RegisterEffect(e1)
+		pc:RegisterFlagEffect(tc:GetCode(),RESET_EVENT+RESETS_STANDARD,0,1)
 	end end
 end
