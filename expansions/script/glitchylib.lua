@@ -41,6 +41,36 @@ function Card.IsMonster(c,typ)
 	return c:IsType(TYPE_MONSTER) and (not typ or c:IsType(typ))
 end
 
+--Select Option
+function Auxiliary.Option(id,tp,desc,...)
+	local list={...}
+	local off=1
+	local ops={}
+	local opval={}
+	local truect=1
+	for ct,b in ipairs(list) do
+		local check=b
+		local localid=id
+		local localdesc=desc+truect-1
+		if type(b)=="table" then
+			check=b[1]
+			localid=b[2]
+			localdesc=b[3]
+		else
+			truect=truect+1
+		end
+		if check==true then
+			ops[off]=aux.Stringid(localid,localdesc)
+			opval[off]=ct-1
+			off=off+1
+		end
+	end
+	local op=Duel.SelectOption(tp,table.unpack(ops))+1
+	local sel=opval[op]
+	Duel.Hint(HINT_OPSELECTED,1-tp,ops[op])
+	return sel
+end
+
 -----------------------------------------------------------------------
 -------------------------------NEGATES---------------------------------
 local _IsChainDisablable, _NegateEffect = Duel.IsChainDisablable, Duel.NegateEffect
