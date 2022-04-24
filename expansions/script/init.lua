@@ -2364,6 +2364,17 @@ end
 ----------------------------------------------------------------------------------------------------------------
 --AUXS AND FUNCTIONS PORTED FROM EDOPRO (CAN BE EXPANDED FOR FACILITATING SCRIPT COMPATIBILITY BETWEEN THE SIMS)
 ----------------------------------------------------------------------------------------------------------------
+function Card.HasLevel(c)
+	if c:IsType(TYPE_MONSTER) then
+		return c:GetType()&TYPE_LINK~=TYPE_LINK
+			and (c:GetType()&TYPE_XYZ~=TYPE_XYZ and not (c:IsHasEffect(EFFECT_RANK_LEVEL) or c:IsHasEffect(EFFECT_RANK_LEVEL_S)))
+			and not c:IsStatus(STATUS_NO_LEVEL)
+	elseif c:IsOriginalType(TYPE_MONSTER) then
+		return not (c:IsOriginalType(TYPE_XYZ+TYPE_LINK) or c:IsStatus(STATUS_NO_LEVEL))
+	end
+	return false
+end
+
 function Auxiliary.FilterBoolFunctionEx(f,value)
 	return	function(target,scard,sumtype,tp)
 				return f(target,value,scard,sumtype,tp)

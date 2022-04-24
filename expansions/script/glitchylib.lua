@@ -41,7 +41,14 @@ function Card.IsMonster(c,typ)
 	return c:IsType(TYPE_MONSTER) and (not typ or c:IsType(typ))
 end
 
---Select Option
+-----------------------------------------------------------------------
+-------------------------------DESCRIPTIONS----------------------------
+function Effect.Desc(e,id,...)
+	local x = {...}
+	local code = #x>0 and x[1] or e:GetOwner():GetOriginalCode()
+	return e:SetDescription(aux.Stringid(code,id))
+end
+
 function Auxiliary.Option(id,tp,desc,...)
 	local list={...}
 	local off=1
@@ -69,6 +76,21 @@ function Auxiliary.Option(id,tp,desc,...)
 	local sel=opval[op]
 	Duel.Hint(HINT_OPSELECTED,1-tp,ops[op])
 	return sel
+end
+
+-----------------------------------------------------------------------
+-------------------------------LOCATIONS---------------------------------
+function Card.IsBanished(c)
+	return c:IsLocation(LOCATION_REMOVED)
+end
+function Card.IsInExtra(c)
+	return c:IsLocation(LOCATION_EXTRA)
+end
+function Card.NotBanishedOrFaceup(c)
+	return not c:IsLocation(LOCATION_REMOVED) or c:IsFaceup()
+end
+function Card.NotInExtraOrFaceup(c)
+	return not c:IsLocation(LOCATION_EXTRA) or c:IsFaceup()
 end
 
 -----------------------------------------------------------------------
@@ -133,6 +155,21 @@ function Auxiliary.GlitchyCannotDisable(f)
 				end
 				return not f or f(e,c)
 			end
+end
+
+-----------------------------------------------------------------------
+-------------------------------TRIBUTE-------------------------------
+local _Release = Duel.Release
+
+Duel.Release = function(g,r)
+	local gx=g:Filter(Card.IsLocation,nil,LOCATION_EXTRA)
+	g:Sub(gx)
+	if #g>0 then
+		_Release(g,r)
+	end
+	if #gx>0 then
+		Duel.SendtoGrave(gx,r|REASON_RELEASE)
+	end
 end
 
 -----------------------------------------------------------------------
