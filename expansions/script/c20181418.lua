@@ -170,10 +170,10 @@ end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local tg=Duel.SelectMatchingCard(tp,s.tgfilter,tp,LOCATION_HAND,0,1,1,nil,e,tp,eg,ep,ev,re,r,rp)
-	local tc=tg:GetFirst()
+	local tc0=tg:GetFirst()
 	if tc0 and Duel.SendtoGrave(tc0,REASON_EFFECT)~=0 and tc0:IsLocation(LOCATION_GRAVE) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_OPERATECARD)
-		local g=Duel.SelectMatchingCard(tp,s.opfilter,tp,LOCATION_DECK,0,1,1,e,tp,eg,ep,ev,re,r,rp)
+		local g=Duel.SelectMatchingCard(tp,s.opfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp,eg,ep,ev,re,r,rp)
 		if g:GetCount()>0 then
 			local tc=g:GetFirst()
 			if tc and tc:IsAbleToHand() and (not (tc:IsMonster(TYPE_PANDEMONIUM) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and tc:IsPandemoniumActivatable(tp,tp,true,false,false,false,eg,ep,ev,re,r,rp)) or Duel.SelectOption(tp,aux.Stringid(id,3),aux.Stringid(id,4))==0) then
