@@ -40,6 +40,9 @@ RESET_TURN_OPPO = RESET_OPPO_TURN
 function Card.IsMonster(c,typ)
 	return c:IsType(TYPE_MONSTER) and (not typ or c:IsType(typ))
 end
+function Card.IsST(c,typ)
+	return c:IsType(TYPE_ST) and (not typ or c:IsType(typ))
+end
 
 -----------------------------------------------------------------------
 -------------------------------DESCRIPTIONS----------------------------
@@ -91,6 +94,23 @@ function Card.NotBanishedOrFaceup(c)
 end
 function Card.NotInExtraOrFaceup(c)
 	return not c:IsLocation(LOCATION_EXTRA) or c:IsFaceup()
+end
+
+function Auxiliary.PLChk(c,p,loc)
+	if aux.GetValueType(c)=="Card" then
+		return (not p or c:IsControler(p)) and (not loc or c:IsLocation(loc))
+	elseif aux.GetValueType(c)=="Group" then
+		return c:IsExists(aux.PLChk,1,nil,p,loc)
+	else
+		return false
+	end
+end
+function Auxiliary.AfterShuffle(g)
+	for p=0,1 do
+		if g:IsExists(aux.PLChk,1,nil,p,LOCATION_DECK) then
+			Duel.ShuffleDeck(p)
+		end
+	end
 end
 
 -----------------------------------------------------------------------
@@ -155,6 +175,12 @@ function Auxiliary.GlitchyCannotDisable(f)
 				end
 				return not f or f(e,c)
 			end
+end
+
+-----------------------------------------------------------------------
+-------------------------------REASONS-------------------------------
+function Auxiliary.ByEffectCond(e)
+	return e:GetHandler():IsReason(REASON_EFFECT)
 end
 
 -----------------------------------------------------------------------
@@ -233,8 +259,11 @@ end
 
 function Duel.Search(g,tp)
 	local ct=Duel.SendtoHand(g,nil,REASON_EFFECT)
-	Duel.ConfirmCards(1-tp,g)
-	return ct
+	local cg=g:Filter(aux.PLChk,nil,tp,LOCATION_HAND)
+	if #cg>0 then
+		Duel.ConfirmCards(1-tp,g)
+	end
+	return ct,#cg
 end
 function Duel.Negate(tc,e,reset)
 	if not reset then reset=0 end
@@ -1316,24 +1345,6 @@ function Duel.GetTargetParam()
 end
 
 --FILTER AUXS
-
---Checks if (c) is controlled by (p) in the location (loc)
-function Auxiliary.PLChk(c,p,loc)
-	if aux.GetValueType(c)=="Card" then
-		return (not p or c:IsControler(p)) and (not loc or c:IsLocation(loc))
-	elseif aux.GetValueType(c)=="Group" then
-		return c:IsExists(aux.PLChk,1,nil,p,loc)
-	else
-		return false
-	end
-end
-function Auxiliary.AfterShuffle(g)
-	for p=0,1 do
-		if g:IsExists(aux.PLChk,1,nil,p,LOCATION_DECK) then
-			Duel.ShuffleDeck(p)
-		end
-	end
-end
 
 
 --CARD MOVEMENT FUNCTIONS
