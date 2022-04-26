@@ -188,14 +188,19 @@ end
 local _Release = Duel.Release
 
 Duel.Release = function(g,r)
+	if aux.GetValueType(g)=="Card" then
+		g=Group.FromCards(g)
+	end
+	local ct1,ct2=0,0
 	local gx=g:Filter(Card.IsLocation,nil,LOCATION_EXTRA)
 	g:Sub(gx)
 	if #g>0 then
-		_Release(g,r)
+		ct1=_Release(g,r)
 	end
 	if #gx>0 then
-		Duel.SendtoGrave(gx,r|REASON_RELEASE)
+		ct2=Duel.SendtoGrave(gx,r|REASON_RELEASE)
 	end
+	return ct1+ct2
 end
 
 -----------------------------------------------------------------------
