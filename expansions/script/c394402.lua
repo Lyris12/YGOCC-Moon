@@ -16,6 +16,7 @@ function s.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL+EFFECT_FLAG_DELAY)
 	e1:SetCountLimit(1,id)
 	e1:SetCondition(aux.LinkSummonedCond)
+	e1:SetCost(s.damcost)
 	e1:SetTarget(s.damtg)
 	e1:SetOperation(s.damop)
 	c:RegisterEffect(e1)
@@ -31,18 +32,20 @@ function s.initial_effect(c)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1,id+100)
 	e2:SetCondition(s.damchk(1000))
+	e2:SetCost(s.damcost)
 	e2:SetTarget(s.thtg)
 	e2:SetOperation(s.thop)
 	c:RegisterEffect(e2)
-	--Shuffle
+	--Add
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,4))
-	e3:SetCategory(CATEGORY_TODECK)
+	e3:SetCategory(CATEGORY_TOHAND)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL+EFFECT_FLAG_DELAY)
 	e3:SetCode(EVENT_TO_GRAVE)
 	e3:SetCountLimit(1,id+200)
 	e3:SetCondition(s.gycon)
+	e3:SetCost(s.damcost)
 	e3:SetTarget(s.gytg)
 	e3:SetOperation(s.gyop)
 	c:RegisterEffect(e3)
@@ -55,7 +58,7 @@ function s.initial_effect(c)
 	e4:SetRange(LOCATION_GRAVE)
 	e4:SetCountLimit(1,id+300)
 	e4:SetCondition(s.damchk(3000))
-	e4:SetCost(aux.bfgcost)
+	e4:SetCost(s.immcost)
 	e4:SetTarget(s.immtg)
 	e4:SetOperation(s.immop)
 	c:RegisterEffect(e4)
@@ -70,6 +73,10 @@ function s.initial_effect(c)
 		ge1:SetOperation(s.checkop)
 		Duel.RegisterEffect(ge1,0)
 	end
+	Duel.AddCustomActivityCounter(id,ACTIVITY_CHAIN,s.chainfilter)
+end
+function s.chainfilter(re,tp,cid)
+	return re:GetHandler():IsSetCard(0xd04) or not re:IsHasCategory(CATEGORY_DAMAGE)
 end
 function s.checkop(e,tp,eg,ep,ev,re,r,rp)
 	if bit.band(r,REASON_EFFECT)~=0 and rp==1-ep and re and re:GetHandler():IsSetCard(0xd04) then
@@ -83,6 +90,20 @@ function s.damchk(val)
 			end
 end
 
+function s.damcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetCustomActivityCount(id,tp,ACTIVITY_CHAIN)==0 end
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)
+	e1:SetCode(EFFECT_CANNOT_ACTIVATE)
+	e1:SetTargetRange(1,0)
+	e1:SetValue(s.aclimit)
+	e1:SetReset(RESET_PHASE+PHASE_END+RESET_TURN_OPPO)
+	Duel.RegisterEffect(e1,tp)
+end
+function s.aclimit(e,re,tp)
+	return not s.chainfilter(re,tp)
+end
 function s.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local b1=Duel.GetLP(1-tp)>=3000
 	local b2=Duel.GetLP(1-tp)<6000
@@ -130,21 +151,26 @@ function s.gycon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD) and s.damchk(2000)(e,tp)
 end
 function s.gyfilter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xd04) and c:IsFaceup() and c:IsAbleToDeck()
+	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xd04) and c:IsFaceup() and c:IsAbleToHand()
 end
 function s.gytg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.gyfilter,tp,LOCATION_REMOVED,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,1,tp,LOCATION_REMOVED)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_REMOVED)
 end
 function s.gyop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,s.gyfilter,tp,LOCATION_REMOVED,0,1,1,nil)
 	if #g>0 then
 		Duel.HintSelection(g)
-		Duel.SendtoDeck(g,nil,2,REASON_EFFECT)
+		Duel.SendtoHand(g,nil,REASON_EFFECT)
 	end
 end
 
+function s.immcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return aux.bfgcost(e,tp,eg,ep,ev,re,r,rp,0) and s.damcost(e,tp,eg,ep,ev,re,r,rp,0) end
+	aux.bfgcost(e,tp,eg,ep,ev,re,r,rp,1)
+	s.damcost(e,tp,eg,ep,ev,re,r,rp,1)
+end
 function s.immfilter(c)
 	return c:IsFaceup() and c:IsMonster() and c:IsSetCard(0xd04)
 end

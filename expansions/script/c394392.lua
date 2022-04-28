@@ -70,7 +70,7 @@ function s.damchk(val)
 			end
 end
 function s.filter(c,e,tp)
-	return c:IsSetCard(0xd04) and c:IsType(TYPE_MONSTER) and c:IsLevel(4) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0xd04) and c:IsType(TYPE_MONSTER) and c:IsLevelBelow(4) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
