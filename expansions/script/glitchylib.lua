@@ -82,6 +82,12 @@ function Auxiliary.Option(id,tp,desc,...)
 end
 
 -----------------------------------------------------------------------
+-------------------------------FLAGS---------------------------------
+function Card.HasFlagEffect(c,id)
+	return c:GetFlagEffect(id)>0
+end
+
+-----------------------------------------------------------------------
 -------------------------------LOCATIONS---------------------------------
 function Card.IsBanished(c)
 	return c:IsLocation(LOCATION_REMOVED)

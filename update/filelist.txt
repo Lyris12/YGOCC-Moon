@@ -8320,7 +8320,7 @@ expansions/script/c39417.lua	78e1311a1347b60f119d0181a4f616be
 expansions/script/c39418.lua	07964d2b752c8b87d78149ac0d67086a
 expansions/script/c39419.lua	2f935b8cf64ef57029ea1df74e933e83
 expansions/script/c394386.lua	6e0ccdf74d24810834d4cea3b7123fa5
-expansions/script/c394387.lua	3aeadc8089aa16414f9d6919143aadd5
+expansions/script/c394387.lua	80d8512988543e13c4409b155814480e
 expansions/script/c394388.lua	361a277c29e665ecdbc43d4ef3039389
 expansions/script/c394389.lua	ff929c5377993d58e922d65693a97a9c
 expansions/script/c394390.lua	f390a4b327553f77c2f60551685db942
@@ -10021,7 +10021,7 @@ expansions/script/c99998878.lua	d6121fd6e644d7a42c4176b47012a0bb
 expansions/script/c99998879.lua	75a21e8fbe12045a37582508c203bdc2
 expansions/script/c99998880.lua	1c40768c257090c4f997bc24f1b31c30
 expansions/script/c99999955.lua	50a1ca34993761ed523c3513173fe6da
-expansions/script/glitchylib.lua	cd4635782dbe24c8ce18d9f0b32d4f4d
+expansions/script/glitchylib.lua	7ca052b82348e06732bb40a654bdb44a
 expansions/script/GLShortcuts.lua	6743700bf509cc48d8f596ff4a8fe5c0
 expansions/script/init.lua	e75a3df2e1236b2e7e6709b812112cd3
 expansions/script/json.lua	d41a01cf67c76915b49c57d21ac471ee
@@ -10121,6 +10121,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	7bcc63a58b139f0adb2bc578d334571c
+update/filelist.txt	d06b0068105032972e1ef5962c29e79d
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	f26634f892e3ed1e4dd3db6d229821b7
+update/version.txt	aec3a217a4c93750d1ed0ec9661736c3

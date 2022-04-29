@@ -58,20 +58,26 @@ function s.initial_effect(c)
 	e4:SetCategory(CATEGORY_REMOVE)
 	e4:SetCountLimit(1)
 	e4:SetCondition(s.rmcon)
-	e4:SetCost(s.damcost)
+	e4:SetCost(s.damcost_flag(id))
 	e4:SetTarget(s.rmtg)
 	e4:SetOperation(s.rmop)
 	c:RegisterEffect(e4)
+	local e4x=e4:Clone()
+	e4x:SetCode(EVENT_SPSUMMON_SUCCESS)
+	c:RegisterEffect(e4x)
 	---banish monster
 	local e5=e3:Clone()
 	e5:SetDescription(aux.Stringid(id,3))
 	e5:SetCategory(CATEGORY_REMOVE)
 	e5:SetCountLimit(1)
 	e5:SetCondition(s.rmcon2)
-	e5:SetCost(s.damcost)
+	e5:SetCost(s.damcost_flag(id+100))
 	e5:SetTarget(s.rmtg2)
 	e5:SetOperation(s.rmop2)
 	c:RegisterEffect(e5)
+	local e5x=e5:Clone()
+	e5x:SetCode(EVENT_SPSUMMON_SUCCESS)
+	c:RegisterEffect(e5x)
 	--count damage
 	if not s.global_check then
 		s.global_check=true
@@ -130,6 +136,13 @@ function s.damcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
 end
+function s.damcost_flag(flag)
+	return	function(e,tp,eg,ep,ev,re,r,rp,chk)
+				if chk==0 then return s.damcost(e,tp,eg,ep,ev,re,r,rp,0) end
+				s.damcost(e,tp,eg,ep,ev,re,r,rp,1)
+				e:GetHandler():RegisterFlagEffect(flag,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
+			end
+end
 function s.aclimit(e,re,tp)
 	return not s.chainfilter(re,tp)
 end
@@ -158,7 +171,7 @@ function s.damtg2(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 
 function s.rmcon(e,tp,eg,ep,ev,re,r,rp)
-	return s.damchk(2000)(e,tp) and not eg:IsContains(e:GetHandler()) and eg:IsExists(s.cf,1,nil)
+	return s.damchk(2000)(e,tp) and not eg:IsContains(e:GetHandler()) and eg:IsExists(s.cf,1,nil) and not e:GetHandler():HasFlagEffect(id)
 end
 function s.rmfilter(c)
 	return c:IsType(TYPE_ST) and (c:IsFaceup() or c:IsLocation(LOCATION_SZONE)) and c:IsAbleToRemove()
@@ -176,7 +189,7 @@ function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 function s.rmcon2(e,tp,eg,ep,ev,re,r,rp)
-	return s.damchk(3000)(e,tp) and not eg:IsContains(e:GetHandler()) and eg:IsExists(s.cf,1,nil)
+	return s.damchk(3000)(e,tp) and not eg:IsContains(e:GetHandler()) and eg:IsExists(s.cf,1,nil) and not e:GetHandler():HasFlagEffect(id+100)
 end
 function s.rmtg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToRemove,tp,0,LOCATION_MZONE,1,nil) end
