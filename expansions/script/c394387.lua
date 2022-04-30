@@ -107,7 +107,7 @@ function s.damchk(val)
 end
 
 function s.sprfilter(c)
-	return c:IsSetCard(0xd04) and c:IsType(TYPE_MONSTER) and c:IsAbleToRemoveAsCost()
+	return c:IsSetCard(0xd04) and c:IsAbleToRemoveAsCost()
 end
 function s.sprcon(e,c)
 	if c==nil then return true end
