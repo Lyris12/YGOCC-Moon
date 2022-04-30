@@ -65,7 +65,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 			local g=Duel.SelectMatchingCard(tp,aux.NegateAnyFilter,tp,0,LOCATION_ONFIELD,1,1,nil)
 			if #g>0 then
 				Duel.HintSelection(g)
-				Duel.Negate(g:GetFirst(),e)
+				Duel.Negate(g:GetFirst(),e,RESET_PHASE+PHASE_END)
 				Duel.AdjustInstantly(g:GetFirst())
 			end
 			b3=Duel.IsExistingMatchingCard(s.rmf,tp,0,LOCATION_MZONE,1,nil) and s.damchk(3000)(e,tp)
