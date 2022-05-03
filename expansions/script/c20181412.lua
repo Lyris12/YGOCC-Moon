@@ -71,10 +71,10 @@ function s.initial_effect(c)
 	c:RegisterEffect(e7)
 end
 function s.mfilter1(c)
-	return c:IsLevelAbove(7) and c:IsRace(RACE_DINOSAUR)
+	return c:IsLevelAbove(7) and c:IsSetCard(0x9b5)
 end
 function s.mfilter2(c)
-	return c:IsLevelAbove(3) and c:IsAttribute(ATTRIBUTE_FIRE)
+	return c:IsLevelAbove(3) and c:IsAttribute(ATTRIBUTE_FIRE) and c:IsRace(RACE_DINOSAUR)
 end
 function s.splimit(e,c,sump,sumtype,sumpos,targetp)
 	if c:IsRace(RACE_DINOSAUR) then return false end
