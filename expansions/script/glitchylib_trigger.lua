@@ -1,0 +1,172 @@
+function Auxiliary.OptionalContinuous(op,id,desc)
+	return	function(e,tp,eg,ep,ev,re,r,rp)
+				if not Duel.SelectYesNo(tp,aux.Stringid(id,desc)) then return end
+				return op(e,tp,eg,ep,ev,re,r,rp)
+			end
+end
+
+-----------------------------------------------------------------------
+--SINGLE TRIGGERS
+function Card.Trigger(c,forced,desc,ctg,defaultprop,prop,event,ctlim,cond,cost,tg,op,typechange)
+	local trigger_type=(type(typechange)=="number") and EFFECT_TYPE_CONTINUOUS or (not forced) and EFFECT_TYPE_TRIGGER_O or EFFECT_TYPE_TRIGGER_F
+	local e1=Effect.CreateEffect(c)
+	if desc then
+		e1:Desc(desc)
+	end
+	if ctg then
+		e1:SetCategory(ctg)
+	end
+	if prop~=nil then
+		if type(prop)=="boolean" then
+			if prop==true then
+				if not defaultprop then defaultprop=0 end
+				e1:SetProperty(EFFECT_FLAG_DELAY+defaultprop)
+				
+			elseif defaultprop then
+				e1:SetProperty(defaultprop)
+			end
+		else
+			e1:SetProperty(prop)
+		end
+	end	
+	e1:SetType(EFFECT_TYPE_SINGLE+trigger_type)
+	e1:SetCode(event)
+	if ctlim then
+		if type(ctlim)=="table" then
+			local flag=#ctlim>2 and ctlim[3] or 0
+			e1:SetCountLimit(ctlim[1],c:GetOriginalCode()+ctlim[2]*100+flag)
+		else
+			e1:SetCountLimit(ctlim)
+		end
+	end
+	if cond then
+		e1:SetCondition(cond)
+	end
+	if cost then
+		e1:SetCost(cost)
+	end
+	if tg then
+		e1:SetTarget(tg)
+	end
+	if op then
+		if type(typechange)=="number" and not forced then
+			op=aux.OptionalContinuous(op,c:GetOriginalCode(),typechange)
+		end
+		e1:SetOperation(op)
+	end
+	c:RegisterEffect(e1)
+	return e1
+end
+
+function Card.LeaveTrigger(c,forced,desc,ctg,prop,ctlim,cond,cost,tg,op,typechange)
+	local event=EVENT_LEAVE_FIELD
+	local e1=c:Trigger(forced,desc,ctg,EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL,prop,event,ctlim,cond,cost,tg,op,typechange)
+	return e1
+end
+function Card.PositionTrigger(c,forced,desc,ctg,prop,ctlim,cond,cost,tg,op,typechange)
+	local event=EVENT_POS_CHANGE
+	local e1=c:Trigger(forced,desc,ctg,EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL,prop,event,ctlim,cond,cost,tg,op,typechange)
+	return e1
+end
+function Card.SentToGYTrigger(c,forced,desc,ctg,prop,ctlim,cond,cost,tg,op,typechange)
+	local event=EVENT_TO_GRAVE
+	local e1=c:Trigger(forced,desc,ctg,EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL,prop,event,ctlim,cond,cost,tg,op,typechange)
+	return e1
+end
+function Card.SummonedTrigger(c,forced,ns,ss,fs,desc,ctg,prop,ctlim,cond,cost,tg,op,typechange)
+	local event=(ns==true) and EVENT_SUMMON_SUCCESS or (ss==true) and EVENT_SPSUMMON_SUCCESS or (fs==true) and EVENT_FLIP_SUMMON_SUCCESS or EVENT_SUMMON_SUCCESS
+	local e1=c:Trigger(forced,desc,ctg,EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL,prop,event,ctlim,cond,cost,tg,op,typechange)
+	local e2,e
+	if ss then
+		e2=e1:Clone()
+		e2:SetCode(EVENT_SPSUMMON_SUCCESS)
+		c:RegisterEffect(e2)
+	end
+	if fs then
+		e=e1:Clone()
+		e:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
+		c:RegisterEffect(e)
+	end
+	return e1,e2,e
+end
+
+-----------------------------------------------------------------------
+--FIELD TRIGGERS
+function Card.FieldTrigger(c,forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op,typechange)
+	local trigger_type=(type(typechange)=="number") and EFFECT_TYPE_CONTINUOUS or (not forced) and EFFECT_TYPE_TRIGGER_O or EFFECT_TYPE_TRIGGER_F
+	local range =range and range or (c:IsOriginalType(TYPE_MONSTER)) and LOCATION_MZONE or (c:IsOriginalType(TYPE_FIELD)) and LOCATION_FZONE or LOCATION_SZONE
+	local e1=Effect.CreateEffect(c)
+	if desc then
+		e1:Desc(desc)
+	end
+	if ctg then
+		e1:SetCategory(ctg)
+	end
+	if prop~=nil and prop then
+		if type(prop)=="boolean" then
+			e1:SetProperty(EFFECT_FLAG_DELAY)
+		else
+			e1:SetProperty(prop)
+		end
+	end	
+	e1:SetType(EFFECT_TYPE_FIELD+trigger_type)
+	e1:SetCode(event)
+	e1:SetRange(range)
+	if ctlim then
+		if type(ctlim)=="table" then
+			local flag=#ctlim>2 and ctlim[3] or 0
+			e1:SetCountLimit(ctlim[1],c:GetOriginalCode()+ctlim[2]*100+flag)
+		else
+			e1:SetCountLimit(ctlim)
+		end
+	end
+	if cond then
+		e1:SetCondition(cond)
+	end
+	if cost then
+		e1:SetCost(cost)
+	end
+	if tg then
+		e1:SetTarget(tg)
+	end
+	if op then
+		if type(typechange)=="number" and not forced then
+			op=aux.OptionalContinuous(op,c:GetOriginalCode(),typechange)
+		end
+		e1:SetOperation(op)
+	end
+	c:RegisterEffect(e1)
+	return e1
+end
+
+function Card.LeaveFieldTrigger(c,forced,desc,ctg,prop,range,ctlim,cond,cost,tg,op,typechange)
+	local event=EVENT_LEAVE_FIELD
+	local e1=c:FieldTrigger(forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op,typechange)
+	return e1
+end
+function Card.PositionFieldTrigger(c,forced,desc,ctg,prop,range,ctlim,cond,cost,tg,op,typechange)
+	local event=EVENT_CHANGE_POS
+	local e1=c:FieldTrigger(forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op,typechange)
+	return e1
+end
+function Card.SentToGYFieldTrigger(c,forced,desc,ctg,prop,range,ctlim,cond,cost,tg,op,typechange)
+	local event=EVENT_TO_GRAVE
+	local e1=c:FieldTrigger(forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op,typechange)
+	return e1
+end
+function Card.SummonedFieldTrigger(c,forced,ns,ss,fs,desc,ctg,prop,range,ctlim,cond,cost,tg,op,typechange)
+	local event=(ns==true) and EVENT_SUMMON_SUCCESS or (ss==true) and EVENT_SPSUMMON_SUCCESS or (fs==true) and EVENT_FLIP_SUMMON_SUCCESS or EVENT_SUMMON_SUCCESS
+	local e1=c:FieldTrigger(forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op,typechange)
+	local e2,e
+	if ss then
+		e2=e1:Clone()
+		e2:SetCode(EVENT_SPSUMMON_SUCCESS)
+		c:RegisterEffect(e2)
+	end
+	if fs then
+		e=e1:Clone()
+		e:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
+		c:RegisterEffect(e)
+	end
+	return e1,e2,e
+end

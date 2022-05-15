@@ -156,6 +156,15 @@ function Card.GetRitualType(c)
 end
 
 dofile("expansions/script/glitchylib.lua") --Glitchy
+dofile("expansions/script/glitchylib_new.lua") --Glitchy's New Functions
+dofile("expansions/script/glitchylib_single.lua") --Glitchy's Single-Type Effects
+dofile("expansions/script/glitchylib_field.lua") --Glitchy's Field-Type Effects
+dofile("expansions/script/glitchylib_trigger.lua") --Glitchy's Trigger Effects
+dofile("expansions/script/glitchylib_global.lua") --Glitchy's Global Effects
+dofile("expansions/script/glitchylib_cond.lua") --Glitchy's Conditions
+dofile("expansions/script/glitchylib_cost.lua") --Glitchy's Costs
+dofile("expansions/script/glitchylib_tgop.lua") --Glitchy's Target+Operations
+
 dofile("expansions/script/proc_evolute.lua") --Evolutes
 dofile("expansions/script/proc_conjoin.lua") --Conjoints
 dofile("expansions/script/proc_pandemonium.lua") --Pandemoniums
