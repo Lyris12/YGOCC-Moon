@@ -30,7 +30,7 @@ function s.initial_effect(c)
 	e4:SetCode(EFFECT_UPDATE_ATTACK)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetTargetRange(LOCATION_MZONE,0)
-	e4:SetCondition(function() return c:GetFlagEffect(id)>0 end)
+	e4:SetCondition(function(e) return e:GetHandler():GetFlagEffect(id)>0 end)
 	e4:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0xe1f))
 	e4:SetValue(500)
 	c:RegisterEffect(e4)
@@ -43,14 +43,14 @@ function s.initial_effect(c)
 	e6:SetCountLimit(1)
 	e6:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e6:SetCategory(CATEGORY_TOHAND)
-	e6:SetCondition(function() return c:GetFlagEffect(id)>0 end)
+	e6:SetCondition(function(e) return e:GetHandler():GetFlagEffect(id)>0 end)
 	e6:SetTarget(s.tg)
 	e6:SetOperation(s.op)
 	c:RegisterEffect(e6)
 	if not s.global_check then
 		s.global_check=true
-		if not s.spsum_effects then s.spsum_effects={e4,e5,e6}
-		else table.insert(s.spsum_effects,e4) table.insert(s.spsum_effects,e5) table.insert(s.spsum_effects,e6) end
+		if not s.spsum_effects then s.spsum_effects={e4:Clone(),e5:Clone(),e6:Clone()}
+		else table.insert(s.spsum_effects,e4:Clone()) table.insert(s.spsum_effects,e5:Clone()) table.insert(s.spsum_effects,e6:Clone()) end
 	end
 end
 function s.repfilter(c,tp)
@@ -102,15 +102,21 @@ function s.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SelectTarget(tp,aux.AND(Card.IsFaceup,Card.IsSetCard),tp,LOCATION_MZONE,0,1,1,tc,0xe1f)
 end
 function s.op(e,tp,eg,ep,ev,re,r,rp)
-	local ex,tc=Duel.GetOperationInfo(0,CATEGORY_TOHAND)
-	if not (ex and tc and tc:IsRelateToEffect(e) and Duel.SendtoHand(tc,nil,REASON_EFFECT)>0 and tc:IsLocation(LOCATION_HAND)) then return end
+	local ex,tg=Duel.GetOperationInfo(0,CATEGORY_TOHAND)
+	if not (ex and tg) then return end
+	local tc=tg:GetFirst()
+	if not (tc and tc:IsRelateToEffect(e) and Duel.SendtoHand(tc,nil,REASON_EFFECT)>0 and tc:IsLocation(LOCATION_HAND)) then return end
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	if not g or #g<2 then return end
 	local pc=(g-tc):GetFirst()
-	if pc:IsFaceup() and pc:IsRelateToEffect(e) then for ef in ipairs(_G["c"..tc:GetCode()]) do
-		local e1=ef:Clone()
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-		pc:RegisterEffect(e1)
-		pc:RegisterFlagEffect(tc:GetCode(),RESET_EVENT+RESETS_STANDARD,0,1)
-	end end
+	if pc:IsFaceup() and pc:IsRelateToEffect(e) then
+		pc:RegisterFlagEffect(tc:GetCode(),RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(id,0))
+		for _,ef in ipairs(getmetatable(tc).spsum_effects) do
+			if not ef:IsHasProperty(EFFECT_FLAG_UNCOPYABLE) then
+				local e1=ef:Clone()
+				e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+				pc:RegisterEffect(e1)
+			end
+		end
+	end
 end

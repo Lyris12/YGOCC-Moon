@@ -32,7 +32,7 @@ function s.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e1:SetCondition(function() return c:GetFlagEffect(id)>0 and Duel.IsAbleToEnterBP() end)
+	e1:SetCondition(function(e) return e:GetHandler():GetFlagEffect(id)>0 and Duel.IsAbleToEnterBP() end)
 	e1:SetTarget(s.atg)
 	e1:SetOperation(s.aop)
 	c:RegisterEffect(e1)
@@ -47,8 +47,8 @@ function s.initial_effect(c)
 	c:RegisterEffect(e5)
 	if not s.global_check then
 		s.global_check=true
-		if not s.spsum_effects then s.spsum_effects={e1}
-		else table.insert(s.spsum_effects,e1) end
+		if not s.spsum_effects then s.spsum_effects={e1:Clone()}
+		else table.insert(s.spsum_effects,e1:Clone()) end
 	end
 end
 function s.con(e,tp,eg,ep,ev,re,r,rp)

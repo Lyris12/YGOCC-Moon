@@ -1,4 +1,4 @@
-﻿expansions/cards-new.cdb	a228cb2dd3f881b8b50b4a9fdc18af4f
+﻿expansions/cards-new.cdb	1d0634977e5992082f34e57acf2462c6
 expansions/lflist.conf	a9e8da0053d309f9ced7f07b99875273
 expansions/strings.conf	9a1060a5e6d69dcb33ebdf44ee5a5588
 expansions/pics/100000714.jpg	74ec20749932cad0249671d71e6d672b
@@ -5594,7 +5594,7 @@ expansions/script/c11110111.lua	4ee65c4074b6c22595bd8fa76b405ff0
 expansions/script/c11110112.lua	b0e2f6191bfd20bac864f15c71a2a533
 expansions/script/c11110113.lua	c37c01aca9e14f4f0aecbe36d8e99d8d
 expansions/script/c11110114.lua	f088affecb0bea9640126573b3e216fe
-expansions/script/c11110115.lua	e6bcbb43cbd9f905314bbf3fcb9f4f7c
+expansions/script/c11110115.lua	3afc16c3092074d82e4383b106ced655
 expansions/script/c11110116.lua	87f3e539b8d81968a40b66446022eae0
 expansions/script/c11111001.lua	3ff9f3d839ca2e1d75f024ca28fa67bf
 expansions/script/c11111002.lua	1586ac3817b343a401e869a85a661751
@@ -6533,14 +6533,14 @@ expansions/script/c19782410.lua	5bcb64959d426faa1e420a99c0e83dc6
 expansions/script/c19782411.lua	29ad7e682cdf7900b1f6f64fae812494
 expansions/script/c19782911.lua	ee7fb4bc2dc333f6d5f50cf0d6bb3baf
 expansions/script/c19782912.lua	d835fadc6b29aff2ab9c8e3b8e00640b
-expansions/script/c19822100.lua	d5e419331180a93cbc665768dec0ab6b
-expansions/script/c19822101.lua	851fb6abe10fe72cdbe7b8232650be91
-expansions/script/c19822102.lua	060f4f4c067d9414cd0ef0c816c7873d
-expansions/script/c19822103.lua	6876d4350d3c33e1c705baa23ab27f36
-expansions/script/c19822104.lua	e01d2100367f9b6d3ee873ee8d8023fd
-expansions/script/c19822105.lua	48e3ca05eacac169f018824027d5d3ec
+expansions/script/c19822100.lua	aef41522ad44df31fae2f7fdb4663030
+expansions/script/c19822101.lua	80f7a40bbee2df1af5605cb0591ba8ae
+expansions/script/c19822102.lua	5d1fe83f6240d6a054d363ad304d63c4
+expansions/script/c19822103.lua	937be99fa6e72caef5c681feafd58070
+expansions/script/c19822104.lua	2548071deb35b1932a474589228e7691
+expansions/script/c19822105.lua	8d25abe2b6a786ad115c8390e0bd399c
 expansions/script/c19822106.lua	ad939caa628cdb15b40984813cce0ea0
-expansions/script/c19822107.lua	9844d054ed701402a2f9d3444b3b8d1e
+expansions/script/c19822107.lua	56839027ff4527ac5405c389ddbe7a9d
 expansions/script/c19822108.lua	e7d49d018c5dc0293f4fe8f0108834de
 expansions/script/c19822109.lua	64ec0bacbb55e4604e03f9fbd0c49706
 expansions/script/c19822110.lua	c333e19270abcfd5b37e29a2416adf70
@@ -6803,9 +6803,9 @@ expansions/script/c213185.lua	0ac7186609f59ee5c5a432b8324bb547
 expansions/script/c213190.lua	334117beb0c2f7208f7e796556dad529
 expansions/script/c213195.lua	b22859ea1390d0912926ad77d15f7d68
 expansions/script/c213200.lua	5460f21267f2ff0f30f33b58dbf1d76b
-expansions/script/c213205.lua	b0c08c9f56837380b9b6415653a76d84
+expansions/script/c213205.lua	2694cd3a9f5f997310b54c961f066a1a
 expansions/script/c213210.lua	1bb68499de7e4e313e742720c2e532fb
-expansions/script/c213215.lua	df748b6a391885c71469430a2ba33abe
+expansions/script/c213215.lua	4222edb7635624c828eb02b702b9e004
 expansions/script/c213300.lua	83c049da307616d7126199987f7f6cf4
 expansions/script/c213305.lua	1d84139d1d0a655bb452a62dc440ba6b
 expansions/script/c213310.lua	f6dfe5c92d8150adbe895a9815d7b547
@@ -8284,7 +8284,7 @@ expansions/script/c39416.lua	9b6c5658d2b1fac6f18b5f91b2c12f91
 expansions/script/c39417.lua	78e1311a1347b60f119d0181a4f616be
 expansions/script/c39418.lua	07964d2b752c8b87d78149ac0d67086a
 expansions/script/c39419.lua	2f935b8cf64ef57029ea1df74e933e83
-expansions/script/c394386.lua	6e0ccdf74d24810834d4cea3b7123fa5
+expansions/script/c394386.lua	25ffbdb6e6c987923ca32bc183fb698c
 expansions/script/c394387.lua	d6ef0a176f3d62cba105cbca43ee346a
 expansions/script/c394388.lua	361a277c29e665ecdbc43d4ef3039389
 expansions/script/c394389.lua	ff929c5377993d58e922d65693a97a9c
@@ -10093,6 +10093,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	9a259533a97358f3a90839e03b5b6c49
+update/filelist.txt	8c473f7ca70194fac8b4c48f518ad31d
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	0c368da82c2f7e87d7497d54277fa7a4
+update/version.txt	4ee2f08f59858c13574afc22ea500892

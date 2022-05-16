@@ -17,7 +17,7 @@ function s.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
 	e2:SetCategory(CATEGORY_NEGATE)
 	e2:SetDescription(1131)
-	e2:SetCondition(aux.AND(function(_,_,_,_,ev) return Duel.IsChainNegatable(ev) end,s.con))
+	e2:SetCondition(function(_,_,_,_,ev,_,_,rp) return Duel.IsChainNegatable(ev) and rp~=c:GetControler() and s.con(e2,tp) end)
 	e2:SetTarget(s.ntg)
 	e2:SetOperation(function(_,_,_,_,ev) Duel.NegateActivation(ev) end)
 	c:RegisterEffect(e2)
@@ -59,8 +59,8 @@ function s.initial_effect(c)
 	c:RegisterEffect(e6)
 	if not s.global_check then
 		s.global_check=true
-		if not s.spsum_effects then s.spsum_effects={e4,e5,e6}
-		else table.insert(s.spsum_effects,e4) table.insert(s.spsum_effects,e5) table.insert(s.spsum_effects,e6) end
+		if not s.spsum_effects then s.spsum_effects={e4:Clone(),e5:Clone(),e6:Clone()}
+		else table.insert(s.spsum_effects,e4:Clone()) table.insert(s.spsum_effects,e5:Clone()) table.insert(s.spsum_effects,e6:Clone()) end
 	end
 end
 function s.con(e,tp,eg,ep,ev,re,r,rp)
@@ -107,13 +107,13 @@ function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g=Duel.SelectMatchingCard(tp,s.dfilter,tp,LOCATION_HAND,0,1,1,nil,tp)
 	Duel.ConfirmCards(1-tp,g)
-	e:SetLabelObject(g:GetFirst():GetCode())
+	e:SetLabel(g:GetFirst():GetCode())
 	Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_COST)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_GRAVE)
 end
 function s.op(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.filter),tp,LOCATION_GRAVE,0,1,1,nil,e:GetLabelObject():GetCode())
+	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.filter),tp,LOCATION_GRAVE,0,1,1,nil,e:GetLabel())
 	Duel.SendtoHand(g,nil,REASON_EFFECT)
 	Duel.ConfirmCards(1-tp,g)
 end

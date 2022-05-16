@@ -31,14 +31,14 @@ function s.initial_effect(c)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetCountLimit(1)
 	e4:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
-	e4:SetCondition(function() return c:GetFlagEffect(id)>0 and Duel.GetTurnPlayer()==c:GetControler() end)
+	e4:SetCondition(function(e) return e:GetHandler():GetFlagEffect(id)>0 and Duel.GetTurnPlayer()==c:GetControler() end)
 	e4:SetTarget(s.target)
 	e4:SetOperation(s.operation)
 	c:RegisterEffect(e4)
 	if not s.global_check then
 		s.global_check=true
-		if not s.spsum_effects then s.spsum_effects={e4}
-		else table.insert(s.spsum_effects,e4) end
+		if not s.spsum_effects then s.spsum_effects={e4:Clone()}
+		else table.insert(s.spsum_effects,e4:Clone()) end
 	end
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)

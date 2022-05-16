@@ -32,7 +32,7 @@ function s.initial_effect(c)
 	e4:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetTargetRange(LOCATION_MZONE,0)
-	e4:SetCondition(function() return c:GetFlagEffect(id)>0 end)
+	e4:SetCondition(function(e) return e:GetHandler():GetFlagEffect(id)>0 end)
 	e4:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0xe1f))
 	e4:SetValue(1)
 	c:RegisterEffect(e4)
@@ -48,8 +48,8 @@ function s.initial_effect(c)
 	c:RegisterEffect(e5)
 	if not s.global_check then
 		s.global_check=true
-		if not s.spsum_effects then s.spsum_effects={e4,e5}
-		else table.insert(s.spsum_effects,e4) table.insert(s.spsum_effects,e5) end
+		if not s.spsum_effects then s.spsum_effects={e4:Clone(),e5:Clone()}
+		else table.insert(s.spsum_effects,e4:Clone()) table.insert(s.spsum_effects,e5:Clone()) end
 	end
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
