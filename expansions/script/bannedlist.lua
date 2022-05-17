@@ -1,19 +1,10 @@
 if not banned_list_table then banned_list_table={} end
 local string=require'string'
 local ls=[[
-#[2020.12 YGOCC+2020.12 TCG]
-
-!2020.12.25 YGOCC
+#[2022.3 YGOCC+2022.1 TCG]
+!2022.5 YGOCC
 #Forbidden YGOCC
-6172122 0 --Red-Eyes Fusion
-44097050 0 --Mecha Phantom Beast Auroradon
-17029608 0 --Psychether Priestess, Joan
-19772590 0 --Advocate of Justice - Ivoric
-19772596 0 --The Advocate of Justice's Summoning
 20181405 0 --Terradication Geryonarsenal
-23251031 0 --Pharaohnic Papyrus of Patience
-28915253 0 --Shadowflame Calvary
-31157205 0 --Mezka Melodia
 33700082 0 --Anifriends Seiryu of the East
 33700083 0 --Anifriends Suzaku of the South
 33700085 0 --Anifriends Byakko of the West
@@ -26,56 +17,48 @@ local ls=[[
 33700079 0 --Anifriends Small-clawed Otter
 33700751 0 --Anifriends Tanuki
 37564909 0 --Sayuri - Scarlet Moon
-63287035 0 --Horrible Reborn
 63553466 0 --Universal Marshall
-63553469 0 --Atom Marshall
 79854546 0 --Numbing Winter Jewel
 79854547 0 --Verdant Illusion
 102400004 0 --Accel Burst Dragon
 56642464 0 --Holy Noble Knight Crusader, Artorgius
-102400133 0 --Blitzkrieg Sky
 195208400 0 --Spectre Magician & Dark Light
-195208417 0 --False Reality Knight Thrax
-195208424 0 --False Reality Wrath Bringer Makolo
 202114501 0 --Sireknight
 56642463 0 --Noble Knight Mordred
 #Limited YGOCC
-38572779 1 --Miscellaneousaurus
-50588353 1 --Crystron Halqifibrax
 77585595 1 --Forgalgia Emperor Jinzo
-11000533 1 --Shya Shadowlord
 15747847 1 --Mythos Valor
-16599458 1 --Telum of the Angel Organization, Zagar
 32904936 1 --Arisa, the Aeonbreaker's Defender
-19772604 1 --The Grand Witch of the Advocate of Justice - Flaric Ebona
-19772610 1 --The Advocate of Justice's Door
-32904923 1 --Serene the Aeonbreaker's Sword
 32904931 1 --Aeonbreaker Fusion
 33700058 1 --Miracle of the Sandstar
 33700065 1 --Anifriends PPP Gentoo
 33700311 1 --NEXTGal G
 33700744 1 --Anifriends "Ikkaku"
 33700746 1 --Anifriends Sky Impulse
-48022718 1 --Space-Time Wizard
-53313934 1 --Disstonant Luster Dragon
 63553459 1 --Nethergear Unit
 37564903 1 --Sayuri - ALICE
 63553468 1 --Proxima Marshall
-79854524 1 --Woodland Wing
-80347321 1 --Metalfoes Mercuryrider
 96212378 1 --Spiral Drill Formation
 96212398 1 --Spiral Drill Formation
-102400114 1 --Blitzkrieg Dragon - Steel
-195208409 1 --False Reality Aquamancer Gyalros
-195208422 1 --False Reality Spirit Monk Dalos
-32904930 1 --Jaden the Aeonbreaker's Alchemist
-11000511 1 --Hidden Secrets of the Shya
 #Semi-limited YGOCC
-47325505 2 --Fossil Dig
-15747835 2 --Mythos Paradox
-37564902 2 --Sayuri - GRAZE
-79854524 2 --Woodland Wing
-102400102 2 --Blitzkrieg Meklight - Dawn
+--							New 2/11/2022
+97569832 0 --Flight of Star Regalia
+33700183 1 --Anifriends Sisha Lefty
+33700184 1 --Anifriends Sisha Right
+--							New 3/24/2022
+63553469 1 --Atom Marshall
+31157205 1 --Mezka Melodia
+17029608 1 --Psychether Priestess, Joan
+23251031 1 --Pharaohnic Papyrus of Patience
+28915253 1 --Shadowflame Calvary
+63287035 1 --Horrible Reborn
+195208417 1 --False Reality Knight Thrax
+195208422 2 --False Reality Spirit Monk Dalos
+53313934 2 --Disstonant Luster Dragon
+26369260 2 --Psychostice Patrol
+
+#RULE CARDS
+5000 1 --Manual Mode
 
 #FORBIDDEN TCG					===Forbidden===
 76794549 0 --Astrograph Sorcerer
@@ -84,7 +67,6 @@ local ls=[[
 34124316 0 --Cyber Jar
 15341821 0 --Dandylion
 8903700 0 --Djinn Releaser of Rituals
-49684352 0 --Double Iris Magician
 51858306 0 --Eclipse Wyvern
 55623480 0 --Fairy Tail - Snow
 78706415 0 --Fiber Jar
@@ -99,7 +81,6 @@ local ls=[[
 57835716 0 --Orcust Harp Horror
 7563579 0 --Performage Plushfire
 17330916 0 --Performapal Monkeyboard
-40318957 0 --Performapal Skullcrobat Joker
 23558733 0 --Phoenixian Cluster Amaryllis
 90411554 0 --Redox, Dragon Ruler of Boulders
 5592689 0 --Samsara Lotus
@@ -128,7 +109,6 @@ local ls=[[
 63504681 0 --Number 86: Heroic Champion - Rhongomyniad
 58820923 0 --Number 95: Galaxy-Eyes Dark Matter Dragon
 34945480 0 --Outer Entity Azathot
-87327776 0 --Salamangreat Miragestallio
 18326736 0 --Tellarknight Ptolemaeus
 81122844 0 --Wind-Up Carrier Zenmaity
 85115440 0 --Zoodiac Broadbull
@@ -181,7 +161,6 @@ local ls=[[
 28985331 1 --Armageddon Knight
 61901281 1 --Black Dragon Collapserpent
 69015963 1 --Cyber-Stein
-70711847 1 --Danger! Nessie!
 14536035 1 --Dark Grepher
 58984738 1 --Dinomight Knight, the True Dracofighter
 82385847 1 --Dinowrestler Pankratops
@@ -189,9 +168,7 @@ local ls=[[
 64034255 1 --Genex Ally Birdman
 99177923 1 --Infernity Archfiend
 33508719 1 --Morphing Jar
-16226786 1 --Night Assailant
 12958919 1 --Phantom Skyblaster
-88264978 1 --Red-Eyes Darkness Metal Dragon
 26889158 1 --Salamangreat Gazelle
 92559258 1 --Servant of Endymion
 81275020 1 --Speedroid Terrortop
@@ -205,7 +182,6 @@ local ls=[[
 74586817 1 --PSY-Framelord Omega
 27552504 1 --Beatrice, Lady of the Eternal
 581014 1 --Daigusto Emeral
-8949584 1 --A Hero Lives
 72892473 1 --Card Destruction
 59750328 1 --Card of Demise
 91623717 1 --Chain Strike
@@ -213,7 +189,6 @@ local ls=[[
 15854426 1 --Divine Wind of Mist Valley
 14733538 1 --Draco Face-Off
 13035077 1 --Dragonic Diagram
-67723438 1 --Emergency Teleport
 95308449 1 --Final Countdown
 81439173 1 --Foolish Burial
 27970830 1 --Gateway of the Six
@@ -224,18 +199,14 @@ local ls=[[
 83764718 1 --Monster Reborn
 33782437 1 --One Day of Peace
 2295440 1 --One for One
-12580477 1 --Raigeki
 58577036 1 --Reasoning
 32807846 1 --Reinforcement of the Army
-52155219 1 --Salamangreat Circle
-73915051 1 --Scapegoat
 24940422 1 --Sekka's Light
 73468603 1 --Set Rotation
 52340444 1 --Sky Striker Mecha - Hornet Drones
 24010609 1 --Sky Striker Mecha Modules - Multirole
 71344451 1 --Slash Draw
 54631665 1 --SPYRAL Resort
-45305419 1 --Symbol of Heritage
 73628505 1 --Terraforming
 35371948 1 --Trickstar Light Stage
 70368879 1 --Upstart Goblin
@@ -244,11 +215,9 @@ local ls=[[
 32723153 1 --Magical Explosion
 89208725 1 --Metaverse
 23002292 1 --Red Reboot
-82732705 1 --Skill Drain
 17078030 1 --Wall of Revealing Light
 43694650 1 --Danger!? Jackalope?
 99745551 1 --Danger!? Tsuchinoko?
-1561110 1 --ABC-Dragon Buster
 90953320 1 --T.G. Hyper Librarian
 52687916 1 --Trishula, Dragon of the Ice Barrier
 48905153 1 --Zoodiac Drident
@@ -263,7 +232,6 @@ local ls=[[
 94689206 0 --Block Dragon
 18144506 1 --Harpie's Feather Duster
 24224830 1 --Called by the Grave
-49684352 1 --Double Iris Magician
 --							New 12/15/2020
 63789924 0 --Smoke Grenade of the Thief
 85243784 0 --Linkross
@@ -276,21 +244,46 @@ local ls=[[
 86148577 0 --Guardragon Elpy
 48905153 0 --Zoodiac Drident
 38572779 1 --Miscellaneousaurus
-40318957 1 --Performapal Skullcrobat Joker
 73539069 1 --Striker Dragon
-87327776 1 --Salamangreat Miragestallio
 63166095 1 --Sky Striker Mobilize - Engage!
-49684352 2 --Double Iris Magician
-45305419 3 --Symbol of Heritage
 --							New 10/1/2021
 46060017 0 --Zoodiac Barrage
 40177746 1 --Eva
 25725326 1 --Prank-Kids Meow-Meow-Mu
 57103969 1 --Fire Formation - Tenki
-70711847 2 --Danger! Nessie!
-40318957 2 --Performapal Skullcrobat Joker
-67723438 2 --Emergency Teleport
-49684352 3 --Double Iris Magician
+--							New 2/7/2022
+6728559 0  --Archnemeses Protos
+40177746 0 --Eva
+72330894 0 --Simorgh, Bird of Sovereignty
+61740673 0 --Imperial Order
+76794549 1 --Astrograph Sorcerer
+5560911 1  --Destrudo the Lost Dragon's Frisson
+55623480 1 --Fairy Tail - Snow
+83190280 1 --Lunalight Tiger
+8491961 1  --Lyrilusc - Recital Starling
+43040603 1 --Monster Gate
+35261759 1 --Pot of Desires
+52947044 2 --Fusion Destiny
+1984618 2  --Nadir Servant
+--							New 3/24/2022
+20292186 0 --Artifact Scythe
+--							New 5/17/2022
+25725326 0 --Prank-Kids Meow-Meow-Mu
+70369116 0 --Predaplant Verte Anaconda
+44097050 0 --Mecha Phantom Beast Auroradon
+35316708 1 --Time Seal
+4031928 1 --Change of Heart
+3078576 1 --Yata-Garasu
+9742784 1 --Jet Synchron
+26118970 1 --Red Rose Dragon
+50588353 1 --Crystron Halqifibrax
+68431965 1 --Shooting Riser Dragon
+17330916 1 --Performapal Monkeyboard
+35261759 2 --Pot of Desires
+17078030 2 --Wall of Revealing Light
+57103969 2 --Fire Formation - Tenki
+77235086 2 --Cyber Angel Benten
+35371948 2 --Trickstar Light Stage
 ]]
 for id in ls:sub(ls:find("!"),ls:find("!",ls:find("!")+1) and ls:find("!",ls:find("!")+1)-1 or -1):gmatch("([0-9]+) 0") do
 	banned_list_table[tonumber(id)]=true
