@@ -122,7 +122,11 @@ function s.retop(e,tp,eg,ep,ev,re,r,rp)
 	g:DeleteGroup()
 	local tc=sg:GetFirst()
 	while tc do
-		Duel.ReturnToField(tc)
+		if tc:IsPreviousLocation(LOCATION_FZONE) then
+			Duel.MoveToField(tc,tp,tc:GetPreviousControler(),LOCATION_FZONE,tc:GetPreviousPosition(),true)
+		else
+			Duel.ReturnToField(tc)
+		end
 		tc=sg:GetNext()
 	end
 end
