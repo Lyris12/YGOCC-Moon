@@ -1,5 +1,6 @@
 --created & coded by Walrus
-local s,id=GetID()
+--Voidictator Servant - Shield of Corvus
+local s,id,o=GetID()
 function s.initial_effect(c)
 	aux.CannotBeEDMaterial(c,nil,LOCATION_MZONE)
 	local e1=Effect.CreateEffect(c)

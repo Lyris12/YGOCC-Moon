@@ -1,5 +1,6 @@
 --created by Walrus, coded by Lyris
-local s,id=GetID()
+--Voidictator Demon - Void-Eyes Null Dragon
+local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	c:SetUniqueOnField(1,0,id)

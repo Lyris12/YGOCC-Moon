@@ -1,5 +1,6 @@
 --created by Walrus, coded by Lyris
-local s,id=GetID()
+--Voidictator Demon - Lichguard of Corvus
+local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddOrigTimeleapType(c)

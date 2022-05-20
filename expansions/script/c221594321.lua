@@ -1,5 +1,6 @@
 --created by Walrus, coded by Lyris
-local s,id=GetID()
+--Voidictator Energy - Ritual Essence
+local s,id,o=GetID()
 function s.initial_effect(c)
 	local e1=aux.AddRitualProcUltimate(c,aux.FilterBoolFunction(Card.IsSetCard,0xc97),Card.GetLevel,"Greater",LOCATION_HAND+LOCATION_GRAVE,aux.FilterBoolFunction(aux.AND(Card.IsFaceup,Card.IsSetCard),0xc97),s.mfilter)
 	e1:SetOperation(s.RitualUltimateOperation(aux.FilterBoolFunction(Card.IsSetCard,0xc97),Card.GetLevel,"Greater",LOCATION_HAND+LOCATION_GRAVE,aux.FilterBoolFunction(aux.AND(Card.IsFaceup,Card.IsSetCard),0xc97),s.mfilter))

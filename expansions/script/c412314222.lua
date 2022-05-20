@@ -1,5 +1,6 @@
 --created by Jake, coded by Lyris, art from Cardfight!! Vanguard's "Great Silver Wolf, Garmore"
-local s,id=GetID()
+--Dawn Blader - Saber
+local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_WARRIOR),4,2)

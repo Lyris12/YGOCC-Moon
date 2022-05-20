@@ -1,5 +1,6 @@
 --created by Walrus, coded by Lyris
-local s,id=GetID()
+--Voidictator Rune - Origins' Realm
+local s,id,o=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)

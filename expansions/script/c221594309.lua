@@ -1,5 +1,6 @@
 --created by Walrus, coded by Lyris
-local s,id=GetID()
+--Voidictator Demon - The Unending Flame
+local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddXyzProcedureLevelFree(c,s.mfilter,function(g) return g:IsExists(Card.IsSetCard,1,nil,0xc97) end,2,2)

@@ -1,4 +1,4 @@
---created & coded by Lyris, art by 匈歌ハトリ on Pixiv
+--created & coded by Lyris, art by 匈歌ハトリ of Pixiv
 --襲雷の空
 local s,id,o=GetID()
 function s.initial_effect(c)

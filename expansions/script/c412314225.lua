@@ -1,5 +1,6 @@
 --created by Jake, coded by Lyris, art from "The Sanctuary in the Sky"
-local s,id=GetID()
+--A Soldier's Resting Place
+local s,id,o=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)

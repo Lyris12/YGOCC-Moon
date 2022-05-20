@@ -13,15 +13,14 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function s.discon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsChainNegatable(ev)
+	return Duel.IsChainDisablable(ev) and rp~=tp
 end
 function s.dfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x7c4) and c:IsDestructable()
 end
 function s.distg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.dfilter,tp,LOCATION_ONFIELD,0,1,aux.ExceptThisCard(e)) and not re:GetHandler():IsStatus(STATUS_DISABLED) end
-	local g=Duel.GetMatchingGroup(s.dfilter,tp,LOCATION_ONFIELD,0,aux.ExceptThisCard(e))
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,1,tp,LOCATION_ONFIELD)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.dfilter,tp,LOCATION_ONFIELD,0,1,aux.ExceptThisCard(e)) end
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,Duel.GetMatchingGroup(s.dfilter,tp,LOCATION_ONFIELD,0,aux.ExceptThisCard(e)),1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_DISABLE,eg,1,0,0)
 end
 function s.disop(e,tp,eg,ep,ev,re,r,rp)

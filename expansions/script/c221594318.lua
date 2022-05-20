@@ -1,5 +1,6 @@
 --created by Walrus, coded by Lyris
-local s,id=GetID()
+--Voidictator Servant - Gate Magician
+local s,id,o=GetID()
 function s.initial_effect(c)
 	aux.AddOrigPandemoniumType(c)
 	local e0=Effect.CreateEffect(c)

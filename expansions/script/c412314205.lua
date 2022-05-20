@@ -1,5 +1,6 @@
 --created by Jake, coded by Lyris
-local s,id=GetID()
+--Dawn Blader - Future King
+local s,id,o=GetID()
 function s.initial_effect(c)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD)

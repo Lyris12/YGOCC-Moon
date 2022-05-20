@@ -1,5 +1,6 @@
---created by Jake, coded by Lyris, art from Cardfight!! Vanguard's "Dragonic Overlord" & "Perdition Emperor Dragon, Dragonic Overlord the Great"
-local s,id=GetID()
+--created by Jake, coded by Lyris, art from Cardfight!! Vanguard's "Dragonic Overlord"
+--Dawn-Eyes Violet Dragon
+local s,id,o=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)

@@ -1,5 +1,6 @@
 --created by Walrus, coded by Lyris
-local s,id=GetID()
+--Voidictator Rune - Chains of Torment
+local s,id,o=GetID()
 function s.initial_effect(c)
 	c:SetUniqueOnField(1,0,id)
 	local e1=Effect.CreateEffect(c)

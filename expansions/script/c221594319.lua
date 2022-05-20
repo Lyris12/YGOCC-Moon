@@ -1,5 +1,6 @@
 --created by Walrus, coded by Lyris
-local s,id=GetID()
+--Voidictator Servant - Gate Attendant
+local s,id,o=GetID()
 function s.initial_effect(c)
 	aux.CannotBeEDMaterial(c,nil,LOCATION_MZONE)
 	local e1=Effect.CreateEffect(c)

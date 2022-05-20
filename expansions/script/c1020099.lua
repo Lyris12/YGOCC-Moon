@@ -1,7 +1,6 @@
---VIATRIX: Riavvio
---Script by XGlitchy30
+--created by Jake
+--A Bushido Beast's Recruitment
 function c1020099.initial_effect(c)
-	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
@@ -11,7 +10,6 @@ function c1020099.initial_effect(c)
 	e1:SetTarget(c1020099.target)
 	e1:SetOperation(c1020099.activate)
 	c:RegisterEffect(e1)
-	--recycle
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(1020099,2))
 	e2:SetCategory(CATEGORY_TOEXTRA)
@@ -24,20 +22,17 @@ function c1020099.initial_effect(c)
 	e2:SetOperation(c1020099.teop)
 	c:RegisterEffect(e2)
 end
---filters
 function c1020099.filter(c,e,tp)
 	return c:IsFaceup() and c:IsSetCard(0x39c) and (c:IsAbleToHand() or c:IsCanBeSpecialSummoned(e,0,tp,false,false))
 end
 function c1020099.tefilter(c)
 	return c:IsRace(RACE_CYBERSE) and c:IsType(TYPE_LINK) and c:IsAbleToDeck()
 end
---Activate
 function c1020099.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_EXTRA) and c1020099.filter(chkc,e,tp) end
 	if chk==0 then return Duel.IsExistingTarget(c1020099.filter,tp,LOCATION_EXTRA,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	local g=Duel.SelectTarget(tp,c1020099.filter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp)
-	--
 	local tc=g:GetFirst()
 	local op=0
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EFFECT)
@@ -48,7 +43,6 @@ function c1020099.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	elseif tc:IsCanBeSpecialSummoned(e,0,tp,false,false) and Duel.GetLocationCountFromEx(tp)>0 then
 		op=Duel.SelectOption(tp,aux.Stringid(1020099,0))
 	else return end
-	--
 	e:SetLabel(op)
 	if op==0 then
 		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
@@ -69,7 +63,6 @@ function c1020099.activate(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
---recycle
 function c1020099.tetg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and c1020099.tefilter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c1020099.tefilter,tp,LOCATION_GRAVE,0,1,nil) end

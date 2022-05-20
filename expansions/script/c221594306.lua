@@ -1,5 +1,6 @@
 --created by Walrus, coded by Lyris
-local s,id=GetID()
+--Voidictator Demon - Gate Keeper
+local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddLinkProcedure(c,s.mfilter,2,99,function(g) return g:IsExists(Card.IsLinkSetCard,1,nil,0xc97) end)

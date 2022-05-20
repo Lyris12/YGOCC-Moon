@@ -1,5 +1,6 @@
 --created by Jake, coded by Lyris, art from Cardfight!! Vanguard's "Battlefield Storm, Sagramore"
-local s,id=GetID()
+--Dawn Blader - Lion
+local s,id,o=GetID()
 function s.initial_effect(c)
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)

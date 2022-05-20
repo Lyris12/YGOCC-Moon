@@ -1,5 +1,6 @@
 --created by Jake, coded by Lyris
-local s,id=GetID()
+--Dawn Blader - Dragonic King
+local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddFusionProcFunRep(c,aux.FilterBoolFunction(Card.IsSetCard,0x613),2,true)

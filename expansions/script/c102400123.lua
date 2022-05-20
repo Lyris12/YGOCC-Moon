@@ -1,4 +1,4 @@
---created & coded by Lyris, art by Idouyouichi on Pixiv
+--created & coded by Lyris, art by Idouyouichi of Pixiv
 --機夜光襲雷竜－ミッドナイト
 local s,id,o=GetID()
 function s.initial_effect(c)

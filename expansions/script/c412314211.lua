@@ -1,5 +1,6 @@
 --created by Jake, coded by Lyris, art from Cardfight!! Vanguard's "Incandescent Lion, Blond Ezel"
-local s,id=GetID()
+--Dawn Blader - Vortex Divider
+local s,id,o=GetID()
 function s.initial_effect(c)
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)

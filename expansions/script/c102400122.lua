@@ -44,7 +44,7 @@ function s.desfilter(c,e,tp)
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return Duel.GetMZoneCount(tp,c)>0 and Duel.GetTurnPlayer()~=tp and aux.bpcon()
+	if chk==0 then return Duel.GetMZoneCount(tp,c)>0
 		and Duel.IsExistingMatchingCard(s.desfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,e:GetHandler(),1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_GRAVE)
@@ -52,16 +52,6 @@ end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and Duel.Destroy(c,REASON_EFFECT)~=0 then
-		if Duel.GetAttacker() then Duel.NegateAttack()
-		else
-			local e1=Effect.CreateEffect(e:GetHandler())
-			e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-			e1:SetCode(EVENT_ATTACK_ANNOUNCE)
-			e1:SetReset(RESET_PHASE+PHASE_END)
-			e1:SetCountLimit(1)
-			e1:SetOperation(s.disop)
-			Duel.RegisterEffect(e1,tp)
-		end
 		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		Duel.SpecialSummon(Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.desfilter),tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil,e,tp),0,tp,tp,false,false,POS_FACEUP)
@@ -93,6 +83,6 @@ function s.op(e,tp,eg,ep,ev,re,r,rp)
 	local tc=g:GetFirst()
 	Duel.DisableShuffleCheck()
 	if Duel.Destroy(g,REASON_EFFECT)~=0 then
-		if tc:IsType(TYPE_MONSTER) and tc:IsSetCard(0x7c4) then Duel.Draw(tp,1,REASON_EFFECT) end
+		if not (tc:IsType(TYPE_MONSTER) and tc:IsSetCard(0x7c4)) then Duel.Draw(tp,1,REASON_EFFECT) end
 	else Duel.ConfirmDecktop(tp,1) end
 end

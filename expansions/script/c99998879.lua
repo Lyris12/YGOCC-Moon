@@ -1,5 +1,6 @@
 --created & coded by Walrus
-local s,id=GetID()
+--Voidictator Rune - Inverse Gating Art
+local s,id,o=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetCountLimit(1,id)

@@ -37,7 +37,7 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if tc:IsFacedown() or not c:IsRelateToEffect(e) or not tc:IsRelateToEffect(e)
-		or tc:IsControler(tp) or not tc:IsLocation(LOCATION_MZONE) then return end
+		or tc:IsControler(tp) or c:IsImmuneToEffect(e) or tc:IsImmuneToEffect(e) then return end
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_UPDATE_ATTACK)

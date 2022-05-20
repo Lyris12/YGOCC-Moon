@@ -1,5 +1,6 @@
 --created by Walrus, coded by Lyris
-local s,id=GetID()
+--Voidictator Deity - Vera the Soul Guardian
+local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddSynchroProcedure2(c,aux.FilterBoolFunction(Card.IsCode,id-8),aux.NonTuner(s.mfilter))

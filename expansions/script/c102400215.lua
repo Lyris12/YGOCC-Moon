@@ -67,12 +67,12 @@ function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsPlayerCanSpecialSummonMonster(tp,id-39,0x96b,0x4011,100,100,1,RACE_ROCK,ATTRIBUTE_EARTH) end
+		and Duel.IsPlayerCanSpecialSummonMonster(tp,id-39,0x96b,TYPES_TOKEN_MONSTER,100,100,1,RACE_ROCK,ATTRIBUTE_EARTH) end
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,0)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0
-		or not Duel.IsPlayerCanSpecialSummonMonster(tp,id-39,0x96b,0x4011,100,100,1,RACE_ROCK,ATTRIBUTE_EARTH) then return end
+		or not Duel.IsPlayerCanSpecialSummonMonster(tp,id-39,0x96b,TYPES_TOKEN_MONSTER,100,100,1,RACE_ROCK,ATTRIBUTE_EARTH) then return end
 	Duel.SpecialSummon(Duel.CreateToken(tp,id-39),0,tp,tp,false,false,POS_FACEUP)
 end

@@ -1,5 +1,6 @@
 --created by Jake, coded by Lyris, art from Cardfight!! Vanguard's "Beast Knight, Garmore"
-local s,id=GetID()
+--Dawn Blader - Tiger
+local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_WARRIOR),aux.NonTuner(nil),1)

@@ -1,5 +1,6 @@
 --created by Walrus, coded by Lyris
-local s,id=GetID()
+--Voidictator Servant - Rune Priestess
+local s,id,o=GetID()
 function s.initial_effect(c)
 	aux.CannotBeEDMaterial(c,nil,LOCATION_MZONE)
 	local e0=Effect.CreateEffect(c)
