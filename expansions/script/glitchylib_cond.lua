@@ -16,6 +16,11 @@ function Auxiliary.ExactEventGroupCond(f,ct,exc)
 			end
 end
 
+--Except on Damage Calc
+function Auxiliary.ExceptOnDamageCalc()
+	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated()
+end
+
 --When this card is X Summoned
 function Auxiliary.FusionSummonedCond(e)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_FUSION)

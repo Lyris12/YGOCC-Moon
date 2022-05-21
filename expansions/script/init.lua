@@ -194,11 +194,11 @@ dofile("expansions/script/proc_evolve.lua") --Evolve
 --overwrite functions
 local is_type, card_remcounter, duel_remcounter, effect_set_target_range, effect_set_reset, add_xyz_proc, add_xyz_proc_nlv, duel_overlay, duel_set_lp, duel_select_target, duel_banish, card_check_remove_overlay_card, is_reason, duel_check_tribute, select_tribute,card_sethighlander,
 	card_is_facedown, card_is_able_to_remove, card_is_able_to_remove_as_cost, card_is_able_to_hand, card_is_can_be_ssed, card_get_level, card_get_previous_level, card_is_level, card_is_level_below, card_is_level_above, card_is_destructable, card_get_syn_level, card_get_rit_level, card_is_xyz_level,
-	duel_check_xyz_mat, duel_select_xyz_mat, duel_recover, duel_damage = 
+	duel_check_xyz_mat, duel_select_xyz_mat, duel_recover, duel_damage, effect_set_count_limit = 
 	
 	Card.IsType, Card.RemoveCounter, Duel.RemoveCounter, Effect.SetTargetRange, Effect.SetReset, Auxiliary.AddXyzProcedure, Auxiliary.AddXyzProcedureLevelFree, Duel.Overlay, Duel.SetLP, Duel.SelectTarget, Duel.Remove, Card.CheckRemoveOverlayCard, Card.IsReason, Duel.CheckTribute, Duel.SelectTribute, Card.SetUniqueOnField,
 	Card.IsFacedown, Card.IsAbleToRemove, Card.IsAbleToRemoveAsCost, Card.IsAbleToHand, Card.IsCanBeSpecialSummoned, Card.GetLevel, Card.GetPreviousLevelOnField, Card.IsLevel, Card.IsLevelBelow, Card.IsLevelAbove, Card.IsDestructable, Card.GetSynchroLevel, Card.GetRitualLevel, Card.IsXyzLevel,
-	Duel.CheckXyzMaterial, Duel.SelectXyzMaterial, Duel.Recover, Duel.Damage
+	Duel.CheckXyzMaterial, Duel.SelectXyzMaterial, Duel.Recover, Duel.Damage, Effect.SetCountLimit
 
 Card.IsReason=function(c,rs)
 	local cusrs=rs>>32
@@ -1094,6 +1094,16 @@ Duel.Damage = function(p,v,r,...)
 	end
 end
 
+Effect.SetCountLimit = function(e,ct,...)
+	local x={...}
+	if #x>0 and type(x[1])=="table" or #x>1 then
+		local flag = #x>1 and x[2] or 0
+		return effect_set_count_limit(e,ct,x[1][1]+x[1][2]*100+flag)
+	else
+		return effect_set_count_limit(e,ct,...)
+	end
+end
+
 --Custom Functions
 function Auxiliary.TribCheckRecursive(c,tp,mg,sg,sc,ct,min,max,p,zone)
 	sg:AddCard(c)
@@ -1635,14 +1645,6 @@ function Effect.GLString(e,id,...)
 	-- else
 		e:SetDescription(aux.Stringid(e:GetOwner():GetOriginalCode(),id))
 	--end
-end
-
-function Duel.IsMainPhase(tp)
-	return (not tp or Duel.GetTurnPlayer()==tp) and (Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2)
-end
-function Duel.IsBattlePhase(tp)
-	local ph=Duel.GetCurrentPhase()
-	return (not tp or Duel.GetTurnPlayer()==tp) and ph>=PHASE_BATTLE_START and ph<=PHASE_BATTLE
 end
 
 function Auxiliary.ActivateST(c)
@@ -2375,13 +2377,16 @@ end
 ----------------------------------------------------------------------------------------------------------------
 function Card.HasLevel(c)
 	if c:IsType(TYPE_MONSTER) then
-		return c:GetType()&TYPE_LINK~=TYPE_LINK
+		return c:GetType()&TYPE_LINK~=TYPE_LINK and c:GetType()&TYPE_TIMELEAP~=TYPE_TIMELEAP
 			and (c:GetType()&TYPE_XYZ~=TYPE_XYZ and not (c:IsHasEffect(EFFECT_RANK_LEVEL) or c:IsHasEffect(EFFECT_RANK_LEVEL_S)))
 			and not c:IsStatus(STATUS_NO_LEVEL)
 	elseif c:IsOriginalType(TYPE_MONSTER) then
-		return not (c:IsOriginalType(TYPE_XYZ+TYPE_LINK) or c:IsStatus(STATUS_NO_LEVEL))
+		return not (c:IsOriginalType(TYPE_XYZ+TYPE_LINK+TYPE_TIMELEAP) or c:IsStatus(STATUS_NO_LEVEL))
 	end
 	return false
+end
+function Card.CanAttack(c)
+	return c:IsAttackable()
 end
 
 function Auxiliary.FilterBoolFunctionEx(f,value)
@@ -2442,6 +2447,87 @@ function Auxiliary.SelectUnselectGroup(g,e,tp,minc,maxc,rescon,chk,seltp,hintmsg
 		end
 	end
 	return sg
+end
+--[[
+Function to perform "Either add it to the hand or do X"
+-card: affected card or group of cards to be moved;
+-player: player performing the operation
+-check: condition for the secondary action, if not provided the default action is "Send it to the GY";
+oper: secondary action;
+str: string to be used in the secondary option
+]]
+function Auxiliary.ToHandOrElse(card,player,check,oper,str,...)
+	if card then
+		if not check then check=Card.IsAbleToGrave end
+		if not oper then oper=aux.thoeSend end
+		if not str then str=574 end
+		local b1,b2=true,true
+		if type(card)=="Group" then
+			for ctg in aux.Next(card) do
+				if not ctg:IsAbleToHand() then
+					b1=false
+				end
+				if not check(ctg,...) then
+					b2=false
+				end
+			end
+		else
+			b1=card:IsAbleToHand()
+			b2=check(card,...)
+		end
+		local opt
+		if b1 and b2 then
+			opt=Duel.SelectOption(player,573,str)
+		elseif b1 then
+			opt=Duel.SelectOption(player,573)
+		else
+			opt=Duel.SelectOption(player,str)+1
+		end
+		if opt==0 then
+			local res=Duel.SendtoHand(card,nil,REASON_EFFECT)
+			if res~=0 then Duel.ConfirmCards(1-player,card) end
+			return res
+		else
+			return oper(card,...)
+		end
+	end
+end
+function Auxiliary.thoeSend(card)
+	return Duel.SendtoGrave(card,REASON_EFFECT)
+end
+--check for Eyes Restrict equip limit
+function Auxiliary.AddEREquipLimit(c,con,equipval,equipop,linkedeff,prop,resetflag,resetcount)
+	local finalprop=EFFECT_FLAG_CANNOT_DISABLE
+	if prop~=nil then
+		finalprop=finalprop|prop
+	end
+	local e1=Effect.CreateEffect(c)
+	if con then
+		e1:SetCondition(con)
+	end
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(finalprop,EFFECT_FLAG2_MAJESTIC_MUST_COPY)
+	e1:SetCode(89785779)
+	e1:SetLabelObject(linkedeff)
+	if resetflag and resetcount then
+		e1:SetReset(resetflag,resetcount)
+	elseif resetflag then
+		e1:SetReset(resetflag)
+	end
+	e1:SetValue(function(ec,c,tp) return equipval(ec,c,tp) end)
+	e1:SetOperation(function(c,e,tp,tc) equipop(c,e,tp,tc) end)
+	c:RegisterEffect(e1)
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetProperty(finalprop&~EFFECT_FLAG_CANNOT_DISABLE,EFFECT_FLAG2_MAJESTIC_MUST_COPY)
+	e2:SetCode(89785779+EFFECT_EQUIP_LIMIT)
+	if resetflag and resetcount then
+		e2:SetReset(resetflag,resetcount)
+	elseif resetflag then
+		e2:SetReset(resetflag)
+	end
+	c:RegisterEffect(e2)
+	linkedeff:SetLabelObject(e2)
 end
 --Checks whether the card is located at any of the sequences passed as arguments.
 function Card.IsSequence(c,...)
@@ -2552,5 +2638,182 @@ function Duel.SelectReleaseGroupCost(tp,f,minc,maxc,use_hand,specialchk,ex,...)
 	end
 	return sg
 end
+
+function Auxiliary.MZFilter(c,tp)
+	return c:IsLocation(LOCATION_MZONE) and c:GetSequence()<5 and c:IsControler(tp)
+end
+--check for Free Monster Zones
+function Auxiliary.ChkfMMZ(sumcount)
+	return	function(sg,e,tp,mg)
+				return sg:FilterCount(Auxiliary.MZFilter,nil,tp)+Duel.GetLocationCount(tp,LOCATION_MZONE)>=sumcount
+			end
+end
 ----------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------
+--EDOPRO IMPORT: UNION PROCEDURE
+--Procedure for Union monster equip/unequip
+--c: Union monster
+--f: Potential targets
+--oldequip: Uses old rules for number of monster equiped (A monster can only by equipped with 1 Union monster at a time.)
+--oldprotect: Uses old rules for destroy replacement (If the equipped monster would be destroyed, destroy this card instead.)
+function Auxiliary.AddUnionProcedure(c,f,oldequip,oldprotect)
+	if oldprotect == nil then oldprotect = oldequip end
+	--equip
+	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(1068)
+	e1:SetCategory(CATEGORY_EQUIP)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetTarget(Auxiliary.UnionTarget(f,oldequip))
+	e1:SetOperation(Auxiliary.UnionOperation(f))
+	c:RegisterEffect(e1)
+	--unequip
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(2)
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:SetType(EFFECT_TYPE_IGNITION)
+	e2:SetRange(LOCATION_SZONE)
+	if oldequip then
+		e2:SetCondition(Auxiliary.IsUnionState)
+	end
+	e2:SetTarget(Auxiliary.UnionSumTarget(oldequip))
+	e2:SetOperation(Auxiliary.UnionSumOperation(oldequip))
+	c:RegisterEffect(e2)
+	--destroy sub
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_EQUIP)
+	e3:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+	e3:SetCode(EFFECT_DESTROY_SUBSTITUTE)
+	if oldprotect then
+		e3:SetCondition(Auxiliary.IsUnionState)
+	end
+	e3:SetValue(Auxiliary.UnionReplace(oldprotect))
+	c:RegisterEffect(e3)
+	--eqlimit
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_SINGLE)
+	e4:SetCode(EFFECT_UNION_LIMIT)
+	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e4:SetValue(Auxiliary.UnionLimit(f))
+	c:RegisterEffect(e4)
+	--auxiliary function compatibility
+	if oldequip then
+		local m=c:GetMetatable()
+		m.old_union=true
+	end
+end
+if not Card.CheckUnionTarget then
+	Card.CheckUnionTarget=function(c,target)
+		local ct1,ct2=c:GetUnionCount()
+		return c:IsHasEffect(EFFECT_UNION_LIMIT) and (((not c:IsHasEffect(EFFECT_OLDUNION_STATUS)) or ct1 == 0)
+			and ((not c:IsHasEffect(EFFECT_UNION_STATUS)) or ct2 == 0))
+	
+	end
+end
+function Auxiliary.UnionFilter(c,f,oldrule)
+	local ct1,ct2=c:GetUnionCount()
+	if c:IsFaceup() and (not f or f(c)) then
+		if oldrule then
+			return ct1==0
+		else
+			return ct2==0
+		end
+	else
+		return false
+	end
+end
+function Auxiliary.UnionTarget(f,oldrule)
+	return function (e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+		local c=e:GetHandler()
+		local code=c:GetOriginalCode()
+		if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and Auxiliary.UnionFilter(c,f,oldrule) end
+		if chk==0 then return e:GetHandler():GetFlagEffect(code)==0 and Duel.GetLocationCount(tp,LOCATION_SZONE)>0
+			and Duel.IsExistingTarget(Auxiliary.UnionFilter,tp,LOCATION_MZONE,0,1,c,f,oldrule) end
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
+		local g=Duel.SelectTarget(tp,Auxiliary.UnionFilter,tp,LOCATION_MZONE,0,1,1,c,f,oldrule)
+		Duel.SetOperationInfo(0,CATEGORY_EQUIP,g,1,0,0)
+		c:RegisterFlagEffect(code,RESET_EVENT+(RESETS_STANDARD-RESET_TOFIELD-RESET_LEAVE)+RESET_PHASE+PHASE_END,0,1)
+	end
+end
+function Auxiliary.UnionOperation(f)
+	return function (e,tp,eg,ep,ev,re,r,rp)
+		local c=e:GetHandler()
+		local tc=Duel.GetFirstTarget()
+		if not c:IsRelateToEffect(e) or c:IsFacedown() then return end
+		if not tc:IsRelateToEffect(e) or (f and not f(tc)) then
+			Duel.SendtoGrave(c,REASON_EFFECT)
+			return
+		end
+		if not Duel.Equip(tp,c,tc,false) then return end
+		aux.SetUnionState(c)
+	end
+end
+function Auxiliary.UnionSumTarget(oldrule)
+	return function (e,tp,eg,ep,ev,re,r,rp,chk)
+		local c=e:GetHandler()
+		local code=c:GetOriginalCode()
+		local pos=POS_FACEUP
+		if oldrule then pos=POS_FACEUP_ATTACK end
+		if chk==0 then return c:GetFlagEffect(code)==0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+			and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,true,false,pos) end
+		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
+		c:RegisterFlagEffect(code,RESET_EVENT+(RESETS_STANDARD-RESET_TOFIELD-RESET_LEAVE)+RESET_PHASE+PHASE_END,0,1)
+	end
+end
+function Auxiliary.UnionSumOperation(oldrule)
+	return function (e,tp,eg,ep,ev,re,r,rp)
+		local c=e:GetHandler()
+		if not c:IsRelateToEffect(e) then return end
+		local pos=POS_FACEUP
+		if oldrule then pos=POS_FACEUP_ATTACK end
+		if Duel.SpecialSummon(c,0,tp,tp,true,false,pos)==0 and Duel.GetLocationCount(tp,LOCATION_MZONE)<=0
+			and c:IsCanBeSpecialSummoned(e,0,tp,true,false,pos) then
+			Duel.SendtoGrave(c,REASON_RULE)
+		end
+	end
+end
+function Auxiliary.UnionReplace(oldrule)
+	return function (e,re,r,rp)
+		if oldrule then
+			return (r&REASON_BATTLE)~=0
+		else
+			return (r&REASON_BATTLE)~=0 or (r&REASON_EFFECT)~=0
+		end
+	end
+end
+function Auxiliary.UnionLimit(f)
+	return function (e,c)
+		return (not f or f(c)) or e:GetHandler():GetEquipTarget()==c
+	end
+end
+function Auxiliary.IsUnionState(effect)
+	local c=effect:GetHandler()
+	return c:IsHasEffect(EFFECT_UNION_STATUS)
+end
+function Auxiliary.SetUnionState(c)
+	local eset={c:GetCardEffect(EFFECT_UNION_LIMIT)}
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_SINGLE)
+	e0:SetCode(EFFECT_EQUIP_LIMIT)
+	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e0:SetValue(eset[1]:GetValue())
+	e0:SetReset(RESET_EVENT+RESETS_STANDARD)
+	c:RegisterEffect(e0)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_UNION_STATUS)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+	c:RegisterEffect(e1)
+	if c.old_union then
+		local e2=e1:Clone()
+		e2:SetCode(EFFECT_OLDUNION_STATUS)
+		c:RegisterEffect(e2)
+	end
+end
+function Auxiliary.CheckUnionEquip(uc,tc)
+	ct1,ct2=tc:GetUnionCount()
+	if uc.old_union then return ct1==0
+	else return ct2==0 end
+end

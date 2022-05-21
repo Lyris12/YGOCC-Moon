@@ -1,5 +1,9 @@
 --COSTS
 -----------------------------------------------------------------------
+function Auxiliary.InfoCost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
+end
 function Auxiliary.LabelCost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(1)
 	if chk==0 then return true end
@@ -38,9 +42,21 @@ function Auxiliary.DiscardSelfCost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsDiscardable() end
 	Duel.SendtoGrave(e:GetHandler(),REASON_COST+REASON_DISCARD)
 end
+function Auxiliary.DetachSelfCost(min,max)
+	if not min then min=1 end
+	if not max then max=min end
+	return	function(e,tp,eg,ep,ev,re,r,rp,chk)
+				if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,min,REASON_COST) end
+				e:GetHandler():RemoveOverlayCard(tp,min,max,REASON_COST)
+			end
+end
 function Auxiliary.ToExtraSelfCost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToExtraAsCost() end
 	Duel.SendtoDeck(e:GetHandler(),nil,SEQ_DECKSHUFFLE,REASON_COST)
+end
+function Auxiliary.ToGraveSelfCost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end
+	Duel.SendtoGrave(e:GetHandler(),REASON_COST)
 end
 
 -----------------------------------------------------------------------
@@ -61,8 +77,8 @@ function Auxiliary.SSLimit(f,desc,oath,reset)
 				e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 				e1:SetReset(reset)
 				e1:SetTargetRange(1,0)
-				e1:SetTarget(	function(eff,c)
-									return not f(c)
+				e1:SetTarget(	function(eff,c,sump,sumtype,sumpos,targetp,se)
+									return not f(c,eff,sump,sumtype,sumpos,targetp,se)
 								end
 							)
 				Duel.RegisterEffect(e1,tp)

@@ -5,33 +5,54 @@ CATEGORY_PLACE_AS_CONTINUOUS_TRAP	= 0x4
 CATEGORY_REDIRECT_ATTACK			= 0x8
 CATEGORY_SET						= 0x10
 CATEGORY_ACTIVATE					= 0x20
+CATEGORY_ATTACH						= 0x40
+CATEGORY_DETACH						= 0x80
+CATEGORY_UPDATE_ATTRIBUTE			= 0x100
+CATEGORY_UPDATE_RACE				= 0x200
+CATEGORY_UPDATE_SETCODE				= 0x400
+CATEGORY_LVCHANGE					= 0x800
+
 
 --constants aliases
 TYPE_ST			= TYPE_SPELL+TYPE_TRAP
 
 ARCHE_FUSION	= 0x46
 
-LOCATION_ALL = LOCATION_DECK+LOCATION_HAND+LOCATION_MZONE+LOCATION_SZONE+LOCATION_GRAVE+LOCATION_REMOVED+LOCATION_EXTRA	
+LOCATION_ALL = LOCATION_DECK+LOCATION_HAND+LOCATION_MZONE+LOCATION_SZONE+LOCATION_GRAVE+LOCATION_REMOVED+LOCATION_EXTRA
+LOCATION_GB  = LOCATION_GRAVE+LOCATION_REMOVED
+
+MAX_RATING = 14
 
 RESET_TURN_SELF = RESET_SELF_TURN
 RESET_TURN_OPPO = RESET_OPPO_TURN
 RESETS_STANDARD_EXC_GRAVE = RESETS_STANDARD&~(RESET_LEAVE|RESET_TOGRAVE)
 
+local _type=type
+function type(o)
+	local tp=_type(o)
+	if tp~="userdata" then return tp
+	elseif o.GetOriginalCode then return "Card"
+	elseif o.KeepAlive then return "Group"
+	elseif o.SetLabelObject then return "Effect"
+	else return "userdata"
+	end
+end
+
 
 --Shortcuts
-function Duel.IsExists(target,tp,f,loc1,loc2,min,exc,...)
+function Duel.IsExists(target,f,tp,loc1,loc2,min,exc,...)
 	if type(target)~="boolean" then return false end
 	local func = (target==true) and Duel.IsExistingTarget or Duel.IsExistingMatchingCard
 	
 	return func(f,tp,loc1,loc2,min,exc,...)
 end
-function Duel.Select(target,tp,hint,f,loc1,loc2,min,max,exc,...)
+function Duel.Select(hint,target,tp,f,pov,loc1,loc2,min,max,exc,...)
 	if type(target)~="boolean" then return false end
 	local func = (target==true) and Duel.SelectTarget or Duel.SelectMatchingCard
 	local hint = hint or HINTMSG_TARGET
 	
 	Duel.Hint(HINT_SELECTMSG,tp,hint)
-	local g=func(tp,f,tp,loc1,loc2,min,max,exc,...)
+	local g=func(tp,f,pov,loc1,loc2,min,max,exc,...)
 	return g
 end
 function Duel.Group(f,tp,loc1,loc2,exc,...)
@@ -49,14 +70,46 @@ function Effect.SetCustomCategory(e,cat)
 	if not global_effect_category_table[e] then global_effect_category_table[e]={} end
 	table.insert(global_effect_category_table[e],cat)
 end
-function Duel.SetCustomOperationInfo(ch,cat,g,ct,p,val)
+function Duel.SetCustomOperationInfo(ch,cat,g,ct,p,val,extra)
 	if not global_effect_info_table[ch+1] or #global_effect_info_table[ch+1]>0 then
 		global_effect_info_table[ch+1]={}
 	end
-	table.insert(global_effect_info_table[ch+1],{cat,g,ct,p,val})
+	table.insert(global_effect_info_table[ch+1],{cat,g,ct,p,val,extra})
 end
 
 --Card Actions
+function Duel.Attach(c,xyz)
+	if type(c)=="Card" then
+		local og=c:GetOverlayGroup()
+		if og:GetCount()>0 then
+			Duel.SendtoGrave(og,REASON_RULE)
+		end
+		Duel.Overlay(xyz,Group.FromCards(c))
+		return xyz:GetOverlayGroup():IsContains(c)
+			
+	elseif type(c)=="Group" then
+		for tc in aux.Next(c) do
+			local og=tc:GetOverlayGroup()
+			if og:GetCount()>0 then
+				Duel.SendtoGrave(og,REASON_RULE)
+			end
+		end
+		Duel.Overlay(xyz,c)
+		return c:FilterCount(function (card,group) return group:IsContains(card) end, nil, xyz:GetOverlayGroup())
+	end
+end
+
+function Card.Recreate(c,...)
+	local x={...}
+	if #x==0 then return end
+	local datalist={CARDDATA_CODE,CARDDATA_ALIAS,CARDDATA_SETCODE,CARDDATA_TYPE,CARDDATA_LEVEL,CARDDATA_ATTRIBUTE,CARDDATA_RACE,CARDDATA_ATTACK,CARDDATA_DEFENSE,CARDDATA_LSCALE,CARDDATA_RSCALE}
+	for i,newval in ipairs(x) do
+		if newval then
+			c:SetCardData(datalist[i],newval)
+		end
+	end
+end
+
 function Duel.Negate(tc,e,reset)
 	if not reset then reset=0 end
 	Duel.NegateRelatedChain(tc,RESET_TURN_SET)
@@ -129,6 +182,51 @@ end
 function Card.HasOriginalLevel(c)
 	return not c:IsOriginalType(TYPE_XYZ+TYPE_LINK)
 end
+function Card.IsOriginalType(c,typ)
+	return c:GetOriginalType()&typ>0
+end
+
+function Card.GetRating(c)
+	local list={false,false,false,false}
+	if c:HasLevel() then
+		list[1]=(c:GetLevel())
+	end
+	if c:IsOriginalType(TYPE_XYZ) then
+		list[2]=(c:GetRank())
+	end
+	if c:IsOriginalType(TYPE_LINK) then
+		list[3]=(c:GetLink())
+	end
+	if c:IsOriginalType(TYPE_TIMELEAP) then
+		list[4]=(c:GetFuture())
+	end
+	return list
+end
+	
+function Card.IsRating(c,n,lv,rk,link,fut)
+	if lv and type(lv)=="boolean" then lv=n end
+	if rk and type(rk)=="boolean" then rk=n end
+	if link and type(link)=="boolean" then link=n end
+	if fut and type(fut)=="boolean" then fut=n end
+	return (lv and c:HasLevel() and c:IsLevel(lv)) or (rk and c:IsOriginalType(TYPE_XYZ) and c:IsRank(rk)) or (link and c:IsOriginalType(TYPE_LINK) and c:IsLink(link))
+		or (fut and c:IsOriginalType(TYPE_TIMELEAP) and c:IsFuture(fut))
+end
+function Card.IsRatingAbove(c,n,lv,rk,link,fut)
+	if lv and type(lv)=="boolean" then lv=n end
+	if rk and type(rk)=="boolean" then rk=n end
+	if link and type(link)=="boolean" then link=n end
+	if fut and type(fut)=="boolean" then fut=n end
+	return (lv and c:HasLevel() and c:IsLevelAbove(lv)) or (rk and c:IsOriginalType(TYPE_XYZ) and c:IsRankAbove(rk)) or (link and c:IsOriginalType(TYPE_LINK) and c:IsLinkAbove(link))
+		or (fut and c:IsOriginalType(TYPE_TIMELEAP) and c:IsFutureAbove(fut))
+end
+function Card.IsRatingBelow(c,n,lv,rk,link,fut)
+	if lv and type(lv)=="boolean" then lv=n end
+	if rk and type(rk)=="boolean" then rk=n end
+	if link and type(link)=="boolean" then link=n end
+	if fut and type(fut)=="boolean" then fut=n end
+	return (lv and c:HasLevel() and c:IsLevelBelow(lv)) or (rk and c:IsOriginalType(TYPE_XYZ) and c:IsRankBelow(rk)) or (link and c:IsOriginalType(TYPE_LINK) and c:IsLinkBelow(link))
+		or (fut and c:IsOriginalType(TYPE_TIMELEAP) and c:IsFutureBelow(fut))
+end
 
 function Card.ByBattleOrEffect(c,f,p)
 	return	function(e,tp,eg,ep,ev,re,r,rp)
@@ -139,6 +237,50 @@ end
 --Chain Info
 function Duel.GetTargetParam()
 	return Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)
+end
+
+--Columns
+function Card.GlitchyGetColumnGroup(c,left,right)
+	local left = (left and type(left)=="number" and left>=0) and left or 0
+	local right = (right and type(right)=="number" and right>=0) and right or 0
+	if left==0 and right==0 then
+		return c:GetColumnGroup()
+	else
+		local f = 	function(card,refc,val)
+						local refseq
+						if refc:GetSequence()<5 then
+							refseq=refc:GetSequence()
+						else
+							if refc:GetSequence()==5 then
+								refseq = 1
+							elseif refc:GetSequence()==6 then
+								refseq = 3
+							end
+						end
+						
+						if card:GetSequence()<5 then
+							if card:IsControler(refc:GetControler()) then
+								return math.abs(refseq-card:GetSequence())==val
+							else
+								return math.abs(refseq+card:GetSequence()-4)==val
+							end
+						
+						elseif card:GetSequence()==5 then
+							local seq = card:IsControler(refc:GetControler()) and 1 or 3
+							return math.abs(refseq-seq)==val
+						elseif card:GetSequence()==6 then
+							local seq = card:IsControler(refc:GetControler()) and 3 or 1
+							return math.abs(refseq-seq)==val
+						end
+					end
+					
+		local lg=Duel.Group(f,c:GetControler(),LOCATION_MZONE+LOCATION_SZONE,LOCATION_MZONE+LOCATION_SZONE,nil,c,left)
+		local cg=c:GetColumnGroup()
+		local rg=Duel.Group(f,c:GetControler(),LOCATION_MZONE+LOCATION_SZONE,LOCATION_MZONE+LOCATION_SZONE,nil,c,right)
+		cg:Merge(lg)
+		cg:Merge(rg)
+		return cg
+	end
 end
 
 --Descriptions
@@ -207,11 +349,21 @@ end
 function Card.IsInExtra(c)
 	return c:IsLocation(LOCATION_EXTRA)
 end
+function Card.IsInMMZ(c)
+	return c:IsLocation(LOCATION_MZONE) and c:GetSequence()<5
+end
+function Card.IsInEMZ(c)
+	return c:IsLocation(LOCATION_MZONE) and c:GetSequence()>=5
+end
+
 function Card.NotBanishedOrFaceup(c)
 	return not c:IsLocation(LOCATION_REMOVED) or c:IsFaceup()
 end
 function Card.NotInExtraOrFaceup(c)
 	return not c:IsLocation(LOCATION_EXTRA) or c:IsFaceup()
+end
+function Card.MonsterOrFacedown(c)
+	return c:IsMonster() or c:IsFacedown()
 end
 
 function Auxiliary.PLChk(c,p,loc)
@@ -248,29 +400,8 @@ function Duel.IsEndPhase(tp)
 	return (not tp or Duel.GetTurnPlayer()==tp) and Duel.GetCurrentPhase()==PHASE_END
 end
 
---SS
-function Duel.SpecialSummonRedirect(e,g,styp,sump,tp,ign1,ign2,pos,loc)
-	if not loc then loc=LOCATION_REMOVED end
-	if type(g)=="Card" then g=Group.FromCards(g) end
-	local ct=0
-	for dg in aux.Next(g) do
-		if Duel.SpecialSummonStep(dg,styp,sump,tp,ign1,ign2,pos) then
-			ct=ct+1
-			local e=Effect.CreateEffect(e:GetHandler())
-			e:SetType(EFFECT_TYPE_SINGLE)
-			e:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
-			e:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CLIENT_HINT)
-			e:SetValue(loc)
-			e:SetReset(RESET_EVENT+RESETS_REDIRECT)
-			dg:RegisterEffect(e,true)
-		end
-	end
-	Duel.SpecialSummonComplete()
-	return ct
-end
-
 -----------------------------------------------------------------------
-function Card.Ignition(c,desc,ctg,prop,range,ctlim,cond,cost,tg,op)
+function Card.Ignition(c,desc,ctg,prop,range,ctlim,cond,cost,tg,op,reset)
 	local range = range and range or (c:IsOriginalType(TYPE_MONSTER)) and LOCATION_MZONE or (c:IsOriginalType(TYPE_FIELD)) and LOCATION_FZONE
 	---
 	local e1=Effect.CreateEffect(c)
@@ -278,7 +409,14 @@ function Card.Ignition(c,desc,ctg,prop,range,ctlim,cond,cost,tg,op)
 		e1:Desc(desc)
 	end
 	if ctg then
-		e1:SetCategory(ctg)
+		if type(ctg)=="table" then
+			e1:SetCategory(ctg[1])
+			if #ctg>1 then
+				e1:SetCustomCategory(ctg[2])
+			end
+		else
+			e1:SetCategory(ctg)
+		end
 	end
 	if prop~=nil then
 		e1:SetProperty(prop)
@@ -305,6 +443,58 @@ function Card.Ignition(c,desc,ctg,prop,range,ctlim,cond,cost,tg,op)
 	if op then
 		e1:SetOperation(op)
 	end
+	if reset then
+		e1:SetReset(reset)
+	end
+	c:RegisterEffect(e1)
+	return e1
+end
+function Card.Activate(c,desc,ctg,prop,event,ctlim,cond,cost,tg,op,reset)
+	local event = event and event or EVENT_FREE_CHAIN
+	local range = range and range or (c:IsOriginalType(TYPE_MONSTER)) and LOCATION_MZONE or (c:IsOriginalType(TYPE_FIELD)) and LOCATION_FZONE
+	---
+	local e1=Effect.CreateEffect(c)
+	if desc then
+		e1:Desc(desc)
+	end
+	if ctg then
+		if type(ctg)=="table" then
+			e1:SetCategory(ctg[1])
+			if #ctg>1 then
+				e1:SetCustomCategory(ctg[2])
+			end
+		else
+			e1:SetCategory(ctg)
+		end
+	end
+	if prop~=nil then
+		e1:SetProperty(prop)
+	end	
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetCode(event)
+	if ctlim then
+		if type(ctlim)=="table" then
+			local flag=#ctlim>2 and ctlim[3] or 0
+			e1:SetCountLimit(ctlim[1],c:GetOriginalCode()+ctlim[2]*100+flag)
+		else
+			e1:SetCountLimit(ctlim)
+		end
+	end
+	if cond then
+		e1:SetCondition(cond)
+	end
+	if cost then
+		e1:SetCost(cost)
+	end
+	if tg then
+		e1:SetTarget(tg)
+	end
+	if op then
+		e1:SetOperation(op)
+	end
+	if reset then
+		e1:SetReset(reset)
+	end
 	c:RegisterEffect(e1)
 	return e1
 end
@@ -318,7 +508,14 @@ function Card.Quick(c,forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op)
 		e1:Desc(desc)
 	end
 	if ctg then
-		e1:SetCategory(ctg)
+		if type(ctg)=="table" then
+			e1:SetCategory(ctg[1])
+			if #ctg>1 then
+				e1:SetCustomCategory(ctg[2])
+			end
+		else
+			e1:SetCategory(ctg)
+		end
 	end
 	if prop~=nil then
 		if type(prop)=="boolean" and prop==true then
@@ -352,4 +549,55 @@ function Card.Quick(c,forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op)
 	end
 	c:RegisterEffect(e1)
 	return e1
+end
+--QE UNION
+function Auxiliary.AddQuickUnionProcedure(c,f,oldequip,oldprotect)
+	if oldprotect == nil then oldprotect = oldequip end
+	--equip
+	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(1068)
+	e1:SetCategory(CATEGORY_EQUIP)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetType(EFFECT_TYPE_QUICK_O)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetTarget(Auxiliary.UnionTarget(f,oldequip))
+	e1:SetOperation(Auxiliary.UnionOperation(f))
+	c:RegisterEffect(e1)
+	--unequip
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(2)
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetCode(EVENT_FREE_CHAIN)
+	e2:SetRange(LOCATION_SZONE)
+	if oldequip then
+		e2:SetCondition(Auxiliary.IsUnionState)
+	end
+	e2:SetTarget(Auxiliary.UnionSumTarget(oldequip))
+	e2:SetOperation(Auxiliary.UnionSumOperation(oldequip))
+	c:RegisterEffect(e2)
+	--destroy sub
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_EQUIP)
+	e3:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+	e3:SetCode(EFFECT_DESTROY_SUBSTITUTE)
+	if oldprotect then
+		e3:SetCondition(Auxiliary.IsUnionState)
+	end
+	e3:SetValue(Auxiliary.UnionReplace(oldprotect))
+	c:RegisterEffect(e3)
+	--eqlimit
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_SINGLE)
+	e4:SetCode(EFFECT_UNION_LIMIT)
+	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e4:SetValue(Auxiliary.UnionLimit(f))
+	c:RegisterEffect(e4)
+	--auxiliary function compatibility
+	if oldequip then
+		local m=c:GetMetatable()
+		m.old_union=true
+	end
+	return e1,e2,e3,e4
 end

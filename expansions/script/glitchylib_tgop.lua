@@ -87,13 +87,13 @@ end
 --Infos
 function Auxiliary.Info(ctg,ct,p,v)
 	return	function(_,e,tp)
-				local p=(p==0) and tp or 1-tp
+				local p=(p>1) and p or (p==0) and tp or (p==1) and 1-tp 
 				return Duel.SetOperationInfo(0,ctg,nil,ct,p,v)
 			end
 end
 function Auxiliary.HandlerInfo(ctg,ct,p,v)
 	return	function(_,e,tp)
-				local p=(p==0) and tp or 1-tp
+				local p=(p>1) and p or (p==0) and tp or (p==1) and 1-tp 
 				return Duel.SetOperationInfo(0,ctg,e:GetHandler(),ct,p,v)
 			end
 end
@@ -287,4 +287,71 @@ function Auxiliary.SSSelfOperation(complete_proc)
 				end
 				return false
 			end
+end
+
+-----------------------------------------------
+--SPECIAL SUMMON
+function Duel.SpecialSummonATK(e,g,styp,sump,tp,ign1,ign2,pos,atk,reset,rc)
+	if not reset then reset=0 end
+	if not rc then rc=e:GetHandler() end
+	if type(g)=="Card" then
+		if g==e:GetHandler() and rc==e:GetHandler() then reset=reset+RESET_DISABLE end
+		g=Group.FromCards(g)
+	end
+	local ct=0
+	for dg in aux.Next(g) do
+		if Duel.SpecialSummonStep(dg,styp,sump,tp,ign1,ign2,pos) then
+			ct=ct+1
+			local e1=Effect.CreateEffect(rc)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetCode(EFFECT_UPDATE_ATTACK)
+			e1:SetValue(atk)
+			e1:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
+			dg:RegisterEffect(e1)
+		end
+	end
+	Duel.SpecialSummonComplete()
+	return ct
+end
+function Duel.SpecialSummonNegate(e,g,styp,sump,tp,ign1,ign2,pos,reset,rc)
+	if not reset then reset=0 end
+	if not rc then rc=e:GetHandler() end
+	if type(g)=="Card" then g=Group.FromCards(g) end
+	local ct=0
+	for dg in aux.Next(g) do
+		if Duel.SpecialSummonStep(dg,styp,sump,tp,ign1,ign2,pos) then
+			ct=ct+1
+			local e1=Effect.CreateEffect(rc)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetCode(EFFECT_DISABLE)
+			e1:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
+			dg:RegisterEffect(e1,true)
+			local e2=Effect.CreateEffect(rc)
+			e2:SetType(EFFECT_TYPE_SINGLE)
+			e2:SetCode(EFFECT_DISABLE_EFFECT)
+			e2:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
+			dg:RegisterEffect(e2,true)
+		end
+	end
+	Duel.SpecialSummonComplete()
+	return ct
+end
+function Duel.SpecialSummonRedirect(e,g,styp,sump,tp,ign1,ign2,pos,loc)
+	if not loc then loc=LOCATION_REMOVED end
+	if type(g)=="Card" then g=Group.FromCards(g) end
+	local ct=0
+	for dg in aux.Next(g) do
+		if Duel.SpecialSummonStep(dg,styp,sump,tp,ign1,ign2,pos) then
+			ct=ct+1
+			local e=Effect.CreateEffect(e:GetHandler())
+			e:SetType(EFFECT_TYPE_SINGLE)
+			e:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
+			e:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CLIENT_HINT)
+			e:SetValue(loc)
+			e:SetReset(RESET_EVENT+RESETS_REDIRECT)
+			dg:RegisterEffect(e,true)
+		end
+	end
+	Duel.SpecialSummonComplete()
+	return ct
 end
