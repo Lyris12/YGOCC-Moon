@@ -1,4 +1,4 @@
-﻿expansions/cards-new.cdb	56809c1481bfb2bbbc8eefb5babeeb99
+﻿expansions/cards-new.cdb	5ffe2828b86c6ee1e2653901154b912a
 expansions/lflist.conf	a6bd20a838b20d0b5c00a988a09ef2eb
 expansions/strings.conf	950b0fe0a93ee9d403badc9698334b30
 expansions/pics/100000714.jpg	74ec20749932cad0249671d71e6d672b
@@ -7601,7 +7601,7 @@ expansions/script/c28916167.lua	699d0696dec909b48ae6a4f458e75d37
 expansions/script/c28916168.lua	66ee1ab4f49776c638b047a01ae72d32
 expansions/script/c29873.lua	d8e77e45dc172bd0f4e773ba465aa12f
 expansions/script/c29874.lua	c5bb7aac7975867592b80ce57a352e0a
-expansions/script/c29875.lua	e2c1da87c6ee2ceb580824085e4c5cf7
+expansions/script/c29875.lua	449eb3663fb0cbd92814ffd666df848f
 expansions/script/c29876.lua	19a265c74c6d34779b0a959faa51f8f5
 expansions/script/c29877.lua	af5fb565cce9fa419ba11cf027622f08
 expansions/script/c29878.lua	55fa20d00eebcacb0e3ce3dad63c1088
@@ -10241,7 +10241,7 @@ expansions/script/glitchylib_single.lua	87783be73f2c887d1e211e036f38fa5a
 expansions/script/glitchylib_tgop.lua	7c3ba822f512b004167cba6153ee0396
 expansions/script/glitchylib_trigger.lua	77841e68966ae328818c5f639d061eed
 expansions/script/GLShortcuts.lua	6743700bf509cc48d8f596ff4a8fe5c0
-expansions/script/init.lua	8b3290384bf6fa504d27efdb083524ab
+expansions/script/init.lua	0122b5106a3a214a3f623b87177a7f0b
 expansions/script/json.lua	d41a01cf67c76915b49c57d21ac471ee
 expansions/script/lap.lua	1325997ac4231550048dae57e7eb75b0
 expansions/script/muse_proc.lua	a66cf99f7a3cfa4630e806d0df693765
@@ -10339,6 +10339,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	d30098d80ef71a734f456355acc2ff97
+update/filelist.txt	4d70046cd6d608e274de3aa38f034a18
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	5ef5155dc1a25b919370c8e2c0ea2b0b
+update/version.txt	d7f8a240014a2501428a84775771da18

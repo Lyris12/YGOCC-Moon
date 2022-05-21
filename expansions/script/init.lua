@@ -2377,8 +2377,7 @@ end
 ----------------------------------------------------------------------------------------------------------------
 function Card.HasLevel(c)
 	if c:IsType(TYPE_MONSTER) then
-		return c:GetType()&TYPE_LINK~=TYPE_LINK and c:GetType()&TYPE_TIMELEAP~=TYPE_TIMELEAP
-			and (c:GetType()&TYPE_XYZ~=TYPE_XYZ and not (c:IsHasEffect(EFFECT_RANK_LEVEL) or c:IsHasEffect(EFFECT_RANK_LEVEL_S)))
+		return ((c:GetType()&TYPE_LINK~=TYPE_LINK and c:GetType()&TYPE_TIMELEAP~=TYPE_TIMELEAP and c:GetType()&TYPE_XYZ~=TYPE_XYZ) or c:IsHasEffect(EFFECT_GRANT_LEVEL))
 			and not c:IsStatus(STATUS_NO_LEVEL)
 	elseif c:IsOriginalType(TYPE_MONSTER) then
 		return not (c:IsOriginalType(TYPE_XYZ+TYPE_LINK+TYPE_TIMELEAP) or c:IsStatus(STATUS_NO_LEVEL))

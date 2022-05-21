@@ -17,7 +17,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsReason(REASON_DESTROY) and e:GetHandler():IsReason(REASON_BATTLE+REASON_EFFECT)
+	return e:GetHandler():IsReason(REASON_DESTROY)
 end
 function s.filter(c,e,tp)
 	return c:IsMonster() and c:IsSetCard(0x296) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
