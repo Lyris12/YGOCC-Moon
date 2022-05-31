@@ -29,7 +29,8 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function s.cpfilter(c)
-	return c:IsSetCard(0x29a) and c:IsType(TYPE_SPELL) and c:CheckActivateEffect(false,true,false)~=nil and not c:IsCode(id)
+	if c:IsCode(id) then return false end
+	return c:IsSetCard(0x29a) and c:IsType(TYPE_SPELL) and c:CheckActivateEffect(false,true,false)~=nil
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then
