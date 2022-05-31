@@ -4,7 +4,7 @@
 local s,id = GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
-	aux.AddFusionProcCodeFunRep(c,29493149,s.material,1,63,true,true)
+	aux.AddFusionProcCodeFunRep(c,29493149,s.materialf,1,63,true,true)
 	--immune
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -43,7 +43,7 @@ function s.initial_effect(c)
 	e3:SetOperation(s.spop)
 	c:RegisterEffect(e3)
 end
-function s.material(c)
+function s.materialf(c)
 	return c:IsFusionType(TYPE_MONSTER) and c:IsFusionType(TYPE_FUSION) and c:IsFusionSetCard(0x29a)
 end
 
