@@ -39,7 +39,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function s.materialf(c)
-	return c:IsFusionSetCard(0x29a) and (c:IsFusionType(TYPE_MONSTER+TYPE_SPELL) or c:IsHasEffect(id+1))
+	return c:IsFusionSetCard(0x29a) and c:IsFusionType(TYPE_MONSTER+TYPE_SPELL) or c:IsHasEffect(id+1)
 end
 
 function s.efilter(e,te)

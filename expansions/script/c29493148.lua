@@ -52,7 +52,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 end
 
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return re:IsActiveType(TYPE_SPELL) and re:GetHandler():IsSetCard(0x29a) and aux.exccon(e)
+	return re:IsActiveType(TYPE_SPELL) and re:GetHandler():IsSetCard(0x29a)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
