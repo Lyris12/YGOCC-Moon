@@ -2655,15 +2655,21 @@ end
 --f: Potential targets
 --oldequip: Uses old rules for number of monster equiped (A monster can only by equipped with 1 Union monster at a time.)
 --oldprotect: Uses old rules for destroy replacement (If the equipped monster would be destroyed, destroy this card instead.)
-function Auxiliary.AddUnionProcedure(c,f,oldequip,oldprotect)
+function Auxiliary.AddUnionProcedure(c,f,oldequip,oldprotect,range,quick)
 	if oldprotect == nil then oldprotect = oldequip end
+	local range = range and range or LOCATION_MZONE
 	--equip
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(1068)
 	e1:SetCategory(CATEGORY_EQUIP)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e1:SetType(EFFECT_TYPE_IGNITION)
-	e1:SetRange(LOCATION_MZONE)
+	if quick then
+		e1:SetType(EFFECT_TYPE_QUICK_O)
+		e1:SetCode(EVENT_FREE_CHAIN)
+	else
+		e1:SetType(EFFECT_TYPE_IGNITION)
+	end
+	e1:SetRange(range)
 	e1:SetTarget(Auxiliary.UnionTarget(f,oldequip))
 	e1:SetOperation(Auxiliary.UnionOperation(f))
 	c:RegisterEffect(e1)
@@ -2701,6 +2707,7 @@ function Auxiliary.AddUnionProcedure(c,f,oldequip,oldprotect)
 		local m=c:GetMetatable()
 		m.old_union=true
 	end
+	return e1,e2,e3,e4
 end
 if not Card.CheckUnionTarget then
 	Card.CheckUnionTarget=function(c,target)

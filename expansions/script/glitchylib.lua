@@ -9,12 +9,37 @@ EFFECT_GLITCHY_EXTRA_MATERIAL_FLAG		= 8006
 EFFECT_GLITCHY_HACK_CODE 				= 8007
 EFFECT_NAME_DECLARED					= 8008
 EFFECT_GLITCHY_CANNOT_DISABLE			= 8009
+EFFECT_GLITCHY_FUSION_SUBSTITUTE 		= 8010
+
+FLAG_UNCOUNTED_NORMAL_SUMMON			= 8000
+FLAG_UNCOUNTED_NORMAL_SET				= 8001
 
 EFFECT_BECOME_HOPT=99977755
 EFFECT_SYNCHRO_MATERIAL_EXTRA=26134837
 EFFECT_SYNCHRO_MATERIAL_MULTIPLE=26134838
 EFFECT_REVERSE_WHEN_IF=48928491
 
+
+---------------------------------------------------------------------------------
+-------------------------------NORMAL SUMMON/SET---------------------------------
+local _Summon, _MSet = Duel.Summon, Duel.MSet
+
+Duel.Summon = function(tp,c,ign,e,mint,zone)
+	if not mint then mint=0 end
+	if not zone then zone=0x1f end
+	if ign then
+		c:RegisterFlagEffect(FLAG_UNCOUNTED_NORMAL_SUMMON,RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD,0,1)
+	end
+	return _Summon(tp,c,ign,e,mint,zone)
+end
+Duel.MSet = function(tp,c,ign,e,mint,zone)
+	if not mint then mint=0 end
+	if not zone then zone=0x1f end
+	if ign then
+		c:RegisterFlagEffect(FLAG_UNCOUNTED_NORMAL_SET,RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD,EFFECT_FLAG_SET_AVAILABLE,1)
+	end
+	return _MSet(tp,c,ign,e,mint,zone)
+end
 
 -----------------------------------------------------------------------
 -------------------------------NEGATES---------------------------------
@@ -98,32 +123,6 @@ Duel.Release = function(g,r)
 		ct2=Duel.SendtoGrave(gx,r|REASON_RELEASE)
 	end
 	return ct1+ct2
-end
-
-
-------------------------------------------
-------------------COSTS-------------------
-
---Discard a card(s) as cost
-function Auxiliary.DiscardCost(f,min,max,...)
-	local extras={...}
-	if not min then min=1 end
-	if not max then max=min end
-	return	function(e,tp,eg,ep,ev,re,r,rp,chk)
-				if chk==0 then return Duel.IsExistingMatchingCard(aux.DiscardFilter(f,REASON_COST),tp,LOCATION_HAND,0,1,nil) end
-				Duel.DiscardHand(tp,aux.DiscardFilter(f,REASON_COST),1,1,REASON_COST+REASON_DISCARD)
-			end
-end
---Discards itself as cost
-function Auxiliary.DiscardSelfCost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsDiscardable() end
-	Duel.SendtoGrave(e:GetHandler(),REASON_COST+REASON_DISCARD)
-end
-
---Shuffles itself to ED as cost
-function Auxiliary.ToExtraSelfCost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToExtraAsCost() end
-	Duel.SendtoDeck(e:GetHandler(),nil,SEQ_DECKSHUFFLE,REASON_COST)
 end
 
 --Modified Functions: Names
@@ -251,8 +250,8 @@ function Auxiliary.ExtraMaterialMaxCheck(c,id)
 	return res
 end
 
-local _GetFusionMaterial, _CheckFusionMaterial, _SelectFusionMaterial, _FCheckMixGoal, _SendtoGrave, _Remove, _SendtoDeck, _Destroy, _SendtoHand =
-Duel.GetFusionMaterial, Card.CheckFusionMaterial, Duel.SelectFusionMaterial, Auxiliary.FCheckMixGoal, Duel.SendtoGrave, Duel.Remove, Duel.SendtoDeck, Duel.Destroy, Duel.SendtoHand
+local _GetFusionMaterial, _CheckFusionMaterial, _SelectFusionMaterial, _FConditionFilterMix, _FCheckMixGoal, _AddFusionProcMix, _AddFusionProcMixRep, _SendtoGrave, _Remove, _SendtoDeck, _Destroy, _SendtoHand =
+Duel.GetFusionMaterial, Card.CheckFusionMaterial, Duel.SelectFusionMaterial, Auxiliary.FConditionFilterMix, Auxiliary.FCheckMixGoal, Auxiliary.AddFusionProcMix, Auxiliary.AddFusionProcMixRep, Duel.SendtoGrave, Duel.Remove, Duel.SendtoDeck, Duel.Destroy, Duel.SendtoHand
 
 Duel.GetFusionMaterial = function(tp,...)
 	local x={...}
@@ -457,6 +456,16 @@ Duel.SelectFusionMaterial = function(tp,fc,matg,...)
 	end
 end
 
+Auxiliary.FConditionFilterMix = function(c,fc,sub,concat_fusion,...)
+	local fusion_type=concat_fusion and SUMMON_TYPE_SPECIAL or SUMMON_TYPE_FUSION
+	if not c:IsCanBeFusionMaterial(fc,fusion_type) then return false end
+	if c:IsHasEffect(EFFECT_GLITCHY_FUSION_SUBSTITUTE) then return true end
+	for i,f in ipairs({...}) do
+		if f(c,fc,sub) then return true end
+	end
+	return false
+end
+
 Auxiliary.FCheckMixGoal = function(sg,tp,fc,sub,chkfnf,...)
 	for _,e in ipairs({Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)}) do
 		local id=e:GetLabel()
@@ -469,6 +478,116 @@ Auxiliary.FCheckMixGoal = function(sg,tp,fc,sub,chkfnf,...)
 		end
 	end
 	return _FCheckMixGoal(sg,tp,fc,sub,chkfnf,...)
+end
+
+function Card.IsCanBeGlitchyFusionSubstitute(c,fc,sub,mg,sg)
+	if not c:IsHasEffect(EFFECT_GLITCHY_FUSION_SUBSTITUTE) then return false end
+	for _,ce in ipairs({c:IsHasEffect(EFFECT_GLITCHY_FUSION_SUBSTITUTE)}) do
+		local tg=ce:GetTarget()
+		if not tg or type(tg)=="function" and tg(ce,c,fc,sub,mg,sg) then
+			return true
+		end
+	end
+	return false
+end
+
+Auxiliary.AddFusionProcMix = function(c,sub,insf,...)
+	if c:IsStatus(STATUS_COPYING_EFFECT) then return end
+	local val={...}
+	local fun={}
+	local mat={}
+	for i=1,#val do
+		if type(val[i])=='function' then
+			fun[i]=function(c,fc,sub,mg,sg,chk) return val[i](c,fc,sub,mg,sg) and not c:IsHasEffect(6205579) or not chk and c:IsCanBeGlitchyFusionSubstitute(fc,sub,mg,sg) end
+		elseif type(val[i])=='table' then
+			fun[i]=function(c,fc,sub,mg,sg,chk)
+					if not chk and c:IsCanBeGlitchyFusionSubstitute(fc,sub,mg,sg) then return true end
+					for _,fcode in ipairs(val[i]) do
+						if type(fcode)=='function' then
+							if fcode(c,fc,sub,mg,sg) and not c:IsHasEffect(6205579) then return true end
+						else
+							if c:IsFusionCode(fcode) or (sub and c:CheckFusionSubstitute(fc)) then return true end
+						end
+					end
+					return false
+			end
+			for _,fcode in ipairs(val[i]) do
+				if type(fcode)~='function' then mat[fcode]=true end
+			end
+		else
+			fun[i]=function(c,fc,sub,_,_2,chk) return c:IsFusionCode(val[i]) or (sub and c:CheckFusionSubstitute(fc)) or not chk and c:IsCanBeGlitchyFusionSubstitute(fc,sub,mg,sg) end
+			mat[val[i]]=true
+		end
+	end
+	local mt=getmetatable(c)
+	if mt.material==nil then
+		mt.material=mat
+	end
+	if mt.material_count==nil then
+		mt.material_count={#fun,#fun}
+	end
+	if mt.material_funs==nil then
+		mt.material_funs=fun
+	end
+	for index,_ in pairs(mat) do
+		Auxiliary.AddCodeList(c,index)
+	end
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e1:SetCode(EFFECT_FUSION_MATERIAL)
+	e1:SetCondition(Auxiliary.FConditionMix(insf,sub,table.unpack(fun)))
+	e1:SetOperation(Auxiliary.FOperationMix(insf,sub,table.unpack(fun)))
+	c:RegisterEffect(e1)
+end
+function Auxiliary.AddFusionProcMixRep(c,sub,insf,fun1,minc,maxc,...)
+	if c:IsStatus(STATUS_COPYING_EFFECT) then return end
+	local val={fun1,...}
+	local fun={}
+	local mat={}
+	for i=1,#val do
+		if type(val[i])=='function' then
+			fun[i]=function(c,fc,sub,mg,sg,chk) return val[i](c,fc,sub,mg,sg) and not c:IsHasEffect(6205579) or not chk and c:IsCanBeGlitchyFusionSubstitute(fc,sub,mg,sg) end
+		elseif type(val[i])=='table' then
+			fun[i]=function(c,fc,sub,mg,sg,chk)
+					if not chk and c:IsCanBeGlitchyFusionSubstitute(fc,sub,mg,sg) then return true end
+					for _,fcode in ipairs(val[i]) do
+						if type(fcode)=='function' then
+							if fcode(c,fc,sub,mg,sg) and not c:IsHasEffect(6205579) then return true end
+						else
+							if c:IsFusionCode(fcode) or (sub and c:CheckFusionSubstitute(fc)) then return true end
+						end
+					end
+					return false
+			end
+			for _,fcode in ipairs(val[i]) do
+				if type(fcode)~='function' then mat[fcode]=true end
+			end
+		else
+			fun[i]=function(c,fc,sub,_,_2,chk) return c:IsFusionCode(val[i]) or (sub and c:CheckFusionSubstitute(fc)) or not chk and c:IsCanBeGlitchyFusionSubstitute(fc,sub,mg,sg) end
+			mat[val[i]]=true
+		end
+	end
+	local mt=getmetatable(c)
+	if mt.material==nil then
+		mt.material=mat
+	end
+	if mt.material_count==nil then
+		mt.material_count={#fun+minc-1,#fun+maxc-1}
+	end
+	if mt.material_funs==nil then
+		mt.material_funs=fun
+	end
+	for index,_ in pairs(mat) do
+		Auxiliary.AddCodeList(c,index)
+	end
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e1:SetCode(EFFECT_FUSION_MATERIAL)
+	e1:SetCondition(Auxiliary.FConditionMixRep(insf,sub,fun[1],minc,maxc,table.unpack(fun,2)))
+	e1:SetOperation(Auxiliary.FOperationMixRep(insf,sub,fun[1],minc,maxc,table.unpack(fun,2)))
+	c:RegisterEffect(e1)
 end
 
 Duel.SendtoGrave = function(tg,reason)
@@ -489,8 +608,9 @@ Duel.SendtoGrave = function(tg,reason)
 			local ce=tc:IsHasEffect(EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)
 			if ce and ce.GetLabel and ce:GetLabel()==ecount then
 				extra_g:AddCard(tc)
-				if not extra_op then
-					extra_op=ce:GetOperation()
+				local fusop=ce:GetOperation()
+				if not extra_op and fusop then
+					extra_op=fusop
 				end
 			end
 		end
@@ -499,7 +619,8 @@ Duel.SendtoGrave = function(tg,reason)
 			for tc in aux.Next(extra_g) do
 				tc:ResetFlagEffect(1006)
 			end
-			local extra_ct=extra_op(extra_g)
+			local op = extra_op and extra_op or _SendtoGrave
+			local extra_ct=op(extra_g,REASON_EFFECT+REASON_MATERIAL+REASON_FUSION)
 			ct2=ct2+extra_ct
 		end
 		ecount=ecount+1

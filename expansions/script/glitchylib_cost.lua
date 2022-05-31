@@ -18,6 +18,23 @@ function Auxiliary.DiscardCost(f,min,max)
 				Duel.DiscardHand(tp,f,min,max,REASON_COST+REASON_DISCARD)
 			end
 end
+function Auxiliary.BanishCost(f,loc1,loc2,min,max,exc)
+	if not loc1 then loc1=LOCATION_ONFIELD end
+	if not loc2 then loc2=loc1 end
+	if not min then min=1 end
+	if not max then max=min end
+	return	function(e,tp,eg,ep,ev,re,r,rp,chk)
+				local exc=(not exc) and nil or e:GetHandler()
+				if chk==0 then return Duel.IsExistingMatchingCard(aux.BanishFilter(f,true),tp,loc1,loc2,min,exc,e,tp) end
+				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+				local g=Duel.SelectMatchingCard(tp,aux.BanishFilter(f,true),tp,loc1,loc2,min,max,exc,e,tp)
+				if #g>0 then
+					local ct=Duel.Remove(g,POS_FACEUP,REASON_COST)
+					return g,ct
+				end
+				return g,0
+			end
+end
 function Auxiliary.ToGraveCost(f,loc1,loc2,min,max,exc)
 	if not loc1 then loc1=LOCATION_ONFIELD end
 	if not loc2 then loc2=loc1 end
@@ -30,6 +47,23 @@ function Auxiliary.ToGraveCost(f,loc1,loc2,min,max,exc)
 				local g=Duel.SelectMatchingCard(tp,aux.ToGraveFilter(f,true),tp,loc1,loc2,min,max,exc,e,tp)
 				if #g>0 then
 					local ct=Duel.SendtoGrave(g,REASON_COST)
+					return g,ct
+				end
+				return g,0
+			end
+end
+function Auxiliary.ToDeckCost(f,loc1,loc2,min,max,exc)
+	if not loc1 then loc1=LOCATION_ONFIELD end
+	if not loc2 then loc2=loc1 end
+	if not min then min=1 end
+	if not max then max=min end
+	return	function(e,tp,eg,ep,ev,re,r,rp,chk)
+				local exc=(not exc) and nil or e:GetHandler()
+				if chk==0 then return Duel.IsExistingMatchingCard(aux.ToDeckFilter(f,true),tp,loc1,loc2,min,exc,e,tp) end
+				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+				local g=Duel.SelectMatchingCard(tp,aux.ToDeckFilter(f,true),tp,loc1,loc2,min,max,exc,e,tp)
+				if #g>0 then
+					local ct=Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_COST)
 					return g,ct
 				end
 				return g,0

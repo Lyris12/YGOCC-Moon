@@ -56,21 +56,25 @@ function Auxiliary.LabelCheck(labelcheck,check,info,...)
 				end
 			end
 end
-function Auxiliary.Target(f,loc1,loc2,min,max,exc,check,info,...)
+function Auxiliary.Target(f,loc1,loc2,min,max,exc,check,info,prechk,necrovalley,...)
 	local x={...}
 	if not min then min=1 end
 	if not max then max=min end
 	if not loc1 then loc1=LOCATION_ONFIELD end
 	if not loc2 then loc2=loc1 end
+	if (loc1|loc2)&LOCATION_GRAVE>0 and necrovalley then f=aux.NecroValleyFilter(f) end
 	return	function (e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-				local exc=(not exc) and nil or e:GetHandler()
+				local exc= (type(exc)=="boolean" and exc) and e:GetHandler() or (exc) and exc or nil
 				if chkc then
 					local plchk=(loc1~=0 and chkc:IsControler(tp) and chkc:IsLocation(loc1) or loc2~=0 and chkc:IsControler(1-tp) and chkc:IsLocation(loc2))
-					return plchk and (not f or f(chkc,e,tp))
+					return plchk and (not f or f(chkc,e,tp,eg,ep,ev,re,r,rp,chk))
 				end
-				if chk==0 then return (not check or check(e,tp,eg,ep,ev,re,r,rp)) and Duel.IsExistingTarget(f,tp,loc1,loc2,min,exc,e,tp) end
+				if chk==0 then
+					if prechk then prechk(e,tp,eg,ep,ev,re,r,rp) end
+					return (not check or check(e,tp,eg,ep,ev,re,r,rp)) and Duel.IsExistingTarget(f,tp,loc1,loc2,min,exc,e,tp,eg,ep,ev,re,r,rp,chk)
+				end
 				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-				local g=Duel.SelectTarget(tp,f,tp,loc1,loc2,min,max,exc,e,tp)
+				local g=Duel.SelectTarget(tp,f,tp,loc1,loc2,min,max,exc,e,tp,eg,ep,ev,re,r,rp,chk)
 				if info then
 					info(g,e,tp,eg,ep,ev,re,r,rp)
 					if #x>0 then
@@ -163,6 +167,48 @@ function Auxiliary.ActivateFieldSpellOperation(f,loc1,loc2,exc)
 end
 
 -----------------------------------------------------------------------
+--Banish
+function Auxiliary.BanishFilter(f,cost)
+	return	function(c,...)
+				return (not f or f(c,...)) and (not cost and c:IsAbleToRemove() or cost and c:IsAbleToRemoveAsCost())
+			end
+end
+function Auxiliary.BanishTarget(f,loc1,loc2,min,exc)
+	if not loc1 then loc1=LOCATION_ONFIELD end
+	if not loc2 then loc2=LOCATION_ONFIELD end
+	if not min then min=1 end
+	return	function (e,tp,eg,ep,ev,re,r,rp,chk)
+				if exc then exc=e:GetHandler() end
+				if chk==0 then return Duel.IsExistingMatchingCard(aux.BanishFilter(f),tp,loc1,loc2,min,exc,e,tp) end
+				if loc1>0 and loc2>0 then
+					Duel.SetCustomOperationInfo(0,CATEGORY_REMOVE,nil,min,PLAYER_ALL,loc1|(loc2&(~loc1)))
+				elseif loc1>0 then
+					Duel.SetCustomOperationInfo(0,CATEGORY_REMOVE,nil,min,tp,loc1)
+				elseif loc2>0 then
+					Duel.SetCustomOperationInfo(0,CATEGORY_REMOVE,nil,min,1-tp,loc1)
+				end
+			end
+end
+function Auxiliary.BanishOperation(f,loc1,loc2,min,max,exc)
+	if not loc1 then loc1=LOCATION_ONFIELD end
+	if not loc2 then loc2=LOCATION_ONFIELD end
+	if (loc1|loc2)&LOCATION_GRAVE>0 then f=aux.NecroValleyFilter(f) end
+	if not min then min=1 end
+	if not max then max=min end
+	return	function (e,tp,eg,ep,ev,re,r,rp)
+				if exc then exc=e:GetHandler() end
+				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+				local g=Duel.SelectMatchingCard(tp,aux.BanishFilter(f),tp,loc1,loc2,min,max,exc,e,tp)
+				if #g>0 then
+					Duel.HintSelection(g)
+					local ct=Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
+					return g,ct
+				end
+				return g,0
+			end
+end
+
+-----------------------------------------------------------------------
 --Destroy
 function Auxiliary.DestroyFilter(f)
 	return	function(c,e,...)
@@ -197,7 +243,7 @@ function Auxiliary.DestroyOperation(f,loc1,loc2,min,max,exc)
 				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 				local g=Duel.SelectMatchingCard(tp,f,tp,loc1,loc2,min,max,exc,e,tp)
 				if #g>0 then
-					Duel.HintSelection(g,true)
+					Duel.HintSelection(g)
 					local ct=Duel.Destroy(g,REASON_EFFECT)
 					return g,ct
 				end
@@ -230,6 +276,13 @@ function Auxiliary.SearchOperation(f,min,max)
 					return g:Filter(aux.PLChk,nil,tp,LOCATION_HAND),ct,ht
 				end
 				return g,0,0
+			end
+end
+
+--To Deck
+function Auxiliary.ToDeckFilter(f,cost)
+	return	function(c,...)
+				return (not f or f(c,...)) and (not cost and c:IsAbleToDeck() or cost and c:IsAbleToDeckAsCost())
 			end
 end
 

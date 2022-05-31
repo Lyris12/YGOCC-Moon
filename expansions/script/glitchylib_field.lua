@@ -1,6 +1,5 @@
 --CONTINUOUS EFFECTS (EFFECT_TYPE_FIELD)
------------------------------------------------------------------------
-function Card.UpdateATKField(c,atk,range,selfzones,oppozones,f)
+function Card.FieldEffect(c,code,range,selfzones,oppozones,f,val)
 	if not range then range=c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE end
 	if not selfzones then selfzones=0 end
 	if type(oppozones)=="boolean" and oppozones==true then
@@ -11,69 +10,118 @@ function Card.UpdateATKField(c,atk,range,selfzones,oppozones,f)
 	local e=Effect.CreateEffect(c)
 	e:SetType(EFFECT_TYPE_FIELD)
 	e:SetRange(range)
-	e:SetCode(EFFECT_UPDATE_ATTACK)
+	e:SetCode(code)
 	e:SetTargetRange(selfzones,oppozones)
 	e:SetTarget(f)
-	e:SetValue(atk)
+	e:SetValue(val)
+	--c:RegisterEffect(e)
+	return e
+end
+
+-----------------------------------------------------------------------
+function Card.UpdateATKField(c,atk,range,selfzones,oppozones,f)
+	local e=c:FieldEffect(EFFECT_UPDATE_ATTACK,range,selfzones,oppozones,f,atk)
 	c:RegisterEffect(e)
 	return e
 end
 function Card.UpdateDEFField(c,def,range,selfzones,oppozones,f)
-	if not range then range=c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE end
-	if not selfzones then selfzones=0 end
-	if type(oppozones)=="boolean" and oppozones==true then
-		oppozones=selfzones
-	elseif not oppozones then
-		oppozones=0
-	end
-	local e=Effect.CreateEffect(c)
-	e:SetType(EFFECT_TYPE_FIELD)
-	e:SetRange(range)
-	e:SetCode(EFFECT_UPDATE_DEFENSE)
-	e:SetTargetRange(selfzones,oppozones)
-	e:SetTarget(f)
-	e:SetValue(def)
+	local e=c:FieldEffect(EFFECT_UPDATE_DEFENSE,range,selfzones,oppozones,f,def)
 	c:RegisterEffect(e)
 	return e
 end
 function Card.UpdateATKDEFField(c,atk,def,range,selfzones,oppozones,f)
-	if not range then range=c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE end
-	if not selfzones then selfzones=0 end
-	if type(oppozones)=="boolean" and oppozones==true then
-		oppozones=selfzones
-	elseif not oppozones then
-		oppozones=0
-	end
-	local e=Effect.CreateEffect(c)
-	e:SetType(EFFECT_TYPE_FIELD)
-	e:SetRange(range)
-	e:SetCode(EFFECT_UPDATE_ATTACK)
-	e:SetTargetRange(selfzones,oppozones)
-	e:SetTarget(f)
-	e:SetValue(atk)
+	local e1=c:FieldEffect(EFFECT_UPDATE_ATTACK,range,selfzones,oppozones,f,atk)
 	c:RegisterEffect(e)
-	local e1x=e:Clone()
-	e1x:SetCode(EFFECT_UPDATE_DEFENSE)
-	e1x:SetValue(def)
-	c:RegisterEffect(e1x)
-	return e,e1x
+	local e2=e1:Clone()
+	e1:SetCode(EFFECT_UPDATE_DEFENSE)
+	e1:SetValue(def)
+	c:RegisterEffect(e1)
+	return e1,e2
+end
+function Card.ChangeATKField(c,atk,range,selfzones,oppozones,f)
+	local e=c:FieldEffect(EFFECT_SET_ATTACK_FINAL,range,selfzones,oppozones,f,atk)
+	c:RegisterEffect(e)
+	return e
+end
+function Card.ChangeDEFField(c,def,range,selfzones,oppozones,f)
+	local e=c:FieldEffect(EFFECT_SET_DEFENSE_FINAL,range,selfzones,oppozones,f,def)
+	c:RegisterEffect(e)
+	return e
+end
+
+function Card.ChangeRaceField(c,race,range,selfzones,oppozones,f)
+	local e=c:FieldEffect(EFFECT_CHANGE_RACE,range,selfzones,oppozones,f,race)
+	c:RegisterEffect(e)
+	return e
 end
 
 function Card.UpdateLevelField(c,lv,range,selfzones,oppozones,f)
-	if not range then range=c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE end
-	if not selfzones then selfzones=0 end
-	if type(oppozones)=="boolean" and oppozones==true then
-		oppozones=selfzones
-	elseif not oppozones then
-		oppozones=0
-	end
-	local e=Effect.CreateEffect(c)
-	e:SetType(EFFECT_TYPE_FIELD)
-	e:SetRange(range)
-	e:SetCode(EFFECT_UPDATE_LEVEL)
-	e:SetTargetRange(selfzones,oppozones)
-	e:SetTarget(f)
-	e:SetValue(lv)
+	local e=c:FieldEffect(EFFECT_UPDATE_LEVEL,range,selfzones,oppozones,f,lv)
 	c:RegisterEffect(e)
 	return e
+end
+function Card.ChangeLevelField(c,lv,range,selfzones,oppozones,f)
+	local e=c:FieldEffect(EFFECT_CHANGE_LEVEL,range,selfzones,oppozones,f,lv)
+	c:RegisterEffect(e)
+	return e
+end
+
+--SS Procedures
+function Card.SSProc(c,desc,prop,range,ctlim,cond,tg,op,pos,p,zone)
+	local default_prop = (not pos1 and not p and not zone) and EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SPSUM_PARAM or EFFECT_FLAG_UNCOPYABLE
+	local prop = prop and prop or 0
+	local range = range and range or (c:IsOriginalType(TYPE_EXTRA)) and LOCATION_EXTRA or LOCATION_HAND
+	if p and p==PLAYER_ALL then
+		tg=aux.SelectFieldForSSProc(tg,pos)
+	end
+	---
+	local e1=Effect.CreateEffect(c)
+	if desc then
+		e1:Desc(desc)
+	end
+	e1:SetProperty(default_prop+prop)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_SPSUMMON_PROC)
+	e1:SetRange(range)
+	if ctlim then
+		if type(ctlim)=="table" then
+			local flag=#ctlim>2 and ctlim[3] or EFFECT_COUNT_CODE_OATH
+			e1:SetCountLimit(ctlim[1],c:GetOriginalCode()+ctlim[2]*100+flag)
+		else
+			e1:SetCountLimit(ctlim)
+		end
+	end
+	if pos or p then
+		if not pos then pos=POS_FACEUP end
+		if not p then p=0 end
+		e1:SetTargetRange(pos,p)
+	end
+	if zone then
+		e1:SetValue(zone)
+	end
+	if cond then
+		e1:SetCondition(cond)
+	end
+	if tg then
+		e1:SetTarget(tg)
+	end
+	if op then
+		e1:SetOperation(op)
+	end
+	c:RegisterEffect(e1)
+	return e1
+end
+function Auxiliary.SelectFieldForSSProc(f,pos)
+	if not f then f=aux.TRUE end
+	if not pos then pos=POS_FACEUP end
+	return	function(...)
+				local outcome=f(...)
+				local sel=Duel.SelectOption(tp,102,103)
+				if sel==0 then
+					e:SetTargetRange(pos,0)
+				else
+					e:SetTargetRange(pos,1)
+				end
+				return outcome
+			end
 end

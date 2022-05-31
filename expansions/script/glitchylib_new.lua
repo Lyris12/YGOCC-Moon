@@ -59,6 +59,16 @@ function Duel.Group(f,tp,loc1,loc2,exc,...)
 	local g=Duel.GetMatchingGroup(f,tp,loc1,loc2,exc,...)
 	return g
 end
+function Auxiliary.Faceup(f,...)
+	return	function(c,...)
+				return (not f or f(c,...)) and c:IsFaceup()
+			end
+end
+function Auxiliary.Facedown(f,...)
+	return	function(c,...)
+				return (not f or f(c,...)) and c:IsFacedown()
+			end
+end
 
 --Custom Categories
 if not global_effect_category_table_global_check then
@@ -110,7 +120,7 @@ function Card.Recreate(c,...)
 	end
 end
 
-function Duel.Negate(tc,e,reset)
+function Duel.Negate(tc,e,reset,notfield,forced)
 	if not reset then reset=0 end
 	Duel.NegateRelatedChain(tc,RESET_TURN_SET)
 	local e1=Effect.CreateEffect(e:GetHandler())
@@ -118,21 +128,24 @@ function Duel.Negate(tc,e,reset)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e1:SetCode(EFFECT_DISABLE)
 	e1:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
-	tc:RegisterEffect(e1)
+	tc:RegisterEffect(e1,forced)
 	local e2=Effect.CreateEffect(e:GetHandler())
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e2:SetCode(EFFECT_DISABLE_EFFECT)
-	e2:SetValue(RESET_TURN_SET)
+	if not notfield then
+		e2:SetValue(RESET_TURN_SET)
+	end
 	e2:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
-	tc:RegisterEffect(e2)
-	if tc:IsType(TYPE_TRAPMONSTER) then
+	tc:RegisterEffect(e2,forced)
+	if not notfield and tc:IsType(TYPE_TRAPMONSTER) then
 		local e=Effect.CreateEffect(e:GetHandler())
 		e:SetType(EFFECT_TYPE_SINGLE)
 		e:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e:SetCode(EFFECT_DISABLE_TRAPMONSTER)
 		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
-		tc:RegisterEffect(e)
+		tc:RegisterEffect(e,forced)
+		return e1,e2,e
 	end
 	return e1,e2
 end
@@ -157,7 +170,7 @@ function Duel.PositionChange(c)
 	return Duel.ChangePosition(c,POS_FACEUP_DEFENSE,POS_FACEDOWN_DEFENSE,POS_FACEUP_ATTACK,POS_FACEUP_ATTACK)
 end
 function Duel.Search(g,tp)
-	local ct=Duel.SendtoHand(g,nil,REASON_EFFECT)
+	local ct=Duel.SendtoHand(g,tp,REASON_EFFECT)
 	local cg=g:Filter(aux.PLChk,nil,tp,LOCATION_HAND)
 	if #cg>0 then
 		Duel.ConfirmCards(1-tp,cg)
@@ -165,12 +178,45 @@ function Duel.Search(g,tp)
 	return ct,#cg
 end
 
+function Duel.ShuffleIntoDeck(g,p)
+	local ct=Duel.SendtoDeck(g,p,SEQ_DECKSHUFFLE,REASON_EFFECT)
+	if ct>0 and aux.PLChk(g,p,LOCATION_DECK) then
+		aux.AfterShuffle(g)
+		if type(g)=="Card" and aux.PLChk(g,p,LOCATION_DECK) then
+			return 1
+		elseif type(g)=="Group" then
+			return g:FilterCount(aux.PLChk,nil,p,LOCATION_DECK)
+		end
+	end
+	return 0
+end
+function Auxiliary.PLChk(c,p,loc)
+	if type(c)=="Card" then
+		return (not p or c:IsControler(p)) and (not loc or c:IsLocation(loc))
+	elseif type(c)=="Group" then
+		return c:IsExists(aux.PLChk,1,nil,p,loc)
+	else
+		return false
+	end
+end
+function Auxiliary.AfterShuffle(g)
+	if type(g)=="Card" then g=Group.FromCards(g) end
+	for p=0,1 do
+		if g:IsExists(aux.PLChk,1,nil,p,LOCATION_DECK) then
+			Duel.ShuffleDeck(p)
+		end
+	end
+end
+
 --Card Filters
 function Card.IsMonster(c,typ)
-	return c:IsType(TYPE_MONSTER) and (not typ or c:IsType(typ))
+	return c:IsType(TYPE_MONSTER) and (type(typ)~="number" or c:IsType(typ))
 end
 function Card.IsST(c,typ)
-	return c:IsType(TYPE_ST) and (not typ or c:IsType(typ))
+	return c:IsType(TYPE_ST) and (type(typ)~="number" or c:IsType(typ))
+end
+function Card.MonsterOrFacedown(c)
+	return c:IsMonster() or c:IsFacedown()
 end
 
 function Card.HasAttack(c)
@@ -179,6 +225,34 @@ end
 function Card.HasDefense(c)
 	return not c:IsOriginalType(TYPE_LINK)
 end
+
+function Card.HasHighest(c,stat,g,f)
+	if not g then g=Duel.GetFieldGroup(0,LOCATION_MZONE,LOCATION_MZONE):Filter(Card.IsFaceup,nil) end
+	local func	=	function(tc,val,fil)
+						return stat(tc)>val and (not fil or fil(tc))
+					end
+	return not g:IsExists(func,1,c,stat(c),f)
+end
+function Card.HasLowest(c,stat,g,f)
+	if not g then g=Duel.GetFieldGroup(0,LOCATION_MZONE,LOCATION_MZONE):Filter(Card.IsFaceup,nil) end
+	local func	=	function(tc,val,fil)
+						return stat(tc)<val and (not fil or fil(tc))
+					end
+	return not g:IsExists(func,1,c,stat(c),f)
+end
+function Card.HasHighestATK(c,g,f)
+	return c:HasHighest(Card.GetAttack,g,f)
+end
+function Card.HasLowestATK(c,g,f)
+	return c:HasLowest(Card.GetAttack,g,f)
+end
+function Card.HasHighestDEF(c,g,f)
+	return c:HasHighest(Card.GetDefense,g,f)
+end
+function Card.HasLowestDEF(c,g,f)
+	return c:HasLowest(Card.GetDefense,g,f)
+end
+
 function Card.HasOriginalLevel(c)
 	return not c:IsOriginalType(TYPE_XYZ+TYPE_LINK)
 end
@@ -323,6 +397,10 @@ end
 function Card.HasFlagEffect(c,id)
 	return c:GetFlagEffect(id)>0
 end
+function Card.UpdateFlagEffectLabel(c,id,ct)
+	if not ct then ct=1 end
+	return c:SetFlagEffectLabel(id,c:GetFlagEffectLabel(id)+ct)
+end
 function Duel.UpdateFlagEffectLabel(p,id,ct)
 	if not ct then ct=1 end
 	return Duel.SetFlagEffectLabel(p,id,Duel.GetFlagEffectLabel(p,id)+ct)
@@ -346,8 +424,8 @@ end
 function Card.IsBanished(c)
 	return c:IsLocation(LOCATION_REMOVED)
 end
-function Card.IsInExtra(c)
-	return c:IsLocation(LOCATION_EXTRA)
+function Card.IsInExtra(c,fu)
+	return c:IsLocation(LOCATION_EXTRA) and (fu==nil or fu and c:IsFaceup() or not fu and c:IsFacedown())
 end
 function Card.IsInMMZ(c)
 	return c:IsLocation(LOCATION_MZONE) and c:GetSequence()<5
@@ -362,26 +440,7 @@ end
 function Card.NotInExtraOrFaceup(c)
 	return not c:IsLocation(LOCATION_EXTRA) or c:IsFaceup()
 end
-function Card.MonsterOrFacedown(c)
-	return c:IsMonster() or c:IsFacedown()
-end
 
-function Auxiliary.PLChk(c,p,loc)
-	if type(c)=="Card" then
-		return (not p or c:IsControler(p)) and (not loc or c:IsLocation(loc))
-	elseif type(c)=="Group" then
-		return c:IsExists(aux.PLChk,1,nil,p,loc)
-	else
-		return false
-	end
-end
-function Auxiliary.AfterShuffle(g)
-	for p=0,1 do
-		if g:IsExists(aux.PLChk,1,nil,p,LOCATION_DECK) then
-			Duel.ShuffleDeck(p)
-		end
-	end
-end
 --Phases
 function Duel.IsDrawPhase(tp)
 	return (not tp or Duel.GetTurnPlayer()==tp) and Duel.GetCurrentPhase()==PHASE_DRAW
@@ -399,9 +458,8 @@ end
 function Duel.IsEndPhase(tp)
 	return (not tp or Duel.GetTurnPlayer()==tp) and Duel.GetCurrentPhase()==PHASE_END
 end
-
 -----------------------------------------------------------------------
-function Card.Ignition(c,desc,ctg,prop,range,ctlim,cond,cost,tg,op,reset)
+function Card.Ignition(c,desc,ctg,prop,range,ctlim,cond,cost,tg,op,reset,quickcon)
 	local range = range and range or (c:IsOriginalType(TYPE_MONSTER)) and LOCATION_MZONE or (c:IsOriginalType(TYPE_FIELD)) and LOCATION_FZONE
 	---
 	local e1=Effect.CreateEffect(c)
@@ -418,7 +476,7 @@ function Card.Ignition(c,desc,ctg,prop,range,ctlim,cond,cost,tg,op,reset)
 			e1:SetCategory(ctg)
 		end
 	end
-	if prop~=nil then
+	if type(prop)=="number" then
 		e1:SetProperty(prop)
 	end	
 	e1:SetType(EFFECT_TYPE_IGNITION)
@@ -447,9 +505,34 @@ function Card.Ignition(c,desc,ctg,prop,range,ctlim,cond,cost,tg,op,reset)
 		e1:SetReset(reset)
 	end
 	c:RegisterEffect(e1)
+	--
+	if quickcon then
+		local e2=e1:Clone()
+		if desc then
+			e2:Desc(desc+1)
+		end
+		e2:SetType(EFFECT_TYPE_QUICK_O)
+		e2:SetCode(EVENT_FREE_CHAIN)
+		if e1:GetCategory()&(CATEGORY_ATKCHANGE+CATEGORY_DEFCHANGE)>0 then
+			local prop = type(prop)=="number" and prop or 0
+			e2:SetProperty(prop+EFFECT_FLAG_DAMAGE_STEP)
+			quickcon=aux.AND(quickcon,aux.ExceptOnDamageCalc)
+		end
+		if ctlim and type(ctlim)=="number" then
+			e1:SetCountLimit(ctlim,EFFECT_COUNT_CODE_SINGLE)
+			e2:SetCountLimit(ctlim,EFFECT_COUNT_CODE_SINGLE)
+		end
+		if cond then
+			e2:SetCondition(aux.AND(cond,quickcon))
+		else
+			e2:SetCondition(quickcon)
+		end
+		c:RegisterEffect(e2)
+		return e1,e2
+	end
 	return e1
 end
-function Card.Activate(c,desc,ctg,prop,event,ctlim,cond,cost,tg,op,reset)
+function Card.Activate(c,desc,ctg,prop,event,ctlim,cond,cost,tg,op,handcon)
 	local event = event and event or EVENT_FREE_CHAIN
 	local range = range and range or (c:IsOriginalType(TYPE_MONSTER)) and LOCATION_MZONE or (c:IsOriginalType(TYPE_FIELD)) and LOCATION_FZONE
 	---
@@ -496,6 +579,18 @@ function Card.Activate(c,desc,ctg,prop,event,ctlim,cond,cost,tg,op,reset)
 		e1:SetReset(reset)
 	end
 	c:RegisterEffect(e1)
+	--
+	if handcon and c:GetOriginalType()&(TYPE_QUICKPLAY+TYPE_TRAP)>0 then
+		local handcode = c:GetOriginalType()&TYPE_TRAP==0 and EFFECT_QP_ACT_IN_NTPHAND or EFFECT_TRAP_ACT_IN_HAND
+		local e2=Effect.CreateEffect(c)
+		e2:SetType(EFFECT_TYPE_SINGLE)
+		e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+		e2:SetCode(EFFECT_QP_ACT_IN_NTPHAND)
+		e2:SetRange(LOCATION_HAND)
+		e2:SetCondition(handcon)
+		c:RegisterEffect(e2)
+		return e1,e2
+	end
 	return e1
 end
 function Card.Quick(c,forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op)
@@ -549,55 +644,4 @@ function Card.Quick(c,forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op)
 	end
 	c:RegisterEffect(e1)
 	return e1
-end
---QE UNION
-function Auxiliary.AddQuickUnionProcedure(c,f,oldequip,oldprotect)
-	if oldprotect == nil then oldprotect = oldequip end
-	--equip
-	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(1068)
-	e1:SetCategory(CATEGORY_EQUIP)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e1:SetType(EFFECT_TYPE_QUICK_O)
-	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetTarget(Auxiliary.UnionTarget(f,oldequip))
-	e1:SetOperation(Auxiliary.UnionOperation(f))
-	c:RegisterEffect(e1)
-	--unequip
-	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(2)
-	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e2:SetType(EFFECT_TYPE_QUICK_O)
-	e2:SetCode(EVENT_FREE_CHAIN)
-	e2:SetRange(LOCATION_SZONE)
-	if oldequip then
-		e2:SetCondition(Auxiliary.IsUnionState)
-	end
-	e2:SetTarget(Auxiliary.UnionSumTarget(oldequip))
-	e2:SetOperation(Auxiliary.UnionSumOperation(oldequip))
-	c:RegisterEffect(e2)
-	--destroy sub
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_EQUIP)
-	e3:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
-	e3:SetCode(EFFECT_DESTROY_SUBSTITUTE)
-	if oldprotect then
-		e3:SetCondition(Auxiliary.IsUnionState)
-	end
-	e3:SetValue(Auxiliary.UnionReplace(oldprotect))
-	c:RegisterEffect(e3)
-	--eqlimit
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE)
-	e4:SetCode(EFFECT_UNION_LIMIT)
-	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e4:SetValue(Auxiliary.UnionLimit(f))
-	c:RegisterEffect(e4)
-	--auxiliary function compatibility
-	if oldequip then
-		local m=c:GetMetatable()
-		m.old_union=true
-	end
-	return e1,e2,e3,e4
 end

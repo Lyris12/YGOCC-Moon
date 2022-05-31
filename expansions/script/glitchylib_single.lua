@@ -70,6 +70,86 @@ function Card.UpdateATKDEFF(c,atk,def,reset,rc)
 	c:RegisterEffect(e1x)
 	return e,e1x
 end
+function Card.ChangeATK(c,atk,reset,rc)
+	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
+	local range=c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	local rc = rc and rc or c
+	local e=Effect.CreateEffect(rc)
+	e:SetType(typ)
+	if not SCRIPT_AS_EQUIP then
+		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+		e:SetRange(range)
+	end
+	e:SetCode(EFFECT_SET_ATTACK_FINAL)
+	e:SetValue(atk)
+	if reset then
+		if type(reset)~="number" then
+			reset = (c==rc) and RESET_DISABLE or 0
+		end
+		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
+	end
+	c:RegisterEffect(e)
+	return e
+end
+function Card.ChangeDEF(c,def,reset,rc)
+	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
+	local range=c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	local rc = rc and rc or c
+	local e=Effect.CreateEffect(rc)
+	e:SetType(typ)
+	if not SCRIPT_AS_EQUIP then
+		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+		e:SetRange(range)
+	end
+	e:SetCode(EFFECT_SET_DEFENSE_FINAL)
+	e:SetValue(def)
+	if reset then
+		if type(reset)~="number" then
+			reset = (c==rc) and RESET_DISABLE or 0
+		end
+		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
+	end
+	c:RegisterEffect(e)
+	return e
+end
+function Card.HalveATK(c,reset,rc)
+	local atk=math.floor(c:GetAttack()/2)
+	return c:ChangeATK(atk,reset,rc)
+end
+function Card.HalveDEF(c,reset,rc)
+	local def=math.floor(c:GetDefense()/2)
+	return c:ChangeDEF(def,reset,rc)
+end
+function Card.DoubleATK(c,reset,rc)
+	local atk=c:GetAttack()*2
+	return c:ChangeATK(atk,reset,rc)
+end
+function Card.DoubleDEF(c,reset,rc)
+	local def=math.floor(c:GetDefense()/2)
+	return c:ChangeDEF(def,reset,rc)
+end
+
+function Card.ChangeRace(c,race,reset,rc)
+	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
+	local range=c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	local rc = rc and rc or c
+	local e=Effect.CreateEffect(rc)
+	e:SetType(typ)
+	if not SCRIPT_AS_EQUIP then
+		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+		e:SetRange(range)
+	end
+	e:SetCode(EFFECT_CHANGE_RACE)
+	e:SetValue(race)
+	if reset then
+		if type(reset)~="number" then
+			reset = (c==rc) and RESET_DISABLE or 0
+		end
+		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
+	end
+	c:RegisterEffect(e)
+	return e
+end
 
 function Card.UpdateLevel(c,lv,reset,rc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
@@ -82,6 +162,27 @@ function Card.UpdateLevel(c,lv,reset,rc)
 		e:SetRange(range)
 	end
 	e:SetCode(EFFECT_UPDATE_LEVEL)
+	e:SetValue(lv)
+	if reset then
+		if type(reset)~="number" then
+			reset = (c==rc) and RESET_DISABLE or 0
+		end
+		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
+	end
+	c:RegisterEffect(e)
+	return e
+end
+function Card.ChangeLevel(c,lv,reset,rc)
+	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
+	local range=c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	local rc = rc and rc or c
+	local e=Effect.CreateEffect(rc)
+	e:SetType(typ)
+	if not SCRIPT_AS_EQUIP then
+		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+		e:SetRange(range)
+	end
+	e:SetCode(EFFECT_CHANGE_LEVEL)
 	e:SetValue(lv)
 	if reset then
 		if type(reset)~="number" then
@@ -244,4 +345,18 @@ function Card.FirstTimeProtection(c,each_turn,battle,effect,oppo_only,reset,rc)
 	end
 	c:RegisterEffect(e)
 	return e
+end
+
+--Restriction and Rules
+function Card.CannotBeSet(c,reset,rc)
+	local rc = rc and rc or c
+	local e=Effect.CreateEffect(rc)
+	e:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e:SetType(EFFECT_TYPE_SINGLE)
+	e:SetCode(EFFECT_CANNOT_SSET)
+	if reset then
+		if type(reset)~="number" then reset=0 end
+		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
+	end
+	c:RegisterEffect(e)
 end
