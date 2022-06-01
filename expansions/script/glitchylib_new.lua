@@ -27,17 +27,6 @@ RESET_TURN_SELF = RESET_SELF_TURN
 RESET_TURN_OPPO = RESET_OPPO_TURN
 RESETS_STANDARD_EXC_GRAVE = RESETS_STANDARD&~(RESET_LEAVE|RESET_TOGRAVE)
 
-local _type=type
-function type(o)
-	local tp=_type(o)
-	if tp~="userdata" then return tp
-	elseif o.GetOriginalCode then return "Card"
-	elseif o.KeepAlive then return "Group"
-	elseif o.SetLabelObject then return "Effect"
-	else return "userdata"
-	end
-end
-
 
 --Shortcuts
 function Duel.IsExists(target,f,tp,loc1,loc2,min,exc,...)
@@ -89,7 +78,7 @@ end
 
 --Card Actions
 function Duel.Attach(c,xyz)
-	if type(c)=="Card" then
+	if aux.GetValueType(c)=="Card" then
 		local og=c:GetOverlayGroup()
 		if og:GetCount()>0 then
 			Duel.SendtoGrave(og,REASON_RULE)
@@ -97,7 +86,7 @@ function Duel.Attach(c,xyz)
 		Duel.Overlay(xyz,Group.FromCards(c))
 		return xyz:GetOverlayGroup():IsContains(c)
 			
-	elseif type(c)=="Group" then
+	elseif aux.GetValueType(c)=="Group" then
 		for tc in aux.Next(c) do
 			local og=tc:GetOverlayGroup()
 			if og:GetCount()>0 then
@@ -182,25 +171,25 @@ function Duel.ShuffleIntoDeck(g,p)
 	local ct=Duel.SendtoDeck(g,p,SEQ_DECKSHUFFLE,REASON_EFFECT)
 	if ct>0 and aux.PLChk(g,p,LOCATION_DECK) then
 		aux.AfterShuffle(g)
-		if type(g)=="Card" and aux.PLChk(g,p,LOCATION_DECK) then
+		if aux.GetValueType(g)=="Card" and aux.PLChk(g,p,LOCATION_DECK) then
 			return 1
-		elseif type(g)=="Group" then
+		elseif aux.GetValueType(g)=="Group" then
 			return g:FilterCount(aux.PLChk,nil,p,LOCATION_DECK)
 		end
 	end
 	return 0
 end
 function Auxiliary.PLChk(c,p,loc)
-	if type(c)=="Card" then
+	if aux.GetValueType(c)=="Card" then
 		return (not p or c:IsControler(p)) and (not loc or c:IsLocation(loc))
-	elseif type(c)=="Group" then
+	elseif aux.GetValueType(c)=="Group" then
 		return c:IsExists(aux.PLChk,1,nil,p,loc)
 	else
 		return false
 	end
 end
 function Auxiliary.AfterShuffle(g)
-	if type(g)=="Card" then g=Group.FromCards(g) end
+	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
 	for p=0,1 do
 		if g:IsExists(aux.PLChk,1,nil,p,LOCATION_DECK) then
 			Duel.ShuffleDeck(p)

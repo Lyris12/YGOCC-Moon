@@ -347,7 +347,7 @@ end
 function Duel.SpecialSummonATK(e,g,styp,sump,tp,ign1,ign2,pos,atk,reset,rc)
 	if not reset then reset=0 end
 	if not rc then rc=e:GetHandler() end
-	if type(g)=="Card" then
+	if aux.GetValueType(g)=="Card" then
 		if g==e:GetHandler() and rc==e:GetHandler() then reset=reset+RESET_DISABLE end
 		g=Group.FromCards(g)
 	end
@@ -369,7 +369,7 @@ end
 function Duel.SpecialSummonNegate(e,g,styp,sump,tp,ign1,ign2,pos,reset,rc)
 	if not reset then reset=0 end
 	if not rc then rc=e:GetHandler() end
-	if type(g)=="Card" then g=Group.FromCards(g) end
+	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
 	local ct=0
 	for dg in aux.Next(g) do
 		if Duel.SpecialSummonStep(dg,styp,sump,tp,ign1,ign2,pos) then
@@ -391,7 +391,7 @@ function Duel.SpecialSummonNegate(e,g,styp,sump,tp,ign1,ign2,pos,reset,rc)
 end
 function Duel.SpecialSummonRedirect(e,g,styp,sump,tp,ign1,ign2,pos,loc)
 	if not loc then loc=LOCATION_REMOVED end
-	if type(g)=="Card" then g=Group.FromCards(g) end
+	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
 	local ct=0
 	for dg in aux.Next(g) do
 		if Duel.SpecialSummonStep(dg,styp,sump,tp,ign1,ign2,pos) then
