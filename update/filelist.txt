@@ -10572,7 +10572,7 @@ expansions/script/glitchylib_single.lua	d1539b85da4526533134e73ed7327f02
 expansions/script/glitchylib_tgop.lua	15006a739c3ec0d7ae6ed0c7c40a5b09
 expansions/script/glitchylib_trigger.lua	5339414cee55bc5bf385c9b74a34e8f2
 expansions/script/GLShortcuts.lua	6743700bf509cc48d8f596ff4a8fe5c0
-expansions/script/init.lua	a1ca39709311600947bf7da1c0ef11d7
+expansions/script/init.lua	41a7d0c59307dac1aa027e75fe716118
 expansions/script/json.lua	d41a01cf67c76915b49c57d21ac471ee
 expansions/script/lap.lua	1325997ac4231550048dae57e7eb75b0
 expansions/script/muse_proc.lua	a66cf99f7a3cfa4630e806d0df693765
@@ -10670,6 +10670,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	924e864e0ded54332e1e6e6a2d1a742f
+update/filelist.txt	2f5a8ecfa72d90d9e8c81c56c2ff2d95
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	0163f845fc971791e7047a62a8378e72
+update/version.txt	285c8185cac41bfbe0d49ba733f4eaa3

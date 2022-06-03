@@ -2725,7 +2725,12 @@ function Auxiliary.AddUnionProcedure(c,f,oldequip,oldprotect,range,quick)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(2)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e2:SetType(EFFECT_TYPE_IGNITION)
+	if quick then
+		e2:SetType(EFFECT_TYPE_QUICK_O)
+		e2:SetCode(EVENT_FREE_CHAIN)
+	else
+		e2:SetType(EFFECT_TYPE_IGNITION)
+	end
 	e2:SetRange(LOCATION_SZONE)
 	if oldequip then
 		e2:SetCondition(Auxiliary.IsUnionState)
@@ -2846,7 +2851,7 @@ function Auxiliary.IsUnionState(effect)
 	return c:IsHasEffect(EFFECT_UNION_STATUS)
 end
 function Auxiliary.SetUnionState(c)
-	local eset={c:GetCardEffect(EFFECT_UNION_LIMIT)}
+	local eset={c:IsHasEffect(EFFECT_UNION_LIMIT)}
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE)
 	e0:SetCode(EFFECT_EQUIP_LIMIT)
