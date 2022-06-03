@@ -27,16 +27,15 @@ RESET_TURN_SELF = RESET_SELF_TURN
 RESET_TURN_OPPO = RESET_OPPO_TURN
 RESETS_STANDARD_EXC_GRAVE = RESETS_STANDARD&~(RESET_LEAVE|RESET_TOGRAVE)
 
-
 --Shortcuts
 function Duel.IsExists(target,f,tp,loc1,loc2,min,exc,...)
-	if type(target)~="boolean" then return false end
+	if aux.GetValueType(target)~="boolean" then return false end
 	local func = (target==true) and Duel.IsExistingTarget or Duel.IsExistingMatchingCard
 	
 	return func(f,tp,loc1,loc2,min,exc,...)
 end
 function Duel.Select(hint,target,tp,f,pov,loc1,loc2,min,max,exc,...)
-	if type(target)~="boolean" then return false end
+	if aux.GetValueType(target)~="boolean" then return false end
 	local func = (target==true) and Duel.SelectTarget or Duel.SelectMatchingCard
 	local hint = hint or HINTMSG_TARGET
 	
@@ -199,10 +198,10 @@ end
 
 --Card Filters
 function Card.IsMonster(c,typ)
-	return c:IsType(TYPE_MONSTER) and (type(typ)~="number" or c:IsType(typ))
+	return c:IsType(TYPE_MONSTER) and (aux.GetValueType(typ)~="number" or c:IsType(typ))
 end
 function Card.IsST(c,typ)
-	return c:IsType(TYPE_ST) and (type(typ)~="number" or c:IsType(typ))
+	return c:IsType(TYPE_ST) and (aux.GetValueType(typ)~="number" or c:IsType(typ))
 end
 function Card.MonsterOrFacedown(c)
 	return c:IsMonster() or c:IsFacedown()
@@ -267,26 +266,26 @@ function Card.GetRating(c)
 end
 	
 function Card.IsRating(c,n,lv,rk,link,fut)
-	if lv and type(lv)=="boolean" then lv=n end
-	if rk and type(rk)=="boolean" then rk=n end
-	if link and type(link)=="boolean" then link=n end
-	if fut and type(fut)=="boolean" then fut=n end
+	if lv and aux.GetValueType(lv)=="boolean" then lv=n end
+	if rk and aux.GetValueType(rk)=="boolean" then rk=n end
+	if link and aux.GetValueType(link)=="boolean" then link=n end
+	if fut and aux.GetValueType(fut)=="boolean" then fut=n end
 	return (lv and c:HasLevel() and c:IsLevel(lv)) or (rk and c:IsOriginalType(TYPE_XYZ) and c:IsRank(rk)) or (link and c:IsOriginalType(TYPE_LINK) and c:IsLink(link))
 		or (fut and c:IsOriginalType(TYPE_TIMELEAP) and c:IsFuture(fut))
 end
 function Card.IsRatingAbove(c,n,lv,rk,link,fut)
-	if lv and type(lv)=="boolean" then lv=n end
-	if rk and type(rk)=="boolean" then rk=n end
-	if link and type(link)=="boolean" then link=n end
-	if fut and type(fut)=="boolean" then fut=n end
+	if lv and aux.GetValueType(lv)=="boolean" then lv=n end
+	if rk and aux.GetValueType(rk)=="boolean" then rk=n end
+	if link and aux.GetValueType(link)=="boolean" then link=n end
+	if fut and aux.GetValueType(fut)=="boolean" then fut=n end
 	return (lv and c:HasLevel() and c:IsLevelAbove(lv)) or (rk and c:IsOriginalType(TYPE_XYZ) and c:IsRankAbove(rk)) or (link and c:IsOriginalType(TYPE_LINK) and c:IsLinkAbove(link))
 		or (fut and c:IsOriginalType(TYPE_TIMELEAP) and c:IsFutureAbove(fut))
 end
 function Card.IsRatingBelow(c,n,lv,rk,link,fut)
-	if lv and type(lv)=="boolean" then lv=n end
-	if rk and type(rk)=="boolean" then rk=n end
-	if link and type(link)=="boolean" then link=n end
-	if fut and type(fut)=="boolean" then fut=n end
+	if lv and aux.GetValueType(lv)=="boolean" then lv=n end
+	if rk and aux.GetValueType(rk)=="boolean" then rk=n end
+	if link and aux.GetValueType(link)=="boolean" then link=n end
+	if fut and aux.GetValueType(fut)=="boolean" then fut=n end
 	return (lv and c:HasLevel() and c:IsLevelBelow(lv)) or (rk and c:IsOriginalType(TYPE_XYZ) and c:IsRankBelow(rk)) or (link and c:IsOriginalType(TYPE_LINK) and c:IsLinkBelow(link))
 		or (fut and c:IsOriginalType(TYPE_TIMELEAP) and c:IsFutureBelow(fut))
 end
@@ -304,8 +303,8 @@ end
 
 --Columns
 function Card.GlitchyGetColumnGroup(c,left,right)
-	local left = (left and type(left)=="number" and left>=0) and left or 0
-	local right = (right and type(right)=="number" and right>=0) and right or 0
+	local left = (left and aux.GetValueType(left)=="number" and left>=0) and left or 0
+	local right = (right and aux.GetValueType(right)=="number" and right>=0) and right or 0
 	if left==0 and right==0 then
 		return c:GetColumnGroup()
 	else
@@ -363,7 +362,7 @@ function Auxiliary.Option(id,tp,desc,...)
 		local check=b
 		local localid=id
 		local localdesc=desc+truect-1
-		if type(b)=="table" then
+		if aux.GetValueType(b)=="table" then
 			check=b[1]
 			localid=b[2]
 			localdesc=b[3]
@@ -456,7 +455,7 @@ function Card.Ignition(c,desc,ctg,prop,range,ctlim,cond,cost,tg,op,reset,quickco
 		e1:Desc(desc)
 	end
 	if ctg then
-		if type(ctg)=="table" then
+		if aux.GetValueType(ctg)=="table" then
 			e1:SetCategory(ctg[1])
 			if #ctg>1 then
 				e1:SetCustomCategory(ctg[2])
@@ -465,13 +464,13 @@ function Card.Ignition(c,desc,ctg,prop,range,ctlim,cond,cost,tg,op,reset,quickco
 			e1:SetCategory(ctg)
 		end
 	end
-	if type(prop)=="number" then
+	if aux.GetValueType(prop)=="number" then
 		e1:SetProperty(prop)
 	end	
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(range)
 	if ctlim then
-		if type(ctlim)=="table" then
+		if aux.GetValueType(ctlim)=="table" then
 			local flag=#ctlim>2 and ctlim[3] or 0
 			e1:SetCountLimit(ctlim[1],c:GetOriginalCode()+ctlim[2]*100+flag)
 		else
@@ -503,11 +502,11 @@ function Card.Ignition(c,desc,ctg,prop,range,ctlim,cond,cost,tg,op,reset,quickco
 		e2:SetType(EFFECT_TYPE_QUICK_O)
 		e2:SetCode(EVENT_FREE_CHAIN)
 		if e1:GetCategory()&(CATEGORY_ATKCHANGE+CATEGORY_DEFCHANGE)>0 then
-			local prop = type(prop)=="number" and prop or 0
+			local prop = aux.GetValueType(prop)=="number" and prop or 0
 			e2:SetProperty(prop+EFFECT_FLAG_DAMAGE_STEP)
 			quickcon=aux.AND(quickcon,aux.ExceptOnDamageCalc)
 		end
-		if ctlim and type(ctlim)=="number" then
+		if ctlim and aux.GetValueType(ctlim)=="number" then
 			e1:SetCountLimit(ctlim,EFFECT_COUNT_CODE_SINGLE)
 			e2:SetCountLimit(ctlim,EFFECT_COUNT_CODE_SINGLE)
 		end
@@ -530,7 +529,7 @@ function Card.Activate(c,desc,ctg,prop,event,ctlim,cond,cost,tg,op,handcon)
 		e1:Desc(desc)
 	end
 	if ctg then
-		if type(ctg)=="table" then
+		if aux.GetValueType(ctg)=="table" then
 			e1:SetCategory(ctg[1])
 			if #ctg>1 then
 				e1:SetCustomCategory(ctg[2])
@@ -545,7 +544,7 @@ function Card.Activate(c,desc,ctg,prop,event,ctlim,cond,cost,tg,op,handcon)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(event)
 	if ctlim then
-		if type(ctlim)=="table" then
+		if aux.GetValueType(ctlim)=="table" then
 			local flag=#ctlim>2 and ctlim[3] or 0
 			e1:SetCountLimit(ctlim[1],c:GetOriginalCode()+ctlim[2]*100+flag)
 		else
@@ -592,7 +591,7 @@ function Card.Quick(c,forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op)
 		e1:Desc(desc)
 	end
 	if ctg then
-		if type(ctg)=="table" then
+		if aux.GetValueType(ctg)=="table" then
 			e1:SetCategory(ctg[1])
 			if #ctg>1 then
 				e1:SetCustomCategory(ctg[2])
@@ -602,7 +601,7 @@ function Card.Quick(c,forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op)
 		end
 	end
 	if prop~=nil then
-		if type(prop)=="boolean" and prop==true then
+		if aux.GetValueType(prop)=="boolean" and prop==true then
 			e1:SetProperty(EFFECT_FLAG_DELAY)
 		else
 			e1:SetProperty(prop)
@@ -612,7 +611,7 @@ function Card.Quick(c,forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op)
 	e1:SetCode(event)
 	e1:SetRange(range)
 	if ctlim then
-		if type(ctlim)=="table" then
+		if aux.GetValueType(ctlim)=="table" then
 			local flag=#ctlim>2 and ctlim[3] or 0
 			e1:SetCountLimit(ctlim[1],c:GetOriginalCode()+ctlim[2]*100+flag)
 		else

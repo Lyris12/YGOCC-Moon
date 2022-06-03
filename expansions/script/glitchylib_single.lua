@@ -6,6 +6,8 @@ function Card.UpdateATK(c,atk,reset,rc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
 	local range=c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
 	local rc = rc and rc or c
+	
+	local att=c:GetAttack()
 	local e=Effect.CreateEffect(rc)
 	e:SetType(typ)
 	if not SCRIPT_AS_EQUIP then
@@ -21,12 +23,19 @@ function Card.UpdateATK(c,atk,reset,rc)
 		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
 	end
 	c:RegisterEffect(e)
-	return e
+	
+	if reset then
+		return e,c:GetAttack()-att
+	else
+		return e
+	end
 end
 function Card.UpdateDEF(c,def,reset,rc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
 	local range=c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
 	local rc = rc and rc or c
+	
+	local df=c:GetDefense()
 	local e=Effect.CreateEffect(rc)
 	e:SetType(typ)
 	if not SCRIPT_AS_EQUIP then
@@ -42,12 +51,17 @@ function Card.UpdateDEF(c,def,reset,rc)
 		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
 	end
 	c:RegisterEffect(e)
-	return e
+	if reset then
+		return e,c:GetDefense()-df
+	else
+		return e
+	end
 end
 function Card.UpdateATKDEFF(c,atk,def,reset,rc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
 	local range=c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
 	local rc = rc and rc or c
+	
 	local e=Effect.CreateEffect(rc)
 	e:SetType(typ)
 	if not SCRIPT_AS_EQUIP then

@@ -441,48 +441,52 @@ Card.CheckRemoveOverlayCard=function(c,tp,ct,r)
 	end
 	return card_check_remove_overlay_card(c,tp,ct,r)
 end
-Duel.CheckTribute=function(c,min,max,mg,p,zone)
-	if not max then max=min end
-	if not p then p=c:GetControler() end
-	if not zone then zone=0x1f001f end
-	local ef={Duel.IsPlayerAffectedByEffect(c:GetControler(),EFFECT_MUST_USE_MZONE)}
-	for _,e in ipairs(ef) do
-		local ev=e:GetValue()
-		if type(ev)=='function' then zone=zone&ev(e) else zone=zone&ev end
-	end
-	zone=zone&(0x1f<<16*p)
-	if zone>0x1f then zone=zone>>16 end
-	return duel_check_tribute(c,min,max,mg,p,zone)
-end
-Duel.SelectTribute=function(sp,c,min,max,mg,p)
-	if not p then p=c:GetControler() end
-	local zone=0x1f001f
-	local ef={Duel.IsPlayerAffectedByEffect(sp,EFFECT_MUST_USE_MZONE)}
-	for _,e in ipairs(ef) do
-		local ev=e:GetValue()
-		if type(ev)=='function' then zone=zone&ev(e) else zone=zone&ev end
-	end
-	zone=zone&(0x1f<<16*p)
-	if zone>0x1f then zone=zone>>16 end
-	local rg=mg~=nil and mg or Duel.GetTributeGroup(c)
-	local sg=Group.CreateGroup()
-	if rg:IsExists(Auxiliary.TribCheckRecursive,1,nil,sp,rg,sg,c,0,min,max,p,zone) then
-		local finish=false
-		while #sg<max do
-			finish=Auxiliary.TributeGoal(sp,sg,c,#sg,min,max,p,zone)
-			local cg=rg:Filter(Auxiliary.TribCheckRecursive,sg,sp,rg,sg,c,#sg,min,max,p,zone)
-			if #cg==0 then break end
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TRIBUTE)
-			local tc=cg:SelectUnselect(sg,sp,finish,false,min,max)
-			if not tc then break end
-			if not sg:IsContains(tc) then
-				sg:AddCard(tc)
-				if #sg>=max then finish=true end
-			else sg:RemoveCard(tc) end
-		end
-	end
-	return #sg>0 and sg or select_tribute(sp,c,min,max,rg,p)
-end
+
+--THESE 2 FUNCTIONS BELOW NEED TO BE REMOVED OR MODIFIED SINCE THEY PREVENT CERTAIN EFFECTS AND INTERACTIONS FROM FUNCTIONING ALTOGETHER
+--See: Dai Dance and EFFECT_SUMMON_PROC ; Ra Sphere Mode with Stormforth
+
+-- Duel.CheckTribute=function(c,min,max,mg,p,zone)
+	-- if not max then max=min end
+	-- if not p then p=c:GetControler() end
+	-- if not zone then zone=0x1f001f end
+	-- local ef={Duel.IsPlayerAffectedByEffect(c:GetControler(),EFFECT_MUST_USE_MZONE)}
+	-- for _,e in ipairs(ef) do
+		-- local ev=e:GetValue()
+		-- if type(ev)=='function' then zone=zone&ev(e) else zone=zone&ev end
+	-- end
+	-- zone=zone&(0x1f<<16*p)
+	-- if zone>0x1f then zone=zone>>16 end
+	-- return duel_check_tribute(c,min,max,mg,p,zone)
+-- end
+-- Duel.SelectTribute=function(sp,c,min,max,mg,p)
+	-- if not p then p=c:GetControler() end
+	-- local zone=0x1f001f
+	-- local ef={Duel.IsPlayerAffectedByEffect(sp,EFFECT_MUST_USE_MZONE)}
+	-- for _,e in ipairs(ef) do
+		-- local ev=e:GetValue()
+		-- if type(ev)=='function' then zone=zone&ev(e) else zone=zone&ev end
+	-- end
+	-- zone=zone&(0x1f<<16*p)
+	-- if zone>0x1f then zone=zone>>16 end
+	-- local rg=mg~=nil and mg or Duel.GetTributeGroup(c)
+	-- local sg=Group.CreateGroup()
+	-- if rg:IsExists(Auxiliary.TribCheckRecursive,1,nil,sp,rg,sg,c,0,min,max,p,zone) then
+		-- local finish=false
+		-- while #sg<max do
+			-- finish=Auxiliary.TributeGoal(sp,sg,c,#sg,min,max,p,zone)
+			-- local cg=rg:Filter(Auxiliary.TribCheckRecursive,sg,sp,rg,sg,c,#sg,min,max,p,zone)
+			-- if #cg==0 then break end
+			-- Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TRIBUTE)
+			-- local tc=cg:SelectUnselect(sg,sp,finish,false,min,max)
+			-- if not tc then break end
+			-- if not sg:IsContains(tc) then
+				-- sg:AddCard(tc)
+				-- if #sg>=max then finish=true end
+			-- else sg:RemoveCard(tc) end
+		-- end
+	-- end
+	-- return #sg>0 and sg or select_tribute(sp,c,min,max,rg,p)
+-- end
 Card.SetUniqueOnField=function(c,s,o,code,loc)
 	if not loc then loc=LOCATION_ONFIELD end
 	card_sethighlander(c,s,o,code,loc)
@@ -1097,8 +1101,10 @@ end
 Effect.SetCountLimit = function(e,ct,...)
 	local x={...}
 	if #x>0 and type(x[1])=="table" or #x>1 then
+		local id=type(x[1])=="table" and x[1][1] or x[1]
+		local mod=type(x[1])=="table" and x[1][2] or 0
 		local flag = #x>1 and x[2] or 0
-		return effect_set_count_limit(e,ct,x[1][1]+x[1][2]*100+flag)
+		return effect_set_count_limit(e,ct,id+mod*100+flag)
 	else
 		return effect_set_count_limit(e,ct,...)
 	end
@@ -2233,12 +2239,23 @@ if not global_card_effect_table_global_check then
 					e:SetTarget(aux.GlitchyCannotDisable(tg))
 				end
 			end
-		end
 		
-		if e:GetCode()==EFFECT_DISABLE_FIELD and e:GetLabel()==0 and e:GetOperation() then
+		elseif e:GetCode()==EFFECT_DISABLE_FIELD and e:GetLabel()==0 and e:GetOperation() then
 			local op=e:GetOperation()
 			e:SetOperation(Auxiliary.SetOperationResultAsLabel(op))
+			
+		elseif e:GetCode()==EFFECT_EXTRA_SUMMON_COUNT or e:GetCode()==EFFECT_EXTRA_SET_COUNT then
+			local s,o=e:GLGetTargetRange()
+			if s~=0 and s&LOCATION_GRAVE==0 then
+				s=s|LOCATION_GRAVE
+			end
+			if o~=0 and o&LOCATION_GRAVE==0 then
+				o=o|LOCATION_GRAVE
+			end
+			e:SetTargetRange(s,o)
 		end
+		
+		
 		local condition,cost,tg,op,val=e:GetCondition(),e:GetCost(),e:GetTarget(),e:GetOperation(),e:GetValue()
 		if condition and ((e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G) or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()==EFFECT_TYPE_XMATERIAL or e:GetType()==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or e:GetType()&EFFECT_TYPE_GRANT~=0)) then	
 			local newcon =	function(...)
@@ -2312,6 +2329,18 @@ if not global_duel_effect_table_global_check then
 									if e:GetCode()==DUEL_EFFECT_NOP[i] then e:SetProperty(e:GetProperty()|EFFECT_FLAG_PLAYER_TARGET) e:SetTargetRange(1,0) end
 								end
 							end
+							
+							if e:GetCode()==EFFECT_EXTRA_SUMMON_COUNT or e:GetCode()==EFFECT_EXTRA_SET_COUNT then
+								local s,o=e:GLGetTargetRange()
+								if s~=0 and s&LOCATION_GRAVE==0 then
+									s=s|LOCATION_GRAVE
+								end
+								if o~=0 and o&LOCATION_GRAVE==0 then
+									o=o|LOCATION_GRAVE
+								end
+							end
+							
+							
 							local condition,cost,tg,op,val=e:GetCondition(),e:GetCost(),e:GetTarget(),e:GetOperation(),e:GetValue()
 							if condition and ((e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G) or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()&EFFECT_TYPE_GRANT~=0)) then
 								local newcon =	function(...)
@@ -2493,6 +2522,25 @@ function Auxiliary.ToHandOrElse(card,player,check,oper,str,...)
 end
 function Auxiliary.thoeSend(card)
 	return Duel.SendtoGrave(card,REASON_EFFECT)
+end
+--register for "Equip to this card by its effect"
+function Auxiliary.EquipByEffectAndLimitRegister(c,e,tp,tc,code,mustbefaceup)
+	local up=false or mustbefaceup
+	if not Duel.Equip(tp,tc,c,up) then return false end
+	--Add Equip limit
+	if code then
+		tc:RegisterFlagEffect(code,RESET_EVENT+RESETS_STANDARD,0,0)
+	end
+	local te=e:GetLabelObject()
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_OWNER_RELATE)
+	e1:SetCode(EFFECT_EQUIP_LIMIT)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+	e1:SetValue(Auxiliary.EquipByEffectLimit)
+	e1:SetLabelObject(te)
+	tc:RegisterEffect(e1)
+	return true
 end
 --check for Eyes Restrict equip limit
 function Auxiliary.AddEREquipLimit(c,con,equipval,equipop,linkedeff,prop,resetflag,resetcount)

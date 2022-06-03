@@ -64,7 +64,7 @@ function Auxiliary.Target(f,loc1,loc2,min,max,exc,check,info,prechk,necrovalley,
 	if not loc2 then loc2=loc1 end
 	if (loc1|loc2)&LOCATION_GRAVE>0 and necrovalley then f=aux.NecroValleyFilter(f) end
 	return	function (e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-				local exc= (type(exc)=="boolean" and exc) and e:GetHandler() or (exc) and exc or nil
+				local exc= (aux.GetValueType(exc)=="boolean" and exc) and e:GetHandler() or (exc) and exc or nil
 				if chkc then
 					local plchk=(loc1~=0 and chkc:IsControler(tp) and chkc:IsLocation(loc1) or loc2~=0 and chkc:IsControler(1-tp) and chkc:IsLocation(loc2))
 					return plchk and (not f or f(chkc,e,tp,eg,ep,ev,re,r,rp,chk))
@@ -319,11 +319,11 @@ end
 
 
 function Auxiliary.SSSelfTarget(loc_clause)
-	if loc_clause~=nil and loc_clause and type(loc_clause)~="table" then loc_clause={LOCATION_GRAVE,LOCATION_HAND} end
+	if loc_clause~=nil and loc_clause and aux.GetValueType(loc_clause)~="table" then loc_clause={LOCATION_GRAVE,LOCATION_HAND} end
 	return	function (e,tp,eg,ep,ev,re,r,rp,chk)
 				local c=e:GetHandler()
 				if chk==0 then
-					return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and c:IsCanBeSpecialSummoned(e,0,tp,true,true) 																					and (not loc_clause or ((c:IsLocation(loc_clause[1]) and not eg:IsContains(c)) or (c:IsLocation(loc_clause[2]))))
+					return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false) 																					and (not loc_clause or ((c:IsLocation(loc_clause[1]) and not eg:IsContains(c)) or (c:IsLocation(loc_clause[2]))))
 				end
 				Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 			end
@@ -332,7 +332,7 @@ function Auxiliary.SSSelfOperation(complete_proc)
 	return	function (e,tp,eg,ep,ev,re,r,rp)
 				local c=e:GetHandler()
 				if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 or not c:IsRelateToEffect(e) then return end
-				if Duel.SpecialSummon(c,0,tp,tp,true,false,POS_FACEUP)~=0 then
+				if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 then
 					if complete_proc then
 						c:CompleteProcedure()
 					end

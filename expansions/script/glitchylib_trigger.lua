@@ -109,6 +109,16 @@ function Card.SummonedTrigger(c,forced,ns,ss,fs,desc,ctg,prop,ctlim,cond,cost,tg
 	end
 	return e1,e2,e3
 end
+function Card.TributedForATributeSummonTrigger(c,forced,f,desc,ctg,prop,ctlim,cond,cost,tg,op,typechange,reset)
+	local event=EVENT_BE_MATERIAL
+	newcond =	function(e,tp,eg,ep,ev,re,r,rp)
+					local c=e:GetHandler()
+					local rc=c:GetReasonCard()
+					return c:IsReason(REASON_SUMMON) and (not f or f(rc,e,tp,eg,ep,ev,re,r,rp)) and (not cond or cond(e,tp,eg,ep,ev,re,r,rp,c,rc))
+				end
+	local e1=c:Trigger(forced,desc,ctg,EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL,prop,event,ctlim,newcond,cost,tg,op,typechange,reset)
+	return e1
+end
 
 -----------------------------------------------------------------------
 --FIELD TRIGGERS
@@ -209,6 +219,13 @@ function Card.SummonedFieldTrigger(c,forced,ns,ss,fs,desc,ctg,prop,range,ctlim,c
 		c:RegisterEffect(e3)
 	end
 	return e1,e2,e3
+end
+function Card.TributedForATributeSummonFieldTrigger(c,forced,f,desc,ctg,prop,range,ctlim,cond,cost,tg,op,typechange,reset)
+	local event=EVENT_BE_MATERIAL
+	local func = function(card,eff,tp,eg,ep,ev,re,r,rp) return card:IsReason(REASON_SUMMON) and (not f or f(card,eff,tp,eg,ep,ev,re,r,rp)) end
+	newcond = function(e,tp,eg,ep,ev,re,r,rp) return eg:IsExists(func,1,nil,e,tp,eg,ep,ev,re,r,rp) and (not cond or cond(e,tp,eg,ep,ev,re,r,rp)) end
+	local e1=c:FieldTrigger(forced,desc,ctg,prop,event,range,ctlim,newcond,cost,tg,op,typechange,reset)
+	return e1
 end
 
 function Card.PhaseTrigger(c,forced,phase,desc,ctg,prop,range,ctlim,cond,cost,tg,op,typechange,reset)
