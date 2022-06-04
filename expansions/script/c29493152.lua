@@ -56,16 +56,16 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and Duel.IsPlayerCanSpecialSummonMonster(tp,id,0x29a,0x21,0,1600,4,RACE_CYBERSE,ATTRIBUTE_EARTH) then
-		c:AddMonsterAttribute(TYPE_EFFECT+TYPE_SPELL+TYPE_TRAP)
+		c:AddMonsterAttribute(TYPE_EFFECT)
 		if Duel.SpecialSummonStep(c,0,tp,tp,true,false,POS_FACEUP) then
 			--remove type
-			local e1=Effect.CreateEffect(c)
-			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-			e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-			e1:SetCode(EFFECT_REMOVE_TYPE)
-			e1:SetValue(TYPE_TRAP)
-			c:RegisterEffect(e1,true)
+			-- local e1=Effect.CreateEffect(c)
+			-- e1:SetType(EFFECT_TYPE_SINGLE)
+			-- e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+			-- e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+			-- e1:SetCode(EFFECT_REMOVE_TYPE)
+			-- e1:SetValue(TYPE_TRAP)
+			-- c:RegisterEffect(e1,true)
 			--redirect
 			local e2=Effect.CreateEffect(c)
 			e2:SetType(EFFECT_TYPE_SINGLE)

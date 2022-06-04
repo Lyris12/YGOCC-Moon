@@ -44,7 +44,7 @@ end
 
 function s.efilter(e,te)
 	local c=te:GetHandler()
-	return c and c:IsOnField()
+	return c and c:IsOnField() and not c:IsSetCard(0x29a)
 end
 
 function s.cf(c)
