@@ -216,6 +216,7 @@ function Auxiliary.DestroyFilter(f)
 			end
 end
 function Auxiliary.DestroyTarget(f,loc1,loc2,min,exc)
+	if not f then f=aux.TRUE end
 	if not loc1 then loc1=LOCATION_ONFIELD end
 	if not loc2 then loc2=LOCATION_ONFIELD end
 	if (loc1|loc2)&(LOCATION_HAND+LOCATION_DECK+LOCATION_EXTRA)>0 then f=aux.DestroyFilter(f) end
@@ -233,6 +234,7 @@ function Auxiliary.DestroyTarget(f,loc1,loc2,min,exc)
 			end
 end
 function Auxiliary.DestroyOperation(f,loc1,loc2,min,max,exc)
+	if not f then f=aux.TRUE end
 	if not loc1 then loc1=LOCATION_ONFIELD end
 	if not loc2 then loc2=LOCATION_ONFIELD end
 	if (loc1|loc2)&(LOCATION_HAND+LOCATION_DECK+LOCATION_EXTRA)>0 then f=aux.DestroyFilter(f) end

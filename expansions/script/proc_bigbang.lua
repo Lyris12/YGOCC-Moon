@@ -134,6 +134,15 @@ function Card.GetVibe(c)
 	if stat==0 then return stat
 	else return stat/math.abs(stat) end
 end
+function Card.IsPositive(c)
+	return c:GetVibe()==1
+end
+function Card.IsNegative(c)
+	return c:GetVibe()==-1
+end
+function Card.IsNeutral(c)
+	return c:GetVibe()==0
+end
 function Card.GetBigbangAttack(c)
 	return c:GetAttack()*math.abs(c:GetVibe())
 end

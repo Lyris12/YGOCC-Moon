@@ -16,7 +16,9 @@ CATEGORY_LVCHANGE					= 0x800
 --constants aliases
 TYPE_ST			= TYPE_SPELL+TYPE_TRAP
 
-ARCHE_FUSION	= 0x46
+ARCHE_FUSION		= 0x46
+ARCHE_PANDEMONIUM	= 0xf80
+ARCHE_BIGBANG		= 0xbba
 
 LOCATION_ALL = LOCATION_DECK+LOCATION_HAND+LOCATION_MZONE+LOCATION_SZONE+LOCATION_GRAVE+LOCATION_REMOVED+LOCATION_EXTRA
 LOCATION_GB  = LOCATION_GRAVE+LOCATION_REMOVED
@@ -448,7 +450,7 @@ function Duel.IsEndPhase(tp)
 end
 -----------------------------------------------------------------------
 function Card.Ignition(c,desc,ctg,prop,range,ctlim,cond,cost,tg,op,reset,quickcon)
-	local range = range and range or (c:IsOriginalType(TYPE_MONSTER)) and LOCATION_MZONE or (c:IsOriginalType(TYPE_FIELD)) and LOCATION_FZONE
+	if not range then range=c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE end
 	---
 	local e1=Effect.CreateEffect(c)
 	if desc then
@@ -521,8 +523,8 @@ function Card.Ignition(c,desc,ctg,prop,range,ctlim,cond,cost,tg,op,reset,quickco
 	return e1
 end
 function Card.Activate(c,desc,ctg,prop,event,ctlim,cond,cost,tg,op,handcon)
+	if not range then range=c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE end
 	local event = event and event or EVENT_FREE_CHAIN
-	local range = range and range or (c:IsOriginalType(TYPE_MONSTER)) and LOCATION_MZONE or (c:IsOriginalType(TYPE_FIELD)) and LOCATION_FZONE
 	---
 	local e1=Effect.CreateEffect(c)
 	if desc then
@@ -582,8 +584,8 @@ function Card.Activate(c,desc,ctg,prop,event,ctlim,cond,cost,tg,op,handcon)
 	return e1
 end
 function Card.Quick(c,forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op)
+	if not range then range=c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE end
 	if not event then event=EVENT_FREE_CHAIN end
-	local range = range or (c:IsOriginalType(TYPE_MONSTER)) and LOCATION_MZONE or (c:IsOriginalType(TYPE_FIELD)) and LOCATION_FZONE
 	local quick_type=(not forced) and EFFECT_TYPE_QUICK_O or EFFECT_TYPE_QUICK_F
 	---
 	local e1=Effect.CreateEffect(c)

@@ -1,5 +1,5 @@
 --CONTINUOUS EFFECTS (EFFECT_TYPE_FIELD)
-function Card.FieldEffect(c,code,range,selfzones,oppozones,f,val)
+function Card.FieldEffect(c,code,range,selfzones,oppozones,f,val,cond)
 	if not range then range=c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE end
 	if not selfzones then selfzones=0 end
 	if type(oppozones)=="boolean" and oppozones==true then
@@ -11,57 +11,62 @@ function Card.FieldEffect(c,code,range,selfzones,oppozones,f,val)
 	e:SetType(EFFECT_TYPE_FIELD)
 	e:SetRange(range)
 	e:SetCode(code)
+	if cond then
+		e:SetCondition(cond)
+	end
 	e:SetTargetRange(selfzones,oppozones)
-	e:SetTarget(f)
+	if f then
+		e:SetTarget(f)
+	end
 	e:SetValue(val)
 	--c:RegisterEffect(e)
 	return e
 end
 
 -----------------------------------------------------------------------
-function Card.UpdateATKField(c,atk,range,selfzones,oppozones,f)
-	local e=c:FieldEffect(EFFECT_UPDATE_ATTACK,range,selfzones,oppozones,f,atk)
+function Card.UpdateATKField(c,atk,range,selfzones,oppozones,f,cond)
+	local e=c:FieldEffect(EFFECT_UPDATE_ATTACK,range,selfzones,oppozones,f,atk,cond)
 	c:RegisterEffect(e)
 	return e
 end
-function Card.UpdateDEFField(c,def,range,selfzones,oppozones,f)
-	local e=c:FieldEffect(EFFECT_UPDATE_DEFENSE,range,selfzones,oppozones,f,def)
+function Card.UpdateDEFField(c,def,range,selfzones,oppozones,f,cond)
+	local e=c:FieldEffect(EFFECT_UPDATE_DEFENSE,range,selfzones,oppozones,f,def,cond)
 	c:RegisterEffect(e)
 	return e
 end
-function Card.UpdateATKDEFField(c,atk,def,range,selfzones,oppozones,f)
-	local e1=c:FieldEffect(EFFECT_UPDATE_ATTACK,range,selfzones,oppozones,f,atk)
-	c:RegisterEffect(e)
-	local e2=e1:Clone()
-	e1:SetCode(EFFECT_UPDATE_DEFENSE)
-	e1:SetValue(def)
+function Card.UpdateATKDEFField(c,atk,def,range,selfzones,oppozones,f,cond)
+	local e1=c:FieldEffect(EFFECT_UPDATE_ATTACK,range,selfzones,oppozones,f,atk,cond)
 	c:RegisterEffect(e1)
+	local e2=e1:Clone()
+	e2:SetCode(EFFECT_UPDATE_DEFENSE)
+	e2:SetValue(def)
+	c:RegisterEffect(e2)
 	return e1,e2
 end
-function Card.ChangeATKField(c,atk,range,selfzones,oppozones,f)
-	local e=c:FieldEffect(EFFECT_SET_ATTACK_FINAL,range,selfzones,oppozones,f,atk)
+function Card.ChangeATKField(c,atk,range,selfzones,oppozones,f,cond)
+	local e=c:FieldEffect(EFFECT_SET_ATTACK_FINAL,range,selfzones,oppozones,f,atk,cond)
 	c:RegisterEffect(e)
 	return e
 end
-function Card.ChangeDEFField(c,def,range,selfzones,oppozones,f)
-	local e=c:FieldEffect(EFFECT_SET_DEFENSE_FINAL,range,selfzones,oppozones,f,def)
-	c:RegisterEffect(e)
-	return e
-end
-
-function Card.ChangeRaceField(c,race,range,selfzones,oppozones,f)
-	local e=c:FieldEffect(EFFECT_CHANGE_RACE,range,selfzones,oppozones,f,race)
+function Card.ChangeDEFField(c,def,range,selfzones,oppozones,f,cond)
+	local e=c:FieldEffect(EFFECT_SET_DEFENSE_FINAL,range,selfzones,oppozones,f,def,cond)
 	c:RegisterEffect(e)
 	return e
 end
 
-function Card.UpdateLevelField(c,lv,range,selfzones,oppozones,f)
-	local e=c:FieldEffect(EFFECT_UPDATE_LEVEL,range,selfzones,oppozones,f,lv)
+function Card.ChangeRaceField(c,race,range,selfzones,oppozones,f,cond)
+	local e=c:FieldEffect(EFFECT_CHANGE_RACE,range,selfzones,oppozones,f,race,cond)
 	c:RegisterEffect(e)
 	return e
 end
-function Card.ChangeLevelField(c,lv,range,selfzones,oppozones,f)
-	local e=c:FieldEffect(EFFECT_CHANGE_LEVEL,range,selfzones,oppozones,f,lv)
+
+function Card.UpdateLevelField(c,lv,range,selfzones,oppozones,f,cond)
+	local e=c:FieldEffect(EFFECT_UPDATE_LEVEL,range,selfzones,oppozones,f,lv,cond)
+	c:RegisterEffect(e)
+	return e
+end
+function Card.ChangeLevelField(c,lv,range,selfzones,oppozones,f,cond)
+	local e=c:FieldEffect(EFFECT_CHANGE_LEVEL,range,selfzones,oppozones,f,lv,cond)
 	c:RegisterEffect(e)
 	return e
 end

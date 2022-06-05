@@ -123,8 +123,13 @@ end
 -----------------------------------------------------------------------
 --FIELD TRIGGERS
 function Card.FieldTrigger(c,forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op,typechange,reset,notreg)
-	local trigger_type=(type(typechange)=="number") and EFFECT_TYPE_CONTINUOUS or (not forced) and EFFECT_TYPE_TRIGGER_O or EFFECT_TYPE_TRIGGER_F
-	local range =range and range or (c:IsOriginalType(TYPE_MONSTER)) and LOCATION_MZONE or (c:IsOriginalType(TYPE_FIELD)) and LOCATION_FZONE or LOCATION_SZONE
+	local trigger_type=(type(typechange)=="number") and EFFECT_TYPE_CONTINUOUS or (type(typechange)=="boolean") and EFFECT_TYPE_ACTIVATE or (not forced) and EFFECT_TYPE_TRIGGER_O or EFFECT_TYPE_TRIGGER_F
+	if trigger_type==EFFECT_TYPE_ACTIVATE then
+		if type(prop)=="boolean" and prop then prop=EFFECT_FLAG_DELAY end
+		return c:Activate(desc,ctg,prop,event,ctlim,cond,cost,tg,op,reset)
+	end
+	
+	local range = range and range or (c:IsOriginalType(TYPE_MONSTER)) and LOCATION_MZONE or (c:IsOriginalType(TYPE_FIELD)) and LOCATION_FZONE or LOCATION_SZONE
 	local e1=Effect.CreateEffect(c)
 	if desc then
 		e1:Desc(desc)
