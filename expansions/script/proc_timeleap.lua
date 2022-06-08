@@ -284,7 +284,12 @@ function Auxiliary.TimeleapMaterialFilter(c,filter,e,tp,sg,mg,bc,ct,...)
 	sg:AddCard(c)
 	ct=ct+1
 	local funs,max,chk={...},1
-	if (not filter or filter(c,e,mg)) and c:GetLevel()==bc:GetFuture()-1 then
+	local override_future_check=false
+	if type(filter)=="table" then
+		override_future_check=filter[2]
+		filter=filter[1]
+	end
+	if (not filter or filter(c,e,mg)) and (override_future_check or c:GetLevel()==bc:GetFuture()-1) then
 		chk=true
 	end
 	if #funs>0 then

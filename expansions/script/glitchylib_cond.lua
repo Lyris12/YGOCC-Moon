@@ -78,6 +78,15 @@ end
 function Auxiliary.LinkSummonedCond(e)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_LINK)
 end
+function Auxiliary.PandemoniumSummonedCond(e)
+	return e:GetHandler():IsSummonType(SUMMON_TYPE_PANDEMONIUM)
+end
+function Auxiliary.BigbangSummonedCond(e)
+	return e:GetHandler():IsSummonType(SUMMON_TYPE_BIGBANG)
+end
+function Auxiliary.TimeleapSummonedCond(e)
+	return e:GetHandler():IsSummonType(SUMMON_TYPE_TIMELEAP)
+end
 
 --Equip
 function Auxiliary.IsEquippedCond(e)
