@@ -13,7 +13,7 @@ function c53313902.initial_effect(c)
 	c:RegisterEffect(e1)
 	--If this card is Summoned: You can target 1 other Level/Rank 8 or lower face-up monster on the field; until the end of this turn, this card gains that target's effects (if any).
 	local e1=Effect.CreateEffect(c)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e1:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_SINGLE)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
 	e1:SetCountLimit(1)
@@ -78,39 +78,39 @@ end
 
 
 function c53313902.copytg(c)
-	return c:IsFaceup() and (c:IsLevelBelow(8) or c:IsRankBelow(8))
+	return c:IsFaceup() and c:IsMonster() and (c:IsLevelBelow(8) or c:IsRankBelow(8))
 end
 function c53313902.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc~=e:GetHandler() and chkc:IsLocation(LOCATION_MZONE) and c53313902.copytg(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,e:GetHandler()) end
+	if chk==0 then return Duel.IsExistingTarget(c53313902.copytg,tp,LOCATION_MZONE,LOCATION_MZONE,1,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,e:GetHandler())
+	Duel.SelectTarget(tp,c53313902.copytg,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,e:GetHandler())
 end
 function c53313902.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if tc and c:IsRelateToEffect(e) and c:IsFaceup() and tc:IsRelateToEffect(e) and tc:IsFaceup() and not tc:IsType(TYPE_TOKEN) then
-		local code=tc:GetOriginalCodeRule()
-		local cid=0
-		if not tc:IsType(TYPE_TRAPMONSTER) then
-			cid=c:CopyEffect(code, RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END, 1)
-		end
-		local e2=Effect.CreateEffect(c)
-		e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e2:SetCode(EVENT_PHASE+PHASE_END)
-		e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-		e2:SetCountLimit(1)
-		e2:SetRange(LOCATION_MZONE)
-		e2:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
-		e2:SetLabel(cid)
-		e2:SetOperation(c53313902.rstop)
-		c:RegisterEffect(e2)
+	if tc and c:IsRelateToEffect(e) and c:IsFaceup() and tc:IsRelateToEffect(e) and tc:IsFaceup() then
+		local code=tc:GetOriginalCode()
+		local cid=c:CopyEffect(code,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,1)
+		local e3=Effect.CreateEffect(c)
+		e3:SetDescription(1162)
+		e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e3:SetCode(EVENT_PHASE+PHASE_END)
+		e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e3:SetCountLimit(1)
+		e3:SetRange(LOCATION_MZONE)
+		e3:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+		e3:SetLabel(cid)
+		e3:SetLabelObject(e2)
+		e3:SetOperation(c53313902.rstop)
+		c:RegisterEffect(e3)
 	end
 end
 function c53313902.rstop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local cid=e:GetLabel()
-	if cid~=0 then c:ResetEffect(cid,RESET_COPY) end
+	c:ResetEffect(cid,RESET_COPY)
+	c:ResetEffect(RESET_DISABLE,RESET_EVENT)
 	Duel.HintSelection(Group.FromCards(c))
 	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 end
