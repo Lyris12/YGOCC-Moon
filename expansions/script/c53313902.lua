@@ -1,15 +1,16 @@
 --Mysterious Blazar Dragon
 function c53313902.initial_effect(c)
 	--You can Special Summon this card (from your hand or GY) by Tributing 1 LIGHT monster you control and 1 "Mysterious" monster or card in your Pandemonium Zone. You can only Summon "Mysterious Blazar Dragon(s)" once per turn this way.
-	local e0=Effect.CreateEffect(c)
-	e0:SetType(EFFECT_TYPE_FIELD)
-	e0:SetCode(EFFECT_SPSUMMON_PROC)
-	e0:SetProperty(EFFECT_FLAG_UNCOPYABLE)
-	e0:SetRange(LOCATION_HAND+LOCATION_GRAVE)
-	e0:SetCountLimit(1,53313902)
-	e0:SetCondition(c53313902.spcon)
-	e0:SetOperation(c53313902.spop)
-	c:RegisterEffect(e0)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_SPSUMMON_PROC)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e1:SetRange(LOCATION_HAND+LOCATION_GRAVE)
+	e1:SetCountLimit(1,53313902+EFFECT_COUNT_CODE_OATH)
+	e1:SetCondition(c53313902.sprcon)
+	e1:SetTarget(c53313902.sprtg)
+	e1:SetOperation(c53313902.sprop)
+	c:RegisterEffect(e1)
 	--If this card is Summoned: You can target 1 other Level/Rank 8 or lower face-up monster on the field; until the end of this turn, this card gains that target's effects (if any).
 	local e1=Effect.CreateEffect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
@@ -35,27 +36,47 @@ function c53313902.initial_effect(c)
 	e2:SetValue(c53313902.valcon)
 	c:RegisterEffect(e2)
 end
-function c53313902.rfilter(c,tp)
-	return (c:IsSetCard(0xcf6) or c:IsLocation(LOCATION_SZONE)) and Duel.CheckReleaseGroup(tp,Card.IsAttribute,1,c,ATTRIBUTE_LIGHT)
+function c53313902.rfilter(c)
+	return c:IsMonster() and (c:IsAttribute(ATTRIBUTE_LIGHT) or c:IsSetCard(0xcf6))
 end
-function c53313902.pzfilter(c)
-	return aux.PaCheckFilter(c) and c:IsReleasable()
+function c53313902.pzfilter(c,alternative)
+	return c:IsSetCard(0xcf6) and c:IsReleasable() and (aux.PaCheckFilter(c) or (alternative and c:IsLocation(LOCATION_MZONE)))
 end
-function c53313902.spcon(e,c)
+function c53313902.rfilter_check(c,sg)
+	return c:IsMonster() and c:IsAttribute(ATTRIBUTE_LIGHT) and (not sg or sg:IsExists(c53313902.pzfilter,1,c,true))
+end
+function c53313902.gcheck(sg,tp)
+	local cg=sg:Filter(Card.IsLocation,nil,LOCATION_MZONE)
+	return Duel.GetMZoneCount(tp,sg)>0 and Duel.CheckReleaseGroup(tp,Auxiliary.IsInGroup,#cg,nil,cg) and sg:IsExists(c53313902.rfilter_check,1,nil,sg)
+end
+function c53313902.sprcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	local g=Duel.GetReleaseGroup(tp):Filter(c53313902.rfilter,nil,tp)+Duel.GetMatchingGroup(c53313902.pzfilter,tp,LOCATION_SZONE,0,nil)
-	return Duel.GetLocationCount(tp,LOCATION_MZONE)>-2
-		and g:GetCount()>0
+	local rg=Duel.GetReleaseGroup(tp):Filter(c53313902.rfilter,nil)
+	local rg2=Duel.Group(c53313902.pzfilter,tp,LOCATION_SZONE,0,nil)
+	rg:Merge(rg2)
+	local check=rg:CheckSubGroup(c53313902.gcheck,2,2,tp)
+	return check
 end
-function c53313902.spop(e,tp,eg,ep,ev,re,r,rp,c)
+function c53313902.sprtg(e,tp,eg,ep,ev,re,r,rp,chk,c)
+	local rg=Duel.GetReleaseGroup(tp):Filter(c53313902.rfilter,nil)
+	local rg2=Duel.Group(c53313902.pzfilter,tp,LOCATION_SZONE,0,nil)
+	rg:Merge(rg2)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local g1=Duel.GetReleaseGroup(tp):Filter(c53313902.rfilter,nil,tp)+Duel.GetMatchingGroup(c53313902.pzfilter,tp,LOCATION_SZONE,0,nil):Select(tp,1,1,nil)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local g2=Duel.SelectReleaseGroup(tp,Card.IsAttribute,1,1,g1:GetFirst(),ATTRIBUTE_LIGHT)
-	g1:Merge(g2)
-	Duel.Release(g1,REASON_COST)
+	local sg=rg:SelectSubGroup(tp,c53313902.gcheck,true,2,2,tp)
+	if sg then
+		sg:KeepAlive()
+		e:SetLabelObject(sg)
+		return true
+	else return false end
 end
+function c53313902.sprop(e,tp,eg,ep,ev,re,r,rp,c)
+	local g=e:GetLabelObject()
+	Duel.Release(g,REASON_COST)
+	g:DeleteGroup()
+end
+
+
 function c53313902.copytg(c)
 	return c:IsFaceup() and (c:IsLevelBelow(8) or c:IsRankBelow(8))
 end

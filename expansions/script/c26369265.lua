@@ -106,11 +106,11 @@ function s.BigbangCondition(e,c,matg,mustg)
 		if fg:IsExists(aux.MustMaterialCounterFilter,1,nil,mg) then return false end
 		Duel.SetSelectedCard(fg)
 		local res=mg:IsExists(Auxiliary.BigbangRecursiveFilter,1,nil,tp,Group.CreateGroup(),mg,c,0,table.unpack(plist))
+		if i==2 then
+			e1:Reset()
+			e1=nil
+		end
 		if res then
-			if i==2 then
-				e1:Reset()
-				e1=nil
-			end
 			return true
 		end
 	end
