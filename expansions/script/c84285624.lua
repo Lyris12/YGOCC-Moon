@@ -157,9 +157,9 @@ function Card.FilterSummonProc(c,tp,peset)
 		end
 		return -2
 	end
-	for _,ce in ipairs({c:IsHasEffect(EFFECT_SET_PROC)}) do
+	for _,ce in ipairs({c:IsHasEffect(EFFECT_SUMMON_PROC)}) do
 		if ce and ce.SetLabel then
-			if c:CheckSetProc(ce,tp) then
+			if c:CheckSummonProc(ce,tp) then
 				table.insert(peset,ce)
 			end
 		end
