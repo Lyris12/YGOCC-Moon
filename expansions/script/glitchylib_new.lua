@@ -417,6 +417,9 @@ end
 function Card.IsInExtra(c,fu)
 	return c:IsLocation(LOCATION_EXTRA) and (fu==nil or fu and c:IsFaceup() or not fu and c:IsFacedown())
 end
+function Card.IsInGY(c)
+	return c:IsLocation(LOCATION_GRAVE)
+end
 function Card.IsInMMZ(c)
 	return c:IsLocation(LOCATION_MZONE) and c:GetSequence()<5
 end

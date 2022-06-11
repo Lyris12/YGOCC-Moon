@@ -1259,9 +1259,9 @@ table.insert(Auxiliary.CannotBeEDMatCodes,EFFECT_CANNOT_BE_FUSION_MATERIAL)
 table.insert(Auxiliary.CannotBeEDMatCodes,EFFECT_CANNOT_BE_SYNCHRO_MATERIAL)
 table.insert(Auxiliary.CannotBeEDMatCodes,EFFECT_CANNOT_BE_XYZ_MATERIAL)
 table.insert(Auxiliary.CannotBeEDMatCodes,EFFECT_CANNOT_BE_LINK_MATERIAL)
-function Auxiliary.CannotBeEDMaterial(c,f,range,isrule,reset,owner)
+function Auxiliary.CannotBeEDMaterial(c,f,range,isrule,reset,owner,prop)
 	if not owner then owner=c end
-	local property = 0
+	local property = type(prop)=="number" and prop or 0
 	if (isrule == nil or isrule == true) then
 		property = property+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE
 	end
@@ -2223,36 +2223,102 @@ if not global_card_effect_table_global_check then
 			end
 		end
 		
-		if e:GetCode()==EFFECT_DISABLE or e:GetCode()==EFFECT_DISABLE_EFFECT or e:GetCode()==EFFECT_DISABLE_CHAIN or e:GetCode()==EFFECT_DISABLE_TRAPMONSTER then
-			if e:GetType()==EFFECT_TYPE_SINGLE then
-				local cond=e:GetCondition()
-				if not cond then
-					e:SetCondition(aux.GlitchyCannotDisableCon())
-				else
-					e:SetCondition(aux.GlitchyCannotDisableCon(con))
-				end
-			elseif e:GetType()==EFFECT_TYPE_FIELD then
-				local tg=e:GetTarget()
-				if not tg then
-					e:SetTarget(aux.GlitchyCannotDisable())
-				else
-					e:SetTarget(aux.GlitchyCannotDisable(tg))
-				end
-			end
-		
-		elseif e:GetCode()==EFFECT_DISABLE_FIELD and e:GetLabel()==0 and e:GetOperation() then
-			local op=e:GetOperation()
-			e:SetOperation(Auxiliary.SetOperationResultAsLabel(op))
+		if e:GetType()&(EFFECT_TYPE_ACTIONS)==0 then
+			local e = e:IsHasType(EFFECT_TYPE_GRANT) and e:GetLabelObject() or e
 			
-		elseif e:GetCode()==EFFECT_EXTRA_SUMMON_COUNT or e:GetCode()==EFFECT_EXTRA_SET_COUNT then
-			local s,o=e:GLGetTargetRange()
-			if s~=0 and s&LOCATION_GRAVE==0 then
-				s=s|LOCATION_GRAVE
+			if e:GetCode()==EFFECT_DISABLE or e:GetCode()==EFFECT_DISABLE_EFFECT or e:GetCode()==EFFECT_DISABLE_CHAIN or e:GetCode()==EFFECT_DISABLE_TRAPMONSTER then
+				if e:GetType()==EFFECT_TYPE_SINGLE then
+					local cond=e:GetCondition()
+					if not cond then
+						e:SetCondition(aux.GlitchyCannotDisableCon())
+					else
+						e:SetCondition(aux.GlitchyCannotDisableCon(con))
+					end
+				elseif e:GetType()==EFFECT_TYPE_FIELD then
+					local tg=e:GetTarget()
+					if not tg then
+						e:SetTarget(aux.GlitchyCannotDisable())
+					else
+						e:SetTarget(aux.GlitchyCannotDisable(tg))
+					end
+				end
+			
+			elseif e:GetCode()==EFFECT_DISABLE_FIELD and e:GetLabel()==0 and e:GetOperation() then
+				local op=e:GetOperation()
+				e:SetOperation(Auxiliary.SetOperationResultAsLabel(op))
+				
+			elseif e:GetCode()==EFFECT_EXTRA_SUMMON_COUNT or e:GetCode()==EFFECT_EXTRA_SET_COUNT then
+				local s,o=e:GLGetTargetRange()
+				if s~=0 and s&LOCATION_GRAVE==0 then
+					s=s|LOCATION_GRAVE
+				end
+				if o~=0 and o&LOCATION_GRAVE==0 then
+					o=o|LOCATION_GRAVE
+				end
+				e:SetTargetRange(s,o)
+			
+			elseif e:GetCode()==EFFECT_UPDATE_ATTACK or e:GetCode()==EFFECT_SET_ATTACK or e:GetCode()==EFFECT_SET_ATTACK_FINAL or e:GetCode()==EFFECT_SWAP_AD then
+				if e:IsHasType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_XMATERIAL) then
+					if e:IsHasType(EFFECT_TYPE_SINGLE) and self:IsHasEffect(EFFECT_GLITCHY_CANNOT_CHANGE_ATK) then
+						for _,ce in ipairs({self:IsHasEffect(EFFECT_GLITCHY_CANNOT_CHANGE_ATK)}) do
+							if ce and aux.GetValueType(ce)=="Effect" and ce.GetLabel then
+								local val=ce:GetValue()
+								if not val or val(ce,e,REASON_EFFECT) then
+									e:Reset()
+									return false
+								end
+							end
+						end
+					end
+					local cond=e:GetCondition()
+					local newcond =	function(e,...)
+										if e:GetCode()==EFFECT_UPDATE_ATTACK or e:GetCode()==EFFECT_SET_ATTACK or e:GetCode()==EFFECT_SET_ATTACK_FINAL or e:GetCode()==EFFECT_SWAP_AD then
+											for _,ce in ipairs({e:GetHandler():IsHasEffect(EFFECT_GLITCHY_CANNOT_CHANGE_ATK)}) do
+												if ce and aux.GetValueType(ce)=="Effect" and ce.GetLabel then
+													local val=ce:GetValue()
+													if not val or val(ce,e,REASON_EFFECT) then
+														return false
+													end
+												end
+											end
+										end
+										return not cond or cond(e,...)
+									end
+					e:SetCondition(newcond)
+				elseif e:IsHasType(EFFECT_TYPE_EQUIP) then
+					local cond=e:GetCondition()
+					local newcond =	function(e,...)
+										if e:GetCode()==EFFECT_UPDATE_ATTACK or e:GetCode()==EFFECT_SET_ATTACK or e:GetCode()==EFFECT_SET_ATTACK_FINAL or e:GetCode()==EFFECT_SWAP_AD then
+											for _,ce in ipairs({e:GetHandler():GetEquipTarget():IsHasEffect(EFFECT_GLITCHY_CANNOT_CHANGE_ATK)}) do
+												if ce and aux.GetValueType(ce)=="Effect" and ce.GetLabel then
+													local val=ce:GetValue()
+													if not val or val(ce,e,REASON_EFFECT) then
+														return false
+													end
+												end
+											end
+										end
+										return not cond or cond(e,...)
+									end
+					e:SetCondition(newcond)
+				elseif e:IsHasType(EFFECT_TYPE_FIELD) then
+					local tg=e:GetTarget()
+					local newtarg =	function(e,c,...)
+										if e:GetCode()==EFFECT_UPDATE_ATTACK or e:GetCode()==EFFECT_SET_ATTACK or e:GetCode()==EFFECT_SET_ATTACK_FINAL or e:GetCode()==EFFECT_SWAP_AD then
+											for _,ce in ipairs({c:IsHasEffect(EFFECT_GLITCHY_CANNOT_CHANGE_ATK)}) do
+												if ce and aux.GetValueType(ce)=="Effect" and ce.GetLabel then
+													local val=ce:GetValue()
+													if not val or val(ce,e,REASON_EFFECT) then
+														return false
+													end
+												end
+											end
+										end
+										return not tg or tg(e,c,...)
+									end
+					e:SetTarget(newtarg)
+				end
 			end
-			if o~=0 and o&LOCATION_GRAVE==0 then
-				o=o|LOCATION_GRAVE
-			end
-			e:SetTargetRange(s,o)
 		end
 		
 		
@@ -2330,13 +2396,68 @@ if not global_duel_effect_table_global_check then
 								end
 							end
 							
-							if e:GetCode()==EFFECT_EXTRA_SUMMON_COUNT or e:GetCode()==EFFECT_EXTRA_SET_COUNT then
-								local s,o=e:GLGetTargetRange()
-								if s~=0 and s&LOCATION_GRAVE==0 then
-									s=s|LOCATION_GRAVE
-								end
-								if o~=0 and o&LOCATION_GRAVE==0 then
-									o=o|LOCATION_GRAVE
+							if e:GetType()&(EFFECT_TYPE_ACTIONS)==0 then
+								local e = e:IsHasType(EFFECT_TYPE_GRANT) and e:GetLabelObject() or e
+									
+								if e:GetCode()==EFFECT_EXTRA_SUMMON_COUNT or e:GetCode()==EFFECT_EXTRA_SET_COUNT then
+									local s,o=e:GLGetTargetRange()
+									if s~=0 and s&LOCATION_GRAVE==0 then
+										s=s|LOCATION_GRAVE
+									end
+									if o~=0 and o&LOCATION_GRAVE==0 then
+										o=o|LOCATION_GRAVE
+									end
+								
+								elseif e:GetCode()==EFFECT_UPDATE_ATTACK or e:GetCode()==EFFECT_SET_ATTACK or e:GetCode()==EFFECT_SET_ATTACK_FINAL or e:GetCode()==EFFECT_SWAP_AD then
+									if e:IsHasType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_XMATERIAL) then
+										local cond=e:GetCondition()
+										local newcond =	function(e,...)
+															if e:GetCode()==EFFECT_UPDATE_ATTACK or e:GetCode()==EFFECT_SET_ATTACK or e:GetCode()==EFFECT_SET_ATTACK_FINAL or e:GetCode()==EFFECT_SWAP_AD then
+																for _,ce in ipairs({e:GetHandler():IsHasEffect(EFFECT_GLITCHY_CANNOT_CHANGE_ATK)}) do
+																	if ce and aux.GetValueType(ce)=="Effect" and ce.GetLabel then
+																		local val=ce:GetValue()
+																		if not val or val(ce,e,REASON_EFFECT) then
+																			return false
+																		end
+																	end
+																end
+															end
+															return not cond or cond(e,...)
+														end
+										e:SetCondition(newcond)
+									elseif e:IsHasType(EFFECT_TYPE_EQUIP) then
+										local cond=e:GetCondition()
+										local newcond =	function(e,...)
+															if e:GetCode()==EFFECT_UPDATE_ATTACK or e:GetCode()==EFFECT_SET_ATTACK or e:GetCode()==EFFECT_SET_ATTACK_FINAL or e:GetCode()==EFFECT_SWAP_AD then
+																for _,ce in ipairs({e:GetHandler():GetEquipTarget():IsHasEffect(EFFECT_GLITCHY_CANNOT_CHANGE_ATK)}) do
+																	if ce and aux.GetValueType(ce)=="Effect" and ce.GetLabel then
+																		local val=ce:GetValue()
+																		if not val or val(ce,e,REASON_EFFECT) then
+																			return false
+																		end
+																	end
+																end
+															end
+															return not cond or cond(e,...)
+														end
+										e:SetCondition(newcond)
+									elseif e:IsHasType(EFFECT_TYPE_FIELD) then
+										local tg=e:GetTarget()
+										local newtarg =	function(e,c,...)
+															if e:GetCode()==EFFECT_UPDATE_ATTACK or e:GetCode()==EFFECT_SET_ATTACK or e:GetCode()==EFFECT_SET_ATTACK_FINAL or e:GetCode()==EFFECT_SWAP_AD then
+																for _,ce in ipairs({c:IsHasEffect(EFFECT_GLITCHY_CANNOT_CHANGE_ATK)}) do
+																	if ce and aux.GetValueType(ce)=="Effect" and ce.GetLabel then
+																		local val=ce:GetValue()
+																		if not val or val(ce,e,REASON_EFFECT) then
+																			return false
+																		end
+																	end
+																end
+															end
+															return not tg or tg(e,c,...)
+														end
+										e:SetTarget(newtarg)
+									end
 								end
 							end
 							

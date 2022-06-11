@@ -263,6 +263,33 @@ function Card.ActivatedEffectsCannotBeNegated(c,reset,rc)
 	return e
 end
 
+--Concessions
+function Card.CanAttackDirectly(c,reset,rc)
+	local rc = rc and rc or c
+	local e=Effect.CreateEffect(rc)
+	e:SetType(EFFECT_TYPE_SINGLE)
+	e:SetCode(EFFECT_DIRECT_ATTACK)
+	if reset then
+		if type(reset)~="number" then reset=0 end
+		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
+	end
+	c:RegisterEffect(e)
+end
+function Card.MustAttack(c,reset,rc,cond)
+	local rc = rc and rc or c
+	local e=Effect.CreateEffect(rc)
+	e:SetType(EFFECT_TYPE_SINGLE)
+	e:SetCode(EFFECT_MUST_ATTACK)
+	if cond then
+		e:SetCondition(cond)
+	end
+	if reset then
+		if type(reset)~="number" then reset=0 end
+		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
+	end
+	c:RegisterEffect(e)
+end
+
 --Protections
 function Card.BattleProtection(c,reset,rc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
@@ -361,6 +388,31 @@ function Card.FirstTimeProtection(c,each_turn,battle,effect,oppo_only,reset,rc)
 	return e
 end
 
+function Card.CannotBeTributed(c,reset,rc)
+	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
+	local rc = rc and rc or c
+	local range=c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	--
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(typ)
+	if not SCRIPT_AS_EQUIP then
+		e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+		e4:SetRange(range)
+	end
+	e4:SetCode(EFFECT_UNRELEASABLE_SUM)
+	e4:SetValue(1)
+	if reset then
+		if type(reset)~="number" then reset=0 end
+		e4:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
+	end
+	c:RegisterEffect(e4)
+	--
+	local e5=e4:Clone()
+	e5:SetCode(EFFECT_UNRELEASABLE_NONSUM)
+	c:RegisterEffect(e5)
+	return e4,e5
+end
+
 --Restriction and Rules
 function Card.CannotBeSet(c,reset,rc)
 	local rc = rc and rc or c
@@ -372,5 +424,36 @@ function Card.CannotBeSet(c,reset,rc)
 		if type(reset)~="number" then reset=0 end
 		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
 	end
+	c:RegisterEffect(e)
+end
+
+function Card.CannotBeMaterial(c,ed_types,f,reset,rc)
+	local rc = rc and rc or c
+	local elist={235,236,238,239,624,825}
+	local list={TYPE_FUSION+TYPE_SYNCHRO+TYPE_XYZ+TYPE_LINK+TYPE_BIGBANG+TYPE_TIMELEAP}
+	for i,typ in ipairs(list) do
+		if ed_types&typ==typ then
+			local e=Effect.CreateEffect(rc)
+			e:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+			e:SetType(EFFECT_TYPE_SINGLE)
+			e:SetCode(elist[i])
+			if f then
+				e:SetValue(function(eff,cc) if not cc then return false end return f(cc,eff) end)
+			end
+			if reset then
+				if type(reset)~="number" then reset=0 end
+				e:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
+			end
+			c:RegisterEffect(e)
+		end
+	end
+end
+
+function Card.MustBeSSedByOwnProcedure(c,rc)
+	local rc = rc and rc or c
+	local e=Effect.CreateEffect(rc)
+	e:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e:SetType(EFFECT_TYPE_SINGLE)
+	e:SetCode(EFFECT_SPSUMMON_CONDITION)
 	c:RegisterEffect(e)
 end

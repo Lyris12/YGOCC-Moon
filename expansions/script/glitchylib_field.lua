@@ -73,7 +73,7 @@ end
 
 --SS Procedures
 function Card.SSProc(c,desc,prop,range,ctlim,cond,tg,op,pos,p,zone)
-	local default_prop = (not pos1 and not p and not zone) and EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SPSUM_PARAM or EFFECT_FLAG_UNCOPYABLE
+	local default_prop = (not pos1 and not p and not zone) and EFFECT_FLAG_UNCOPYABLE or EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SPSUM_PARAM
 	local prop = prop and prop or 0
 	local range = range and range or (c:IsOriginalType(TYPE_EXTRA)) and LOCATION_EXTRA or LOCATION_HAND
 	if p and p==PLAYER_ALL then
