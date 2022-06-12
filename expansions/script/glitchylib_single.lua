@@ -429,8 +429,9 @@ end
 
 function Card.CannotBeMaterial(c,ed_types,f,reset,rc)
 	local rc = rc and rc or c
+	local effs={}
 	local elist={235,236,238,239,624,825}
-	local list={TYPE_FUSION+TYPE_SYNCHRO+TYPE_XYZ+TYPE_LINK+TYPE_BIGBANG+TYPE_TIMELEAP}
+	local list={TYPE_FUSION,TYPE_SYNCHRO,TYPE_XYZ,TYPE_LINK,TYPE_BIGBANG,TYPE_TIMELEAP}
 	for i,typ in ipairs(list) do
 		if ed_types&typ==typ then
 			local e=Effect.CreateEffect(rc)
@@ -445,7 +446,13 @@ function Card.CannotBeMaterial(c,ed_types,f,reset,rc)
 				e:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
 			end
 			c:RegisterEffect(e)
+			table.insert(effs,e)
 		end
+	end
+	if #effs>0 then
+		return table.unpack(effs)
+	else
+		return false
 	end
 end
 
