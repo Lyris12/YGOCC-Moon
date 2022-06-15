@@ -71,7 +71,7 @@ function s.rescon(e,tp,eg,ep,ev,re,r,rp)
 end
 
 function s.rfilter(c,tp)
-	return --[[c:IsCode(901019) and]] (c:IsControler(tp) or c:IsFaceup())
+	return c:IsCode(901019) and (c:IsControler(tp) or c:IsFaceup())
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(1)
