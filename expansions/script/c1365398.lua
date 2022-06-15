@@ -22,11 +22,11 @@ function s.initial_effect(c)
 	c:SSCounter(s.counterfilter)
 end
 function s.counterfilter(c)
-	return c:IsSetCard(0xae9)
+	return c:IsSetCard(0xae6)
 end
 
 function s.filter(c,e,tp)
-	return c:IsSetCard(0xae9) and c:IsMonster() and c:HasLevel() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0xae6) and c:IsMonster() and c:HasLevel() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 		and c:GetLevel()<=Duel.GetFieldGroup(tp,LOCATION_REMOVED,0):FilterCount(Card.IsFacedown,nil)
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)

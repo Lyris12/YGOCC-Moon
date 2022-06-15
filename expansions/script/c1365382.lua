@@ -35,7 +35,7 @@ function s.initial_effect(c)
 end
 --timeleap summon
 function s.TLfil(c)
-	return c:IsMonster(TYPE_TIMELEAP) and c:IsFuture(11) and c:IsSetCard(0xae9)
+	return c:IsMonster(TYPE_TIMELEAP) and c:IsFuture(11) and c:IsSetCard(0xae6)
 end
 function s.TLcon(e,c)
 	local tp=e:GetHandlerPlayer()
