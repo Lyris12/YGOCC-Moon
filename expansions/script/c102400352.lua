@@ -1,5 +1,5 @@
---created by Lyris
---機氷竜の塩水
+--created by Lyris, art by KrysFun of DeviantArt
+--機氷竜エターンドラ
 local s,id,o=GetID()
 function s.initial_effect(c)
 	local tp=c:GetControler()

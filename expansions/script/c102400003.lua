@@ -63,10 +63,10 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SendtoDeck(dg,nil,1,REASON_EFFECT)
 end
 function s.cfilter(c,tp)
-	return c:GetSummonLocation()==LOCATION_DECK and c:GetSummonPlayer()==1-tp
+	return c:IsSummonLocation(LOCATION_DECK) and c:IsSummonPlayer(1-tp)
 end
 function s.setcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(s.cfilter,1,nil,tp)
+	return eg:FilterCount(s.cfilter,nil,tp)==1
 end
 function s.settg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsSSetable() end

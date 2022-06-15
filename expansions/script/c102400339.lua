@@ -17,7 +17,7 @@ function s.mfilter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xaaa)
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCurrentChain()==0 and rp~=tp and eg:IsExists(function(tc) local mg=tc:GetMaterial() return mg and mg:IsExists(s.mfilter,1,nil) end,1,nil)
+	return Duel.GetCurrentChain()==0 and rp~=tp and eg:FilterCount(function(tc) local mg=tc:GetMaterial() return mg and mg:IsExists(s.mfilter,1,nil) end,nil)==1
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(aux.AND(Card.IsSetCard,Card.IsAbleToDeck),tp,LOCATION_GRAVE,0,1,nil,0xaaa) end

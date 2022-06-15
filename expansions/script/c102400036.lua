@@ -1,6 +1,5 @@
 --created & coded by Lyris, art found by meedogh
 --スターリ・アイズ・スぺーシュル・ドラゴン
-s.spt_other_space=102400037
 local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
@@ -18,6 +17,7 @@ function s.initial_effect(c)
 	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
 end
+s.spt_other_space=102400037
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():GetAttackAnnouncedCount()==0 end
 	local e1=Effect.CreateEffect(e:GetHandler())
