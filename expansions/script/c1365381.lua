@@ -69,7 +69,7 @@ function s.splimit(e,c)
 end
 
 function s.costfilter(c,tp)
-	return c:IsMonster() and c:IsSetCard(0xae6) and c:IsAbleToRemoveAsCost() and Duel.IsExistingMatchingCard(s.thf,tp,LOCATION_DECK,0,1,c,{c:GetCode()})
+	return c:IsMonster() and c:IsSetCard(0xae6) and c:IsAbleToRemoveAsCost(POS_FACEDOWN) and Duel.IsExistingMatchingCard(s.thf,tp,LOCATION_DECK,0,1,c,{c:GetCode()})
 end
 function s.thf(c,codes)
 	return c:IsMonster() and c:IsRace(RACE_PSYCHO) and c:IsAbleToHand() and not c:IsCode(table.unpack(codes))
@@ -86,7 +86,7 @@ function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if #g>0 then
 		local check=g:GetFirst():IsType(TYPE_TIMELEAP)
 		e:SetLabel(table.unpack({g:GetFirst():GetCode()}))
-		if Duel.Remove(g,POS_FACEUP,REASON_COST)>0 and g:GetFirst():IsBanished() and check then
+		if Duel.Remove(g,POS_FACEDOWN,REASON_COST)>0 and g:GetFirst():IsBanished() and check then
 			Duel.SetTargetParam(1)
 		else
 			Duel.SetTargetParam(0)
