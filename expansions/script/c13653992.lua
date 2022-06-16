@@ -44,6 +44,7 @@ function s.initial_effect(c)
 	e3:SetDescription(aux.Stringid(id,1))
 	e3:SetCategory(CATEGORY_ATKCHANGE)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e3:SetProperty(EFFECT_FLAG_DELAY)
 	e3:SetCode(EVENT_BATTLE_DAMAGE)
 	e3:SetCondition(s.atkcon)
 	e3:SetCost(s.atkcost)
@@ -114,7 +115,7 @@ end
 function s.afilter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xae6) and c:IsFaceup()
 end
-function s.activate(e,tp,eg,ep,ev,re,r,rp)
+function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local ag=Duel.GetMatchingGroup(s.afilter,tp,LOCATION_MZONE,0,e:GetHandler())
 	local atk=Duel.GetMatchingGroupCount(Card.IsFacedown,tp,LOCATION_REMOVED,0,nil)*100
 	if #ag>0 then
