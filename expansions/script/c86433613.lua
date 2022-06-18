@@ -30,7 +30,6 @@ function cid.initial_effect(c)
 	--draw from ED
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,1))
-	e1:SetGlitchyCategory(GLCATEGORY_ED_DRAW)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e1:SetCountLimit(1,id+100)
@@ -115,7 +114,6 @@ function cid.tmcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function cid.tmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.GLIsAbleToDrawFromExtra,tp,LOCATION_EXTRA,0,1,nil,tp) and Duel.IsExistingMatchingCard(Card.GLIsAbleToDrawFromExtra,tp,0,LOCATION_EXTRA,1,nil,1-tp) end
-	aux.GLSetSpecialInfo(e,GLCATEGORY_ED_DRAW,nil,1,PLAYER_ALL,LOCATION_EXTRA)
 end
 function cid.tmop(e,tp,eg,ep,ev,re,r,rp)
 	if not cid.tmtg(e,tp,eg,ep,ev,re,r,rp,0) then return end

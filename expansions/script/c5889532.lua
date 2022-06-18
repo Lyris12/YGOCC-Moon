@@ -49,8 +49,11 @@ function s.thfilter(c,attr)
 	local egroup=global_card_effect_table[c]
 	for i=1,#egroup do
 		local ce=egroup[i]
-		if ce and ce.SetLabelObject and glitchy_effect_table[ce] and glitchy_effect_table[ce][1]&GLCATEGORY_PLACE_SELF_AS_CONTINUOUS_TRAP==GLCATEGORY_PLACE_SELF_AS_CONTINUOUS_TRAP then
-			return true
+		if ce and aux.GetValueType(ce)=="Effect" and ce.SetLabelObject then
+			local cat,flag=ce:GetCustomCategory()
+			if cat&CATEGORY_PLACE_AS_CONTINUOUS_TRAP>0 and flag&CATEGORY_FLAG_SELF>0 then
+				return true
+			end
 		end
 	end
 	return false
@@ -60,8 +63,11 @@ function s.thfilter2(c,tp)
 	local egroup=global_card_effect_table[c]
 	for i=1,#egroup do
 		local ce=egroup[i]
-		if ce and ce.SetLabelObject and glitchy_effect_table[ce] and glitchy_effect_table[ce][1]&GLCATEGORY_PLACE_SELF_AS_CONTINUOUS_TRAP==GLCATEGORY_PLACE_SELF_AS_CONTINUOUS_TRAP then
-			return true
+		if ce and aux.GetValueType(ce)=="Effect" and ce.SetLabelObject then
+			local cat,flag=ce:GetCustomCategory()
+			if cat&CATEGORY_PLACE_AS_CONTINUOUS_TRAP>0 and flag&CATEGORY_FLAG_SELF>0 then
+				return true
+			end
 		end
 	end
 	return false

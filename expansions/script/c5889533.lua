@@ -95,7 +95,7 @@ function s.zcheck(c,i,tp)
 end
 function s.znop(e,tp,eg,ep,ev,re,r,rp)
 	local en=e:GetLabel()
-	if not en or en==0 or not e:GetHandler():IsRelateToEffect(e) then return end
+	if not en or en==0 or not e:GetHandler():IsRelateToChain(0) then return end
 	local i=math.log(en,2)
 	if i<=4 then
 		local zone,sx,dx=0,i-1,i+1
@@ -178,11 +178,11 @@ function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,0,0)
 end
 function s.rmop(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
+	if not e:GetHandler():IsRelateToChain(0) then return end
 	local tc=Duel.GetFirstTarget()
 	local seq=tc:GetSequence()
 	if tc:IsControler(1-tp) then seq=seq+16 end
-	if tc:IsRelateToEffect(e) and Duel.Remove(tc,POS_FACEUP,REASON_EFFECT+REASON_TEMPORARY)~=0 then
+	if tc:IsRelateToChain(0) and Duel.Remove(tc,POS_FACEUP,REASON_EFFECT+REASON_TEMPORARY)~=0 then
 		local fid=e:GetHandler():GetFieldID()
 		tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END+RESET_SELF_TURN,EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE,1,fid)
 		local e1=Effect.CreateEffect(e:GetHandler())

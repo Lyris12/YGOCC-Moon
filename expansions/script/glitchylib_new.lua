@@ -12,9 +12,15 @@ CATEGORY_UPDATE_RACE				= 0x200
 CATEGORY_UPDATE_SETCODE				= 0x400
 CATEGORY_LVCHANGE					= 0x800
 
+CATEGORY_FLAG_SELF					= 0x1
+
+--zone constants
+EXTRA_MONSTER_ZONE=0x60
 
 --constants aliases
 TYPE_ST			= TYPE_SPELL+TYPE_TRAP
+
+RACES_BEASTS = RACE_BEAST+RACE_BEASTWARRIOR+RACE_WINDBEAST
 
 ARCHE_FUSION		= 0x46
 ARCHE_PANDEMONIUM	= 0xf80
@@ -66,9 +72,15 @@ if not global_effect_category_table_global_check then
 	global_effect_category_table={}
 	global_effect_info_table={}
 end
-function Effect.SetCustomCategory(e,cat)
+function Effect.SetCustomCategory(e,cat,flags)
+	if not flags then flags=0 end
 	if not global_effect_category_table[e] then global_effect_category_table[e]={} end
-	table.insert(global_effect_category_table[e],cat)
+	global_effect_category_table[e][1]=cat
+	global_effect_category_table[e][2]=flags
+end
+function Effect.GetCustomCategory(e)
+	if not global_effect_category_table[e] then return 0,0 end
+	return global_effect_category_table[e][1], global_effect_category_table[e][2]
 end
 function Duel.SetCustomOperationInfo(ch,cat,g,ct,p,val,extra)
 	if not global_effect_info_table[ch+1] or #global_effect_info_table[ch+1]>0 then

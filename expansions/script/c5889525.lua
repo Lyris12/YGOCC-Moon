@@ -6,12 +6,13 @@ function s.initial_effect(c)
 	--place as Trap
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
-	e1:GLSetCategory(GLCATEGORY_PLACE_SELF_AS_CONTINUOUS_TRAP)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetCustomCategory(CATEGORY_PLACE_AS_CONTINUOUS_TRAP,CATEGORY_FLAG_SELF)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetRange(LOCATION_HAND)
-	e1:SetHintTiming(0,TIMING_BATTLE_START+TIMING_ATTACK)
 	e1:SetCountLimit(1,id)
+	e1:SetCondition(s.pccon)
 	e1:SetTarget(s.pctg)
 	e1:SetOperation(s.pcop)
 	c:RegisterEffect(e1)
@@ -30,6 +31,9 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 --PLACE AS TRAP
+function s.pccon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsMainPhase()
+end
 function s.pctg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return false end
@@ -54,7 +58,7 @@ function s.pctg(e,tp,eg,ep,ev,re,r,rp,chk)
 		end
 		return check and not e:GetHandler():IsForbidden()
 	end
-	Duel.SetGLOperationInfo(e,0,GLCATEGORY_PLACE_SELF_AS_CONTINUOUS_TRAP,e:GetHandler(),1,0,0,LOCATION_HAND)
+	Duel.SetCustomOperationInfo(0,CATEGORY_PLACE_AS_CONTINUOUS_TRAP,e:GetHandler(),1,0,0)
 end
 function s.zcheck(c,i,tp)
 	if i<5 then
@@ -66,7 +70,7 @@ function s.zcheck(c,i,tp)
 end
 function s.pcop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 or c:IsForbidden() then return end
+	if not c:IsRelateToChain(0) or Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 or c:IsForbidden() then return end
 	local zone=0
 	local incr=(tp==0) and 1 or -1
 	for p=tp,1-tp,incr do
@@ -86,6 +90,8 @@ function s.pcop(e,tp,eg,ep,ev,re,r,rp)
 	end
 	if zone==0 then return end
 	if not c:IsImmuneToEffect(e) and Duel.MoveToField(c,tp,tp,LOCATION_SZONE,POS_FACEUP,true,zone) then
+		local fid=c:GetFieldID()
+		c:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1,fid)
 		local e1=Effect.CreateEffect(c)
 		e1:SetCode(EFFECT_CHANGE_TYPE)
 		e1:SetType(EFFECT_TYPE_SINGLE)
@@ -102,8 +108,24 @@ function s.pcop(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetValue(1)
 		e2:SetReset(RESET_PHASE+PHASE_END)
 		Duel.RegisterEffect(e2,tp)
+		local e3=Effect.CreateEffect(c)
+		e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e3:SetCode(EVENT_PHASE+PHASE_END)
+		e3:SetCountLimit(1)
+		e3:SetLabel(fid)
+		e3:SetOperation(s.spop)
+		e3:SetReset(RESET_PHASE+PHASE_END)
+		Duel.RegisterEffect(e3,tp)
 	end
 end
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if c:GetFlagEffectLabel(id)==e:GetLabel() and c:IsLocation(LOCATION_SZONE) and c:IsControler(tp) and c:GetType()&0x20004==0x20004 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+	and c:IsCanBeSpecialSummoned(e,0,tp,false,false) then
+		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+	end
+end
+		
 
 --NEGATE
 function s.discon(e,tp,eg,ep,ev,re,r,rp)
@@ -124,8 +146,8 @@ end
 function s.disop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsFaceup() and tc:IsRelateToEffect(e) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
-		if Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)>0 and Duel.NegateActivation(ev) and re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:GetHandler():IsRelateToEffect(re) then
+	if tc and tc:IsFaceup() and tc:IsRelateToChain(0) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
+		if Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)>0 and Duel.NegateActivation(ev) and re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:GetHandler():IsRelateToChain(ev) then
 			Duel.SendtoGrave(eg,REASON_EFFECT)
 		end
 	end

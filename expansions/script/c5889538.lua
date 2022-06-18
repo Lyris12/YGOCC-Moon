@@ -5,94 +5,320 @@ local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddFusionProcFunRep(c,s.ffilter,2,true)
-	aux.AddContactFusionProcedure(c,Card.IsAbleToGraveAsCost,LOCATION_MZONE,0,Duel.SendtoGrave,REASON_COST)
-	--limit
+	aux.AddContactFusionProcedure(c,Card.IsAbleToGraveAsCost,LOCATION_SZONE,0,Duel.SendtoGrave,REASON_COST)
+	--clear zones
+	c:SummonedTrigger(false,false,true,false,0,CATEGORY_TOHAND+CATEGORY_GRAVE_ACTION,true,{1,0},nil,nil,s.zntg,s.znop)
+	--replace 1
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_HAND_LIMIT)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e1:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_DESTROY_REPLACE)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetTargetRange(0,1)
-	e1:SetValue(s.hlimit)
+	e1:SetCountLimit(1,id+100)
+	e1:SetTarget(s.desreptg)
+	e1:SetValue(s.desrepval)
+	e1:SetOperation(s.desrepop)
 	c:RegisterEffect(e1)
-	--place
+	--replace 1
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,0))
-	e2:SetCategory(CATEGORY_LVCHANGE)
-	e2:GLSetCategory(GLCATEGORY_PLACE_SELF_AS_CONTINUOUS_TRAP)
-	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetCountLimit(1,id)
-	e2:SetCost(s.cost)
-	e2:SetTarget(s.target)
-	e2:SetOperation(s.operation)
+	e2:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
+	e2:SetCode(EFFECT_DESTROY_REPLACE)
+	e2:SetRange(LOCATION_SZONE)
+	e2:SetCountLimit(1,id+200)
+	e2:SetCondition(s.desrepcon2)
+	e2:SetTarget(s.desreptg2)
+	e2:SetValue(s.desrepval2)
+	e2:SetOperation(s.desrepop2)
 	c:RegisterEffect(e2)
 end
 function s.ffilter(c,fc,sumtype,tp,sub,mg,sg)
-	return c:GetType()&0x20004==0x20004 and c:GetOriginalType()&TYPE_MONSTER==TYPE_MONSTER and c:GetOriginalRace()&RACE_BEAST==RACE_BEAST
+	return c:GetType()&0x20004==0x20004 and c:GetOriginalType()&TYPE_MONSTER==TYPE_MONSTER and c:GetOriginalRace()&RACES_BEASTS>0
 end
---LIMIT
+
 function s.zcheck(c,i,tp)
 	local zone=0x1<<i
 	return aux.IsZone(c,zone,tp)
 end
-function s.hlimit(e,c)
-	local tp=e:GetHandlerPlayer()
+function s.zntg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then
+		local check=false
+		for i=0,4 do
+			if not Duel.CheckLocation(tp,LOCATION_MZONE,i) and not Duel.GetFieldGroup(tp,LOCATION_MZONE,0):IsExists(s.zcheck,1,nil,i,tp) then
+				check=true
+				break
+			end
+		end
+		return check
+	end
+	local zone=0
 	local ct=0
 	for i=0,4 do
 		if not Duel.CheckLocation(tp,LOCATION_MZONE,i) and not Duel.GetFieldGroup(tp,LOCATION_MZONE,0):IsExists(s.zcheck,1,nil,i,tp) then
 			ct=ct+1
+			zone=zone|(0x1<<i)
 		end
 	end
-	return 6-ct
+	if ct>1 then
+		local int={}
+		for i=1,ct do
+			table.insert(int,i)
+		end
+		ct=Duel.AnnounceNumber(tp,table.unpack(int))
+	end
+	local en=Duel.SelectField(tp,ct,LOCATION_MZONE,0,EXTRA_MONSTER_ZONE|(~zone),false)
+	Duel.Hint(HINT_ZONE,tp,en)
+	e:SetLabel(en)
+	Duel.SetTargetParam(ct)
+end
+function s.zdisfilter(c)
+	if c:IsLocation(LOCATION_ONFIELD+LOCATION_REMOVED) and not c:IsFaceup() then return end
+	local t=global_card_effect_table[c]
+	if t and #t>0 then
+		local fixct=#t
+		for i=1,fixct do
+			local ce=t[i]
+			if ce and ce.SetLabelObject and (ce:GetCode()==EFFECT_DISABLE_FIELD or ce:GetCode()==EFFECT_USE_EXTRA_MZONE) then
+				return true
+			end
+		end
+	end
+	return false
+end
+function s.znop(e,tp,eg,ep,ev,re,r,rp)
+	--handle card effect
+	local g=Duel.GetMatchingGroup(s.zdisfilter,tp,LOCATION_ONFIELD+LOCATION_GRAVE+LOCATION_REMOVED,LOCATION_ONFIELD+LOCATION_GRAVE+LOCATION_REMOVED,nil)
+	if #g>0 then
+		local tc=g:GetFirst()
+		while tc do
+			local en=(tc:GetControler()==tp) and e:GetLabel() or e:GetLabel()<<16
+			local t=global_card_effect_table[tc]
+			if t and #t>0 then
+				local fixct=#t
+				for i=1,fixct do
+					local ce=t[i]
+					if ce and ce.SetLabelObject and ce:GetCode()==EFFECT_DISABLE_FIELD then
+						local reset,rct=ce:GLGetReset()
+						if not rct then rct=1 end
+						reset=(reset&(~(RESET_EVENT+RESETS_STANDARD_DISABLE)))|(RESET_EVENT+RESETS_STANDARD_DISABLE)
+						local val=ce:GetValue()
+						if val then
+							local zone=type(val)=="number" and val or val()
+							tc:RegisterFlagEffect(id,reset,0,rct)
+							local ne=Effect.CreateEffect(ce:GetOwner())
+							ne:SetType(EFFECT_TYPE_FIELD)
+							ne:SetRange(ce:GetRange())
+							ne:SetCode(EFFECT_DISABLE_FIELD)
+							ne:SetValue(zone&(~en))
+							if ce:GetLabelObject() then ne:SetLabelObject(ce:GetLabelObject()) end
+							ne:SetReset(reset,rct)
+							tc:RegisterEffect(ne)
+							ce:SetCondition(s.zcond)
+						else	
+							local zone=ce:GetLabel()
+							if zone~=nil and zone~=0 and zone&en>0 then
+								tc:RegisterFlagEffect(id,reset,0,rct)
+								local ne=Effect.CreateEffect(ce:GetOwner())
+								ne:SetType(EFFECT_TYPE_FIELD)
+								ne:SetRange(ce:GetRange())
+								ne:SetCode(EFFECT_DISABLE_FIELD)
+								ne:SetLabel(zone&(~en))
+								if ce:GetLabelObject() then ne:SetLabelObject(ce:GetLabelObject()) end
+								ne:SetOperation(s.disop)
+								ne:SetReset(reset,rct)
+								tc:RegisterEffect(ne)
+								ce:SetCondition(s.zcond)
+							elseif zone==0 then
+								tc:RegisterFlagEffect(id,reset,0,rct)
+								local ne=Effect.CreateEffect(ce:GetOwner())
+								ne:SetType(EFFECT_TYPE_FIELD)
+								ne:SetRange(ce:GetRange())
+								ne:SetCode(EFFECT_DISABLE_FIELD)
+								ne:SetLabel(~en)
+								if ce:GetLabelObject() then ne:SetLabelObject(ce:GetLabelObject()) end
+								ne:SetOperation(s.disop2(ce:GetOperation()))
+								ne:SetReset(reset,rct)
+								tc:RegisterEffect(ne)
+								ce:SetCondition(s.zcond)
+							end
+						end
+						
+					elseif ce and ce.SetLabelObject and ce:GetCode()==EFFECT_USE_EXTRA_MZONE then
+						local reset,rct=ce:GLGetReset()
+						if not rct then rct=1 end
+						reset=(reset&(~(RESET_EVENT+RESETS_STANDARD_DISABLE)))|(RESET_EVENT+RESETS_STANDARD_DISABLE)
+						local val=ce:GetValue()
+						local zct=math.fmod(val,0x10)
+						local zone=bit.rshift(val-zct,16)
+						if zone&en~=0 then
+							tc:RegisterFlagEffect(id,reset,0,rct)
+							local ne=ce:Clone()
+							ne:SetValue(bit.lshift(zone&(~en),16)+zct-1)
+							ne:SetReset(reset,rct)
+							tc:RegisterEffect(ne)
+							ce:SetCondition(s.zcond)
+						end
+					end
+				end
+			end
+			tc=g:GetNext()
+		end
+	end
+	--handle duel effect
+	local incr=(tp==0) and 1 or -1
+	for p=tp,1-tp,incr do
+		local en=(p==tp) and e:GetLabel() or e:GetLabel()<<16
+		local t=global_duel_effect_table[p]
+		if t and #t>0 then
+			local fixct=#t
+			for i=1,fixct do
+				local ce=t[i]
+				if ce and ce.SetLabelObject and ce:GetCode()==EFFECT_DISABLE_FIELD then
+					local reset,rct=ce:GLGetReset()
+					if not rct then rct=1 end
+					local val=ce:GetValue()
+					if val then
+						local zone=type(val)=="number" and val or val()
+						ce:GetOwner():RegisterFlagEffect(id,reset,0,rct)
+						local ne=Effect.CreateEffect(ce:GetOwner())
+						ne:SetType(EFFECT_TYPE_FIELD)
+						ne:SetCode(EFFECT_DISABLE_FIELD)
+						ne:SetValue(zone&(~en))
+						if ce:GetLabelObject() then ne:SetLabelObject(ce:GetLabelObject()) end
+						ne:SetReset(reset,rct)
+						Duel.RegisterEffect(ne,p)
+						ce:SetCondition(s.zcond2)
+					else	
+						local zone=ce:GetLabel()
+						if zone~=0 and zone&en>0 then
+							ce:GetOwner():RegisterFlagEffect(id,reset,0,rct)
+							local ne=Effect.CreateEffect(ce:GetOwner())
+							ne:SetType(EFFECT_TYPE_FIELD)
+							ne:SetCode(EFFECT_DISABLE_FIELD)
+							ne:SetLabel(zone&(~en))
+							if ce:GetLabelObject() then ne:SetLabelObject(ce:GetLabelObject()) end
+							ne:SetOperation(s.disop)
+							ne:SetReset(reset,rct)
+							Duel.RegisterEffect(ne,p)
+							ce:SetCondition(s.zcond2)
+						elseif zone==0 then
+							ce:GetOwner():RegisterFlagEffect(id,reset,0,rct)
+							local ne=Effect.CreateEffect(ce:GetOwner())
+							ne:SetType(EFFECT_TYPE_FIELD)
+							ne:SetCode(EFFECT_DISABLE_FIELD)
+							ne:SetLabel(~en)
+							if ce:GetLabelObject() then ne:SetLabelObject(ce:GetLabelObject()) end
+							ne:SetOperation(s.disop2(ce:GetOperation()))
+							ne:SetReset(reset,rct)
+							Duel.RegisterEffect(ne,p)
+							ce:SetCondition(s.zcond2)
+						end
+					end
+				end
+			end
+		end
+	end
+	local ct=Duel.GetTargetParam()
+	local g=Duel.Group(aux.NecroValleyFilter(s.spfilter),tp,LOCATION_GB,0,nil)
+	if g:CheckSubGroup(s.gcheck,ct,ct) and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+		local sg=g:SelectSubGroup(tp,s.gcheck,false,ct,ct)
+		if #sg==ct then
+			Duel.Search(sg,tp)
+		end
+	end
+end
+function s.spfilter(c)
+	return c:NotBanishedOrFaceup() and c:IsMonster() and c:IsRace(RACES_BEASTS) and c:IsAbleToHand()
+end
+function s.gcheck(g)
+	return g:GetClassCount(Card.GetAttribute)==#g
+end
+function s.zcond(e)
+	return e:GetHandler():GetFlagEffect(id)<=0
+end
+function s.zcond2(e)
+	return e:GetOwner():GetFlagEffect(id)<=0
+end
+function s.disop(e,tp)
+	return e:GetLabel()
+end
+function s.disop2(op)
+	return	function(e,tp)
+				Debug.Message(type(op))
+				local zone=(type(op)=="number") and op or op(e,tp)
+				return zone&e:GetLabel()
+	end
 end
 
---PLACE
-function s.cfilter(c,tp)
-	return c:IsRace(RACE_BEAST) and c:GetOriginalLevel()>0 and c:IsAbleToGraveAsCost() and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,c:GetOriginalLevel())
+function s.repfilter(c,tp)
+	return c:IsFaceup() and c:IsControler(tp) and c:IsLocation(LOCATION_MZONE) and c:IsRace(RACES_BEASTS)
+		and c:IsReason(REASON_BATTLE+REASON_EFFECT) and not c:IsReason(REASON_REPLACE)
 end
-function s.filter(c,lv)
-	return c:IsFaceup() and c:IsRace(RACE_BEAST) and not c:IsLevel(lv)
-end
-function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	e:SetLabel(1)
-	return true
-end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.desreptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
-		if e:GetLabel()~=1 then return false end
-		e:SetLabel(0)
-		return Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and not e:GetHandler():IsForbidden() and Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_DECK,0,1,nil,tp)
+		return eg:IsExists(s.repfilter,1,nil,tp) and not eg:IsContains(e:GetHandler()) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and not e:GetHandler():IsForbidden()
+		and not e:GetHandler():IsStatus(STATUS_DESTROY_CONFIRMED+STATUS_BATTLE_DESTROYED)
 	end
-	e:SetLabel(0)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_DECK,0,1,1,nil,tp)
-	Duel.SendtoGrave(g,REASON_COST)
-	e:SetLabelObject(g:GetFirst())
-	Duel.SetGLOperationInfo(e,0,GLCATEGORY_PLACE_SELF_AS_CONTINUOUS_TRAP,e:GetHandler(),1,0,0,LOCATION_MZONE)
-	local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,e:GetLabelObject():GetOriginalLevel())
-	Duel.SetOperationInfo(0,CATEGORY_LVCHANGE,g,#g,0,e:GetLabelObject():GetOriginalLevel())
+	if Duel.SelectEffectYesNo(tp,e:GetHandler(),96) then
+		return true
+	end
+	return false
 end
-function s.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.desrepval(e,c)
+	return s.repfilter(c,e:GetHandlerPlayer())
+end
+function s.desrepop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
-	if not c:IsImmuneToEffect(e) and Duel.MoveToField(c,tp,tp,LOCATION_SZONE,POS_FACEUP,true) then
-		local e1=Effect.CreateEffect(c)
-		e1:SetCode(EFFECT_CHANGE_TYPE)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET)
-		e1:SetValue(TYPE_TRAP+TYPE_CONTINUOUS)
-		c:RegisterEffect(e1)
-		local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,tp)
-		local tc=g:GetFirst()
-		for tc in aux.Next(g) do
+	if not c:IsImmuneToEffect(e) then
+		Duel.Hint(HINT_CARD,0,id)
+		if Duel.MoveToField(c,tp,tp,LOCATION_SZONE,POS_FACEUP,true) then
 			local e1=Effect.CreateEffect(c)
+			e1:SetCode(EFFECT_CHANGE_TYPE)
 			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetCode(EFFECT_CHANGE_LEVEL)
-			e1:SetValue(e:GetLabelObject():GetOriginalLevel())
-			e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-			tc:RegisterEffect(e1)
+			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+			e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET)
+			e1:SetValue(TYPE_TRAP+TYPE_CONTINUOUS)
+			c:RegisterEffect(e1)
+			if c:IsLocation(LOCATION_SZONE) and c:IsControler(tp) and c:GetType()&0x20004==0x20004
+			and Duel.GetLocationCount(tp,LOCATION_MZONE,nil,LOCATION_REASON_COUNT)+Duel.GetLocationCount(1-tp,LOCATION_MZONE,nil,LOCATION_REASON_COUNT)>0 then
+				local dis=Duel.SelectDisableField(tp,1,LOCATION_MZONE,LOCATION_MZONE,EXTRA_MONSTER_ZONE)
+				Duel.Hint(HINT_ZONE,tp,dis)
+				local e1=Effect.CreateEffect(c)
+				e1:SetType(EFFECT_TYPE_FIELD)
+				e1:SetCode(EFFECT_DISABLE_FIELD)
+				e1:SetLabel(dis)
+				e1:SetOperation(s.disop0)
+				e1:SetReset(RESET_PHASE+PHASE_END,2)
+				Duel.RegisterEffect(e1,tp)
+			end
 		end
 	end
+end
+function s.disop0(e,tp)
+	return e:GetLabel()
+end
+
+function s.desrepcon2(e)
+	return e:GetHandler():GetType()&0x20004==0x20004
+end
+function s.repfilter2(c,tp)
+	return c:IsFaceup() and c:IsControler(tp) and c:IsLocation(LOCATION_ONFIELD) and c:GetType()&0x20004==0x20004
+		and c:IsReason(REASON_BATTLE+REASON_EFFECT) and not c:IsReason(REASON_REPLACE)
+end
+function s.desreptg2(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then
+		return eg:IsExists(s.repfilter2,1,nil,tp) and not eg:IsContains(e:GetHandler()) and e:GetHandler():IsAbleToGrave()
+		and not e:GetHandler():IsStatus(STATUS_DESTROY_CONFIRMED+STATUS_BATTLE_DESTROYED)
+	end
+	if Duel.SelectEffectYesNo(tp,e:GetHandler(),96) then
+		return true
+	end
+	return false
+end
+function s.desrepval2(e,c)
+	return s.repfilter2(c,e:GetHandlerPlayer())
+end
+function s.desrepop2(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	Duel.Hint(HINT_CARD,0,id)
+	Duel.SendtoGrave(c,REASON_EFFECT+REASON_REPLACE)
 end

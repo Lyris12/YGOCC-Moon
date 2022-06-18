@@ -17,7 +17,7 @@ function s.initial_effect(c)
 	--place
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
-	e2:GLSetCategory(GLCATEGORY_PLACE_SELF_AS_CONTINUOUS_TRAP)
+	e2:SetCustomCategory(CATEGORY_PLACE_AS_CONTINUOUS_TRAP,CATEGORY_FLAG_SELF)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)
@@ -79,13 +79,13 @@ function s.pctg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.GetLocationCount(e:GetHandler():GetOwner(),LOCATION_SZONE)>0 and Duel.IsExistingTarget(s.pcfilter,tp,0,LOCATION_MZONE,1,e:GetHandler(),e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	local g=Duel.SelectTarget(tp,s.pcfilter,tp,0,LOCATION_MZONE,1,1,e:GetHandler(),e:GetHandler())
-	Duel.SetGLOperationInfo(e,0,GLCATEGORY_PLACE_SELF_AS_CONTINUOUS_TRAP,e:GetHandler(),1,0,0,LOCATION_MZONE)
+	Duel.SetCustomOperationInfo(0,CATEGORY_PLACE_AS_CONTINUOUS_TRAP,e:GetHandler(),1,0,0)
 end
 function s.pcop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if not c or not tc:IsFaceup() or not c:IsRelateToEffect(e) or Duel.GetLocationCount(c:GetOwner(),LOCATION_SZONE)<0 then return end
-	if tc and tc:IsRelateToEffect(e) and s.pcfilter(tc,c) then
+	if not c or not tc:IsFaceup() or not c:IsRelateToChain(0) or Duel.GetLocationCount(c:GetOwner(),LOCATION_SZONE)<0 then return end
+	if tc and tc:IsRelateToChain(0) and s.pcfilter(tc,c) then
 		local fid=c:GetFieldID()
 		local g=Group.FromCards(c,tc)
 		local gc=g:GetFirst()
@@ -156,9 +156,9 @@ function s.mcheck(c)
 	return c:IsPreviousLocation(LOCATION_MZONE) and (c:GetPreviousTypeOnField()&TYPE_MONSTER==TYPE_MONSTER or c:IsPreviousPosition(POS_FACEDOWN))
 end
 function s.gyop(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
+	if not e:GetHandler():IsRelateToChain(0) then return end
 	local tc=Duel.GetFirstTarget()
-	if not tc or not tc:IsRelateToEffect(e) then return end
+	if not tc or not tc:IsRelateToChain(0) then return end
 	local g=tc:GetColumnGroup():Filter(aux.TRUE,tc)
 	if #g==0 then return end
 	if Duel.Destroy(g,REASON_EFFECT)>0 then

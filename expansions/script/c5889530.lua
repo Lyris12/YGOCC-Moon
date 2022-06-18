@@ -54,8 +54,11 @@ function s.thfilter(c,g)
 	local egroup=global_card_effect_table[c]
 	for i=1,#egroup do
 		local ce=egroup[i]
-		if ce and ce.SetLabelObject and glitchy_effect_table[ce] and glitchy_effect_table[ce][1]&GLCATEGORY_PLACE_SELF_AS_CONTINUOUS_TRAP==GLCATEGORY_PLACE_SELF_AS_CONTINUOUS_TRAP then
-			return true
+		if ce and aux.GetValueType(ce)=="Effect" and ce.SetLabelObject then
+			local cat,flag=ce:GetCustomCategory()
+			if cat&CATEGORY_PLACE_AS_CONTINUOUS_TRAP>0 and flag&CATEGORY_FLAG_SELF>0 then
+				return true
+			end
 		end
 	end
 	return false
@@ -106,7 +109,7 @@ function s.zntg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.znop(e,tp,eg,ep,ev,re,r,rp)
 	local zone=0xff
-	if Duel.GetLocationCount(tp,LOCATION_MZONE,PLAYER_NONE,LOCATION_REASON_COUNT)>0 then
+	if Duel.GetLocationCount(tp,LOCATION_MZONE,PLAYER_NONE,LOCATION_REASON_COUNT)+Duel.GetLocationCount(1-tp,LOCATION_MZONE,PLAYER_NONE,LOCATION_REASON_COUNT)>0 then
 		local dis=Duel.SelectDisableField(tp,1,LOCATION_MZONE,LOCATION_MZONE,EXTRA_MONSTER_ZONE)
 		zone=(~dis)
 		Duel.Hint(HINT_ZONE,tp,dis)

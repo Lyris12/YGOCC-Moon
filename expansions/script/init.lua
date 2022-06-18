@@ -1443,25 +1443,9 @@ EFFECT_TYPE_TRIGGER=EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_TRIGGER_F
 EFFECT_TYPE_QUICK=EFFECT_TYPE_QUICK_O+EFFECT_TYPE_QUICK_F
 EFFECT_TYPE_CHAIN_STARTER=EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_TRIGGER_F+EFFECT_TYPE_QUICK_O+EFFECT_TYPE_QUICK_F+EFFECT_TYPE_ACTIVATE+EFFECT_TYPE_IGNITION
 
-TYPE_ST = TYPE_SPELL+TYPE_TRAP
-
---glitchy custom categories (apply with e:SetGlitchyCategory)
-GLCATEGORY_PLACE_SELF_AS_CONTINUOUS_TRAP=0x1
-GLCATEGORY_ED_DRAW=0x8000
-GLCATEGORY_ACTIVATE_LMARKER=0x10000
-GLCATEGORY_DEACTIVATE_LMARKER=0x20000
-GLCATEGORY_SYNCHRO_SUMMON=0x40000
-GLCATEGORY_SELF_DAMAGE_ONLY=0x80000
-
---glitchy's custom effects
-
-
 --glitchy's custom events
 EVENT_ACTIVATE_LINK_MARKER=9000
 EVENT_DEACTIVATE_LINK_MARKER=9001
-
---zone constants
-EXTRA_MONSTER_ZONE=0x60
 
 --resets
 RESETS_STANDARD_DISABLE=RESETS_STANDARD|RESET_DISABLE
@@ -1481,29 +1465,6 @@ function Group.Includes(g1,g2)
 		end
 	end
 	return check
-end
-
-if not Auxiliary.GLSpecialInfos then Auxiliary.GLSpecialInfos={} end
-function Duel.SetGLOperationInfo(e,category,g,ct,p,loc,fromloc)
-	if not g then
-		Auxiliary.GLSpecialInfos[e]={category,nil,ct,p,loc,fromloc}
-	else
-		Auxiliary.GLSpecialInfos[e]={category,g,ct,0,0,fromloc}
-	end
-end
-function Auxiliary.GLSetSpecialInfo(e,category,g,ct,p,loc,fromloc)
-	Duel.SetGLOperationInfo(e,category,g,ct,p,loc,fromloc)
-end
-function Auxiliary.SetGLOperationInfo(e,category,g,ct,p,loc,fromloc)
-	Duel.SetGLOperationInfo(e,category,g,ct,p,loc,fromloc)
-end
-
-function Effect.GLSetCategory(e,category)
-	if not glitchy_effect_table[e] then glitchy_effect_table[e]={0} end
-	glitchy_effect_table[e][1]=glitchy_effect_table[e][1]|category
-end
-function Effect.SetGlitchyCategory(e,category)
-	Effect.GLSetCategory(e,category)
 end
 
 function Effect.GLGetTargetRange(e)

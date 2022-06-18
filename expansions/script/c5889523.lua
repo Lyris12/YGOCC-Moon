@@ -6,7 +6,7 @@ function s.initial_effect(c)
 	--place as Trap
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
-	e1:GLSetCategory(GLCATEGORY_PLACE_SELF_AS_CONTINUOUS_TRAP)
+	e1:SetCustomCategory(CATEGORY_PLACE_AS_CONTINUOUS_TRAP,CATEGORY_FLAG_SELF)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_HAND)
 	e1:SetCountLimit(1,id)
@@ -28,7 +28,7 @@ function s.initial_effect(c)
 	--return
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,2))
-	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e3:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_DECKDES)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e3:SetCode(EVENT_PHASE+PHASE_END)
 	e3:SetRange(LOCATION_GRAVE)
@@ -61,7 +61,7 @@ function s.pctg(e,tp,eg,ep,ev,re,r,rp,chk)
 		end
 		return check and not e:GetHandler():IsForbidden()
 	end
-	Duel.SetGLOperationInfo(e,0,GLCATEGORY_PLACE_SELF_AS_CONTINUOUS_TRAP,e:GetHandler(),1,0,0,LOCATION_HAND)
+	Duel.SetCustomOperationInfo(0,CATEGORY_PLACE_AS_CONTINUOUS_TRAP,e:GetHandler(),1,0,0)
 end
 function s.zcheck(c,i,tp)
 	local zone=0x1<<i
@@ -69,7 +69,7 @@ function s.zcheck(c,i,tp)
 end
 function s.pcop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
+	if not c:IsRelateToChain(0) or Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 	local zone=0
 	for i=0,4 do
 		if not Duel.CheckLocation(tp,LOCATION_MZONE,i) and not Duel.GetFieldGroup(tp,LOCATION_MZONE,0):IsExists(s.zcheck,1,nil,i,tp) and Duel.CheckLocation(tp,LOCATION_SZONE,i) then
@@ -100,8 +100,11 @@ function s.thfilter(c)
 	local egroup=global_card_effect_table[c]
 	for i=1,#egroup do
 		local ce=egroup[i]
-		if ce and ce.SetLabelObject and glitchy_effect_table[ce] and glitchy_effect_table[ce][1]&GLCATEGORY_PLACE_SELF_AS_CONTINUOUS_TRAP==GLCATEGORY_PLACE_SELF_AS_CONTINUOUS_TRAP then
-			return true
+		if ce and aux.GetValueType(ce)=="Effect" and ce.SetLabelObject then
+			local cat,flag=ce:GetCustomCategory()
+			if cat&CATEGORY_PLACE_AS_CONTINUOUS_TRAP>0 and flag&CATEGORY_FLAG_SELF>0 then
+				return true
+			end
 		end
 	end
 	return false
@@ -149,12 +152,12 @@ function s.spfilter(c,e,tp)
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
+	if c:IsRelateToChain(0) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
 		local zone=0x1<<c:GetPreviousSequence()
 		if Duel.GetMZoneCount(tp)>0 and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
-			if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil,e,tp) and Duel.SelectYesNo(tp,aux.Stringid(id,3)) then
+			if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE,0,1,nil,e,tp) and Duel.SelectYesNo(tp,aux.Stringid(id,3)) then
 				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-				local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.spfilter),tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil,e,tp)
+				local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.spfilter),tp,LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil,e,tp)
 				if #g>0 then
 					Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 				end

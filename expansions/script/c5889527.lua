@@ -30,7 +30,7 @@ function s.initial_effect(c)
 	--draw
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,2))
-	e3:GLSetCategory(GLCATEGORY_PLACE_SELF_AS_CONTINUOUS_TRAP)
+	e3:SetCustomCategory(CATEGORY_PLACE_AS_CONTINUOUS_TRAP,CATEGORY_FLAG_SELF)
 	e3:SetCategory(CATEGORY_DRAW+CATEGORY_TODECK)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_MZONE)
@@ -56,7 +56,7 @@ function s.atkval(e,c)
 			end
 		end
 	end
-	return ct*300
+	return ct*400
 end
 --ENABLE ZONE
 function s.zntg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -120,32 +120,48 @@ function s.znop(e,tp,eg,ep,ev,re,r,rp)
 						local reset,rct=ce:GLGetReset()
 						if not rct then rct=1 end
 						reset=(reset&(~(RESET_EVENT+RESETS_STANDARD_DISABLE)))|(RESET_EVENT+RESETS_STANDARD_DISABLE)
-						local zone=ce:GetLabel()
-						if type(zone)~=nil and zone~=0 and zone&en>0 then
+						local val=ce:GetValue()
+						if val then
+							local zone=type(val)=="number" and val or val()
 							tc:RegisterFlagEffect(id,reset,0,rct)
 							local ne=Effect.CreateEffect(ce:GetOwner())
 							ne:SetType(EFFECT_TYPE_FIELD)
 							ne:SetRange(ce:GetRange())
 							ne:SetCode(EFFECT_DISABLE_FIELD)
-							ne:SetLabel(zone&(~en))
+							ne:SetValue(zone&(~en))
 							if ce:GetLabelObject() then ne:SetLabelObject(ce:GetLabelObject()) end
-							ne:SetOperation(s.disop)
 							ne:SetReset(reset,rct)
 							tc:RegisterEffect(ne)
 							ce:SetCondition(s.zcond)
-						elseif zone==0 then
-							tc:RegisterFlagEffect(id,reset,0,rct)
-							local ne=Effect.CreateEffect(ce:GetOwner())
-							ne:SetType(EFFECT_TYPE_FIELD)
-							ne:SetRange(ce:GetRange())
-							ne:SetCode(EFFECT_DISABLE_FIELD)
-							ne:SetLabel(~en)
-							if ce:GetLabelObject() then ne:SetLabelObject(ce:GetLabelObject()) end
-							ne:SetOperation(s.disop2(ce:GetOperation()))
-							ne:SetReset(reset,rct)
-							tc:RegisterEffect(ne)
-							ce:SetCondition(s.zcond)
+						else	
+							local zone=ce:GetLabel()
+							if zone~=nil and zone~=0 and zone&en>0 then
+								tc:RegisterFlagEffect(id,reset,0,rct)
+								local ne=Effect.CreateEffect(ce:GetOwner())
+								ne:SetType(EFFECT_TYPE_FIELD)
+								ne:SetRange(ce:GetRange())
+								ne:SetCode(EFFECT_DISABLE_FIELD)
+								ne:SetLabel(zone&(~en))
+								if ce:GetLabelObject() then ne:SetLabelObject(ce:GetLabelObject()) end
+								ne:SetOperation(s.disop)
+								ne:SetReset(reset,rct)
+								tc:RegisterEffect(ne)
+								ce:SetCondition(s.zcond)
+							elseif zone==0 then
+								tc:RegisterFlagEffect(id,reset,0,rct)
+								local ne=Effect.CreateEffect(ce:GetOwner())
+								ne:SetType(EFFECT_TYPE_FIELD)
+								ne:SetRange(ce:GetRange())
+								ne:SetCode(EFFECT_DISABLE_FIELD)
+								ne:SetLabel(~en)
+								if ce:GetLabelObject() then ne:SetLabelObject(ce:GetLabelObject()) end
+								ne:SetOperation(s.disop2(ce:GetOperation()))
+								ne:SetReset(reset,rct)
+								tc:RegisterEffect(ne)
+								ce:SetCondition(s.zcond)
+							end
 						end
+						
 					elseif ce and ce.SetLabelObject and ce:GetCode()==EFFECT_USE_EXTRA_MZONE then
 						local reset,rct=ce:GLGetReset()
 						if not rct then rct=1 end
@@ -179,29 +195,43 @@ function s.znop(e,tp,eg,ep,ev,re,r,rp)
 				if ce and ce.SetLabelObject and ce:GetCode()==EFFECT_DISABLE_FIELD then
 					local reset,rct=ce:GLGetReset()
 					if not rct then rct=1 end
-					local zone=ce:GetLabel()
-					if zone~=0 and zone&en>0 then
+					local val=ce:GetValue()
+					if val then
+						local zone=type(val)=="number" and val or val()
 						ce:GetOwner():RegisterFlagEffect(id,reset,0,rct)
 						local ne=Effect.CreateEffect(ce:GetOwner())
 						ne:SetType(EFFECT_TYPE_FIELD)
 						ne:SetCode(EFFECT_DISABLE_FIELD)
-						ne:SetLabel(zone&(~en))
+						ne:SetValue(zone&(~en))
 						if ce:GetLabelObject() then ne:SetLabelObject(ce:GetLabelObject()) end
-						ne:SetOperation(s.disop)
 						ne:SetReset(reset,rct)
 						Duel.RegisterEffect(ne,p)
 						ce:SetCondition(s.zcond2)
-					elseif zone==0 then
-						ce:GetOwner():RegisterFlagEffect(id,reset,0,rct)
-						local ne=Effect.CreateEffect(ce:GetOwner())
-						ne:SetType(EFFECT_TYPE_FIELD)
-						ne:SetCode(EFFECT_DISABLE_FIELD)
-						ne:SetLabel(~en)
-						if ce:GetLabelObject() then ne:SetLabelObject(ce:GetLabelObject()) end
-						ne:SetOperation(s.disop2(ce:GetOperation()))
-						ne:SetReset(reset,rct)
-						Duel.RegisterEffect(ne,p)
-						ce:SetCondition(s.zcond2)
+					else	
+						local zone=ce:GetLabel()
+						if zone~=0 and zone&en>0 then
+							ce:GetOwner():RegisterFlagEffect(id,reset,0,rct)
+							local ne=Effect.CreateEffect(ce:GetOwner())
+							ne:SetType(EFFECT_TYPE_FIELD)
+							ne:SetCode(EFFECT_DISABLE_FIELD)
+							ne:SetLabel(zone&(~en))
+							if ce:GetLabelObject() then ne:SetLabelObject(ce:GetLabelObject()) end
+							ne:SetOperation(s.disop)
+							ne:SetReset(reset,rct)
+							Duel.RegisterEffect(ne,p)
+							ce:SetCondition(s.zcond2)
+						elseif zone==0 then
+							ce:GetOwner():RegisterFlagEffect(id,reset,0,rct)
+							local ne=Effect.CreateEffect(ce:GetOwner())
+							ne:SetType(EFFECT_TYPE_FIELD)
+							ne:SetCode(EFFECT_DISABLE_FIELD)
+							ne:SetLabel(~en)
+							if ce:GetLabelObject() then ne:SetLabelObject(ce:GetLabelObject()) end
+							ne:SetOperation(s.disop2(ce:GetOperation()))
+							ne:SetReset(reset,rct)
+							Duel.RegisterEffect(ne,p)
+							ce:SetCondition(s.zcond2)
+						end
 					end
 				end
 			end
@@ -220,8 +250,11 @@ function s.spfilter(c,e,tp)
 	local egroup=global_card_effect_table[c]
 	for i=1,#egroup do
 		local ce=egroup[i]
-		if ce and ce.SetLabelObject and glitchy_effect_table[ce] and glitchy_effect_table[ce][1]&GLCATEGORY_PLACE_SELF_AS_CONTINUOUS_TRAP==GLCATEGORY_PLACE_SELF_AS_CONTINUOUS_TRAP then
-			return true
+		if ce and aux.GetValueType(ce)=="Effect" and ce.SetLabelObject then
+			local cat,flag=ce:GetCustomCategory()
+			if cat&CATEGORY_PLACE_AS_CONTINUOUS_TRAP>0 and flag&CATEGORY_FLAG_SELF>0 then
+				return true
+			end
 		end
 	end
 	return false
@@ -237,6 +270,7 @@ function s.disop(e,tp)
 end
 function s.disop2(op)
 	return	function(e,tp)
+				Debug.Message(type(op))
 				local zone=(type(op)=="number") and op or op(e,tp)
 				return zone&e:GetLabel()
 	end
@@ -252,14 +286,14 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 		return Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and not e:GetHandler():IsForbidden() and ct>0 and Duel.IsPlayerCanDraw(tp,ct)
 	end
 	Duel.SetTargetPlayer(tp)
-	Duel.SetGLOperationInfo(e,0,GLCATEGORY_PLACE_SELF_AS_CONTINUOUS_TRAP,e:GetHandler(),1,0,0,LOCATION_MZONE)
+	Duel.SetCustomOperationInfo(0,CATEGORY_PLACE_AS_CONTINUOUS_TRAP,e:GetHandler(),1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,ct)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,0,tp,ct-1)
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
-	if not c:IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
+	if not c:IsRelateToChain(0) or Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 	if not c:IsImmuneToEffect(e) and Duel.MoveToField(c,tp,tp,LOCATION_SZONE,POS_FACEUP,true) then
 		local e1=Effect.CreateEffect(c)
 		e1:SetCode(EFFECT_CHANGE_TYPE)

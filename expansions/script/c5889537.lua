@@ -18,7 +18,7 @@ function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_ATKCHANGE+CATEGORY_DEFCHANGE+CATEGORY_DISABLE)
-	e2:GLSetCategory(GLCATEGORY_PLACE_SELF_AS_CONTINUOUS_TRAP)
+	e2:SetCustomCategory(CATEGORY_PLACE_AS_CONTINUOUS_TRAP,CATEGORY_FLAG_SELF)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1,id)
@@ -35,7 +35,7 @@ function s.xyztg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.xyzop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsFacedown() or not c:IsRelateToEffect(e) then return end
+	if c:IsFacedown() or not c:IsRelateToChain(0) then return end
 	local g=Duel.GetMatchingGroup(s.xyzfilter,tp,LOCATION_SZONE,LOCATION_SZONE,nil)
 	if #g>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
@@ -53,7 +53,7 @@ function s.filter(c)
 	return c:IsFaceup() and (c:GetAttack()>0 or c:GetDefense()>0)
 end
 function s.filter2(c)
-	return c:IsFaceup() and not (c:GetAttack()==0 and c:GetDefense()==0 and c:IsDisabled())
+	return c:IsFaceup() and not (c:GetAttack()==0 and c:GetDefense()==0 and not aux.NegateMonsterFilter(c))
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
@@ -64,21 +64,23 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 		local b3=(e:GetHandler():GetOverlayCount()>=3 and Duel.IsExistingMatchingCard(s.filter2,tp,0,LOCATION_MZONE,1,nil))
 		return Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and not e:GetHandler():IsForbidden() and (b1 or b2 or b3)
 	end
-	Duel.SetGLOperationInfo(e,0,GLCATEGORY_PLACE_SELF_AS_CONTINUOUS_TRAP,e:GetHandler(),1,0,0,LOCATION_MZONE)
+	Duel.SetCustomOperationInfo(0,CATEGORY_PLACE_AS_CONTINUOUS_TRAP,e:GetHandler(),1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 	if e:GetHandler():GetOverlayCount()>1 then
 		local g=Duel.GetMatchingGroup(s.filter,tp,0,LOCATION_MZONE,nil)
-		Duel.SetOperationInfo(0,CATEGORY_ATKCHANGE,g,1,0,0)
-		Duel.SetOperationInfo(0,CATEGORY_DEFCHANGE,g,1,0,0)
+		Duel.SetCustomOperationInfo(0,CATEGORY_ATKCHANGE,g,1,0,0,{-2})
+		Duel.SetCustomOperationInfo(0,CATEGORY_DEFCHANGE,g,1,0,0,{-2})
 	end
 	if e:GetHandler():GetOverlayCount()>2 then
-		local g=Duel.GetMatchingGroup(s.filter,tp,0,LOCATION_MZONE,nil)
+		local g=Duel.GetMatchingGroup(s.filter2,tp,0,LOCATION_MZONE,nil)
+		Duel.SetCustomOperationInfo(0,CATEGORY_ATKCHANGE,g,1,0,0,{0})
+		Duel.SetCustomOperationInfo(0,CATEGORY_DEFCHANGE,g,1,0,0,{0})
 		Duel.SetOperationInfo(0,CATEGORY_DISABLE,g,1,0,0)
 	end
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
+	if not c:IsRelateToChain(0) or Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 	local ct=e:GetHandler():GetOverlayCount()
 	if not c:IsImmuneToEffect(e) and Duel.MoveToField(c,tp,tp,LOCATION_SZONE,POS_FACEUP,true) then
 		local e1=Effect.CreateEffect(c)
@@ -153,34 +155,24 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 			end
 		else
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-			local g=Duel.SelectMatchingCard(tp,s.filter2,tp,0,LOCATION_MZONE,1,1,nil)
-			local tc=g:GetFirst()
-			if tc then
+			local g=Duel.SelectMatchingCard(tp,s.filter2,tp,0,LOCATION_MZONE,1,2,nil)
+			if #g>0 then
 				Duel.HintSelection(g)
-				local e1=Effect.CreateEffect(c)
-				e1:SetType(EFFECT_TYPE_SINGLE)
-				e1:SetCode(EFFECT_SET_ATTACK_FINAL)
-				e1:SetValue(0)
-				e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-				tc:RegisterEffect(e1)
-				local e1x=Effect.CreateEffect(c)
-				e1x:SetType(EFFECT_TYPE_SINGLE)
-				e1x:SetCode(EFFECT_SET_DEFENSE_FINAL)
-				e1x:SetValue(0)
-				e1x:SetReset(RESET_EVENT+RESETS_STANDARD)
-				tc:RegisterEffect(e1x)
-				Duel.NegateRelatedChain(tc,RESET_TURN_SET)
-				local e2=Effect.CreateEffect(c)
-				e2:SetType(EFFECT_TYPE_SINGLE)
-				e2:SetCode(EFFECT_DISABLE)
-				e2:SetReset(RESET_EVENT+RESETS_STANDARD)
-				tc:RegisterEffect(e2)
-				local e3=Effect.CreateEffect(c)
-				e3:SetType(EFFECT_TYPE_SINGLE)
-				e3:SetCode(EFFECT_DISABLE_EFFECT)
-				e3:SetValue(RESET_TURN_SET)
-				e3:SetReset(RESET_EVENT+RESETS_STANDARD)
-				tc:RegisterEffect(e3)
+				for tc in aux.Next(g) do
+					local e1=Effect.CreateEffect(c)
+					e1:SetType(EFFECT_TYPE_SINGLE)
+					e1:SetCode(EFFECT_SET_ATTACK_FINAL)
+					e1:SetValue(0)
+					e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+					tc:RegisterEffect(e1)
+					local e1x=Effect.CreateEffect(c)
+					e1x:SetType(EFFECT_TYPE_SINGLE)
+					e1x:SetCode(EFFECT_SET_DEFENSE_FINAL)
+					e1x:SetValue(0)
+					e1x:SetReset(RESET_EVENT+RESETS_STANDARD)
+					tc:RegisterEffect(e1x)
+					Duel.Negate(tc,e)
+				end
 			end
 		end
 	end

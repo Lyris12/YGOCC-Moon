@@ -13,7 +13,7 @@ function s.initial_effect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_IGNORE_IMMUNE)
-	e2:SetCode(EFFECT_SPSUMMON_PROC_G)
+	e2:SetCode(EFFECT_TYPE_IGNITION+EFFECT_TYPE_CONTINUOUS)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCondition(s.nscon)
 	e2:SetOperation(s.nsop)
@@ -36,29 +36,24 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 --SUMMON PROC
-function s.nscon(e,c)
-	if c==nil then return true end
-	return c:IsSummonable(false,nil) and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
+function s.nscon(e,tp)
+	local c=e:GetHandler()
+	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and c:IsPoisonFrogSummonable()
 end
-function s.nsop(e,tp,eg,ep,ev,re,r,rp,c)
+function s.nsop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
 	Duel.Summon(tp,c,false,nil)
 	if c:IsLocation(LOCATION_MZONE) then
-		local e1=Effect.CreateEffect(e:GetHandler())
+		local e1=Effect.CreateEffect(e:GetOwner())
 		e1:SetDescription(aux.Stringid(id,1))
 		e1:SetType(EFFECT_TYPE_FIELD)
 		e1:SetCode(EFFECT_EXTRA_SUMMON_COUNT)
 		e1:SetTargetRange(LOCATION_HAND+LOCATION_MZONE,0)
-		e1:SetCondition(s.xtrcon(Duel.GetCurrentPhase()))
 		e1:SetTarget(aux.TargetBoolFunction(Card.IsRace,RACE_BEAST))
 		e1:SetReset(RESET_PHASE+PHASE_END)
 		Duel.RegisterEffect(e1,tp)
 	end
 	return false
-end
-function s.xtrcon(ph)
-	return	function(e)
-				return Duel.GetTurnPlayer()==e:GetHandlerPlayer() and Duel.GetCurrentPhase()==ph
-			end
 end
 function s.mattg(e,c)
 	return c:GetType()&0x20004==0x20004 and c:GetOriginalType()&TYPE_MONSTER==TYPE_MONSTER and c:GetOriginalRace()&RACE_BEAST==RACE_BEAST
@@ -76,7 +71,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c,tc=e:GetHandler(),Duel.GetFirstTarget()
-	if not c:IsRelateToEffect(e) or not tc or not tc:IsFaceup() or not tc:IsRelateToEffect(e) then return end
+	if not c:IsRelateToChain(0) or not tc or not tc:IsFaceup() or not tc:IsRelateToChain(0) then return end
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,3))
 	e1:SetProperty(EFFECT_FLAG_CLIENT_HINT)
@@ -124,4 +119,67 @@ function s.znop(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.disop(e,tp)
 	return e:GetLabel()
+end
+
+function Card.IsPoisonFrogSummonable(c)
+	local tp=c:GetControler()
+	if not c:IsSummonableCard() or c:IsForbidden() then return false end
+	for _,ce in ipairs({Duel.IsPlayerAffectedByEffect(tp,EFFECT_SUMMON_COST)}) do
+		if ce and ce.SetLabel then
+			local cost=ce:GetCost()
+			if cost and not cost(ce,c,tp) then
+				return false
+			end
+		end
+	end
+	if c:IsHasEffect(EFFECT_CANNOT_SUMMON) then return false end
+	--
+	local peset={}
+	local res=c:FilterPoisonFrogSummonProc(tp,peset)
+	if #peset==0 and (aux.GetValueType(res)=="boolean" and not res or aux.GetValueType(res)=="number" and res==-2) then
+		Debug.Message(res)
+		return false
+	end
+	
+	return true
+end
+function Card.FilterPoisonFrogSummonProc(c,tp,peset)
+	if c:IsHasEffect(EFFECT_LIMIT_SUMMON_PROC) then
+		for _,ce in ipairs({c:IsHasEffect(EFFECT_LIMIT_SUMMON_PROC)}) do
+			if ce and ce.SetLabel then
+				if c:CheckPoisonFrogSummonProc(ce,tp) then
+					table.insert(peset,ce)
+				end
+			end
+		end
+		if #peset>0 then
+			return -1
+		end
+		return -2
+	end
+end
+function Card.CheckPoisonFrogSummonProc(c,ce,tp)
+	if not ce:CheckCountLimit(tp) then return false end
+	local toplayer=tp
+	if ce:IsHasProperty(EFFECT_FLAG_SPSUM_PARAM) then
+		local s,o=ce:GLGetTargetRange()
+		if o and o~=0 then
+			toplayer=1-tp
+		end
+	end
+	local sumtype=ce:GetValue() and ce:GetValue() or SUMMON_TYPE_NORMAL
+	for _,pe in ipairs({Duel.IsPlayerAffectedByEffect(tp,EFFECT_CANNOT_SUMMON)}) do
+		if pe and pe.SetLabel then
+			local tg=pe:GetTarget()
+			if not tg then return false end
+			if tg(pe,c,tp,sumtype,POS_FACEUP,toplayer) then return false end
+		end
+	end
+	if not c:CheckUniqueOnField(toplayer,LOCATION_MZONE) then return false end
+	
+	local cond=ce:GetCondition()
+	if not cond or cond(ce,c,0,0x1f) then
+		return true
+	end
+	return false
 end

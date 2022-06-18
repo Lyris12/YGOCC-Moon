@@ -21,7 +21,6 @@ function c86433608.initial_effect(c)
 	--change markers
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(86433608,0))
-	e2:SetGlitchyCategory(GLCATEGORY_DEACTIVATE_LMARKER+GLCATEGORY_ACTIVATE_LMARKER)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_CHAINING)
 	e2:SetRange(LOCATION_MZONE)
@@ -96,8 +95,6 @@ function c86433608.lmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():GetLinkMarker()~=0 and e:GetHandler():GLIsCanDeactivateLinkMarkers(1)
 		and (Duel.IsExistingMatchingCard(c86433608.dfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,e:GetHandler()) or e:GetHandler():GLIsCanActivateLinkMarkers(1,true))
 	end
-	aux.GLSetSpecialInfo(e,GLCATEGORY_DEACTIVATE_LMARKER,e:GetHandler(),1,0,0)
-	aux.GLSetSpecialInfo(e,GLCATEGORY_ACTIVATE_LMARKER,nil,1,PLAYER_ALL,LOCATION_MZONE)
 end
 function c86433608.lmop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
