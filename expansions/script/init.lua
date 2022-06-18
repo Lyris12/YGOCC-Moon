@@ -2967,33 +2967,3 @@ function Auxiliary.UnionLimit(f)
 		return (not f or f(c)) or e:GetHandler():GetEquipTarget()==c
 	end
 end
-function Auxiliary.IsUnionState(effect)
-	local c=effect:GetHandler()
-	return c:IsHasEffect(EFFECT_UNION_STATUS)
-end
-function Auxiliary.SetUnionState(c)
-	local eset={c:IsHasEffect(EFFECT_UNION_LIMIT)}
-	local e0=Effect.CreateEffect(c)
-	e0:SetType(EFFECT_TYPE_SINGLE)
-	e0:SetCode(EFFECT_EQUIP_LIMIT)
-	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e0:SetValue(eset[1]:GetValue())
-	e0:SetReset(RESET_EVENT+RESETS_STANDARD)
-	c:RegisterEffect(e0)
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_UNION_STATUS)
-	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-	c:RegisterEffect(e1)
-	if c.old_union then
-		local e2=e1:Clone()
-		e2:SetCode(EFFECT_OLDUNION_STATUS)
-		c:RegisterEffect(e2)
-	end
-end
-function Auxiliary.CheckUnionEquip(uc,tc)
-	ct1,ct2=tc:GetUnionCount()
-	if uc.old_union then return ct1==0
-	else return ct2==0 end
-end
