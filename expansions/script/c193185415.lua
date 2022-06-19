@@ -22,12 +22,13 @@ function cm.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetCode(EVENT_TO_GRAVE)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
+	e3:SetCountLimit(1,m+100)
 	e3:SetCondition(cm.milcon)
 	e3:SetTarget(cm.miltg)
 	e3:SetOperation(cm.milop)
 	c:RegisterEffect(e3)
-	end
-	function cm.cfilter(c)
+end
+function cm.cfilter(c)
 	return c:IsSetCard(0xd78) and (c:IsAbleToHand() or c:IsAbleToGrave()) and not c:IsCode(m)
 end
 function cm.setg(e,tp,eg,ep,ev,re,r,rp,chk)
