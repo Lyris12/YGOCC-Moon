@@ -57,20 +57,24 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>4 and Duel.IsPlayerCanDiscardDeck(tp,1)
-		and Duel.GetDecktopGroup(tp,5):FilterCount(Card.IsAbleToHand,nil)>0 end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,0,tp,LOCATION_DECK)
+	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>4 and Duel.IsPlayerCanDiscardDeck(tp,1) end
+end
+function s.tfilter(c)
+	return c:IsSetCard(0xd78) and (c:IsAbleToHand() or c:IsAbleToGrave())
+end
+function s.gcheck(g)
+	return g:IsExists(Card.IsAbleToGrave,1,nil) and (g:IsExists(Card.IsAbleToHand,1,nil) or #g==1)
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	if not Duel.IsPlayerCanDiscardDeck(tp,1) then return end
 	local g=Duel.GetDecktopGroup(tp,5)
 	Duel.ConfirmCards(tp,g)
-	if g:FilterCount(Card.IsSetCard,nil,0xd78)>0 and Duel.SelectYesNo(tp,1191) then
-		local tg=g:FilterSelect(tp,Card.IsSetCard,1,2,nil,0xd78)
+	local fg=g:Filter(s.tfilter,nil)
+	if #fg>0 then
+		local tg=fg:SelectSubGroup(tp,s.gcheck,false,1,2)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-		local tc=tg:Select(tp,1,1,nil):GetFirst()
-		if tc and tc:IsAbleToGrave() then
-			Duel.SendtoGrave(tc,REASON_EFFECT)
+		local tc=tg:FilterSelect(tp,Card.IsAbleToGrave,1,1,nil):GetFirst()
+		if tc and Duel.SendtoGrave(tc,REASON_EFFECT)>0 and tc:IsLocation(LOCATION_GRAVE) then
 			tg:RemoveCard(tc)
 			local hc=tg:GetFirst()
 			if hc and hc:IsAbleToHand() then
@@ -90,9 +94,7 @@ function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_HAND,0,nil)
 	if chk==0 then return #g>0 end
 	local ct=1
-	for i=2,3 do
-		if Duel.IsPlayerCanDraw(tp,i) then ct=i end
-	end
+	if Duel.IsPlayerCanDraw(tp,2) then ct=2 end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DISCARD)
 	e:SetLabel(Duel.SendtoGrave(g:Select(tp,1,ct,nil),REASON_DISCARD+REASON_COST))
 end

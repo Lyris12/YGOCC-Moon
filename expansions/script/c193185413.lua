@@ -75,18 +75,23 @@ end
 function s.filter(c)
 	return c:IsRace(RACE_ZOMBIE) and c:IsType(TYPE_MONSTER)
 end
+function s.thfilter(c)
+	return c:IsSetCard(0xd78) and c:IsAbleToHand()
+end
 function s.op(e,tp,eg,ep,ev,re,r,rp)
 	if not Duel.IsPlayerCanDiscardDeck(tp,1) then return end
 	local g=Duel.GetDecktopGroup(tp,10)
 	Duel.ConfirmCards(tp,g)
 	local tg=g:Filter(aux.AND(Card.IsAbleToGrave,Card.IsRace),nil,RACE_ZOMBIE)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local sg=g:FilterSelect(tp,Card.IsSetCard,1,1,nil):GetFirst()
-	if sg and sg:IsAbleToHand() then
+	local sg=g:FilterSelect(tp,s.thfil,1,1,nil):GetFirst()
+	if sg then
 		Duel.SendtoHand(sg,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,sg)
 		Duel.ShuffleHand(tp)
-		tg:Sub(sg)
+		if tg:IsContains(sg) then
+			tg:Sub(sg)
+		end
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local gg=tg:Select(tp,1,2,nil)
