@@ -84,7 +84,7 @@ function s.op(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ConfirmCards(tp,g)
 	local tg=g:Filter(aux.AND(Card.IsAbleToGrave,Card.IsRace),nil,RACE_ZOMBIE)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local sg=g:FilterSelect(tp,s.thfil,1,1,nil):GetFirst()
+	local sg=g:FilterSelect(tp,s.thfilter,1,1,nil):GetFirst()
 	if sg then
 		Duel.SendtoHand(sg,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,sg)

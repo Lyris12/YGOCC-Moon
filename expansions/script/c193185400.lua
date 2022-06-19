@@ -35,21 +35,17 @@ function s.filter(c,e)
 	return c:IsFaceup() and c:IsRace(RACE_ZOMBIE) and c:IsType(TYPE_MONSTER) and c:IsCanBeEffectTarget(e)
 end
 function s.check(g)
-	return g:IsExists(Card.IsAbleToDeck,4,nil)
+	return #g>1 and g:IsExists(Card.IsAbleToDeck,#g-1,nil) or #g==1
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and chkc:IsControler(tp) and s.filter(chkc,e) end
 	local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_REMOVED,0,nil,e)
 	if chk==0 then
-		aux.GCheckAdditional=s.check
-		local res=g:CheckSubGroup(aux.TRUE,1,5)
-		aux.GCheckAdditional=nil
+		local res=g:CheckSubGroup(s.check,1,5)
 		return res
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	aux.GCheckAdditional=s.check
-	local rg=g:SelectSubGroup(tp,aux.TRUE,false,1,5)
-	aux.GCheckAdditional=nil
+	local rg=g:SelectSubGroup(tp,s.check,false,1,5)
 	Duel.SetTargetCard(rg)
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,rg,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,rg,#rg-1,0,0)
