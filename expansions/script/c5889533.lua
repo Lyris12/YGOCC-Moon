@@ -131,7 +131,7 @@ end
 --PLACE
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:IsPreviousPosition(POS_FACEUP) and not c:IsLocation(LOCATION_DECK) and rp~=tp and r&REASON_EFFECT>0
+	return not c:IsLocation(LOCATION_DECK) and rp~=tp and r&REASON_EFFECT>0
 end
 function s.filter(c)
 	return (not c:IsLocation(LOCATION_MZONE) or c:IsFaceup()) and c:IsRace(RACE_BEAST) and not c:IsForbidden()
