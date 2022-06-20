@@ -42,7 +42,7 @@ s.listed_series = {0xa4a}
 
 --special summon proc
 function s.spfilter(c,tp)
-	return (c:IsFaceup() or not c:IsOnField()) and ((c:IsMonster() and c:IsRace(RACE_BEAST)) or c:GetType()&TYPE_TRAP+TYPE_CONTINUOUS==TYPE_TRAP+TYPE_CONTINUOUS) and not c:IsCode(id)
+	return (c:IsFaceup() or not c:IsOnField()) and ((c:IsMonster() and c:IsRace(RACE_BEAST)) or c:IsOnField() and c:GetType()&TYPE_TRAP+TYPE_CONTINUOUS==TYPE_TRAP+TYPE_CONTINUOUS) and not c:IsCode(id)
 		and c:IsAbleToHandAsCost()
 end
 function s.spcon(e,c)
