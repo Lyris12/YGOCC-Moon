@@ -2,6 +2,7 @@
 --Keddy was here~
 local cod,id=GetID()
 function cod.initial_effect(c)
+	aux.EnableUnionAttribute(c,cod.eqlimit)
 	--Equip
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
@@ -21,26 +22,12 @@ function cod.initial_effect(c)
 	e2:SetTarget(cod.sptg)
 	e2:SetOperation(cod.spop)
 	c:RegisterEffect(e2)
-	--Destroy substitute
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_EQUIP)
-	e3:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
-	e3:SetCode(EFFECT_DESTROY_SUBSTITUTE)
-	e3:SetValue(cod.repval)
-	c:RegisterEffect(e3)
 	--ATK up
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_EQUIP)
 	e4:SetCode(EFFECT_UPDATE_ATTACK)
 	e4:SetValue(500)
 	c:RegisterEffect(e4)
-	--Equip Limit
-	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_SINGLE)
-	e5:SetCode(EFFECT_EQUIP_LIMIT)
-	e5:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e5:SetValue(cod.eqlimit)
-	c:RegisterEffect(e5)
 	--Draw
 	local e6=Effect.CreateEffect(c)
 	e6:SetDescription(aux.Stringid(id,2))

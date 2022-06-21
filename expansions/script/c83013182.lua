@@ -2,6 +2,7 @@
 --Scripted by Boos
 local cod,id=GetID()
 function cod.initial_effect(c)
+	aux.EnableUnionAttribute(c,cod.eqlimit)
 	--Equip
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
@@ -21,20 +22,6 @@ function cod.initial_effect(c)
 	e2:SetTarget(cod.sptg)
 	e2:SetOperation(cod.spop)
 	c:RegisterEffect(e2)
-	--Destroy substitute
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_EQUIP)
-	e3:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
-	e3:SetCode(EFFECT_DESTROY_SUBSTITUTE)
-	e3:SetValue(cod.repval)
-	c:RegisterEffect(e3)
-	--Equip Limit
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE)
-	e4:SetCode(EFFECT_EQUIP_LIMIT)
-	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e4:SetValue(cod.eqlimit)
-	c:RegisterEffect(e4)
 	--Extra Attack
 	local e5=Effect.CreateEffect(c)
 	e5:SetType(EFFECT_TYPE_EQUIP)
