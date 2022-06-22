@@ -105,10 +105,10 @@ function cod.costfilter(c)
 end
 function cod.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cod.costfilter,tp,LOCATION_HAND,0,1,e:GetHandler()) end
-	Duel.DiscardHand(tp,cod.costfilter,1,1,REASON_COST,e:GetHandler())
+	Duel.DiscardHand(tp,cod.costfilter,1,1,REASON_COST+REASON_DISCARD,e:GetHandler())
 end
 function cod.cfilter(c,tp)
-	return c:IsControler(tp) and c:IsType(TYPE_UNION) and c:IsAttribute(ATTRIBUTE_WATER)
+	return c:IsFaceup() and c:IsControler(tp) and c:IsType(TYPE_UNION) and c:IsAttribute(ATTRIBUTE_WATER)
 end
 function cod.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(cod.cfilter,1,nil,tp)
@@ -118,27 +118,29 @@ function cod.sptg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,true,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
-	c:RegisterFlagEffect(id,RESET_EVENT+0x7e0000+RESET_PHASE+PHASE_END,0,1)
 end
-function cod.eqfilter(c)
-	return c:IsAttribute(ATTRIBUTE_WATER) and c:IsType(TYPE_UNION)
+function cod.eqfilter(c,tp,tc)
+	return c:IsAttribute(ATTRIBUTE_WATER) and c:IsType(TYPE_UNION) and aux.CheckUnionEquip(c,tc) and c:CheckUnionTarget(tc) and c:CheckUniqueOnField(tp) and not c:IsForbidden()
 end
 function cod.spop2(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-	local g=Duel.GetMatchingGroup(cod.eqfilter,tp,LOCATION_HAND,0,nil)
-	if Duel.SpecialSummon(c,0,tp,tp,true,false,POS_FACEUP)~=0 and g:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(id,3)) then
-		local sg=g:Select(tp,1,1,nil)
-		if sg:GetCount()==0 then return end
-		local tc=sg:GetFirst()
-		if c:IsFacedown() or not cod.filter(c) then
-			Duel.SendtoGrave(tc,REASON_EFFECT)
-			return
+	if Duel.SpecialSummon(c,0,tp,tp,true,false,POS_FACEUP)~=0 then
+		local g=Duel.GetMatchingGroup(cod.eqfilter,tp,LOCATION_HAND,0,nil,tp,c)
+		if Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and g:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(id,3)) then
+			local sg=g:Select(tp,1,1,nil)
+			if sg:GetCount()==0 then return end
+			local ec=sg:GetFirst()
+			if ec and aux.CheckUnionEquip(ec,c) and Duel.Equip(tp,ec,c) then
+				aux.SetUnionState(ec)
+				local e1=Effect.CreateEffect(c)
+				e1:SetType(EFFECT_TYPE_SINGLE)
+				e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CANNOT_DISABLE)
+				e1:SetRange(LOCATION_SZONE)
+				e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+				e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+				ec:RegisterEffect(e1)
+			end
 		end
-		if not Duel.Equip(tp,tc,c,true) then return end
-		tc:RegisterFlagEffect(tc:GetCode(),RESET_EVENT+0x7e0000+RESET_PHASE+PHASE_END,0,1)
-		aux.SetUnionState(tc)
-	elseif Duel.SpecialSummon(c,0,tp,tp,true,false,POS_FACEUP) and c:IsCanBeSpecialSummoned(e,0,tp,true,false) then
-		Duel.SendtoGrave(c,REASON_RULE)
 	end
 end

@@ -35,7 +35,7 @@ function cod.initial_effect(c)
 	--Equip 2
 	local e6=Effect.CreateEffect(c)
 	e6:SetDescription(aux.Stringid(id,2))
-	e6:SetCategory(CATEGORY_TOHAND+CATEGORY_EQUIP)
+	e6:SetCategory(CATEGORY_TOHAND+CATEGORY_EQUIP+CATEGORY_GRAVE_ACTION)
 	e6:SetType(EFFECT_TYPE_IGNITION)
 	e6:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e6:SetRange(LOCATION_MZONE)
@@ -131,27 +131,28 @@ end
 
 --Swap
 function cod.ecfilter1(c)
-	return c:IsFaceup() and c:GetEquipTarget()
+	return c:IsType(TYPE_EQUIP) and c:IsFaceup() and c:GetEquipTarget()
 end
-function cod.ecfilter2(c)
-	return c:IsSetCard(0x33F) and Duel.IsExistingMatchingCard(cod.mfilter,tp,LOCATION_MZONE,0,1,nil,c) 
+function cod.ecfilter2(c,tp)
+	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x33f) and c:CheckUniqueOnField(tp) and not c:IsForbidden() and Duel.IsExistingMatchingCard(cod.mfilter,tp,LOCATION_MZONE,0,1,nil,c)
 end
 function cod.mfilter(c,ec)
-	local ct1,ct2=c:GetUnionCount()
-	return c:IsFaceup() and ec:CheckEquipTarget(c) and ct2==0
+	return c:IsFaceup() and aux.CheckUnionEquip(ec,c) and ec:CheckUnionTarget(c)
 end
 function cod.eqtg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return false end
+	if chkc then return chkc:IsLocation(LOCATION_SZONE) and chkc:IsControler(tp) and cod.ecfilter1(chkc) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0 
 		and Duel.IsExistingTarget(cod.ecfilter1,tp,LOCATION_SZONE,0,1,nil,tp)
-		and Duel.IsExistingMatchingCard(cod.ecfilter2,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil) end
+		and Duel.IsExistingMatchingCard(cod.ecfilter2,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil,tp)
+	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	local g=Duel.SelectTarget(tp,cod.ecfilter1,tp,LOCATION_SZONE,0,1,1,nil,tp)
+	Duel.SetOperationInfo(0,CATEGORY_EQUIP,nil,1,tp,LOCATION_HAND+LOCATION_GRAVE)
 end
 function cod.eqop2(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	local eg=Duel.GetMatchingGroup(cod.ecfilter2,tp,LOCATION_HAND+LOCATION_GRAVE,0,nil)
-	if tc and tc:IsRelateToEffect(e) and Duel.SendtoHand(tc,nil,REASON_EFFECT) and eg:GetCount()>0 then
+	local eg=Duel.GetMatchingGroup(aux.NecroValleyFilter(cod.ecfilter2),tp,LOCATION_HAND+LOCATION_GRAVE,0,nil,tp)
+	if tc and tc:IsRelateToEffect(e) and Duel.SendtoHand(tc,nil,REASON_EFFECT)>0 and tc:IsLocation(LOCATION_HAND) and eg:GetCount()>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,2))
 		local eqc=eg:Select(tp,1,1,nil):GetFirst()
 		if not eqc then return end

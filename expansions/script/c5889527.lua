@@ -128,7 +128,7 @@ function s.znop(e,tp,eg,ep,ev,re,r,rp)
 								if tp==1 then
 									zone=((zone&0xffff)<<16)|((zone>>16)&0xffff)
 								end
-								--Debug.Message(tostring(zone).." "..tostring(~en).." "..tostring((zone&(~en))&0xffff))
+								Debug.Message(tostring(zone).." "..tostring(~en).." "..tostring((zone&(~en))&0xffff))
 								tc:RegisterFlagEffect(id,reset,0,rct)
 								local newzone=(zone&(~en)&0xffff)
 								if tp==1 then
@@ -183,31 +183,31 @@ function s.znop(e,tp,eg,ep,ev,re,r,rp)
 								break
 							end
 						end
-						if check then	
-							local con=ce:GetCondition()
-							if not con or con(ce,tp,eg,ep,ev,re,r,rp) then
-								local reset,rct=ce:GLGetReset()
-								if not rct then rct=1 end
-								local val=ce:GetValue()
-								if val then
-									local zone=type(val)=="number" and val or val()
-									if tp==1 then
-										zone=((zone&0xffff)<<16)|((zone>>16)&0xffff)
-									end
-									--Debug.Message(tostring(zone).." "..tostring(~en).." "..tostring(((zone)&(~en))&0xffff))
-									ce:GetOwner():RegisterFlagEffect(id,reset,0,rct)
-									local newzone=(zone&(~en)&0xffff)
-									if tp==1 then
-										newzone=((newzone&0xffff)<<16)|((newzone>>16)&0xffff)
-									end
-									if newzone~=0 then
-										local ne=ce:Clone()
-										ne:SetValue(newzone)
-										if ce:GetLabelObject() then ne:SetLabelObject(ce:GetLabelObject()) end
-										Duel.RegisterEffect(ne,p)
-									end
-									ce:SetCondition(s.zcond2)
+					end
+					if check then	
+						local con=ce:GetCondition()
+						if not con or con(ce,tp,eg,ep,ev,re,r,rp) then
+							local reset,rct=ce:GLGetReset()
+							if not rct then rct=1 end
+							local val=ce:GetValue()
+							if val then
+								local zone=type(val)=="number" and val or val()
+								if tp==1 then
+									zone=((zone&0xffff)<<16)|((zone>>16)&0xffff)
 								end
+								--Debug.Message(tostring(zone).." "..tostring(~en).." "..tostring(zone&(~en)))
+								ce:GetOwner():RegisterFlagEffect(id,reset,0,rct)
+								local newzone=(zone&(~en))
+								if tp==1 then
+									newzone=((newzone&0xffff)<<16)|((newzone>>16)&0xffff)
+								end
+								if newzone~=0 then
+									local ne=ce:Clone()
+									ne:SetValue(newzone)
+									if ce:GetLabelObject() then ne:SetLabelObject(ce:GetLabelObject()) end
+									Duel.RegisterEffect(ne,p)
+								end
+								ce:SetCondition(s.zcond2)
 							end
 						end
 					end

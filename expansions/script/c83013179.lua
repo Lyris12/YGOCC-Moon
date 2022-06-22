@@ -8,8 +8,9 @@ function cod.initial_effect(c)
 	--Equip
     local e1=Effect.CreateEffect(c)
     e1:SetDescription(aux.Stringid(id,0))
+	e1:SetCategory(CATEGORY_EQUIP+CATEGORY_GRAVE_ACTION)
     e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-    e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
+    e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
     e1:SetCode(EVENT_SPSUMMON_SUCCESS)
     e1:SetCountLimit(1,id)
     e1:SetCondition(cod.eqcon)
@@ -33,37 +34,32 @@ end
 function cod.eqcon(e,tp,eg,ep,ev,re,r,rp)
     return e:GetHandler():IsSummonType(SUMMON_TYPE_SYNCHRO)
 end
-function cod.cfilter(c,tc)
-	return c:IsType(TYPE_UNION) and c:CheckEquipTarget(tc) and aux.CheckUnionEquip(c,tc)
+function cod.cfilter(c,tp,tc)
+	return c:IsType(TYPE_UNION) and aux.CheckUnionEquip(c,tc) and c:CheckUnionTarget(tc) and c:CheckUniqueOnField(tp) and not c:IsForbidden()
 end
 function cod.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and cod.cfilter(chkc,e:GetHandler()) end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and cod.cfilter(chkc,tp,e:GetHandler()) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
-		and Duel.IsExistingTarget(cod.cfilter,tp,LOCATION_GRAVE,0,1,nil,e:GetHandler()) end
+		and Duel.IsExistingTarget(cod.cfilter,tp,LOCATION_GRAVE,0,1,nil,tp,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	local g=Duel.SelectTarget(tp,cod.cfilter,tp,LOCATION_GRAVE,0,1,1,nil,e:GetHandler())
-	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,g,1,0,0)
-    Duel.SetOperationInfo(0,CATEGORY_EQUIP,g,1,0,0)
+	local g=Duel.SelectTarget(tp,aux.NecroValleyFilter(cod.cfilter),tp,LOCATION_GRAVE,0,1,1,nil,tp,e:GetHandler())
+    Duel.SetOperationInfo(0,CATEGORY_EQUIP,g,#g,0,0)
 end
-function cod.cfilter2(c)
-	return c:IsType(TYPE_UNION) and Duel.IsExistingMatchingCard(cod.mfilter,tp,LOCATION_MZONE,0,1,nil,c)
+function cod.cfilter2(c,tp,exc)
+	return c:IsType(TYPE_MONSTER) and c:IsType(TYPE_UNION) and c:CheckUniqueOnField(tp) and not c:IsForbidden() and Duel.IsExistingMatchingCard(cod.mfilter,tp,LOCATION_MZONE,0,1,exc,c)
 end
 function cod.mfilter(c,ec)
-	return c:IsFaceup() and ec:CheckEquipTarget(c) and aux.CheckUnionEquip(ec,c)
+	return c:IsFaceup() and aux.CheckUnionEquip(ec,c) and ec:CheckUnionTarget(c)
 end
 function cod.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if not c:IsRelateToEffect(e) or c:IsFacedown() then return end
-	if not tc and not tc:IsRelateToEffect(e) or not cod.filter(tc,c) then
-		Duel.SendtoGrave(c,REASON_EFFECT)
-		return
-	end
+	if not tc and not tc:IsRelateToEffect(e) or not cod.cfilter(tc,tp,c) then return end
 	if not Duel.Equip(tp,tc,c,false) then return end
 	aux.SetUnionState(tc)
-	local eg=Duel.GetMatchingGroup(cod.cfilter2,tp,LOCATION_GRAVE,0,nil)
-	if eg:GetCount()>0 and Duel.GetFieldGroupCount(e:GetHandlerPlayer(),LOCATION_MZONE,0)>1
-		and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
+	local eg=Duel.GetMatchingGroup(aux.NecroValleyFilter(cod.cfilter2),tp,LOCATION_GRAVE,0,c,tp)
+	if Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and eg:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 		local eqc=eg:Select(tp,1,1,nil):GetFirst()
 		if not eqc then return end

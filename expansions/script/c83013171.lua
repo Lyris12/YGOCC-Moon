@@ -31,10 +31,11 @@ function cod.initial_effect(c)
 	--Equip 2
 	local e6=Effect.CreateEffect(c)
 	e6:SetDescription(aux.Stringid(id,2))
-	e6:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e6:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_EQUIP)
 	e6:SetType(EFFECT_TYPE_IGNITION)
 	e6:SetRange(LOCATION_SZONE)
 	e6:SetCountLimit(1,id)
+	e6:SetCondition(cod.spcon)
 	e6:SetCost(cod.spcost)
 	e6:SetTarget(cod.sptg2)
 	e6:SetOperation(cod.spop2)
@@ -95,6 +96,9 @@ function cod.eqlimit(e,c)
 end
 
 --Special Summon 2
+function cod.spcon(e)
+	return e:GetHandler():GetEquipGroup():GetCount()>0
+end
 function cod.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return c:IsAbleToGraveAsCost() end
@@ -108,9 +112,8 @@ function cod.sptg2(e,tp,eg,ep,ev,re,r,rp,chk)
 		and Duel.IsExistingMatchingCard(cod.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end
-function cod.ecfilter2(c,ec)
-	return c:IsSetCard(0x33F) and c:IsType(TYPE_MONSTER)
-		and c:CheckEquipTarget(ec) and aux.CheckUnionEquip(c,ec)
+function cod.ecfilter2(c,tp,tc)
+	return c:IsSetCard(0x33F) and c:IsType(TYPE_MONSTER) and aux.CheckUnionEquip(c,tc) and c:CheckUnionTarget(tc) and c:CheckUniqueOnField(tp) and not c:IsForbidden()
 end
 function cod.spop2(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
@@ -119,13 +122,12 @@ function cod.spop2(e,tp,eg,ep,ev,re,r,rp)
 	if g:GetCount()>0 then
 		local tc=g:GetFirst()
 		if Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)==0 then return end
-		local eg=Duel.GetMatchingGroup(cod.ecfilter2,tp,LOCATION_HAND,0,nil,tc)
-		if eg:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(83013180,3))
-			and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 then
-			local sg=Duel.SelectMatchingCard(tp,cod.ecfilter2,tp,LOCATION_HAND,0,1,1,nil,tc)
+		local eg=Duel.GetMatchingGroup(cod.ecfilter2,tp,LOCATION_HAND,0,nil,tp,tc)
+		if Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and eg:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(83013180,3)) then
+			local sg=Duel.SelectMatchingCard(tp,cod.ecfilter2,tp,LOCATION_HAND,0,1,1,nil,tp,tc)
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
 			local ec=sg:GetFirst()
-			if ec and aux.CheckUnionEquip(ec,tc) and Duel.Equip(tp,ec,tc) then
+			if ec and Duel.Equip(tp,ec,tc) then
 				aux.SetUnionState(ec)
 			end
 		end
