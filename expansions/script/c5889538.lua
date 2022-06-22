@@ -84,59 +84,41 @@ function s.zdisfilter(c)
 	return false
 end
 function s.znop(e,tp,eg,ep,ev,re,r,rp)
+	local en=e:GetLabel()
 	--handle card effect
 	local g=Duel.GetMatchingGroup(s.zdisfilter,tp,LOCATION_ONFIELD+LOCATION_GRAVE+LOCATION_REMOVED,LOCATION_ONFIELD+LOCATION_GRAVE+LOCATION_REMOVED,nil)
 	if #g>0 then
 		local tc=g:GetFirst()
 		while tc do
-			local en=(tc:GetControler()==tp) and e:GetLabel() or e:GetLabel()<<16
 			local t=global_card_effect_table[tc]
 			if t and #t>0 then
 				local fixct=#t
 				for i=1,fixct do
 					local ce=t[i]
-					if ce and ce.SetLabelObject and ce:GetCode()==EFFECT_DISABLE_FIELD then
-						local reset,rct=ce:GLGetReset()
-						if not rct then rct=1 end
-						reset=(reset&(~(RESET_EVENT+RESETS_STANDARD_DISABLE)))|(RESET_EVENT+RESETS_STANDARD_DISABLE)
-						local val=ce:GetValue()
-						if val then
-							local zone=type(val)=="number" and val or val()
-							tc:RegisterFlagEffect(id,reset,0,rct)
-							local ne=Effect.CreateEffect(ce:GetOwner())
-							ne:SetType(EFFECT_TYPE_FIELD)
-							ne:SetRange(ce:GetRange())
-							ne:SetCode(EFFECT_DISABLE_FIELD)
-							ne:SetValue(zone&(~en))
-							if ce:GetLabelObject() then ne:SetLabelObject(ce:GetLabelObject()) end
-							ne:SetReset(reset,rct)
-							tc:RegisterEffect(ne)
-							ce:SetCondition(s.zcond)
-						else	
-							local zone=ce:GetLabel()
-							if zone~=nil and zone~=0 and zone&en>0 then
+					if ce and ce.SetLabelObject and ce:GetCode()==EFFECT_DISABLE_FIELD and aux.GetValueType(ce:GetHandler())=="Card" then
+						local con=ce:GetCondition()
+						if not con or con(ce,tp,eg,ep,ev,re,r,rp) then
+							local reset,rct=ce:GLGetReset()
+							if not rct then rct=1 end
+							reset=(reset&(~(RESET_EVENT+RESETS_STANDARD_DISABLE)))|(RESET_EVENT+RESETS_STANDARD_DISABLE)
+							local val=ce:GetValue()
+							if val then
+								local zone=type(val)=="number" and val or val()
+								if tp==1 then
+									zone=((zone&0xffff)<<16)|((zone>>16)&0xffff)
+								end
+								--Debug.Message(tostring(zone).." "..tostring(~en).." "..tostring((zone&(~en))&0xffff))
 								tc:RegisterFlagEffect(id,reset,0,rct)
-								local ne=Effect.CreateEffect(ce:GetOwner())
-								ne:SetType(EFFECT_TYPE_FIELD)
-								ne:SetRange(ce:GetRange())
-								ne:SetCode(EFFECT_DISABLE_FIELD)
-								ne:SetLabel(zone&(~en))
-								if ce:GetLabelObject() then ne:SetLabelObject(ce:GetLabelObject()) end
-								ne:SetOperation(s.disop)
-								ne:SetReset(reset,rct)
-								tc:RegisterEffect(ne)
-								ce:SetCondition(s.zcond)
-							elseif zone==0 then
-								tc:RegisterFlagEffect(id,reset,0,rct)
-								local ne=Effect.CreateEffect(ce:GetOwner())
-								ne:SetType(EFFECT_TYPE_FIELD)
-								ne:SetRange(ce:GetRange())
-								ne:SetCode(EFFECT_DISABLE_FIELD)
-								ne:SetLabel(~en)
-								if ce:GetLabelObject() then ne:SetLabelObject(ce:GetLabelObject()) end
-								ne:SetOperation(s.disop2(ce:GetOperation()))
-								ne:SetReset(reset,rct)
-								tc:RegisterEffect(ne)
+								local newzone=(zone&(~en)&0xffff)
+								if tp==1 then
+									newzone=((newzone&0xffff)<<16)|((newzone>>16)&0xffff)
+								end
+								if newzone~=0 then
+									local ne=ce:Clone()
+									ne:SetValue(newzone)
+									if ce:GetLabelObject() then ne:SetLabelObject(ce:GetLabelObject()) end
+									tc:RegisterEffect(ne)
+								end
 								ce:SetCondition(s.zcond)
 							end
 						end
@@ -165,51 +147,47 @@ function s.znop(e,tp,eg,ep,ev,re,r,rp)
 	--handle duel effect
 	local incr=(tp==0) and 1 or -1
 	for p=tp,1-tp,incr do
-		local en=(p==tp) and e:GetLabel() or e:GetLabel()<<16
 		local t=global_duel_effect_table[p]
 		if t and #t>0 then
 			local fixct=#t
 			for i=1,fixct do
 				local ce=t[i]
-				if ce and ce.SetLabelObject and ce:GetCode()==EFFECT_DISABLE_FIELD then
-					local reset,rct=ce:GLGetReset()
-					if not rct then rct=1 end
-					local val=ce:GetValue()
-					if val then
-						local zone=type(val)=="number" and val or val()
-						ce:GetOwner():RegisterFlagEffect(id,reset,0,rct)
-						local ne=Effect.CreateEffect(ce:GetOwner())
-						ne:SetType(EFFECT_TYPE_FIELD)
-						ne:SetCode(EFFECT_DISABLE_FIELD)
-						ne:SetValue(zone&(~en))
-						if ce:GetLabelObject() then ne:SetLabelObject(ce:GetLabelObject()) end
-						ne:SetReset(reset,rct)
-						Duel.RegisterEffect(ne,p)
-						ce:SetCondition(s.zcond2)
-					else	
-						local zone=ce:GetLabel()
-						if zone~=0 and zone&en>0 then
-							ce:GetOwner():RegisterFlagEffect(id,reset,0,rct)
-							local ne=Effect.CreateEffect(ce:GetOwner())
-							ne:SetType(EFFECT_TYPE_FIELD)
-							ne:SetCode(EFFECT_DISABLE_FIELD)
-							ne:SetLabel(zone&(~en))
-							if ce:GetLabelObject() then ne:SetLabelObject(ce:GetLabelObject()) end
-							ne:SetOperation(s.disop)
-							ne:SetReset(reset,rct)
-							Duel.RegisterEffect(ne,p)
-							ce:SetCondition(s.zcond2)
-						elseif zone==0 then
-							ce:GetOwner():RegisterFlagEffect(id,reset,0,rct)
-							local ne=Effect.CreateEffect(ce:GetOwner())
-							ne:SetType(EFFECT_TYPE_FIELD)
-							ne:SetCode(EFFECT_DISABLE_FIELD)
-							ne:SetLabel(~en)
-							if ce:GetLabelObject() then ne:SetLabelObject(ce:GetLabelObject()) end
-							ne:SetOperation(s.disop2(ce:GetOperation()))
-							ne:SetReset(reset,rct)
-							Duel.RegisterEffect(ne,p)
-							ce:SetCondition(s.zcond2)
+				if ce and aux.GetValueType(ce)=="Effect" and ce.SetLabelObject and ce:GetCode()==EFFECT_DISABLE_FIELD then
+					local check=true
+					if global_reset_duel_effect_table[ce] then
+						local check=false
+						for _,rce in ipairs({Duel.IsPlayerAffectedByEffect(p,GLOBAL_EFFECT_RESET)}) do
+							if rce and rce.GetLabelObject and rce:GetLabelObject()==ce then
+								check=true
+								break
+							end
+						end
+						if check then	
+							local con=ce:GetCondition()
+							if not con or con(ce,tp,eg,ep,ev,re,r,rp) then
+								local reset,rct=ce:GLGetReset()
+								if not rct then rct=1 end
+								local val=ce:GetValue()
+								if val then
+									local zone=type(val)=="number" and val or val()
+									if tp==1 then
+										zone=((zone&0xffff)<<16)|((zone>>16)&0xffff)
+									end
+									--Debug.Message(tostring(zone).." "..tostring(~en).." "..tostring(((zone)&(~en))&0xffff))
+									ce:GetOwner():RegisterFlagEffect(id,reset,0,rct)
+									local newzone=(zone&(~en)&0xffff)
+									if tp==1 then
+										newzone=((newzone&0xffff)<<16)|((newzone>>16)&0xffff)
+									end
+									if newzone~=0 then
+										local ne=ce:Clone()
+										ne:SetValue(newzone)
+										if ce:GetLabelObject() then ne:SetLabelObject(ce:GetLabelObject()) end
+										Duel.RegisterEffect(ne,p)
+									end
+									ce:SetCondition(s.zcond2)
+								end
+							end
 						end
 					end
 				end
@@ -231,6 +209,16 @@ function s.spfilter(c)
 end
 function s.gcheck(g)
 	return g:GetClassCount(Card.GetAttribute)==#g
+end
+function s.newcon(con,ce)
+	return	function(e,tp,eg,ep,ev,re,r,rp)
+				if not ce or not ce.GetLabelObject then
+					e:Reset()
+					return false
+				else
+					return not con or con(e,tp,eg,ep,ev,re,r,rp)
+				end
+			end
 end
 function s.zcond(e)
 	return e:GetHandler():GetFlagEffect(id)<=0

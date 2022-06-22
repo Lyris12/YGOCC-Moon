@@ -51,19 +51,18 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	local dis=Duel.SelectDisableField(tp,2,LOCATION_MZONE,0,EXTRA_MONSTER_ZONE)
 	e:SetLabel(dis)
 	Duel.Hint(HINT_ZONE,tp,dis)
+	if tp==1 then
+		dis=((dis&0xffff)<<16)|((dis>>16)&0xffff)
+	end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_DISABLE_FIELD)
-	e1:SetLabel(dis)
-	e1:SetOperation(s.disop0)
+	e1:SetValue(dis)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
 end
 function s.spval(e,c)
 	return 0,~e:GetLabel()&0x1f
-end
-function s.disop0(e,tp)
-	return e:GetLabel()
 end
 
 --PLACE

@@ -1450,9 +1450,6 @@ EVENT_DEACTIVATE_LINK_MARKER=9001
 --resets
 RESETS_STANDARD_DISABLE=RESETS_STANDARD|RESET_DISABLE
 
---Duel Effects without player target range
-DUEL_EFFECT_NOP={EFFECT_DISABLE_FIELD}
-
 function Group.Includes(g1,g2)
 	if #g1==0 or #g1<#g2 then return false end
 	local check=true
@@ -1475,7 +1472,7 @@ function Effect.GLGetTargetRange(e)
 end
 
 function Effect.GLGetReset(e)
-	if not global_reset_effect_table[e] then return 0,0 end
+	if not global_reset_effect_table[e] then return 0,1 end
 	local reset=global_reset_effect_table[e][1]
 	local rct=global_reset_effect_table[e][2]
 	return reset,rct
@@ -2203,10 +2200,6 @@ if not global_card_effect_table_global_check then
 						e:SetTarget(aux.GlitchyCannotDisable(tg))
 					end
 				end
-			
-			elseif e:GetCode()==EFFECT_DISABLE_FIELD and e:GetLabel()==0 and e:GetOperation() then
-				local op=e:GetOperation()
-				e:SetOperation(Auxiliary.SetOperationResultAsLabel(op))
 				
 			elseif e:GetCode()==EFFECT_EXTRA_SUMMON_COUNT or e:GetCode()==EFFECT_EXTRA_SET_COUNT then
 				local s,o=e:GLGetTargetRange()
@@ -2350,12 +2343,22 @@ if not global_duel_effect_table_global_check then
 	Duel.RegisterEffect = function(e,tp)
 							if not global_duel_effect_table[tp] then global_duel_effect_table[tp]={} end
 							table.insert(global_duel_effect_table[tp],e)
-							local s,o=e:GLGetTargetRange()
-							if not e:IsHasProperty(EFFECT_FLAG_PLAYER_TARGET) and s==0 and o==0 then
-								for i=1,#DUEL_EFFECT_NOP do
-									if e:GetCode()==DUEL_EFFECT_NOP[i] then e:SetProperty(e:GetProperty()|EFFECT_FLAG_PLAYER_TARGET) e:SetTargetRange(1,0) end
-								end
+							
+							local reset,rct=e:GLGetReset()
+							if reset then 
+								if not global_reset_duel_effect_table then
+									global_reset_duel_effect_table={}
+								end							
+								local r=Effect.GlobalEffect()
+								r:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+								r:SetCode(GLOBAL_EFFECT_RESET)
+								r:SetTargetRange(1,0)
+								r:SetLabelObject(e)
+								r:SetReset(reset,rct)
+								Duel.register_global_duel_effect_table(r,tp)
+								global_reset_duel_effect_table[e]=true								
 							end
+								
 							
 							if e:GetType()&(EFFECT_TYPE_ACTIONS)==0 then
 								local e = e:IsHasType(EFFECT_TYPE_GRANT) and e:GetLabelObject() or e
@@ -2478,7 +2481,8 @@ if not global_duel_effect_table_global_check then
 									end
 								end
 							end
-							return Duel.register_global_duel_effect_table(e,tp)
+							
+							return Duel.register_global_duel_effect_table(e,tp)	
 	end
 end
 

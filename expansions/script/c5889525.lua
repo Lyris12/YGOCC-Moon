@@ -47,10 +47,11 @@ function s.pctg(e,tp,eg,ep,ev,re,r,rp,chk)
 					index=(p==tp) and i or 4-i
 				else
 					if p==tp then
-						index=i
+						index = (i==5) and 1 or 3
 					end
 				end
-				if index~=nil and not Duel.CheckLocation(p,LOCATION_MZONE,i) and not Duel.GetFieldGroup(p,LOCATION_MZONE,0):IsExists(s.zcheck,1,nil,i,p) and Duel.CheckLocation(tp,LOCATION_SZONE,index) then
+				local refg = (i<5) and Duel.GetFieldGroup(p,LOCATION_MZONE,0) or Duel.GetFieldGroup(p,LOCATION_MZONE,LOCATION_MZONE)
+				if index and not Duel.CheckLocation(p,LOCATION_MZONE,i) and not refg:IsExists(s.zcheck,1,nil,i,p) and Duel.CheckLocation(tp,LOCATION_SZONE,index) then
 					check=true
 					break
 				end
@@ -80,10 +81,11 @@ function s.pcop(e,tp,eg,ep,ev,re,r,rp)
 				index=(p==tp) and i or 4-i
 			else
 				if p==tp then
-					index=i
+					index = (i==5) and 1 or 3
 				end
 			end
-			if index and not Duel.CheckLocation(p,LOCATION_MZONE,i) and not Duel.GetFieldGroup(p,LOCATION_MZONE,0):IsExists(s.zcheck,1,nil,i,p) and Duel.CheckLocation(tp,LOCATION_SZONE,index) then
+			local refg = (i<5) and Duel.GetFieldGroup(p,LOCATION_MZONE,0) or Duel.GetFieldGroup(p,LOCATION_MZONE,LOCATION_MZONE)
+			if index and not Duel.CheckLocation(p,LOCATION_MZONE,i) and not refg:IsExists(s.zcheck,1,nil,i,p) and Duel.CheckLocation(tp,LOCATION_SZONE,index) then
 				zone=zone|aux.GLSetValueDependingOnNumber(index,6,0x1,0x2,0x4,0x8,0x10,0x2,0x8)
 			end
 		end

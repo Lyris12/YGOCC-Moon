@@ -144,7 +144,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 					Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
 				end
 			elseif sel==1 then
-				local zone=Duel.SelectDisableField(tp,1,LOCATION_MZONE,LOCATION_MZONE,0)
+				local zone=Duel.SelectDisableField(tp,1,LOCATION_MZONE,LOCATION_MZONE,EXTRA_MONSTER_ZONE)
 				Duel.Hint(HINT_ZONE,tp,zone)
 				local e1=Effect.CreateEffect(e:GetHandler())
 				e1:SetType(EFFECT_TYPE_FIELD)
