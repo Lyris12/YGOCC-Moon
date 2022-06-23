@@ -140,24 +140,27 @@ function s.znop(e,tp,eg,ep,ev,re,r,rp)
 									if ce:GetLabelObject() then ne:SetLabelObject(ce:GetLabelObject()) end
 									tc:RegisterEffect(ne)
 								end
-								ce:SetCondition(s.zcond)
+								ce:SetCondition(s.zcond(con))
 							end
 						end
 						
 					elseif ce and ce.SetLabelObject and ce:GetCode()==EFFECT_USE_EXTRA_MZONE then
-						local reset,rct=ce:GLGetReset()
-						if not rct then rct=1 end
-						reset=(reset&(~(RESET_EVENT+RESETS_STANDARD_DISABLE)))|(RESET_EVENT+RESETS_STANDARD_DISABLE)
-						local val=ce:GetValue()
-						local zct=math.fmod(val,0x10)
-						local zone=bit.rshift(val-zct,16)
-						if zone&en~=0 then
-							tc:RegisterFlagEffect(id,reset,0,rct)
-							local ne=ce:Clone()
-							ne:SetValue(bit.lshift(zone&(~en),16)+zct-1)
-							ne:SetReset(reset,rct)
-							tc:RegisterEffect(ne)
-							ce:SetCondition(s.zcond)
+						local con=ce:GetCondition()
+						if not con or con(ce,tp,eg,ep,ev,re,r,rp) then
+							local reset,rct=ce:GLGetReset()
+							if not rct then rct=1 end
+							reset=(reset&(~(RESET_EVENT+RESETS_STANDARD_DISABLE)))|(RESET_EVENT+RESETS_STANDARD_DISABLE)
+							local val=ce:GetValue()
+							local zct=math.fmod(val,0x10)
+							local zone=bit.rshift(val-zct,16)
+							if zone&en~=0 then
+								tc:RegisterFlagEffect(id,reset,0,rct)
+								local ne=ce:Clone()
+								ne:SetValue(bit.lshift(zone&(~en),16)+zct-1)
+								ne:SetReset(reset,rct)
+								tc:RegisterEffect(ne)
+								ce:SetCondition(s.zcond(con))
+							end
 						end
 					end
 				end
@@ -209,7 +212,7 @@ function s.znop(e,tp,eg,ep,ev,re,r,rp)
 									if ce:GetLabelObject() then ne:SetLabelObject(ce:GetLabelObject()) end
 									Duel.RegisterEffect(ne,p)
 								end
-								ce:SetCondition(s.zcond2)
+								ce:SetCondition(s.zcond2(con))
 							end
 						end
 					end
@@ -239,22 +242,15 @@ function s.spfilter(c,e,tp)
 	end
 	return false
 end
-function s.newcon(con,ce)
-	return	function(e,tp,eg,ep,ev,re,r,rp)
-				--Debug.Message(aux.GetValueType(ce))
-				if not ce or not ce.GetLabelObject then
-					e:Reset()
-					return false
-				else
-					return not con or con(e,tp,eg,ep,ev,re,r,rp)
-				end
+function s.zcond(con)
+	return	function(e,...)
+				return e:GetHandler():GetFlagEffect(id)<=0 and (not con or con(e,...))
 			end
 end
-function s.zcond(e)
-	return e:GetHandler():GetFlagEffect(id)<=0
-end
-function s.zcond2(e)
-	return e:GetOwner():GetFlagEffect(id)<=0
+function s.zcond2(con)
+	return	function(e,...)
+				return e:GetOwner():GetFlagEffect(id)<=0 and (not con or con(e,...))
+			end
 end
 function s.disop(e,tp)
 	return e:GetLabel()
