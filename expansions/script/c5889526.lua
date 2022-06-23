@@ -131,7 +131,8 @@ function s.disop(e,tp)
 end
 function s.retop(e,tp,eg,ep,ev,re,r,rp)
 	local gc=e:GetLabelObject()
-	if not gc:IsLocation(LOCATION_SZONE) or gc:GetFlagEffectLabel(id)~=e:GetLabel() or Duel.GetLocationCount(1-tp,LOCATION_MZONE)<=0 or not Duel.MoveToField(gc,tp,1-tp,LOCATION_MZONE,POS_FACEUP,true) then
+	if not gc:IsLocation(LOCATION_SZONE) or gc:GetFlagEffectLabel(id)~=e:GetLabel() then return end
+	if Duel.GetLocationCount(1-tp,LOCATION_MZONE)<=0 or not Duel.MoveToField(gc,tp,1-tp,LOCATION_MZONE,POS_FACEUP,true) then
 		Duel.SendtoGrave(gc,REASON_EFFECT)
 	end
 end
