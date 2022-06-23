@@ -154,16 +154,18 @@ function s.znop(e,tp,eg,ep,ev,re,r,rp)
 				local ce=t[i]
 				if ce and aux.GetValueType(ce)=="Effect" and ce.SetLabelObject and ce:GetCode()==EFFECT_DISABLE_FIELD then
 					local check=true
-					if global_reset_duel_effect_table[ce] then
-						local check=false
+					if global_reset_duel_effect_table[ce] and global_reset_duel_effect_table[ce]==true then
+						check=false
 						for _,rce in ipairs({Duel.IsPlayerAffectedByEffect(p,GLOBAL_EFFECT_RESET)}) do
 							if rce and rce.GetLabelObject and rce:GetLabelObject()==ce then
+								--Debug.Message(ce:GetOwner():GetCode())
 								check=true
 								break
 							end
 						end
 					end
-					if check then	
+					if check then
+						--Debug.Message(ce:GetOwner():GetCode())
 						local con=ce:GetCondition()
 						if not con or con(ce,tp,eg,ep,ev,re,r,rp) then
 							local reset,rct=ce:GLGetReset()
@@ -174,7 +176,7 @@ function s.znop(e,tp,eg,ep,ev,re,r,rp)
 								if tp==1 then
 									zone=((zone&0xffff)<<16)|((zone>>16)&0xffff)
 								end
-								--Debug.Message(tostring(zone).." "..tostring(~en).." "..tostring(zone&(~en)))
+								Debug.Message(tostring(zone).." "..tostring(~en).." "..tostring(zone&(~en)))
 								ce:GetOwner():RegisterFlagEffect(id,reset,0,rct)
 								local newzone=(zone&(~en))
 								if tp==1 then

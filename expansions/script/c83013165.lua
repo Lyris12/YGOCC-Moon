@@ -33,7 +33,7 @@ function cod.initial_effect(c)
 	e6:SetDescription(aux.Stringid(id,2))
 	e6:SetCategory(CATEGORY_TOGRAVE)
 	e6:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e6:SetProperty(EFFECT_FLAG_DELAY)
+	e6:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e6:SetCode(EVENT_TO_GRAVE)
 	e6:SetCountLimit(1,id)
 	e6:SetCondition(cod.tgcon)
@@ -97,9 +97,8 @@ end
 
 --Send 1 "Seatector" 
 function cod.tgcon(e,tp,eg,ep,ev,re,r,rp)
-	return (e:GetHandler():IsReason(REASON_COST) and re:GetHandler():IsSetCard(0x33f))
-		or (re:GetHandler():IsSetCard(0x33f) and bit.band(r,REASON_EFFECT)~=0)
-		and re:GetHandler():IsType(TYPE_MONSTER)
+	return e:GetHandler():IsReason(REASON_COST) and re:IsHasType(0x7e0) and re:IsActiveType(TYPE_MONSTER)
+		and re:GetHandler():IsSetCard(0x33F)
 end
 function cod.cfilter(c)
 	return c:IsSetCard(0x33F) and c:IsAbleToGrave()

@@ -116,35 +116,37 @@ end
 
 
 --Equip
-function cod.ecfilter1(c,mc)
-	return c:IsSetCard(0x33F) and cod.ecfilter2(c,mc)
-end
-function cod.ecfilter2(ec,mc)
-	local ct1,ct2=mc:GetUnionCount()
-	return mc:IsFaceup() and mc:IsSetCard(0x33F) and ec:CheckEquipTarget(mc) and ec:GetCode()~=mc:GetCode() and ct2==0
+function cod.ecfilter1(c,tp,tc)
+	return c:IsMonster() and c:IsSetCard(0x33F) and aux.CheckUnionEquip(c,tc) and c:CheckUnionTarget(tc) and c:CheckUniqueOnField(tp) and not c:IsForbidden()
 end
 function cod.mfilter(c,tp)
-	return c:IsFaceup() and c:IsSetCard(0x33F) 
-		and Duel.IsExistingMatchingCard(cod.ecfilter1,tp,LOCATION_DECK,0,1,nil,c)
+	return c:IsFaceup() and c:IsSetCard(0x33F) and Duel.IsExistingMatchingCard(cod.ecfilter1,tp,LOCATION_DECK,0,1,nil,tp,c)
 end
 function cod.eqtg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and cod.ecfilter1(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and cod.mfilter(chkc,tp) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0 
 		and Duel.IsExistingTarget(cod.mfilter,tp,LOCATION_MZONE,0,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	local g=Duel.SelectTarget(tp,cod.mfilter,tp,LOCATION_MZONE,0,1,1,nil,tp)
-	Duel.SetOperationInfo(0,CATEGORY_EQUIP,g,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_EQUIP,nil,1,tp,LOCATION_DECK)
 end
 function cod.eqop2(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	local eg=Duel.GetMatchingGroup(cod.ecfilter1,tp,LOCATION_DECK,0,nil,tc)
-	if tc and tc:IsRelateToEffect(e) and eg:GetCount()>0 then
+	local eqg=Duel.GetMatchingGroup(cod.ecfilter1,tp,LOCATION_DECK,0,nil,tp,tc)
+	if tc and tc:IsRelateToEffect(e) and cod.mfilter(tc,tp) and eqg:GetCount()>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,2))
-		local eqc=eg:FilterSelect(tp,cod.ecfilter1,1,1,nil,tc):GetFirst()
+		local eqc=eqg:Select(tp,1,1,nil):GetFirst()
 		if not eqc then return end
-		if not Duel.Equip(tp,eqc,tc) then return end
-		eqc:RegisterFlagEffect(eqc:GetCode(),RESET_EVENT+RESETS_STANDARD,0,1)
-		aux.SetUnionState(eqc)
+		if eqc and aux.CheckUnionEquip(eqc,tc) and Duel.Equip(tp,eqc,tc) then
+			aux.SetUnionState(ec)
+			local e1=Effect.CreateEffect(e:GetHandler())
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CANNOT_DISABLE)
+			e1:SetRange(LOCATION_SZONE)
+			e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+			e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+			eqc:RegisterEffect(e1)
+		end
 	end
 end
 

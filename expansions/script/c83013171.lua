@@ -97,7 +97,7 @@ end
 
 --Special Summon 2
 function cod.spcon(e)
-	return e:GetHandler():GetEquipGroup():GetCount()>0
+	return e:GetHandler():GetEquipTarget()~=nil
 end
 function cod.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

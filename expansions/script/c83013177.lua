@@ -97,6 +97,7 @@ function c83013177.eqop(e,tp,eg,ep,ev,re,r,rp)
 		local g=Duel.SelectMatchingCard(tp,c83013177.eqfilter2,tp,LOCATION_MZONE,0,1,1,nil,tc)
 		local gc=g:GetFirst()
 		if gc:IsFaceup() and Duel.Equip(tp,tc,gc) then
+			aux.SetUnionState(tc)
 			local c=e:GetHandler()
 			local e1=Effect.CreateEffect(c)
 			e1:SetType(EFFECT_TYPE_SINGLE)
