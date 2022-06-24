@@ -34,7 +34,7 @@ function cod.initial_effect(c)
 	e6:SetCategory(CATEGORY_DRAW)
 	e6:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e6:SetCode(EVENT_TO_GRAVE)
-	e6:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
+	e6:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL+EFFECT_FLAG_PLAYER_TARGET)
 	e6:SetCountLimit(1,id)
 	e6:SetCondition(cod.drcon)
 	e6:SetTarget(cod.drtg)
@@ -101,7 +101,7 @@ function cod.drcon(e,tp,eg,ep,ev,re,r,rp)
 		and re:GetHandler():IsSetCard(0x33F)
 end
 function cod.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
+	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
 	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(1)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)

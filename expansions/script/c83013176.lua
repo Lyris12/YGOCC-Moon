@@ -138,7 +138,7 @@ function cod.eqop2(e,tp,eg,ep,ev,re,r,rp)
 		local eqc=eqg:Select(tp,1,1,nil):GetFirst()
 		if not eqc then return end
 		if eqc and aux.CheckUnionEquip(eqc,tc) and Duel.Equip(tp,eqc,tc) then
-			aux.SetUnionState(ec)
+			aux.SetUnionState(eqc)
 			local e1=Effect.CreateEffect(e:GetHandler())
 			e1:SetType(EFFECT_TYPE_SINGLE)
 			e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CANNOT_DISABLE)
