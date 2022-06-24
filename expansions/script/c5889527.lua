@@ -128,9 +128,9 @@ function s.znop(e,tp,eg,ep,ev,re,r,rp)
 								if tp==1 then
 									zone=((zone&0xffff)<<16)|((zone>>16)&0xffff)
 								end
-								Debug.Message(tostring(zone).." "..tostring(~en).." "..tostring((zone&(~en))&0xffff))
+								Debug.Message(tostring(zone).." "..tostring(~en).." "..tostring(zone&(~en)))
 								tc:RegisterFlagEffect(id,reset,0,rct)
-								local newzone=(zone&(~en)&0xffff)
+								local newzone=(zone&(~en))
 								if tp==1 then
 									newzone=((newzone&0xffff)<<16)|((newzone>>16)&0xffff)
 								end
