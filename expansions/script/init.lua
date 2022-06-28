@@ -2154,32 +2154,32 @@ if not global_card_effect_table_global_check then
 	function Card:RegisterEffect(e,forced)
 		if not global_card_effect_table[self] then global_card_effect_table[self]={} end
 		table.insert(global_card_effect_table[self],e)
-		local cid=self:GetOriginalCode()
+		-- local cid=self:GetOriginalCode()
 		
-		if #global_card_effect_table[self]==1 then
-			local mt=getmetatable(self)
-			if LISTED_NAMES[cid] and not self.checked_card_code_list then
-				if self.card_code_list==nil then
-					mt.card_code_list={}
-					for _,code in ipairs(LISTED_NAMES[cid]) do
-						if code==0 then
-							mt.card_code_list[cid]=true
-						else
-							mt.card_code_list[code]=true
-						end
-					end
-				else
-					for _,code in ipairs(LISTED_NAMES[cid]) do
-						if code==0 then
-							self.card_code_list[cid]=true
-						else
-							self.card_code_list[code]=true
-						end
-					end
-				end
-				mt.checked_card_code_list=true
-			end
-		end
+		-- if #global_card_effect_table[self]==1 then
+			-- local mt=getmetatable(self)
+			-- if LISTED_NAMES[cid] and not self.checked_card_code_list then
+				-- if self.card_code_list==nil then
+					-- mt.card_code_list={}
+					-- for _,code in ipairs(LISTED_NAMES[cid]) do
+						-- if code==0 then
+							-- mt.card_code_list[cid]=true
+						-- else
+							-- mt.card_code_list[code]=true
+						-- end
+					-- end
+				-- else
+					-- for _,code in ipairs(LISTED_NAMES[cid]) do
+						-- if code==0 then
+							-- self.card_code_list[cid]=true
+						-- else
+							-- self.card_code_list[code]=true
+						-- end
+					-- end
+				-- end
+				-- mt.checked_card_code_list=true
+			-- end
+		-- end
 		
 		if e:GetType()&(EFFECT_TYPE_ACTIONS)==0 then
 			local e = e:IsHasType(EFFECT_TYPE_GRANT) and e:GetLabelObject() or e
