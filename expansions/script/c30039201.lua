@@ -20,7 +20,7 @@ function c30039201.desfilter(c)
 end
 
 function c30039201.sumfilter(c,e,tp)
-	return c:IsSetCard(0x13F) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and c:IsLevelBelow(4) and not c:IsCode(30039201)
+	return c:IsSetCard(0x93f) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and c:IsLevelBelow(4) and not c:IsCode(30039201)
 end
 
 function c30039201.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

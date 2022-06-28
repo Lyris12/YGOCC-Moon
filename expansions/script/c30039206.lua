@@ -67,7 +67,7 @@ function c30039206.spfilter(c,code)
 	return code1==code or code2==code
 end
 function ref.matfilter(c,tp)
-	return c:IsSetCard(0x13F) and Duel.IsPlayerCanRelease(tp,c)
+	return c:IsSetCard(0x93f) and Duel.IsPlayerCanRelease(tp,c)
 end
 function ref.spcon(e,c)
 	if c==nil then return true end

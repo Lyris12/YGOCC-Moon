@@ -51,11 +51,11 @@ function c30039209.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 
 function c30039209.cfilter(c,e,tp)
-	return c:IsFaceup() and c:IsSetCard(0x13F) and c:IsAbleToHandAsCost()
+	return c:IsFaceup() and c:IsSetCard(0x93f) and c:IsAbleToHandAsCost()
 		and Duel.IsExistingMatchingCard(c30039209.spfilter,tp,LOCATION_HAND,0,1,nil,e,tp,c:GetCode())
 end
 function c30039209.spfilter(c,e,tp,code)
-	return c:IsSetCard(0x13F) and not c:IsCode(code)
+	return c:IsSetCard(0x93f) and not c:IsCode(code)
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 
@@ -68,7 +68,7 @@ function c30039209.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 
 function c30039209.spfilter2(c,e,tp)
-	return c:IsSetCard(0x13F) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0x93f) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 		--and Duel.IsExistingMatchingCard(c30039209.codefilter,tp,LOCATION_MZONE,0,1,nil,c:GetCode())
 end
 function c30039209.codefilter(c,code)
@@ -108,7 +108,7 @@ function c30039209.norop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetTargetRange(LOCATION_HAND,0)
 	e1:SetCode(EFFECT_EXTRA_SUMMON_COUNT)
-	e1:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x13F))
+	e1:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x93f))
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
 	Duel.RegisterFlagEffect(tp,30039209,RESET_PHASE+PHASE_END,0,1)

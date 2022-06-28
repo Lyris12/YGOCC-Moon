@@ -57,18 +57,18 @@ function c30039203.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 	
 function ref.ssfilter(c,e,tp,lv)
-	return c:IsSetCard(0x13F) and c:GetLevel()==lv
+	return c:IsSetCard(0x93f) and c:GetLevel()==lv
 		and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
 end
 function ref.matfilter(c,tp)
-	return c:IsSetCard(0x13F)
+	return c:IsSetCard(0x93f)
 end
 function ref.ssfilterchk(c,e,tp,mg)
-	return c:IsSetCard(0x13F) and mg:CheckWithSumEqual(Card.GetLevel,c:GetLevel(),2,64,tp)
+	return c:IsSetCard(0x93f) and mg:CheckWithSumEqual(Card.GetLevel,c:GetLevel(),2,64,tp)
 		and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
 end
 function ref.sstg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local mg=Duel.GetReleaseGroup(tp):Filter(Card.IsSetCard,nil,0x13F)
+	local mg=Duel.GetReleaseGroup(tp):Filter(Card.IsSetCard,nil,0x93f)
 	if chk==0 then return Duel.IsExistingMatchingCard(ref.ssfilterchk,tp,LOCATION_DECK,0,1,nil,e,tp,mg) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local tc=Duel.SelectMatchingCard(tp,ref.ssfilterchk,tp,LOCATION_DECK,0,1,1,nil,e,tp,mg):GetFirst()

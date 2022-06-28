@@ -28,7 +28,7 @@ function c30039205.initial_effect(c)
 end
 
 function c30039205.filter1(c)
-	return c:IsSetCard(0x13F) and c:IsType(TYPE_MONSTER) and c:IsAbleToDeck()
+	return c:IsSetCard(0x93f) and c:IsType(TYPE_MONSTER) and c:IsAbleToDeck()
 end
 
 function c30039205.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
@@ -55,7 +55,7 @@ function c30039205.operation(e,tp,eg,ep,ev,re,r,rp)
 end
 
 function c30039205.filter(c)
-	return c:IsSetCard(0x13F) and c:IsAbleToHand()
+	return c:IsSetCard(0x93f) and c:IsAbleToHand()
 end
 function c30039205.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c30039205.filter,tp,LOCATION_DECK,0,1,nil) end

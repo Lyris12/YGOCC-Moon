@@ -1,7 +1,7 @@
 --Levelution Ac-Cell-eration
 local ref=_G['c'..30039208]
 function c30039208.initial_effect(c)
-	c:EnableCounterPermit(0x13F)
+	c:EnableCounterPermit(0x93f)
 	
 		--Activate
 	local e1=Effect.CreateEffect(c)
@@ -26,7 +26,7 @@ function c30039208.initial_effect(c)
 	e4:SetCode(EFFECT_UPDATE_ATTACK)
 	e4:SetRange(LOCATION_SZONE)
 	e4:SetTargetRange(LOCATION_MZONE,0)
-	e4:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x13F))
+	e4:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x93f))
 	e4:SetValue(c30039208.atkval)
 	c:RegisterEffect(e4)
 	
@@ -50,7 +50,7 @@ function c30039208.lvfilter(c,lv)
 end
 
 function c30039208.setfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x13F)
+	return c:IsFaceup() and c:IsSetCard(0x93f)
 	end
 
 function c30039208.ctcon(e,tp,eg,ep,ev,re,r,rp)
@@ -58,16 +58,16 @@ function c30039208.ctcon(e,tp,eg,ep,ev,re,r,rp)
 	end
 
 function c30039208.ctop(e,tp,eg,ep,ev,re,r,rp)
- 	e:GetHandler():AddCounter(0x13F,1)
+ 	e:GetHandler():AddCounter(0x93f,1)
 	end
 
 function c30039208.atkval(e,c)
-	return e:GetHandler():GetCounter(0x13F)*200
+	return e:GetHandler():GetCounter(0x93f)*200
 end
 
 --Destruction Replace
 function ref.repfilter(c,tp)
-	return c:IsFaceup() and c:IsControler(tp) and c:IsLocation(LOCATION_MZONE) and c:IsSetCard(0x13F)
+	return c:IsFaceup() and c:IsControler(tp) and c:IsLocation(LOCATION_MZONE) and c:IsSetCard(0x93f)
 		and c:IsReason(REASON_EFFECT+REASON_BATTLE)
 end
 function ref.reptg(e,tp,eg,ep,ev,re,r,rp,chk)

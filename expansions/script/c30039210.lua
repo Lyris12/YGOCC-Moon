@@ -35,7 +35,7 @@ function c30039210.initial_effect(c)
 	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0
 end
 function c30039210.filter(c,e,sp)
-	return c:IsSetCard(0x13F) and c:IsCanBeSpecialSummoned(e,0,sp,false,false) and c:IsLevelBelow(4)
+	return c:IsSetCard(0x93f) and c:IsCanBeSpecialSummoned(e,0,sp,false,false) and c:IsLevelBelow(4)
 end
 function c30039210.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
@@ -60,7 +60,7 @@ function ref.thcon(e,tp,eg,ep,ev,re,r,rp)
 		and c:IsPreviousLocation(LOCATION_ONFIELD) --and c:GetPreviousSequence()<5
 end
 function ref.thfilter(c)
-	return c:IsSetCard(0x13F) and c:IsAbleToHand() and not c:IsCode(30039210)
+	return c:IsSetCard(0x93f) and c:IsAbleToHand() and not c:IsCode(30039210)
 end
 function ref.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(ref.thfilter,tp,LOCATION_DECK,0,1,nil) end

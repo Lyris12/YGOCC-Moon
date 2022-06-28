@@ -18,11 +18,11 @@ function c30039207.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c30039207.filter1(c,e,tp)
 	local lv=c:GetLevel()
-	return lv>0 and c:IsFaceup() and c:IsSetCard(0x13F)
+	return lv>0 and c:IsFaceup() and c:IsSetCard(0x93f)
 		and (Duel.IsExistingMatchingCard(c30039207.filter2,tp,LOCATION_DECK,0,1,nil,lv+1,e,tp) or Duel.IsExistingMatchingCard(c30039207.filter2,tp,LOCATION_DECK,0,1,nil,lv-1,e,tp))
 end
 function c30039207.filter2(c,lv,e,tp)
-	return c:IsSetCard(0x13F) and (c:GetLevel()==lv+1 or c:GetLevel()==lv-1) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0x93f) and (c:GetLevel()==lv+1 or c:GetLevel()==lv-1) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c30039207.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then

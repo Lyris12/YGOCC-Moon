@@ -32,7 +32,7 @@ function c30039204.initial_effect(c)
 	end
 	
 	function c30039204.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0x13F)
+	return c:IsFaceup() and c:IsSetCard(0x93f)
 end
 	
 	function c30039204.undescon(e,tp,eg,ep,ev,re,r,rp)
@@ -41,7 +41,7 @@ end
 end
 
 function c30039204.thcfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x13F)
+	return c:IsFaceup() and c:IsSetCard(0x93f)
 		and not c:IsCode(30039204)
 end
 function c30039204.thcon(e,tp,eg,ep,ev,re,r,rp)
@@ -59,7 +59,7 @@ function c30039204.sccon(e,tp,eg,ep,ev,re,r,rp)
 end
 
 function c30039204.scfilter(c)
-	return c:IsSetCard(0x13F) and c:IsAbleToHand()
+	return c:IsSetCard(0x93f) and c:IsAbleToHand()
 end
 
 function c30039204.sctg(e,tp,eg,ep,ev,re,r,rp,chk)
