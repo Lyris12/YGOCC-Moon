@@ -60,13 +60,14 @@ function s.eqcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetAttacker()==e:GetHandler()
 end
 function s.eqfilter(c,ec,tp)
-	return c:IsCode(24343171) and c:CheckEquipTarget(ec) and not c:IsForbidden() and c:CheckUniqueOnField(c,tp)
+	return c:IsCode(24343171) and c:CheckEquipTarget(ec) and not c:IsForbidden() and c:CheckUniqueOnField(tp)
 end
 function s.eqtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
 		and Duel.IsExistingMatchingCard(s.eqfilter,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE,0,1,nil,e:GetHandler(),tp)
 	end
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,nil,1,tp,LOCATION_DECK+LOCATION_HAND+LOCATION_GRAVE)
+	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,nil,1,tp,0)
 end
 function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

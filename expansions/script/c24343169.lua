@@ -29,7 +29,7 @@ function s.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_CHAINING)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCountLimit(1,id)
+	e2:SetCountLimit(2,id)
 	e2:SetCondition(s.discon)
 	e2:SetCost(s.discost)
 	e2:SetTarget(s.distg)
@@ -54,7 +54,7 @@ function s.ctop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 function s.discon(e,tp,eg,ep,ev,re,r,rp)
-	return ep==1-tp
+	return rp~=tp and not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED)
 end
 function s.cfilter(c)
 	return c:IsSetCard(0x24d) and (c:IsFaceup() or not c:IsOnField()) and c:IsAbleToGraveAsCost()
