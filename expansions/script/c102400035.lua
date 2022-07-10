@@ -1,5 +1,5 @@
---created by Lyris, art by lethe-me-alone
---Maiden of Cosmic Singularities
+--created by Lyris, art by Maratus Funk & David Parker for the Science Photo Library
+--サイコロ二クル
 local s,id,o=GetID()
 function s.initial_effect(c)
 	local tp=c:GetControler()
