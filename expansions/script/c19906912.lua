@@ -3,8 +3,8 @@
 local cid,id=GetID()
 function cid.initial_effect(c)
 c:EnableReviveLimit()
-       aux.AddOrigEvoluteType(c)
-     aux.AddEvoluteProc(c,nil,4,cid.filter1,cid.filter2,1,99)  
+	   aux.AddOrigEvoluteType(c)
+	 aux.AddEvoluteProc(c,nil,4,aux.OR(cid.filter1,cid.filter2),1,99)  
   --atk up
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)

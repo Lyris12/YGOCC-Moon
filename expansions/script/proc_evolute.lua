@@ -139,7 +139,7 @@ function Card.GetOriginalStage(c)
 	end
 end
 function Card.GetStage(c)
-	if not Auxiliary.Evolutes[c] or c:GetEC()==0 then return 0 end
+	if not Auxiliary.Evolutes[c] or (c:IsLocation(LOCATION_MZONE) and c:GetEC()==0) then return 0 end
 	local te=c:IsHasEffect(EFFECT_STAGE)
 	if type(te:GetValue())=='function' then
 		return te:GetValue()(te,c)
@@ -527,7 +527,7 @@ end
 function Auxiliary.EvoluteCounter(e,tp,eg,ep,ev,re,r,rp,c,smat,mg)
 	local g=eg:Filter(Auxiliary.ECSumFilter,nil)
 	for tc in aux.Next(g) do
-		if not tc:IsHasEffect(EFFECT_CONVERGENT_EVOLUTE) then tc:AddEC(tc:GetStage(),tp) end
+		if not tc:IsHasEffect(EFFECT_CONVERGENT_EVOLUTE) then tc:AddEC(tc:GetOriginalStage(),tp) end
 		if tc:IsHasEffect(EFFECT_CONVERGENT_EVOLUTE) then 
 			local cone={tc:IsHasEffect(EFFECT_CONVERGENT_EVOLUTE)}
 			for _,te in ipairs(cone) do
