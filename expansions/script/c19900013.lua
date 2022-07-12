@@ -49,7 +49,7 @@ end
 function cid.atop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DISCARD)
 	local g=Duel.SelectMatchingCard(tp,Card.IsDiscardable,tp,LOCATION_HAND,0,1,1,e:GetHandler())
-	Duel.SendtoGrave(g,nil,REASON_DISCARD+REASON_COST)
+	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD)
 end
 function cid.condition(e,tp,eg,ep,ev,re,r,rp)
 	return ep~=tp 

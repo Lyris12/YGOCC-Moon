@@ -35,7 +35,7 @@ end
 function s.filterx(c)
 	return c:IsFaceup() and c:IsType(TYPE_MONSTER) and not c:IsType(TYPE_EFFECT) and c:IsAbleToHand()
 end
-function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)  
+function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)	
 if chk==0 then return Duel.IsExistingMatchingCard(s.rmfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp) end
 local g=Duel.SelectMatchingCard(tp,s.rmfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
