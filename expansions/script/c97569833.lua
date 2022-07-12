@@ -78,7 +78,7 @@ function c97569833.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c97569833.actcon(e)
-	return Duel.GetAttacker()==e:GetHandler():GetEquipTarget() or Duel.GetAttackTarget()==e:GetHandler():GetEquipTarget()
+	return Duel.GetAttacker()==e:GetHandler():GetEquipTarget()
 end
 function c97569833.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
