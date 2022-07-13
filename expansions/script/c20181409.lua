@@ -109,7 +109,7 @@ function s.activate(e)
 	end
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local ct=e:GetHandler():GetMaterialCount()
+	local ct=e:GetHandler():GetMaterial():FilterCount(Card.IsSetCard,nil,0x9b5)
 	if chk==0 then return ct>0 and Duel.IsExistingMatchingCard(aux.TRUE,tp,0,LOCATION_MZONE,1,nil) end
 	local g=Duel.GetMatchingGroup(aux.TRUE,tp,0,LOCATION_MZONE,nil)
 	e:SetLabel(ct)
