@@ -23,9 +23,9 @@ function cid.initial_effect(c)
 	e2:SetTarget(cid.thtg)
 	e2:SetOperation(cid.thop)
 	c:RegisterEffect(e2)
-		local e0=e2:Clone()
-	e0:SetCode(EVENT_SPSUMMON_SUCCESS)
-	c:RegisterEffect(e0)
+		local e3=e2:Clone()
+	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
+	c:RegisterEffect(e3)
 
 end
 

@@ -42,7 +42,7 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetTarget(cid.atktg)
 		e1:SetValue(500)
 		e1:SetLabel(fid)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_DISABLE)
+		 e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 		c:RegisterEffect(e1)
 	end
 end
