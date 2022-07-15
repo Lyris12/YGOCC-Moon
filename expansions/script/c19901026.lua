@@ -22,10 +22,20 @@ function cid.condition(e,tp,eg,ep,ev,re,r,rp)
 	return rp~=tp and re:IsActiveType(TYPE_MONSTER) and Duel.IsChainNegatable(ev)
 	   
 end
+function cid.filter(c)
+	return c:IsSetCard(0x57b) and c:IsDiscardable()
+end
+function cid.cfilter(c)
+	return c:IsSetCard(0x57b) and c:IsType(TYPE_MONSTER) and not c:IsPublic()
+end
 function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	 if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,e:GetHandler()) end
+	 if chk==0 then return Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_HAND,0,1,e:GetHandler()) and Duel.IsExistingMatchingCard(cid.cfilter,tp,LOCATION_HAND,0,1,e:GetHandler()) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
+	local g=Duel.SelectMatchingCard(tp,cid.cfilter,tp,LOCATION_HAND,0,1,1,e:GetHandler())
+	Duel.ConfirmCards(1-tp,g)
+	Duel.ShuffleHand(tp)
 	if e:GetHandler():IsStatus(STATUS_ACT_FROM_HAND) then
-		Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD)
+		Duel.DiscardHand(tp,cid.filter,1,1,REASON_COST+REASON_DISCARD)
 	end
 end
   
