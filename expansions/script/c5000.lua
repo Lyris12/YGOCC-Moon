@@ -1,14 +1,14 @@
 --Manual Mode
 --Scripted by: XGlitchy30
 
-local counter_list={}
-for line in io.lines('strings.conf') do
-	if line:sub(1,8)=="!counter" then
-		local p1=line:find("0x")
-		local v=tonumber(line:sub(p1,p1+5)) or tonumber(line:sub(p1,p1+4)) or tonumber(line:sub(p1,p1+3)) or tonumber(line:sub(p1,p1+2))
-		if v then table.insert(counter_list,v) end
-	end
-end
+local counter_list={0x1, 0x3, 0x4, 0x5}
+-- for line in io.lines('strings.conf') do
+	-- if line:sub(1,8)=="!counter" then
+		-- local p1=line:find("0x")
+		-- local v=tonumber(line:sub(p1,p1+5)) or tonumber(line:sub(p1,p1+4)) or tonumber(line:sub(p1,p1+3)) or tonumber(line:sub(p1,p1+2))
+		-- if v then table.insert(counter_list,v) end
+	-- end
+-- end
 
 local NUMLIST,NUMLIST2,NUMLIST3={},{},{}
 for i=0,10000,100 do

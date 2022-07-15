@@ -8964,7 +8964,7 @@ expansions/script/c47695418.lua	3fead20c67539f9094148953859ed632
 expansions/script/c48022718.lua	4afa492b051375752ee07cc71bbac98f
 expansions/script/c49451958.lua	b7aeb0e5df0a20559c21f6dba46fb620
 expansions/script/c49451959.lua	59ec14709bfe8a7c4cdd59900ca21b98
-expansions/script/c5000.lua	bf0e80aa649a29cc08a6efaa17dc3033
+expansions/script/c5000.lua	1eefed9b4290e7a3a8653f43540cab18
 expansions/script/c50030993.lua	829d8cb8970081250291838bd4d40107
 expansions/script/c50030994.lua	41836a9e126186932aca68d9e8cf8ebb
 expansions/script/c50030995.lua	ac938eaf1f14c104e0d6f57f89a6e922
@@ -10486,6 +10486,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	51a5b10cb27d356e67f3769b20da486c
+update/filelist.txt	f04d3ce61a4b5be3398f6f0319f88283
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	d3ae66bb43204c83997e213e811e9365
+update/version.txt	52fcdcd12a2f60370ea8b600e84b6e9c
