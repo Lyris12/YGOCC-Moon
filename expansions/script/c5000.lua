@@ -10,12 +10,15 @@ for line in io.lines('strings.conf') do
 	end
 end
 
-local NUMLIST,NUMLIST2={},{}
+local NUMLIST,NUMLIST2,NUMLIST3={},{},{}
 for i=0,10000,100 do
 	table.insert(NUMLIST,i)
 end
 for i=0,5000,100 do
 	table.insert(NUMLIST2,i)
+end
+for i=0,100 do
+	table.insert(NUMLIST3,i)
 end
 
 local s,id=GetID()
@@ -58,6 +61,9 @@ function s.ops(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(aux.TRUE,tp,LOCATION_ALL,LOCATION_ALL,c)
 	for tc in aux.Next(g) do
 		tc:ResetEffect(tc:GetOriginalCode(),RESET_CARD)
+		for _,ct in ipairs(counter_list) do
+			tc:EnableCounterPermit(ct,LOCATION_ALL)
+		end
 		--Manual Actions
 		local e0=Effect.CreateEffect(c)
 		e0:SetDescription(aux.Stringid(id,14))
@@ -422,7 +428,7 @@ function s.manual_actions(e,tp,eg,ep,ev,re,r,rp)
 			if not Duel.SelectYesNo(1-tp,aux.Stringid(id+2,12)) then return end
 		end
 		local counter=Duel.AnnounceNumber(tp,table.unpack(counter_list))	   
-		local ct=Duel.AnnounceNumber(0,table.unpack(ctt))
+		local ct=Duel.AnnounceNumber(0,table.unpack(NUMLIST3))
 		c:AddCounter(counter,ct)
 	--Change/Add/Reset stats
 	elseif sel==15 then
