@@ -524,7 +524,8 @@ function s.manual_actions(e,tp,eg,ep,ev,re,r,rp,g)
 			if tp~=tc:GetControler() then		
 				if not Duel.SelectYesNo(1-tp,aux.Stringid(id+2,13)) then return end
 			end
-			while true do
+			local statcheck=true
+			while statcheck do
 				local opt=aux.Option(id+3,tp,0,true,true,true,true,true,true,true,true,true,true,true,true,{true,id+1,8})
 				local effect,value=0,0
 				if opt<=10 then
@@ -627,9 +628,9 @@ function s.manual_actions(e,tp,eg,ep,ev,re,r,rp,g)
 							ce:Reset()
 						end
 					end
-					return
+					statcheck=false
 				else
-					return
+					statcheck=false
 				end
 			end
 		end
