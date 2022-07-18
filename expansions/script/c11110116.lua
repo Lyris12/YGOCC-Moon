@@ -3,7 +3,7 @@
 local s,id=GetID()
 
 function s.initial_effect(c)
-	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_WARRIOR),aux.NonTuner(Card.IsRace,RACE_WARRIOR),1)
+	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_WARRIOR),aux.NonTuner(Card.IsSetCard,0x2a7),1)
 	c:EnableReviveLimit()
 	--add protection
 	local e1=Effect.CreateEffect(c)

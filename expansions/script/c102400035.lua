@@ -1,15 +1,11 @@
---created by Lyris, art by Maratus Funk & David Parker for the Science Photo Library
---サイコロ二クル
+--created by Lyris, art by 塵埃路こまき of Pixiv
+--天威の龍人霊
 local s,id,o=GetID()
 function s.initial_effect(c)
-	local tp=c:GetControler()
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e1:SetCode(EVENT_PHASE_START+PHASE_DRAW)
-	e1:SetCountLimit(1,5001+EFFECT_COUNT_CODE_DUEL)
-	e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
-	e1:SetOperation(function()
-		Duel.SendtoDeck(Duel.CreateToken(0,5000),0,SEQ_DECKTOP,REASON_RULE)
-	end)
-	Duel.RegisterEffect(e1,0)
+	c:EnableReviveLimit()
+	--mat=1+ Wyrm Effect Monsters
+	aux.AddLinkProcedure(c,s.filter,1)
+end
+function s.filter(c)
+	return c:IsRace(RACE_WYRM) and c:IsType(TYPE_EFFECT)
 end
