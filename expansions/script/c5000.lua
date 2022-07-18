@@ -251,8 +251,9 @@ function s.manual_actions(e,tp,eg,ep,ev,re,r,rp,g)
 	local b12=c:IsExists(function(fc) return fc:IsLocation(LOCATION_MZONE) and fc:IsFaceup() end,1,nil)
 	local b13=Duel.IsExistingMatchingCard(aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,c)
 	local b14=c:IsExists(function(fc) return fc:GetOverlayCount()>0 end,1,nil)
+	local b15=Duel.IsExistingMatchingCard(aux.TRUE,tp,LOCATION_MZONE,0,1,c)
 	--
-	local sel=aux.Option(id,tp,0,b1,b2,b22,b4,b7,b5,b6,b6,b6,b3,b8,b9,b3,b10,{b11,id+1,14},{b12,id+1,15},{b9,id+4,0},{true,id+4,1},{b13,id+4,7},{b14,id+4,9})
+	local sel=aux.Option(id,tp,0,b1,b2,b22,b4,b7,b5,b6,b6,b6,b3,b8,b9,b3,b10,{b11,id+1,14},{b12,id+1,15},{b9,id+4,0},{true,id+4,1},{b13,id+4,7},{b14,id+4,9},{b15,id+5,4})
 	--Normal Summon
 	if sel==0 and not g then
 		if tp~=c:GetControler() then
@@ -524,8 +525,7 @@ function s.manual_actions(e,tp,eg,ep,ev,re,r,rp,g)
 			if tp~=tc:GetControler() then		
 				if not Duel.SelectYesNo(1-tp,aux.Stringid(id+2,13)) then return end
 			end
-			local statcheck=true
-			while statcheck do
+			while true do
 				local opt=aux.Option(id+3,tp,0,true,true,true,true,true,true,true,true,true,true,true,true,{true,id+1,8})
 				local effect,value=0,0
 				if opt<=10 then
@@ -628,9 +628,9 @@ function s.manual_actions(e,tp,eg,ep,ev,re,r,rp,g)
 							ce:Reset()
 						end
 					end
-					statcheck=false
+					return
 				else
-					statcheck=false
+					return
 				end
 			end
 		end
@@ -681,6 +681,13 @@ function s.manual_actions(e,tp,eg,ep,ev,re,r,rp,g)
 			end
 			local g=tc:GetOverlayGroup():Select(tp,1,99,nil)
 			Duel.SendtoGrave(g,nil,REASON_RULE)
+		end
+	--Summon on top of other cards (Xyz Change)
+	elseif sel==20 then
+		for tc in aux.Next(c) do
+			local g=Duel.SelectMatchingCard(tp,aux.TRUE,tp,LOCATION_MZONE,0,1,1,nil)
+			Duel.Overlay(tc,g)
+			Duel.SpecialSummon(tc,0,tp,tp,true,true,POS_FACEUP+POS_FACEDOWN)
 		end
 	end
 end
@@ -746,6 +753,30 @@ function s.global_manual_actions(e,tp,eg,ep,ev,re,r,rp)
 		end
 		local ct=Duel.AnnounceNumber(TP,table.unpack(nlist))
 		Duel.ConfirmDecktop(tp,ct)
+		
+		local top=Duel.GetDecktopGroup(tp,ct)
+		if #top>0 and Duel.SelectYesNo(tp,aux.Stringid(id+5,5)) then
+			local g=top:Select(tp,1,#top,nil)
+			top:Sub(g)
+			if #g>0 then
+				local elist=global_card_effect_table[g:GetFirst()]
+				for _,effect in ipairs(elist) do
+					if effect and effect.GetLabel and effect:GetLabel()==1 then
+						s.manual_actions(effect,tp,eg,ep,ev,re,r,rp,g)
+					end
+				end
+			end
+		end
+		if #top>0 and Duel.SelectYesNo(tp,aux.Stringid(id+5,6)) then
+			local elist=global_card_effect_table[top:GetFirst()]
+			for _,effect in ipairs(elist) do
+				if effect and effect.GetLabel and effect:GetLabel()==1 then
+					s.manual_actions(effect,tp,eg,ep,ev,re,r,rp,top)
+				end
+			end
+		else
+			Duel.ShuffleDeck(tp)
+		end
 	--Show Hand
 	elseif sel==4 then
 		local g=Duel.GetFieldGroup(tp,LOCATION_HAND,0)
