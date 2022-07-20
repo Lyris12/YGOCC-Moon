@@ -253,7 +253,7 @@ function s.manual_actions(e,tp,eg,ep,ev,re,r,rp,g)
 	local b14=c:IsExists(function(fc) return fc:GetOverlayCount()>0 end,1,nil)
 	local b15=Duel.IsExistingMatchingCard(aux.TRUE,tp,LOCATION_MZONE,0,1,c)
 	--
-	local sel=aux.Option(id,tp,0,b1,b2,b22,b4,b7,b5,b6,b6,b6,b3,b8,b9,b3,b10,{b11,id+1,14},{b12,id+1,15},{b9,id+4,0},{true,id+4,1},{b13,id+4,7},{b14,id+4,9},{b15,id+5,4})
+	local sel=aux.Option(id,tp,0,false,false,b22,b4,b7,b5,b6,b6,b6,b3,b8,b9,b3,b10,{b11,id+1,14},{b12,id+1,15},{b9,id+4,0},{true,id+4,1},{b13,id+4,7},{b14,id+4,9},{b15,id+5,4})
 	--Normal Summon
 	if sel==0 and not g then
 		if tp~=c:GetControler() then
