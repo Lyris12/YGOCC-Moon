@@ -167,15 +167,12 @@ function s.ops(e,tp,eg,ep,ev,re,r,rp)
 		e8:SetCondition(function (eff) return eff:GetHandler():IsDefensePos() end)
 		e8:SetOperation(function (eff,p) local sel=Duel.SelectOption(p,aux.Stringid(id+5,2),aux.Stringid(id+5,3)) if sel==0 then eff:GetLabelObject():SetValue(0) else eff:GetLabelObject():SetValue(1) end end)
 		tc:RegisterEffect(e8)
-		-- local e8=Effect.CreateEffect(c)
-		-- e8:SetType(EFFECT_TYPE_SINGLE)
-		-- e8:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
-		-- e8:SetCode(EFFECT_CANNOT_SUMMON)
-		-- e8:SetValue(1)
-		-- tc:RegisterEffect(e8)
-		-- local e9=e8:Clone()
-		-- e9:SetCode(EFFECT_CANNOT_MSET)
-		-- tc:RegisterEffect(e9)
+		local e9=Effect.CreateEffect(c)
+		e9:SetType(EFFECT_TYPE_SINGLE)
+		e9:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_IGNORE_IMMUNE)
+		e9:SetCode(EFFECT_EXTRA_TOMAIN_KOISHI)
+		e9:SetValue(1)
+		tc:RegisterEffect(e9)
 	end
 	--Global Manual Actions
 	local ge=Effect.CreateEffect(c)
@@ -213,12 +210,7 @@ function s.ops(e,tp,eg,ep,ev,re,r,rp)
 end
 
 function s.deck_manual_actions(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if tp~=c:GetControler() then
-		if not Duel.SelectYesNo(1-tp,aux.Stringid(id+4,13)) then return end
-		Duel.ConfirmCards(1-c:GetControler(),Duel.GetFieldGroup(c:GetControler(),LOCATION_DECK,0))
-	end
-	local g=Duel.SelectMatchingCard(tp,aux.TRUE,c:GetControler(),LOCATION_DECK,0,0,999,c)
+	local g=Duel.SelectMatchingCard(tp,aux.TRUE,tp,LOCATION_DECK,0,0,999,c)
 	if #g>0 then
 		for tc in aux.Next(g) do
 			Duel.Hint(HINT_CARD,tp,tc:GetOriginalCode())
@@ -230,20 +222,20 @@ function s.deck_manual_actions(e,tp,eg,ep,ev,re,r,rp)
 			end
 		end
 	end
-	Duel.ShuffleDeck(c:GetControler())
+	Duel.ShuffleDeck(tp)
 end
 
 function s.manual_actions(e,tp,eg,ep,ev,re,r,rp,g)
 	local c = not g and Group.FromCards(e:GetHandler()) or g
 	local cc=c:GetFirst()
-	local b1=(Duel.GetLocationCount(tp,LOCATION_MZONE)>0 or cc:IsLocation(LOCATION_MZONE) and cc:IsFaceup()) and cc:IsSummonable(true,nil) and not g
-	local b2=Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and cc:IsMSetable(true,nil) and not g
+	local b1=c:IsExists(Card.IsOnField,1,nil)
+	local b2=c:IsExists(aux.NOT(Card.IsLocation),1,nil,LOCATION_GRAVE+LOCATION_REMOVED)
 	local b22=Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 	local b3=Duel.GetLocationCount(tp,LOCATION_SZONE)>0
 	local b4=c:IsExists(aux.NOT(Card.IsLocation),1,nil,LOCATION_GRAVE)
 	local b5=c:IsExists(aux.NOT(Card.IsLocation),1,nil,LOCATION_REMOVED)
 	local b6=c:IsExists(aux.NOT(Card.IsLocation),1,nil,LOCATION_DECK+LOCATION_EXTRA)
-	local b7=c:IsExists(aux.NOT(Card.IsLocation),1,nil,LOCATION_HAND+LOCATION_EXTRA)
+	local b7=c:IsExists(function(fc) return not fc:IsLocation(LOCATION_HAND) and (not fc:IsLocation(LOCATION_EXTRA) or fc:IsFaceup()) end,1,nil)
 	local b8=c:IsExists(Card.IsLocation,1,nil,LOCATION_HAND+LOCATION_DECK+LOCATION_EXTRA)
 	local b9=c:IsExists(Card.IsLocation,1,nil,LOCATION_MZONE)
 	local b10=c:IsExists(aux.NOT(Card.IsLocation),1,nil,LOCATION_EXTRA)
@@ -253,47 +245,41 @@ function s.manual_actions(e,tp,eg,ep,ev,re,r,rp,g)
 	local b14=c:IsExists(function(fc) return fc:GetOverlayCount()>0 end,1,nil)
 	local b15=Duel.IsExistingMatchingCard(aux.TRUE,tp,LOCATION_MZONE,0,1,c)
 	--
-	local sel=aux.Option(id,tp,0,false,false,b22,b4,b7,b5,b6,b6,b6,b3,b8,b9,b3,b10,{b11,id+1,14},{b12,id+1,15},{b9,id+4,0},{true,id+4,1},{b13,id+4,7},{b14,id+4,9},{b15,id+5,4})
-	--Normal Summon
+	local sel=aux.Option(id,tp,0,false,b2,b22,b4,b7,b5,b6,b6,b6,b3,b8,b9,b3,b10,{b11,id+1,14},{b12,id+1,15},{b9,id+4,0},{true,id+4,1},{b13,id+4,7},{b14,id+4,9},{b15,id+5,4})
+	--Change Position
 	if sel==0 and not g then
-		if tp~=c:GetControler() then
-			Duel.HintSelection(Group.FromCards(c))
-			if not Duel.SelectYesNo(1-tp,aux.Stringid(id+2,0)) then return end
+		local fc=c:Filter(Card.IsOnField,nil)
+		for tc in aux.Next(fc) do
+			local p=tc:GetFlagEffect(id)>0 and 1-tc:GetOwner() or tc:GetOwner()
+			if tp~=tc:GetControler() then
+				Duel.HintSelection(Group.FromCards(tc))
+				if not Duel.SelectYesNo(1-tp,aux.Stringid(id+6,4)) then return end
+			end
+			local pos=Duel.SelectPosition(tp,tc,POS_FACEUP+POS_FACEDOWN)
+			Duel.ChangePosition(tc,pos)
 		end
-		local e1=Effect.CreateEffect(c)
-		e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_SUMMON_PROC)
-		e1:SetCondition(function(eff,card) if card==nil then return true end return true end)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-		c:RegisterEffect(e1)
-		Duel.Summon(tp,c,true,nil)
-	--Normal Set
-	elseif sel==1 and not g then
-		if tp~=c:GetControler() then
-			Duel.HintSelection(Group.FromCards(c))
-			if not Duel.SelectYesNo(1-tp,aux.Stringid(id+2,0)) then return end
+	--Destroy
+	elseif sel==1 then
+		local fc=c:Filter(aux.NOT(Card.IsLocation),nil,LOCATION_GRAVE+LOCATION_REMOVED)
+		for tc in aux.Next(fc) do
+			local p=tc:GetFlagEffect(id)>0 and 1-tc:GetOwner() or tc:GetOwner()
+			if tp~=tc:GetControler() then
+				Duel.HintSelection(Group.FromCards(tc))
+				if not Duel.SelectYesNo(1-tp,aux.Stringid(id+6,3)) then return end
+			end
+			Duel.Destroy(tc,REASON_RULE)
 		end
-		local e1=Effect.CreateEffect(c)
-		e1:SetDescription(aux.Stringid(123709,0))
-		e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_SET_PROC)
-		e1:SetCondition(function(eff,card) if card==nil then return true end end)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-		c:RegisterEffect(e1)
-		Duel.MSet(tp,c,true,nil)
 	--Special Summon
 	elseif sel==2 then
 		local fc=c:Filter(aux.NOT(Card.IsLocation),nil,LOCATION_MZONE)
 		for tc in aux.Next(fc) do
 			local p=tc:GetFlagEffect(id)>0 and 1-tc:GetOwner() or tc:GetOwner()
 			if tp~=tc:GetControler() then
+				if tc:IsLocation(LOCATION_EXTRA) and Duel.GetLocationCount(p,LOCATION_MZONE)<=0 then return end
 				Duel.HintSelection(Group.FromCards(tc))
 				if not Duel.SelectYesNo(1-tp,aux.Stringid(id+2,0)) then return end
 			end
-			local pos=Duel.SelectPosition(tp,tc,POS_FACEUP+POS_FACEDOWN)
-			Duel.SpecialSummon(tc,0,tp,p,true,true,pos)
+			Duel.SpecialSummon(tc,0,tp,p,true,true,POS_FACEUP+POS_FACEDOWN)
 		end
 	--To GY
 	elseif sel==3 then
@@ -473,16 +459,16 @@ function s.manual_actions(e,tp,eg,ep,ev,re,r,rp,g)
 				local th=Effect.CreateEffect(tc)
 				th:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 				th:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SET_AVAILABLE)
-				th:SetCode(EVENT_TO_HAND)
+				th:SetCode(EVENT_TO_DECK)
 				th:SetLabel(ogtyp)
 				th:SetOperation(function(effect)
 									effect:GetHandler():SetCardData(CARDDATA_TYPE,effect:GetLabel())
 								end)
 				th:SetReset(RESET_EVENT+RESETS_STANDARD)
 				tc:RegisterEffect(th)
-				local td=th:Clone()
-				td:SetCode(EVENT_TO_DECK)
-				tc:RegisterEffect(td)
+				-- local td=th:Clone()
+				-- td:SetCode(EVENT_TO_DECK)
+				-- tc:RegisterEffect(td)
 				local rem=th:Clone()
 				rem:SetCode(EVENT_REMOVE)
 				tc:RegisterEffect(rem)
@@ -492,10 +478,10 @@ function s.manual_actions(e,tp,eg,ep,ev,re,r,rp,g)
 				local sp=th:Clone()
 				sp:SetCode(EVENT_SPSUMMON_SUCCESS)
 				tc:RegisterEffect(sp)
-				local mv=th:Clone()
-				mv:SetCode(EVENT_MOVE)
-				mv:SetCondition(function(effect) return not effect:GetHandler():IsLocation(LOCATION_EXTRA) end)
-				tc:RegisterEffect(mv)
+				-- local mv=th:Clone()
+				-- mv:SetCode(EVENT_MOVE)
+				-- mv:SetCondition(function(effect) return not effect:GetHandler():IsLocation(LOCATION_EXTRA) end)
+				-- tc:RegisterEffect(mv)
 			end
 			Duel.SendtoExtraP(tc,p,REASON_RULE)
 		end
@@ -668,6 +654,14 @@ function s.manual_actions(e,tp,eg,ep,ev,re,r,rp,g)
 				if not Duel.SelectYesNo(1-tp,aux.Stringid(id+4,8)) then return end
 			end
 			local g=Duel.SelectMatchingCard(tp,aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
+			if tc:GetOverlayCount()>0 then
+				Duel.HintSelection(Group.FromCards(tc))
+				if Duel.SelectYesNo(tp,aux.Stringid(id+6,4)) then
+					Duel.Overlay(g:GetFirst(),tc:GetOverlayGroup())
+				else
+					Duel.SendtoGrave(tc:GetOverlayGroup(),REASON_RULE)
+				end
+			end
 			Duel.Overlay(g:GetFirst(),Group.FromCards(tc))
 		end
 	--Detach Overlay Unit
@@ -685,7 +679,17 @@ function s.manual_actions(e,tp,eg,ep,ev,re,r,rp,g)
 	--Summon on top of other cards (Xyz Change)
 	elseif sel==20 then
 		for tc in aux.Next(c) do
-			local g=Duel.SelectMatchingCard(tp,aux.TRUE,tp,LOCATION_MZONE,0,1,1,nil)
+			local g=Duel.SelectMatchingCard(tp,aux.TRUE,tp,LOCATION_MZONE,0,1,99,nil)
+			for gc in aux.Next(g) do
+				if gc:GetOverlayCount()>0 then
+					Duel.HintSelection(Group.FromCards(gc))
+					if Duel.SelectYesNo(tp,aux.Stringid(id+6,4)) then
+						Duel.Overlay(tc,gc:GetOverlayGroup())
+					else
+						Duel.SendtoGrave(gc:GetOverlayGroup(),REASON_RULE)
+					end
+				end
+			end
 			Duel.Overlay(tc,g)
 			Duel.SpecialSummon(tc,0,tp,tp,true,true,POS_FACEUP+POS_FACEDOWN)
 		end
@@ -880,7 +884,7 @@ function s.chain_link_action(e,tp,eg,ep,ev,re,r,rp)
 		if sel==0 then
 			return
 		elseif sel==1 then
-			local g=Duel.SelectMatchingCard(tp,function(fc) return not fc:IsCode(id) end ,tp,LOCATION_ALL-LOCATION_DECK-LOCATION_EXTRA,LOCATION_ALL-LOCATION_DECK-LOCATION_EXTRA,0,999,nil)
+			local g=Duel.SelectMatchingCard(tp,function(fc) return not fc:IsCode(id) end ,tp,LOCATION_ALL-LOCATION_DECK,LOCATION_ALL-LOCATION_DECK-LOCATION_EXTRA-LOCATION_HAND,0,999,nil)
 			if #g>0 then
 				if #g<=5 then
 					Duel.HintSelection(g)
