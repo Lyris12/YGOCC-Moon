@@ -49,6 +49,6 @@ function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then
-		 Duel.SendtoDeck(eg,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
+		  Duel.SendtoHand(ec,nil,REASON_EFFECT)
 	end
 end

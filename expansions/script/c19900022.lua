@@ -45,7 +45,7 @@ end
 function cid.discon(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) then return false end
 	local loc=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION)
-	return loc==LOCATION_MZONE and re:IsActiveType(TYPE_MONSTER)
+	return  re:IsActiveType(TYPE_MONSTER)
 		and Duel.IsChainNegatable(ev)
 end
 

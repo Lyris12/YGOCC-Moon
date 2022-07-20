@@ -51,13 +51,13 @@ function cid.filterx(c)
 end
 function cid.thcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return  c:IsLocation(LOCATION_GRAVE) and  r==REASON_EVOLUTE ~=0
+	return  c:IsLocation(LOCATION_GRAVE) and r==REASON_EVOLUTE 
 end
 function cid.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_ONFIELD) and chkc:IsOnField() end
-	if chk==0 then return Duel.IsExistingTarget(Card.IsOnField,tp,0,LOCATION_ONFIELD,1,nil) end
+	if chkc then return chkc:IsLocation(LOCATION_ONFIELD) and chkc:IsFaceup() end
+	if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,0,LOCATION_ONFIELD,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	local g=Duel.SelectTarget(tp,Card.IsOnField,tp,0,LOCATION_ONFIELD,1,1,nil)
+	local g=Duel.SelectTarget(tp,Card.IsFaceup,tp,0,LOCATION_ONFIELD,1,1,nil)
 	  Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,0,0)
 end
 function cid.thop(e,tp,eg,ep,ev,re,r,rp)
