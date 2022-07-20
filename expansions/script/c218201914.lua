@@ -28,8 +28,8 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return c:IsAbleToRemoveAsCost() and Duel.CheckReleaseGroup(tp,Card.IsCode,1,nil,CARD_NEBULA_TOKEN) end
-	local g=Duel.SelectReleaseGroup(tp,Card.IsCode,1,1,nil,CARD_NEBULA_TOKEN)
+	if chk==0 then return c:IsAbleToRemoveAsCost() and Duel.CheckReleaseGroup(tp,Card.IsCode,1,nil,TOKEN_NEBULA) end
+	local g=Duel.SelectReleaseGroup(tp,Card.IsCode,1,1,nil,TOKEN_NEBULA)
 	Duel.Release(g,REASON_COST)
 	Duel.Remove(c,POS_FACEUP,REASON_COST)
 end

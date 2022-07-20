@@ -52,14 +52,14 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsPlayerCanSpecialSummonMonster(tp,CARD_DRAGON_EGG_TOKEN,0,0x4011,300,300,1,RACE_DRAGON,ATTRIBUTE_FIRE) end
+		and Duel.IsPlayerCanSpecialSummonMonster(tp,TOKEN_DRAGON_EGG,0,0x4011,300,300,1,RACE_DRAGON,ATTRIBUTE_FIRE) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,1,0,0)
 end
 function s.op(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0
-		or not Duel.IsPlayerCanSpecialSummonMonster(tp,CARD_DRAGON_EGG_TOKEN,0,0x4011,300,300,1,RACE_DRAGON,ATTRIBUTE_FIRE) then return end
-	local token=Duel.CreateToken(tp,CARD_DRAGON_EGG_TOKEN)
+		or not Duel.IsPlayerCanSpecialSummonMonster(tp,TOKEN_DRAGON_EGG,0,0x4011,300,300,1,RACE_DRAGON,ATTRIBUTE_FIRE) then return end
+	local token=Duel.CreateToken(tp,TOKEN_DRAGON_EGG)
 	Duel.SpecialSummon(token,0,tp,tp,false,false,POS_FACEUP)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -76,12 +76,12 @@ function s.op(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
-		local ct=Duel.GetMatchingGroupCount(Card.IsCode,tp,LOCATION_ONFIELD,0,1,nil,CARD_DRAGON_EGG_TOKEN)
+		local ct=Duel.GetMatchingGroupCount(Card.IsCode,tp,LOCATION_ONFIELD,0,1,nil,TOKEN_DRAGON_EGG)
 		return ct>0 and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>=ct
 	end
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
-	local ct=Duel.GetMatchingGroupCount(Card.IsCode,tp,LOCATION_ONFIELD,0,nil,CARD_DRAGON_EGG_TOKEN)
+	local ct=Duel.GetMatchingGroupCount(Card.IsCode,tp,LOCATION_ONFIELD,0,nil,TOKEN_DRAGON_EGG)
 	if ct==0 then return end
 	Duel.ConfirmDecktop(tp,ct)
 	local g=Duel.GetDecktopGroup(tp,ct)

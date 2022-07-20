@@ -11,7 +11,7 @@ function s.initial_effect(c)
 	e2:SetRange(LOCATION_FZONE)
 	e2:SetTargetRange(LOCATION_MZONE,0)
 	e2:SetTarget(aux.AND(aux.TargetBoolFunction(Card.IsRace,RACE_DRAGON),aux.TargetBoolFunction(Card.IsAttribute,ATTRIBUTE_FIRE),aux.TargetBoolFunction(aux.NOT(Card.IsType),TYPE_TOKEN)))
-	e2:SetValue(function(e,c) return Duel.GetMatchingGroup(aux.AND(Card.IsFaceup,Card.IsCode),e:GetHandlerPlayer(),LOCATION_MZONE,0,nil,CARD_DRAGON_EGG_TOKEN):GetSum(Card.GetAttack) end)
+	e2:SetValue(function(e,c) return Duel.GetMatchingGroup(aux.AND(Card.IsFaceup,Card.IsCode),e:GetHandlerPlayer(),LOCATION_MZONE,0,nil,TOKEN_DRAGON_EGG):GetSum(Card.GetAttack) end)
 	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_IGNITION)
@@ -41,14 +41,14 @@ function s.hcost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsPlayerCanSpecialSummonMonster(tp,CARD_DRAGON_EGG_TOKEN,0,0x4011,300,300,1,RACE_DRAGON,ATTRIBUTE_FIRE) end
+		and Duel.IsPlayerCanSpecialSummonMonster(tp,TOKEN_DRAGON_EGG,0,0x4011,300,300,1,RACE_DRAGON,ATTRIBUTE_FIRE) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,1,0,0)
 end
 function s.op(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_MZONE)<=0
-		or not Duel.IsPlayerCanSpecialSummonMonster(tp,CARD_DRAGON_EGG_TOKEN,0,0x4011,300,300,1,RACE_DRAGON,ATTRIBUTE_FIRE) then return end
-	local token=Duel.CreateToken(tp,CARD_DRAGON_EGG_TOKEN)
+		or not Duel.IsPlayerCanSpecialSummonMonster(tp,TOKEN_DRAGON_EGG,0,0x4011,300,300,1,RACE_DRAGON,ATTRIBUTE_FIRE) then return end
+	local token=Duel.CreateToken(tp,TOKEN_DRAGON_EGG)
 	Duel.SpecialSummon(token,0,tp,tp,false,false,POS_FACEUP)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -65,7 +65,7 @@ function s.op(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.filter(c,e,tp)
 	return c:IsSetCard(0xfc1) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-		and c:GetLevel()>0 and Duel.CheckReleaseGroup(tp,Card.IsCode,c:GetLevel(),nil,CARD_DRAGON_EGG_TOKEN)
+		and c:GetLevel()>0 and Duel.CheckReleaseGroup(tp,Card.IsCode,c:GetLevel(),nil,TOKEN_DRAGON_EGG)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

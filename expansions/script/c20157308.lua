@@ -47,8 +47,8 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Remove(dg,POS_FACEDOWN,REASON_EFFECT)
 end
 function s.tdcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsCode,3,nil,CARD_DRAGON_EGG_TOKEN) end
-	Duel.Release(Duel.SelectReleaseGroup(tp,Card.IsCode,3,3,nil,CARD_DRAGON_EGG_TOKEN),REASON_COST)
+	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsCode,3,nil,TOKEN_DRAGON_EGG) end
+	Duel.Release(Duel.SelectReleaseGroup(tp,Card.IsCode,3,3,nil,TOKEN_DRAGON_EGG),REASON_COST)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToHand() end

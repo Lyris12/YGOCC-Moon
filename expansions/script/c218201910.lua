@@ -44,14 +44,14 @@ end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return not Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT)
 		and Duel.GetLocationCount(tp,LOCATION_MZONE)>1
-		and Duel.IsPlayerCanSpecialSummonMonster(tp,CARD_NEBULA_TOKEN,0x88f,0x4011,0,0,1,RACE_PYRO,ATTRIBUTE_LIGHT) end
+		and Duel.IsPlayerCanSpecialSummonMonster(tp,TOKEN_NEBULA,0x88f,0x4011,0,0,1,RACE_PYRO,ATTRIBUTE_LIGHT) end
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,2,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,0,0)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT)
 		or Duel.GetLocationCount(tp,LOCATION_MZONE)<=1
-		or not Duel.IsPlayerCanSpecialSummonMonster(tp,CARD_NEBULA_TOKEN,0x88f,0x4011,0,0,1,RACE_PYRO,ATTRIBUTE_LIGHT) then return end
-	local tokens=Group.FromCards(Duel.CreateToken(tp,CARD_NEBULA_TOKEN),Duel.CreateToken(tp,CARD_NEBULA_TOKEN))
+		or not Duel.IsPlayerCanSpecialSummonMonster(tp,TOKEN_NEBULA,0x88f,0x4011,0,0,1,RACE_PYRO,ATTRIBUTE_LIGHT) then return end
+	local tokens=Group.FromCards(Duel.CreateToken(tp,TOKEN_NEBULA),Duel.CreateToken(tp,TOKEN_NEBULA))
 	Duel.SpecialSummon(tokens,0,tp,tp,false,false,POS_FACEUP)
 end

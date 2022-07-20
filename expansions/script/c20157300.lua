@@ -62,9 +62,9 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.IsPlayerAffectedByEffect(tp,id) or Duel.GetLocationCount(tp,LOCATION_MZONE)<2 
-		or not Duel.IsPlayerCanSpecialSummonMonster(tp,CARD_DRAGON_EGG_TOKEN,0,0x4011,300,300,1,RACE_DRAGON,ATTRIBUTE_FIRE) then return end
+		or not Duel.IsPlayerCanSpecialSummonMonster(tp,TOKEN_DRAGON_EGG,0,0x4011,300,300,1,RACE_DRAGON,ATTRIBUTE_FIRE) then return end
 	for i=0,1 do
-		local token=Duel.CreateToken(tp,CARD_DRAGON_EGG_TOKEN)
+		local token=Duel.CreateToken(tp,TOKEN_DRAGON_EGG)
 		Duel.SpecialSummonStep(token,0,tp,tp,false,false,POS_FACEUP)
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
@@ -82,8 +82,8 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SpecialSummonComplete()
 end
 function s.tdcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsCode,2,nil,CARD_DRAGON_EGG_TOKEN) end
-	Duel.Release(Duel.SelectReleaseGroup(tp,Card.IsCode,2,2,nil,CARD_DRAGON_EGG_TOKEN),REASON_COST)
+	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsCode,2,nil,TOKEN_DRAGON_EGG) end
+	Duel.Release(Duel.SelectReleaseGroup(tp,Card.IsCode,2,2,nil,TOKEN_DRAGON_EGG),REASON_COST)
 end
 function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

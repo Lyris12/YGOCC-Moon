@@ -32,26 +32,26 @@ function s.damcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	local atk=Duel.GetMatchingGroup(Card.IsCode,tp,LOCATION_ONFIELD,0,nil,CARD_DRAGON_EGG_TOKEN):GetSum(Card.GetAttack)
+	local atk=Duel.GetMatchingGroup(Card.IsCode,tp,LOCATION_ONFIELD,0,nil,TOKEN_DRAGON_EGG):GetSum(Card.GetAttack)
 	Duel.SetTargetPlayer(1-tp)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,atk)
 end
 function s.damop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
-	local atk=Duel.GetMatchingGroup(Card.IsCode,tp,LOCATION_ONFIELD,0,nil,CARD_DRAGON_EGG_TOKEN):GetSum(Card.GetAttack)
+	local atk=Duel.GetMatchingGroup(Card.IsCode,tp,LOCATION_ONFIELD,0,nil,TOKEN_DRAGON_EGG):GetSum(Card.GetAttack)
 	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
 	Duel.Damage(p,atk,REASON_EFFECT)
 end
 function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsPlayerCanSpecialSummonMonster(tp,CARD_DRAGON_EGG_TOKEN,0,0x4011,300,300,1,RACE_DRAGON,ATTRIBUTE_FIRE) end
+		and Duel.IsPlayerCanSpecialSummonMonster(tp,TOKEN_DRAGON_EGG,0,0x4011,300,300,1,RACE_DRAGON,ATTRIBUTE_FIRE) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,1,0,0)
 end
 function s.op(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_MZONE)<=0
-		or not Duel.IsPlayerCanSpecialSummonMonster(tp,CARD_DRAGON_EGG_TOKEN,0,0x4011,300,300,1,RACE_DRAGON,ATTRIBUTE_FIRE) then return end
-	local token=Duel.CreateToken(tp,CARD_DRAGON_EGG_TOKEN)
+		or not Duel.IsPlayerCanSpecialSummonMonster(tp,TOKEN_DRAGON_EGG,0,0x4011,300,300,1,RACE_DRAGON,ATTRIBUTE_FIRE) then return end
+	local token=Duel.CreateToken(tp,TOKEN_DRAGON_EGG)
 	Duel.SpecialSummon(token,0,tp,tp,false,false,POS_FACEUP)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_SINGLE)
