@@ -3,7 +3,6 @@
 local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
-	--mat=1+ Wyrm Effect Monsters
 	aux.AddLinkProcedure(c,s.filter,1)
 end
 function s.filter(c)
