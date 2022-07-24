@@ -41,7 +41,13 @@ function s.tunerfilter(c)
 	return false
 end
 function s.gcheck(g)
-	return not g:IsExists(Card.HasFlagEffect,2,nil,id)
+	local res = not g:IsExists(Card.HasFlagEffect,2,nil,id)
+	for tc in aux.Next(g) do
+		if tc:HasFlagEffect(id) then
+			tc:ResetFlagEffect(id)
+		end
+	end
+	return res
 end
 
 function s.handcon(e)
