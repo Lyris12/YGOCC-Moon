@@ -99,7 +99,7 @@ function c400017.operation(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local codes={e:GetLabel()}
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g0=Duel.SelectMatchingCard(tp,c400017.filter2,tp,LOCATION_DECK,0,1,1,nil,table.unpack(codes))
+	local g0=Duel.SelectMatchingCard(tp,c400017.filter2,tp,LOCATION_DECK,0,1,1,nil,codes)
 	if #g0>0 then
 		Duel.SendtoHand(g0,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g0)
