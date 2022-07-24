@@ -48,8 +48,8 @@ function c400010.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,c400010.filter,tp,LOCATION_DECK+LOCATION_HAND,0,1,1,nil,e,tp)
 	if g:GetCount()>0 then
 		if Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)==0 then return end
-		if Duel.IsPlayerCanSpecialSummonMonster(tp,400009,0x246,0x4011,1700,1000,4,RACE_FAIRY,ATTRIBUTE_WATER)
-		and Duel.IsExistingMatchingCard(function(c)return c:IsSetCard(0x246) and c:IsType(TYPE_QUICKPLAY) and c:GetCode()~=400013 end,tp,LOCATION_GRAVE,0,1,nil)
+		if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsPlayerCanSpecialSummonMonster(tp,400009,0x246,0x4011,1700,1000,4,RACE_FAIRY,ATTRIBUTE_WATER)
+		and Duel.IsExistingMatchingCard(function(c)return c:IsSetCard(0x246) and c:IsType(TYPE_QUICKPLAY) and not c:IsCode(400013) end,tp,LOCATION_GRAVE,0,1,nil)
 		and Duel.SelectYesNo(tp,aux.Stringid(400010,0)) then
 			Duel.BreakEffect()
 			local token=Duel.CreateToken(tp,400009)
