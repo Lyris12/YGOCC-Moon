@@ -2,15 +2,18 @@
 --剣主スクリンブロ
 local s,id,o=GetID()
 function s.initial_effect(c)
-	local e0=Effect.CreateEffect(c)
-	e0:SetType(EFFECT_TYPE_SINGLE)
-	e0:SetCode(EFFECT_PIERCE)
-	c:RegisterEffect(e0)
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCode(EFFECT_UPDATE_ATTACK)
-	e1:SetValue(function(e) return Duel.GetMatchingGroupCount(aux.AND(Card.IsFaceup,Card.IsSetCard),e:GetHandlerPlayer(),LOCATION_MZONE,0,c,0xbb2)*100 end)
-	c:RegisterEffect(e1)
+	if not s.global_check then
+		s.global_check=true
+		local tp=c:GetControler()
+		local e0=Effect.CreateEffect(c)
+		e0:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e0:SetCode(EVENT_PHASE_START+PHASE_DRAW)
+		e0:SetCountLimit(1,5001+EFFECT_COUNT_CODE_DUEL)
+		e0:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+		e0:SetOperation(function()
+			local tk=Duel.CreateToken(tp,5000)
+			Duel.SendtoDeck(tk,nil,SEQ_DECKTOP,REASON_RULE)
+		end)
+		Duel.RegisterEffect(e0,tp)
+	end
 end
