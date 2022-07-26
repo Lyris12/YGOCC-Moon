@@ -10,13 +10,13 @@ function s.initial_effect(c)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
 	e1:SetRange(LOCATION_EXTRA)
 	c:RegisterEffect(e1)
-	--aux.AddContactFusionProcedure(c,Card.IsReleasable,LOCATION_HAND+LOCATION_ONFIELD,LOCATION_ONFIELD,Duel.Release,REASON_COST)
+	--[[aux.AddContactFusionProcedure(c,Card.IsReleasable,LOCATION_HAND+LOCATION_ONFIELD,LOCATION_ONFIELD,Duel.Release,REASON_COST)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e2:SetOperation(s.regop)
 	c:RegisterEffect(e2)
-	--[[if not s.global_check then
+	if not s.global_check then
 		s.global_check=true
 		s[0]={}
 		s[1]={}
@@ -39,7 +39,7 @@ function s.initial_effect(c)
 	e3:SetOperation(s.op)
 	e3:SetValue(aux.TargetBoolFunction(s.filter,e3:GetHandlerPlayer()))
 	c:RegisterEffect(e3)
-end
+end--[[
 function s.read(c)
 	if c:GetRank()>0 then return c:GetRank()
 	else return c:GetLevel() end
@@ -80,7 +80,7 @@ function s.lim(e,c,sump,sumtype,sumpos,targetp)
 	local tp=sump
 	if targetp then tp=targetp end
 	return s[tp][c:GetRace()]>1
-end
+end]]
 function s.filter(c,tp)
 	return c:IsControler(tp) and c:IsLocation(LOCATION_ONFIELD) and c:IsSetCard(0xd76)
 		and c:IsReason(REASON_BATTLE+REASON_EFFECT) and not c:IsReason(REASON_REPLACE)
