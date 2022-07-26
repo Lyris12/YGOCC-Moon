@@ -245,7 +245,7 @@ function s.manual_actions(e,tp,eg,ep,ev,re,r,rp,g)
 	local b14=c:IsExists(function(fc) return fc:GetOverlayCount()>0 end,1,nil)
 	local b15=Duel.IsExistingMatchingCard(aux.TRUE,tp,LOCATION_MZONE,0,1,c)
 	--
-	local sel=aux.Option(id,tp,0,false,b2,b22,b4,b7,b5,b6,b6,b6,b3,b8,b9,b3,b10,{b11,id+1,14},{b12,id+1,15},{b9,id+4,0},{true,id+4,1},{b13,id+4,7},{b14,id+4,9},{b15,id+5,4})
+	local sel=aux.Option(id,tp,0,false,b2,b22,b4,b7,b5,b6,b6,b6,b3,b8,b9,b3,b10,{b11,id+1,14},{b12,id+1,15},{b9,id+4,0},{true,id+4,1},{b13,id+4,7},{b14,id+4,9},{b15,id+5,4},{b14,id+5,7})
 	--Change Position
 	if sel==0 and not g then
 		local fc=c:Filter(Card.IsOnField,nil)
@@ -693,6 +693,25 @@ function s.manual_actions(e,tp,eg,ep,ev,re,r,rp,g)
 			Duel.Overlay(tc,g)
 			Duel.SpecialSummon(tc,0,tp,tp,true,true,POS_FACEUP+POS_FACEDOWN)
 		end
+	--Send to GY but maintain materials
+	elseif sel==21 then
+		local fc=c:Filter(function(x) return x:GetOverlayCount()>0 end,nil)
+		for tc in aux.Next(fc) do
+			local p=tc:GetFlagEffect(id)>0 and 1-tc:GetOwner() or tc:GetOwner()
+			if tp~=tc:GetControler() then
+				Duel.HintSelection(Group.FromCards(tc))
+				if not Duel.SelectYesNo(1-tp,aux.Stringid(id+2,1)) then return end
+			end
+			local dummy=Duel.GetFieldGroup(tp,LOCATION_DECK+LOCATION_EXTRA,0):GetFirst()
+			local g=tc:GetOverlayGroup()
+			local summat=g:GetMaxGroup(Card.GetSequence):GetFirst()
+			local rzone=1<<tc:GetSequence()
+			Duel.Overlay(dummy,g)
+			Duel.SendtoGrave(tc,nil,REASON_RULE)
+			Duel.MoveToField(summat,tp,tc:GetControler(),LOCATION_MZONE,POS_FACEUP_ATTACK,true,rzone)
+			g:RemoveCard(summat)
+			Duel.Overlay(summat,g)
+		end
 	end
 end
 
@@ -884,7 +903,7 @@ function s.chain_link_action(e,tp,eg,ep,ev,re,r,rp)
 		if sel==0 then
 			return
 		elseif sel==1 then
-			local g=Duel.SelectMatchingCard(tp,function(fc) return not fc:IsCode(id) end ,tp,LOCATION_ALL-LOCATION_DECK,LOCATION_ALL-LOCATION_DECK-LOCATION_EXTRA-LOCATION_HAND,0,999,nil)
+			local g=Duel.SelectMatchingCard(tp,function(fc) return not fc:IsCode(id) end,tp,LOCATION_ALL-LOCATION_DECK,LOCATION_ALL-LOCATION_DECK-LOCATION_EXTRA-LOCATION_HAND,0,999,nil)
 			if #g>0 then
 				if #g<=5 then
 					Duel.HintSelection(g)
