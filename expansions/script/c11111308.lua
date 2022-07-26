@@ -17,6 +17,15 @@ local e1=Effect.CreateEffect(c)
 	e1:SetTarget(c11111308.ngtg)
 	e1:SetOperation(c11111308.ngop)
 	c:RegisterEffect(e1)
+	local e2=Effect.CreateEffect(c)
+	e2:SetCategory(CATEGORY_REMOVE)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e2:SetCode(EVENT_DAMAGE)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetCondition(c11111308.bcon)
+	e2:SetTarget(c11111308.btg)
+	e2:SetOperation(c11111308.bop)
+	c:RegisterEffect(e2)
 end
 function c11111308.cfilter(c)
 	return c:IsSetCard(0x5a3) and c:IsFaceup() and c:IsAbleToDeckOrExtraAsCost()
@@ -41,4 +50,17 @@ function c11111308.ngop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.NegateEffect(ev) and re:GetHandler():IsRelateToEffect(re) then
 		Duel.Destroy(eg,REASON_EFFECT)
 	end
+end
+function c11111308.bcon(e,tp,eg,ep,ev,re,r,rp)
+	return ep~=tp and r&REASON_EFFECT==REASON_EFFECT
+end
+function c11111308.btg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,3,1-tp,LOCATION_DECK)
+end
+function c11111308.bop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetFieldGroupCount(tp,0,LOCATION_DECK)==0 then return end
+	local g=Duel.GetDecktopGroup(1-tp,3)
+	Duel.DisableShuffleCheck()
+	Duel.Remove(g,POS_FACEDOWN,REASON_EFFECT)
 end
