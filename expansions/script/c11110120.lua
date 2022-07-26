@@ -85,7 +85,7 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 function s.filter(c)
-	return c:IsMonster() and c:IsSetCard(0x223,0x222,0x528,0xd0a1,0xd0a2) and c:IsAbleToHand()
+	return c:IsMonster() and c:IsSetCard(0x223,0x2a7,0x528,0xd0a1,0xd0a2) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil) end
