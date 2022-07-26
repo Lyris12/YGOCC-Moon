@@ -41,7 +41,8 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function s.read(c)
-	return Duel.ReadCard(c,CARDDATA_LEVEL)
+	if c:GetRace()>0 then return c:GetRank()
+	else return c:GetLevel() end
 end
 function s.mchk(c,fc,sub,mg,sg)
 	return (not sg or #(sg-c)<2
