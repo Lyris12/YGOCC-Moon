@@ -40,10 +40,13 @@ function s.initial_effect(c)
 	e3:SetValue(aux.TargetBoolFunction(s.filter,e3:GetHandlerPlayer()))
 	c:RegisterEffect(e3)
 end
+function s.read(c)
+	return Duel.ReadCard(c,CARDDATA_LEVEL)
+end
 function s.mchk(c,fc,sub,mg,sg)
 	return (not sg or #(sg-c)<2
 		or sg:IsExists(function(tc) return aux.gffcheck(Group.FromCards(c,tc),Card.IsSetCard,0xd76,Card.IsAttribute,ATTRIBUTE_WATER) end,1,c,sg)) and not sg:IsExists(Card.IsFusionType,1,nil,TYPE_LINK|TYPE_TIMELEAP)
-		and sg:GetClassCount(Duel.ReadCard,CARDDATA_LEVEL)==1 and aux.drccheck(g)
+		and sg:GetClassCount(s.read)==1 and aux.drccheck(g)
 end
 function s.ctfilter(c,tp,rc)
 	return c:IsSummonPlayer(tp) and c:IsRace(rc)
