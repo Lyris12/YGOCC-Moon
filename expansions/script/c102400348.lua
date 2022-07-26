@@ -16,7 +16,7 @@ function s.initial_effect(c)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e2:SetOperation(s.regop)
 	c:RegisterEffect(e2)
-	if not s.global_check then
+	--[[if not s.global_check then
 		s.global_check=true
 		s[0]={}
 		s[1]={}
@@ -30,7 +30,7 @@ function s.initial_effect(c)
 		ge1:SetCode(EVENT_SPSUMMON_SUCCESS)
 		ge1:SetOperation(s.rchk)
 		Duel.RegisterEffect(ge1,0)
-	end
+	end]]
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
 	e3:SetCode(EFFECT_DESTROY_REPLACE)
