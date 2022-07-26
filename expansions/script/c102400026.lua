@@ -2,8 +2,8 @@
 --トラップマ・スカンク
 local s,id,o=GetID()
 function s.initial_effect(c)
-	if not s.global_check then
-		s.global_check=true
+	if not manual_global_check then
+		manual_global_check=true
 		local tp=c:GetControler()
 		local e0=Effect.CreateEffect(c)
 		e0:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
