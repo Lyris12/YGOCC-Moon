@@ -1,13 +1,14 @@
+---hmmm
 local cid,id=GetID()
 function cid.initial_effect(c)
-c:EnableReviveLimit()
-	   aux.AddOrigEvoluteType(c)
-	 aux.AddEvoluteProc(c,nil,7,aux.OR(cid.filter1,cid.filter2),2,99) 
+	c:EnableReviveLimit()
+	aux.AddOrigEvoluteType(c)
+	aux.AddEvoluteProc(c,nil,7,aux.OR(cid.filter1,cid.filter2),2,99) 
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e1:SetRange(LOCATION_MZONE)
-e1:SetTargetRange(LOCATION_MZONE,0)
+	e1:SetTargetRange(LOCATION_MZONE,0)
 	e1:SetCode(EFFECT_UPDATE_ATTACK)
 	e1:SetValue(cid.atkval)
 	c:RegisterEffect(e1)
@@ -37,32 +38,30 @@ e1:SetTargetRange(LOCATION_MZONE,0)
 	e0:SetType(EFFECT_TYPE_SINGLE)
 	e0:SetCode(EFFECT_MATERIAL_CHECK)
 	e0:SetValue(cid.valcheck)
+	e0:SetLabelObject(e3)
 	c:RegisterEffect(e0)
 end
-
 function cid.filter1(c,ec,tp)
 	return c:IsAttribute(ATTRIBUTE_FIRE) 
 end
 function cid.filter2(c,ec,tp)
 	return c:IsRace(RACE_PLANT) 
 end
-
 function cid.valcheck(e,c)
 	local g=c:GetMaterial()
-	if g:IsExists(Card.IsType,1,nil,TYPE_EVOLUTE) then
-		e:GetLabelObject():SetLabel(1)
-	else
-		e:GetLabelObject():SetLabel(0)
+	if g:IsExists(cid.spfilter,1,nil) then
+		e:SetLabel(1)
+		else
+		e:SetLabel(0)
 	end
 end
 function cid.descon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_EVOLUTE) and e:GetLabel()==1
 end
-
 function cid.desop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,0,nil)
 	for tc in aux.Next(g) do
-   local e1=Effect.CreateEffect(e:GetHandler())
+		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
 		e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
@@ -70,17 +69,13 @@ function cid.desop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 		e1:SetValue(cid.atkval)
 		tc:RegisterEffect(e1)
-  local e2=e1:Clone()
+		local e2=e1:Clone()
 		e2:SetCode(EFFECT_UPDATE_DEFENSE)
 		tc:RegisterEffect(e2)
+	end
 end
-end
-
 function cid.atkval(e,c)
 	return Duel.GetMatchingGroupCount(cid.IsRace,c:GetControler(),LOCATION_GRAVE,0,nil,RACE_WYRM+RACE_PLANT)*500
-end
-function cid.ovfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x107f) and c:IsType(TYPE_XYZ) and c:IsRank(4)
 end
 function cid.actcon(e)
 	return Duel.GetAttacker()==e:GetHandler() or Duel.GetAttackTarget()==e:GetHandler()
@@ -90,7 +85,7 @@ function cid.atkcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function cid.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-		   if chk==0 then return e:GetHandler():IsCanRemoveEC(tp,3,REASON_COST) end
+	if chk==0 then return e:GetHandler():IsCanRemoveEC(tp,3,REASON_COST) end
 	e:GetHandler():RemoveEC(tp,3,REASON_COST)
 end
 function cid.atkop(e,tp,eg,ep,ev,re,r,rp)
@@ -104,15 +99,6 @@ function cid.atkop(e,tp,eg,ep,ev,re,r,rp)
 		c:RegisterEffect(e1)
 	end
 end
-
-function cid.valcheck(e,c)
-	local g=c:GetMaterial()
-	e:SetLabel(0)
-	if g:IsExists(cid.spfilter,1,nil,nil) then
-		e:SetLabel(1)
-	end
-end
-
-function cid.spfilter(c,e,tp)
-	return c:IsSetCard(0x57b) and c:IsType(TYPE_EVOLUTE)
+function cid.spfilter(c)
+	return c:IsSetCard(0x57b) and c:IsType(TYPE_EVOLUTE) 
 end

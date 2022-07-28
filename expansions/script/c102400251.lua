@@ -52,19 +52,14 @@ function s.op(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Destroy(c,REASON_EFFECT)
 end
 function s.regop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e1:SetCode(EVENT_PRE_BATTLE_DAMAGE)
-	e1:SetOperation(function(e,tp,eg,ep,ev)
-		local a=Duel.GetAttacker()
-		if a:IsControler(1-tp) then a=Duel.GetAttackTarget() end
-		if not a then return end
-		if a:IsSetCard(0xa6c) and ep~=tp and Duel.SelectEffectYesNo(tp,c) then
-			Duel.ChangeBattleDamage(1-tp,ev*2)
-			e1:Reset()
-		end
-	end)
-	e1:SetReset(RESET_PHASE+PHASE_END)
-	Duel.RegisterEffect(e1,tp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
+	local g=Duel.SelectMatchingCard(tp,aux.AND(Card.IsFaceup,Card.IsSetCard),tp,LOCATION_MZONE,0,1,1,nil,0xa6c)
+	Duel.HintSelection(g)
+	if #g==0 then return end
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_CHANGE_BATTLE_DAMAGE)
+	e1:SetValue(aux.ChangeBattleDamage(1,DOUBLE_DAMAGE))
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,2)
+	g:GetFirst():RegisterEffect(e1)
 end

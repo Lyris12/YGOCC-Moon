@@ -19,8 +19,8 @@ function s.initial_effect(c)
 	e2:SetOperation(s.sumop)
 	c:RegisterEffect(e2)
 end
-function s.filter(c)
-	return c:IsSetCard(0xa6c) and c:IsType(TYPE_MONSTER)
+function s.filter(c,code)
+	return c:IsSetCard(0xa6c) and c:IsType(TYPE_MONSTER) and not c:IsCode(code)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(aux.AND(s.filter,Card.IsAbleToHand),tp,LOCATION_DECK,0,1,nil) end
@@ -32,7 +32,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.SendtoHand(g,nil,REASON_EFFECT)==0 then return end
 	Duel.ConfirmCards(1-tp,g)
 	Duel.ShuffleHand(tp)
-	local dg=Duel.GetMatchingGroup(s.filter,tp,LOCATION_HAND,0,nil)
+	local dg=Duel.GetMatchingGroup(s.filter,tp,LOCATION_HAND,0,nil,g:GetFirst():GetCode())
 	if #dg==0 or not Duel.SelectYesNo(tp,1101) then return end
 	Duel.BreakEffect()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)

@@ -56,7 +56,7 @@ function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function cid.thfilter(c)
-	return c:IsSetCard(0x57b) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand() and not c:IsCode(19900015)
+	return c:IsSetCard(0x57b) and c:IsAbleToHand() and not c:IsCode(19900015)
 end
 function cid.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cid.thfilter,tp,LOCATION_DECK,0,1,nil) end

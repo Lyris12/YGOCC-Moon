@@ -2,9 +2,11 @@
 --アーマリンの灯台
 local s,id,o=GetID()
 function s.initial_effect(c)
+	c:SetUniqueOnField(c,1,0,id)
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_ACTIVATE)
 	e0:SetCode(EVENT_FREE_CHAIN)
+	e0:SetCountLimit(1,id+EFFECT_COUNT_CODE_OATH)
 	e0:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
 	e0:SetTarget(s.target)
 	e0:SetOperation(s.activate)
@@ -12,7 +14,7 @@ function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e2:SetCode(EVENT_ATTACK_ANNOUNCE)
-	e2:SetRange(LOCATION_FZONE)
+	e2:SetRange(LOCATION_SZONE)
 	e2:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
 	e2:SetCondition(s.thcon)
 	e2:SetTarget(s.thtg)
@@ -62,5 +64,5 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,tp)
 end
 function s.thlimit(e,c,tp,r,re)
-	return c:IsCode(e:GetLabel()) and re and re:IsActiveType(TYPE_MONSTER) and re:GetHandler():IsCode(id) and r==REASON_EFFECT
+	return c:IsCode(e:GetLabel()) and re and re:GetHandler():IsCode(id) and r==REASON_EFFECT
 end

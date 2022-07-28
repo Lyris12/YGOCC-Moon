@@ -35,6 +35,9 @@ function s.initial_effect(c)
 	e2:SetOperation(s.drop)
 	c:RegisterEffect(e2)
 end
+function s.mfilter(c)
+	return c:IsSynchroType(TYPE_TUNER) or c:IsSetCard(0xa6c)
+end
 function s.filter(c,e,tp)
 	return c:IsSetCard(0xa6c) and c:IsType(TYPE_MONSTER) and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp,c:GetCode())
 end

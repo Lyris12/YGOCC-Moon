@@ -21,7 +21,7 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function cid.filter(c,tp)
-	return  c:IsSetCard(0x57b) and c:IsType(TYPE_MONSTER) and c:IsReason(REASON_DISCARD)
+	return  c:IsSetCard(0x57b) and c:IsReason(REASON_DISCARD)
 end
 function cid.condition(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(cid.filter,1,nil,tp)

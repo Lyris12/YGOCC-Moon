@@ -5,39 +5,12 @@ function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCategory(CATEGORY_DESTROY)
-	e1:SetTarget(s.target)
-	e1:SetOperation(s.activate)
+	e1:SetCountLimit(1,id+EFFECT_COUNT_CODE_OATH)
+	e1:SetCategory(CATEGORY_TODECK+CATEGORY_SPECIAL_SUMMON)
+	e1:SetCondition(function(e,tp,eg) return eg:IsExists(s.cfilter,1,nil,tp) end)
+	e1:SetTarget(s.tg)
+	e1:SetOperation(s.op)
 	c:RegisterEffect(e1)
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e2:SetRange(LOCATION_GRAVE)
-	e2:SetProperty(EFFECT_FLAG_DAMAGE_CAL+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
-	e2:SetCategory(CATEGORY_TODECK+CATEGORY_SPECIAL_SUMMON)
-	e2:SetCondition(function(e,tp,eg) return eg:IsExists(s.cfilter,1,nil,tp) end)
-	e2:SetCost(aux.bfgcost)
-	e2:SetTarget(s.tg)
-	e2:SetOperation(s.op)
-	c:RegisterEffect(e2)
-end
-function s.filter(c)
-	return c:IsSetCard(0xa6c) and c:IsType(TYPE_MONSTER)
-end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	local g=Duel.GetMatchingGroup(Card.IsType,tp,0,LOCATION_ONFIELD,nil,TYPE_SPELL+TYPE_TRAP)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_HAND,0,1,nil) and #g>0 end
-	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_HAND)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
-end
-function s.activate(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	if Duel.Destroy(Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_HAND,0,1,1,nil),REASON_EFFECT)==0 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	Duel.Destroy(Duel.SelectMatchingCard(tp,Card.IsType,tp,0,LOCATION_ONFIELD,1,2,nil,TYPE_SPELL+TYPE_TRAP),REASON_EFFECT)
-end
-function s.cfilter(c,tp)
-	return c:IsFaceup() and c:IsSetCard(0xa6c) and c:IsControler(tp)
 end
 function s.rfilter(c)
 	return c:IsSetCard(0xa6c) and c:IsType(TYPE_MONSTER) and c:GetOriginalLevel()>0 and c:IsAbleToDeck()
@@ -61,5 +34,6 @@ function s.op(e,tp,eg,ep,ev,re,r,rp)
 	if not tc then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local mg=g:SelectWithSumEqual(tp,Card.GetOriginalLevel,tc:GetLevel(),1,99)
-	if Duel.SendtoDeck(mg,nil,2,REASON_EFFECT)>0 and mg:IsExists(Card.IsLocation,1,nil,LOCATION_DECK+LOCATION_EXTRA) then Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP) end
+	if Duel.SendtoDeck(mg,nil,2,REASON_EFFECT)>0 and mg:IsExists(Card.IsLocation,1,nil,LOCATION_DECK+LOCATION_EXTRA)
+		and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)>0 then tc:CompleteProcedure() end
 end
