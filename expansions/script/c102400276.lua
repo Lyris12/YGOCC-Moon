@@ -2,7 +2,7 @@
 --アーマリンの灯台
 local s,id,o=GetID()
 function s.initial_effect(c)
-	c:SetUniqueOnField(c,1,0,id)
+	c:SetUniqueOnField(1,0,id)
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_ACTIVATE)
 	e0:SetCode(EVENT_FREE_CHAIN)
@@ -63,6 +63,6 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
 end
-function s.thlimit(e,c,tp,r,re)
-	return c:IsCode(e:GetLabel()) and re and re:GetHandler():IsCode(id) and r==REASON_EFFECT
+function s.thlimit(e,c,tp,re)
+	return c:IsCode(e:GetLabel()) and re and re:GetHandler():IsCode(id)
 end

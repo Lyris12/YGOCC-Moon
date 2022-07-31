@@ -16,6 +16,7 @@ function cid.initial_effect(c)
 	e2:SetCode(EVENT_DISCARD)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCondition(cid.condition)
+	e2:SetCost(cid.cost)
 	e2:SetTarget(cid.target)
 	e2:SetOperation(cid.operation)
 	c:RegisterEffect(e2)
@@ -25,6 +26,10 @@ function cid.filter(c,tp)
 end
 function cid.condition(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(cid.filter,1,nil,tp)
+end
+function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetFlagEffect(tp,id)==0 end
+	Duel.RegisterFlagEffect(tp,id,RESET_CHAIN,0,1)
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end

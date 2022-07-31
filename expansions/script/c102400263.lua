@@ -42,7 +42,8 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_HAND+LOCATION_MZONE,0,1,1,nil)
 	if Duel.Destroy(g,REASON_EFFECT)>0 and Duel.Draw(tp,2,REASON_EFFECT)~=2 then return end
 	local dc=Duel.GetDecktopGroup(tp,1):GetFirst()
-	while dc and Duel.SelectEffectYesNo(tp,e:GetHandler()) do
+	for i=1,2 do
+		if not (dc and Duel.SelectEffectYesNo(tp,e:GetHandler())) then break end
 		Duel.DisableShuffleCheck()
 		Duel.Destroy(dc,REASON_EFFECT)
 		dc=Duel.GetDecktopGroup(tp,1):GetFirst()
