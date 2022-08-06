@@ -15,7 +15,7 @@ function cid.initial_effect(c)
 	e0:SetTargetRange(0,1)
 	e0:SetCondition(cid.limitcon)
 	c:RegisterEffect(e0)
-	--Upstart Catoblin.
+	--draw
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(433006,0))
 	e1:SetCategory(CATEGORY_DRAW)
@@ -26,19 +26,19 @@ function cid.initial_effect(c)
 	e1:SetTarget(cid.drtg)
 	e1:SetOperation(cid.drop)
 	c:RegisterEffect(e1)
-	--DURO!MONSTAH CADO!
+	--tohand
 	local e2=Effect.CreateEffect(c)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e2:SetCategory(CATEGORY_TOHAND)
 	e2:SetCode(EVENT_DRAW)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1)
 	e2:SetCondition(cid.thcon)
 	e2:SetTarget(cid.thtg)
 	e2:SetOperation(cid.thop)
 	c:RegisterEffect(e2)
-	--:clap: :clap: REVIVE REVIEW :clap: :clap:
+	--revive
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_FIELD)
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -49,7 +49,7 @@ function cid.initial_effect(c)
 	e3:SetTarget(cid.revtg)
 	e3:SetOperation(cid.revop)
 	c:RegisterEffect(e3)
-	--THE PART BELOW MUST BE PUT AFTER YOU DEFINED ALL THE EFFECTS (e1,e2,e3...)
+	--global_check
 	if not cid.global_check then
 		cid.global_check=true
 		local ge1=Effect.CreateEffect(c)
@@ -111,7 +111,7 @@ function cid.drop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function cid.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return not (r==REASON_RULE)
+	return r~=REASON_RULE
 end
 function cid.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsAbleToHand() end
