@@ -54,6 +54,12 @@ function Card.ChangeDEFField(c,def,range,selfzones,oppozones,f,cond)
 	return e
 end
 
+function Card.ChangeAttributeField(c,attr,range,selfzones,oppozones,f,cond)
+	local e=c:FieldEffect(EFFECT_CHANGE_ATTRIBUTE,range,selfzones,oppozones,f,attr,cond)
+	c:RegisterEffect(e)
+	return e
+end
+
 function Card.ChangeRaceField(c,race,range,selfzones,oppozones,f,cond)
 	local e=c:FieldEffect(EFFECT_CHANGE_RACE,range,selfzones,oppozones,f,race,cond)
 	c:RegisterEffect(e)

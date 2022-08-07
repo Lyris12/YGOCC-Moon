@@ -20,6 +20,9 @@ GLOBAL_EFFECT_RESET	=	10203040
 --zone constants
 EXTRA_MONSTER_ZONE=0x60
 
+--timings
+RELEVANT_TIMINGS = TIMINGS_CHECK_MONSTER+TIMING_MAIN_END+TIMING_END_PHASE
+
 --constants aliases
 TYPE_ST			= TYPE_SPELL+TYPE_TRAP
 
@@ -180,7 +183,7 @@ function Duel.Search(g,tp)
 	if #cg>0 then
 		Duel.ConfirmCards(1-tp,cg)
 	end
-	return ct,#cg
+	return ct,#cg,cg
 end
 
 function Duel.ShuffleIntoDeck(g,p)
@@ -261,8 +264,12 @@ end
 function Card.HasOriginalLevel(c)
 	return not c:IsOriginalType(TYPE_XYZ+TYPE_LINK)
 end
+
 function Card.IsOriginalType(c,typ)
 	return c:GetOriginalType()&typ>0
+end
+function Card.IsOriginalRace(c,rc)
+	return c:GetOriginalRace()&rc>0
 end
 
 function Card.GetRating(c)
@@ -362,6 +369,16 @@ function Card.GlitchyGetColumnGroup(c,left,right)
 	end
 end
 
+--Exception
+function Auxiliary.ActivateException(e,chk)
+	local c=e:GetHandler()
+	if c and e:IsHasType(EFFECT_TYPE_ACTIVATE) and not c:IsType(TYPE_CONTINUOUS+TYPE_FIELD+TYPE_EQUIP) and not c:IsHasEffect(EFFECT_REMAIN_FIELD) and (not chk or chk==0 or c:IsRelateToChain(0)) then
+		return c
+	else
+		return nil
+	end
+end
+
 --Descriptions
 function Effect.Desc(e,id,...)
 	local x = {...}
@@ -425,6 +442,18 @@ function Auxiliary.GainEffectType(c,oc,reset)
 	end
 end
 
+--Group Check
+
+--EDOPro Imported
+function Group.CheckSameProperty(g,f,...)
+	local chk=nil
+	for tc in aux.Next(g) do
+		chk = chk and (chk&f(tc,...)) or f(tc,...)
+		if chk==0 then return false,0 end
+	end
+	return true, chk
+end
+
 --Locations
 function Card.IsBanished(c)
 	return c:IsLocation(LOCATION_REMOVED)
@@ -442,11 +471,43 @@ function Card.IsInEMZ(c)
 	return c:IsLocation(LOCATION_MZONE) and c:GetSequence()>=5
 end
 
+function Card.NotOnFieldOrFaceup(c)
+	return not c:IsOnField() or c:IsFaceup()
+end
 function Card.NotBanishedOrFaceup(c)
 	return not c:IsLocation(LOCATION_REMOVED) or c:IsFaceup()
 end
 function Card.NotInExtraOrFaceup(c)
 	return not c:IsLocation(LOCATION_EXTRA) or c:IsFaceup()
+end
+
+--Once per turn
+function Effect.OPT(e,ct)
+	if not ct then ct=1 end
+	return e:SetCountLimit(ct)
+end
+
+if not Auxiliary.HOPTTracker then
+	Auxiliary.HOPTTracker={}
+end
+function Effect.HOPT(e,oath)
+	if not e:GetOwner() then return end
+	local c=e:GetOwner()
+	local cid=c:GetOriginalCode()
+	if not aux.HOPTTracker[c] then
+		aux.HOPTTracker[c]=0
+	end
+	if type(aux.HOPTTracker[c])=="number" then
+		cid=cid+aux.HOPTTracker[c]*100
+	end
+	aux.HOPTTracker[c]=aux.HOPTTracker[c]+1
+	
+	local flag=0
+	if oath then
+		flag=flag|EFFECT_COUNT_CODE_OATH
+	end
+	
+	return e:SetCountLimit(1,cid+flag)
 end
 
 --Phases

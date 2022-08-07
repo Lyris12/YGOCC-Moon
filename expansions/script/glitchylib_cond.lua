@@ -17,9 +17,45 @@ function Auxiliary.ExactEventGroupCond(f,ct,exc)
 			end
 end
 
---Except on Damage Calc
+--Turn/Phase Conditions
+function Auxiliary.DrawPhaseCond(tp)
+	return	function(e,p)
+				local tp = (not tp or tp==0) and p or 1-p
+				return Duel.IsDrawPhase(tp)
+			end
+end
+function Auxiliary.StandbyPhaseCond(tp)
+	return	function(e,p)
+				local tp = (not tp or tp==0) and p or 1-p
+				return Duel.IsStandbyPhase(tp)
+			end
+end
+function Auxiliary.MainPhaseCond(tp,ct)
+	return	function(e,p)
+				local tp = (not tp or tp==0) and p or 1-p
+				return Duel.IsMainPhase(tp,ct)
+			end
+end
+function Auxiliary.BattlePhaseCond(tp)
+	return	function(e,p)
+				local tp = (not tp or tp==0) and p or 1-p
+				return Duel.IsBattlePhase(tp)
+			end
+end
+function Auxiliary.EndPhaseCond(tp)
+	return	function(e,p)
+				local tp = (not tp or tp==0) and p or 1-p
+				return Duel.IsEndPhase(tp)
+			end
+end
 function Auxiliary.ExceptOnDamageCalc()
 	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated()
+end
+function Auxiliary.TurnPlayerCond(tp)
+	return	function(e,p)
+				local tp = (not tp or tp==0) and p or 1-p
+				return Duel.GetTurnPlayer()==tp
+			end
 end
 
 --Location Group Check Conditions
@@ -86,6 +122,9 @@ function Auxiliary.BigbangSummonedCond(e)
 end
 function Auxiliary.TimeleapSummonedCond(e)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_TIMELEAP)
+end
+function Auxiliary.ProcSummonedCond(e)
+	return e:GetHandler():IsSummonType(SUMMON_TYPE_SPECIAL+1)
 end
 
 --Equip
