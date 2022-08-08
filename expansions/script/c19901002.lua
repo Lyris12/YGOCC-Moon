@@ -3,6 +3,8 @@ local cid,id=GetID()
 function cid.initial_effect(c)
 	aux.AddOrigEvoluteType(c)
 	c:EnableReviveLimit()
+   aux.AddOrigConjointType(c)
+	aux.EnableConjointAttribute(c,1)
 	aux.AddEvoluteProc(c,nil,3,cid.filter2,1,1)
 	--to hand
 	local e1=Effect.CreateEffect(c)

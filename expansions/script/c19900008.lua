@@ -3,6 +3,8 @@ local cid,id=GetID()
 function cid.initial_effect(c)
 c:EnableReviveLimit()
 	   aux.AddOrigEvoluteType(c)
+   aux.AddOrigConjointType(c)
+	aux.EnableConjointAttribute(c,1)
 	 aux.AddEvoluteProc(c,nil,7,aux.AND(cid.filter1,cid.filter2),2,99)  
 	--discard deck & draw
 	local e1=Effect.CreateEffect(c)

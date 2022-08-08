@@ -1,10 +1,12 @@
 --Paintress Dragon
-
+  
 local cid,id=GetID()
 function cid.initial_effect(c)
 c:EnableReviveLimit()
-       aux.AddOrigEvoluteType(c)
-     aux.AddEvoluteProc(c,nil,8,cid.filter1,cid.filter1,2,99)  
+   aux.AddOrigConjointType(c)
+	aux.EnableConjointAttribute(c,1)
+	   aux.AddOrigEvoluteType(c)
+	 aux.AddEvoluteProc(c,nil,8,cid.filter1,cid.filter1,2,99)  
 	--destroy
   local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,0))

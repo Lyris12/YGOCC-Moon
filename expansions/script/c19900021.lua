@@ -15,7 +15,7 @@ function cid.initial_effect(c)
   --special summon
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(16956455,0))
-	e2:SetCategory(CATEGORY_DESTROY)
+	e2:SetCategory(CATEGORY_TODECK)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetType(EFFECT_TYPE_IGNITION)
    e2:SetCountLimit(1,id)

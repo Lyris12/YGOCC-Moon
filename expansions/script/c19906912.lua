@@ -3,6 +3,8 @@
 local cid,id=GetID()
 function cid.initial_effect(c)
 c:EnableReviveLimit()
+   aux.AddOrigConjointType(c)
+	aux.EnableConjointAttribute(c,1)
 	   aux.AddOrigEvoluteType(c)
 	 aux.AddEvoluteProc(c,nil,4,aux.OR(cid.filter1,cid.filter2),1,99)  
   --atk up
