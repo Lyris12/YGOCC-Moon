@@ -7,7 +7,7 @@ function s.initial_effect(c)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCountLimit(1,id+EFFECT_COUNT_CODE_OATH)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_TODECK)
+	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_TODECK+CATEGORY_DRAW)
 	e1:SetTarget(s.tg)
 	e1:SetOperation(s.op)
 	c:RegisterEffect(e1)
@@ -43,14 +43,18 @@ end
 function s.filter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xd76) and (c:IsAbleToHand() or c:IsAbleToDeck())
 end
+function s.chk(g,tp)
+	return aux.dncheck(g) and (#g<3 or Duel.IsPlayerCanDraw(tp,1))
+end
 function s.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(s.filter,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	local g=Duel.GetMatchingGroup(aux.AND(s.filter,Card.IsCanBeEffectTarget),tp,LOCATION_GRAVE,0,nil,e):SelectSubGroup(tp,aux.dncheck,false,1,5)
+	local g=Duel.GetMatchingGroup(aux.AND(s.filter,Card.IsCanBeEffectTarget),tp,LOCATION_GRAVE,0,nil,e):SelectSubGroup(tp,s.chk,false,1,5,tp)
 	Duel.SetTargetCard(g)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,#g-1,0,0)
+	if #g>2 then Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1) end
 end
 function s.op(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -79,7 +83,10 @@ function s.op(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetProperty(EFFECT_FLAG_CLIENT_HINT)
 	e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,2)
 	sc:RegisterEffect(e1)
-	Duel.SendtoDeck(g:Filter(Card.IsRelateToEffect,nil,e),nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
+	if Duel.SendtoDeck(g:Filter(Card.IsRelateToEffect,nil,e),nil,SEQ_DECKSHUFFLE,REASON_EFFECT)>1
+		and g:FilterCount(Card.IsLocation,nil,LOCATION_DECK+LOCATION_EXTRA)>1 then
+		Duel.Draw(tp,1,REASON_EFFECT)
+	end
 end
 function s.lim(e,c,sump,sumtype,sumpos,targetp)
 	if sumpos and bit.band(sumpos,POS_FACEDOWN)>0 then return false end

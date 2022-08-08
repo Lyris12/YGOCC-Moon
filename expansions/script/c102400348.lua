@@ -3,19 +3,27 @@
 local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
-	aux.AddFusionProcFunRep(c,s.mchk,3,true)
+	aux.AddFusionProcFunRep(c,s.mchk,2,true)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
 	e1:SetRange(LOCATION_EXTRA)
 	c:RegisterEffect(e1)
-	aux.AddContactFusionProcedure(c,aux.FilterBoolFunction(aux.IsInGroup,Duel.GetReleaseGroup(c:GetControler(),true)),LOCATION_HAND+LOCATION_ONFIELD,LOCATION_ONFIELD,Duel.Release,REASON_COST)
+	aux.AddContactFusionProcedure(c,aux.FilterBoolFunction(aux.IsInGroup,Duel.GetReleaseGroup(c:GetControler(),true)),LOCATION_ONFIELD,LOCATION_ONFIELD,Duel.Release,REASON_COST)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e2:SetOperation(s.regop)
 	c:RegisterEffect(e2)
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_FIELD)
+	e4:SetCode(EFFECT_LIMIT_SPECIAL_SUMMON_POSITION)
+	e4:SetRange(LOCATION_MZONE)
+	e4:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e4:SetTargetRange(1,0)
+	e4:SetTarget(s.lim)
+	c:RegisterEffect(e4)
 	if not s.global_check then
 		s.global_check=true
 		s[0]={}
@@ -35,38 +43,17 @@ function s.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
 	e3:SetCode(EFFECT_DESTROY_REPLACE)
 	e3:SetRange(LOCATION_MZONE)
+	e3:SetCountLimit(2)
 	e3:SetTarget(s.tg)
 	e3:SetOperation(s.op)
 	e3:SetValue(aux.TargetBoolFunction(s.filter,c:GetControler()))
 	c:RegisterEffect(e3)
 end
 function s.mchk(c,fc,sub,mg,sg)
-	return (not sg or #(sg-c)<2
-		or sg:IsExists(function(tc) return aux.gffcheck(Group.FromCards(c,tc),Card.IsSetCard,0xd76,Card.IsAttribute,ATTRIBUTE_WATER) end,1,c,sg)) and not sg:IsExists(Card.IsFusionType,1,nil,TYPE_LINK|TYPE_TIMELEAP)
-		and sg:GetClassCount(Duel.ReadCard,CARDDATA_LEVEL)==1 and aux.drccheck(g)
+	return (not sg or #(sg-c)==0 or sg:IsExists(function(tc) return c:IsAttribute(ATTRIBUTE_WATER) and tc:IsSetCard(0xd76) or c:IsSetCard(0xd76) and tc:IsAttribute(ATTRIBUTE_WATER) end,1,c)) and aux.drccheck(g)
 end
 function s.ctfilter(c,tp,rc)
 	return c:IsSummonPlayer(tp) and c:IsRace(rc)
-end
-function s.regop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetFlagEffect(tp,id)>0 then return end
-	local rc=1
-	while rc<RACE_ALL do s[tp][rc]=0 rc=rc<<1 end
-	Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,2)
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_LIMIT_SPECIAL_SUMMON_POSITION)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e1:SetTargetRange(1,0)
-	e1:SetTarget(s.lim)
-	e1:SetReset(RESET_PHASE+PHASE_END,2)
-	Duel.RegisterEffect(e1,tp)
-end
-function s.lim(e,c,sump,sumtype,sumpos,targetp)
-	if sumpos and bit.band(sumpos,POS_FACEDOWN)>0 then return false end
-	local tp=sump
-	if targetp then tp=targetp end
-	return s[tp][c:GetRace()]>1
 end
 function s.rchk(e,tp,eg)
 	for p=0,1 do if Duel.GetFlagEffect(p,id)>0 then
@@ -76,6 +63,12 @@ function s.rchk(e,tp,eg)
 			rc=rc<<1
 		end
 	end end
+end
+function s.lim(e,c,sump,sumtype,sumpos,targetp)
+	if sumpos and bit.band(sumpos,POS_FACEDOWN)>0 then return false end
+	local tp=sump
+	if targetp then tp=targetp end
+	return s[tp][c:GetRace()]>1
 end
 function s.filter(c,tp)
 	return c:IsControler(tp) and c:IsLocation(LOCATION_ONFIELD) and c:IsSetCard(0xd76)
