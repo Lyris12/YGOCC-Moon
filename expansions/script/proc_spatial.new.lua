@@ -133,7 +133,7 @@ function Card.SwitchSpace(c)
 	return true
 end
 function Card.IsCanBeSpaceMaterial(c,sptc)
-	if not c:IsAbleToRemove() or c:IsType(TYPE_TOKEN) or c:IsOnField() and c:IsFacedown() then return false end
+	if not c:IsAbleToRemove() or c:IsOnField() and c:IsFacedown() then return false end
 	local tef={c:IsHasEffect(EFFECT_CANNOT_BE_SPACE_MATERIAL)}
 	for _,te in ipairs(tef) do
 		if (type(te:GetValue())=="function" and te:GetValue()(te,sptc)) or te:GetValue()==1 then return false end
@@ -240,13 +240,11 @@ function Auxiliary.SpaceCheckOtherMaterial(c,mg,sptc,tp)
 end
 function Auxiliary.SptMatCheck(c,sg,sptc)
 	local djn=sptc:GetLevel()
-	return sg:IsExists(function(tc)
-		local aadiff=math.abs(c:GetAttack()-tc:GetAttack())
-		local dddiff=math.abs(c:GetDefense()-tc:GetDefense())
-		local addiff=math.abs(c:GetAttack()-tc:GetDefense())
-		local dadiff=math.abs(c:GetDefense()-tc:GetAttack())
+	return not sg:IsExists(function(tc)
+		local adiff=math.abs(c:GetAttack()-tc:GetAttack())
+		local ddiff=math.abs(c:GetDefense()-tc:GetDefense())
 		local rdiff=100*djn
-		return aadiff<=rdiff or dddiff<=rdiff or addiff<=rdiff or dadiff<=rdiff
+		return adiff>rdiff and ddiff>rdiff
 	end,1,c)
 end
 function Auxiliary.SpatialValue(c)

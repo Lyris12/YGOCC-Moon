@@ -18,9 +18,6 @@ Card.GetType=function(c,scard,sumtype,p)
 	local tpe=scard and get_type(c,scard,sumtype,p) or get_type(c)
 	if Auxiliary.Relays[c] then
 		tpe=tpe|TYPE_RELAY
-		if not Auxiliary.Relays[c]() then
-			tpe=tpe&~TYPE_PENDULUM
-		end
 	end
 	return tpe
 end
@@ -28,9 +25,6 @@ Card.GetOriginalType=function(c)
 	local tpe=get_orig_type(c)
 	if Auxiliary.Relays[c] then
 		tpe=tpe|TYPE_RELAY
-		if not Auxiliary.Relays[c]() then
-			tpe=tpe&~TYPE_PENDULUM
-		end
 	end
 	return tpe
 end
@@ -38,9 +32,6 @@ Card.GetPreviousTypeOnField=function(c)
 	local tpe=get_prev_type_field(c)
 	if Auxiliary.Relays[c] then
 		tpe=tpe|TYPE_RELAY
-		if not Auxiliary.Relays[c]() then
-			tpe=tpe&~TYPE_PENDULUM
-		end
 	end
 	return tpe
 end

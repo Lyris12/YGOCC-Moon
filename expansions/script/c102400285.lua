@@ -13,4 +13,4 @@ function s.initial_effect(c)
 		Duel.SendtoDeck(tk,nil,SEQ_DECKTOP,REASON_RULE)
 	end)
 	Duel.RegisterEffect(e0,tp)
-	end
+end
