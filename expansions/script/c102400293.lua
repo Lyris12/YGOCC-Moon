@@ -16,6 +16,7 @@ function s.initial_effect(c)
 	e1:SetOperation(s.op)
 	c:RegisterEffect(e1)
 end
+s.spt_other_space=102400289
 function s.filter(c,e,tp)
 	return c:IsFaceup() and c:IsSetCard(0xf87) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsCode(id)
 end

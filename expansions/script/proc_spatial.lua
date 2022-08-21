@@ -123,10 +123,8 @@ end
 function Card.SwitchSpace(c)
 	if not Auxiliary.Spatials[c] then return false end
 	Auxiliary.Spatials[c]=nil
-	local mt=_G["c" .. c:GetOriginalCode()]
-	local ospc=mt.spt_other_space
-	if not ospc or ospc==c:GetOriginalCode() then ospc=Duel.ReadCard(c:GetOriginalCode(),CARDDATA_ALIAS) end
-	if ospc==0 then return false end
+	local ospc=c.spt_other_space
+	if not ospc or ospc==0 then return false end
 	c:SetEntityCode(ospc,true)
 	c:ReplaceEffect(ospc,0,0)
 	Duel.SetMetatable(c,_G["c"..ospc])
@@ -179,16 +177,6 @@ function Auxiliary.AddSpatialProc(c,sptcheck,...)
 	ge2:SetOperation(Auxiliary.SpatialOperation)
 	ge2:SetValue(SUMMON_TYPE_SPATIAL)
 	c:RegisterEffect(ge2)
-	if not spatial_check then
-		spatial_check=true
-		local ge5=Effect.CreateEffect(c)
-		ge5:SetType(EFFECT_TYPE_FIELD)
-		ge5:SetCode(EFFECT_TO_GRAVE_REDIRECT)
-		ge5:SetTargetRange(0xff,0xff)
-		ge5:SetTarget(function(e,tc) return Auxiliary.Spatials[tc] end)
-		ge5:SetValue(LOCATION_REMOVED)
-		Duel.RegisterEffect(ge5,0)
-	end
 end
 function Auxiliary.SpaceMatFilter(c,sptc,tp,...)
 	if c:IsFacedown() or not c:IsCanBeSpaceMaterial(sptc) then return false end
@@ -198,17 +186,18 @@ function Auxiliary.SpaceMatFilter(c,sptc,tp,...)
 	return false
 end
 function Auxiliary.SptCheckRecursive(c,tp,sg,mg,sptc,ct,djn,sptcheck,...)
-	if not c:IsLevelAbove(1) and not c:IsRankAbove(1) then return false end
+	if not c:IsLevelAbove(1) and not c:IsRankAbove(1)
+		or c:IsLevelAbove(djn+1) or c:IsRankAbove(djn+1) then return false end
 	sg:AddCard(c)
 	ct=ct+1
-	local funs,max,chk={...},0
+	local funs,max,min,chk={...},0,0
 	for i=1,#funs do
+		min=min+funs[i][2]
 		max=max+funs[i][3]
 		if funs[i][1](c) then
 			chk=true
 		end
 	end
-	if max>99 then max=99 end
 	local res=chk and (Auxiliary.SptCheckGoal(tp,sg,sptc,ct,sptcheck,...)
 		or (ct<max and mg:IsExists(Auxiliary.SptCheckRecursive,1,sg,tp,sg,mg,sptc,ct,djn,sptcheck,...)))
 	sg:RemoveCard(c)
@@ -221,8 +210,10 @@ function Auxiliary.SptCheckGoal(tp,sg,sptc,ct,sptcheck,...)
 		if not sg:IsExists(funs[i][1],funs[i][2],nil) then return false end
 		min=min+funs[i][2]
 	end
-	return ct>=min and sg:CheckWithSumGreater(Auxiliary.SpatialValue,sptc:GetLevel()+1)
-		and sg:IsExists(Auxiliary.SptMatCheck,1,nil,sg,sptc)
+	local djn=sptc:GetLevel()+1
+	if min<djn then Duel.SetSelectedCard(sg) end
+	return ct>=min and sg:CheckWithSumGreater(Auxiliary.SpatialValue,djn)
+		and sg:IsExists(Auxiliary.SptMatCheck,#sg,nil,sg,sptc)
 		and (not sptcheck or sptcheck(sg,sptc,tp)) and Duel.GetLocationCountFromEx(tp,tp,sg,sptc)>0
 		and not sg:IsExists(Auxiliary.SpaceUncompatibilityFilter,1,nil,sg,sptc,tp)
 end
@@ -349,6 +340,8 @@ function Auxiliary.SpatialOperation(e,tp,eg,ep,ev,re,r,rp,c,smat,mg)
 			end
 		else rg:AddCard(tc) end
 	end
-	Duel.Remove(rg,POS_FACEUP,REASON_MATERIAL+REASON_SPATIAL)
+	Duel.SendtoGrave(rg,REASON_MATERIAL+REASON_SPATIAL)
 	g:DeleteGroup()
+	local ospc=Duel.CreateToken(tp,c.spt_other_space)
+	if Group.CreateGroup(ospc):SelectSubGroup(tp,aux.TRUE,true) then c:SwitchSpace() end
 end

@@ -4,7 +4,7 @@ local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddOrigSpatialType(c)
-	aux.AddSpatialProc(c,aux.dabcheck,aux.TRUE,2,2)
+	aux.AddSpatialProc(c,aux.dabcheck,aux.FilterBoolFunction(aux.NOT(Card.IsType),TYPE_TOKEN),2,2)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_SINGLE)
 	e1:SetCode(EVENT_REMOVE)
@@ -14,6 +14,7 @@ function s.initial_effect(c)
 	e1:SetOperation(s.op)
 	c:RegisterEffect(e1)
 end
+s.spt_other_space=102400286
 function s.filter(c,e,tp,sync)
 	local REASON_SPTMAT=REASON_MATERIAL+REASON_SPATIAL
 	return c:IsLocation(LOCATION_REMOVED) and c:GetReason()&REASON_SPTMAT==REASON_SPTMAT

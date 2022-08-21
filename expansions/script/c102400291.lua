@@ -4,7 +4,7 @@ local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddOrigSpatialType(c)
-	aux.AddSpatialProc(c,aux.drccheck,aux.TRUE,2,2)
+	aux.AddSpatialProc(c,aux.drccheck,aux.FilterBoolFunction(aux.NOT(Card.IsType),TYPE_TOKEN),2,2)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_SINGLE)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
@@ -15,6 +15,7 @@ function s.initial_effect(c)
 	e1:SetOperation(s.op)
 	c:RegisterEffect(e1)
 end
+s.spt_other_space=102400287
 function s.filter(c)
 	return c:IsSetCard(0xf87) and c:IsAbleToRemoveAsCost()
 end

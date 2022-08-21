@@ -4,7 +4,7 @@ local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddOrigSpatialType(c)
-	aux.AddSpatialProc(c,nil,aux.TRUE,2,2)
+	aux.AddSpatialProc(c,nil,aux.FilterBoolFunction(aux.NOT(Card.IsType),TYPE_TOKEN),2,2)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
@@ -16,6 +16,7 @@ function s.initial_effect(c)
 	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
 end
+s.spt_other_space=102400036
 function s.filter(c)
 	return c:IsType(TYPE_MONSTER) and aux.nzatk(c) and c:IsAbleToRemove()
 end
