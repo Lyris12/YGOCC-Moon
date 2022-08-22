@@ -451,8 +451,10 @@ function Card.CannotBeMaterial(c,ed_types,f,reset,rc)
 			e:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 			e:SetType(EFFECT_TYPE_SINGLE)
 			e:SetCode(elist[i])
-			if f then
+			if type(f)=="function" then
 				e:SetValue(function(eff,cc) if not cc then return false end return f(cc,eff) end)
+			else
+				e:SetValue(1)
 			end
 			if reset then
 				if type(reset)~="number" then reset=0 end
