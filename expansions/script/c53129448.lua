@@ -1,14 +1,13 @@
 --Singolarità Oscura
 --Scripted by: XGlitchy30
 
-local s,id=GetID()
-
 s.effect_text = [[
 ● You can only use the ① effect of "Dark Singularity" once per turn.
 
 ① Target 1 face-up Xyz Monster on the field with no materials; attach as material to it, 1 monster in its same column or in an adjacent one, and if you do, attach 1 monster in the same column as the attached monster or in an adjacent one, and keep repeating this process until there are no more cards to attach, also, after that, if the targeted monster is the only monster on the field, destroy all other cards on the field.
 ]]
 
+local s,id=GetID()
 function s.initial_effect(c)
 	c:Activate(0,{0,CATEGORY_ATTACH},EFFECT_FLAG_CARD_TARGET,false,{1,0},nil,nil,s.tg,s.op)
 end

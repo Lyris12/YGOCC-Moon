@@ -7,9 +7,10 @@ s.effect_text = [[
 ● You can only use each effect of "Tempest Shocker" once per turn.
 ● You can only Special Summon "Tempest Shocker" once per turn with its ① effect.
 
-① You can Special Summon this card (from your hand) to either field in face-up Defense Position. 
+① If you control a face-up Spell/Trap, you can Special Summon this card (from your hand) to either field in face-up Defense Position. 
 ② If Summoned this way: Destroy all face-up Spells/Traps on this card's owner field.
-③ When another Thunder monster(s) is Normal or Special Summoned to your field (except during the Damage Step): You can Set from your GY to your field, 1 Field Spell or 1 Continuous Spell/Trap. It can be activated this turn.
+③ Negate the effects of all other face-up Field Spells and Continuous Spells/Traps on this card's owner field.
+④ When another Thunder monster(s) is Normal or Special Summoned to your field (except during the Damage Step): You can Set from your GY to your field, 1 Field Spell or 1 Continuous Spell/Trap. (It can be activated this turn if it is a Trap).
 ]]
 
 function s.initial_effect(c)
@@ -37,26 +38,44 @@ function s.initial_effect(c)
 	e2:SetTarget(s.destg)
 	e2:SetOperation(s.desop)
 	c:RegisterEffect(e2)
-	--set
+	--disable
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,4))
-	e3:SetCustomCategory(CATEGORY_SET)
-	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e3:SetCode(EVENT_SUMMON_SUCCESS)
+	e3:SetType(EFFECT_TYPE_FIELD)
+	e3:SetProperty(EFFECT_FLAG_ABSOLUTE_TARGET)
+	e3:SetCode(EFFECT_DISABLE)
 	e3:SetRange(LOCATION_MZONE)
-	e3:SetCountLimit(1,{id,2})
-	e3:SetCondition(s.tgcon)
-	e3:SetTarget(s.tgtg)
-	e3:SetOperation(s.tgop)
+	e3:SetTargetRange(LOCATION_ONFIELD,0)
+	e3:SetTarget(s.disfilter)
 	c:RegisterEffect(e3)
-	local e3x=e3:Clone()
-	e3x:SetCode(EVENT_SPSUMMON_SUCCESS)
+	local e3x=Effect.CreateEffect(c)
+	e3x:SetType(EFFECT_TYPE_FIELD)
+	e3x:SetProperty(EFFECT_FLAG_ABSOLUTE_TARGET)
+	e3x:SetCode(EFFECT_DISABLE_TRAPMONSTER)
+	e3x:SetRange(LOCATION_MZONE)
+	e3x:SetTargetRange(LOCATION_MZONE,0)
+	e3x:SetTarget(s.disfilter)
 	c:RegisterEffect(e3x)
+	--set
+	local e4=Effect.CreateEffect(c)
+	e4:SetDescription(aux.Stringid(id,4))
+	e4:SetCustomCategory(CATEGORY_SET)
+	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e4:SetCode(EVENT_SUMMON_SUCCESS)
+	e4:SetRange(LOCATION_MZONE)
+	e4:SetCountLimit(1,{id,2})
+	e4:SetCondition(s.tgcon)
+	e4:SetTarget(s.tgtg)
+	e4:SetOperation(s.tgop)
+	c:RegisterEffect(e4)
+	local e4x=e4:Clone()
+	e4x:SetCode(EVENT_SPSUMMON_SUCCESS)
+	c:RegisterEffect(e4x)
 end
 
 function s.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
+	if not Duel.IsExistingMatchingCard(aux.Faceup(Card.IsST),tp,LOCATION_ONFIELD,0,1,nil) then return false end
 	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and e:GetHandler():IsCanBeSpecialSummoned(e,1,tp,false,false,POS_FACEUP)
 	or Duel.GetLocationCount(1-tp,LOCATION_MZONE,tp)>0 and e:GetHandler():IsCanBeSpecialSummoned(e,1,tp,false,false,POS_FACEUP,1-tp)
 end
@@ -90,6 +109,10 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	if #g>0 then
 		Duel.Destroy(g,REASON_EFFECT)
 	end
+end
+
+function s.disfilter(e,c)
+	return c~=e:GetHandler() and (c:GetType()&(TYPE_SPELL+TYPE_FIELD)==TYPE_SPELL+TYPE_FIELD or c:IsST() and c:IsType(TYPE_CONTINUOUS))
 end
 
 --set

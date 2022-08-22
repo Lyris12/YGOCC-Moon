@@ -7,7 +7,7 @@ s.effect_text = [[
 ● You can only use the ① and ② effect of "Bee Blade" once per turn.
 
 ① When this card is Summoned: You can Special Summon 1 Insect monster from your hand in a different battle position from this card.
-② (Quick Effect): You can discard 1 card, then target 1 other monster you control that is in an adjacent column; change this card's battle position, then change that target's battle position.
+② (Quick Effect): You can discard 1 card, then target 1 other monster you control in this card's column or in an adjacent one; change this card's battle position, then change that target's battle position.
 ③ Each time a monster(s) changes its battle position, that monster(s) gains 700 ATK/DEF, until the end of the turn.
 ]]
 
@@ -48,7 +48,8 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 function s.posfilter(c,e)
-	return c:IsMonster() and c:IsCanChangePosition() and e:GetHandler():GetColumnGroup(1,1):IsContains(c)
+	local g=e:GetHandler():GlitchyGetColumnGroup(1,1)
+	return c:IsMonster() and c:IsCanChangePosition() and g:IsContains(c)
 end
 function s.poschk(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsCanChangePosition()

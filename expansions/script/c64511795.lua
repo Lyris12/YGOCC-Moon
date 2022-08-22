@@ -42,8 +42,15 @@ end
 function s.ptop(e,tp)
 	local c=e:GetHandler()
 	if c and c:IsFaceup() and c:IsRelateToEffect(e) then
-		c:EffectProtection(true,RESET_PHASE+PHASE_END)
-		c:TargetProtection(true,RESET_PHASE+PHASE_END)
+		local e1=Effect.CreateEffect(c)
+		e1:Desc(3)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_IMMUNE_EFFECT)
+		e1:SetProperty(EFFECT_FLAG_CLIENT_HINT)
+		e1:SetValue(s.efilter)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD_DISABLE+RESET_PHASE+PHASE_END)
+		e1:SetOwnerPlayer(tp)
+		c:RegisterEffect(e1)
 		--
 		local fid=c:GetFieldID()
 		c:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1,fid)
@@ -59,6 +66,9 @@ function s.ptop(e,tp)
 		Duel.RegisterEffect(e3,tp)
 		c:CreateEffectRelation(e3)
 	end
+end
+function s.efilter(e,re)
+	return e:GetOwnerPlayer()~=re:GetOwnerPlayer()
 end
 function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetOwner()

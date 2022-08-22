@@ -4,13 +4,12 @@
 local s,id=GetID()
 
 s.effect_text = [[
-● You can only use the ① effect of "Spellcasters' Capetain" once per turn.
+● You can only use the ③ effect of "Spellcasters' Capetain" once per turn.
 
-① If this card is sent from the field to the GY while equipped to a monster: You can target 1 monster your opponent controls; place 1 Casted Spell Counter on it, also, as long as that monster remains face-up on your opponent's field, when you activate the effect of a DARK Spellcaster monster, you can make that effect become the following one.
+① Once per turn, you can either: Target 1 Spellcaster monster on the field; equip this card to that target, OR: Unequip this card and Special Summon it.
+② A monster equipped with this card becomes DARK and gains 600 ATK/DEF, also if the equipped monster would be destroyed by battle or card effect, destroy this card instead.
+③ If this card is sent from the field to the GY while equipped to a monster: You can target 1 monster your opponent controls; place 1 Casted Spell Counter on it, also, as long as that monster remains face-up on your opponent's field, when you activate the effect of a DARK Spellcaster monster, you can make that effect become the following one.
 ● Take control of 1 monster your opponent controls with a Casted Spell Counter(s) on it
-
-② Once per turn, you can either: Target 1 Spellcaster monster on the field; equip this card to that target, OR: Unequip this card and Special Summon it.
-③ A monster equipped with this card becomes DARK and gains 600 ATK/DEF, also if the equipped monster would be destroyed by battle or card effect, destroy this card instead. 
 ]]
 
 function s.initial_effect(c)

@@ -1,4 +1,4 @@
-﻿expansions/cards-new.cdb	b4da06332002369ba72805e5696f9830
+﻿expansions/cards-new.cdb	7312e9a5feb7d00d2cd7831900a1c646
 expansions/lflist.conf	a1a65308b18d3b60bad5a02069c1baa6
 expansions/strings.conf	6e10d823e4e669b91c89d4639f4523f4
 expansions/pics/100000714.jpg	74ec20749932cad0249671d71e6d672b
@@ -969,12 +969,12 @@ expansions/pics/14060019.jpg	4559a369eb4f094309eff62eb116552b
 expansions/pics/14060020.jpg	930bbaea1b0616afdd457edad22416f2
 expansions/pics/14142136.jpg	5a36f5bd524005754570b94e6b7e4ca6
 expansions/pics/1497.jpg	6527ca231ab12afa13f2dcf3ff0333ca
-expansions/pics/15150373.jpg	627334d46299be30eab7084dc1463baa
+expansions/pics/15150373.jpg	642bbadab030a9911bf4d8d3fb8f65f5
 expansions/pics/151991819.jpg	82b1c902cdf0e345d965ea6938f5a5bb
 expansions/pics/15401635.jpg	a6f93e8011d43fc398ec51e22548459b
 expansions/pics/15401636.jpg	7ef0186e716d1c63927a4bdbb05c52ca
-expansions/pics/15507081.jpg	87110670e7cb8091348c2740fc60a0de
-expansions/pics/15510990.jpg	e2625813ffd446acbf44990249a1a98b
+expansions/pics/15507081.jpg	5903e853fe337bfa5e0ab92c0422cceb
+expansions/pics/15510990.jpg	89f3dd8d1c3e6cccf27b12e0ff7f1375
 expansions/pics/1552222.jpg	5ab13a6ad12df3b8feff8a12c04422fb
 expansions/pics/155255.jpg	60eac550dab3819399b08e45b18ac691
 expansions/pics/155265.jpg	0b65045485ea0603590dbad79bbea6d2
@@ -1332,7 +1332,7 @@ expansions/pics/185129309.jpg	4d5a5252418e56ee03759963bc01065f
 expansions/pics/185129310.jpg	ac1fcd4e49375ab315085caa97be20f5
 expansions/pics/185129311.jpg	0713f08660776f2c7393638e167fa4ce
 expansions/pics/185129312.jpg	6e803bde9e68b37e14686bf8b595f59c
-expansions/pics/18710709.jpg	7681434b8b65a71b0fc53ab4db0eec19
+expansions/pics/18710709.jpg	4d16eb6fea678f821ca0a6aaba2f3889
 expansions/pics/19141500.jpg	66fa04eddd47c5d87fc5a2297d27a2cc
 expansions/pics/19141501.jpg	cea216e33b5fd52773d398d21415907f
 expansions/pics/19141502.jpg	1b636b8b76f180e6cd02d951bff9d72e
@@ -1966,7 +1966,7 @@ expansions/pics/21933012.jpg	a6942cd897eae04984581f72decdd28d
 expansions/pics/21933013.png	d7300558dc833b38d9e87d04feda15ef
 expansions/pics/21933014.png	3a333ad4920e7ee8be4b005adba7a666
 expansions/pics/21933015.png	233e13de006491a6dd2493de4224ed20
-expansions/pics/22026709.jpg	092249f7c128944f4df83ed7ef61286f
+expansions/pics/22026709.jpg	b25eb26f5d2a940b83a1020bf92096b9
 expansions/pics/22112900.jpg	74af03f268cfd6bb1f1ae2af53b05c9b
 expansions/pics/22112901.jpg	fabbd161778f70b16cc24d890716cf7d
 expansions/pics/22112902.jpg	e41b64350382f4a5377f9879cf42351b
@@ -3390,8 +3390,8 @@ expansions/pics/378180020.jpg	af8545c60be3dd2c27235d811cdecb67
 expansions/pics/378180021.jpg	6bdfceab0e47b1ddcfd7bc7887748e22
 expansions/pics/378181000.jpg	c8a316e6b3359977194b2fc9d0d02e6c
 expansions/pics/37920475.png	2177dfdd4e7dbad69f043f8ff6a538dc
-expansions/pics/38142741.jpg	cc1c370bd0ec2af465e6d9fef5a8b306
-expansions/pics/38199698.jpg	374be0026bea1d144b8eaa216978ccaf
+expansions/pics/38142741.jpg	111e0e032cb5b88056d74d9721bc364e
+expansions/pics/38199698.jpg	a0e08987367324bd8d2851be6c004ae6
 expansions/pics/38648101.jpg	7f934c14e46d48db5b4c7aaed0abf566
 expansions/pics/38648102.jpg	e0b2a50de2e6abf22768ef37441131cb
 expansions/pics/38648103.jpg	dfe8979d933672f969e93364a3b033c2
@@ -3414,7 +3414,7 @@ expansions/pics/38648119.jpg	667d9fcec526b837b8d431c81b84e651
 expansions/pics/38648120.jpg	770ad5ddd964d4bec27f6178f5764fa1
 expansions/pics/38648121.jpg	028fced5b62a90ba843dc9df85e49ede
 expansions/pics/39001.jpg	6eeb6a1139b79a4fb68e7c5ef919e96b
-expansions/pics/39175984.jpg	71398d357e63f6bb7410fc751e194fba
+expansions/pics/39175984.jpg	3dbd1468322d4ec4f4f52565525f1e7a
 expansions/pics/39203.jpg	aa2d21bd7caebf5320a385a9534dc5ca
 expansions/pics/39211.jpg	512a50cc1acf690cebd807abae227079
 expansions/pics/39213.jpg	7f7114bdfc281c477a9a465ae80dee8b
@@ -3810,7 +3810,7 @@ expansions/pics/4200122.jpg	e3719f8a77ff3044c41c9c2f4f108dd3
 expansions/pics/4200122.png	33d4174da50bffeaffc30f6dac810067
 expansions/pics/4200123.jpg	39fc3a47e684ed0f35d612020632fc94
 expansions/pics/4200123.png	e4cb908c88a6a9595cc71d1594a0dfd7
-expansions/pics/4206969.jpg	163eaa8630f82e5288c25b933a9ce86f
+expansions/pics/4206969.jpg	027c8123215e54c81f1653a144a8d0b3
 expansions/pics/4237066.jpg	0f308b0d15fd771e353a9b74786bc982
 expansions/pics/42745698.jpg	4aef4b1824c0d24c8614d81813ff98cc
 expansions/pics/433001.png	20acf67d6c62e7aaf8f5f602ca19c75c
@@ -3853,8 +3853,8 @@ expansions/pics/444409.png	c9989ea5f4480e383dda137c16af5f58
 expansions/pics/444410.png	f3cd172915e6140dc67d0acfed7249b7
 expansions/pics/444411.png	ce5666b77fd8aba19074641a0d6329c2
 expansions/pics/46128097.jpg	932c2243808d46ef31cb121a20be83d8
-expansions/pics/46457858.jpg	fff08819dadcaf2d108d42957185f4ab
-expansions/pics/46718688.jpg	a716ca5d73d6ee70667a5eb6ba8c37ef
+expansions/pics/46457858.jpg	06123978c8fef2fc6ac3447a89106c42
+expansions/pics/46718688.jpg	1d388f2b3eee028930f0950a0760df28
 expansions/pics/47511800.jpg	4f165b4f45f022e3f966c40b29ea979d
 expansions/pics/47511801.jpg	84854441b57b8f8919398a15c5f4713f
 expansions/pics/47511802.jpg	ac6375b393e690052e1f48a8805f03a0
@@ -3869,7 +3869,7 @@ expansions/pics/47511810.jpg	df4715793a7ff00ce77ef6ed3dd4ff6c
 expansions/pics/47511811.jpg	c1d03ed7c1e7e21d8fd83a4c36107cc3
 expansions/pics/47511812.jpg	8052dee050c718e64a67eaa181646658
 expansions/pics/47511813.jpg	6400b90f95e321d146a8f997651aa9cb
-expansions/pics/47695418.jpg	e38a74d2e63c6ad8b8d6f016346a99a5
+expansions/pics/47695418.jpg	a68a534b0689edf7f5c554b4be1e6815
 expansions/pics/48022718.jpg	7fb9426ce4ba9ca732144153f1f69038
 expansions/pics/49451958.jpg	f3ce83b319143bdb02e7fa64ae9587ed
 expansions/pics/49451959.jpg	f3255d139099112b992764b22cfc6f5f
@@ -4026,8 +4026,8 @@ expansions/pics/52460549.jpg	f8bbc90fbe20cc67c7d66a13df631d7f
 expansions/pics/52471658.jpg	93777d0983a7cc1b2f27bdd52a912c59
 expansions/pics/52480561.jpg	52a2ce365555c3598d20d93fda1b1eb6
 expansions/pics/52800430.jpg	60d7b22cae4c771a0f3f2fcb55de4e0e
-expansions/pics/53129448.jpg	c9c053861b67e6f82f9a583f2d3f403c
-expansions/pics/53293547.jpg	28534ce019cd97811e6af5f06c52d3d2
+expansions/pics/53129448.jpg	f251978cdb8bde787875d212c9cd697c
+expansions/pics/53293547.jpg	834310df4b79c8dea4d51ee3a0aa81fd
 expansions/pics/53313901.jpg	debc1f82b3c536559fc5c346b540181e
 expansions/pics/53313902.jpg	81521ff71cdf70d4effbfa5a616869b6
 expansions/pics/53313903.jpg	55a9712fbdcecc0f772e3b574a158806
@@ -4063,8 +4063,8 @@ expansions/pics/53313931.png	32b2e0b22d58ff73a582c750491d71ab
 expansions/pics/53313932.jpg	dbd8fa8b1bd4be5aa176ed21efec75d5
 expansions/pics/53313933.jpg	8097ace9d7ec20e6567349dc523db700
 expansions/pics/53313934.jpg	4001262f227513032ff523d0f7db9c24
-expansions/pics/53581215.jpg	87aa5485fe29978b8658f721f766fd77
-expansions/pics/53832652.jpg	e425140ad4c7ce0795a1c19f32c77779
+expansions/pics/53581215.jpg	0424534447c3e53721f749a6166a50f4
+expansions/pics/53832652.jpg	ceaf17bc5f605e007b1f02f1889fe457
 expansions/pics/5418114.jpg	b4cf0f382ac345b9ff04eab600061507
 expansions/pics/54181140.jpg	113130a40c1b0af96eb297deeaac366a
 expansions/pics/54181141.jpg	05981787741281cb14f2f1ce46cb2727
@@ -4165,7 +4165,7 @@ expansions/pics/5889535.jpg	d00c95236bc7f1e235777faf9a171a20
 expansions/pics/5889536.jpg	03cc1dbc51d813100841192c0f5fd509
 expansions/pics/5889537.png	77b6162cd4d20feeb1aaeba45e4294d2
 expansions/pics/5889538.png	8de8f0ac534e826d8aa35e93949a6ed8
-expansions/pics/5889540.jpg	10edca6e54e670c714f55d49a3718eb7
+expansions/pics/5889540.jpg	829c1dc5531d87e11c43e823b1dc7290
 expansions/pics/6007214.jpg	3b6f17368a651c23a0d47c801d0cceea
 expansions/pics/61811400.png	be63fd659dfdb0115ed7d8b6e4967774
 expansions/pics/61811401.png	b98e899a034091a59a364d28d26d86b6
@@ -4307,7 +4307,7 @@ expansions/pics/63553583.png	257735b9bfed2c988a3d4edb7631fb1a
 expansions/pics/63553584.png	4f8b83c7284b080e457881b4c6cad086
 expansions/pics/63553585.png	b064b9a467fb5706a2bd0e90116b6694
 expansions/pics/64226943.jpg	fe70741cb95986f87fe0df2cd31fd1f4
-expansions/pics/64511795.jpg	831c6418d8beb83b64c54efe18561c77
+expansions/pics/64511795.jpg	b12024951d935dddd2bdc46e606ff2ca
 expansions/pics/65040001.jpg	7eb55032d7ff5473feb77d74585d89a5
 expansions/pics/65040002.jpg	6327f24f48a9aee6bff0fa8f8b3cc7b1
 expansions/pics/65040003.jpg	97ad14f1519a437a495018ad6fb90b4b
@@ -4316,7 +4316,7 @@ expansions/pics/65040005.jpg	48fd5fa02a4758837a9565b905e54fd6
 expansions/pics/65040006.jpg	b51bb5106fdf76a416692be5f27dfb1a
 expansions/pics/65040007.jpg	d984c5815fbf22c1c5544f0c8914653d
 expansions/pics/65040008.jpg	8975baa72b9180028553679e9e47f89e
-expansions/pics/66788018.jpg	9b8af029e006d3cfe84d6cb77291230f
+expansions/pics/66788018.jpg	b3f789ea90f203e2e0b22c6ccca24d13
 expansions/pics/67864641.jpg	925d3dfdb80c665caf749db0db0f1085
 expansions/pics/67864642.jpg	f306a82fa95affef2dd9c4a9caaf8790
 expansions/pics/67864643.jpg	ba42364eb87022d4961753a3485f0878
@@ -4493,7 +4493,7 @@ expansions/pics/70070085.jpg	2f69bfd048c6abe723072459710aae8e
 expansions/pics/70070086.png	a17e0da5e1f3d2615e43c9edee5852f8
 expansions/pics/71911430.jpg	72fc10e5e4a5de678bcb0ba1624152ae
 expansions/pics/71911431.jpg	68d7520fa651f7951d09ab8ead475e2e
-expansions/pics/71983791.jpg	a6d47457ddf73675bdf6a03e8eea5829
+expansions/pics/71983791.jpg	147e611524c4883a255a80aebea0966e
 expansions/pics/720050.jpg	5686b81c46624a0c1329bdfffa8ece55
 expansions/pics/720051.jpg	6bc95cdcae0b2d9f71499801de7fb28f
 expansions/pics/720052.jpg	38b1abc3a4431ec2d24b25ed2c62922b
@@ -4506,8 +4506,8 @@ expansions/pics/720058.jpg	e248fa4c4e4e882d893bf63d71692cee
 expansions/pics/720059.jpg	b851b1e08320bed4554c59e2b5594b3c
 expansions/pics/73610374.jpg	0c7c7a6f61f13fa2a4e16585a10a6485
 expansions/pics/75977701.jpg	dbc33e20ba57dace37a529de784caf74
-expansions/pics/76103676.jpg	82c8585de33f35bb8e6c5bfff922a4c3
-expansions/pics/76184693.jpg	25ab0267d66229c309b6efcfc1e8395f
+expansions/pics/76103676.jpg	48b0054d46a55d50d17bca4c75a91e17
+expansions/pics/76184693.jpg	f3235b12fbd61ad576c738a7afe4f1c9
 expansions/pics/76565315.jpg	e359abcf815dc86c51732a00f746ff44
 expansions/pics/76565316.jpg	a619c0469de8e713f75dc15f8df0b3b6
 expansions/pics/76565317.jpg	c906e760823c9e31279c7d10f2fb3561
@@ -4729,8 +4729,8 @@ expansions/pics/83013180.jpg	ed86d1c3e701e8219bc3ad20dd4ec5de
 expansions/pics/83013181.jpg	4dd1bede29686766aa1beb05cb57ae0f
 expansions/pics/83013182.jpg	a9102a8bfe4336830fa13aa67561f4d1
 expansions/pics/83013183.jpg	0782b25b07f6c5a52ababeaaefaec424
-expansions/pics/83028479.jpg	3c7f9f9476759f750b40bee2a58eb268
-expansions/pics/84285624.jpg	8391b954f5027457e164a1b555151df5
+expansions/pics/83028479.jpg	a9a8fa189c5f86a93d8c368d3887d66d
+expansions/pics/84285624.jpg	45b5492af2864be9f1da38d24d050fd5
 expansions/pics/84607220.jpg	e69451a0a398f78ebd04a15828d27b8a
 expansions/pics/84607221.jpg	60932a38b1e84d729b3a89055dfe89df
 expansions/pics/84607222.jpg	3b41b3c768f4b1ad4afaf184b6f67194
@@ -4786,7 +4786,7 @@ expansions/pics/86433612.png	7210632ba54d0d719ad8026d185e0df2
 expansions/pics/86433613.png	fc4663584606adf2c966228e737b736a
 expansions/pics/86433614.png	7984636ef5241b90cded042961d2e8b3
 expansions/pics/86433615.png	14efc35e12dd1b75e4d8d0884a583d2c
-expansions/pics/8643861.jpg	b68a1bf9e5c8bb7c931ec89daa61ee5b
+expansions/pics/8643861.jpg	5e9ed921fb9ba77f1f71596b0cba542d
 expansions/pics/88001.jpg	e4a52dc55f400f826627450d4c8d64a4
 expansions/pics/88002.jpg	2862b3bdd2a13b259988e8dc81a37a4f
 expansions/pics/88003.jpg	26330cc5e936f01f005ab43036f4328f
@@ -4973,7 +4973,7 @@ expansions/pics/89217835.jpg	0a8c312e8bf93d8445b85d104f1b639c
 expansions/pics/89217836.jpg	8799ab4f462d28a4ae7a1106a23aa1ec
 expansions/pics/89217837.jpg	1bd08c6907314ced922f65c351e8a905
 expansions/pics/89217838.jpg	adb76d616421633b1c1a19e3feafa64c
-expansions/pics/8944577.jpg	f1164ec6d97cd0070c55374a85cb3f8c
+expansions/pics/8944577.jpg	1ce54fe61e70590badc997b268c9997d
 expansions/pics/901019.png	afa1b8bc48849650c00402e5c87c28ae
 expansions/pics/901020.png	f1f112228765d6c083945ee66ca4aff2
 expansions/pics/901021.png	685a75aa97bc6174fb82be288a8b6872
@@ -5007,7 +5007,7 @@ expansions/pics/90277800.jpg	9fbf250ab2a67f3e4acdc831cecf980c
 expansions/pics/90288200.jpg	5a5fa1def23164dd138f291c0e027eed
 expansions/pics/91091091.png	114914e72423e45addd98f7249013178
 expansions/pics/91512896.jpg	ab6078f0549dda2968d7d4e364e59414
-expansions/pics/9159940.jpg	0062500cb6cdd3bf18e1ffcfc1fde9d2
+expansions/pics/9159940.jpg	93860a655a72c464f0fc71b319c07642
 expansions/pics/91630820.png	d5648b2e27500ebbfebb13854f1773a1
 expansions/pics/91630821.png	1d34957e3198399aedb50b0e58f1991d
 expansions/pics/91630822.png	34513873a76a135c7d432f47f2f773c7
@@ -5083,7 +5083,7 @@ expansions/pics/93818609.jpg	80abbc33aa9a65a99e70b9c7e226f362
 expansions/pics/93818610.jpg	77ed35283dc9779512749ffd5e6fbf36
 expansions/pics/93818611.jpg	a35db435443e7736b242434da2e52e8f
 expansions/pics/93969013.jpg	3eb270e099a5b33d5b6bab299e988a31
-expansions/pics/9430388.jpg	92b9e91ec02d8c52ab878b8a2af169cc
+expansions/pics/9430388.jpg	f0cbc84109ed055091cfca03ee6258b1
 expansions/pics/95403419.png	a8996099e8395b2dbc0a38e9359cc74f
 expansions/pics/95403420.png	32a1b438e33b7930e869cee46efbe52e
 expansions/pics/95403421.png	2c263ef410a8ffdd9d34c65d9f726f02
@@ -7314,7 +7314,7 @@ expansions/script/c21933013.lua	85f7d7aa84df7c4acf53a0ce4ba2a31a
 expansions/script/c21933014.lua	4191bbc1162362d0be9b78cf4baab1d9
 expansions/script/c21933015.lua	0ac478275b20a5e207ac482e5c0614b9
 expansions/script/c21933016.lua	2868d89d82feb57835d259f4ea6fbdb0
-expansions/script/c22026709.lua	3463269a59856dc2bd64a19b58437db5
+expansions/script/c22026709.lua	52666b67cce9426a8d7c94ca9928949e
 expansions/script/c22112900.lua	743af525a65fd21540c59f63d4024777
 expansions/script/c22112901.lua	df2bbe6822190f58559df03f1b26e139
 expansions/script/c22112902.lua	54527e7c44347cf3ca1eba6b999581ef
@@ -8730,7 +8730,7 @@ expansions/script/c38648119.lua	f5419be525be2302747110b78c185c95
 expansions/script/c38648120.lua	7338da698d00403f1da2daae27244729
 expansions/script/c38648121.lua	2b9005c0b26ae606c057e56c37416dd7
 expansions/script/c39001.lua	c8e05bcdd51c2bf718c8b405847a31ec
-expansions/script/c39175984.lua	d6d2d85bd31a36bd8b66dfc4ae88ce17
+expansions/script/c39175984.lua	ef343bda332fbae66f1f043646e2bf3f
 expansions/script/c39203.lua	ef77f425c478c387a677600b49cbdfa7
 expansions/script/c39211.lua	a8d2df579221e4a464b6b3a1eeb0f743
 expansions/script/c39213.lua	9c3adadfad9982093e00847a0da57e9d
@@ -9068,7 +9068,7 @@ expansions/script/c4200120.lua	e2cfc0f14149828c47bdffa3e117df46
 expansions/script/c4200121.lua	728d014c7b73976dfc6275fa37b32f34
 expansions/script/c4200122.lua	850031a1b34e95095d0ced2c50f13882
 expansions/script/c4200123.lua	ee041b9c0f106bc0d062ea989f9dd941
-expansions/script/c4206969.lua	5ebfa930c8f68a79ab8cccd25e109ddf
+expansions/script/c4206969.lua	55100c86ba9a9abc6b0193e900f4779a
 expansions/script/c4237066.lua	09bf85133237ad740c5d706e34defe6c
 expansions/script/c42745698.lua	f5e9d92a05a9fd98fc3e07a15c943644
 expansions/script/c433001.lua	4f36b1477571eeb8118c8a98afafa88d
@@ -9274,7 +9274,7 @@ expansions/script/c52460549.lua	e7060e01e6306db40db13e73e6059417
 expansions/script/c52471658.lua	033bf3e049c46b0b42fe8a859677c669
 expansions/script/c52480561.lua	2d6bac5338deb5af9d375798473b5cbf
 expansions/script/c52800430.lua	192d612567a2672aba58f9c447b12206
-expansions/script/c53129448.lua	1e88fbec6f9d8024ed4a54c17a8c683c
+expansions/script/c53129448.lua	3e355c49e18a9c73c3bcc4f12a2cf3ec
 expansions/script/c53293547.lua	868429ba438233bee5dd819c0e5579db
 expansions/script/c53313901.lua	4a38d41f98fa4e77e9a8f84baa8b3f45
 expansions/script/c53313902.lua	34091e2b7c7ce70c39d2b634260376f7
@@ -9412,7 +9412,7 @@ expansions/script/c5889535.lua	00fa39ab098d6ffbddce06898b39947f
 expansions/script/c5889536.lua	244edff51cea7bac2355d6c09bb9af46
 expansions/script/c5889537.lua	9630d4cb129d6d479658454e98d4ebe2
 expansions/script/c5889538.lua	1ef32132167212579212ab7074a925b1
-expansions/script/c5889540.lua	e34868de6a118481a8569a51534f9609
+expansions/script/c5889540.lua	7735ba0ef0880368d1b60f8a126447aa
 expansions/script/c61811400.lua	1ec7149f6a5fe39b11e47c3abcb985f1
 expansions/script/c61811401.lua	ac32aca9a756439bb1059ed821785d33
 expansions/script/c61811402.lua	868a91f5a1ff825c03c86cfe07e887a2
@@ -9547,7 +9547,7 @@ expansions/script/c63553583.lua	2f285d7042785175284ad1e76babf190
 expansions/script/c63553584.lua	5dbe9330149fcf5589f0d7ac90bbc8b6
 expansions/script/c63553585.lua	df8ff92a06355b3996cb3e8a39ce35fb
 expansions/script/c64226943.lua	af49b2257a90f98280af052a6e7776df
-expansions/script/c64511795.lua	d0974ca745b0f5b31aa603c33b835134
+expansions/script/c64511795.lua	85e291b0fb1f2de17559c97f45b6c553
 expansions/script/c65040001.lua	46198249d5b487866d382d6222e644df
 expansions/script/c65040002.lua	ce0fb96eeb47f79fbfd1130e37db792d
 expansions/script/c65040003.lua	778b0d5370dad14b01c33e61e0734d33
@@ -9984,7 +9984,7 @@ expansions/script/c86433612.lua	c111298291aaa3ad4c800b5d221397aa
 expansions/script/c86433613.lua	b36d99ef0604de7a4c62439859b06f63
 expansions/script/c86433614.lua	c63c5083dcac4842abf8ecf1bcbc8f36
 expansions/script/c86433615.lua	23e288ced815a10f1dba6397498a6675
-expansions/script/c8643861.lua	6d287cd74b44eabb452e7e8fa3bfe2d5
+expansions/script/c8643861.lua	970ba437302c7ffd227c040e6cc64183
 expansions/script/c8713110.lua	b45ba1da222a575e9d0fa75d759d29c7
 expansions/script/c8713111.lua	ed7faa6f8eef0d12eab980c8f3d5722d
 expansions/script/c88001.lua	513b97432abadc1755fc8c37881fa920
@@ -10279,7 +10279,7 @@ expansions/script/c93818609.lua	4ab0cdbf66935b1a9a3ddd918585e1d2
 expansions/script/c93818610.lua	c781e458b30c395bdc26ca1ed93f21eb
 expansions/script/c93818611.lua	5ebf9522fb679bea2d26717948851c96
 expansions/script/c93969013.lua	a2cbf033195fefba4985ad1753c0d08e
-expansions/script/c9430388.lua	36b49babeb02663e20ce426bb0a482e3
+expansions/script/c9430388.lua	602d4d9ebd9de2cf50068fb0b9d764b2
 expansions/script/c95403419.lua	2a51fefee7748b5b30fbe525a269c737
 expansions/script/c95403420.lua	8be5530be40a1840bc4f12bfefea79de
 expansions/script/c95403421.lua	fb400a9fa0c30647cfaeae23b2e4c0a2
@@ -10636,6 +10636,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	dc9f14bd1f86b1c7aecfdf8c585e6ba4
+update/filelist.txt	4d6bcf9bd7cc9ada0842444c4164191b
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	97e3a02c1666672556194d28f30f6a19
+update/version.txt	67f8e47b71a156573770abfc38364d6c

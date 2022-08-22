@@ -7,9 +7,9 @@ s.effect_text = [[
 ● Cannot be Special Summoned, except by its own effect.
 ● You can only use the ② effect of "Protosdragia, the Primal Life" once per turn.
 
-① If this card you control would be banished, returned to the hand or shuffled into the Deck by an opponent's card effect, you can respectively banish, return to the hand or shuffle into the Deck (or Extra Deck), 1 other card you control instead.
+① If this card you control would be banished, returned to the hand or shuffled into the Deck by an opponent's card effect, you can respectively banish, return to the hand, or shuffle into the Deck, 1 other card you control instead.
 ② During the End Phase of the turn this face-up card you controlled was sent from the field to the GY because of an opponent's card effect or because it was destroyed by battle: You can Special Summon this card from your GY, and if you do, apply 1 of these effects depending on the original type of the card that sent this card to the GY.
-● Monster: Special Summon from your Deck or Extra Deck, 1 monster with the same original Attribute and original Type, OR with the same original ATK and original DEF as the monster that sent this card to the GY, except "Protosdragia, the Primal Life".
+● Monster: Special Summon from your Deck or Extra Deck, 1 monster with the same original Attribute, original Type, original ATK or original DEF as the monster that sent this card to the GY, except "Protosdragia, the Primal Life".
 ● Spell: Add from your Deck to your hand, 1 Spell with the same Type (Normal, Continuous, Field, Ritual, Equip, Quick-Play) as the Spell that sent this card to the GY.
 ● Trap: Set directly from your Deck, 1 Trap with the same Type (Normal, Continuous, Counter) as the Trap that sent this card to the GY.
 ]]
@@ -58,7 +58,7 @@ end
 --redirect
 function s.cfilter(c,loc)
 	local t={[LOCATION_REMOVED]=Card.IsAbleToRemoveAsCost; [LOCATION_HAND]=Card.IsAbleToHandAsCost; [LOCATION_DECK]=Card.IsAbleToDeckOrExtraAsCost}
-	return aux.GetValueType(t[loc])=="function" and t[loc](c)
+	return type(t[loc])=="function" and t[loc](c)
 end
 function s.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -107,7 +107,7 @@ function s.filter(c,e,tp,list)
 	local emzft=Duel.GetLocationCountFromEx(tp,tp,nil,c,0x60)
 	return typ&TYPE_MONSTER>0 and c:IsMonster() and (c:IsLocation(LOCATION_DECK) and ft>1 or c:IsLocation(LOCATION_EXTRA) and (ft>1 and exft>0 or ft<=1 and emzft>0))
 	and not Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-	and (c:GetOriginalAttribute()&attr>0 and c:GetOriginalRace()&rc>0 or c:GetTextAttack()==atk and c:GetTextDefense()==def) and not c:IsCode(id)
+	and (c:GetOriginalAttribute()&attr>0 or c:GetOriginalRace()&rc>0 or c:GetTextAttack()==atk or c:GetTextDefense()==def) and not c:IsCode(id)
 		or typ&TYPE_SPELL>0 and c:IsLocation(LOCATION_DECK) and c:IsType(TYPE_SPELL) and (typ&TYPE_CONTINUOUS+TYPE_FIELD+TYPE_RITUAL+TYPE_EQUIP+TYPE_QUICKPLAY==0
 		and c:GetType()==TYPE_SPELL or c:IsType(typ&TYPE_CONTINUOUS+TYPE_FIELD+TYPE_RITUAL+TYPE_EQUIP+TYPE_QUICKPLAY)) and c:IsAbleToHand()
 			or typ&TYPE_TRAP>0 and c:IsLocation(LOCATION_DECK) and c:IsType(TYPE_TRAP) and (typ&TYPE_CONTINUOUS+TYPE_COUNTER==0 and c:GetType()==TYPE_TRAP or c:IsType(typ&TYPE_CONTINUOUS+TYPE_COUNTER)) and c:IsSSetable()
@@ -130,7 +130,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 			local exft=Duel.GetLocationCountFromEx(tp,tp,nil,tc)
 			local ogtyp,attr,rc,atk,def=e:GetLabel()
 			--
-			local b1=typ&TYPE_MONSTER>0 and (tc:IsLocation(LOCATION_DECK) and ft>0 or tc:IsLocation(LOCATION_EXTRA) and exft>0) and not Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) and tc:IsCanBeSpecialSummoned(e,0,tp,false,false) and (tc:GetOriginalAttribute()&attr>0 and tc:GetOriginalRace()&rc>0 or tc:GetTextAttack()==atk and tc:GetTextDefense()==def)
+			local b1=typ&TYPE_MONSTER>0 and (tc:IsLocation(LOCATION_DECK) and ft>0 or tc:IsLocation(LOCATION_EXTRA) and exft>0) and not Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) and tc:IsCanBeSpecialSummoned(e,0,tp,false,false) and (tc:GetOriginalAttribute()&attr>0 or tc:GetOriginalRace()&rc>0 or tc:GetTextAttack()==atk or tc:GetTextDefense()==def)
 			and not tc:IsCode(id)
 			local b2=typ&TYPE_SPELL>0 and tc:IsLocation(LOCATION_DECK)
 			and (ogtyp&TYPE_CONTINUOUS+TYPE_FIELD+TYPE_RITUAL+TYPE_EQUIP+TYPE_QUICKPLAY==0 and tc:GetType()==TYPE_SPELL or tc:IsType(ogtyp&TYPE_CONTINUOUS+TYPE_FIELD+TYPE_RITUAL+TYPE_EQUIP+TYPE_QUICKPLAY)) and tc:IsAbleToHand()

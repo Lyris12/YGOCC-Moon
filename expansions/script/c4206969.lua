@@ -119,43 +119,48 @@ end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE,nil,LOCATION_REASON_COUNT)>0 or Duel.GetLocationCount(1-tp,LOCATION_MZONE,nil,LOCATION_REASON_COUNT)>0
 	end
-	local zone=Duel.SelectDisableField(tp,1,LOCATION_MZONE,LOCATION_MZONE,0x60)
-	Duel.Hint(HINT_ZONE,tp,zone)
-	e:SetLabel(zone)
+	local ct=Duel.GetLocationCount(1-tp,LOCATION_MZONE,PLAYER_NONE,LOCATION_REASON_COUNT)
+	local zone1=Duel.SelectDisableField(tp,1,LOCATION_MZONE,LOCATION_MZONE,0x60)
+	local zone2=0
+	if ct>1 and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+		zone2=Duel.SelectDisableField(tp,1,LOCATION_MZONE,LOCATION_MZONE,zone1|0x60)
+	end
+	Duel.Hint(HINT_ZONE,tp,zone1|zone2)
+	e:SetLabel(zone1,zone2)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
-	local zone=e:GetLabel()
-	local p=tp
-	local nseq=math.log(zone,2)
-	if nseq>=16 then
-		p=1-tp
-		nseq=nseq-16
-	end
-	if not Duel.CheckLocation(p,LOCATION_MZONE,nseq) then return end
+	local zone1,zone2=e:GetLabel()
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
-	e1:SetLabel(zone)
+	e1:SetLabel(zone1,zone2)
 	e1:SetCondition(s.dscon)
 	e1:SetOperation(s.dsop)
 	Duel.RegisterEffect(e1,tp)
+	local e3=e1:Clone()
+	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
+	Duel.RegisterEffect(e3,tp)
 	local e2=e1:Clone()
 	e2:SetCode(EVENT_MSET)
 	Duel.RegisterEffect(e2,tp)
-	e1:SetLabelObject(e2)
+	e1:SetLabelObject(e3)
 	e2:SetLabelObject(e1)
+	e3:SetLabelObject(e2)
 end
 function s.dscon(e,tp,eg,ep,ev,re,r,rp)
-	local zone=e:GetLabel()
-	return eg:IsExists(s.filter,1,nil,zone,tp)
+	local zone1,zone2=e:GetLabel()
+	return eg:IsExists(s.filter,1,nil,zone1,tp) or eg:IsExists(s.filter,1,nil,zone2,tp)
 end
 function s.dsop(e,tp,eg,ep,ev,re,r,rp)
-	local zone=e:GetLabel()
-	local g=eg:Filter(s.filter,nil,zone,tp)
-	if #g>0 then
+	local zone1,zone2=e:GetLabel()
+	local g1=eg:Filter(s.filter,nil,zone1,tp)
+	local g2=eg:Filter(s.filter,nil,zone2,tp)
+	g1:Merge(g2)
+	if #g1>0 then
 		Duel.Hint(HINT_CARD,tp,id)
 		Duel.Hint(HINT_CARD,1-tp,id)
-		Duel.Destroy(g,REASON_EFFECT)
+		Duel.Destroy(g1,REASON_EFFECT)
+		e:GetLabelObject():GetLabelObject():Reset()
 		e:GetLabelObject():Reset()
 		e:Reset()
 	end
