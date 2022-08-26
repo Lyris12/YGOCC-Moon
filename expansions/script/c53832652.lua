@@ -33,7 +33,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 	--
 	SCRIPT_AS_EQUIP=true
-	c:UpdateDEF(2600)
+	c:UpdateDEF(2600,false)
 	SCRIPT_AS_EQUIP=false
 	--
 	c:PositionFieldTrigger(false,2,CATEGORY_POSITION+CATEGORY_SPECIAL_SUMMON+CATEGORY_DESTROY+CATEGORY_ATKCHANGE,EFFECT_FLAG_CARD_TARGET,LOCATION_SZONE,nil,s.condition,nil,s.target,s.operation)

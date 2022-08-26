@@ -52,8 +52,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		local _,def=tc:UpdateDEF(-1000,RESET_EVENT+RESETS_STANDARD,c)
 		if c:IsRelateToEffect(e) and atk==-1000 and def==-1000 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 		and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
-			c:UpdateATK(1000,RESET_EVENT+RESETS_STANDARD)
-			c:UpdateDEF(1000,RESET_EVENT+RESETS_STANDARD)
+			c:UpdateATKDEF(1000)
 		end
 	end
 end
