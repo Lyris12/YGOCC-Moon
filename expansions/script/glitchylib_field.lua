@@ -1,5 +1,5 @@
---CONTINUOUS EFFECTS (EFFECT_TYPE_FIELD)
 function Card.FieldEffect(c,code,range,selfzones,oppozones,f,val,cond)
+--CONTINUOUS EFFECTS (EFFECT_TYPE_FIELD)
 	if not range then range=c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE end
 	if not selfzones then selfzones=0 end
 	if type(oppozones)=="boolean" and oppozones==true then

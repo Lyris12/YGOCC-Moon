@@ -1195,7 +1195,7 @@ function Auxiliary.EquipEquip(e,tp,eg,ep,ev,re,r,rp)
 	if re~=e:GetLabelObject() then return end
 	local c=e:GetHandler()
 	local tc=Duel.GetChainInfo(Duel.GetCurrentChain(),CHAININFO_TARGET_CARDS):GetFirst()
-	if tc and c:IsRelateToEffect(re) and tc:IsRelateToEffect(re) and tc:IsFaceup() then
+	if tc and c:IsRelateToChain() and tc:IsRelateToChain() and tc:IsFaceup() then
 		Duel.Equip(tp,c,tc)
 	end
 end
@@ -2686,8 +2686,8 @@ function Card.IsInExtraMZone(c,tp)
 	return c:IsLocation(LOCATION_MZONE) and c:GetSequence()>4 and (not tp or c:IsControler(tp))
 end
 
-function Duel.GetTargetCards(e)
-	return Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
+function Duel.GetTargetCards()
+	return Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToChain,nil)
 end
 
 function Auxiliary.ReleaseCostFilter(c,f,...)

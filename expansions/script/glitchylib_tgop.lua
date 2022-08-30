@@ -401,9 +401,9 @@ function Duel.SpecialSummonRedirect(e,g,styp,sump,tp,ign1,ign2,pos,loc)
 			local e=Effect.CreateEffect(e:GetHandler())
 			e:SetType(EFFECT_TYPE_SINGLE)
 			e:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
-			e:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CLIENT_HINT)
+			e:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 			e:SetValue(loc)
-			e:SetReset(RESET_EVENT+RESETS_REDIRECT)
+			e:SetReset(RESET_EVENT+RESETS_REDIRECT_FIELD)
 			dg:RegisterEffect(e,true)
 		end
 	end

@@ -1,8 +1,11 @@
+--Philia, Amministrale della Luce
 --created by ZEN, coded by ZEN & Lyris
+
 local cid,id=GetID()
 function cid.initial_effect(c)
+	--spproc
 	local e1=Effect.CreateEffect(c)
-	e1:GLString(0)
+	e1:Desc(0)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
 	e1:SetCode(EFFECT_SPSUMMON_PROC)
@@ -11,19 +14,19 @@ function cid.initial_effect(c)
 	e1:SetCondition(cid.spcon)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
-	e2:GLString(1)
+	e2:Desc(1)
 	e2:SetCategory(CATEGORY_DESTROY)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1,id+100)
+	e2:SetCost(cid.descost)
 	e2:SetTarget(cid.destg)
 	e2:SetOperation(cid.desop)
-	e2:SetCost(cid.descost)
 	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
-	e3:GLString(2)
+	e3:Desc(2)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e3:SetCode(EVENT_TO_GRAVE)
@@ -35,32 +38,37 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function cid.cfilter(c)
-	return c:IsSetCard(0xd7c) and c:IsFaceup()
+	return c:IsSetCard(0xd7c) and c:IsFaceup() and c:GetSequence()<5
 end
 function cid.spcon(e,c)
 	if c==nil then return true end
-	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(cid.cfilter,c:GetControler(),LOCATION_SZONE,0,1,nil)
+	local tp=c:GetControler()
+	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(cid.cfilter,tp,LOCATION_SZONE,0,1,nil)
+end
+function cid.filter(c)
+	return not c:IsLocation(LOCATION_MZONE) or c:IsFaceup()
 end
 function cid.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) and chkc:IsType(TYPE_SPELL+TYPE_TRAP) end
-	if chk==0 then return Duel.IsExistingTarget(Card.IsType,tp,0,LOCATION_ONFIELD,1,nil,TYPE_SPELL+TYPE_TRAP) end
+	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) and cid.filter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(cid.filter,tp,0,LOCATION_ONFIELD,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectTarget(tp,Card.IsType,tp,0,LOCATION_ONFIELD,1,1,nil,TYPE_SPELL+TYPE_TRAP)
+	local g=Duel.SelectTarget(tp,cid.filter,tp,0,LOCATION_ONFIELD,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,0,0)
 end
 function cid.costfilter(c)
-	return c:IsSetCard(0xd7c) and c:IsLocation(LOCATION_SZONE) and c:IsAbleToGraveAsCost() and c:GetSequence()<5
+	return c:IsSetCard(0xd7c) and c:IsFaceup() and c:IsAbleToGraveAsCost() and c:GetSequence()<5
 end
 function cid.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cid.costfilter,tp,LOCATION_SZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,cid.costfilter,tp,LOCATION_SZONE,0,1,1,nil)
-	Duel.SendtoGrave(g,REASON_COST)
+	if #g>0 then
+		Duel.SendtoGrave(g,REASON_COST)
+	end
 end
 function cid.desop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) then Duel.Destroy(tc,REASON_EFFECT) end
+	if tc and tc:IsRelateToChain() then Duel.Destroy(tc,REASON_EFFECT) end
 end
 function cid.des2con(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsReason(REASON_COST) and e:GetHandler():IsPreviousLocation(LOCATION_SZONE) and e:GetHandler():GetPreviousSequence()<5 and re:IsHasType(0x7e0) and re:IsActiveType(TYPE_MONSTER)
@@ -70,10 +78,10 @@ function cid.des2tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) end
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectTarget(tp,nil,tp,0,LOCATION_MZONE,1,1,nil)
+	local g=Duel.SelectTarget(tp,aux.TRUE,tp,0,LOCATION_MZONE,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,0,0)
 end
 function cid.des2op(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) then Duel.Destroy(tc,REASON_EFFECT) end
+	if tc and tc:IsRelateToChain() then Duel.Destroy(tc,REASON_EFFECT) end
 end

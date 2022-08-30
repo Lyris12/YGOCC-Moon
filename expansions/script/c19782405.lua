@@ -1,8 +1,10 @@
+--Ephesiam, Amministrale dei Mari
 --created by ZEN, coded by ZEN & Lyris
+
 local cid,id=GetID()
 function cid.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
-	e1:GLString(1)
+	e1:Desc(1)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
 	e1:SetCode(EFFECT_SPSUMMON_PROC)
@@ -11,8 +13,7 @@ function cid.initial_effect(c)
 	e1:SetCondition(cid.spcon)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
-	e2:GLString(2)
-	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:Desc(2)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
@@ -23,7 +24,7 @@ function cid.initial_effect(c)
 	e2:SetCost(cid.prcost)
 	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
-	e3:GLString(3)
+	e3:Desc(3)
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
@@ -52,7 +53,7 @@ function cid.prtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(Duel.AnnounceType(tp))
 end
 function cid.costfilter(c)
-	return c:IsSetCard(0xd7c) and c:IsLocation(LOCATION_SZONE) and c:IsAbleToGraveAsCost()
+	return c:IsSetCard(0xd7c) and c:GetSequence()<5 and c:IsAbleToGraveAsCost()
 end
 function cid.prcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cid.costfilter,tp,LOCATION_SZONE,0,2,nil) end
@@ -85,10 +86,10 @@ function cid.aclimit1(e,re,tp)
 	return re:IsActiveType(TYPE_MONSTER) and aux.tgoval(e,re,tp)
 end
 function cid.aclimit2(e,re,tp)
-	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_SPELL) and aux.tgoval(e,re,tp)
+	return re:IsActiveType(TYPE_SPELL) and aux.tgoval(e,re,tp)
 end
 function cid.aclimit3(e,re,tp)
-	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_TRAP) and aux.tgoval(e,re,tp)
+	return re:IsActiveType(TYPE_TRAP) and aux.tgoval(e,re,tp)
 end
 function cid.imtg(e,c)
 	return c:IsSetCard(0xd7c)
@@ -113,7 +114,7 @@ end
 function cid.plop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 	local tc=Duel.GetFirstTarget()
-	if not Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true) then return end
+	if not Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true) or not tc:IsLocation(LOCATION_SZONE) or not c:IsFaceup() then return end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCode(EFFECT_CHANGE_TYPE)
@@ -122,17 +123,13 @@ function cid.plop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET)
 	e1:SetValue(TYPE_SPELL+TYPE_CONTINUOUS)
 	tc:RegisterEffect(e1)
-	Duel.RaiseEvent(tc,EVENT_CUSTOM+id+3,e,r,tp,tp,0)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
-		Duel.BreakEffect()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local g=Duel.SelectMatchingCard(tp,cid.spfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
 		local tc2=g:GetFirst()
 		if tc2 then
+			Duel.BreakEffect()
 			Duel.SpecialSummon(tc2,0,tp,tp,false,false,POS_FACEUP)
-		else
-			Duel.ConfirmCards(1-tp,Duel.GetFieldGroup(tp,LOCATION_DECK,0))
-			Duel.ShuffleDeck(tp)
 		end
 	end
 end

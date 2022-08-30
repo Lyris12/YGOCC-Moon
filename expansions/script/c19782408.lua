@@ -15,7 +15,7 @@ function cid.initial_effect(c)
 	e2:SetCode(EFFECT_UPDATE_DEFENSE)
 	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
-	e3:GLString(1)
+	e3:Desc(1)
 	e3:SetCategory(CATEGORY_ATKCHANGE+CATEGORY_LEAVE_GRAVE)
 	e3:SetType(EFFECT_TYPE_QUICK_O)
 	e3:SetCode(EVENT_FREE_CHAIN)
@@ -26,14 +26,14 @@ function cid.initial_effect(c)
 	e3:SetOperation(cid.operation)
 	c:RegisterEffect(e3)
 	local e4=Effect.CreateEffect(c)
-	e4:GLString(2)
+	e4:Desc(2)
 	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e4:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e4:SetCode(EVENT_CUSTOM+id)
+	e4:SetCode(EVENT_MOVE)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetCountLimit(1,id)
 	e4:SetCategory(CATEGORY_DRAW)
-	e4:SetCondition(function(e,tp,eg,ep) return ep==tp end)
+	e4:SetCondition(cid.drcon)
 	e4:SetTarget(cid.drtg)
 	e4:SetOperation(cid.drop)
 	c:RegisterEffect(e4)
@@ -59,18 +59,17 @@ end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 	local tc=Duel.GetFirstTarget()
-	if not tc:IsRelateToEffect(e) or not Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true) then return end
+	if not tc:IsRelateToChain() or not Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true) then return end
 	local c=e:GetHandler()
 	local e1=Effect.CreateEffect(c)
-	e1:GLString(0)
+	e1:Desc(0)
 	e1:SetCode(EFFECT_CHANGE_TYPE)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CLIENT_HINT)
 	e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET)
 	e1:SetValue(TYPE_SPELL+TYPE_CONTINUOUS)
 	tc:RegisterEffect(e1)
-	Duel.RaiseEvent(tc,EVENT_CUSTOM+id,e,r,tp,tp,0)
-	if c:IsRelateToEffect(e) and c:IsFaceup() and Duel.GetMatchingGroupCount(cid.sfilter,tp,LOCATION_SZONE,LOCATION_SZONE,nil)>0 then
+	if c:IsRelateToChain() and c:IsFaceup() and Duel.GetMatchingGroupCount(cid.sfilter,tp,LOCATION_SZONE,LOCATION_SZONE,nil)>0 then
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_SINGLE)
 		e2:SetCode(EFFECT_UPDATE_ATTACK)
@@ -81,6 +80,13 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 end
 function cid.sfilter(c)
 	return c:GetSequence()<5
+end
+
+function cid.cfilter(c,tp)
+	return c:IsLocation(LOCATION_SZONE) and c:GetSequence()<5 and c:IsControler(tp) and c:IsFaceup() and c:IsSetCard(0xd7c)
+end
+function cid.drcon(e,tp,eg,ep,ev,re,r,rp)
+	return eg:IsExists(cid.cfilter,1,nil,tp)
 end
 function cid.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end

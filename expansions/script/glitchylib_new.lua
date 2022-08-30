@@ -20,6 +20,9 @@ GLOBAL_EFFECT_RESET	=	10203040
 --zone constants
 EXTRA_MONSTER_ZONE=0x60
 
+--resets
+RESETS_REDIRECT_FIELD = 0x047e0000
+
 --timings
 RELEVANT_TIMINGS = TIMINGS_CHECK_MONSTER+TIMING_MAIN_END+TIMING_END_PHASE
 
@@ -326,7 +329,7 @@ function Duel.GetTargetParam()
 end
 
 --Columns
-function Card.GlitchyGetColumnGroup(c,left,right)
+function Card.GlitchyGetColumnGroup(c,left,right,without_center)
 	local left = (left and aux.GetValueType(left)=="number" and left>=0) and left or 0
 	local right = (right and aux.GetValueType(right)=="number" and right>=0) and right or 0
 	if left==0 and right==0 then
@@ -361,7 +364,7 @@ function Card.GlitchyGetColumnGroup(c,left,right)
 					end
 					
 		local lg=Duel.Group(f,c:GetControler(),LOCATION_MZONE+LOCATION_SZONE,LOCATION_MZONE+LOCATION_SZONE,nil,c,left)
-		local cg=c:GetColumnGroup()
+		local cg = without_center and Group.CreateGroup() or c:GetColumnGroup()
 		local rg=Duel.Group(f,c:GetControler(),LOCATION_MZONE+LOCATION_SZONE,LOCATION_MZONE+LOCATION_SZONE,nil,c,right)
 		cg:Merge(lg)
 		cg:Merge(rg)
@@ -469,6 +472,18 @@ function Card.IsInMMZ(c)
 end
 function Card.IsInEMZ(c)
 	return c:IsLocation(LOCATION_MZONE) and c:GetSequence()>=5
+end
+function Card.IsSequence(c,seq)
+	return c:GetSequence()==seq
+end
+function Card.IsSequenceBelow(c,seq)
+	return c:GetSequence()<=seq
+end
+function Card.IsSequenceAbove(c,seq)
+	return c:GetSequence()>=seq
+end
+function Card.IsInMainSequence(c)
+	return c:IsSequenceBelow(4)
 end
 
 function Card.NotOnFieldOrFaceup(c)
@@ -602,7 +617,6 @@ function Card.Ignition(c,desc,ctg,prop,range,ctlim,cond,cost,tg,op,reset,quickco
 	return e1
 end
 function Card.Activate(c,desc,ctg,prop,event,ctlim,cond,cost,tg,op,handcon)
-	if not range then range=c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE end
 	local event = event and event or EVENT_FREE_CHAIN
 	---
 	local e1=Effect.CreateEffect(c)

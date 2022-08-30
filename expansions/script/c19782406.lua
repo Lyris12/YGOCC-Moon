@@ -1,8 +1,10 @@
+--Sardia, Amministrale della Brezza
 --created by ZEN, coded by ZEN & Lyris
+
 local cid,id=GetID()
 function cid.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
-	e1:GLString(1)
+	e1:Desc(1)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
 	e1:SetCode(EFFECT_SPSUMMON_PROC)
@@ -11,12 +13,12 @@ function cid.initial_effect(c)
 	e1:SetCondition(cid.spcon)
 	c:RegisterEffect(e1)
 	local e3=Effect.CreateEffect(c)
-	e3:GLString(2)
+	e3:Desc(2)
 	e3:SetType(EFFECT_TYPE_QUICK_O)
 	e3:SetCode(EVENT_CHAINING)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1,id+500)
-	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e3:SetCategory(CATEGORY_DISABLE+CATEGORY_LEAVE_GRAVE)
 	e3:SetCondition(cid.discon)
 	e3:SetCost(cid.cost)
@@ -24,7 +26,7 @@ function cid.initial_effect(c)
 	e3:SetOperation(cid.disop)
 	c:RegisterEffect(e3)
 	local e2=Effect.CreateEffect(c)
-	e2:GLString(3)
+	e2:Desc(3)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e2:SetCode(EVENT_TO_GRAVE)
 	e2:SetCountLimit(1,id+1000)
@@ -56,33 +58,32 @@ function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 		Duel.SendtoGrave(g,REASON_COST)
 	end
 end
-function cid.filter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xd7c) and not c:IsForbidden()
+function cid.filter(c,tp,tgchk)
+	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xd7c) and (not tgchk (or c:CheckUniqueOnField(tp) and not c:IsForbidden()))
 end
 function cid.distg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and cid.filter(chkc) end
-	if chk==0 then return not re:GetHandler():IsStatus(STATUS_DISABLED)
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and cid.filter(chkc,tp) end
+	if chk==0 then return not re:GetHandler():IsDisabled()
 		and Duel.GetLocationCount(tp,LOCATION_SZONE)>-1
-		and Duel.IsExistingTarget(cid.filter,tp,LOCATION_GRAVE,0,1,nil)
+		and Duel.IsExistingTarget(cid.filter,tp,LOCATION_GRAVE,0,1,nil,tp)
 	end
 	Duel.SetOperationInfo(0,CATEGORY_DISABLE,eg,1,0,0)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
-	local g=Duel.SelectTarget(tp,aux.NecroValleyFilter(cid.filter),tp,LOCATION_GRAVE,0,1,1,nil)
+	local g=Duel.SelectTarget(tp,cid.filter,tp,LOCATION_GRAVE,0,1,1,nil,tp)
 	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,g,1,tp,LOCATION_GRAVE)
 end
 function cid.disop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if not Duel.NegateEffect(ev) or Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 or not tc:IsRelateToEffect(e) then return end
+	if not Duel.NegateEffect(ev) or Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 or not tc or not tc:IsRelateToChain() or not cid.filter(tc,tp,true) then return end
 	Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
 	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:GLString(0)
+	e1:Desc(0)
 	e1:SetCode(EFFECT_CHANGE_TYPE)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CLIENT_HINT)
 	e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET)
 	e1:SetValue(TYPE_SPELL+TYPE_CONTINUOUS)
 	tc:RegisterEffect(e1)
-	Duel.RaiseEvent(tc,EVENT_CUSTOM+id+2,e,r,tp,tp,0)
 end
 function cid.drcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsReason(REASON_COST) and e:GetHandler():IsPreviousLocation(LOCATION_SZONE) and e:GetHandler():GetPreviousSequence()<5 and re:IsHasType(0x7e0) and re:IsActiveType(TYPE_MONSTER)
@@ -94,26 +95,26 @@ function cid.drtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetTargetParam(1)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end
-function cid.pfilter(c)
-	return c:IsSetCard(0xd7c) and not c:IsForbidden()
+function cid.pfilter(c,tp)
+	return c:IsSetCard(0xd7c) and c:CheckUniqueOnField(tp) and not c:IsForbidden()
 end
 function cid.drop(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	if Duel.Draw(p,d,REASON_EFFECT)==0 then return end
 	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
-	local g=Duel.GetMatchingGroup(cid.pfilter,tp,LOCATION_HAND,0,nil)
+	local g=Duel.GetMatchingGroup(cid.pfilter,tp,LOCATION_HAND,0,nil,tp)
 	if #g==0 or not Duel.SelectYesNo(tp,aux.Stringid(id,4)) then return end
-	Duel.BreakEffect()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
 	local tc=g:Select(tp,1,1,nil):GetFirst()
+	if not tc then return end
+	Duel.BreakEffect()
 	Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
 	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:GLString(0)
+	e1:Desc(0)
 	e1:SetCode(EFFECT_CHANGE_TYPE)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CLIENT_HINT)
 	e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET)
 	e1:SetValue(TYPE_SPELL+TYPE_CONTINUOUS)
 	tc:RegisterEffect(e1)
-	Duel.RaiseEvent(tc,EVENT_CUSTOM+id+2,e,r,tp,tp,0)
 end
