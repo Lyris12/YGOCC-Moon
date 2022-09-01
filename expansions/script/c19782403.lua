@@ -55,7 +55,7 @@ function cid.scop(e,tp,eg,ep,ev,re,r,rp)
 	local ops,opct={},0
 	if tc:IsAbleToHand() then table.insert(ops,1190) else opct=1 end
 	if (not tc:IsForbidden() and Duel.GetLocationCount(tp,LOCATION_SZONE)>0) then table.insert(ops,aux.Stringid(id,1)) end
-	if #opt==0 then return end
+	if #ops==0 then return end
 	local opt=Duel.SelectOption(tp,table.unpack(ops))+opct
 	if opt==0 then
 		Duel.SendtoHand(tc,nil,REASON_EFFECT)

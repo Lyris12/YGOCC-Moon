@@ -59,7 +59,7 @@ function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 end
 function cid.filter(c,tp,tgchk)
-	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xd7c) and (not tgchk (or c:CheckUniqueOnField(tp) and not c:IsForbidden()))
+	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xd7c) and (not tgchk or (c:CheckUniqueOnField(tp) and not c:IsForbidden()))
 end
 function cid.distg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and cid.filter(chkc,tp) end
