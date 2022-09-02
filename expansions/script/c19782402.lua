@@ -68,7 +68,7 @@ function cid.des2con(e,tp,eg,ep,ev,re,r,rp)
 		and re:GetHandler():IsSetCard(0xd7c)
 end
 function cid.filter(c)
-	return not c:IsLocation(LOCATION_MZONE) or c:IsFaceup()
+	return c:IsST() and (not c:IsLocation(LOCATION_MZONE) or c:IsFaceup())
 end
 function cid.des2tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) and cid.filter(chkc) end
