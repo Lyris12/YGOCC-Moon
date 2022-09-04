@@ -1,4 +1,4 @@
---created by Jake, coded by Lyris, art from Cardfight!! Vanguard's "Beast Knight, Garmore"
+--created by Jake, art from Cardfight!! Vanguard's "Beast Knight, Garmore"
 --Dawn Blader - Tiger
 local s,id,o=GetID()
 function s.initial_effect(c)

@@ -1,5 +1,5 @@
---created by Walrus, coded by Lyris
---Voidictator Rune - Unstable Gating Art
+--created by Walrus
+--Voidictator Rune - Gates of Perdition
 local s,id,o=GetID()
 function s.initial_effect(c)
 	local e0=Effect.CreateEffect(c)

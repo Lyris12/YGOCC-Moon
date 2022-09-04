@@ -1,5 +1,5 @@
---created by Walrus, coded by Lyris
---Voidictator Servant - Rune Sorceress
+--created by Walrus
+--Voidictator Rune - Ultimate Gating Art
 local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()

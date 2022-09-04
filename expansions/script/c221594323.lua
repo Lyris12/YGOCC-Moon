@@ -1,5 +1,5 @@
---created by Walrus, coded by Lyris
---Voidictator Deity - Sauriel the Luna Arbiter
+--created by Walrus
+--Voidictator Deity - Sauriel the Cosmic Arbiter
 local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()

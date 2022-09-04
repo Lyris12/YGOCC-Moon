@@ -1,5 +1,5 @@
 --created & coded by Lyris, art from "Abyss-squall"
---アーマリンの嵐
+--アーマリン嵐
 local s,id,o=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)

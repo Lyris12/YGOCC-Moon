@@ -1,4 +1,4 @@
---created by Jake, coded by Lyris, art from "The Sanctuary in the Sky"
+--created by Jake, art from "The Sanctuary in the Sky"
 --A Soldier's Resting Place
 local s,id,o=GetID()
 function s.initial_effect(c)

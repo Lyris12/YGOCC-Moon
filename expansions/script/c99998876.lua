@@ -1,4 +1,4 @@
---created & coded by Walrus
+--created by Walrus
 --Voidictator Rune - Energy Renewal
 local s,id,o=GetID()
 function s.initial_effect(c)

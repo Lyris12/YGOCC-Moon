@@ -1,5 +1,5 @@
---created by Walrus, coded by Lyris
---Voidictator Rune - Oath of the Demons
+--created by Walrus
+--Voidictator Rune - Raging Flames
 local s,id,o=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)

@@ -1,5 +1,5 @@
 --created & coded by Lyris, art taken by Casey Horner of Unsplash
---アーマリンの灯台
+--アーマリン灯台
 local s,id,o=GetID()
 function s.initial_effect(c)
 	c:SetUniqueOnField(1,0,id)

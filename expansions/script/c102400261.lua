@@ -1,5 +1,5 @@
 --created & coded by Lyris, art at https://kaiserscience.files.wordpress.com/2015/06/mid-atlantic-ridge-noaa.png
---アーマリンの降臨
+--アーマリン降臨
 local s,id,o=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)

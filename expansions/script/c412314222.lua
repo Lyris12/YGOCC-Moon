@@ -1,4 +1,4 @@
---created by Jake, coded by Lyris, art from Cardfight!! Vanguard's "Great Silver Wolf, Garmore"
+--created by Jake, art from Cardfight!! Vanguard's "Great Silver Wolf, Garmore"
 --Dawn Blader - Saber
 local s,id,o=GetID()
 function s.initial_effect(c)

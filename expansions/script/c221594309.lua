@@ -1,4 +1,4 @@
---created by Walrus, coded by Lyris
+--created by Walrus
 --Voidictator Demon - The Unending Flame
 local s,id,o=GetID()
 function s.initial_effect(c)

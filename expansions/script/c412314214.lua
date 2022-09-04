@@ -1,4 +1,4 @@
---created by Jake, coded by Glitchy
+--created by Jake
 --Dawn Blader - Eroko
 local s,id,o=GetID()
 function s.initial_effect(c)

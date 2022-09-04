@@ -1,4 +1,4 @@
---created by Jake, coded by Lyris, art from Cardfight!! Vanguard's "Incandescent Lion, Blond Ezel"
+--created by Jake, art from Cardfight!! Vanguard's "Incandescent Lion, Blond Ezel"
 --Dawn Blader - Vortex Divider
 local s,id,o=GetID()
 function s.initial_effect(c)

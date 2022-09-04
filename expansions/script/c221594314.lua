@@ -1,5 +1,5 @@
---created by Walrus, coded by Lyris
---Voidictator Servant - Guardian of Corvus
+--created by Walrus
+--Voidictator Demon - Guardian of Corvus
 local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()

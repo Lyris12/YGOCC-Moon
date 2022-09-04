@@ -1,5 +1,5 @@
---created by Walrus, coded by Lyris
---Voidictator Rune - Wrath of Zanyris
+--created by Walrus
+--Voidictator Rune - The Goddess's Wrath
 local s,id,o=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)

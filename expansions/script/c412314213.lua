@@ -1,4 +1,4 @@
---created by Jake, coded by Lyris, art from Cardfight!! Vanguard's "Battlefield Storm, Sagramore"
+--created by Jake, art from Cardfight!! Vanguard's "Battlefield Storm, Sagramore"
 --Dawn Blader - Lion
 local s,id,o=GetID()
 function s.initial_effect(c)

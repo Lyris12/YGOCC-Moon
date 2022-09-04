@@ -1,5 +1,5 @@
---created by Walrus, coded by Lyris
---Voidictator Demon - Gate Keeper
+--created by Walrus
+--Voidictator Demon - The Gate Keeper
 local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()

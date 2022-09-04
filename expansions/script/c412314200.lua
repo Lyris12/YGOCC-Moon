@@ -1,4 +1,4 @@
---created by Jake, coded by Lyris, art from Cardfight!! Vanguard's "Dragonic Overlord"
+--created by Jake, art from Cardfight!! Vanguard's "Dragonic Overlord"
 --Dawn-Eyes Violet Dragon
 local s,id,o=GetID()
 function s.initial_effect(c)

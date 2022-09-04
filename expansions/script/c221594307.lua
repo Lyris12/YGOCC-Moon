@@ -1,4 +1,4 @@
---created by Walrus, coded by Lyris
+--created by Walrus
 --Voidictator Deity - Jezebel the Dark Angel
 local s,id,o=GetID()
 function s.initial_effect(c)

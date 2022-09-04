@@ -1,5 +1,5 @@
---created by Walrus, coded by Lyris
---Voidictator Servant - Gate Sorcerer
+--created by Walrus
+--Voidictator Servant - Gate Sorceress
 local s,id,o=GetID()
 function s.initial_effect(c)
 	aux.EnablePendulumAttribute(c)

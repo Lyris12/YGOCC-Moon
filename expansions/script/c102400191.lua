@@ -1,4 +1,5 @@
---Strident Blast
+--created & coded by Lyris, art from Yu-Gi-Oh! GX episode 83
+--ストライデント・ブラスト
 local s,id,o=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
@@ -14,12 +15,9 @@ function s.ffilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_FUSION) and c:GetOriginalRace()&RACE_MACHINE>0
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	--If a "Cyber Dragon" monster is on the field: Destroy 1 card on the field, also your opponent cannot activate cards or effects during the Battle Phase this turn.
 	local b1=Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil)
-	--If a Fusion Monster is on the field that was originally Machine: Banish 1 card your opponent controls. You can only apply this effect of "Strident Blast" once per turn.
 	local b2=Duel.IsExistingMatchingCard(s.ffilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil)
 		and Duel.IsExistingMatchingCard(Card.IsAbleToRemove,tp,0,LOCATION_ONFIELD,1,nil)
-		and Duel.GetFlagEffect(tp,id)==0
 	if chk==0 then return b1 or b2 end
 	local off=1
 	local ops={}
@@ -67,10 +65,8 @@ function s.condition(e)
 	return ph>=PHASE_BATTLE_START and ph<=PHASE_BATTLE
 end
 function s.remove(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetFlagEffect(tp,id)>0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToRemove,tp,0,LOCATION_ONFIELD,1,1,nil)
 	Duel.HintSelection(g)
 	Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
-	Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
 end

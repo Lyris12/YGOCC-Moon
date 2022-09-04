@@ -1,5 +1,5 @@
---created by Walrus, coded by Lyris
---Voidictator Rune - Judgement of the Deities
+--created by Walrus
+--Voidictator Rune - Final Verdict
 local s,id,o=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)

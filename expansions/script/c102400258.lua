@@ -1,5 +1,5 @@
 --created & coded by Lyris, art from Cardfight!! Vanguard's "Blue Storm Dragon, Maelstrom"
---アーマリン・ドラゴン―メイルストローム
+--アーマリン・ドラゴン－メイルストローム
 local s,id,o=GetID()
 function s.initial_effect(c)
 	aux.AddOrigRelayType(c)

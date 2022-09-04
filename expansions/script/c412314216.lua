@@ -1,4 +1,4 @@
---created by Jake, coded by Lyris
+--created by Jake
 --Dawn Blader - Dragonic King
 local s,id,o=GetID()
 function s.initial_effect(c)

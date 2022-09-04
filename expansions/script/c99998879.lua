@@ -1,5 +1,5 @@
---created & coded by Walrus
---Voidictator Rune - Inverse Gating Art
+--created by Walrus
+--Voidictator Rune - Execution of the Divine
 local s,id,o=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)

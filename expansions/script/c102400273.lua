@@ -1,5 +1,5 @@
 --created & coded by Lyris, art from Cardfight!! Vanguard's "Hydro Hurricane Dragon"
---アーマリン・ドラゴン―津波
+--アーマリン・ドラゴン－津波
 local s,id,o=GetID()
 function s.initial_effect(c)
 	aux.AddOrigRelayType(c)

@@ -1,5 +1,5 @@
---created by Walrus, coded by Lyris
---Voidictator Demon - Void-Eyes Null Dragon
+--created by Walrus
+--Voidictator Rune - Guiding Eulogy
 local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()

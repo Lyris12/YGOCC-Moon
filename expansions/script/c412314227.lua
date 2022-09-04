@@ -1,4 +1,4 @@
---created by Jake, coded by Lyris
+--created by Jake
 --Survival of The Bravest
 local s,id,o=GetID()
 function s.initial_effect(c)

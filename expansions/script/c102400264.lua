@@ -1,5 +1,5 @@
 --created & coded by Lyris, art at https://previews.123rf.com/images/ipekmorel/ipekmorel1607/ipekmorel160700112/61071912-ruhigen-meeresoberfl%C3%A4che-mit-wellen.jpg
---アーマリンの海―メガラニカ
+--アーマリン海－メガラニカ
 local s,id,o=GetID()
 function s.initial_effect(c)
 	local e0=Effect.CreateEffect(c)

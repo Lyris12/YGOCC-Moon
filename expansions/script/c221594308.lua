@@ -1,5 +1,5 @@
---created by Walrus, coded by Lyris
---Voidictator Deity - Vera the Soul Guardian
+--created by Walrus
+--Voidictator Deity - Vera the Grand Judge
 local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()

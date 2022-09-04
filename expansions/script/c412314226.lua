@@ -1,4 +1,4 @@
---created by Jake, coded by Lyris
+--created by Jake
 --Bond Between Dawn
 local s,id,o=GetID()
 function s.initial_effect(c)

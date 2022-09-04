@@ -1,4 +1,4 @@
---created by Jake, coded by Lyris, art by BachEric1461 of DeviantArt
+--created by Jake, art by BachEric1461 of DeviantArt
 --Dawn Blader - Panther
 local s,id,o=GetID()
 function s.initial_effect(c)
