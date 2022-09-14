@@ -17,6 +17,9 @@ CATEGORY_FLAG_SELF					= 0x1
 --Effects
 GLOBAL_EFFECT_RESET	=	10203040
 
+--Properties
+EFFECT_FLAG_DDD = EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL
+
 --zone constants
 EXTRA_MONSTER_ZONE=0x60
 
@@ -64,6 +67,9 @@ function Duel.Group(f,tp,loc1,loc2,exc,...)
 	local g=Duel.GetMatchingGroup(f,tp,loc1,loc2,exc,...)
 	return g
 end
+function Duel.HintMessage(tp,msg)
+	return Duel.Hint(HINT_SELECTMSG,tp,msg)
+end
 function Auxiliary.Faceup(f,...)
 	return	function(c,...)
 				return (not f or f(c,...)) and c:IsFaceup()
@@ -74,6 +80,7 @@ function Auxiliary.Facedown(f,...)
 				return (not f or f(c,...)) and c:IsFacedown()
 			end
 end
+
 
 --Custom Categories
 if not global_effect_category_table_global_check then
@@ -323,6 +330,10 @@ function Card.ByBattleOrEffect(c,f,p)
 			end
 end
 
+function Card.IsContained(c,g)
+	return g:IsContains(c)
+end
+
 --Chain Info
 function Duel.GetTargetParam()
 	return Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)
@@ -380,6 +391,9 @@ function Auxiliary.ActivateException(e,chk)
 	else
 		return nil
 	end
+end
+function Auxiliary.ExceptThis(c)
+	if c:IsRelateToChain() then return c else return nil end
 end
 
 --Descriptions
@@ -524,6 +538,24 @@ function Effect.HOPT(e,oath)
 	
 	return e:SetCountLimit(1,cid+flag)
 end
+function Effect.SHOPT(e,oath)
+	if not e:GetOwner() then return end
+	local c=e:GetOwner()
+	local cid=c:GetOriginalCode()
+	if not aux.HOPTTracker[c] then
+		aux.HOPTTracker[c]=0
+	end
+	if type(aux.HOPTTracker[c])=="number" then
+		cid=cid+aux.HOPTTracker[c]*100
+	end
+	
+	local flag=0
+	if oath then
+		flag=flag|EFFECT_COUNT_CODE_OATH
+	end
+	
+	return e:SetCountLimit(1,cid+flag)
+end
 
 --Phases
 function Duel.IsDrawPhase(tp)
@@ -533,7 +565,8 @@ function Duel.IsStandbyPhase(tp)
 	return (not tp or Duel.GetTurnPlayer()==tp) and Duel.GetCurrentPhase()==PHASE_STANDBY
 end
 function Duel.IsMainPhase(tp,ct)
-	return (not tp or Duel.GetTurnPlayer()==tp) and (not ct and (Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2) or ct==1 and Duel.GetCurrentPhase()==PHASE_MAIN1 or ct==2 and Duel.GetCurrentPhase()==PHASE_MAIN2)
+	return (not tp or Duel.GetTurnPlayer()==tp)
+		and (not ct and (Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2) or ct==1 and Duel.GetCurrentPhase()==PHASE_MAIN1 or ct==2 and Duel.GetCurrentPhase()==PHASE_MAIN2)
 end
 function Duel.IsBattlePhase(tp)
 	local ph=Duel.GetCurrentPhase()

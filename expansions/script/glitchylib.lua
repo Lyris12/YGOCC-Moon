@@ -215,294 +215,22 @@ Duel.AnnounceCard = function(p,...)
 end
 
 --Modified Functions: FUSIONS
-function Auxiliary.PureExtraFilter(c)
-	return c:GetFlagEffect(1005)>0
-end
-function Auxiliary.PureExtraFilterLoop(c,eff)
-	return c:GetFlagEffect(1005)>0 and not c:IsHasEffect(eff)
-end
-function Auxiliary.ExtraFusionFilter0(c,ce,tg)
-	return c:IsCanBeFusionMaterial() and tg(ce,c)
-end
-function Auxiliary.ExtraFusionFilter(c,e,ce,tg)
-	return c:IsCanBeFusionMaterial() and not c:IsImmuneToEffect(e) and tg(ce,c)
-end
-function Auxiliary.ExtraMaterialFilterSelect(c,e,f)
-	return c:GetFlagEffect(1006)>0 and f(e,c)
-end
-function Auxiliary.ExtraMaterialFilterGoal(mg,og)
-	local og=og:Clone()
-	local res = (not og:IsExists(aux.TRUE,1,mg) or not og:IsExists(aux.PureExtraFilter,1,mg))
-	og:DeleteGroup()
-	return res
-end
-function Auxiliary.ExtraMaterialMaxCheck(c,id)
-	if not c:IsHasEffect(EFFECT_GLITCHY_EXTRA_MATERIAL_FLAG) then return false end
-	local res=false
-	for _,flag in ipairs({c:IsHasEffect(EFFECT_GLITCHY_EXTRA_MATERIAL_FLAG)}) do
-		if flag and flag.GetLabel then
-			if flag:GetValue()==id then
-				res=true
-			else
-				return false
-			end
-		end
-	end
-	return res
-end
+local _SendtoGrave, _Remove, _SendtoDeck, _Destroy, _SendtoHand, _FShaddollCondition, _FShaddollOperation =
+Duel.SendtoGrave, Duel.Remove, Duel.SendtoDeck, Duel.Destroy, Duel.SendtoHand, Auxiliary.FShaddollCondition, Auxiliary.FShaddollOperation
 
-local _GetFusionMaterial, _CheckFusionMaterial, _SelectFusionMaterial, _FConditionFilterMix, _FCheckMixGoal, _AddFusionProcMix, _AddFusionProcMixRep, _SendtoGrave, _Remove, _SendtoDeck, _Destroy, _SendtoHand =
-Duel.GetFusionMaterial, Card.CheckFusionMaterial, Duel.SelectFusionMaterial, Auxiliary.FConditionFilterMix, Auxiliary.FCheckMixGoal, Auxiliary.AddFusionProcMix, Auxiliary.AddFusionProcMixRep, Duel.SendtoGrave, Duel.Remove, Duel.SendtoDeck, Duel.Destroy, Duel.SendtoHand
+Auxiliary.FGoalCheckGlitchy = nil
+Auxiliary.EnableOnlyGlitchyFusionProcs = false
 
-Duel.GetFusionMaterial = function(tp,...)
-	local x={...}
-	local loc = #x>0 and x[1] or LOCATION_MZONE+LOCATION_HAND
-	local res,base=_GetFusionMaterial(tp,...)
-	if Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL) then
-		local egroup={Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)}
-		local ogres=res:Clone()
-		for _,ce in ipairs(egroup) do
-			if ce and ce.GetLabel then
-				local mats=Duel.GetMatchingGroup(aux.ExtraFusionFilter0,tp,0xff,0xff,nil,ce,ce:GetTarget())
-				if #mats>0 then
-					for tc in aux.Next(mats) do
-						if tc:GetFlagEffect(1005)>0 then
-							tc:ResetFlagEffect(1005)
-						end
-						if not ogres:IsContains(tc) then
-							tc:RegisterFlagEffect(1005,RESET_CHAIN,0,1)
-						end
-					end
-					res:Merge(mats)
-				end
-			end
-		end
-	end
-	return res,base
-end
-
-Card.CheckFusionMaterial = function(c,...)
-	local x={...}
-	local matg = #x>0 and x[1] or nil
-	local cg = #x>1 and x[2] or nil
-	local chkf = #x>2 and x[3] or PLAYER_NONE
-	local not_material = #x>3 and x[4]
-	
-	local res=_CheckFusionMaterial(c,matg,cg,chkf,not_material)
-	if self_reference_effect then
-		local tp=self_reference_effect:GetHandlerPlayer()
-		if Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL) then
-			local egroup={Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)}
-			local all_mats=Group.CreateGroup()
-			for _,ce in ipairs(egroup) do
-				if ce and ce.GetLabel then
-					local id=ce:GetLabel()
-					local chk_fus=ce:GetValue()
-					if aux.GetValueType(chk_fus)=="function" then
-						chk_fus,_=chk_fus(ce,c,tp)
-					end
-					if chk_fus then
-						local mats=Duel.GetMatchingGroup(aux.ExtraFusionFilter0,tp,0xff,0xff,nil,ce,ce:GetTarget())
-						if #mats>0 then
-							for ec1 in aux.Next(mats) do
-								if ec1:GetFlagEffect(1005)>0 then
-									if ec1:GetFlagEffect(1006)<=0 then
-										ec1:RegisterFlagEffect(1006,RESET_CHAIN,0,1)
-									end
-									local flag=Effect.CreateEffect(ce:GetHandler())
-									flag:SetType(EFFECT_TYPE_SINGLE)
-									flag:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-									flag:SetCode(EFFECT_GLITCHY_EXTRA_MATERIAL_FLAG)
-									flag:SetValue(id)
-									flag:SetReset(RESET_CHAIN)
-									ec1:RegisterEffect(flag)
-								end
-							end
-							all_mats:Merge(mats)
-						end
-					end
-				end
-			end
-			all_mats:Merge(matg)
-			res=_CheckFusionMaterial(c,all_mats,cg,chkf,not_material)
-			for ec2 in aux.Next(all_mats) do
-				if ec2:GetFlagEffect(1006)>0 then
-					ec2:ResetFlagEffect(1006)
-				end
-				for _,flag in ipairs({ec2:IsHasEffect(EFFECT_GLITCHY_EXTRA_MATERIAL_FLAG)}) do
-					if flag and flag.GetLabel then
-						flag:Reset()
-					end
-				end
-			end
-		end
-	end
-	return res
-end
-
-Duel.SelectFusionMaterial = function(tp,fc,matg,...)
-	local x={...}
-	local cg= #x>0 and x[1] or nil
-	local chkf= #x>1 and x[2] or PLAYER_NONE
-	local not_material= #x>2 and x[3]
-	if not Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL) then
-		return _SelectFusionMaterial(tp,fc,matg,cg,chkf,not_material)
-	else
-		local egroup={Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)}
-		local all_mats=Group.CreateGroup()
-		for _,ce in ipairs(egroup) do
-			if ce and ce.GetLabel then
-				local id=ce:GetLabel()
-				local chk_fus=ce:GetValue()
-				if aux.GetValueType(chk_fus)=="function" then
-					chk_fus,_=chk_fus(ce,fc,tp)
-				end
-				if chk_fus then
-					local mats=Duel.GetMatchingGroup(aux.ExtraFusionFilter,tp,0xff,0xff,nil,self_reference_effect,ce,ce:GetTarget())
-					if #mats>0 then
-						for ec1 in aux.Next(mats) do
-							if ec1:GetFlagEffect(1005)>0 then
-								if ec1:GetFlagEffect(1006)<=0 then
-									ec1:RegisterFlagEffect(1006,RESET_CHAIN,0,1)
-								end
-								local flag=Effect.CreateEffect(ce:GetHandler())
-								flag:SetType(EFFECT_TYPE_SINGLE)
-								flag:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-								flag:SetCode(EFFECT_GLITCHY_EXTRA_MATERIAL_FLAG)
-								flag:SetValue(id)
-								flag:SetReset(RESET_CHAIN)
-								ec1:RegisterEffect(flag)
-							end
-						end
-						all_mats:Merge(mats)
-					end
-				end
-			end
-		end
-		all_mats:Merge(matg)
-		
-		local chosen_mats=_SelectFusionMaterial(tp,fc,all_mats,cg,chkf,not_material)
-		for ec2 in aux.Next(all_mats) do
-			if ec2:GetFlagEffect(1006)>0 then
-				ec2:ResetFlagEffect(1006)
-			end
-			for _,flag in ipairs({ec2:IsHasEffect(EFFECT_GLITCHY_EXTRA_MATERIAL_FLAG)}) do
-				if flag and flag.GetLabel then
-					flag:Reset()
-				end
-			end
-		end
-		
-		local extra_mats=Group.CreateGroup()
-		local valid_effs,extra_opt={},{}
-		for mc in aux.Next(chosen_mats) do
-			for _,ce in ipairs(egroup) do
-				if --[[mc:GetFlagEffect(1005)>0 and ]]ce and ce.GetLabel and ce:GetTarget()(ce,mc) then
-					--register card as possible extra material
-					extra_mats:AddCard(mc)
-					mc:RegisterFlagEffect(1006,RESET_CHAIN,0,1)
-					--register description
-					local d=ce:GetDescription()
-					for _,desc in ipairs(extra_opt) do
-						if desc==d then
-							d=false
-							break
-						end
-					end
-					if d then
-						table.insert(extra_opt,d)
-						table.insert(valid_effs,ce)
-					end
-				end
-			end
-		end
-		if #extra_opt>0 and (chosen_mats:IsExists(aux.PureExtraFilter,1,nil) or Duel.SelectYesNo(tp,aux.Stringid(1006,0))) then
-			local ecount=0
-			while aux.GetValueType(extra_mats)=="Group" and #extra_mats>0 and #extra_opt>0 and (ecount==0 or chosen_mats:IsExists(aux.PureExtraFilterLoop,1,nil,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL) or Duel.SelectYesNo(tp,aux.Stringid(1006,0))) do
-				local opt=Duel.SelectOption(tp,table.unpack(extra_opt))+1
-				local eff=valid_effs[opt]
-				local _,max=eff:GetValue()(eff,nil)
-				if not max or max==0 then max=#extra_mats end
-				local emats=extra_mats:SelectSubGroup(tp,aux.ExtraMaterialFilterGoal,false,1,max,extra_mats)
-				--local emats=extra_mats:FilterSelect(tp,aux.ExtraMaterialFilterSelect,1,max,nil,eff,eff:GetTarget())
-				if #emats>0 then
-					for tc in aux.Next(emats) do
-						local e1=Effect.CreateEffect(tc)
-						e1:SetType(EFFECT_TYPE_SINGLE)
-						e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_CANNOT_DISABLE)
-						e1:SetCode(EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)
-						e1:SetOperation(eff:GetOperation())
-						e1:SetLabel(ecount)
-						e1:SetReset(RESET_CHAIN)
-						tc:RegisterEffect(e1,true)
-						extra_mats:RemoveCard(tc)
-					end
-				end
-				table.remove(extra_opt,opt)
-				table.remove(valid_effs,opt)
-				ecount=ecount+1
-			end
-		end
-		for ec3 in aux.Next(matg) do
-			if ec3:GetFlagEffect(1005)>0 then
-				ec3:ResetFlagEffect(1005)
-			end
-		end
-		for ec4 in aux.Next(chosen_mats) do
-			if ec4:GetFlagEffect(1006)>0 and not ec4:IsHasEffect(EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL) then
-				ec4:ResetFlagEffect(1006)
-			end
-		end
-		return chosen_mats
-	end
-end
-
-Auxiliary.FConditionFilterMix = function(c,fc,sub,concat_fusion,...)
-	local fusion_type=concat_fusion and SUMMON_TYPE_SPECIAL or SUMMON_TYPE_FUSION
-	if not c:IsCanBeFusionMaterial(fc,fusion_type) then return false end
-	if c:IsHasEffect(EFFECT_GLITCHY_FUSION_SUBSTITUTE) then return true end
-	for i,f in ipairs({...}) do
-		if f(c,fc,sub) then return true end
-	end
-	return false
-end
-
-Auxiliary.FCheckMixGoal = function(sg,tp,fc,sub,chkfnf,...)
-	for _,e in ipairs({Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)}) do
-		local id=e:GetLabel()
-		local val=e:GetValue()
-		if val then
-			local _,valmax=val(e,nil)
-			if not (not sg or not sg:IsExists(aux.ExtraMaterialMaxCheck,valmax+1,nil,id)) then
-				return false
-			end
-		end
-	end
-	return _FCheckMixGoal(sg,tp,fc,sub,chkfnf,...)
-end
-
-function Card.IsCanBeGlitchyFusionSubstitute(c,fc,sub,mg,sg)
-	if not c:IsHasEffect(EFFECT_GLITCHY_FUSION_SUBSTITUTE) then return false end
-	for _,ce in ipairs({c:IsHasEffect(EFFECT_GLITCHY_FUSION_SUBSTITUTE)}) do
-		local tg=ce:GetTarget()
-		if not tg or type(tg)=="function" and tg(ce,c,fc,sub,mg,sg) then
-			return true
-		end
-	end
-	return false
-end
-
-Auxiliary.AddFusionProcMix = function(c,sub,insf,...)
+function Auxiliary.AddFusionProcMix(c,sub,insf,...)
 	if c:IsStatus(STATUS_COPYING_EFFECT) then return end
 	local val={...}
 	local fun={}
 	local mat={}
 	for i=1,#val do
 		if type(val[i])=='function' then
-			fun[i]=function(c,fc,sub,mg,sg,chk) return val[i](c,fc,sub,mg,sg) and not c:IsHasEffect(6205579) or not chk and c:IsCanBeGlitchyFusionSubstitute(fc,sub,mg,sg) end
+			fun[i]=function(c,fc,sub,mg,sg) return val[i](c,fc,sub,mg,sg) and not c:IsHasEffect(6205579) end
 		elseif type(val[i])=='table' then
-			fun[i]=function(c,fc,sub,mg,sg,chk)
-					if not chk and c:IsCanBeGlitchyFusionSubstitute(fc,sub,mg,sg) then return true end
+			fun[i]=function(c,fc,sub,mg,sg)
 					for _,fcode in ipairs(val[i]) do
 						if type(fcode)=='function' then
 							if fcode(c,fc,sub,mg,sg) and not c:IsHasEffect(6205579) then return true end
@@ -516,7 +244,7 @@ Auxiliary.AddFusionProcMix = function(c,sub,insf,...)
 				if type(fcode)~='function' then mat[fcode]=true end
 			end
 		else
-			fun[i]=function(c,fc,sub,_,_2,chk) return c:IsFusionCode(val[i]) or (sub and c:CheckFusionSubstitute(fc)) or not chk and c:IsCanBeGlitchyFusionSubstitute(fc,sub,mg,sg) end
+			fun[i]=function(c,fc,sub) return c:IsFusionCode(val[i]) or (sub and c:CheckFusionSubstitute(fc)) end
 			mat[val[i]]=true
 		end
 	end
@@ -541,6 +269,400 @@ Auxiliary.AddFusionProcMix = function(c,sub,insf,...)
 	e1:SetOperation(Auxiliary.FOperationMix(insf,sub,table.unpack(fun)))
 	c:RegisterEffect(e1)
 end
+
+function Auxiliary.FConditionMix(insf,sub,...)
+	local funs={...}
+	return	function(e,g,gc,chkfnf)
+				if g==nil then return insf and Auxiliary.MustMaterialCheck(nil,e:GetHandlerPlayer(),EFFECT_MUST_BE_FMATERIAL) end
+				local c=e:GetHandler()
+				local tp=c:GetControler()
+				local notfusion=chkfnf&0x100>0
+				local concat_fusion=chkfnf&0x200>0
+				local sub=(sub or notfusion) and not concat_fusion
+				local mg=g:Filter(Auxiliary.FConditionFilterMix,c,c,sub,concat_fusion,table.unpack(funs))
+				if gc then
+					if not mg:IsContains(gc) then return false end
+					Duel.SetSelectedCard(Group.FromCards(gc))
+				end
+				if not Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL) then
+					return mg:CheckSubGroup(Auxiliary.FCheckMixGoal,#funs,#funs,tp,c,sub,chkfnf,table.unpack(funs))
+				else
+					local extramats,extrafuns,extramaxs={},{},{}
+					for _,ce in ipairs({Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)}) do
+						if ce and ce.GetLabel then
+							local val=ce:GetValue()
+							if not val or val(ce,c,tp) then
+								local tg=ce:GetTarget()
+								local exg=Duel.GetMatchingGroup(aux.GlitchyFMaterialExFilter,tp,0xff,0xff,mg,ce,tg,tp,c)
+								if #exg>0 then
+									mg:Merge(exg)
+									table.insert(extramats,exg)
+									if tg then
+										table.insert(extrafuns,tg)
+									else
+										table.insert(extrafuns,aux.TRUE)
+									end
+									local max=1
+									if val then
+										_,max=val(ce,c,tp)
+										max = type(max)=="number" and max or 1
+									end
+									table.insert(extramaxs,max)
+								end
+							end
+						end
+					end
+					return mg:CheckSubGroup(Auxiliary.FCheckMixExGoal,#funs,#funs,tp,c,sub,chkfnf,extramats,extrafuns,extramaxs,table.unpack(funs))
+				end
+			end
+end
+function Auxiliary.FOperationMix(insf,sub,...)
+	local funs={...}
+	return	function(e,tp,eg,ep,ev,re,r,rp,gc,chkfnf)
+				local c=e:GetHandler()
+				local tp=c:GetControler()
+				local notfusion=chkfnf&0x100>0
+				local concat_fusion=chkfnf&0x200>0
+				local sub=(sub or notfusion) and not concat_fusion
+				local mg=eg:Filter(Auxiliary.FConditionFilterMix,c,c,sub,concat_fusion,table.unpack(funs))
+				if gc then Duel.SetSelectedCard(Group.FromCards(gc)) end
+				--
+				local original_mats=mg:Clone()
+				local extramats,extramats_repetead,extrafuns,extramaxs,extraeffs={},{},{},{},{}
+				for _,ce in ipairs({Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)}) do
+					if ce and ce.GetLabel then
+						local val=ce:GetValue()
+						if not val or val(ce,c,tp) then
+							local tg=ce:GetTarget()
+							local exg=Duel.GetMatchingGroup(aux.GlitchyFMaterialExFilter,tp,0xff,0xff,nil,ce,tg,tp,c)
+							if #exg>0 then
+								table.insert(extraeffs,ce)
+								mg:Merge(exg)
+								table.insert(extramats,exg)
+								if tg then
+									table.insert(extrafuns,tg)
+								else
+									table.insert(extrafuns,aux.TRUE)
+								end
+								local max=1
+								if val then
+									_,max=val(ce,c,tp)
+									max = type(max)=="number" and max or 1
+								end
+								table.insert(extramaxs,max)
+							end
+						end
+					end
+				end
+				
+				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
+				local sg=mg:SelectSubGroup(tp,Auxiliary.FCheckMixExGoal,false,#funs,#funs,tp,c,sub,chkfnf,extramats,extrafuns,extramaxs,table.unpack(funs))
+				if #extramats>0 then
+					for i,exg in ipairs(extramats) do
+						local ce=extraeffs[i]
+						local tg=ce:GetTarget()
+						exg=exg:Filter(aux.NOT(Card.IsHasEffect),nil,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)
+						if ce:GetCode()==EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL then
+							exg=exg:Filter(aux.GlitchyFMaterialExFilter,nil,ce,tg,tp,c,false,sg,sg,true)
+							local exmg=original_mats:Filter(aux.GlitchyFMaterialExFilter,nil,ce,tg,tp,c,false,sg,sg,true)
+							if #exmg>0 then
+								original_mats:Merge(exg)
+								for clone in aux.Next(exmg) do
+									if not extramats_repetead[clone] then
+										extramats_repetead[clone]=0
+									end
+									extramats_repetead[clone]=extramats_repetead[clone]+1
+								end
+							end
+						end
+						if #exg>0 then
+							local max=extramaxs[i]
+							local valid=sg:IsExists(Card.IsContained,1,nil,exg)
+							local forced=sg:IsExists(aux.FMaterialFilterSelEx,1,nil,exg,extramats_repetead)
+							if valid and (forced or Duel.SelectYesNo(tp,ce:GetDescription())) then
+								Duel.Hint(HINT_CARD,tp,ce:GetHandler():GetOriginalCode())
+								local fg=sg:Filter(aux.FMaterialFilterSelEx,nil,exg,extramats_repetead)
+								if #fg<max and exg:FilterCount(aux.TRUE,fg)>0 and Duel.SelectYesNo(tp,ce:GetDescription()) then
+									local opt=exg:Select(tp,1,max-#fg,fg)
+									fg:Merge(opt)
+								end
+								Duel.HintSelection(fg)
+								for tc in aux.Next(fg) do
+									local e1=Effect.CreateEffect(ce:GetOwner())
+									e1:SetType(EFFECT_TYPE_FIELD)
+									e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_IGNORE_IMMUNE)
+									e1:SetCode(EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)
+									e1:SetOperation(ce:GetOperation())
+									e1:SetReset(RESET_CHAIN)
+									tc:RegisterEffect(e1)
+								end
+							end
+							for clone in aux.Next(exg) do
+								if extramats_repetead[clone] then
+									extramats_repetead[clone]=extramats_repetead[clone]-1
+								end
+							end
+						end
+					end
+				end			
+				Duel.SetFusionMaterial(sg)
+			end
+end
+function Auxiliary.GlitchyFMaterialExFilter(c,ce,tg,tp,fc,sub,mg,sg,depth)
+	return not c:IsImmuneToEffect(ce) and (not tg or tg(c,tp,fc,sub,mg,sg,depth))
+end
+function Auxiliary.FMaterialFilterSelEx(c,exg,extramats_repetead)
+	return exg:IsContains(c) and (not extramats_repetead[c] or extramats_repetead[c]<=0)
+end
+function Auxiliary.FCheckMixExGoal(sg,tp,fc,sub,chkfnf,extramats,extrafuns,extramaxs,...)
+	local chkf=chkfnf&0xff
+	local concat_fusion=chkfnf&0x200>0
+	if not concat_fusion and sg:IsExists(Auxiliary.TuneMagicianCheckX,1,nil,sg,EFFECT_TUNE_MAGICIAN_F) then return false end
+	if not Auxiliary.MustMaterialCheck(sg,tp,EFFECT_MUST_BE_FMATERIAL) then return false end
+	local g=Group.CreateGroup()
+	local xct={}
+	local res=sg:IsExists(Auxiliary.FCheckMixEx,1,nil,tp,sg,g,fc,sub,extramats,extrafuns,extramaxs,xct,...)
+	local res1=(chkf==PLAYER_NONE or Duel.GetLocationCountFromEx(tp,tp,sg,fc)>0)
+	local res2=(not Auxiliary.FCheckAdditional or Auxiliary.FCheckAdditional(tp,sg,fc))
+	local res3=(not Auxiliary.FGoalCheckAdditional or Auxiliary.FGoalCheckAdditional(tp,sg,fc))
+	local res4=(not Auxiliary.FGoalCheckGlitchy or Auxiliary.FGoalCheckGlitchy(tp,sg,fc,sub,chkfnf))
+	--Debug.Message(res4)
+	return res and res1	and res2 and res3 and res4
+end
+function Auxiliary.FCheckMixEx(c,tp,mg,sg,fc,sub,extramats,extrafuns,extramaxs,xct,fun1,fun2,...)
+	local xchk=false
+	if fun2 then
+		sg:AddCard(c)
+		local res=false
+		
+		if #extramats>0 then
+			for i,exg in ipairs(extramats) do
+				if exg:IsContains(c) then
+					xchk=true
+					if extrafuns[i](c,tp,fc,sub,mg,sg,true) and (#xct<i or xct[i]<extramaxs[i]) then
+						if #xct<i then
+							xct[i]=0
+						end
+						xct[i]=xct[i]+1
+						res=mg:IsExists(Auxiliary.FCheckMixEx,1,sg,tp,mg,sg,fc,sub,extramats,extrafuns,extramaxs,xct,fun2,...)
+					end
+				end
+			end
+		end
+		if not xchk then
+			if fun1(c,fc,false,mg,sg) then
+				res=mg:IsExists(Auxiliary.FCheckMixEx,1,sg,tp,mg,sg,fc,sub,extramats,extrafuns,extramaxs,xct,fun2,...)
+			elseif sub and fun1(c,fc,true,mg,sg) then
+				res=mg:IsExists(Auxiliary.FCheckMixEx,1,sg,tp,mg,sg,fc,false,extramats,extrafuns,extramaxs,xct,fun2,...)
+			end
+		end
+		sg:RemoveCard(c)
+		return res
+	else
+		if #extramats>0 then
+			for i,exg in ipairs(extramats) do
+				if exg:IsContains(c) then
+					xchk=true
+					if extrafuns[i](c,tp,fc,sub,mg,sg,true) and (#xct<i or xct[i]<extramaxs[i]) then
+						if #xct<i then
+							xct[i]=0
+						end
+						xct[i]=xct[i]+1
+						return true
+					end
+				end
+			end
+		end
+		return not xchk and fun1(c,fc,sub,mg,sg)
+	end
+end
+--
+function Auxiliary.AddFusionProcShaddoll(c,attr)
+	local mt=getmetatable(c)
+	if mt.material_funs==nil then
+		mt.material_funs={aux.FShaddollFilter1,aux.FShaddollFilterAttr(attr)}
+	end
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e1:SetCode(EFFECT_FUSION_MATERIAL)
+	e1:SetCondition(Auxiliary.FShaddollCondition(attr))
+	e1:SetOperation(Auxiliary.FShaddollOperation(attr))
+	c:RegisterEffect(e1)
+end
+function Auxiliary.FShaddollFilterAttr(attr)
+	return	function(c)
+				return aux.FShaddollFilter2(c,attr)
+			end
+end
+function Auxiliary.FShaddollCondition(attr)
+	return 	function(e,g,gc,chkf)
+				if not aux.EnableOnlyGlitchyFusionProcs then
+					return _FShaddollCondition(attr)(e,g,gc,chkf)
+				else
+					if g==nil then return Auxiliary.MustMaterialCheck(nil,e:GetHandlerPlayer(),EFFECT_MUST_BE_FMATERIAL) end
+					local c=e:GetHandler()
+					local tp=e:GetHandlerPlayer()
+					local fc=Duel.GetFieldCard(tp,LOCATION_FZONE,0)
+					local exg=nil
+					local mg=g:Filter(Auxiliary.FConditionFilterMix,c,c,false,false,aux.FShaddollFilter1,aux.FShaddollFilterAttr(attr))
+					local extramats,extraeffs,extrafuns,extramaxs={},{},{},{}
+					if fc and fc:IsHasEffect(81788994) and fc:IsCanRemoveCounter(tp,0x16,3,REASON_EFFECT) then
+						local fe=fc:IsHasEffect(81788994)
+						exg=Duel.GetMatchingGroup(Auxiliary.FShaddollExFilter,tp,0,LOCATION_MZONE,mg,c,attr,fe)
+						mg:Merge(exg)
+						table.insert(extramats,exg)
+						table.insert(extraeffs,fe)
+						table.insert(extrafuns,aux.TRUE)
+						table.insert(extramaxs,1)
+					end
+					if gc then
+						if not mg:IsContains(gc) then return false end
+						Duel.SetSelectedCard(Group.FromCards(gc))
+					end
+					if not Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL) then
+						return mg:CheckSubGroup(Auxiliary.FCheckMixGoal,2,2,tp,c,false,false,aux.FShaddollFilter1,aux.FShaddollFilterAttr(attr))
+					else
+						for _,ce in ipairs({Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)}) do
+							if ce and ce.GetLabel then
+								local val=ce:GetValue()
+								if not val or val(ce,c,tp) then
+									local tg=ce:GetTarget()
+									local exg=Duel.GetMatchingGroup(aux.GlitchyFMaterialExFilter,tp,0xff,0xff,mg,ce,tg,tp,c)
+									if #exg>0 then
+										mg:Merge(exg)
+										table.insert(extramats,exg)
+										table.insert(extraeffs,ce)
+										if tg then
+											table.insert(extrafuns,tg)
+										else
+											table.insert(extrafuns,aux.TRUE)
+										end
+										local max=1
+										if val then
+											_,max=val(ce,c,tp)
+											max = type(max)=="number" and max or 1
+										end
+										table.insert(extramaxs,max)
+									end
+								end
+							end
+						end
+						return mg:CheckSubGroup(Auxiliary.FCheckMixExGoal,2,2,tp,c,false,chkf,extramats,extrafuns,extramaxs,aux.FShaddollFilter1,aux.FShaddollFilterAttr(attr))
+					end
+				end
+			end
+end
+function Auxiliary.FShaddollOperation(attr)
+	return	function(e,tp,eg,ep,ev,re,r,rp,gc,chkf)
+				if not aux.EnableOnlyGlitchyFusionProcs then
+					return _FShaddollOperation(attr)(e,tp,eg,ep,ev,re,r,rp,gc,chkf)
+				else
+					local c=e:GetHandler()
+					local mg=eg:Filter(Auxiliary.FConditionFilterMix,c,c,false,false,aux.FShaddollFilter1,aux.FShaddollFilterAttr(attr))
+					local fc=Duel.GetFieldCard(tp,LOCATION_FZONE,0)
+					local exg0=nil
+					
+					local original_mats = mg:Clone()
+					local extramats,extramats_repetead,extraeffs,extrafuns,extramaxs={},{},{},{},{}
+					if fc and fc:IsHasEffect(81788994) and fc:IsCanRemoveCounter(tp,0x16,3,REASON_EFFECT) then
+						local fe=fc:IsHasEffect(81788994)
+						exg0=Duel.GetMatchingGroup(Auxiliary.FShaddollExFilter,tp,0,LOCATION_MZONE,nil,c,attr,fe)
+						if #exg0>0 then
+							mg:Merge(exg0)
+							table.insert(extramats,exg0)
+							table.insert(extraeffs,fe)
+							table.insert(extrafuns,aux.TRUE)
+							table.insert(extramaxs,1)
+						end
+					end
+					if gc then Duel.SetSelectedCard(Group.FromCards(gc)) end
+					--
+					for _,ce in ipairs({Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)}) do
+						if ce and ce.GetLabel then
+							local val=ce:GetValue()
+							if not val or val(ce,c,tp) then
+								local tg=ce:GetTarget()
+								local exg=Duel.GetMatchingGroup(aux.GlitchyFMaterialExFilter,tp,0xff,0xff,nil,ce,tg,tp,c)
+								if #exg>0 then
+									table.insert(extramats,exg)
+									table.insert(extraeffs,ce)
+									mg:Merge(exg)
+									if tg then
+										table.insert(extrafuns,tg)
+									else
+										table.insert(extrafuns,aux.TRUE)
+									end
+									local max=1
+									if val then
+										_,max=val(ce,c,tp)
+										max = type(max)=="number" and max or 1
+									end
+									table.insert(extramaxs,max)
+								end
+							end
+						end
+					end
+					
+					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
+					local sg=mg:SelectSubGroup(tp,Auxiliary.FCheckMixExGoal,false,2,2,tp,c,false,chkf,extramats,extrafuns,extramaxs,aux.FShaddollFilter1,aux.FShaddollFilterAttr(attr))
+					if #extramats>0 then
+						for i,exg in ipairs(extramats) do
+							local ce=extraeffs[i]
+							local tg=ce:GetTarget()
+							exg=exg:Filter(aux.NOT(Card.IsHasEffect),nil,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)
+							if ce:GetCode()==EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL then
+								exg=exg:Filter(aux.GlitchyFMaterialExFilter,nil,ce,tg,tp,c,false,sg,sg,true)
+								local exmg=original_mats:Filter(aux.GlitchyFMaterialExFilter,nil,ce,tg,tp,c,false,sg,sg,true)
+								if #exmg>0 then
+									original_mats:Merge(exg)
+									for clone in aux.Next(exmg) do
+										if not extramats_repetead[clone] then
+											extramats_repetead[clone]=0
+										end
+										extramats_repetead[clone]=extramats_repetead[clone]+1
+									end
+								end
+							end
+							if #exg>0 then								
+								local max=extramaxs[i]
+								local valid=sg:IsExists(Card.IsContained,1,nil,exg)
+								local forced=sg:IsExists(aux.FMaterialFilterSelEx,1,nil,exg,extramats_repetead)
+								local ShaddollPrison = ce:GetCode()==81788994 and fc and fc:IsHasEffect(81788994) and fc:IsCanRemoveCounter(tp,0x16,3,REASON_EFFECT)
+								if valid and (forced or Duel.SelectYesNo(tp,ce:GetDescription())) then
+									Duel.Hint(HINT_CARD,tp,ce:GetHandler():GetOriginalCode())
+									if ShaddollPrison then
+										fc:RemoveCounter(tp,0x16,3,REASON_EFFECT)
+									end
+									local fg=sg:Filter(aux.FMaterialFilterSelEx,nil,exg,extramats_repetead)
+									if #fg<max and exg:FilterCount(aux.TRUE,fg)>0 and Duel.SelectYesNo(tp,ce:GetDescription()) then
+										local opt=exg:Select(tp,1,max-#fg,fg)
+										fg:Merge(opt)
+									end
+									Duel.HintSelection(fg)
+									for tc in aux.Next(fg) do
+										local e1=Effect.CreateEffect(ce:GetOwner())
+										e1:SetType(EFFECT_TYPE_FIELD)
+										e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_IGNORE_IMMUNE)
+										e1:SetCode(EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)
+										e1:SetOperation(ce:GetOperation())
+										e1:SetReset(RESET_CHAIN)
+										tc:RegisterEffect(e1)
+									end
+								end
+								for clone in aux.Next(exg) do
+									if extramats_repetead[clone] then
+										extramats_repetead[clone]=extramats_repetead[clone]-1
+									end
+								end
+							end
+						end
+					end			
+					Duel.SetFusionMaterial(sg)
+				end
+			end
+end
+
 function Auxiliary.AddFusionProcMixRep(c,sub,insf,fun1,minc,maxc,...)
 	if c:IsStatus(STATUS_COPYING_EFFECT) then return end
 	local val={fun1,...}
@@ -548,10 +670,9 @@ function Auxiliary.AddFusionProcMixRep(c,sub,insf,fun1,minc,maxc,...)
 	local mat={}
 	for i=1,#val do
 		if type(val[i])=='function' then
-			fun[i]=function(c,fc,sub,mg,sg,chk) return val[i](c,fc,sub,mg,sg) and not c:IsHasEffect(6205579) or not chk and c:IsCanBeGlitchyFusionSubstitute(fc,sub,mg,sg) end
+			fun[i]=function(c,fc,sub,mg,sg) return val[i](c,fc,sub,mg,sg) and not c:IsHasEffect(6205579) end
 		elseif type(val[i])=='table' then
-			fun[i]=function(c,fc,sub,mg,sg,chk)
-					if not chk and c:IsCanBeGlitchyFusionSubstitute(fc,sub,mg,sg) then return true end
+			fun[i]=function(c,fc,sub,mg,sg)
 					for _,fcode in ipairs(val[i]) do
 						if type(fcode)=='function' then
 							if fcode(c,fc,sub,mg,sg) and not c:IsHasEffect(6205579) then return true end
@@ -565,7 +686,7 @@ function Auxiliary.AddFusionProcMixRep(c,sub,insf,fun1,minc,maxc,...)
 				if type(fcode)~='function' then mat[fcode]=true end
 			end
 		else
-			fun[i]=function(c,fc,sub,_,_2,chk) return c:IsFusionCode(val[i]) or (sub and c:CheckFusionSubstitute(fc)) or not chk and c:IsCanBeGlitchyFusionSubstitute(fc,sub,mg,sg) end
+			fun[i]=function(c,fc,sub) return c:IsFusionCode(val[i]) or (sub and c:CheckFusionSubstitute(fc)) end
 			mat[val[i]]=true
 		end
 	end
@@ -590,24 +711,413 @@ function Auxiliary.AddFusionProcMixRep(c,sub,insf,fun1,minc,maxc,...)
 	e1:SetOperation(Auxiliary.FOperationMixRep(insf,sub,fun[1],minc,maxc,table.unpack(fun,2)))
 	c:RegisterEffect(e1)
 end
+function Auxiliary.FConditionMixRep(insf,sub,fun1,minc,maxc,...)
+	local funs={...}
+	return	function(e,g,gc,chkfnf)
+				if g==nil then return insf and Auxiliary.MustMaterialCheck(nil,e:GetHandlerPlayer(),EFFECT_MUST_BE_FMATERIAL) end
+				local c=e:GetHandler()
+				local tp=c:GetControler()
+				local notfusion=chkfnf&0x100>0
+				local concat_fusion=chkfnf&0x200>0
+				local sub=(sub or notfusion) and not concat_fusion
+				local mg=g:Filter(Auxiliary.FConditionFilterMix,c,c,sub,concat_fusion,fun1,table.unpack(funs))
+				if gc then
+					if not mg:IsContains(gc) then return false end
+					local sg=Group.CreateGroup()
+					return Auxiliary.FSelectMixRep(gc,tp,mg,sg,c,sub,chkfnf,fun1,minc,maxc,table.unpack(funs))
+				end
+				local sg=Group.CreateGroup()
+				if not Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL) then
+					return mg:IsExists(Auxiliary.FSelectMixRep,1,nil,tp,mg,sg,c,sub,chkfnf,fun1,minc,maxc,table.unpack(funs))
+				else
+					local extramats,extrafuns,extramaxs={},{},{}
+					for _,ce in ipairs({Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)}) do
+						if ce and ce.GetLabel then
+							local val=ce:GetValue()
+							if not val or val(ce,c,tp) then
+								local tg=ce:GetTarget()
+								local exg=Duel.GetMatchingGroup(aux.GlitchyFMaterialExFilter,tp,0xff,0xff,mg,ce,tg,tp,c)
+								if #exg>0 then
+									mg:Merge(exg)
+									table.insert(extramats,exg)
+									if tg then
+										table.insert(extrafuns,tg)
+									else
+										table.insert(extrafuns,aux.TRUE)
+									end
+									local max=1
+									if val then
+										_,max=val(ce,c,tp)
+										max = type(max)=="number" and max or 1
+									end
+									table.insert(extramaxs,max)
+								end
+							end
+						end
+					end
+					return mg:IsExists(Auxiliary.FSelectMixRepEx,1,nil,tp,mg,sg,c,sub,chkfnf,fun1,minc,maxc,extramats,extrafuns,extramaxs,table.unpack(funs))
+				end
+			end
+end
+function Auxiliary.FOperationMixRep(insf,sub,fun1,minc,maxc,...)
+	local funs={...}
+	return	function(e,tp,eg,ep,ev,re,r,rp,gc,chkfnf)
+				local c=e:GetHandler()
+				local tp=c:GetControler()
+				local notfusion=chkfnf&0x100>0
+				local concat_fusion=chkfnf&0x200>0
+				local sub=(sub or notfusion) and not concat_fusion
+				local mg=eg:Filter(Auxiliary.FConditionFilterMix,c,c,sub,concat_fusion,fun1,table.unpack(funs))
+				local sg=Group.CreateGroup()
+				if gc then sg:AddCard(gc) end
+				
+				local original_mats=mg:Clone()
+				local extramats,extramats_repetead,extrafuns,extramaxs,extraeffs={},{},{},{},{}
+				for _,ce in ipairs({Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)}) do
+					if ce and ce.GetLabel then
+						local val=ce:GetValue()
+						if not val or val(ce,c,tp) then
+							local tg=ce:GetTarget()
+							local exg=Duel.GetMatchingGroup(aux.GlitchyFMaterialExFilter,tp,0xff,0xff,nil,ce,tg,tp,c)
+							if #exg>0 then
+								table.insert(extraeffs,ce)
+								mg:Merge(exg)
+								table.insert(extramats,exg)
+								if tg then
+									table.insert(extrafuns,tg)
+								else
+									table.insert(extrafuns,aux.TRUE)
+								end
+								local max=1
+								if val then
+									_,max=val(ce,c,tp)
+									max = type(max)=="number" and max or 1
+								end
+								table.insert(extramaxs,max)
+							end
+						end
+					end
+				end
+				
+				while sg:GetCount()<maxc+#funs do
+					local cg=mg:Filter(Auxiliary.FSelectMixRepEx,sg,tp,mg,sg,c,sub,chkfnf,fun1,minc,maxc,extramats,extrafuns,extramaxs,table.unpack(funs))
+					if cg:GetCount()==0 then break end
+					local finish=Auxiliary.FCheckMixRepGoalEx(tp,sg,c,sub,chkfnf,fun1,minc,maxc,extramats,extrafuns,extramaxs,table.unpack(funs))
+					local cancel_group=sg:Clone()
+					if gc then cancel_group:RemoveCard(gc) end
+					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
+					local tc=cg:SelectUnselect(cancel_group,tp,finish,false,minc+#funs,maxc+#funs)
+					if not tc then break end
+					if sg:IsContains(tc) then
+						sg:RemoveCard(tc)
+					else
+						sg:AddCard(tc)
+					end
+				end
+				
+				if #extramats>0 then
+					for i,exg in ipairs(extramats) do
+						local ce=extraeffs[i]
+						local tg=ce:GetTarget()
+						exg=exg:Filter(aux.NOT(Card.IsHasEffect),nil,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)
+						if ce:GetCode()==EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL then
+							exg=exg:Filter(aux.GlitchyFMaterialExFilter,nil,ce,tg,tp,c,false,sg,sg,true)
+							local exmg=original_mats:Filter(aux.GlitchyFMaterialExFilter,nil,ce,tg,tp,c,false,sg,sg,true)
+							if #exmg>0 then
+								original_mats:Merge(exg)
+								for clone in aux.Next(exmg) do
+									if not extramats_repetead[clone] then
+										extramats_repetead[clone]=0
+									end
+									extramats_repetead[clone]=extramats_repetead[clone]+1
+								end
+							end
+						end
+						if #exg>0 then
+							local max=extramaxs[i]
+							local valid=sg:IsExists(Card.IsContained,1,nil,exg)
+							local forced=sg:IsExists(aux.FMaterialFilterSelEx,1,nil,exg,extramats_repetead)
+							if valid and (forced or Duel.SelectYesNo(tp,ce:GetDescription())) then
+								Duel.Hint(HINT_CARD,tp,ce:GetHandler():GetOriginalCode())
+								local fg=sg:Filter(aux.FMaterialFilterSelEx,nil,exg,extramats_repetead)
+								if #fg<max and exg:FilterCount(aux.TRUE,fg)>0 and Duel.SelectYesNo(tp,ce:GetDescription()) then
+									local opt=exg:Select(tp,1,max-#fg,fg)
+									fg:Merge(opt)
+								end
+								Duel.HintSelection(fg)
+								for tc in aux.Next(fg) do
+									local e1=Effect.CreateEffect(ce:GetOwner())
+									e1:SetType(EFFECT_TYPE_FIELD)
+									e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_IGNORE_IMMUNE)
+									e1:SetCode(EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)
+									e1:SetOperation(ce:GetOperation())
+									e1:SetReset(RESET_CHAIN)
+									tc:RegisterEffect(e1)
+								end
+							end
+							for clone in aux.Next(exg) do
+								if extramats_repetead[clone] then
+									extramats_repetead[clone]=extramats_repetead[clone]-1
+								end
+							end
+						end
+					end
+				end			
+				
+				Duel.SetFusionMaterial(sg)
+			end
+end
+function Auxiliary.FSelectMixRepEx(c,tp,mg,sg,fc,sub,chkfnf,...)
+	sg:AddCard(c)
+	local res=false
+	if Auxiliary.FCheckAdditional and not Auxiliary.FCheckAdditional(tp,sg,fc) then
+		res=false
+	elseif Auxiliary.FCheckMixRepGoalEx(tp,sg,fc,sub,chkfnf,...) then
+		res=true
+	else
+		Debug.Message(1)
+		local g=Group.CreateGroup()
+		local xct={}
+		res=sg:IsExists(Auxiliary.FCheckMixRepSelectedEx,1,nil,xct,tp,mg,sg,g,fc,sub,chkfnf,...)
+	end
+	sg:RemoveCard(c)
+	return res
+end
+function Auxiliary.FCheckMixRepGoalEx(tp,sg,fc,sub,chkfnf,fun1,minc,maxc,extramats,extrafuns,extramaxs,...)
+	Debug.Message(0)
+	local chkf=chkfnf&0xff
+	if sg:GetCount()<minc+#{...} or sg:GetCount()>maxc+#{...} then return false end
+	if not (chkf==PLAYER_NONE or Duel.GetLocationCountFromEx(tp,tp,sg,fc)>0) then return false end
+	if Auxiliary.FCheckAdditional and not Auxiliary.FCheckAdditional(tp,sg,fc) then return false end
+	if Auxiliary.FGoalCheckGlitchy and not Auxiliary.FGoalCheckGlitchy(tp,sg,fc,sub,chkfnf) then return false end
+	if not Auxiliary.FCheckMixRepGoalCheck(tp,sg,fc,chkfnf) then return false end
+	local g=Group.CreateGroup()
+	return Auxiliary.FCheckMixRepEx(sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,{},...)
+end
+function Auxiliary.FCheckMixRepGoalCheck(tp,sg,fc,chkfnf)
+	local concat_fusion=chkfnf&0x200>0
+	if not concat_fusion and sg:IsExists(Auxiliary.TuneMagicianCheckX,1,nil,sg,EFFECT_TUNE_MAGICIAN_F) then return false end
+	if not Auxiliary.MustMaterialCheck(sg,tp,EFFECT_MUST_BE_FMATERIAL) then return false end
+	if Auxiliary.FGoalCheckAdditional and not Auxiliary.FGoalCheckAdditional(tp,sg,fc) then return false end
+	return true
+end
+function Auxiliary.FCheckMixRepEx(sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,xct,fun2,...)
+	Debug.Message("01")
+	if fun2 then
+		return sg:IsExists(Auxiliary.FCheckMixRepFilterEx,1,g,sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,xct,fun2,...)
+	else
+		Debug.Message('WARNING')
+		local ct1=sg:FilterCount(fun1,g,fc,sub,mg,sg)
+		local ct2=sg:FilterCount(fun1,g,fc,false,mg,sg)
+		return ct1==sg:GetCount()-g:GetCount() and ct1-ct2<=1
+	end
+end
+function Auxiliary.FCheckMixRepFilterEx(c,sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,xct,fun2,...)
+	Debug.Message("02 "..tostring(c:GetCode()))
+	local xchk=false
+	if #extramats>0 then
+		for i,exg in ipairs(extramats) do
+			Debug.Message('extramat 02')
+			if exg:IsContains(c) then
+				xchk=true
+				if extrafuns[i](c,tp,fc,sub,mg,sg,true) and (#xct<i or xct[i]<extramaxs[i]) then
+					if #xct<i then
+						xct[i]=0
+					end
+					xct[i]=xct[i]+1
+					g:AddCard(c)
+					local res=Auxiliary.FCheckMixRepEx(sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,xct,...)
+					g:RemoveCard(c)
+					return res
+				end
+			end
+		end
+	end
+	if not xchk and fun2(c,fc,sub,mg,sg) then
+		Debug.Message('function 02')
+		g:AddCard(c)
+		local sub=sub and fun2(c,fc,false,mg,sg)
+		local res=Auxiliary.FCheckMixRepEx(sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,xct,...)
+		g:RemoveCard(c)
+		return res
+	end
+	return false
+end
+
+function Auxiliary.FCheckMixRepSelectedEx(c,...)
+	return Auxiliary.FCheckMixRepTemplateEx(c,Auxiliary.FCheckMixRepSelectedCondEx,...)
+end
+function Auxiliary.FCheckMixRepSelectedCondEx(xct,tp,mg,sg,g,...)
+	if g:GetCount()<sg:GetCount() then
+		Debug.Message(21)
+		return sg:IsExists(Auxiliary.FCheckMixRepSelectedEx,1,g,xct,tp,mg,sg,g,...)
+	else
+		Debug.Message(22)
+		return Auxiliary.FCheckSelectMixRepEx(xct,tp,mg,sg,g,...)
+	end
+end
+function Auxiliary.FCheckMixRepTemplateEx(c,cond,xct,tp,mg,sg,g,fc,sub,chkfnf,fun1,minc,maxc,extramats,extrafuns,extramaxs,...)
+	Debug.Message(tostring(3).." "..tostring(c:GetCode()))
+	local xchk=false
+	for i,f in ipairs({...}) do
+		if #extramats>0 then
+			for i,exg in ipairs(extramats) do
+				Debug.Message('extramat')
+				if exg:IsContains(c) then
+					xchk=true
+					if extrafuns[i](c,tp,fc,sub,mg,sg,true) and (#xct<i or xct[i]<extramaxs[i]) then
+						if #xct<i then
+							xct[i]=0
+						end
+						xct[i]=xct[i]+1
+						g:AddCard(c)
+						local res=cond(xct,tp,mg,sg,g,fc,sub,chkfnf,fun1,minc,maxc,extramats,extrafuns,extramaxs,...)
+						g:RemoveCard(c)
+						if res then return true end
+					end
+				end
+			end
+		end
+		if xchk then
+			return false
+		end
+		if f(c,fc,sub,mg,sg) then
+			Debug.Message('dots')
+			g:AddCard(c)
+			local sub=sub and f(c,fc,false,mg,sg)
+			local t={...}
+			table.remove(t,i)
+			local res=cond(xct,tp,mg,sg,g,fc,sub,chkfnf,fun1,minc,maxc,extramats,extrafuns,extramaxs,table.unpack(t))
+			g:RemoveCard(c)
+			if res then return true end
+		end
+	end
+	if maxc>0 then
+		if #extramats>0 then
+			for i,exg in ipairs(extramats) do
+				Debug.Message('extramat_maxc')
+				if exg:IsContains(c) then
+					xchk=true
+					if extrafuns[i](c,tp,fc,sub,mg,sg,true) and (#xct<i or xct[i]<extramaxs[i]) then
+						if #xct<i then
+							xct[i]=0
+						end
+						xct[i]=xct[i]+1
+						g:AddCard(c)
+						local res=cond(xct,tp,mg,sg,g,fc,sub,chkfnf,fun1,minc-1,maxc-1,extramats,extrafuns,extramaxs,...)
+						g:RemoveCard(c)
+						if res then return true end
+					end
+				end
+			end
+		end
+		if not xchk and fun1(c,fc,sub,mg,sg) then
+			Debug.Message('function')
+			g:AddCard(c)
+			local sub=sub and fun1(c,fc,false,mg,sg)
+			local res=cond(xct,tp,mg,sg,g,fc,sub,chkfnf,fun1,minc-1,maxc-1,extramats,extrafuns,extramaxs,...)
+			g:RemoveCard(c)
+			if res then return true end
+		end
+	end
+	return false
+end
+function Auxiliary.FCheckSelectMixRepEx(xct,tp,mg,sg,g,fc,sub,chkfnf,fun1,minc,maxc,extramats,extrafuns,extramaxs,...)
+	local chkf=chkfnf&0xff
+	if Auxiliary.FCheckAdditional and not Auxiliary.FCheckAdditional(tp,g,fc) then return false end
+	if Auxiliary.FGoalCheckGlitchy and not Auxiliary.FGoalCheckGlitchy(tp,sg,fc,sub,chkfnf) then return false end
+	if chkf==PLAYER_NONE or Duel.GetLocationCountFromEx(tp,tp,g,fc)>0 then
+		Debug.Message(41)
+		if minc<=0 and #{...}==0 and Auxiliary.FCheckMixRepGoalCheck(tp,g,fc,chkfnf) then return true end
+		return mg:IsExists(Auxiliary.FCheckSelectMixRepAllEx,1,g,xct,tp,mg,sg,g,fc,sub,chkfnf,fun1,minc,maxc,extramats,extrafuns,extramaxs,...)
+	else
+		Debug.Message(42)
+		return mg:IsExists(Auxiliary.FCheckSelectMixRepMEx,1,g,xct,tp,mg,sg,g,fc,sub,chkfnf,fun1,minc,maxc,extramats,extrafuns,extramaxs,...)
+	end
+end
+function Auxiliary.FCheckSelectMixRepAllEx(c,xct,tp,mg,sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,fun2,...)
+	Debug.Message(tostring(51).." "..tostring(c:GetCode()))
+	local xchk=false
+	if fun2 then
+		if #extramats>0 then
+			Debug.Message('extramat 05')
+			for i,exg in ipairs(extramats) do
+				if exg:IsContains(c) then
+					xchk=true
+					if extrafuns[i](c,tp,fc,sub,mg,sg,true) and (#xct<i or xct[i]<extramaxs[i]) then
+						if #xct<i then
+							xct[i]=0
+						end
+						xct[i]=xct[i]+1
+						g:AddCard(c)
+						local res=Auxiliary.FCheckSelectMixRepEx(xct,tp,mg,sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,...)
+						g:RemoveCard(c)
+						return res
+					end
+				end
+			end
+		end
+		if not xchk and fun2(c,fc,sub,mg,sg) then
+			Debug.Message('fun2 05')
+			g:AddCard(c)
+			local sub=sub and fun2(c,fc,false,mg,sg)
+			local res=Auxiliary.FCheckSelectMixRepEx(xct,tp,mg,sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,...)
+			g:RemoveCard(c)
+			return res
+		end
+	elseif maxc>0 then
+		if #extramats>0 then
+			Debug.Message('extramat_maxc 05')
+			for i,exg in ipairs(extramats) do
+				if exg:IsContains(c) then
+					xchk=true
+					if extrafuns[i](c,tp,fc,sub,mg,sg,true) and (#xct<i or xct[i]<extramaxs[i]) then
+						if #xct<i then
+							xct[i]=0
+						end
+						xct[i]=xct[i]+1
+						g:AddCard(c)
+						local res=Auxiliary.FCheckSelectMixRepEx(xct,tp,mg,sg,g,fc,sub,chkf,fun1,minc-1,maxc-1,extramats,extrafuns,extramaxs)
+						g:RemoveCard(c)
+						return res
+					end
+				end
+			end
+		end
+		if not xchk and fun1(c,fc,sub,mg,sg) then
+			Debug.Message('fun1 05')
+			g:AddCard(c)
+			local sub=sub and fun1(c,fc,false,mg,sg)
+			local res=Auxiliary.FCheckSelectMixRepEx(xct,tp,mg,sg,g,fc,sub,chkf,fun1,minc-1,maxc-1,extramats,extrafuns,extramaxs)
+			g:RemoveCard(c)
+			return res
+		end
+	end
+	return false
+end
+function Auxiliary.FCheckSelectMixRepMEx(c,xct,tp,...)
+	Debug.Message(52)
+	return c:IsControler(tp) and c:IsLocation(LOCATION_MZONE)
+		and Auxiliary.FCheckMixRepTemplateEx(c,Auxiliary.FCheckSelectMixRepEx,xct,tp,...)
+end
 
 Duel.SendtoGrave = function(tg,reason)
 	if reason~=REASON_EFFECT+REASON_MATERIAL+REASON_FUSION or aux.GetValueType(tg)~="Group" then
 		return _SendtoGrave(tg,reason)
 	end
-	local rg=tg:Filter(aux.FilterEqualFunction(Card.GetFlagEffect,0,1006),nil)
+	local rg=tg:Filter(Card.IsHasEffect,nil,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)
 	tg:Sub(rg)
 	local opt=0
-	local ct1=_SendtoGrave(rg,reason)
+	
+	local ct1=_SendtoGrave(tg,reason)
 	local ct2=0
 	
-	local ecount=0
-	while #tg>0 do
+	while #rg>0 do
 		local extra_g=Group.CreateGroup()
 		local extra_op=false
-		for tc in aux.Next(tg) do
+		for tc in aux.Next(rg) do
 			local ce=tc:IsHasEffect(EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)
-			if ce and ce.GetLabel and ce:GetLabel()==ecount then
+			if ce and ce.GetLabel then
 				extra_g:AddCard(tc)
 				local fusop=ce:GetOperation()
 				if not extra_op and fusop then
@@ -616,15 +1126,11 @@ Duel.SendtoGrave = function(tg,reason)
 			end
 		end
 		if #extra_g>0 then
-			tg:Sub(extra_g)
-			for tc in aux.Next(extra_g) do
-				tc:ResetFlagEffect(1006)
-			end
+			rg:Sub(extra_g)
 			local op = extra_op and extra_op or _SendtoGrave
 			local extra_ct=op(extra_g,REASON_EFFECT+REASON_MATERIAL+REASON_FUSION)
 			ct2=ct2+extra_ct
 		end
-		ecount=ecount+1
 	end
 	return ct1+ct2
 end
@@ -632,18 +1138,17 @@ Duel.Remove = function(tg,pos,reason)
 	if reason~=REASON_EFFECT+REASON_MATERIAL+REASON_FUSION or aux.GetValueType(tg)~="Group" then
 		return _Remove(tg,pos,reason)
 	end
-	local rg=tg:Filter(aux.FilterEqualFunction(Card.GetFlagEffect,0,1006),nil)
+	local rg=tg:Filter(Card.IsHasEffect,nil,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)
 	tg:Sub(rg)
 	local opt=0
-	local ct1=_Remove(rg,pos,reason)
+	local ct1=_Remove(tg,pos,reason)
 	local ct2=0
-	local ecount=0
-	while #tg>0 do
+	while #rg>0 do
 		local extra_g=Group.CreateGroup()
 		local extra_op=false
-		for tc in aux.Next(tg) do
+		for tc in aux.Next(rg) do
 			local ce=tc:IsHasEffect(EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)
-			if ce and ce.GetLabel and ce:GetLabel()==ecount then
+			if ce and ce.GetLabel then
 				extra_g:AddCard(tc)
 				if not extra_op then
 					extra_op=ce:GetOperation()
@@ -651,14 +1156,10 @@ Duel.Remove = function(tg,pos,reason)
 			end
 		end
 		if #extra_g>0 then
-			tg:Sub(extra_g)
-			for tc in aux.Next(extra_g) do
-				tc:ResetFlagEffect(1006)
-			end
+			rg:Sub(extra_g)
 			local extra_ct=extra_op(extra_g)
 			ct2=ct2+extra_ct
 		end
-		ecount=ecount+1
 	end
 	return ct1+ct2
 end
@@ -666,18 +1167,18 @@ Duel.SendtoDeck = function(tg,p,seq,reason)
 	if reason~=REASON_EFFECT+REASON_MATERIAL+REASON_FUSION or aux.GetValueType(tg)~="Group" then
 		return _SendtoDeck(tg,p,seq,reason)
 	end
-	local rg=tg:Filter(aux.FilterEqualFunction(Card.GetFlagEffect,0,1006),nil)
+	local rg=tg:Filter(Card.IsHasEffect,nil,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)
 	tg:Sub(rg)
 	local opt=0
-	local ct1=_SendtoDeck(rg,p,seq,reason)
+	local ct1=_SendtoDeck(tg,p,seq,reason)
 	local ct2=0
-	local ecount=0
-	while #tg>0 do
+
+	while #rg>0 do
 		local extra_g=Group.CreateGroup()
 		local extra_op=false
-		for tc in aux.Next(tg) do
+		for tc in aux.Next(rg) do
 			local ce=tc:IsHasEffect(EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)
-			if ce and ce.GetLabel and ce:GetLabel()==ecount then
+			if ce and ce.GetLabel then
 				extra_g:AddCard(tc)
 				if not extra_op then
 					extra_op=ce:GetOperation()
@@ -685,14 +1186,10 @@ Duel.SendtoDeck = function(tg,p,seq,reason)
 			end
 		end
 		if #extra_g>0 then
-			tg:Sub(extra_g)
-			for tc in aux.Next(extra_g) do
-				tc:ResetFlagEffect(1006)
-			end
+			rg:Sub(extra_g)
 			local extra_ct=extra_op(extra_g)
 			ct2=ct2+extra_ct
 		end
-		ecount=ecount+1
 	end
 	return ct1+ct2
 end
@@ -700,18 +1197,18 @@ Duel.Destroy = function(tg,reason,...)
 	if reason~=REASON_EFFECT+REASON_MATERIAL+REASON_FUSION or aux.GetValueType(tg)~="Group" then
 		return _Destroy(tg,reason,...)
 	end
-	local rg=tg:Filter(aux.FilterEqualFunction(Card.GetFlagEffect,0,1006),nil)
+	local rg=tg:Filter(Card.IsHasEffect,nil,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)
 	tg:Sub(rg)
 	local opt=0
-	local ct1=_Destroy(rg,reason,...)
+	local ct1=_Destroy(tg,reason,...)
 	local ct2=0
-	local ecount=0
-	while #tg>0 do
+	
+	while #rg>0 do
 		local extra_g=Group.CreateGroup()
 		local extra_op=false
-		for tc in aux.Next(tg) do
+		for tc in aux.Next(rg) do
 			local ce=tc:IsHasEffect(EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)
-			if ce and ce.GetLabel and ce:GetLabel()==ecount then
+			if ce and ce.GetLabel then
 				extra_g:AddCard(tc)
 				if not extra_op then
 					extra_op=ce:GetOperation()
@@ -719,10 +1216,7 @@ Duel.Destroy = function(tg,reason,...)
 			end
 		end
 		if #extra_g>0 then
-			tg:Sub(extra_g)
-			for tc in aux.Next(extra_g) do
-				tc:ResetFlagEffect(1006)
-			end
+			rg:Sub(extra_g)
 			local extra_ct=extra_op(extra_g)
 			ct2=ct2+extra_ct
 		end
@@ -734,18 +1228,17 @@ Duel.SendtoHand = function(tg,p,reason)
 	if reason~=REASON_EFFECT+REASON_MATERIAL+REASON_FUSION or aux.GetValueType(tg)~="Group" then
 		return _SendtoHand(tg,p,reason)
 	end
-	local rg=tg:Filter(aux.FilterEqualFunction(Card.GetFlagEffect,0,1006),nil)
+	local rg=tg:Filter(Card.IsHasEffect,nil,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)
 	tg:Sub(rg)
 	local opt=0
-	local ct1=_SendtoHand(rg,p,reason)
+	local ct1=_SendtoHand(tg,p,reason)
 	local ct2=0
-	local ecount=0
-	while #tg>0 do
+	while #rg>0 do
 		local extra_g=Group.CreateGroup()
 		local extra_op=false
-		for tc in aux.Next(tg) do
+		for tc in aux.Next(rg) do
 			local ce=tc:IsHasEffect(EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)
-			if ce and ce.GetLabel and ce:GetLabel()==ecount then
+			if ce and ce.GetLabel then
 				extra_g:AddCard(tc)
 				if not extra_op then
 					extra_op=ce:GetOperation()
@@ -753,14 +1246,10 @@ Duel.SendtoHand = function(tg,p,reason)
 			end
 		end
 		if #extra_g>0 then
-			tg:Sub(extra_g)
-			for tc in aux.Next(extra_g) do
-				tc:ResetFlagEffect(1006)
-			end
+			rg:Sub(extra_g)
 			local extra_ct=extra_op(extra_g)
 			ct2=ct2+extra_ct
 		end
-		ecount=ecount+1
 	end
 	return ct1+ct2
 end
@@ -1015,7 +1504,7 @@ Auxiliary.LinkOperation = function(f,minc,maxc,gf)
 					local extra_op=false
 					for tc in aux.Next(g) do
 						local ce=tc:IsHasEffect(EFFECT_GLITCHY_EXTRA_LINK_MATERIAL)
-						if ce and ce.GetLabel and ce:GetLabel()==ecount then
+						if ce and ce.GetLabel then
 							extra_g:AddCard(tc)
 							if not extra_op then
 								extra_op=ce:GetOperation()

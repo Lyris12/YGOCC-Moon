@@ -179,6 +179,7 @@ dofile("expansions/script/proc_runic.lua") --Runic
 dofile("expansions/script/proc_magick.lua") --Magick
 dofile("expansions/script/proc_xros.lua") --Xroses
 dofile("expansions/script/proc_evolve.lua") --Evolves
+dofile("expansions/script/proc_drive.lua") --Drive
 dofile("expansions/script/muse_proc.lua") --"Muse"
 dofile("expansions/script/tables.lua") --Special Tables
 -- dofile("expansions/script/proc_harmony.lua") --Harmonies
@@ -1259,7 +1260,7 @@ table.insert(Auxiliary.CannotBeEDMatCodes,EFFECT_CANNOT_BE_FUSION_MATERIAL)
 table.insert(Auxiliary.CannotBeEDMatCodes,EFFECT_CANNOT_BE_SYNCHRO_MATERIAL)
 table.insert(Auxiliary.CannotBeEDMatCodes,EFFECT_CANNOT_BE_XYZ_MATERIAL)
 table.insert(Auxiliary.CannotBeEDMatCodes,EFFECT_CANNOT_BE_LINK_MATERIAL)
-function Auxiliary.CannotBeEDMaterial(c,f,range,isrule,reset,owner,prop)
+function Auxiliary.CannotBeEDMaterial(c,f,range,isrule,reset,owner,prop,allow_customs)
 	if not owner then owner=c end
 	local property = type(prop)=="number" and prop or 0
 	if (isrule == nil or isrule == true) then
@@ -1268,25 +1269,28 @@ function Auxiliary.CannotBeEDMaterial(c,f,range,isrule,reset,owner,prop)
 	if range ~=nil then
 		property = property+EFFECT_FLAG_SINGLE_RANGE
 	end
+	local allow_customs = type(allow_customs)=="nil" or allow_customs
 	for _,val in ipairs(Auxiliary.CannotBeEDMatCodes) do
-		local restrict = Effect.CreateEffect(owner)
-		restrict:SetType(EFFECT_TYPE_SINGLE)
-		restrict:SetCode(val)
-		if (property ~= 0) then
-			restrict:SetProperty(property)
+		if allow_customs or val==EFFECT_CANNOT_BE_FUSION_MATERIAL or val==EFFECT_CANNOT_BE_SYNCHRO_MATERIAL or val==EFFECT_CANNOT_BE_XYZ_MATERIAL or val==EFFECT_CANNOT_BE_LINK_MATERIAL then
+			local restrict = Effect.CreateEffect(owner)
+			restrict:SetType(EFFECT_TYPE_SINGLE)
+			restrict:SetCode(val)
+			if (property ~= 0) then
+				restrict:SetProperty(property)
+			end
+			if range~=nil then
+				restrict:SetRange(range)
+			end
+			if f==nil then
+				restrict:SetValue(1)
+			else
+				restrict:SetValue(Auxiliary.FilterToCannotValue(f))
+			end
+			if reset~=nil then
+				restrict:SetReset(reset)
+			end
+			c:RegisterEffect(restrict)
 		end
-		if range~=nil then
-			restrict:SetRange(range)
-		end
-		if f==nil then
-			restrict:SetValue(1)
-		else
-			restrict:SetValue(Auxiliary.FilterToCannotValue(f))
-		end
-		if reset~=nil then
-			restrict:SetReset(reset)
-		end
-		c:RegisterEffect(restrict)
 	end
 end
 function Auxiliary.FilterToCannotValue(f)

@@ -260,22 +260,29 @@ function Auxiliary.SearchFilter(f)
 				return (not f or f(c,...)) and c:IsAbleToHand()
 			end
 end
-function Auxiliary.SearchTarget(f,min)
+function Auxiliary.SearchTarget(f,min,loc)
 	if not min then min=1 end
+	if not loc then loc=LOCATION_DECK end
 	return	function (e,tp,eg,ep,ev,re,r,rp,chk)
-				if chk==0 then return Duel.IsExistingMatchingCard(aux.SearchFilter(f),tp,LOCATION_DECK,0,min,nil,e,tp) end
-				Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,min,tp,LOCATION_DECK)
+				if chk==0 then return Duel.IsExistingMatchingCard(aux.SearchFilter(f),tp,loc,0,min,nil,e,tp) end
+				Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,min,tp,loc)
 			end
 end
-function Auxiliary.SearchOperation(f,min,max)
+function Auxiliary.SearchOperation(f,min,max,loc,relcheck)
 	if not min then min=1 end
 	if not max then max=min end
+	if not loc then loc=LOCATION_DECK end
+	local filter=aux.SearchFilter(f)
+	if loc&LOCATION_GRAVE>0 then
+		filter=aux.NecroValleyFilter(filter)
+	end
 	return	function (e,tp,eg,ep,ev,re,r,rp)
+				if relcheck and not e:GetHandler():IsRelateToChain() then return end
 				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-				local g=Duel.SelectMatchingCard(tp,aux.SearchFilter(f),tp,LOCATION_DECK,0,min,max,nil,e,tp)
+				local g=Duel.SelectMatchingCard(tp,filter,tp,loc,0,min,max,nil,e,tp)
 				if #g>0 then
-					local ct,ht=Duel.Search(g,tp)
-					return g:Filter(aux.PLChk,nil,tp,LOCATION_HAND),ct,ht
+					local ct,ht,hg=Duel.Search(g,tp)
+					return hg,ct,ht
 				end
 				return g,0,0
 			end

@@ -311,7 +311,7 @@ function Card.BattleProtection(c,reset,rc)
 	e:SetType(typ)
 	if not SCRIPT_AS_EQUIP then
 		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-		e:SetRange(MZONE)
+		e:SetRange(LOCATION_MZONE)
 	end
 	e:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
 	e:SetValue(1)
@@ -322,7 +322,7 @@ function Card.BattleProtection(c,reset,rc)
 	c:RegisterEffect(e)
 	return e
 end
-function Card.EffectProtection(c,oppo_only,reset,rc)
+function Card.EffectProtection(c,oppo_only,reset,rc,rct)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
 	local rc = rc and rc or c
 	local range=c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
@@ -340,12 +340,13 @@ function Card.EffectProtection(c,oppo_only,reset,rc)
 	end
 	if reset then
 		if type(reset)~="number" then reset=0 end
-		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
+		local rct = rct or 1
+		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
 	end
 	c:RegisterEffect(e)
 	return e
 end
-function Card.TargetProtection(c,oppo_only,reset,rc)
+function Card.TargetProtection(c,oppo_only,reset,rc,rct)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
 	local rc = rc and rc or c
 	local range=c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
@@ -363,7 +364,8 @@ function Card.TargetProtection(c,oppo_only,reset,rc)
 	end
 	if reset then
 		if type(reset)~="number" then reset=0 end
-		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
+		local rct = rct or 1
+		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
 	end
 	c:RegisterEffect(e)
 	return e

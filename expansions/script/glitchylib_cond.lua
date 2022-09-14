@@ -20,31 +20,37 @@ end
 --Turn/Phase Conditions
 function Auxiliary.DrawPhaseCond(tp)
 	return	function(e,p)
-				local tp = (not tp or tp==0) and p or 1-p
+				local tp = (tp==0) and p or (tp==1) and 1-p or nil
 				return Duel.IsDrawPhase(tp)
 			end
 end
 function Auxiliary.StandbyPhaseCond(tp)
 	return	function(e,p)
-				local tp = (not tp or tp==0) and p or 1-p
+				local tp = (tp==0) and p or (tp==1) and 1-p or nil
 				return Duel.IsStandbyPhase(tp)
 			end
 end
 function Auxiliary.MainPhaseCond(tp,ct)
 	return	function(e,p)
-				local tp = (not tp or tp==0) and p or 1-p
+				local tp = (tp==0) and p or (tp==1) and 1-p or nil
 				return Duel.IsMainPhase(tp,ct)
 			end
 end
 function Auxiliary.BattlePhaseCond(tp)
 	return	function(e,p)
-				local tp = (not tp or tp==0) and p or 1-p
+				local tp = (tp==0) and p or (tp==1) and 1-p or nil
 				return Duel.IsBattlePhase(tp)
+			end
+end
+function Auxiliary.MainOrBattlePhaseCond(tp,ct)
+	return	function(e,p)
+				local tp = (tp==0) and p or (tp==1) and 1-p or nil
+				return Duel.IsMainPhase(tp,ct) or Duel.IsBattlePhase(tp)
 			end
 end
 function Auxiliary.EndPhaseCond(tp)
 	return	function(e,p)
-				local tp = (not tp or tp==0) and p or 1-p
+				local tp = (tp==0) and p or (tp==1) and 1-p or nil
 				return Duel.IsEndPhase(tp)
 			end
 end
@@ -122,6 +128,9 @@ function Auxiliary.BigbangSummonedCond(e)
 end
 function Auxiliary.TimeleapSummonedCond(e)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_TIMELEAP)
+end
+function Auxiliary.DriveSummonedCond(e)
+	return e:GetHandler():IsSummonType(SUMMON_TYPE_DRIVE)
 end
 function Auxiliary.ProcSummonedCond(e)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_SPECIAL+1)
