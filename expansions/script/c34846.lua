@@ -95,8 +95,8 @@ function s.splimit(e,c,sump,sumtype,sumpos,targetp,se)
 	return not c:IsType(TYPE_DRIVE) and c:IsLocation(LOCATION_DECK)
 end
 
-function s.encon(e)
-	return not e:GetHandler():IsEngaged()
+function s.encon(e,tp)
+	return not e:GetHandler():IsEngaged() and Duel.GetTurnPlayer()==1-tp
 end
 function s.entg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
