@@ -295,7 +295,7 @@ function Card.DriveEffect(c,energycost,desc,category,typ,property,event,conditio
 		e:SetCode(event)
 	end
 	e:SetRange(LOCATION_HAND)
-	if typ~=EFFECT_TYPE_SINGLE or typ~=EFFECT_TYPE_FIELD or typ&EFFECT_TYPE_CONTINUOUS==0 then
+	if typ~=EFFECT_TYPE_SINGLE and typ~=EFFECT_TYPE_FIELD and typ&EFFECT_TYPE_CONTINUOUS==0 then
 		e:HOPT()
 	end
 	e:SetCondition(aux.DriveEffectCondition(condition))

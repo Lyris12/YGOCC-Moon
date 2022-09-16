@@ -10617,7 +10617,7 @@ expansions/script/proc_chroma.lua	e10f8331d1565332b41c77ee8138ea05
 expansions/script/proc_conjoin.lua	73b4306e063882fcb59786484763394c
 expansions/script/proc_corona.lua	447ba131b9de38718dc740bccedaf965
 expansions/script/proc_deckmaster.lua	b0cd59261bcd72b81e00df8e18958ace
-expansions/script/proc_drive.lua	9374d1f82372792ac6c20d2de9163e89
+expansions/script/proc_drive.lua	d005159138392285e08fb3e8e58105bb
 expansions/script/proc_evolute.lua	9faab2a40e0785a698f63bbde6be9478
 expansions/script/proc_evolve.lua	a8659d78e04a57260b621122f07ea2ed
 expansions/script/proc_harmony.lua	63fefd8a118eb432a53db195eddeae45
@@ -10705,6 +10705,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	059b75e17ffb8c269a61075646a3572c
+update/filelist.txt	056b7d72a0cd469139847de6991feb03
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	d3d5749a99da3d8a8be5c81daa577112
+update/version.txt	3abb2d9538a0b6f40b4299968ff7b1a9
