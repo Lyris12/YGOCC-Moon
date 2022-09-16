@@ -953,7 +953,7 @@ function Auxiliary.FCheckMixRepGoalEx(tp,sg,fc,sub,chkfnf,fun1,minc,maxc,extrama
 	--Debug.Message('res5: '..tostring(res5))
 	if res5 then return false end
 	local g=Group.CreateGroup()
-	local res6 = Auxiliary.FCheckMixRepEx(sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,extramats_only,{},...)
+	local res6 = Auxiliary.FCheckMixRepEx(tp,sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,extramats_only,{},...)
 	--if not aux.NoDebug then Debug.Message('res6: '..tostring(res6)) end
 	return res6
 end
@@ -964,9 +964,9 @@ function Auxiliary.FCheckMixRepGoalCheck(tp,sg,fc,chkfnf)
 	if Auxiliary.FGoalCheckAdditional and not Auxiliary.FGoalCheckAdditional(tp,sg,fc) then return false end
 	return true
 end
-function Auxiliary.FCheckMixRepEx(sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,extramats_only,xct,fun2,...)
+function Auxiliary.FCheckMixRepEx(tp,sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,extramats_only,xct,fun2,...)
 	if fun2 then
-		return sg:IsExists(Auxiliary.FCheckMixRepFilterEx,1,g,sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,extramats_only,xct,fun2,...)
+		return sg:IsExists(Auxiliary.FCheckMixRepFilterEx,1,g,tp,sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,extramats_only,xct,fun2,...)
 	else
 		local xg=Group.CreateGroup()
 		local used_sub=false
@@ -1003,7 +1003,7 @@ function Auxiliary.FCheckMixRepEx(sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extr
 		return ct1==sg:GetCount()-g:GetCount() --and ct1-ct2<=1
 	end
 end
-function Auxiliary.FCheckMixRepFilterEx(c,sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,extramats_only,xct,fun2,...)
+function Auxiliary.FCheckMixRepFilterEx(c,tp,sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,extramats_only,xct,fun2,...)
 	--Debug.Message("02 "..tostring(c:GetCode()))
 	local xchk=false
 	if #extramats>0 then
@@ -1019,7 +1019,7 @@ function Auxiliary.FCheckMixRepFilterEx(c,sg,g,fc,sub,chkf,fun1,minc,maxc,extram
 					end
 					xct[i]=xct[i]+1
 					g:AddCard(c)
-					local res=Auxiliary.FCheckMixRepEx(sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,extramats_only,xct,...)
+					local res=Auxiliary.FCheckMixRepEx(tp,sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,extramats_only,xct,...)
 					g:RemoveCard(c)
 					if res then
 						return true
@@ -1035,7 +1035,7 @@ function Auxiliary.FCheckMixRepFilterEx(c,sg,g,fc,sub,chkf,fun1,minc,maxc,extram
 		--Debug.Message('function 02')
 		g:AddCard(c)
 		local sub=sub and fun2(c,fc,false,mg,sg)
-		local res=Auxiliary.FCheckMixRepEx(sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,extramats_only,xct,...)
+		local res=Auxiliary.FCheckMixRepEx(tp,sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,extramats_only,xct,...)
 		g:RemoveCard(c)
 		return res
 	end

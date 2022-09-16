@@ -22,7 +22,7 @@ function s.goalcheck(tp,sg,fc,sub,chkfnf)
 	return sg:IsExists(s.mttg,1,nil,tp,fc,sub,true,sg,true)
 end
 function s.filter1(c,e,tp,chkf,rc)
-	if not (not c:IsPublic() and c:IsType(TYPE_FUSION) and Duel.GetLocationCountFromEx(tp,tp,rc,TYPE_FUSION)>0 and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,true)) then return false end
+	if not (not c:IsPublic() and c:IsType(TYPE_FUSION) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,true)) then return false end
 	aux.FGoalCheckGlitchy = s.goalcheck
 	aux.EnableOnlyGlitchyFusionProcs = true
 	local e1=Effect.CreateEffect(rc)
