@@ -287,7 +287,8 @@ function Auxiliary.FConditionMix(insf,sub,...)
 				if not Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL) then
 					return mg:CheckSubGroup(Auxiliary.FCheckMixGoal,#funs,#funs,tp,c,sub,chkfnf,table.unpack(funs))
 				else
-					local extramats,extrafuns,extramaxs={},{},{}
+					local original_mats=mg:Clone()
+					local extramats,extrafuns,extramaxs,extramats_only={},{},{},{}
 					for _,ce in ipairs({Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)}) do
 						if ce and ce.GetLabel then
 							local val=ce:GetValue()
@@ -296,6 +297,10 @@ function Auxiliary.FConditionMix(insf,sub,...)
 								local exg=Duel.GetMatchingGroup(aux.GlitchyFMaterialExFilter,tp,0xff,0xff,mg,ce,tg,tp,c)
 								if #exg>0 then
 									mg:Merge(exg)
+									
+									local exmg=exg:Filter(aux.TRUE,original_mats)
+									table.insert(extramats_only,exmg)
+									original_mats:Merge(exg)
 									table.insert(extramats,exg)
 									if tg then
 										table.insert(extrafuns,tg)
@@ -312,7 +317,7 @@ function Auxiliary.FConditionMix(insf,sub,...)
 							end
 						end
 					end
-					return mg:CheckSubGroup(Auxiliary.FCheckMixExGoal,#funs,#funs,tp,c,sub,chkfnf,extramats,extrafuns,extramaxs,table.unpack(funs))
+					return mg:CheckSubGroup(Auxiliary.FCheckMixExGoal,#funs,#funs,tp,c,sub,chkfnf,extramats,extrafuns,extramaxs,extramats_only,table.unpack(funs))
 				end
 			end
 end
@@ -327,8 +332,8 @@ function Auxiliary.FOperationMix(insf,sub,...)
 				local mg=eg:Filter(Auxiliary.FConditionFilterMix,c,c,sub,concat_fusion,table.unpack(funs))
 				if gc then Duel.SetSelectedCard(Group.FromCards(gc)) end
 				--
-				local original_mats=mg:Clone()
-				local extramats,extramats_repetead,extrafuns,extramaxs,extraeffs={},{},{},{},{}
+				local original_mats, original_mats2 = mg:Clone(), mg:Clone()
+				local extramats,extramats_repetead,extrafuns,extramaxs,extraeffs,extramats_only={},{},{},{},{},{}
 				for _,ce in ipairs({Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)}) do
 					if ce and ce.GetLabel then
 						local val=ce:GetValue()
@@ -338,6 +343,9 @@ function Auxiliary.FOperationMix(insf,sub,...)
 							if #exg>0 then
 								table.insert(extraeffs,ce)
 								mg:Merge(exg)
+								local exmg=exg:Filter(aux.TRUE,original_mats2)
+								table.insert(extramats_only,exmg)
+								original_mats2:Merge(exg)
 								table.insert(extramats,exg)
 								if tg then
 									table.insert(extrafuns,tg)
@@ -356,7 +364,7 @@ function Auxiliary.FOperationMix(insf,sub,...)
 				end
 				
 				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
-				local sg=mg:SelectSubGroup(tp,Auxiliary.FCheckMixExGoal,false,#funs,#funs,tp,c,sub,chkfnf,extramats,extrafuns,extramaxs,table.unpack(funs))
+				local sg=mg:SelectSubGroup(tp,Auxiliary.FCheckMixExGoal,false,#funs,#funs,tp,c,sub,chkfnf,extramats,extrafuns,extramaxs,extramats_only,table.unpack(funs))
 				if #extramats>0 then
 					for i,exg in ipairs(extramats) do
 						local ce=extraeffs[i]
@@ -414,57 +422,78 @@ end
 function Auxiliary.FMaterialFilterSelEx(c,exg,extramats_repetead)
 	return exg:IsContains(c) and (not extramats_repetead[c] or extramats_repetead[c]<=0)
 end
-function Auxiliary.FCheckMixExGoal(sg,tp,fc,sub,chkfnf,extramats,extrafuns,extramaxs,...)
+function Auxiliary.FCheckMixExGoal(sg,tp,fc,sub,chkfnf,extramats,extrafuns,extramaxs,extramats_only,...)
 	local chkf=chkfnf&0xff
 	local concat_fusion=chkfnf&0x200>0
 	if not concat_fusion and sg:IsExists(Auxiliary.TuneMagicianCheckX,1,nil,sg,EFFECT_TUNE_MAGICIAN_F) then return false end
 	if not Auxiliary.MustMaterialCheck(sg,tp,EFFECT_MUST_BE_FMATERIAL) then return false end
 	local g=Group.CreateGroup()
 	local xct={}
-	local res=sg:IsExists(Auxiliary.FCheckMixEx,1,nil,tp,sg,g,fc,sub,extramats,extrafuns,extramaxs,xct,...)
+	local res=sg:IsExists(Auxiliary.FCheckMixEx,1,nil,tp,sg,g,fc,sub,extramats,extrafuns,extramaxs,extramats_only,xct,...)
 	local res1=(chkf==PLAYER_NONE or Duel.GetLocationCountFromEx(tp,tp,sg,fc)>0)
 	local res2=(not Auxiliary.FCheckAdditional or Auxiliary.FCheckAdditional(tp,sg,fc))
 	local res3=(not Auxiliary.FGoalCheckAdditional or Auxiliary.FGoalCheckAdditional(tp,sg,fc))
 	local res4=(not Auxiliary.FGoalCheckGlitchy or Auxiliary.FGoalCheckGlitchy(tp,sg,fc,sub,chkfnf))
-	--Debug.Message(res4)
+	----Debug.Message(res4)
 	return res and res1	and res2 and res3 and res4
 end
-function Auxiliary.FCheckMixEx(c,tp,mg,sg,fc,sub,extramats,extrafuns,extramaxs,xct,fun1,fun2,...)
+function Auxiliary.FCheckMixEx(c,tp,mg,sg,fc,sub,extramats,extrafuns,extramaxs,extramats_only,xct,fun1,fun2,...)
 	local xchk=false
 	if fun2 then
 		sg:AddCard(c)
 		local res=false
-		
+		--Debug.Message('fun2 '..tostring(c:GetCode()))
 		if #extramats>0 then
 			for i,exg in ipairs(extramats) do
 				if exg:IsContains(c) then
-					xchk=true
-					if extrafuns[i](c,tp,fc,sub,mg,sg,true) and (#xct<i or xct[i]<extramaxs[i]) then
-						if #xct<i then
+					if extramats_only and extramats_only[i]:IsContains(c) then
+						xchk=true
+					end
+					if (extrafuns[i](c,tp,fc,false,mg,sg,true) or (sub and extrafuns[i](c,tp,fc,sub,mg,sg,true))) and (not xct[i] or xct[i]<extramaxs[i]) then
+						local presub=sub
+						if c:IsControler(1-tp) then Debug.Message(c:GetCode()) end
+						Debug.Message(sub)
+						if not extrafuns[i](c,tp,fc,false,mg,sg,true) and sub and extrafuns[i](c,tp,fc,sub,mg,sg,true) then
+							sub=false
+						end
+						Debug.Message(sub)
+						if not xct[i] then
 							xct[i]=0
 						end
 						xct[i]=xct[i]+1
-						res=mg:IsExists(Auxiliary.FCheckMixEx,1,sg,tp,mg,sg,fc,sub,extramats,extrafuns,extramaxs,xct,fun2,...)
+						res=mg:IsExists(Auxiliary.FCheckMixEx,1,sg,tp,mg,sg,fc,sub,extramats,extrafuns,extramaxs,extramats_only,xct,fun2,...)
+						if res then
+							break
+						else
+							xct[i]=xct[i]-1
+							sub=presub
+						end
 					end
 				end
 			end
 		end
+		--Debug.Message(tostring(res)..' '..tostring(xchk)..' '..tostring(c:GetCode()))
 		if not xchk then
 			if fun1(c,fc,false,mg,sg) then
-				res=mg:IsExists(Auxiliary.FCheckMixEx,1,sg,tp,mg,sg,fc,sub,extramats,extrafuns,extramaxs,xct,fun2,...)
-			elseif sub and fun1(c,fc,true,mg,sg) then
-				res=mg:IsExists(Auxiliary.FCheckMixEx,1,sg,tp,mg,sg,fc,false,extramats,extrafuns,extramaxs,xct,fun2,...)
+				res=mg:IsExists(Auxiliary.FCheckMixEx,1,sg,tp,mg,sg,fc,sub,extramats,extrafuns,extramaxs,extramats_only,xct,fun2,...)
+			elseif sub and fun1(c,fc,sub,mg,sg) then
+				res=mg:IsExists(Auxiliary.FCheckMixEx,1,sg,tp,mg,sg,fc,false,extramats,extrafuns,extramaxs,extramats_only,xct,fun2,...)
 			end
 		end
 		sg:RemoveCard(c)
+		--Debug.Message(' ')
 		return res
 	else
+		--Debug.Message('final '..tostring(c:GetCode()))
 		if #extramats>0 then
 			for i,exg in ipairs(extramats) do
 				if exg:IsContains(c) then
-					xchk=true
-					if extrafuns[i](c,tp,fc,sub,mg,sg,true) and (#xct<i or xct[i]<extramaxs[i]) then
-						if #xct<i then
+					if extramats_only and extramats_only[i]:IsContains(c) then
+						xchk=true
+					end
+					--Debug.Message('final extracheck '..tostring(c:GetCode().." "..tostring(xct[i])))
+					if extrafuns[i](c,tp,fc,sub,mg,sg,true) and (not xct[i] or xct[i]<extramaxs[i]) then
+						if not xct[i] then
 							xct[i]=0
 						end
 						xct[i]=xct[i]+1
@@ -473,6 +502,7 @@ function Auxiliary.FCheckMixEx(c,tp,mg,sg,fc,sub,extramats,extrafuns,extramaxs,x
 				end
 			end
 		end
+		--Debug.Message('final check '..tostring(c:GetCode().." "..tostring(not xchk and fun1(c,fc,sub,mg,sg))))
 		return not xchk and fun1(c,fc,sub,mg,sg)
 	end
 end
@@ -506,11 +536,16 @@ function Auxiliary.FShaddollCondition(attr)
 					local fc=Duel.GetFieldCard(tp,LOCATION_FZONE,0)
 					local exg=nil
 					local mg=g:Filter(Auxiliary.FConditionFilterMix,c,c,false,false,aux.FShaddollFilter1,aux.FShaddollFilterAttr(attr))
-					local extramats,extraeffs,extrafuns,extramaxs={},{},{},{}
+					
+					local original_mats=mg:Clone()
+					local extramats,extraeffs,extrafuns,extramaxs,extramats_only={},{},{},{},{}
 					if fc and fc:IsHasEffect(81788994) and fc:IsCanRemoveCounter(tp,0x16,3,REASON_EFFECT) then
 						local fe=fc:IsHasEffect(81788994)
 						exg=Duel.GetMatchingGroup(Auxiliary.FShaddollExFilter,tp,0,LOCATION_MZONE,mg,c,attr,fe)
 						mg:Merge(exg)
+						local exmg=exg:Filter(aux.TRUE,original_mats)
+						table.insert(extramats_only,exmg)
+						original_mats:Merge(exg)
 						table.insert(extramats,exg)
 						table.insert(extraeffs,fe)
 						table.insert(extrafuns,aux.TRUE)
@@ -532,6 +567,9 @@ function Auxiliary.FShaddollCondition(attr)
 									if #exg>0 then
 										mg:Merge(exg)
 										table.insert(extramats,exg)
+										local exmg=exg:Filter(aux.TRUE,original_mats)
+										table.insert(extramats_only,exmg)
+										original_mats:Merge(exg)
 										table.insert(extraeffs,ce)
 										if tg then
 											table.insert(extrafuns,tg)
@@ -548,7 +586,7 @@ function Auxiliary.FShaddollCondition(attr)
 								end
 							end
 						end
-						return mg:CheckSubGroup(Auxiliary.FCheckMixExGoal,2,2,tp,c,false,chkf,extramats,extrafuns,extramaxs,aux.FShaddollFilter1,aux.FShaddollFilterAttr(attr))
+						return mg:CheckSubGroup(Auxiliary.FCheckMixExGoal,2,2,tp,c,false,chkf,extramats,extrafuns,extramaxs,extramats_only,aux.FShaddollFilter1,aux.FShaddollFilterAttr(attr))
 					end
 				end
 			end
@@ -563,14 +601,17 @@ function Auxiliary.FShaddollOperation(attr)
 					local fc=Duel.GetFieldCard(tp,LOCATION_FZONE,0)
 					local exg0=nil
 					
-					local original_mats = mg:Clone()
-					local extramats,extramats_repetead,extraeffs,extrafuns,extramaxs={},{},{},{},{}
+					local original_mats, original_mats2 = mg:Clone(), mg:Clone()
+					local extramats,extramats_repetead,extraeffs,extrafuns,extramaxs,extramats_only={},{},{},{},{},{}
 					if fc and fc:IsHasEffect(81788994) and fc:IsCanRemoveCounter(tp,0x16,3,REASON_EFFECT) then
 						local fe=fc:IsHasEffect(81788994)
 						exg0=Duel.GetMatchingGroup(Auxiliary.FShaddollExFilter,tp,0,LOCATION_MZONE,nil,c,attr,fe)
 						if #exg0>0 then
 							mg:Merge(exg0)
 							table.insert(extramats,exg0)
+							local exmg=exg0:Filter(aux.TRUE,original_mats2)
+							table.insert(extramats_only,exmg)
+							original_mats2:Merge(exg0)
 							table.insert(extraeffs,fe)
 							table.insert(extrafuns,aux.TRUE)
 							table.insert(extramaxs,1)
@@ -588,6 +629,9 @@ function Auxiliary.FShaddollOperation(attr)
 									table.insert(extramats,exg)
 									table.insert(extraeffs,ce)
 									mg:Merge(exg)
+									local exmg=exg:Filter(aux.TRUE,original_mats2)
+									table.insert(extramats_only,exmg)
+									original_mats2:Merge(exg)
 									if tg then
 										table.insert(extrafuns,tg)
 									else
@@ -605,7 +649,7 @@ function Auxiliary.FShaddollOperation(attr)
 					end
 					
 					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
-					local sg=mg:SelectSubGroup(tp,Auxiliary.FCheckMixExGoal,false,2,2,tp,c,false,chkf,extramats,extrafuns,extramaxs,aux.FShaddollFilter1,aux.FShaddollFilterAttr(attr))
+					local sg=mg:SelectSubGroup(tp,Auxiliary.FCheckMixExGoal,false,2,2,tp,c,false,chkf,extramats,extrafuns,extramaxs,extramats_only,aux.FShaddollFilter1,aux.FShaddollFilterAttr(attr))
 					if #extramats>0 then
 						for i,exg in ipairs(extramats) do
 							local ce=extraeffs[i]
@@ -730,7 +774,8 @@ function Auxiliary.FConditionMixRep(insf,sub,fun1,minc,maxc,...)
 				if not Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL) then
 					return mg:IsExists(Auxiliary.FSelectMixRep,1,nil,tp,mg,sg,c,sub,chkfnf,fun1,minc,maxc,table.unpack(funs))
 				else
-					local extramats,extrafuns,extramaxs={},{},{}
+					local original_mats=mg:Clone()
+					local extramats,extrafuns,extramaxs,extramats_only={},{},{},{}
 					for _,ce in ipairs({Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)}) do
 						if ce and ce.GetLabel then
 							local val=ce:GetValue()
@@ -740,6 +785,9 @@ function Auxiliary.FConditionMixRep(insf,sub,fun1,minc,maxc,...)
 								if #exg>0 then
 									mg:Merge(exg)
 									table.insert(extramats,exg)
+									local exmg=exg:Filter(aux.TRUE,original_mats)
+									table.insert(extramats_only,exmg)
+									original_mats:Merge(exg)
 									if tg then
 										table.insert(extrafuns,tg)
 									else
@@ -755,7 +803,7 @@ function Auxiliary.FConditionMixRep(insf,sub,fun1,minc,maxc,...)
 							end
 						end
 					end
-					return mg:IsExists(Auxiliary.FSelectMixRepEx,1,nil,tp,mg,sg,c,sub,chkfnf,fun1,minc,maxc,extramats,extrafuns,extramaxs,table.unpack(funs))
+					return mg:IsExists(Auxiliary.FSelectMixRepEx,1,nil,tp,mg,sg,c,sub,chkfnf,fun1,minc,maxc,extramats,extrafuns,extramaxs,extramats_only,table.unpack(funs))
 				end
 			end
 end
@@ -771,8 +819,8 @@ function Auxiliary.FOperationMixRep(insf,sub,fun1,minc,maxc,...)
 				local sg=Group.CreateGroup()
 				if gc then sg:AddCard(gc) end
 				
-				local original_mats=mg:Clone()
-				local extramats,extramats_repetead,extrafuns,extramaxs,extraeffs={},{},{},{},{}
+				local original_mats, original_mats2 = mg:Clone(), mg:Clone()
+				local extramats,extramats_repetead,extrafuns,extramaxs,extraeffs,extramats_only={},{},{},{},{},{}
 				for _,ce in ipairs({Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)}) do
 					if ce and ce.GetLabel then
 						local val=ce:GetValue()
@@ -783,6 +831,9 @@ function Auxiliary.FOperationMixRep(insf,sub,fun1,minc,maxc,...)
 								table.insert(extraeffs,ce)
 								mg:Merge(exg)
 								table.insert(extramats,exg)
+								local exmg=exg:Filter(aux.TRUE,original_mats2)
+								table.insert(extramats_only,exmg)
+								original_mats2:Merge(exg)
 								if tg then
 									table.insert(extrafuns,tg)
 								else
@@ -800,9 +851,10 @@ function Auxiliary.FOperationMixRep(insf,sub,fun1,minc,maxc,...)
 				end
 				
 				while sg:GetCount()<maxc+#funs do
-					local cg=mg:Filter(Auxiliary.FSelectMixRepEx,sg,tp,mg,sg,c,sub,chkfnf,fun1,minc,maxc,extramats,extrafuns,extramaxs,table.unpack(funs))
+					local cg=mg:Filter(Auxiliary.FSelectMixRepEx,sg,tp,mg,sg,c,sub,chkfnf,fun1,minc,maxc,extramats,extrafuns,extramaxs,extramats_only,table.unpack(funs))
 					if cg:GetCount()==0 then break end
-					local finish=Auxiliary.FCheckMixRepGoalEx(tp,sg,c,sub,chkfnf,fun1,minc,maxc,extramats,extrafuns,extramaxs,table.unpack(funs))
+					local finish=Auxiliary.FCheckMixRepGoalEx(tp,sg,c,sub,chkfnf,fun1,minc,maxc,extramats,extrafuns,extramaxs,extramats_only,table.unpack(funs))
+					--Debug.Message(tostring(finish)..'1')
 					local cancel_group=sg:Clone()
 					if gc then cancel_group:RemoveCard(gc) end
 					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
@@ -813,6 +865,7 @@ function Auxiliary.FOperationMixRep(insf,sub,fun1,minc,maxc,...)
 					else
 						sg:AddCard(tc)
 					end
+					--Debug.Message(tostring(finish)..'2')
 				end
 				
 				if #extramats>0 then
@@ -867,7 +920,9 @@ function Auxiliary.FOperationMixRep(insf,sub,fun1,minc,maxc,...)
 				Duel.SetFusionMaterial(sg)
 			end
 end
+--Auxiliary.NoDebug = false
 function Auxiliary.FSelectMixRepEx(c,tp,mg,sg,fc,sub,chkfnf,...)
+	--Debug.Message(c:GetCode())
 	sg:AddCard(c)
 	local res=false
 	if Auxiliary.FCheckAdditional and not Auxiliary.FCheckAdditional(tp,sg,fc) then
@@ -875,7 +930,6 @@ function Auxiliary.FSelectMixRepEx(c,tp,mg,sg,fc,sub,chkfnf,...)
 	elseif Auxiliary.FCheckMixRepGoalEx(tp,sg,fc,sub,chkfnf,...) then
 		res=true
 	else
-		Debug.Message(1)
 		local g=Group.CreateGroup()
 		local xct={}
 		res=sg:IsExists(Auxiliary.FCheckMixRepSelectedEx,1,nil,xct,tp,mg,sg,g,fc,sub,chkfnf,...)
@@ -883,16 +937,28 @@ function Auxiliary.FSelectMixRepEx(c,tp,mg,sg,fc,sub,chkfnf,...)
 	sg:RemoveCard(c)
 	return res
 end
-function Auxiliary.FCheckMixRepGoalEx(tp,sg,fc,sub,chkfnf,fun1,minc,maxc,extramats,extrafuns,extramaxs,...)
-	Debug.Message(0)
+function Auxiliary.FCheckMixRepGoalEx(tp,sg,fc,sub,chkfnf,fun1,minc,maxc,extramats,extrafuns,extramaxs,extramats_only,...)
+	--Debug.Message(0)
 	local chkf=chkfnf&0xff
-	if sg:GetCount()<minc+#{...} or sg:GetCount()>maxc+#{...} then return false end
-	if not (chkf==PLAYER_NONE or Duel.GetLocationCountFromEx(tp,tp,sg,fc)>0) then return false end
-	if Auxiliary.FCheckAdditional and not Auxiliary.FCheckAdditional(tp,sg,fc) then return false end
-	if Auxiliary.FGoalCheckGlitchy and not Auxiliary.FGoalCheckGlitchy(tp,sg,fc,sub,chkfnf) then return false end
-	if not Auxiliary.FCheckMixRepGoalCheck(tp,sg,fc,chkfnf) then return false end
+	local res1 = (sg:GetCount()<minc+#{...} or sg:GetCount()>maxc+#{...})
+	--Debug.Message('res1: '..tostring(res1))
+	if res1 then return false end
+	local res2 = not (chkf==PLAYER_NONE or Duel.GetLocationCountFromEx(tp,tp,sg,fc)>0)
+	--Debug.Message('res2: '..tostring(res2))
+	if res2 then return false end
+	local res3 = Auxiliary.FCheckAdditional and not Auxiliary.FCheckAdditional(tp,sg,fc)
+	--Debug.Message('res3: '..tostring(res3))
+	if res3 then return false end
+	local res4 = Auxiliary.FGoalCheckGlitchy and not Auxiliary.FGoalCheckGlitchy(tp,sg,fc,sub,chkfnf)
+	--Debug.Message('res4: '..tostring(res4))
+	if res4 then return false end
+	local res5 = not Auxiliary.FCheckMixRepGoalCheck(tp,sg,fc,chkfnf)
+	--Debug.Message('res5: '..tostring(res5))
+	if res5 then return false end
 	local g=Group.CreateGroup()
-	return Auxiliary.FCheckMixRepEx(sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,{},...)
+	local res6 = Auxiliary.FCheckMixRepEx(sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,extramats_only,{},...)
+	--if not aux.NoDebug then Debug.Message('res6: '..tostring(res6)) end
+	return res6
 end
 function Auxiliary.FCheckMixRepGoalCheck(tp,sg,fc,chkfnf)
 	local concat_fusion=chkfnf&0x200>0
@@ -901,43 +967,78 @@ function Auxiliary.FCheckMixRepGoalCheck(tp,sg,fc,chkfnf)
 	if Auxiliary.FGoalCheckAdditional and not Auxiliary.FGoalCheckAdditional(tp,sg,fc) then return false end
 	return true
 end
-function Auxiliary.FCheckMixRepEx(sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,xct,fun2,...)
-	Debug.Message("01")
+function Auxiliary.FCheckMixRepEx(sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,extramats_only,xct,fun2,...)
 	if fun2 then
-		return sg:IsExists(Auxiliary.FCheckMixRepFilterEx,1,g,sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,xct,fun2,...)
+		return sg:IsExists(Auxiliary.FCheckMixRepFilterEx,1,g,sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,extramats_only,xct,fun2,...)
 	else
-		Debug.Message('WARNING')
-		local ct1=sg:FilterCount(fun1,g,fc,sub,mg,sg)
-		local ct2=sg:FilterCount(fun1,g,fc,false,mg,sg)
-		return ct1==sg:GetCount()-g:GetCount() and ct1-ct2<=1
+		local xg=Group.CreateGroup()
+		local used_sub=false
+		local tg=sg:Filter(aux.TRUE,g)
+		for c in aux.Next(tg) do
+			local xchk=false
+			if #extramats>0 then
+				for i,exg in ipairs(extramats) do
+					if exg:IsContains(c) then
+						if extramats_only and extramats_only[i]:IsContains(c) then
+							xchk=true
+						end
+						if (extrafuns[i](c,tp,fc,false,mg,sg,true) or (not used_sub and extrafuns[i](c,tp,fc,sub,mg,sg,true))) and (not xct[i] or xct[i]<extramaxs[i]) then
+							if not extrafuns[i](c,tp,fc,false,mg,sg,true) and extrafuns[i](c,tp,fc,sub,mg,sg,true) then
+								used_sub=true
+							end
+							if not xct[i] then
+								xct[i]=0
+							end
+							xct[i]=xct[i]+1
+							xg:AddCard(c)
+						end
+					end
+				end
+			end
+			if not xchk and (fun1(c,fc,false,mg,sg) or (not used_sub and fun1(c,tp,fc,sub,mg,sg,true))) then
+				if not fun1(c,tp,fc,false,mg,sg,true) and fun1(c,tp,fc,sub,mg,sg,true) then
+					used_sub=true
+				end
+				xg:AddCard(c)
+			end
+		end
+		local ct1=#xg
+		return ct1==sg:GetCount()-g:GetCount() --and ct1-ct2<=1
 	end
 end
-function Auxiliary.FCheckMixRepFilterEx(c,sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,xct,fun2,...)
-	Debug.Message("02 "..tostring(c:GetCode()))
+function Auxiliary.FCheckMixRepFilterEx(c,sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,extramats_only,xct,fun2,...)
+	--Debug.Message("02 "..tostring(c:GetCode()))
 	local xchk=false
 	if #extramats>0 then
 		for i,exg in ipairs(extramats) do
-			Debug.Message('extramat 02')
+			--Debug.Message('extramat 02')
 			if exg:IsContains(c) then
-				xchk=true
-				if extrafuns[i](c,tp,fc,sub,mg,sg,true) and (#xct<i or xct[i]<extramaxs[i]) then
-					if #xct<i then
+				if extramats_only and extramats_only[i]:IsContains(c) then
+					xchk=true
+				end
+				if extrafuns[i](c,tp,fc,sub,mg,sg,true) and (not xct[i] or xct[i]<extramaxs[i]) then
+					if not xct[i] then
 						xct[i]=0
 					end
 					xct[i]=xct[i]+1
 					g:AddCard(c)
-					local res=Auxiliary.FCheckMixRepEx(sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,xct,...)
+					local res=Auxiliary.FCheckMixRepEx(sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,extramats_only,xct,...)
 					g:RemoveCard(c)
-					return res
+					if res then
+						return true
+					else
+						xct[i]=xct[i]-1
+					end
 				end
 			end
 		end
 	end
+	--Debug.Message(tostring(xchk)..' '..tostring(fun2(c,fc,sub,mg,sg)))
 	if not xchk and fun2(c,fc,sub,mg,sg) then
-		Debug.Message('function 02')
+		--Debug.Message('function 02')
 		g:AddCard(c)
 		local sub=sub and fun2(c,fc,false,mg,sg)
-		local res=Auxiliary.FCheckMixRepEx(sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,xct,...)
+		local res=Auxiliary.FCheckMixRepEx(sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,extramats_only,xct,...)
 		g:RemoveCard(c)
 		return res
 	end
@@ -949,45 +1050,51 @@ function Auxiliary.FCheckMixRepSelectedEx(c,...)
 end
 function Auxiliary.FCheckMixRepSelectedCondEx(xct,tp,mg,sg,g,...)
 	if g:GetCount()<sg:GetCount() then
-		Debug.Message(21)
+		--Debug.Message(21)
 		return sg:IsExists(Auxiliary.FCheckMixRepSelectedEx,1,g,xct,tp,mg,sg,g,...)
 	else
-		Debug.Message(22)
+		--Debug.Message(22)
 		return Auxiliary.FCheckSelectMixRepEx(xct,tp,mg,sg,g,...)
 	end
 end
-function Auxiliary.FCheckMixRepTemplateEx(c,cond,xct,tp,mg,sg,g,fc,sub,chkfnf,fun1,minc,maxc,extramats,extrafuns,extramaxs,...)
-	Debug.Message(tostring(3).." "..tostring(c:GetCode()))
+function Auxiliary.FCheckMixRepTemplateEx(c,cond,xct,tp,mg,sg,g,fc,sub,chkfnf,fun1,minc,maxc,extramats,extrafuns,extramaxs,extramats_only,...)
+	--Debug.Message(tostring(3).." "..tostring(c:GetCode()))
 	local xchk=false
 	for i,f in ipairs({...}) do
 		if #extramats>0 then
-			for i,exg in ipairs(extramats) do
-				Debug.Message('extramat')
+			for j,exg in ipairs(extramats) do
+				--Debug.Message('extramat')
 				if exg:IsContains(c) then
-					xchk=true
-					if extrafuns[i](c,tp,fc,sub,mg,sg,true) and (#xct<i or xct[i]<extramaxs[i]) then
-						if #xct<i then
-							xct[i]=0
+					if extramats_only and extramats_only[j]:IsContains(c) then
+						xchk=true
+					end
+					if extrafuns[j](c,tp,fc,sub,mg,sg,true) and (not xct[j] or xct[j]<extramaxs[j]) then
+						if not xct[j] then
+							xct[j]=0
 						end
-						xct[i]=xct[i]+1
+						xct[j]=xct[j]+1
 						g:AddCard(c)
-						local res=cond(xct,tp,mg,sg,g,fc,sub,chkfnf,fun1,minc,maxc,extramats,extrafuns,extramaxs,...)
+						local sub=sub and f(c,fc,false,mg,sg)
+						local t={...}
+						table.remove(t,i)
+						local res=cond(xct,tp,mg,sg,g,fc,sub,chkfnf,fun1,minc,maxc,extramats,extrafuns,extramaxs,extramats_only,table.unpack(t))
 						g:RemoveCard(c)
-						if res then return true end
+						if res then
+							return true
+						else
+							xct[j]=xct[j]-1
+						end
 					end
 				end
 			end
 		end
-		if xchk then
-			return false
-		end
-		if f(c,fc,sub,mg,sg) then
-			Debug.Message('dots')
+		if not xchk and f(c,fc,sub,mg,sg) then
+			--Debug.Message('dots')
 			g:AddCard(c)
 			local sub=sub and f(c,fc,false,mg,sg)
 			local t={...}
 			table.remove(t,i)
-			local res=cond(xct,tp,mg,sg,g,fc,sub,chkfnf,fun1,minc,maxc,extramats,extrafuns,extramaxs,table.unpack(t))
+			local res=cond(xct,tp,mg,sg,g,fc,sub,chkfnf,fun1,minc,maxc,extramats,extrafuns,extramaxs,extramats_only,table.unpack(t))
 			g:RemoveCard(c)
 			if res then return true end
 		end
@@ -995,100 +1102,118 @@ function Auxiliary.FCheckMixRepTemplateEx(c,cond,xct,tp,mg,sg,g,fc,sub,chkfnf,fu
 	if maxc>0 then
 		if #extramats>0 then
 			for i,exg in ipairs(extramats) do
-				Debug.Message('extramat_maxc')
+				--Debug.Message('extramat_maxc')
 				if exg:IsContains(c) then
-					xchk=true
-					if extrafuns[i](c,tp,fc,sub,mg,sg,true) and (#xct<i or xct[i]<extramaxs[i]) then
-						if #xct<i then
+					if extramats_only and extramats_only[i]:IsContains(c) then
+						xchk=true
+					end
+					if extrafuns[i](c,tp,fc,sub,mg,sg,true) and (not xct[i] or xct[i]<extramaxs[i]) then
+						if not xct[i] then
 							xct[i]=0
 						end
 						xct[i]=xct[i]+1
 						g:AddCard(c)
-						local res=cond(xct,tp,mg,sg,g,fc,sub,chkfnf,fun1,minc-1,maxc-1,extramats,extrafuns,extramaxs,...)
+						local res=cond(xct,tp,mg,sg,g,fc,sub,chkfnf,fun1,minc-1,maxc-1,extramats,extrafuns,extramaxs,extramats_only,...)
 						g:RemoveCard(c)
-						if res then return true end
+						if res then
+							return true
+						else
+							xct[i]=xct[i]-1
+						end
 					end
 				end
 			end
 		end
 		if not xchk and fun1(c,fc,sub,mg,sg) then
-			Debug.Message('function')
+			--Debug.Message('function')
 			g:AddCard(c)
 			local sub=sub and fun1(c,fc,false,mg,sg)
-			local res=cond(xct,tp,mg,sg,g,fc,sub,chkfnf,fun1,minc-1,maxc-1,extramats,extrafuns,extramaxs,...)
+			local res=cond(xct,tp,mg,sg,g,fc,sub,chkfnf,fun1,minc-1,maxc-1,extramats,extrafuns,extramaxs,extramats_only,...)
 			g:RemoveCard(c)
 			if res then return true end
 		end
 	end
 	return false
 end
-function Auxiliary.FCheckSelectMixRepEx(xct,tp,mg,sg,g,fc,sub,chkfnf,fun1,minc,maxc,extramats,extrafuns,extramaxs,...)
+function Auxiliary.FCheckSelectMixRepEx(xct,tp,mg,sg,g,fc,sub,chkfnf,fun1,minc,maxc,extramats,extrafuns,extramaxs,extramats_only,...)
 	local chkf=chkfnf&0xff
 	if Auxiliary.FCheckAdditional and not Auxiliary.FCheckAdditional(tp,g,fc) then return false end
 	if Auxiliary.FGoalCheckGlitchy and not Auxiliary.FGoalCheckGlitchy(tp,sg,fc,sub,chkfnf) then return false end
 	if chkf==PLAYER_NONE or Duel.GetLocationCountFromEx(tp,tp,g,fc)>0 then
-		Debug.Message(41)
+		--Debug.Message(tostring(41).." "..tostring(minc).." "..tostring(#{...}).." "..tostring(Auxiliary.FCheckMixRepGoalCheck(tp,g,fc,chkfnf)))
 		if minc<=0 and #{...}==0 and Auxiliary.FCheckMixRepGoalCheck(tp,g,fc,chkfnf) then return true end
-		return mg:IsExists(Auxiliary.FCheckSelectMixRepAllEx,1,g,xct,tp,mg,sg,g,fc,sub,chkfnf,fun1,minc,maxc,extramats,extrafuns,extramaxs,...)
+		return mg:IsExists(Auxiliary.FCheckSelectMixRepAllEx,1,g,xct,tp,mg,sg,g,fc,sub,chkfnf,fun1,minc,maxc,extramats,extrafuns,extramaxs,extramats_only,...)
 	else
-		Debug.Message(42)
-		return mg:IsExists(Auxiliary.FCheckSelectMixRepMEx,1,g,xct,tp,mg,sg,g,fc,sub,chkfnf,fun1,minc,maxc,extramats,extrafuns,extramaxs,...)
+		--Debug.Message(42)
+		return mg:IsExists(Auxiliary.FCheckSelectMixRepMEx,1,g,xct,tp,mg,sg,g,fc,sub,chkfnf,fun1,minc,maxc,extramats,extrafuns,extramaxs,extramats_only,...)
 	end
 end
-function Auxiliary.FCheckSelectMixRepAllEx(c,xct,tp,mg,sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,fun2,...)
-	Debug.Message(tostring(51).." "..tostring(c:GetCode()))
+function Auxiliary.FCheckSelectMixRepAllEx(c,xct,tp,mg,sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,extramats_only,fun2,...)
+	--Debug.Message(tostring(51).." "..tostring(c:GetCode()))
 	local xchk=false
 	if fun2 then
 		if #extramats>0 then
-			Debug.Message('extramat 05')
+			--Debug.Message('extramat 05')
 			for i,exg in ipairs(extramats) do
 				if exg:IsContains(c) then
-					xchk=true
-					if extrafuns[i](c,tp,fc,sub,mg,sg,true) and (#xct<i or xct[i]<extramaxs[i]) then
-						if #xct<i then
+					if extramats_only and extramats_only[i]:IsContains(c) then
+						xchk=true
+					end
+					if extrafuns[i](c,tp,fc,sub,mg,sg,true) and (not xct[i] or xct[i]<extramaxs[i]) then
+						if not xct[i] then
 							xct[i]=0
 						end
 						xct[i]=xct[i]+1
 						g:AddCard(c)
-						local res=Auxiliary.FCheckSelectMixRepEx(xct,tp,mg,sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,...)
+						local res=Auxiliary.FCheckSelectMixRepEx(xct,tp,mg,sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,extramats_only,...)
 						g:RemoveCard(c)
-						return res
+						if res then
+							return true
+						else
+							xct[i]=xct[i]-1
+						end
 					end
 				end
 			end
 		end
 		if not xchk and fun2(c,fc,sub,mg,sg) then
-			Debug.Message('fun2 05')
+			--Debug.Message('fun2 05')
 			g:AddCard(c)
 			local sub=sub and fun2(c,fc,false,mg,sg)
-			local res=Auxiliary.FCheckSelectMixRepEx(xct,tp,mg,sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,...)
+			local res=Auxiliary.FCheckSelectMixRepEx(xct,tp,mg,sg,g,fc,sub,chkf,fun1,minc,maxc,extramats,extrafuns,extramaxs,extramats_only,...)
 			g:RemoveCard(c)
 			return res
 		end
 	elseif maxc>0 then
 		if #extramats>0 then
-			Debug.Message('extramat_maxc 05')
+			--Debug.Message('extramat_maxc 05')
 			for i,exg in ipairs(extramats) do
 				if exg:IsContains(c) then
-					xchk=true
-					if extrafuns[i](c,tp,fc,sub,mg,sg,true) and (#xct<i or xct[i]<extramaxs[i]) then
-						if #xct<i then
+					if extramats_only and extramats_only[i]:IsContains(c) then
+						xchk=true
+					end
+					if extrafuns[i](c,tp,fc,sub,mg,sg,true) and (not xct[i] or xct[i]<extramaxs[i]) then
+						if not xct[i] then
 							xct[i]=0
 						end
 						xct[i]=xct[i]+1
 						g:AddCard(c)
-						local res=Auxiliary.FCheckSelectMixRepEx(xct,tp,mg,sg,g,fc,sub,chkf,fun1,minc-1,maxc-1,extramats,extrafuns,extramaxs)
+						local res=Auxiliary.FCheckSelectMixRepEx(xct,tp,mg,sg,g,fc,sub,chkf,fun1,minc-1,maxc-1,extramats,extrafuns,extramaxs,extramats_only)
 						g:RemoveCard(c)
-						return res
+						if res then
+							return true
+						else
+							xct[i]=xct[i]-1
+						end
 					end
 				end
 			end
 		end
 		if not xchk and fun1(c,fc,sub,mg,sg) then
-			Debug.Message('fun1 05')
+			--Debug.Message('fun1 05')
 			g:AddCard(c)
 			local sub=sub and fun1(c,fc,false,mg,sg)
-			local res=Auxiliary.FCheckSelectMixRepEx(xct,tp,mg,sg,g,fc,sub,chkf,fun1,minc-1,maxc-1,extramats,extrafuns,extramaxs)
+			local res=Auxiliary.FCheckSelectMixRepEx(xct,tp,mg,sg,g,fc,sub,chkf,fun1,minc-1,maxc-1,extramats,extrafuns,extramaxs,extramats_only)
 			g:RemoveCard(c)
 			return res
 		end
@@ -1096,7 +1221,7 @@ function Auxiliary.FCheckSelectMixRepAllEx(c,xct,tp,mg,sg,g,fc,sub,chkf,fun1,min
 	return false
 end
 function Auxiliary.FCheckSelectMixRepMEx(c,xct,tp,...)
-	Debug.Message(52)
+	--Debug.Message(52)
 	return c:IsControler(tp) and c:IsLocation(LOCATION_MZONE)
 		and Auxiliary.FCheckMixRepTemplateEx(c,Auxiliary.FCheckSelectMixRepEx,xct,tp,...)
 end

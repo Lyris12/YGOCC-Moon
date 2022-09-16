@@ -18,26 +18,23 @@ end
 function s.spfilter2(c,e,tp,m,f,chkf)
 	return (not f or f(c)) and c:CheckFusionMaterial(m,nil,chkf)
 end
+function s.goalcheck(tp,sg,fc,sub,chkfnf)
+	return sg:IsExists(s.mttg,1,nil,tp,fc,sub,true,sg,true)
+end
 function s.filter1(c,e,tp,chkf,rc)
-	if not (not c:IsPublic() and c:IsType(TYPE_FUSION) and Duel.GetLocationCountFromEx(tp,tp,rc,TYPE_FUSION) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,true)) then return false end
-	--enable exactly 1 opponent's material
-	local e0=Effect.CreateEffect(rc)
-	e0:SetType(EFFECT_TYPE_FIELD)
-	e0:SetCode(EFFECT_GLITCHY_FUSION_SUBSTITUTE)
-	e0:SetTargetRange(0,LOCATION_MZONE)
-	Duel.RegisterEffect(e0,tp)
+	if not (not c:IsPublic() and c:IsType(TYPE_FUSION) and Duel.GetLocationCountFromEx(tp,tp,rc,TYPE_FUSION)>0 and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,true)) then return false end
+	aux.FGoalCheckGlitchy = s.goalcheck
+	aux.EnableOnlyGlitchyFusionProcs = true
 	local e1=Effect.CreateEffect(rc)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetCode(EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)
-	e1:SetLabel(3)
-	e1:SetLabelObject(c)
 	e1:SetTargetRange(1,0)
 	e1:SetTarget(s.mttg)
 	e1:SetValue(s.mtval)
 	Duel.RegisterEffect(e1,tp)
 	--
-	local mg=Duel.GetFusionMaterial(tp):Filter(Card.IsOnField,nil)
+	local mg=Duel.GetFusionMaterial(tp):Filter(Card.IsOnField,rc)
 	local res=s.spfilter2(c,e,tp,mg,nil,chkf)
 	if not res then
 		local ce=Duel.GetChainMaterial(tp)
@@ -48,24 +45,37 @@ function s.filter1(c,e,tp,chkf,rc)
 			res=s.spfilter2(c,e,tp,mg,mf,chkf)
 		end
 	end
-	e0:Reset()
+	aux.FGoalCheckGlitchy = nil
+	aux.EnableOnlyGlitchyFusionProcs = false
 	e1:Reset()
 	return res
 end
-function s.mttg(e,c)
-	if not c:IsFaceup() or c:IsControler(e:GetOwner():GetControler()) then return end
-	local fc=e:GetLabelObject()
+function s.mttg(c,tp,fc,sub,mg,sg,depth)
+	if not c:IsFaceup() or c:IsControler(tp) or not c:IsLocation(LOCATION_MZONE) or c:IsRace(RACE_WINDBEAST) then return false end
+	if not depth then return true end
 	if not fc then return false end
 	local funs=fc.material_funs
 	if not funs then return false end
 	for _,fun in ipairs(funs) do
-		if fun(c,fc,sub,mg,sg,true) then
-			return false
+		if mg and sg then
+			if fun(c,fc,false,mg,sg,true) then
+				if sub and not fun(c,fc,sub,mg,sg,true) then
+					return true
+				else
+					return false
+				end
+			elseif not fun(c,fc,false,mg,sg,true) then
+				return true
+			elseif sub and not fun(c,fc,sub,mg,sg,true) then
+				return true
+			elseif not sub and not fun(c,fc,sub,mg,sg,true) then
+				return false
+			end
 		end
 	end
 	return true
 end
-function s.mtval(e,c,tp,mg)
+function s.mtval(e,c,tp)
 	if not c then return false, 1 end
 	return true, 1
 end
@@ -96,20 +106,13 @@ function s.op(e,tp,eg,ep,ev,re,r,rp)
 	local fc=e:GetLabelObject()
 	if c and c:IsRelateToEffect(e) and Duel.SendtoGrave(c,REASON_EFFECT)>0 and c:IsLocation(LOCATION_GRAVE) and fc and fc:IsRelateToEffect(e) and fc:IsInExtra() then
 		local chkf=tp
-		--enable exactly 1 opponent's material
-		local e0=Effect.CreateEffect(c)
-		e0:SetType(EFFECT_TYPE_FIELD)
-		e0:SetCode(EFFECT_GLITCHY_FUSION_SUBSTITUTE)
-		e0:SetTargetRange(0,LOCATION_MZONE)
-		e0:SetReset(RESET_CHAIN)
-		Duel.RegisterEffect(e0,tp)
+		aux.FGoalCheckGlitchy = s.goalcheck
+		aux.EnableOnlyGlitchyFusionProcs = true
 		local e1=Effect.CreateEffect(c)
 		e1:Desc(2)
 		e1:SetType(EFFECT_TYPE_FIELD)
 		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 		e1:SetCode(EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)
-		e1:SetLabel(3)
-		e1:SetLabelObject(fc)
 		e1:SetTargetRange(1,0)
 		e1:SetTarget(s.mttg)
 		e1:SetValue(s.mtval)
@@ -146,7 +149,8 @@ function s.op(e,tp,eg,ep,ev,re,r,rp)
 			end
 			fc:CompleteProcedure()
 		end
-		e0:Reset()
+		aux.FGoalCheckGlitchy = nil
+		aux.EnableOnlyGlitchyFusionProcs = false
 		e1:Reset()
 		if fc:IsFaceup() and fc:IsLocation(LOCATION_MZONE) then
 			Duel.Negate(fc,e,nil,nil,true)
