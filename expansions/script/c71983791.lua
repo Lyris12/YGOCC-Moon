@@ -51,7 +51,7 @@ function s.filter1(c,e,tp,chkf,rc)
 	return res
 end
 function s.mttg(c,tp,fc,sub,mg,sg,depth)
-	if not c:IsFaceup() or c:IsControler(tp) or not c:IsLocation(LOCATION_MZONE) or c:IsRace(RACE_WINDBEAST) then return false end
+	if not c:IsFaceup() or c:IsControler(tp) or not c:IsLocation(LOCATION_MZONE) then return false end
 	if not depth then return true end
 	if not fc then return false end
 	local funs=fc.material_funs
