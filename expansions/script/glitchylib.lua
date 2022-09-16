@@ -451,12 +451,9 @@ function Auxiliary.FCheckMixEx(c,tp,mg,sg,fc,sub,extramats,extrafuns,extramaxs,e
 					end
 					if (extrafuns[i](c,tp,fc,false,mg,sg,true) or (sub and extrafuns[i](c,tp,fc,sub,mg,sg,true))) and (not xct[i] or xct[i]<extramaxs[i]) then
 						local presub=sub
-						if c:IsControler(1-tp) then Debug.Message(c:GetCode()) end
-						Debug.Message(sub)
 						if not extrafuns[i](c,tp,fc,false,mg,sg,true) and sub and extrafuns[i](c,tp,fc,sub,mg,sg,true) then
 							sub=false
 						end
-						Debug.Message(sub)
 						if not xct[i] then
 							xct[i]=0
 						end
