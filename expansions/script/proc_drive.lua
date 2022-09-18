@@ -104,7 +104,6 @@ function Auxiliary.AddOrigDriveType(c)
 end
 function Auxiliary.AddDriveProc(c,energy)
 	if c:IsStatus(STATUS_COPYING_EFFECT) then return end
-	Duel.EnableGlobalFlag(GLOBALFLAG_SELF_TOGRAVE)
 	
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(DRIVE_STRINGS,0))
@@ -204,10 +203,11 @@ function Auxiliary.EngageOperation(e,tp)
 	aux.CheckEnergyOperation(e,tp)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_CANNOT_DISABLE)
 	e1:SetCode(EFFECT_PUBLIC)
 	e1:SetLabel(FLAG_ENGAGE)
 	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-	c:RegisterEffect(e1)
+	c:RegisterEffect(e1,true)
 	c:RegisterFlagEffect(FLAG_ENGAGE,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(DRIVE_STRINGS,3))
 	Duel.RaiseEvent(c,EVENT_ENGAGE,e,REASON_RULE,tp,tp,0)
 	--
@@ -220,6 +220,7 @@ function Auxiliary.EngageOperation(e,tp)
 	e5:SetOperation(function(ce) Duel.SendtoGrave(ce:GetHandler(),REASON_RULE) end)
 	e5:SetReset(RESET_EVENT+RESETS_STANDARD)
 	c:RegisterEffect(e5)
+	Duel.AdjustAll()
 end
 
 function Duel.GetEngagedCard(tp)
