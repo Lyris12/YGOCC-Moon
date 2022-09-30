@@ -1,6 +1,7 @@
 --Not yet finalized values
 --Custom constants
 self_reference_effect				= nil
+current_reason_effect				= nil
 
 EFFECT_DEFAULT_CALL					=31993443
 EFFECT_EXTRA_GEMINI					=86433590
@@ -2150,6 +2151,8 @@ end
 -----------------
 
 --EFFECT TABLES
+global_override_reason_effect_check = false
+
 --Global Card Effect Table
 if not global_card_effect_table_global_check then
 	global_card_effect_table_global_check=true
@@ -2283,37 +2286,63 @@ if not global_card_effect_table_global_check then
 		local condition,cost,tg,op,val=e:GetCondition(),e:GetCost(),e:GetTarget(),e:GetOperation(),e:GetValue()
 		if condition and ((e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G) or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()==EFFECT_TYPE_XMATERIAL or e:GetType()==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or e:GetType()&EFFECT_TYPE_GRANT~=0)) then	
 			local newcon =	function(...)
+								local x={...}
 								self_reference_effect=e
-								return condition(...)
+								if global_override_reason_effect_check then
+									current_reason_effect = #x>=6 and x[6] or nil
+									if aux.GetValueType(current_reason_effect)=="Effect" and current_reason_effect:IsHasCheatCode(GECC_OVERRIDE_REASON_EFFECT) then
+										x[6]=current_reason_effect:GetCheatCodeValue(GECC_OVERRIDE_REASON_EFFECT)
+										current_reason_effect=x[6]
+									end
+								end
+								return condition(table.unpack(x))
 							end
 			e:SetCondition(newcon)
 		end
 		if cost and not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()==EFFECT_TYPE_XMATERIAL or e:GetType()==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or e:GetType()&EFFECT_TYPE_GRANT~=0) then
 			local newcost =	function(...)
+								local x={...}
 								self_reference_effect=e
-								return cost(...)
+								if global_override_reason_effect_check then
+									current_reason_effect = #x>=6 and x[6] or nil
+									if aux.GetValueType(current_reason_effect)=="Effect" and current_reason_effect:IsHasCheatCode(GECC_OVERRIDE_REASON_EFFECT) then
+										x[6]=current_reason_effect:GetCheatCodeValue(GECC_OVERRIDE_REASON_EFFECT)
+										current_reason_effect=x[6]
+									end
+								end
+								return cost(table.unpack(x))
 							end
 			e:SetCost(newcost)
 		end
 		if tg then
-			if e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G then
+			if e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()==EFFECT_TYPE_XMATERIAL or e:GetType()==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or e:GetType()&EFFECT_TYPE_GRANT~=0) then
 				local newtg =	function(...)
+									local x={...}
 									self_reference_effect=e
-									return tg(...)
-								end
-				e:SetTarget(newtg)
-			elseif not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()==EFFECT_TYPE_XMATERIAL or e:GetType()==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or e:GetType()&EFFECT_TYPE_GRANT~=0) then
-				local newtg =	function(...)
-									self_reference_effect=e
-									return tg(...)
+									if global_override_reason_effect_check then
+										current_reason_effect = #x>=6 and x[6] or nil
+										if aux.GetValueType(current_reason_effect)=="Effect" and current_reason_effect:IsHasCheatCode(GECC_OVERRIDE_REASON_EFFECT) then
+											x[6]=current_reason_effect:GetCheatCodeValue(GECC_OVERRIDE_REASON_EFFECT)
+											current_reason_effect=x[6]
+										end
+									end
+									return tg(table.unpack(x))
 								end
 				e:SetTarget(newtg)
 			end
 		end
 		if op and ((e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G) or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()==EFFECT_TYPE_XMATERIAL or e:GetType()==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or e:GetType()&EFFECT_TYPE_GRANT~=0)) then
 			local newop =	function(...)
+								local x={...}
 								self_reference_effect=e
-								return op(...)
+								if global_override_reason_effect_check then
+									current_reason_effect = #x>=6 and x[6] or nil
+									if aux.GetValueType(current_reason_effect)=="Effect" and current_reason_effect:IsHasCheatCode(GECC_OVERRIDE_REASON_EFFECT) then
+										x[6]=current_reason_effect:GetCheatCodeValue(GECC_OVERRIDE_REASON_EFFECT)
+										current_reason_effect=x[6]
+									end
+								end
+								return op(table.unpack(x))
 							end
 			e:SetOperation(newop)
 		end
@@ -2433,37 +2462,63 @@ if not global_duel_effect_table_global_check then
 							local condition,cost,tg,op,val=e:GetCondition(),e:GetCost(),e:GetTarget(),e:GetOperation(),e:GetValue()
 							if condition and ((e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G) or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()&EFFECT_TYPE_GRANT~=0)) then
 								local newcon =	function(...)
+													local x={...}
 													self_reference_effect=e
-													return condition(...)
+													if global_override_reason_effect_check then
+														current_reason_effect = #x>=6 and x[6] or nil
+														if aux.GetValueType(current_reason_effect)=="Effect" and current_reason_effect:IsHasCheatCode(GECC_OVERRIDE_REASON_EFFECT) then
+															x[6]=current_reason_effect:GetCheatCodeValue(GECC_OVERRIDE_REASON_EFFECT)
+															current_reason_effect=x[6]
+														end
+													end
+													return condition(table.unpack(x))
 												end
 								e:SetCondition(newcon)
 							end
 							if cost and ((e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G) or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()&EFFECT_TYPE_GRANT~=0)) then
 								local newcost =	function(...)
+													local x={...}
 													self_reference_effect=e
-													return cost(...)
+													if global_override_reason_effect_check then
+														current_reason_effect = #x>=6 and x[6] or nil
+														if aux.GetValueType(current_reason_effect)=="Effect" and current_reason_effect:IsHasCheatCode(GECC_OVERRIDE_REASON_EFFECT) then
+															x[6]=current_reason_effect:GetCheatCodeValue(GECC_OVERRIDE_REASON_EFFECT)
+															current_reason_effect=x[6]
+														end
+													end
+													return cost(table.unpack(x))
 												end
 								e:SetCost(newcost)
 							end
 							if tg then
-								if e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G then
+								if e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()&EFFECT_TYPE_GRANT~=0) then
 									local newtg =	function(...)
+														local x={...}
 														self_reference_effect=e
-														return tg(...)
-													end
-									e:SetTarget(newtg)
-								elseif not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()&EFFECT_TYPE_GRANT~=0) then
-									local newtg =	function(...)
-														self_reference_effect=e
-														return tg(...)
+														if global_override_reason_effect_check then
+															current_reason_effect = #x>=6 and x[6] or nil
+															if aux.GetValueType(current_reason_effect)=="Effect" and current_reason_effect:IsHasCheatCode(GECC_OVERRIDE_REASON_EFFECT) then
+																x[6]=current_reason_effect:GetCheatCodeValue(GECC_OVERRIDE_REASON_EFFECT)
+																current_reason_effect=x[6]
+															end
+														end
+														return tg(table.unpack(x))
 													end
 									e:SetTarget(newtg)
 								end
 							end
 							if op and ((e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G) or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()&EFFECT_TYPE_GRANT~=0)) then
 								local newop =	function(...)
+													local x={...}
 													self_reference_effect=e
-													return op(...)
+													if global_override_reason_effect_check then
+														current_reason_effect = #x>=6 and x[6] or nil
+														if aux.GetValueType(current_reason_effect)=="Effect" and current_reason_effect:IsHasCheatCode(GECC_OVERRIDE_REASON_EFFECT) then
+															x[6]=current_reason_effect:GetCheatCodeValue(GECC_OVERRIDE_REASON_EFFECT)
+															current_reason_effect=x[6]
+														end
+													end
+													return op(table.unpack(x))
 												end
 								e:SetOperation(newop)
 							end

@@ -39,9 +39,21 @@ function Card.Trigger(c,forced,desc,ctg,defaultprop,prop,event,ctlim,cond,cost,t
 	e1:SetType(EFFECT_TYPE_SINGLE+trigger_type)
 	e1:SetCode(event)
 	if ctlim then
-		if type(ctlim)=="table" then
-			local flag=#ctlim>2 and ctlim[3] or 0
-			e1:SetCountLimit(ctlim[1],c:GetOriginalCode()+ctlim[2]*100+flag)
+		if type(ctlim)=="boolean" then
+			e1:HOPT()
+		elseif type(ctlim)=="table" then
+			if type(ctlim[1])=="boolean" then
+				local shopt=#ctlim>1
+				local oath=#ctlim>2
+				if shopt then
+					e1:SHOPT(oath)
+				else
+					e1:HOPT(oath)
+				end
+			else
+				local flag=#ctlim>2 and ctlim[3] or 0
+				e1:SetCountLimit(ctlim[1],c:GetOriginalCode()+ctlim[2]*100+flag)
+			end
 		else
 			e1:SetCountLimit(ctlim)
 		end

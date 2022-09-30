@@ -20,6 +20,8 @@ EFFECT_SYNCHRO_MATERIAL_EXTRA=26134837
 EFFECT_SYNCHRO_MATERIAL_MULTIPLE=26134838
 EFFECT_REVERSE_WHEN_IF=48928491
 
+UNIVERSAL_GLITCHY_TOKEN = 1231
+
 
 ---------------------------------------------------------------------------------
 -------------------------------NORMAL SUMMON/SET---------------------------------
@@ -125,6 +127,146 @@ Duel.Release = function(g,r)
 	end
 	return ct1+ct2
 end
+
+-----------------------------------------------------------------------
+-------------------------------GECCs-----------------------------------
+GECC_OVERRIDE_ACTIVE_TYPE	 	= 0x1
+GECC_OVERRIDE_REASON_EFFECT 	= 0x2
+GECC_OVERRIDE_REASON_CARD 		= 0x4
+
+function Card.SetCheatCode(c,code,temp)
+	if not temp then
+		if not c.cheat_code_table then
+			local mt=getmetatable(c)
+			mt.cheat_code_table=code
+		else
+			local ogcode = type(c.cheat_code_table)~="nil" and c.cheat_code_table or 0
+			c.cheat_code_table=ogcode|code
+		end
+	else
+		local id=c:GetFieldID()
+		if not c.cheat_code_table_temp then
+			local mt=getmetatable(c)
+			mt.cheat_code_table_temp={}
+			mt.cheat_code_table_temp[id]=code
+		else
+			local ogcode = type(c.cheat_code_table_temp[id])~="nil" and c.cheat_code_table_temp[id] or 0
+			c.cheat_code_table_temp[id]=ogcode|code
+		end
+	end
+end
+function Effect.SetCheatCode(e,code,temp)
+	local c=e:GetHandler()
+	if not c then return end
+	if not temp then
+		if not c.cheat_code_effect_table then
+			local mt=getmetatable(c)
+			mt.cheat_code_effect_table={}
+			mt.cheat_code_effect_table[e]=code
+		else
+			local ogcode = type(c.cheat_code_effect_table[e])~="nil" and c.cheat_code_effect_table[e] or 0
+			c.cheat_code_effect_table[e]=ogcode|code
+		end
+	else
+		local id=e:GetFieldID()
+		if not c.cheat_code_effect_table_temp then
+			local mt=getmetatable(c)
+			mt.cheat_code_effect_table_temp={}
+			mt.cheat_code_effect_table_temp[id]=code
+		else
+			local ogcode = type(c.cheat_code_effect_table_temp[id])~="nil" and c.cheat_code_effect_table_temp[id] or 0
+			c.cheat_code_effect_table_temp[id]=ogcode|code
+		end
+	end
+end
+function Card.GetCheatCode(c)
+	if not c then return 0 end
+	local code = (not c.cheat_code_table) and 0 or c.cheat_code_table
+	local temp = (not c.cheat_code_table_temp or not c.cheat_code_table_temp[c:GetFieldID()]) and 0 or c.cheat_code_table_temp[c:GetFieldID()]
+	return (code&~temp)|temp
+end
+function Effect.GetCheatCode(e)
+	local c=e:GetHandler()
+	if not c then return 0 end
+	local code = (not c.cheat_code_effect_table or not c.cheat_code_effect_table[e]) and 0 or c.cheat_code_effect_table[e]
+	local temp = (not c.cheat_code_effect_table_temp or not c.cheat_code_effect_table_temp[e:GetFieldID()]) and 0 or c.cheat_code_effect_table_temp[e:GetFieldID()]
+	return (code&~temp)|temp
+end
+function Card.IsHasCheatCode(c,code)
+	local getcode=c:GetCheatCode()
+	return getcode&code>0
+end
+function Effect.IsHasCheatCode(e,code)
+	local getcode=e:GetCheatCode()
+	return getcode&code>0
+end
+
+function Card.SetCheatCodeValue(c,code,val)
+	if not c or not c:IsHasCheatCode(code) then return end
+	if not c.cheat_code_table_values then
+		local mt=getmetatable(c)
+		mt.cheat_code_table_values={}
+		mt.cheat_code_table_values[code]=val
+	else
+		c.cheat_code_table_values[code]=val
+	end
+end
+function Effect.SetCheatCodeValue(e,code,val)
+	local c=e:GetHandler()
+	if not c or not e:IsHasCheatCode(code) then return end
+	if not c.cheat_code_effect_table_values then
+		local mt=getmetatable(c)
+		mt.cheat_code_effect_table_values={}
+		mt.cheat_code_effect_table_values[e]={}
+		mt.cheat_code_effect_table_values[e][code]=val
+	else
+		if not c.cheat_code_effect_table_values[e] then
+			c.cheat_code_effect_table_values[e]={}
+		end
+		c.cheat_code_effect_table_values[e][code]=val
+	end
+end
+function Card.GetCheatCodeValue(c,code)
+	if not c or not c:IsHasCheatCode(code) or not c.cheat_code_table_values or not c.cheat_code_table_values[code] then return end
+	return c.cheat_code_table_values[code]
+end
+function Effect.GetCheatCodeValue(e,code)
+	local c=e:GetHandler()
+	if not c or not e:IsHasCheatCode(code) or not c.cheat_code_effect_table_values or not c.cheat_code_effect_table_values[e] or not c.cheat_code_effect_table_values[e][code] then return end
+	return c.cheat_code_effect_table_values[e][code]
+end
+
+local _GetActiveType, _IsActiveType, _GetReasonCard, _GetReasonEffect = Effect.GetActiveType, Effect.IsActiveType, Card.GetReasonCard, Card.GetReasonEffect
+
+Effect.GetActiveType = function(e)
+	if e:IsHasCheatCode(GECC_OVERRIDE_ACTIVE_TYPE) then
+		return e:GetHandler():GetType()
+	else
+		return _GetActiveType(e)
+	end
+end
+Effect.IsActiveType = function(e,typ)
+	if e:IsHasCheatCode(GECC_OVERRIDE_ACTIVE_TYPE) then
+		return e:GetHandler():GetType()&typ>0
+	else
+		return _IsActiveType(e,typ)
+	end
+end
+Card.GetReasonEffect = function(c)
+	if c:IsHasCheatCode(GECC_OVERRIDE_REASON_EFFECT) then
+		return c:GetCheatCodeValue(GECC_OVERRIDE_REASON_EFFECT)
+	else
+		return _GetReasonEffect(c)
+	end
+end
+Card.GetReasonCard = function(c)
+	if c:IsHasCheatCode(GECC_OVERRIDE_REASON_CARD) then
+		return c:GetCheatCodeValue(GECC_OVERRIDE_REASON_CARD)
+	else
+		return _GetReasonCard(c)
+	end
+end
+
 
 --Modified Functions: Names
 local _IsCode, _IsFusionCode, _IsLinkCode, _IsOriginalCodeRule =

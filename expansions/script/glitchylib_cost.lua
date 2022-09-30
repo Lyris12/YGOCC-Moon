@@ -9,13 +9,13 @@ function Auxiliary.LabelCost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 end
 
-function Auxiliary.DiscardCost(f,min,max)
-	if not f then f=Card.IsDiscardable end
+function Auxiliary.DiscardCost(f,min,max,exc)
 	if not min then min=1 end
 	if not max then max=min end
 	return	function(e,tp,eg,ep,ev,re,r,rp,chk)
-				if chk==0 then return Duel.IsExistingMatchingCard(f,tp,LOCATION_HAND,0,min,nil) end
-				Duel.DiscardHand(tp,f,min,max,REASON_COST+REASON_DISCARD)
+				local exc=(not exc) and nil or e:GetHandler()
+				if chk==0 then return Duel.IsExistingMatchingCard(aux.DiscardFilter(f,true),tp,LOCATION_HAND,0,min,exc) end
+				Duel.DiscardHand(tp,aux.DiscardFilter(f,true),min,max,REASON_COST+REASON_DISCARD,exc)
 			end
 end
 function Auxiliary.BanishCost(f,loc1,loc2,min,max,exc)

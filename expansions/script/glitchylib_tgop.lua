@@ -1,3 +1,6 @@
+GFILTER_TABLE = {aux.dncheck}
+GFILTER_DIFFERENT_NAMES = 1
+
 --Target/Operation functions and filters
 --Simple Target
 function Auxiliary.Check(check,info,...)
@@ -181,11 +184,11 @@ function Auxiliary.BanishTarget(f,loc1,loc2,min,exc)
 				if exc then exc=e:GetHandler() end
 				if chk==0 then return Duel.IsExistingMatchingCard(aux.BanishFilter(f),tp,loc1,loc2,min,exc,e,tp) end
 				if loc1>0 and loc2>0 then
-					Duel.SetCustomOperationInfo(0,CATEGORY_REMOVE,nil,min,PLAYER_ALL,loc1|(loc2&(~loc1)))
+					Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,min,PLAYER_ALL,loc1|(loc2&(~loc1)))
 				elseif loc1>0 then
-					Duel.SetCustomOperationInfo(0,CATEGORY_REMOVE,nil,min,tp,loc1)
+					Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,min,tp,loc1)
 				elseif loc2>0 then
-					Duel.SetCustomOperationInfo(0,CATEGORY_REMOVE,nil,min,1-tp,loc1)
+					Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,min,1-tp,loc1)
 				end
 			end
 end
@@ -215,29 +218,50 @@ function Auxiliary.DestroyFilter(f)
 				return (not f or f(c,e,...)) and c:IsDestructable(e)
 			end
 end
+function Auxiliary.NotConfirmed(f)
+	return	function(c,...)
+				return not c:IsPublic() or (not f or f(c,...))
+			end
+end
 function Auxiliary.DestroyTarget(f,loc1,loc2,min,exc)
 	if not f then f=aux.TRUE end
 	if not loc1 then loc1=LOCATION_ONFIELD end
 	if not loc2 then loc2=LOCATION_ONFIELD end
-	if (loc1|loc2)&(LOCATION_HAND+LOCATION_DECK+LOCATION_EXTRA)>0 then f=aux.DestroyFilter(f) end
 	if not min then min=1 end
-	return	function (e,tp,eg,ep,ev,re,r,rp,chk)
-				if exc then exc=e:GetHandler() end
-				if chk==0 then return Duel.IsExistingMatchingCard(f,tp,loc1,loc2,min,exc,e,tp) end
-				if loc1>0 and loc2>0 then
-					Duel.SetCustomOperationInfo(0,CATEGORY_DESTROY,nil,min,PLAYER_ALL,loc1|(loc2&(~loc1)))
-				elseif loc1>0 then
-					Duel.SetCustomOperationInfo(0,CATEGORY_DESTROY,nil,min,tp,loc1)
-				elseif loc2>0 then
-					Duel.SetCustomOperationInfo(0,CATEGORY_DESTROY,nil,min,1-tp,loc1)
+	local locs = (loc1&(~loc2))|loc2
+	if locs&(LOCATION_HAND+LOCATION_DECK+LOCATION_EXTRA)>0 then
+		f=aux.DestroyFilter(f)
+		return	function (e,tp,eg,ep,ev,re,r,rp,chk)
+					if exc then exc=e:GetHandler() end
+					if chk==0 then return Duel.IsExistingMatchingCard(f,tp,loc1,loc2,min,exc,e,tp) end
+					local p = (loc1>0 and loc2>0) and PLAYER_ALL or (loc1>0) and tp or 1-tp
+					if locs&LOCATION_ONFIELD>0 then
+						local g=Duel.GetMatchingGroup(f,tp,loc1,loc2,exc,e,tp)
+						if not Duel.IsExistingMatchingCard(aux.NotConfirmed(f),tp,loc1,loc2,min,exc,e,tp) then
+							Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,min,p,locs)
+						else
+							Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,min,p,locs)
+						end
+					else
+						Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,min,p,locs)
+					end
 				end
-			end
+	else
+		return	function (e,tp,eg,ep,ev,re,r,rp,chk)
+					if exc then exc=e:GetHandler() end
+					if chk==0 then return Duel.IsExistingMatchingCard(f,tp,loc1,loc2,min,exc,e,tp) end
+					local p = (loc1>0 and loc2>0) and PLAYER_ALL or (loc1>0) and tp or 1-tp
+					local g=Duel.GetMatchingGroup(f,tp,loc1,loc2,exc,e,tp)
+					Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,min,p,locs)
+				end
+	end
 end
 function Auxiliary.DestroyOperation(f,loc1,loc2,min,max,exc)
 	if not f then f=aux.TRUE end
 	if not loc1 then loc1=LOCATION_ONFIELD end
 	if not loc2 then loc2=LOCATION_ONFIELD end
-	if (loc1|loc2)&(LOCATION_HAND+LOCATION_DECK+LOCATION_EXTRA)>0 then f=aux.DestroyFilter(f) end
+	local locs = (loc1&(~loc2))|loc2
+	if locs&(LOCATION_HAND+LOCATION_DECK+LOCATION_EXTRA)>0 then f=aux.DestroyFilter(f) end
 	if not min then min=1 end
 	if not max then max=min end
 	return	function (e,tp,eg,ep,ev,re,r,rp)
@@ -254,38 +278,127 @@ function Auxiliary.DestroyOperation(f,loc1,loc2,min,max,exc)
 end
 
 -----------------------------------------------------------------------
+--Discard
+function Auxiliary.DiscardFilter(f,cost)
+	local r = (not cost) and REASON_EFFECT or REASON_COST
+	return	function(c)
+				return (not f or f(c)) and c:IsDiscardable(r)
+			end
+end
+function Auxiliary.DiscardTarget(f,min,max,p)
+	if not min then min=1 end
+	return	function (e,tp,eg,ep,ev,re,r,rp,chk)
+				local p = (not p or p==0) and tp or 1-tp
+				if chk==0 then return Duel.IsExistingMatchingCard(aux.DiscardFilter(f),p,LOCATION_HAND,0,min,nil) end
+				Duel.SetTargetPlayer(p)
+				if not max then
+					Duel.SetTargetParam(min)
+				end
+				Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,p,min)
+			end
+end
+function Auxiliary.DiscardOperation(f,min,max,p)
+	if not min then
+		return	function (e,tp,eg,ep,ev,re,r,rp)
+					local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
+					return Duel.DiscardHand(p,aux.DiscardFilter(f),d,d,REASON_EFFECT+REASON_DISCARD)
+				end
+	else
+		return	function (e,tp,eg,ep,ev,re,r,rp)
+					local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
+					return Duel.DiscardHand(p,aux.DiscardFilter(f),min,max,REASON_EFFECT+REASON_DISCARD)
+				end
+	end
+end
+
+--Draw
+function Auxiliary.DrawTarget(min)
+	if not min then min=1 end
+	return	function (e,tp,eg,ep,ev,re,r,rp,chk)
+				if chk==0 then return Duel.IsPlayerCanDraw(tp,min) end
+				Duel.SetTargetPlayer(tp)
+				Duel.SetTargetParam(min)
+				Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,min)
+			end
+end
+function Auxiliary.DrawOperation()
+	return	function (e,tp,eg,ep,ev,re,r,rp)
+				local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
+				return Duel.Draw(p,d,REASON_EFFECT)
+			end
+end
+
+-----------------------------------------------------------------------
 --Search
 function Auxiliary.SearchFilter(f)
 	return	function(c,...)
 				return (not f or f(c,...)) and c:IsAbleToHand()
 			end
 end
-function Auxiliary.SearchTarget(f,min,loc)
+function Auxiliary.SearchTarget(f,min,loc,max)
 	if not min then min=1 end
 	if not loc then loc=LOCATION_DECK end
-	return	function (e,tp,eg,ep,ev,re,r,rp,chk)
-				if chk==0 then return Duel.IsExistingMatchingCard(aux.SearchFilter(f),tp,loc,0,min,nil,e,tp) end
-				Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,min,tp,loc)
-			end
+	local gf
+	if type(f)=="table" then
+		if #f>1 then
+			gf=GFILTER_TABLE[f[2]]
+		end
+		f=f[1]
+	end
+	local filter=aux.SearchFilter(f)
+	if not gf or min==1 then
+		return	function (e,tp,eg,ep,ev,re,r,rp,chk)
+					if chk==0 then return Duel.IsExistingMatchingCard(filter,tp,loc,0,min,nil,e,tp) end
+					Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,min,tp,loc)
+				end
+	else
+		return	function (e,tp,eg,ep,ev,re,r,rp,chk)
+					local g=Duel.GetMatchingGroup(filter,tp,loc,0,nil,e,tp)
+					if chk==0 then return g:CheckSubGroup(filter,min,max,e,tp) end
+					Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,min,tp,loc)
+				end
+	end
 end
 function Auxiliary.SearchOperation(f,min,max,loc,relcheck)
 	if not min then min=1 end
 	if not max then max=min end
 	if not loc then loc=LOCATION_DECK end
+	local gf
+	if type(f)=="table" then
+		if #f>1 then
+			gf=GFILTER_TABLE[f[2]]
+		end
+		f=f[1]
+	end
 	local filter=aux.SearchFilter(f)
 	if loc&LOCATION_GRAVE>0 then
 		filter=aux.NecroValleyFilter(filter)
 	end
-	return	function (e,tp,eg,ep,ev,re,r,rp)
-				if relcheck and not e:GetHandler():IsRelateToChain() then return end
-				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-				local g=Duel.SelectMatchingCard(tp,filter,tp,loc,0,min,max,nil,e,tp)
-				if #g>0 then
-					local ct,ht,hg=Duel.Search(g,tp)
-					return hg,ct,ht
+	if not gf then
+		return	function (e,tp,eg,ep,ev,re,r,rp)
+					if relcheck and not e:GetHandler():IsRelateToChain() then return end
+					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+					local g=Duel.SelectMatchingCard(tp,filter,tp,loc,0,min,max,nil,e,tp)
+					if #g>0 then
+						local ct,ht,hg=Duel.Search(g,tp)
+						return hg,ct,ht
+					end
+					return g,0,0
 				end
-				return g,0,0
-			end
+	else
+		return	function (e,tp,eg,ep,ev,re,r,rp)
+					if relcheck and not e:GetHandler():IsRelateToChain() then return end
+					local g=Duel.GetMatchingGroup(filter,tp,loc,0,nil)
+					if #g<min then return end
+					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+					local sg=g:SelectSubGroup(tp,gf,false,min,max)
+					if #sg>0 then
+						local ct,ht,hg=Duel.Search(sg,tp)
+						return hg,ct,ht
+					end
+					return sg,0,0
+				end
+	end
 end
 
 --To Deck
@@ -332,7 +445,8 @@ function Auxiliary.SSSelfTarget(loc_clause)
 	return	function (e,tp,eg,ep,ev,re,r,rp,chk)
 				local c=e:GetHandler()
 				if chk==0 then
-					return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false) 																					and (not loc_clause or ((c:IsLocation(loc_clause[1]) and not eg:IsContains(c)) or (c:IsLocation(loc_clause[2]))))
+					return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+						and (not loc_clause or ((c:IsLocation(loc_clause[1]) and not eg:IsContains(c)) or (c:IsLocation(loc_clause[2]))))
 				end
 				Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 			end
@@ -340,14 +454,12 @@ end
 function Auxiliary.SSSelfOperation(complete_proc)
 	return	function (e,tp,eg,ep,ev,re,r,rp)
 				local c=e:GetHandler()
-				if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 or not c:IsRelateToEffect(e) then return end
-				if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 then
-					if complete_proc then
-						c:CompleteProcedure()
-					end
-					return true
+				if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 or not c:IsRelateToChain() then return end
+				local ct=Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+				if ct~=0 and complete_proc then
+					c:CompleteProcedure()
 				end
-				return false
+				return ct
 			end
 end
 

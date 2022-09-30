@@ -81,7 +81,6 @@ function Auxiliary.Facedown(f,...)
 			end
 end
 
-
 --Custom Categories
 if not global_effect_category_table_global_check then
 	global_effect_category_table_global_check=true
@@ -188,6 +187,7 @@ function Duel.PositionChange(c)
 	return Duel.ChangePosition(c,POS_FACEUP_DEFENSE,POS_FACEDOWN_DEFENSE,POS_FACEUP_ATTACK,POS_FACEUP_ATTACK)
 end
 function Duel.Search(g,tp)
+	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
 	local ct=Duel.SendtoHand(g,tp,REASON_EFFECT)
 	local cg=g:Filter(aux.PLChk,nil,tp,LOCATION_HAND)
 	if #cg>0 then
@@ -198,12 +198,12 @@ end
 
 function Duel.ShuffleIntoDeck(g,p)
 	local ct=Duel.SendtoDeck(g,p,SEQ_DECKSHUFFLE,REASON_EFFECT)
-	if ct>0 and aux.PLChk(g,p,LOCATION_DECK) then
+	if ct>0 then
 		aux.AfterShuffle(g)
-		if aux.GetValueType(g)=="Card" and aux.PLChk(g,p,LOCATION_DECK) then
+		if aux.GetValueType(g)=="Card" and aux.PLChk(g,p,LOCATION_DECK+LOCATION_EXTRA) then
 			return 1
 		elseif aux.GetValueType(g)=="Group" then
-			return g:FilterCount(aux.PLChk,nil,p,LOCATION_DECK)
+			return g:FilterCount(aux.PLChk,nil,p,LOCATION_DECK+LOCATION_EXTRA)
 		end
 	end
 	return 0
@@ -218,9 +218,8 @@ function Auxiliary.PLChk(c,p,loc)
 	end
 end
 function Auxiliary.AfterShuffle(g)
-	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
 	for p=0,1 do
-		if g:IsExists(aux.PLChk,1,nil,p,LOCATION_DECK) then
+		if aux.PLChk(g,p,LOCATION_DECK) then
 			Duel.ShuffleDeck(p)
 		end
 	end
@@ -282,19 +281,22 @@ function Card.IsOriginalRace(c,rc)
 	return c:GetOriginalRace()&rc>0
 end
 
+function Card.HasRank(c)
+	return c:IsType(TYPE_XYZ) or c:IsOriginalType(TYPE_XYZ)
+end
 function Card.GetRating(c)
 	local list={false,false,false,false}
 	if c:HasLevel() then
-		list[1]=(c:GetLevel())
+		list[1]=c:GetLevel()
 	end
 	if c:IsOriginalType(TYPE_XYZ) then
-		list[2]=(c:GetRank())
+		list[2]=c:GetRank()
 	end
 	if c:IsOriginalType(TYPE_LINK) then
-		list[3]=(c:GetLink())
+		list[3]=c:GetLink()
 	end
 	if c:IsOriginalType(TYPE_TIMELEAP) then
-		list[4]=(c:GetFuture())
+		list[4]=c:GetFuture()
 	end
 	return list
 end
@@ -393,6 +395,7 @@ function Auxiliary.ActivateException(e,chk)
 	end
 end
 function Auxiliary.ExceptThis(c)
+	if aux.GetValueType(c)=="Effect" then c=c:GetHandler() end
 	if c:IsRelateToChain() then return c else return nil end
 end
 
@@ -454,7 +457,7 @@ function Auxiliary.GainEffectType(c,oc,reset)
 		e:SetType(EFFECT_TYPE_SINGLE)
 		e:SetCode(EFFECT_ADD_TYPE)
 		e:SetValue(TYPE_EFFECT)
-		e:SetReset(RESET_EVENT+RESETS_STANDARD)
+		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
 		c:RegisterEffect(e,true)
 	end
 end
@@ -593,15 +596,27 @@ function Card.Ignition(c,desc,ctg,prop,range,ctlim,cond,cost,tg,op,reset,quickco
 			e1:SetCategory(ctg)
 		end
 	end
-	if aux.GetValueType(prop)=="number" then
+	if aux.GetValueType(prop)=="number" and prop~=0 then
 		e1:SetProperty(prop)
 	end	
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(range)
 	if ctlim then
-		if aux.GetValueType(ctlim)=="table" then
-			local flag=#ctlim>2 and ctlim[3] or 0
-			e1:SetCountLimit(ctlim[1],c:GetOriginalCode()+ctlim[2]*100+flag)
+		if type(ctlim)=="boolean" then
+			e1:HOPT()
+		elseif type(ctlim)=="table" then
+			if type(ctlim[1])=="boolean" then
+				local shopt=#ctlim>1
+				local oath=#ctlim>2
+				if shopt then
+					e1:SHOPT(oath)
+				else
+					e1:HOPT(oath)
+				end
+			else
+				local flag=#ctlim>2 and ctlim[3] or 0
+				e1:SetCountLimit(ctlim[1],c:GetOriginalCode()+ctlim[2]*100+flag)
+			end
 		else
 			e1:SetCountLimit(ctlim)
 		end
@@ -672,9 +687,21 @@ function Card.Activate(c,desc,ctg,prop,event,ctlim,cond,cost,tg,op,handcon)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(event)
 	if ctlim then
-		if aux.GetValueType(ctlim)=="table" then
-			local flag=#ctlim>2 and ctlim[3] or 0
-			e1:SetCountLimit(ctlim[1],c:GetOriginalCode()+ctlim[2]*100+flag)
+		if type(ctlim)=="boolean" then
+			e1:HOPT()
+		elseif type(ctlim)=="table" then
+			if type(ctlim[1])=="boolean" then
+				local shopt=#ctlim>1
+				local oath=#ctlim>2
+				if shopt then
+					e1:SHOPT(oath)
+				else
+					e1:HOPT(oath)
+				end
+			else
+				local flag=#ctlim>2 and ctlim[3] or 0
+				e1:SetCountLimit(ctlim[1],c:GetOriginalCode()+ctlim[2]*100+flag)
+			end
 		else
 			e1:SetCountLimit(ctlim)
 		end
@@ -739,9 +766,21 @@ function Card.Quick(c,forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op)
 	e1:SetCode(event)
 	e1:SetRange(range)
 	if ctlim then
-		if aux.GetValueType(ctlim)=="table" then
-			local flag=#ctlim>2 and ctlim[3] or 0
-			e1:SetCountLimit(ctlim[1],c:GetOriginalCode()+ctlim[2]*100+flag)
+		if type(ctlim)=="boolean" then
+			e1:HOPT()
+		elseif type(ctlim)=="table" then
+			if type(ctlim[1])=="boolean" then
+				local shopt=#ctlim>1
+				local oath=#ctlim>2
+				if shopt then
+					e1:SHOPT(oath)
+				else
+					e1:HOPT(oath)
+				end
+			else
+				local flag=#ctlim>2 and ctlim[3] or 0
+				e1:SetCountLimit(ctlim[1],c:GetOriginalCode()+ctlim[2]*100+flag)
+			end
 		else
 			e1:SetCountLimit(ctlim)
 		end

@@ -140,3 +140,12 @@ end
 function Auxiliary.IsEquippedCond(e)
 	return e:GetHandler():GetEquipTarget()
 end
+
+--Reason and Reason Player
+function Auxiliary.ByCardEffect(p)
+	return	function(e,tp,eg,ep,ev,re,r,rp)
+				local c=e:GetHandler()
+				local p = (p==0) and tp or (p==1) and 1-tp or nil
+				return c:IsReason(REASON_EFFECT) and (not p or c:GetReasonPlayer()==p)
+			end
+end
