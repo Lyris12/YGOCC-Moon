@@ -94,7 +94,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		local te=tc:GetActivateEffect()
 		local b1=tc:IsAbleToHand()
 		if e:GetLabel()==1 then Duel.RegisterFlagEffect(tp,15248873,RESET_CHAIN,0,1) end
-		local b2=te:IsActivatable(tp,true,true) and (tc:IsType(TYPE_FIELD) or Duel.GetLocationCount(tp,LOCATION_SZONE)>0)
+		local b2=tc:IsType(TYPE_CONTINUOUS+TYPE_FIELD) and te:IsActivatable(tp,true,true) and (tc:IsType(TYPE_FIELD) or Duel.GetLocationCount(tp,LOCATION_SZONE)>0)
 		Duel.ResetFlagEffect(tp,15248873)
 		if b1 and (not b2 or Duel.SelectOption(tp,1190,1150)==0) then
 			Duel.Search(tc,tp)
