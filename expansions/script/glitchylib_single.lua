@@ -86,6 +86,7 @@ function Card.ChangeATK(c,atk,reset,rc)
 	local range=c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
 	local reset = (type(reset)=="number" or reset==false) and reset or 0
 	local rc = rc and rc or c
+	local oatk=c:GetAttack()
 	local e=Effect.CreateEffect(rc)
 	e:SetType(typ)
 	if not SCRIPT_AS_EQUIP then
@@ -99,13 +100,18 @@ function Card.ChangeATK(c,atk,reset,rc)
 		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
 	end
 	c:RegisterEffect(e)
-	return e
+	if not reset then
+		return e
+	else
+		return e,oatk,c:GetAttack()
+	end
 end
 function Card.ChangeDEF(c,def,reset,rc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
 	local range=c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
 	local reset = type(reset)=="number" and reset or 0
 	local rc = rc and rc or c
+	local odef=c:GetDefense()
 	local e=Effect.CreateEffect(rc)
 	e:SetType(typ)
 	if not SCRIPT_AS_EQUIP then
@@ -119,8 +125,44 @@ function Card.ChangeDEF(c,def,reset,rc)
 		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
 	end
 	c:RegisterEffect(e)
-	return e
+	if not reset then
+		return e
+	else
+		return e,odef,c:GetDefense()
+	end
 end
+function Card.ChangeATKDEF(c,atk,def,reset,rc)
+	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
+	local range=c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	local reset = (type(reset)=="number" or reset==false) and reset or 0
+	local rc = rc and rc or c
+	local oatk=c:GetAttack()
+	local odef=c:GetDefense()
+	local e=Effect.CreateEffect(rc)
+	e:SetType(typ)
+	if not SCRIPT_AS_EQUIP then
+		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+		e:SetRange(range)
+	end
+	e:SetCode(EFFECT_SET_ATTACK_FINAL)
+	e:SetValue(atk)
+	local e1x=e:Clone()
+	e1x:SetCode(EFFECT_SET_DEFENSE_FINAL)
+	e1x:SetValue(def)
+	if reset then
+		reset = rc==c and reset|RESET_DISABLE or reset
+		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
+		e1x:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
+	end
+	c:RegisterEffect(e)
+	c:RegisterEffect(e1x)
+	if not reset then
+		return e,e1x
+	else
+		return e,e1x,oatk,c:GetAttack(),odef,c:GetDefense()
+	end
+end
+
 function Card.HalveATK(c,reset,rc)
 	local atk=math.floor(c:GetAttack()/2)
 	return c:ChangeATK(atk,reset,rc)

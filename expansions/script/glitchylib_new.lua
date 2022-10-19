@@ -447,7 +447,24 @@ function Duel.UpdateFlagEffectLabel(p,id,ct)
 	if not ct then ct=1 end
 	return Duel.SetFlagEffectLabel(p,id,Duel.GetFlagEffectLabel(p,id)+ct)
 end
-
+function Card.HasFlagEffectLabel(c,id,val)
+	if not c:HasFlagEffect(id) then return false end
+	for _,label in ipairs({c:GetFlagEffectLabel(id)}) do
+		if label==val then
+			return true
+		end
+	end
+	return false
+end
+function Duel.PlayerHasFlagEffectLabel(p,id,val)
+	if Duel.GetFlagEffect(tp,id)==0 then return false end
+	for _,label in ipairs({Duel.GetFlagEffectLabel(tp,id)}) do
+		if label==val then
+			return true
+		end
+	end
+	return false
+end
 --Gain Effect
 function Auxiliary.GainEffectType(c,oc,reset)
 	if not oc then oc=c end
@@ -503,6 +520,9 @@ function Card.IsInMainSequence(c)
 	return c:IsSequenceBelow(4)
 end
 
+function Card.IsSpellTrapOnField(c)
+	return not c:IsLocation(LOCATION_MZONE) or (c:IsFaceup() and c:IsST())
+end
 function Card.NotOnFieldOrFaceup(c)
 	return not c:IsOnField() or c:IsFaceup()
 end
@@ -606,8 +626,8 @@ function Card.Ignition(c,desc,ctg,prop,range,ctlim,cond,cost,tg,op,reset,quickco
 			e1:HOPT()
 		elseif type(ctlim)=="table" then
 			if type(ctlim[1])=="boolean" then
-				local shopt=#ctlim>1
-				local oath=#ctlim>2
+				local shopt=ctlim[2]
+				local oath=ctlim[3]
 				if shopt then
 					e1:SHOPT(oath)
 				else
@@ -691,8 +711,8 @@ function Card.Activate(c,desc,ctg,prop,event,ctlim,cond,cost,tg,op,handcon)
 			e1:HOPT()
 		elseif type(ctlim)=="table" then
 			if type(ctlim[1])=="boolean" then
-				local shopt=#ctlim>1
-				local oath=#ctlim>2
+				local shopt=ctlim[2]
+				local oath=ctlim[3]
 				if shopt then
 					e1:SHOPT(oath)
 				else
@@ -770,8 +790,8 @@ function Card.Quick(c,forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op)
 			e1:HOPT()
 		elseif type(ctlim)=="table" then
 			if type(ctlim[1])=="boolean" then
-				local shopt=#ctlim>1
-				local oath=#ctlim>2
+				local shopt=ctlim[2]
+				local oath=ctlim[3]
 				if shopt then
 					e1:SHOPT(oath)
 				else
@@ -799,4 +819,89 @@ function Card.Quick(c,forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op)
 	end
 	c:RegisterEffect(e1)
 	return e1
+end
+
+function Card.CreateNegateEffect(c,negateact,rp,rf,desc,range,ctlim,cond,cost,tg,negatedop)
+	local negcategory = negateact and CATEGORY_NEGATE or CATEGORY_DISABLE
+	local negatedop = negatedop or 0
+	if c:IsOriginalType(TYPE_MONSTER) then
+		local range = range and range or (c:IsOriginalType(TYPE_MONSTER)) and LOCATION_MZONE or (c:IsOriginalType(TYPE_FIELD)) and LOCATION_FZONE or LOCATION_SZONE
+		local e1=Effect.CreateEffect(c)
+		if desc then
+			e1:Desc(desc)
+		end
+		e1:SetCategory(negcategory+negatedop)
+		e1:SetType(EFFECT_TYPE_QUICK_O)
+		if negateact then
+			e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
+		end
+		e1:SetCode(EVENT_CHAINING)
+		e1:SetRange(range)
+		if ctlim then
+			if type(ctlim)=="boolean" then
+				e1:HOPT()
+			elseif type(ctlim)=="table" then
+				if type(ctlim[1])=="boolean" then
+					local shopt=ctlim[2]
+					local oath=ctlim[3]
+					if shopt then
+						e1:SHOPT(oath)
+					else
+						e1:HOPT(oath)
+					end
+				else
+					local flag=#ctlim>2 and ctlim[3] or 0
+					e1:SetCountLimit(ctlim[1],c:GetOriginalCode()+ctlim[2]*100+flag)
+				end
+			else
+				e1:SetCountLimit(ctlim)
+			end
+		end
+		e1:SetCondition(aux.NegateCondition(true,negateact,rp,rf,cond))
+		if cost then e1:SetCost(cost) end
+		e1:SetTarget(aux.NegateTarget(negateact,negatedop,tg))
+		e1:SetOperation(aux.NegateOperation(negateact,negatedop))
+		c:RegisterEffect(e1)
+	else
+		local e1=Effect.CreateEffect(c)
+		if desc then
+			e1:Desc(desc)
+		end
+		e1:SetCategory(negcategory+negatedop)
+		if not range then
+			e1:SetType(EFFECT_TYPE_ACTIVATE)
+		else
+			e1:SetType(EFFECT_TYPE_QUICK_O)
+			e1:SetRange(range)
+		end
+		if negateact then
+			e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
+		end
+		e1:SetCode(EVENT_CHAINING)
+		if ctlim then
+			if type(ctlim)=="boolean" then
+				e1:HOPT()
+			elseif type(ctlim)=="table" then
+				if type(ctlim[1])=="boolean" then
+					local shopt=ctlim[2]
+					local oath=ctlim[3]
+					if shopt then
+						e1:SHOPT(oath)
+					else
+						e1:HOPT(oath)
+					end
+				else
+					local flag=#ctlim>2 and ctlim[3] or 0
+					e1:SetCountLimit(ctlim[1],c:GetOriginalCode()+ctlim[2]*100+flag)
+				end
+			else
+				e1:SetCountLimit(ctlim)
+			end
+		end
+		e1:SetCondition(aux.NegateCondition(false,negateact,rp,rf,cond))
+		if cost then e1:SetCost(cost) end
+		e1:SetTarget(aux.NegateTarget(negateact,negatedop,tg))
+		e1:SetOperation(aux.NegateOperation(negateact,negatedop))
+		c:RegisterEffect(e1)
+	end
 end

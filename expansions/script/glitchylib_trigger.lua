@@ -1,3 +1,19 @@
+Auxiliary.IsForcedEffect=false
+
+function Auxiliary.DoNotCheckActivationLegality(tg,prop)
+	if type(prop)~="number" or prop&EFFECT_FLAG_CARD_TARGET==0 then
+		return	function(e,tp,eg,ep,ev,re,r,rp,chk)
+					if chk==0 then return true end
+					tg(e,tp,eg,ep,ev,re,r,rp,chk)
+				end
+	else
+		return	function(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+					if chkc then return tg(e,tp,eg,ep,ev,re,r,rp,chkc) end
+					if chk==0 then return true end
+					tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+				end
+	end
+end
 function Auxiliary.OptionalContinuous(op,id,desc)
 	return	function(e,tp,eg,ep,ev,re,r,rp)
 				if not Duel.SelectYesNo(tp,aux.Stringid(id,desc)) then return end
@@ -43,8 +59,8 @@ function Card.Trigger(c,forced,desc,ctg,defaultprop,prop,event,ctlim,cond,cost,t
 			e1:HOPT()
 		elseif type(ctlim)=="table" then
 			if type(ctlim[1])=="boolean" then
-				local shopt=#ctlim>1
-				local oath=#ctlim>2
+				local shopt=ctlim[2]
+				local oath=ctlim[3]
 				if shopt then
 					e1:SHOPT(oath)
 				else
@@ -65,6 +81,7 @@ function Card.Trigger(c,forced,desc,ctg,defaultprop,prop,event,ctlim,cond,cost,t
 		e1:SetCost(cost)
 	end
 	if tg then
+		if forced then tg=aux.DoNotCheckActivationLegality(tg,prop) end
 		e1:SetTarget(tg)
 	end
 	if op then
@@ -121,6 +138,11 @@ function Card.SummonedTrigger(c,forced,ns,ss,fs,desc,ctg,prop,ctlim,cond,cost,tg
 	end
 	return e1,e2,e3
 end
+function Card.TributedTrigger(c,forced,desc,ctg,prop,ctlim,cond,cost,tg,op,typechange,reset)
+	local event=EVENT_RELEASE
+	local e1=c:Trigger(forced,desc,ctg,EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL,prop,event,ctlim,cond,cost,tg,op,typechange,reset)
+	return e1
+end
 function Card.TributedForATributeSummonTrigger(c,forced,f,desc,ctg,prop,ctlim,cond,cost,tg,op,typechange,reset)
 	local event=EVENT_BE_MATERIAL
 	newcond =	function(e,tp,eg,ep,ev,re,r,rp)
@@ -136,6 +158,9 @@ end
 --FIELD TRIGGERS
 function Card.FieldTrigger(c,forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op,typechange,reset,notreg)
 	local trigger_type=(type(typechange)=="number") and EFFECT_TYPE_CONTINUOUS or (type(typechange)=="boolean") and EFFECT_TYPE_ACTIVATE or (not forced) and EFFECT_TYPE_TRIGGER_O or EFFECT_TYPE_TRIGGER_F
+	if forced then
+		aux.IsForcedEffect=true
+	end
 	if trigger_type==EFFECT_TYPE_ACTIVATE then
 		if type(prop)=="boolean" and prop then prop=EFFECT_FLAG_DELAY end
 		return c:Activate(desc,ctg,prop,event,ctlim,cond,cost,tg,op,reset)
@@ -167,9 +192,21 @@ function Card.FieldTrigger(c,forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg
 	e1:SetCode(event)
 	e1:SetRange(range)
 	if ctlim then
-		if type(ctlim)=="table" then
-			local flag=#ctlim>2 and ctlim[3] or 0
-			e1:SetCountLimit(ctlim[1],c:GetOriginalCode()+ctlim[2]*100+flag)
+		if type(ctlim)=="boolean" then
+			e1:HOPT()
+		elseif type(ctlim)=="table" then
+			if type(ctlim[1])=="boolean" then
+				local shopt=ctlim[2]
+				local oath=ctlim[3]
+				if shopt then
+					e1:SHOPT(oath)
+				else
+					e1:HOPT(oath)
+				end
+			else
+				local flag=#ctlim>2 and ctlim[3] or 0
+				e1:SetCountLimit(ctlim[1],c:GetOriginalCode()+ctlim[2]*100+flag)
+			end
 		else
 			e1:SetCountLimit(ctlim)
 		end
@@ -181,6 +218,7 @@ function Card.FieldTrigger(c,forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg
 		e1:SetCost(cost)
 	end
 	if tg then
+		if forced then tg=aux.DoNotCheckActivationLegality(tg,prop) end
 		e1:SetTarget(tg)
 	end
 	if op then
@@ -195,30 +233,31 @@ function Card.FieldTrigger(c,forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg
 	if not notreg then
 		c:RegisterEffect(e1)
 	end
+	aux.IsForcedEffect=false
 	return e1
 end
 
-function Card.DestroyedFieldTrigger(c,forced,desc,ctg,prop,range,ctlim,cond,cost,tg,op,typechange,reset)
+function Card.DestroyedFieldTrigger(c,forced,desc,ctg,prop,range,ctlim,cond,cost,tg,op,typechange,reset,notreg)
 	local event=EVENT_DESTROYED
-	local e1=c:FieldTrigger(forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op,typechange,reset)
+	local e1=c:FieldTrigger(forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op,typechange,reset,notreg)
 	return e1
 end
-function Card.LeaveFieldTrigger(c,forced,desc,ctg,prop,range,ctlim,cond,cost,tg,op,typechange,reset)
+function Card.LeaveFieldTrigger(c,forced,desc,ctg,prop,range,ctlim,cond,cost,tg,op,typechange,reset,notreg)
 	local event=EVENT_LEAVE_FIELD
-	local e1=c:FieldTrigger(forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op,typechange,reset)
+	local e1=c:FieldTrigger(forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op,typechange,reset,notreg)
 	return e1
 end
-function Card.PositionFieldTrigger(c,forced,desc,ctg,prop,range,ctlim,cond,cost,tg,op,typechange,reset)
+function Card.PositionFieldTrigger(c,forced,desc,ctg,prop,range,ctlim,cond,cost,tg,op,typechange,reset,notreg)
 	local event=EVENT_CHANGE_POS
-	local e1=c:FieldTrigger(forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op,typechange,reset)
+	local e1=c:FieldTrigger(forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op,typechange,reset,notreg)
 	return e1
 end
-function Card.SentToGYFieldTrigger(c,forced,desc,ctg,prop,range,ctlim,cond,cost,tg,op,typechange,reset)
+function Card.SentToGYFieldTrigger(c,forced,desc,ctg,prop,range,ctlim,cond,cost,tg,op,typechange,reset,notreg)
 	local event=EVENT_TO_GRAVE
-	local e1=c:FieldTrigger(forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op,typechange,reset)
+	local e1=c:FieldTrigger(forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op,typechange,reset,notreg)
 	return e1
 end
-function Card.SummonedFieldTrigger(c,forced,ns,ss,fs,desc,ctg,prop,range,ctlim,cond,cost,tg,op,typechange,reset)
+function Card.SummonedFieldTrigger(c,forced,ns,ss,fs,desc,ctg,prop,range,ctlim,cond,cost,tg,op,typechange,reset,notreg)
 	local event=(ns==true) and EVENT_SUMMON_SUCCESS or (ss==true) and EVENT_SPSUMMON_SUCCESS or (fs==true) and EVENT_FLIP_SUMMON_SUCCESS or EVENT_SUMMON_SUCCESS
 	local e1=c:FieldTrigger(forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op,typechange,reset,true)
 	local e2,e3
@@ -237,18 +276,23 @@ function Card.SummonedFieldTrigger(c,forced,ns,ss,fs,desc,ctg,prop,range,ctlim,c
 	end
 	return e1,e2,e3
 end
-function Card.TributedForATributeSummonFieldTrigger(c,forced,f,desc,ctg,prop,range,ctlim,cond,cost,tg,op,typechange,reset)
+function Card.TributedFieldTrigger(c,forced,desc,ctg,prop,range,ctlim,cond,cost,tg,op,typechange,reset,notreg)
+	local event=EVENT_RELEASE
+	local e1=c:FieldTrigger(forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op,typechange,reset,notreg)
+	return e1
+end
+function Card.TributedForATributeSummonFieldTrigger(c,forced,f,desc,ctg,prop,range,ctlim,cond,cost,tg,op,typechange,reset,notreg)
 	local event=EVENT_BE_MATERIAL
 	local func = function(card,eff,tp,eg,ep,ev,re,r,rp) return card:IsReason(REASON_SUMMON) and (not f or f(card,eff,tp,eg,ep,ev,re,r,rp)) end
 	newcond = function(e,tp,eg,ep,ev,re,r,rp) return eg:IsExists(func,1,nil,e,tp,eg,ep,ev,re,r,rp) and (not cond or cond(e,tp,eg,ep,ev,re,r,rp)) end
-	local e1=c:FieldTrigger(forced,desc,ctg,prop,event,range,ctlim,newcond,cost,tg,op,typechange,reset)
+	local e1=c:FieldTrigger(forced,desc,ctg,prop,event,range,ctlim,newcond,cost,tg,op,typechange,reset,notreg)
 	return e1
 end
 
-function Card.PhaseTrigger(c,forced,phase,desc,ctg,prop,range,ctlim,cond,cost,tg,op,typechange,reset)
+function Card.PhaseTrigger(c,forced,phase,desc,ctg,prop,range,ctlim,cond,cost,tg,op,typechange,reset,notreg)
 	if not phase then phase=PHASE_END end
 	if not ctlim then ctlim=1 end
 	local event=EVENT_PHASE+phase
-	local e1=c:FieldTrigger(forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op,typechange,reset)
+	local e1=c:FieldTrigger(forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op,typechange,reset,notreg)
 	return e1
 end
