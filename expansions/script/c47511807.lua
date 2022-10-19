@@ -43,7 +43,7 @@ function s.splimit(e,se,sp,st)
 end
 
 function s.thfilter(c)
-	return c:IsMonster() and c:IsRace(RACE_WARRIOR)
+	return c:IsMonster() and c:IsSetCard(0xfa6)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
