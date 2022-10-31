@@ -32,7 +32,7 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Hint(HINT_CARD,tp,99189322+i)
 		Duel.Hint(HINT_CARD,1-tp,99189322+i)
 	end
-	Debug.Message("The world has ended")
+	Duel.SelectOption(tp,aux.Stringid(id,0))
 	local g=Duel.GetMatchingGroup(nil,tp,0,LOCATION_HAND+LOCATION_ONFIELD+LOCATION_DECK+LOCATION_EXTRA,nil)
 	if #g>0 then
 		Duel.Destroy(g,REASON_RULE)
