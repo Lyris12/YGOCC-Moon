@@ -37,6 +37,7 @@ function cid.initial_effect(c)
 	e3:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
 	e3:SetTarget(cid.target2)
 	c:RegisterEffect(e3)
+
 end
 function cid.filter1(c,ec,tp)
 	return c:IsAttribute(ATTRIBUTE_FIRE) 
@@ -70,7 +71,7 @@ function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD)
 end
 function cid.filter(c,tp,ep,val)
-	return c:IsFaceup() and c:GetSummonPlayer()~=tp and not c:IsDisabled()
+	return c:IsFaceup() and c:IsType(TYPE_EFFECT) and c:GetSummonPlayer()~=tp and not c:IsDisabled()
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return eg:IsExists(cid.filter,1,nil,tp) end
@@ -79,9 +80,11 @@ function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetChainLimit(cid.limit(Duel.GetCurrentChain()))
 end
 function cid.target2(e,tp,eg,ep,ev,re,r,rp,chk)
+	   local c=e:GetHandler()
 	local tc=eg:GetFirst()
-	if chk==0 then return rp==1-tp and tc:IsFaceup() and not tc:IsDisabled() end
+	if chk==0 then return rp==1-tp and e:GetHandler():GetFlagEffect(id)==0  and tc:IsFaceup() and not tc:IsDisabled() end
 	Duel.SetTargetCard(tc)
+	 c:RegisterFlagEffect(id,RESET_EVENT+0x7e0000+RESET_PHASE+PHASE_END,0,1)
 	Duel.SetChainLimit(cid.limit(Duel.GetCurrentChain()))
 end
 function cid.operation(e,tp,eg,ep,ev,re,r,rp,chk)

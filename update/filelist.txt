@@ -1,4 +1,4 @@
-﻿expansions/cards-new.cdb	8c3d29790a1858ba54f98d3650143bbb
+﻿expansions/cards-new.cdb	35ff61a1985a5968cf563a91662d4d3e
 expansions/lflist.conf	cc5f911d95b32cef46d32d93a5c5e8a2
 expansions/strings.conf	39323d6f914a80e274ee6786b0291ba3
 expansions/pics/100000714.jpg	74ec20749932cad0249671d71e6d672b
@@ -6932,7 +6932,7 @@ expansions/script/c19822109.lua	64ec0bacbb55e4604e03f9fbd0c49706
 expansions/script/c19822110.lua	c333e19270abcfd5b37e29a2416adf70
 expansions/script/c19822111.lua	029cf9bc3e2752717558c9fd7cc99552
 expansions/script/c19822112.lua	af791a4324fff92c661edb0cdbb4ed4f
-expansions/script/c19900001.lua	526026f87a8ec17a530f21189c7ad0be
+expansions/script/c19900001.lua	7bac5015003cf3cafaad2a7f2fa33e7e
 expansions/script/c19900002.lua	0183bc75e3ffe18876cf87c32f74727e
 expansions/script/c19900003.lua	46c3b43f844ed526253d7b27f621529f
 expansions/script/c19900004.lua	788b44183c76adf72c66ef6177651937
@@ -6949,7 +6949,7 @@ expansions/script/c19900018.lua	2bf2d98fd5c89ada2beeacb7655f2da8
 expansions/script/c19900021.lua	22fb0064217bad84dd9092925865ad47
 expansions/script/c19900022.lua	c5afcffd61e8de88f6fa285e0a56598f
 expansions/script/c19900023.lua	588a0224e2cdd500519c7042834d6349
-expansions/script/c19900024.lua	8e92fa10fb371de203c70d2c3bd5aec5
+expansions/script/c19900024.lua	f165deccd9419f5b8fa88acc14fab939
 expansions/script/c19900025.lua	cfe5e5ecb26ecfeade1d4d2fbfaed0a1
 expansions/script/c19900026.lua	788282690f31d83619ad855b56aa8ec9
 expansions/script/c19900027.lua	6741fadbb6d09355a72fda1040bbba08
@@ -10686,6 +10686,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	7ffd582203a5f9dd3efa4af3187d4c24
+update/filelist.txt	7c43bd179c37c38c3e9533376b583246
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	b1e29e3dbafe9d1d2bce49cb29adc4be
+update/version.txt	8ff4e7aeab65e3ce8db752e36e5f67bf
