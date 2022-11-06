@@ -1,4 +1,4 @@
-function Card.FieldEffect(c,code,range,selfzones,oppozones,f,val,cond)
+function Card.FieldEffect(c,code,range,selfzones,oppozones,f,val,cond,reset,rc)
 --CONTINUOUS EFFECTS (EFFECT_TYPE_FIELD)
 	if not range then range=c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE end
 	if not selfzones then selfzones=0 end
@@ -7,7 +7,14 @@ function Card.FieldEffect(c,code,range,selfzones,oppozones,f,val,cond)
 	elseif not oppozones then
 		oppozones=0
 	end
-	local e=Effect.CreateEffect(c)
+	if not rc then rc=c end
+	local rct=1
+    if type(reset)=="table" then
+        rct=reset[2]
+        reset=reset[1]
+    end
+	
+	local e=Effect.CreateEffect(rc)
 	e:SetType(EFFECT_TYPE_FIELD)
 	e:SetRange(range)
 	e:SetCode(code)
@@ -18,24 +25,30 @@ function Card.FieldEffect(c,code,range,selfzones,oppozones,f,val,cond)
 	if f then
 		e:SetTarget(f)
 	end
-	e:SetValue(val)
+	if val then
+		e:SetValue(val)
+	end
+	if reset then
+		if type(reset)~="number" then reset=0 end
+		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
+	end
 	--c:RegisterEffect(e)
 	return e
 end
 
 -----------------------------------------------------------------------
-function Card.UpdateATKField(c,atk,range,selfzones,oppozones,f,cond)
-	local e=c:FieldEffect(EFFECT_UPDATE_ATTACK,range,selfzones,oppozones,f,atk,cond)
+function Card.UpdateATKField(c,atk,range,selfzones,oppozones,f,cond,reset,rc)
+	local e=c:FieldEffect(EFFECT_UPDATE_ATTACK,range,selfzones,oppozones,f,atk,cond,reset,rc)
 	c:RegisterEffect(e)
 	return e
 end
-function Card.UpdateDEFField(c,def,range,selfzones,oppozones,f,cond)
-	local e=c:FieldEffect(EFFECT_UPDATE_DEFENSE,range,selfzones,oppozones,f,def,cond)
+function Card.UpdateDEFField(c,def,range,selfzones,oppozones,f,cond,reset,rc)
+	local e=c:FieldEffect(EFFECT_UPDATE_DEFENSE,range,selfzones,oppozones,f,def,cond,reset,rc)
 	c:RegisterEffect(e)
 	return e
 end
-function Card.UpdateATKDEFField(c,atk,def,range,selfzones,oppozones,f,cond)
-	local e1=c:FieldEffect(EFFECT_UPDATE_ATTACK,range,selfzones,oppozones,f,atk,cond)
+function Card.UpdateATKDEFField(c,atk,def,range,selfzones,oppozones,f,cond,reset,rc)
+	local e1=c:FieldEffect(EFFECT_UPDATE_ATTACK,range,selfzones,oppozones,f,atk,cond,reset,rc)
 	c:RegisterEffect(e1)
 	local e2=e1:Clone()
 	e2:SetCode(EFFECT_UPDATE_DEFENSE)
@@ -43,36 +56,288 @@ function Card.UpdateATKDEFField(c,atk,def,range,selfzones,oppozones,f,cond)
 	c:RegisterEffect(e2)
 	return e1,e2
 end
-function Card.ChangeATKField(c,atk,range,selfzones,oppozones,f,cond)
-	local e=c:FieldEffect(EFFECT_SET_ATTACK_FINAL,range,selfzones,oppozones,f,atk,cond)
+function Card.ChangeATKField(c,atk,range,selfzones,oppozones,f,cond,reset,rc)
+	local e=c:FieldEffect(EFFECT_SET_ATTACK_FINAL,range,selfzones,oppozones,f,atk,cond,reset,rc)
 	c:RegisterEffect(e)
 	return e
 end
-function Card.ChangeDEFField(c,def,range,selfzones,oppozones,f,cond)
-	local e=c:FieldEffect(EFFECT_SET_DEFENSE_FINAL,range,selfzones,oppozones,f,def,cond)
-	c:RegisterEffect(e)
-	return e
-end
-
-function Card.ChangeAttributeField(c,attr,range,selfzones,oppozones,f,cond)
-	local e=c:FieldEffect(EFFECT_CHANGE_ATTRIBUTE,range,selfzones,oppozones,f,attr,cond)
+function Card.ChangeDEFField(c,def,range,selfzones,oppozones,f,cond,reset,rc)
+	local e=c:FieldEffect(EFFECT_SET_DEFENSE_FINAL,range,selfzones,oppozones,f,def,cond,reset,rc)
 	c:RegisterEffect(e)
 	return e
 end
 
-function Card.ChangeRaceField(c,race,range,selfzones,oppozones,f,cond)
-	local e=c:FieldEffect(EFFECT_CHANGE_RACE,range,selfzones,oppozones,f,race,cond)
+function Card.AddTypeField(c,typ,range,selfzones,oppozones,f,cond,reset,rc)
+	local e=c:FieldEffect(EFFECT_ADD_TYPE,range,selfzones,oppozones,f,typ,cond,reset,rc)
 	c:RegisterEffect(e)
 	return e
 end
 
-function Card.UpdateLevelField(c,lv,range,selfzones,oppozones,f,cond)
-	local e=c:FieldEffect(EFFECT_UPDATE_LEVEL,range,selfzones,oppozones,f,lv,cond)
+function Card.ChangeAttributeField(c,attr,range,selfzones,oppozones,f,cond,reset,rc)
+	local e=c:FieldEffect(EFFECT_CHANGE_ATTRIBUTE,range,selfzones,oppozones,f,attr,cond,reset,rc)
 	c:RegisterEffect(e)
 	return e
 end
-function Card.ChangeLevelField(c,lv,range,selfzones,oppozones,f,cond)
-	local e=c:FieldEffect(EFFECT_CHANGE_LEVEL,range,selfzones,oppozones,f,lv,cond)
+
+function Card.ChangeRaceField(c,race,range,selfzones,oppozones,f,cond,reset,rc)
+	local e=c:FieldEffect(EFFECT_CHANGE_RACE,range,selfzones,oppozones,f,race,cond,reset,rc)
+	c:RegisterEffect(e)
+	return e
+end
+
+function Card.UpdateLevelField(c,lv,range,selfzones,oppozones,f,cond,reset,rc)
+	local e=c:FieldEffect(EFFECT_UPDATE_LEVEL,range,selfzones,oppozones,f,lv,cond,reset,rc)
+	c:RegisterEffect(e)
+	return e
+end
+function Card.ChangeLevelField(c,lv,range,selfzones,oppozones,f,cond,reset,rc)
+	local e=c:FieldEffect(EFFECT_CHANGE_LEVEL,range,selfzones,oppozones,f,lv,cond,reset,rc)
+	c:RegisterEffect(e)
+	return e
+end
+
+--Battle Related
+BATTLE_TIMING_FUNCTIONS_FIELD={
+[BATTLE_TIMING_BATTLES]=	function(f1,f2)
+								return	function(e)
+											local a=Duel.GetAttacker()
+											if not a then return false end
+											local d=Duel.GetAttackTarget()
+											if a:IsControler(1-e:GetHandlerPlayer()) then a,d=d,a end
+											return a and (not f1 or f1(a,e,d)) and (not d or (not f2 or f2(d,e,a)))
+										end
+							end;
+[BATTLE_TIMING_ATTACKS]=	function(f1,f2)
+								return	function(e)
+											local a=Duel.GetAttacker()
+											if not a or a:IsControler(1-e:GetHandlerPlayer()) then return false end
+											local d=Duel.GetAttackTarget()
+											return (not f1 or f1(a,e,d)) and (not d or (not f2 or f2(d,e,c)))
+										end
+							end;
+[BATTLE_TIMING_ATTACKS_DIRECTLY]=	function(f1)
+										return	function(e)
+													local a=Duel.GetAttacker()
+													if not a or a:IsControler(1-e:GetHandlerPlayer()) then return false end
+													local d=Duel.GetBattleTarget()
+													return (not f1 or f1(a,e,d)) and not d
+												end
+									end;
+[BATTLE_TIMING_IS_ATTACKED]=	function(f1,f2)
+									return	function(e)
+												local a=Duel.GetAttackTarget()
+												if not a or a:IsControler(1-e:GetHandlerPlayer()) then return false end
+												local d=Duel.GetAttacker()
+												return (not f1 or f1(a,e,d)) and (not f2 or f2(d,e,c))
+											end
+								end;
+}
+
+function Card.CanAttackDirectlyField(c,range,selfzones,oppozones,f,cond,reset,rc)
+	local e=c:FieldEffect(EFFECT_DIRECT_ATTACK,range,selfzones,oppozones,f,nil,cond,reset,rc)
+	c:RegisterEffect(e)
+	return e
+end
+function Card.CanAttackWhileInDefensePositionField(c,range,selfzones,oppozones,f,cond,reset,rc)
+	local e=c:FieldEffect(EFFECT_DEFENSE_ATTACK,range,selfzones,oppozones,f,1,cond,reset,rc)
+	c:RegisterEffect(e)
+	return e
+end
+function Card.MustAttackField(c,range,selfzones,oppozones,f,cond,reset,rc)
+	local e=c:FieldEffect(EFFECT_MUST_ATTACK,range,selfzones,oppozones,f,nil,cond,reset,rc)
+	c:RegisterEffect(e)
+	return e
+end
+function Card.ArmadesEffectField(c,timing,protection,range,self,oppo,f1,cond,reset,rc)
+	if not timing then timing=BATTLE_TIMING_BATTLES end
+	if not self then self=0 end
+	if not oppo then oppo=0 end
+	local f2
+	if type(timing)=="table" then
+		f2=timing[2]
+		timing=timing[1]
+	end
+	local battlecond=BATTLE_TIMING_FUNCTIONS_FIELD[timing](f1,f2)
+	local condition =	function(e)
+							return (not battlecond or battlecond(e)) and (not cond or cond(e))
+						end
+
+	local val
+	if not protection then
+		val=1
+	else
+		if type(protection)=="number" then
+			local list={}
+			local i=1
+			while i<=8 do
+				if protection&i==i then
+					table.insert(list,PROTECTION_FUNCTIONS[i])
+				end
+				i=i*2
+			end
+			val =	function(eff,re,rp)
+						for _,f in ipairs(list) do
+							if not f(eff,re,rp) then
+								return false
+							end
+						end
+						return true
+					end
+		elseif type(protection)=="function" then
+			val=protection
+		else
+			val=function(eff,re,rp) return rp~=eff:GetHandlerPlayer() end
+		end
+	end
+	local e=c:FieldEffect(EFFECT_CANNOT_ACTIVATE,LOCATION_MZONE,self,oppo,nil,val,condition,reset,rc)
+	e:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	c:RegisterEffect(e)
+	return e
+end
+
+--Protections
+function Card.BattleProtectionField(c,range,selfzones,oppozones,f,cond,reset,rc)
+	local e=c:FieldEffect(EFFECT_INDESTRUCTABLE_BATTLE,range,selfzones,oppozones,f,1,cond,reset,rc)
+	c:RegisterEffect(e)
+	return e
+end
+function Card.EffectProtectionField(c,protection,range,selfzones,oppozones,f,cond,reset,rc)
+	local val
+	if not protection then
+		val=1
+	else
+		if type(protection)=="number" then
+			local list={}
+			local i=1
+			while i<=8 do
+				if protection&i==i then
+					table.insert(list,PROTECTION_FUNCTIONS[i])
+				end
+				i=i*2
+			end
+			val =	function(eff,re,rp)
+						for _,f in ipairs(list) do
+							if not f(eff,re,rp) then
+								return false
+							end
+						end
+						return true
+					end
+		elseif type(protection)=="function" then
+			val=protection
+		else
+			val=function(eff,re,rp) return rp~=eff:GetHandlerPlayer() end
+		end
+	end
+	local e=c:FieldEffect(EFFECT_INDESTRUCTABLE_EFFECT,range,selfzones,oppozones,f,val,cond,reset,rc)
+	c:RegisterEffect(e)
+	return e
+end
+function Card.TargetProtectionField(c,protection,range,selfzones,oppozones,f,cond,reset,rc)
+	local val
+	if not protection then
+		val=1
+	else
+		if type(protection)=="number" then
+			local list={}
+			local i=1
+			while i<=8 do
+				if protection&i==i then
+					table.insert(list,PROTECTION_FUNCTIONS[i])
+				end
+				i=i*2
+			end
+			val =	function(eff,re,rp)
+						for _,f in ipairs(list) do
+							if not f(eff,re,rp) then
+								return false
+							end
+						end
+						return true
+					end
+		elseif type(protection)=="function" then
+			val=protection
+		else
+			val=aux.tgoval
+		end
+	end
+	local e=c:FieldEffect(EFFECT_CANNOT_BE_EFFECT_TARGET,range,selfzones,oppozones,f,val,cond,reset,rc)
+	e:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+	c:RegisterEffect(e)
+	return e
+end
+function Card.UnaffectedProtectionField(c,protection,range,selfzones,oppozones,f,cond,reset,rc)
+	local val
+	if not protection then
+		val=1
+	else
+		if type(protection)=="number" then
+			local list={}
+			local i=1
+			while i<=8 do
+				if protection&i==i then
+					table.insert(list,UNAFFECTED_PROTECTION_FUNCTIONS[i])
+				end
+				i=i*2
+			end
+			val =	function(eff,re)
+						for _,f in ipairs(list) do
+							if not f(eff,re) then
+								return false
+							end
+						end
+						return true
+					end
+		elseif type(protection)=="function" then
+			val=protection
+		else
+			val=function(eff,re,rp) return rp~=eff:GetHandlerPlayer() end
+		end
+	end
+	local e=c:FieldEffect(EFFECT_IMMUNE_EFFECT,range,selfzones,oppozones,f,val,cond,reset,rc)
+	c:RegisterEffect(e)
+	return e
+end
+function Card.FirstTimeProtectionField(c,each_turn,battle,effect,protection,range,selfzones,oppozones,f,cond,reset,rc)
+	local val
+	if not protection then
+		val=function (eff,re,r,rp)
+				return (battle and r&REASON_BATTLE>0) or (effect and r&REASON_EFFECT>0)
+			end
+	else
+		if type(protection)=="number" then
+			local list={}
+			local i=1
+			while i<=8 do
+				if protection&i==i then
+					table.insert(list,PROTECTION_FUNCTIONS[i])
+				end
+				i=i*2
+			end
+			val =	function(eff,re,rp)
+						if not ((battle and r&REASON_BATTLE>0) or (effect and r&REASON_EFFECT>0)) then return false end
+						for _,f in ipairs(list) do
+							if not f(eff,re,rp) then
+								return false
+							end
+						end
+						return true
+					end
+		elseif type(protection)=="function" then
+			val=function (eff,re,r,rp)
+					return (battle and r&REASON_BATTLE>0) or (effect and r&REASON_EFFECT>0 and protection(eff,re,r,rp))
+				end
+		else
+			val=function (eff,re,r,rp)
+					return (battle and r&REASON_BATTLE>0) or (effect and r&REASON_EFFECT>0 and rp~=eff:GetHandlerPlayer())
+				end
+		end
+	end
+	local e=c:FieldEffect(EFFECT_INDESTRUCTABLE_COUNT,range,selfzones,oppozones,f,val,cond,reset,rc)
+	if not each_turn then
+		e:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
+	end
+	e:SetCountLimit(1)
 	c:RegisterEffect(e)
 	return e
 end

@@ -36,7 +36,7 @@ function s.initial_effect(c)
 	c:UpdateDEF(2600,false)
 	SCRIPT_AS_EQUIP=false
 	--
-	c:PositionFieldTrigger(false,2,CATEGORY_POSITION+CATEGORY_SPECIAL_SUMMON+CATEGORY_DESTROY+CATEGORY_ATKCHANGE,EFFECT_FLAG_CARD_TARGET,LOCATION_SZONE,nil,s.condition,nil,s.target,s.operation)
+	c:PositionFieldTrigger(nil,false,2,CATEGORY_POSITION+CATEGORY_SPECIAL_SUMMON+CATEGORY_DESTROY+CATEGORY_ATKCHANGE,EFFECT_FLAG_CARD_TARGET,LOCATION_SZONE,nil,s.condition,nil,s.target,s.operation)
 end
 function s.unionf(c)
 	return c:IsFaceup() and c:IsMonster() and c:HasLevel() and c:GetLevel()%2==0

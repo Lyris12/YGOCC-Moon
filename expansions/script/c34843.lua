@@ -63,7 +63,7 @@ end
 function s.spop2(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetTargetCards()
 	if #g==0 or Duel.GetLocationCount(tp,LOCATION_MZONE)<#g or (#g>1 and Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT)) then return end
-	Duel.SpecialSummonRedirect(e,g,0,tp,tp,false,false,POS_FACEUP,LOCATION_DECKBOT)
+	Duel.SpecialSummonRedirect(e,g,0,tp,tp,false,false,POS_FACEUP,nil,LOCATION_DECKBOT)
 end
 
 function s.spcon3(e,tp,eg,ep,ev,re,r,rp)

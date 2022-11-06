@@ -1,7 +1,9 @@
 --created by Jake
---Bushido God Ventus Dragon
+--Divinità Bushido Drago Ventus
+
 local s,id,o=GetID()
 function s.initial_effect(c)
+	--protection
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_IMMUNE_EFFECT)
@@ -9,20 +11,24 @@ function s.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetValue(s.unval)
 	c:RegisterEffect(e1)
+	--ssproc
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,2))
 	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e2:SetType(EFFECT_TYPE_SINGLE)
-	e2:SetCode(EFFECT_SUMMON_PROC)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetCode(EFFECT_SPSUMMON_PROC)
+	e2:SetRange(LOCATION_HAND)
 	e2:SetCondition(s.otcon)
 	e2:SetOperation(s.otop)
 	e2:SetValue(1)
 	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e3:SetCode(EVENT_SUMMON_SUCCESS)
+	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e3:SetOperation(s.unchainable)
 	c:RegisterEffect(e3)
+	--destroy
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(id,0))
 	e4:SetCategory(CATEGORY_DESTROY)
@@ -34,41 +40,55 @@ function s.initial_effect(c)
 	e4:SetTarget(s.dytg)
 	e4:SetOperation(s.dyop)
 	c:RegisterEffect(e4)
+	--draw
 	local e5=Effect.CreateEffect(c)
 	e5:SetDescription(aux.Stringid(id,1))
 	e5:SetCategory(CATEGORY_DRAW)
 	e5:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e5:SetType(EFFECT_TYPE_IGNITION)
 	e5:SetRange(LOCATION_MZONE)
-	e5:SetCountLimit(1,id)
+	e5:SetCountLimit(1,id+100)
 	e5:SetCost(s.drcost)
 	e5:SetTarget(s.drtg)
 	e5:SetOperation(s.drop)
 	c:RegisterEffect(e5)
 end
-function s.otfilter(c)
-	return c:IsSetCard(0x4b0) and c:IsType(TYPE_MONSTER) and c:IsAbleToRemoveAsCost()
-end
-function s.drfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x4b0) and c:IsType(TYPE_MONSTER) and c:IsAbleToDeckAsCost()
-end
 function s.unval(e,te)
 	return te:IsActiveType(TYPE_MONSTER) and te:GetOwnerPlayer()~=e:GetHandlerPlayer() and (te:GetOwner():IsSummonType(SUMMON_TYPE_SPECIAL) or te:GetHandler():IsSummonType(SUMMON_TYPE_SPECIAL))
 end
-function s.unchainable(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsSummonType(SUMMON_TYPE_NORMAL+1) then return end
-	Duel.SetChainLimitTillChainEnd(aux.FALSE)
-end
+
 function s.otcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
 	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(s.otfilter,tp,LOCATION_GRAVE,0,3,nil)
+		and Duel.IsExistingMatchingCard(s.otfilter,tp,LOCATION_GRAVE,0,2,nil)
 end
 function s.otop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=Duel.SelectMatchingCard(tp,s.otfilter,tp,LOCATION_GRAVE,0,3,3,nil)
-	Duel.Remove(g,POS_FACEUP,REASON_COST)
+	local g=Duel.SelectMatchingCard(tp,s.otfilter,tp,LOCATION_GRAVE,0,2,2,nil)
+	if #g>0 then
+		Duel.Remove(g,POS_FACEUP,REASON_COST)
+	end
+	--Cannot attack this turn
+	local e1=Effect.CreateEffect(c)
+	e1:Desc(3)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CLIENT_HINT)
+	e1:SetCode(EFFECT_CANNOT_ATTACK)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD+RESET_PHASE+PHASE_END)
+	c:RegisterEffect(e1)
+end
+
+function s.unchainable(e,tp,eg,ep,ev,re,r,rp)
+	if e:GetHandler():GetSummonType()~=SUMMON_TYPE_SPECIAL+1 then return end
+	Duel.SetChainLimitTillChainEnd(s.chainlm)
+end
+function s.chainlm(e,rp,tp)
+	return tp==rp
+end
+
+function s.otfilter(c)
+	return c:IsSetCard(0x4b0) and c:IsType(TYPE_MONSTER) and c:IsAbleToRemoveAsCost()
 end
 function s.dycost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.otfilter,tp,LOCATION_HAND,0,1,nil) end
@@ -87,9 +107,13 @@ function s.dytg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function s.dyop(e,tp,eg,ep,ev,re,r,rp,chk)
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) then
+	if tc and tc:IsRelateToChain() then
 		Duel.Destroy(tc,REASON_EFFECT)
 	end
+end
+
+function s.drfilter(c)
+	return c:IsFaceup() and c:IsSetCard(0x4b0) and c:IsType(TYPE_MONSTER) and c:IsAbleToDeckOrExtraAsCost()
 end
 function s.drcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.drfilter,tp,LOCATION_REMOVED,0,1,nil) end

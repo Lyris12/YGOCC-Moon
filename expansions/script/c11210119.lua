@@ -4,7 +4,7 @@
 local s,id=GetID()
 
 function s.initial_effect(c)
-	c:DestroyedFieldTrigger(false,0,CATEGORY_SPECIAL_SUMMON+CATEGORY_DESTROY,EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET,false,{1,0,EFFECT_COUNT_CODE_OATH},aux.EventGroupCond(s.cf),nil,s.tg,s.op,true)
+	c:DestroyedFieldTrigger(nil,false,0,CATEGORY_SPECIAL_SUMMON+CATEGORY_DESTROY,EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET,false,{1,0,EFFECT_COUNT_CODE_OATH},aux.EventGroupCond(s.cf),nil,s.tg,s.op,true)
 end
 function s.cf(c,_,tp)
 	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousControler(tp) and c:IsPreviousPosition(POS_FACEUP) and c:GetPreviousTypeOnField()&TYPE_BIGBANG>0

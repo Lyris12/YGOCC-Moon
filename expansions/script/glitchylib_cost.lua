@@ -40,13 +40,13 @@ function Auxiliary.DiscardCost(f,min,max,exc)
 end
 function Auxiliary.BanishCost(f,loc1,loc2,min,max,exc)
 	if not loc1 then loc1=LOCATION_ONFIELD end
-	if not loc2 then loc2=loc1 end
+	if not loc2 then loc2=0 end
 	if not min then min=1 end
 	if not max then max=min end
 	return	function(e,tp,eg,ep,ev,re,r,rp,chk)
 				local exc=(not exc) and nil or e:GetHandler()
 				if chk==0 then return Duel.IsExistingMatchingCard(aux.BanishFilter(f,true),tp,loc1,loc2,min,exc,e,tp) end
-				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 				local g=Duel.SelectMatchingCard(tp,aux.BanishFilter(f,true),tp,loc1,loc2,min,max,exc,e,tp)
 				if #g>0 then
 					local ct=Duel.Remove(g,POS_FACEUP,REASON_COST)
@@ -57,7 +57,7 @@ function Auxiliary.BanishCost(f,loc1,loc2,min,max,exc)
 end
 function Auxiliary.ToGraveCost(f,loc1,loc2,min,max,exc)
 	if not loc1 then loc1=LOCATION_ONFIELD end
-	if not loc2 then loc2=loc1 end
+	if not loc2 then loc2=0 end
 	if not min then min=1 end
 	if not max then max=min end
 	return	function(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -72,17 +72,22 @@ function Auxiliary.ToGraveCost(f,loc1,loc2,min,max,exc)
 				return g,0
 			end
 end
-function Auxiliary.ToDeckCost(f,loc1,loc2,min,max,exc)
+function Auxiliary.ToDeckCost(f,loc1,loc2,min,max,exc,main_or_extra)
+	f=aux.ToDeckFilter(f,true,main_or_extra)
 	if not loc1 then loc1=LOCATION_ONFIELD end
-	if not loc2 then loc2=loc1 end
+	if not loc2 then loc2=0 end
 	if not min then min=1 end
 	if not max then max=min end
 	return	function(e,tp,eg,ep,ev,re,r,rp,chk)
 				local exc=(not exc) and nil or e:GetHandler()
-				if chk==0 then return Duel.IsExistingMatchingCard(aux.ToDeckFilter(f,true),tp,loc1,loc2,min,exc,e,tp) end
+				if chk==0 then return Duel.IsExistingMatchingCard(f,tp,loc1,loc2,min,exc,e,tp) end
 				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-				local g=Duel.SelectMatchingCard(tp,aux.ToDeckFilter(f,true),tp,loc1,loc2,min,max,exc,e,tp)
+				local g=Duel.SelectMatchingCard(tp,f,tp,loc1,loc2,min,max,exc,e,tp)
 				if #g>0 then
+					local hg=g:Filter(Card.IsLocation,nil,LOCATION_GRAVE+LOCATION_REMOVED)
+					if #hg>0 then
+						Duel.HintSelection(hg)
+					end
 					local ct=Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_COST)
 					return g,ct
 				end
@@ -133,10 +138,24 @@ end
 
 -----------------------------------------------------------------------
 --Restrictions (Limits)
-function Card.SSCounter(c,f)
-	return Duel.AddCustomActivityCounter(c:GetOriginalCode(),ACTIVITY_SPSUMMON,f)
+function Auxiliary.AttackRestrictionCost(oath,reset,desc)
+	local prop=EFFECT_FLAG_CANNOT_DISABLE
+	if oath then prop=prop|EFFECT_FLAG_OATH end
+	if desc then prop=prop|EFFECT_FLAG_CLIENT_HINT end
+	if not reset then reset=RESET_PHASE+PHASE_END end
+	return	function(e,tp,eg,ep,ev,re,r,rp,chk)
+				local c=e:GetHandler()
+				if chk==0 then return c:GetAttackAnnouncedCount()==0 end
+				local e1=Effect.CreateEffect(c)
+				if desc then e1:Desc(desc) end
+				e1:SetType(EFFECT_TYPE_SINGLE)
+				e1:SetProperty(prop)
+				e1:SetCode(EFFECT_CANNOT_ATTACK)
+				e1:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
+				c:RegisterEffect(e1)
+			end
 end
-function Auxiliary.SSLimit(f,desc,oath,reset,id,cf)
+function Auxiliary.SSRestrictionCost(f,oath,reset,id,cf,desc)
 	if id then
 		if not cf then
 			Duel.AddCustomActivityCounter(id,ACTIVITY_SPSUMMON,f)
@@ -152,7 +171,7 @@ function Auxiliary.SSLimit(f,desc,oath,reset,id,cf)
 				local id=e:GetHandler():GetOriginalCode()
 				if chk==0 then return Duel.GetCustomActivityCount(id,tp,ACTIVITY_SPSUMMON)==0 end
 				local e1=Effect.CreateEffect(e:GetHandler())
-				e1:Desc(desc)
+				if desc then e1:Desc(desc) end
 				e1:SetType(EFFECT_TYPE_FIELD)
 				e1:SetProperty(prop)
 				e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
@@ -168,4 +187,12 @@ end
 
 function Card.ActivationCounter(c,f)
 	return Duel.AddCustomActivityCounter(c:GetOriginalCode(),ACTIVITY_CHAIN,f)
+end
+function Card.SSCounter(c,f)
+	return Duel.AddCustomActivityCounter(c:GetOriginalCode(),ACTIVITY_SPSUMMON,f)
+end
+
+--old names
+function Auxiliary.SSLimit(f,desc,oath,reset,id,cf)
+	return Auxiliary.SSRestrictionCost(f,oath,reset,id,cf,desc)
 end

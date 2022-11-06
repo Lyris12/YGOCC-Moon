@@ -48,11 +48,11 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToEffect(e) and tc:IsFaceup() and not tc:IsImmuneToEffect(e) and tc:IsAttackAbove(1000) and tc:IsDefenseAbove(1000) then
-		local _,atk=tc:UpdateATK(-1000,RESET_EVENT+RESETS_STANDARD,c)
-		local _,def=tc:UpdateDEF(-1000,RESET_EVENT+RESETS_STANDARD,c)
+		local _,atk=tc:UpdateATK(-1000,true,c)
+		local _,def=tc:UpdateDEF(-1000,true,c)
 		if c:IsRelateToEffect(e) and atk==-1000 and def==-1000 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 		and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
-			c:UpdateATKDEF(1000)
+			c:UpdateATKDEF(1000,1000,true)
 		end
 	end
 end

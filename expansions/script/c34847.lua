@@ -84,8 +84,8 @@ function s.ptop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToChain() and tc:IsFaceup() then
-		tc:EffectProtection(false,RESET_PHASE+PHASE_END,c,2)
-		tc:TargetProtection(false,RESET_PHASE+PHASE_END,c,2)
+		tc:EffectProtection(false,{RESET_PHASE+PHASE_END,2},c)
+		tc:TargetProtection(false,{RESET_PHASE+PHASE_END,2},c)
 		tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,EFFECT_FLAG_CLIENT_HINT,2,0,aux.Stringid(id,4))
 	end
 end

@@ -13,7 +13,7 @@ s.effect_text = [[
 
 function s.initial_effect(c)
 	c:Quick(false,0,CATEGORY_ATKCHANGE,EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP,false,LOCATION_HAND,{1,0},aux.ExceptOnDamageCalc,aux.ToGraveSelfCost,s.target,s.operation)
-	c:DestroyedFieldTrigger(false,1,CATEGORY_SPECIAL_SUMMON+CATEGORY_REMOVE,false,LOCATION_GRAVE,{1,1},s.spcon,aux.SSLimit(s.counterfilter2,2,true),s.sptg,s.spop)
+	c:DestroyedFieldTrigger(nil,false,1,CATEGORY_SPECIAL_SUMMON+CATEGORY_REMOVE,false,LOCATION_GRAVE,{1,1},s.spcon,aux.SSLimit(s.counterfilter2,2,true),s.sptg,s.spop)
 	--
 	c:SSCounter(s.counterfilter)
 end

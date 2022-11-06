@@ -70,6 +70,9 @@ function Auxiliary.LocationGroupCond(f,loc1,loc2,min,max,exc)
 	if not loc2 then loc2=loc1 end
 	if not min then min=1 end
 	return	function(e,tp,eg,ep,ev,re,r,rp)
+				if not tp then
+					tp=e:GetHandlerPlayer()
+				end
 				local exc=(not exc) and nil or e:GetHandler()
 				local ct=Duel.GetMatchingGroupCount(f,tp,loc1,loc2,exc,e,tp,eg,ep,ev,re,r,rp)
 				return ct>=min and (not max or ct<=max)
@@ -80,6 +83,9 @@ function Auxiliary.ExactLocationGroupCond(f,loc1,loc2,ct0,exc)
 	if not loc2 then loc2=loc1 end
 	if not ct then ct=1 end
 	return	function(e,tp,eg,ep,ev,re,r,rp)
+				if not tp then
+					tp=e:GetHandlerPlayer()
+				end
 				local exc=(not exc) and nil or e:GetHandler()
 				local ct=Duel.GetMatchingGroupCount(f,tp,loc1,loc2,exc,e,tp,eg,ep,ev,re,r,rp)
 				return ct==ct0
@@ -88,6 +94,9 @@ end
 function Auxiliary.CompareLocationGroupCond(res,f,loc,exc)
 	if not loc then loc=LOCATION_MZONE end
 	return	function(e,tp,eg,ep,ev,re,r,rp)
+				if not tp then
+					tp=e:GetHandlerPlayer()
+				end
 				local res = (res and res==1) and 1-tp or tp
 				local exc=(not exc) and nil or e:GetHandler()
 				local ct1=Duel.GetMatchingGroupCount(f,tp,loc,0,exc,e,tp,eg,ep,ev,re,r,rp)
@@ -142,10 +151,52 @@ function Auxiliary.IsEquippedCond(e)
 end
 
 --Reason and Reason Player
-function Auxiliary.ByCardEffect(p)
+function Auxiliary.ByCardEffectCond(p,typ)
 	return	function(e,tp,eg,ep,ev,re,r,rp)
 				local c=e:GetHandler()
 				local p = (p==0) and tp or (p==1) and 1-tp or nil
 				return c:IsReason(REASON_EFFECT) and (not p or c:GetReasonPlayer()==p)
+					and (not typ or (re and re:IsActiveType(typ)))
 			end
+end
+function Auxiliary.ByCardEffect(p,typ)
+	return aux.ByCardEffectCond(p,typ)
+end
+
+--Xyz Related
+function Auxiliary.HasXyzMaterialCond(e)
+	return e:GetHandler():GetOverlayCount()>0
+end
+
+--Link Related
+function Auxiliary.ThisCardPointsToCond(f,min)
+	if not f then f=aux.TRUE end
+	return	function(e)
+				local tp=e:GetHandlerPlayer()
+				return e:GetHandler():GetLinkedGroup():IsExists(f,min,nil,e,tp)
+			end
+end
+
+-----------------------------------------------------------------------
+--Summon Conditions
+function Card.MustFirstBeSummoned(c,sumtype,rc)
+	local rc = rc and rc or c
+	local e=Effect.CreateEffect(rc)
+	e:SetType(EFFECT_TYPE_SINGLE)
+	e:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e:SetCode(EFFECT_SPSUMMON_CONDITION)
+	e:SetValue(	function(eff,se,sp,st)
+					return not e:GetHandler():IsLocation(LOCATION_EXTRA) or (sumtype and st&sumtype==sumtype)
+				end
+			  )
+	c:RegisterEffect(e)
+	return e
+end
+function Card.MustBeSSedByOwnProcedure(c,rc)
+	local rc = rc and rc or c
+	local e=Effect.CreateEffect(rc)
+	e:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e:SetType(EFFECT_TYPE_SINGLE)
+	e:SetCode(EFFECT_SPSUMMON_CONDITION)
+	c:RegisterEffect(e)
 end

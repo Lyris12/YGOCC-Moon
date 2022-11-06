@@ -126,9 +126,9 @@ function s.desrepop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if e:GetLabel()==0 then
 		local bc=c:GetBattleTarget()
-		c:UpdateATK(-math.abs(bc:GetAttack()-c:GetDefense()))
+		c:UpdateATK(-math.abs(bc:GetAttack()-c:GetDefense()),true)
 	elseif e:GetLabel()==1 then
-		c:UpdateDEF(-1000)
+		c:UpdateDEF(-1000,true)
 	end
 end
 function s.sdcon(e)

@@ -12,7 +12,7 @@ s.effect_text = [[
 ]]
 
 function s.initial_effect(c)
-	local e1=c:SentToGYFieldTrigger(false,0,CATEGORY_SPECIAL_SUMMON+CATEGORY_DISABLE,EFFECT_FLAG_DAMAGE_STEP,LOCATION_HAND+LOCATION_GRAVE,{1,0},aux.EventGroupCond(s.cf),false,aux.SSSelfTarget(true),s.op)
+	local e1=c:SentToGYFieldTrigger(nil,false,0,CATEGORY_SPECIAL_SUMMON+CATEGORY_DISABLE,EFFECT_FLAG_DAMAGE_STEP,LOCATION_HAND+LOCATION_GRAVE,{1,0},aux.EventGroupCond(s.cf),false,aux.SSSelfTarget(true),s.op)
 	
 	aux.AddUnionProcedure(c,s.unionf,false,false,false,true)
 	

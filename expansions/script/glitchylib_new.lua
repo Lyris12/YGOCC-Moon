@@ -18,6 +18,7 @@ CATEGORY_FLAG_SELF					= 0x1
 GLOBAL_EFFECT_RESET	=	10203040
 
 --Properties
+EFFECT_FLAG_DD = EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL
 EFFECT_FLAG_DDD = EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL
 
 --zone constants
@@ -70,12 +71,12 @@ end
 function Duel.HintMessage(tp,msg)
 	return Duel.Hint(HINT_SELECTMSG,tp,msg)
 end
-function Auxiliary.Faceup(f,...)
+function Auxiliary.Faceup(f)
 	return	function(c,...)
 				return (not f or f(c,...)) and c:IsFaceup()
 			end
 end
-function Auxiliary.Facedown(f,...)
+function Auxiliary.Facedown(f)
 	return	function(c,...)
 				return (not f or f(c,...)) and c:IsFacedown()
 			end
@@ -435,9 +436,30 @@ function Auxiliary.Option(id,tp,desc,...)
 	return sel
 end
 
+--Filters
+function Auxiliary.Filter(f,...)
+	local ext_params={...}
+	return aux.FilterBoolFunction(f,table.unpack(ext_params))
+end
+function Auxiliary.MonsterFilter(f,...)
+	local ext_params={...}
+	return	function(target)
+				return target:IsMonster() and f(target,table.unpack(ext_params))
+			end
+end
+function Auxiliary.STFilter(f,...)
+	local ext_params={...}
+	return	function(target)
+				return target:IsST() and f(target,table.unpack(ext_params))
+			end
+end
+
 --Flag Effects
 function Card.HasFlagEffect(c,id)
 	return c:GetFlagEffect(id)>0
+end
+function Duel.PlayerHasFlagEffect(p,id)
+	return Duel.GetFlagEffect(p,id)>0
 end
 function Card.UpdateFlagEffectLabel(c,id,ct)
 	if not ct then ct=1 end
@@ -533,6 +555,23 @@ function Card.NotInExtraOrFaceup(c)
 	return not c:IsLocation(LOCATION_EXTRA) or c:IsFaceup()
 end
 
+function Card.GetPreviousZone(c)
+	return 1<<c:GetPreviousSequence()
+end
+function Duel.CheckPendulumZones(tp)
+	return Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,1)
+end
+function Card.IsInLinkedZone(c,cc)
+	return cc:GetLinkedGroup():IsContains(c)
+end
+function Card.WasInLinkedZone(c,cc)
+	return cc:GetLinkedZone(c:GetPreviousControler())&c:GetPreviousZone()~=0
+end
+function Card.HasBeenInLinkedZone(c,cc)
+	return cc:GetLinkedGroup():IsContains(c) or (not c:IsLocation(LOCATION_MZONE) and cc:GetLinkedZone(c:GetPreviousControler())&c:GetPreviousZone()~=0)
+end
+
+
 --Once per turn
 function Effect.OPT(e,ct)
 	if not ct then ct=1 end
@@ -598,6 +637,18 @@ end
 function Duel.IsEndPhase(tp)
 	return (not tp or Duel.GetTurnPlayer()==tp) and Duel.GetCurrentPhase()==PHASE_END
 end
+
+--Location Check
+function Auxiliary.AddThisCardBanishedAlreadyCheck(c)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	e1:SetCode(EVENT_REMOVE)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e1:SetOperation(Auxiliary.ThisCardInGraveAlreadyCheckOperation)
+	c:RegisterEffect(e1)
+	return e1
+end
+
 -----------------------------------------------------------------------
 function Card.Ignition(c,desc,ctg,prop,range,ctlim,cond,cost,tg,op,reset,quickcon)
 	if not range then range=c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE end
@@ -684,7 +735,7 @@ function Card.Ignition(c,desc,ctg,prop,range,ctlim,cond,cost,tg,op,reset,quickco
 	end
 	return e1
 end
-function Card.Activate(c,desc,ctg,prop,event,ctlim,cond,cost,tg,op,handcon)
+function Card.Activate(c,desc,ctg,prop,event,ctlim,cond,cost,tg,op,handcon,timing)
 	local event = event and event or EVENT_FREE_CHAIN
 	---
 	local e1=Effect.CreateEffect(c)
@@ -726,6 +777,13 @@ function Card.Activate(c,desc,ctg,prop,event,ctlim,cond,cost,tg,op,handcon)
 			e1:SetCountLimit(ctlim)
 		end
 	end
+	if timing then
+		if type(timing)=="table" then
+			e1:SetHintTiming(timing[1],timing[2])
+		else
+			e1:SetHintTiming(0,timing)
+		end
+	end
 	if cond then
 		e1:SetCondition(cond)
 	end
@@ -756,7 +814,7 @@ function Card.Activate(c,desc,ctg,prop,event,ctlim,cond,cost,tg,op,handcon)
 	end
 	return e1
 end
-function Card.Quick(c,forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op)
+function Card.Quick(c,forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op,timing)
 	if not range then range=c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE end
 	if not event then event=EVENT_FREE_CHAIN end
 	local quick_type=(not forced) and EFFECT_TYPE_QUICK_O or EFFECT_TYPE_QUICK_F
@@ -803,6 +861,13 @@ function Card.Quick(c,forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op)
 			end
 		else
 			e1:SetCountLimit(ctlim)
+		end
+	end
+	if timing then
+		if type(timing)=="table" then
+			e1:SetHintTiming(timing[1],timing[2])
+		else
+			e1:SetHintTiming(0,timing)
 		end
 	end
 	if cond then

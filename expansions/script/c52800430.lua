@@ -20,7 +20,7 @@ function s.initial_effect(c)
 	
 	c:SummonedTrigger(false,true,false,false,0,CATEGORY_POSITION,false,nil,nil,nil,aux.PositionSelfTarget,aux.PositionSelfOperation)
 	
-	c:SummonedFieldTrigger(true,true,true,true,1,CATEGORY_COUNTER,false,LOCATION_MZONE+LOCATION_FZONE,nil,aux.EventGroupCond(s.cf),nil,nil,aux.EventCounterSelfOperation(0x102,1,s.cf),2)
+	c:SummonedFieldTrigger(nil,true,true,true,true,1,CATEGORY_COUNTER,false,LOCATION_MZONE+LOCATION_FZONE,nil,aux.EventGroupCond(s.cf),nil,nil,aux.EventCounterSelfOperation(0x102,1,s.cf),2)
 	
 	c:UpdateLevelField(s.value,false,LOCATION_ONFIELD+LOCATION_HAND,true,s.lvf)
 	

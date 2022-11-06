@@ -73,6 +73,6 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local ec=eg:Filter(s.cf,nil,e:GetLabel(),re):GetFirst()
 	if ec and c:IsFaceup() then
 		Duel.Hint(HINT_CARD,0,id)
-		c:UpdateATK(ec:GetTextAttack())
+		c:UpdateATK(ec:GetTextAttack(),true)
 	end
 end

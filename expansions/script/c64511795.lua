@@ -9,7 +9,7 @@ s.effect_text = [[
 ]]
 
 function s.initial_effect(c)
-	c:SummonedFieldTrigger(false,true,true,true,0,{CATEGORY_ATKCHANGE,CATEGORY_UPDATE_RACE},EFFECT_FLAG_CARD_TARGET,LOCATION_MZONE,nil,aux.EventGroupCond(s.cf),nil,s.target,s.operation)
+	c:SummonedFieldTrigger(nil,false,true,true,true,0,{CATEGORY_ATKCHANGE,CATEGORY_UPDATE_RACE},EFFECT_FLAG_CARD_TARGET,LOCATION_MZONE,nil,aux.EventGroupCond(s.cf),nil,s.target,s.operation)
 	c:Quick(false,1,false,false,false,false,1,s.ptcon,nil,nil,s.ptop)
 end
 function s.cf(c,e)

@@ -17,7 +17,7 @@ function s.initial_effect(c)
 	--Change Position
 	local e2=c:Quick(false,1,CATEGORY_POSITION,EFFECT_FLAG_CARD_TARGET,nil,nil,{1,2},nil,aux.DiscardCost,aux.Target(s.posfilter,LOCATION_MZONE,0,1,1,true,s.poschk,s.posinfo),s.posop)
 	--Gain ATK
-	local e3=c:PositionFieldTrigger(true,2,CATEGORY_ATKCHANGE+CATEGORY_DEFCHANGE,0,nil,nil,s.boostcon,nil,nil,s.boostop,true)
+	local e3=c:PositionFieldTrigger(nil,true,2,CATEGORY_ATKCHANGE+CATEGORY_DEFCHANGE,0,nil,nil,s.boostcon,nil,nil,s.boostop,true)
 end
 
 function s.filter(c,e,tp,pos)
@@ -81,7 +81,7 @@ function s.boostop(e,tp,eg,ep,ev,re,r,rp)
 	if #g<=0 then return end
 	Duel.Hint(HINT_CARD,0,id)
 	for tc in aux.Next(g) do
-		tc:UpdateATK(700,RESETS_STANDARD+RESET_PHASE+PHASE_END,e:GetHandler())
-		tc:UpdateDEF(700,RESETS_STANDARD+RESET_PHASE+PHASE_END,e:GetHandler())
+		tc:UpdateATK(700,RESET_PHASE+PHASE_END,e:GetHandler())
+		tc:UpdateDEF(700,RESET_PHASE+PHASE_END,e:GetHandler())
 	end
 end

@@ -17,7 +17,7 @@ function s.initial_effect(c)
 	e1:SetLabel(0)
 	c:RegisterEffect(e1)
 	--
-	c:SummonedFieldTrigger(false,false,true,false,3,CATEGORY_TOHAND,true,LOCATION_GRAVE,{1,0},aux.EventGroupCond(s.cf),s.thcost,s.thtg,s.thop)
+	c:SummonedFieldTrigger(nil,false,false,true,false,3,CATEGORY_TOHAND,true,LOCATION_GRAVE,{1,0},aux.EventGroupCond(s.cf),s.thcost,s.thtg,s.thop)
 	--
 	c:SSCounter(s.counterfilter)
 end

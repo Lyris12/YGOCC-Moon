@@ -8,7 +8,7 @@ function s.initial_effect(c)
 	--stats
 	c:UpdateATKDEFField(500,500,nil,LOCATION_MZONE,0,aux.TargetBoolFunction(Card.IsSetCard,0xfa6))
 	--onsummon
-	c:SummonedFieldTrigger(false,true,true,true,0,nil,true,nil,true,aux.EventGroupCond(s.cfilter),nil,s.target,s.operation)
+	c:SummonedFieldTrigger(nil,false,true,true,true,0,nil,true,nil,true,aux.EventGroupCond(s.cfilter),nil,s.target,s.operation)
 end
 
 function s.cfilter(c,_,tp)

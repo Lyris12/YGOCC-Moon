@@ -82,7 +82,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 			g:Merge(gg)
 			if Duel.Remove(g,POS_FACEUP,REASON_EFFECT)==2 and g:FilterCount(Card.IsLocation,nil,LOCATION_REMOVED)==2 and c:IsLocation(LOCATION_GRAVE) and c:IsRelateToEffect(e)
 			and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
-				Duel.SpecialSummonATK(e,c,0,tp,tp,false,false,POS_FACEUP,500)
+				Duel.SpecialSummonATK(e,c,0,tp,tp,false,false,POS_FACEUP,nil,500)
 			end
 		end
 	end
