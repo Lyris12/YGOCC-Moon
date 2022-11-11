@@ -28,7 +28,7 @@ function s.initial_effect(c)
 	)
 end
 function s.ffilter(c,fc,sub,mg,sg)
-	return (not sg or not sg:IsExists(Card.IsFusionAttribute,1,c,c:GetFusionAttribute()))
+	return c:IsFusionType(TYPE_MONSTER) and (not sg or not sg:IsExists(Card.IsFusionAttribute,1,c,c:GetFusionAttribute()))
 		and (not mg or #mg<3 or mg:IsExists(s.includefilter,1,nil))
 end
 function s.includefilter(c)

@@ -4,7 +4,7 @@
 local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
-	aux.AddFusionProcFun2(c,aux.Filter(Card.IsFusionSetCard,0xd71),s.ffilter,true)
+	aux.AddFusionProcFun2(c,s.mfilter1,s.ffilter,true)
 	--destroy
 	c:SummonedTrigger(false,false,true,false,0,CATEGORY_HANDES,true,true,
 		nil,
@@ -24,6 +24,9 @@ function s.initial_effect(c)
 		),
 		RELEVANT_TIMINGS
 	)
+end
+function s.mfilter1(c)
+	return c:IsFusionSetCard(0xd71) and c:IsFusionType(TYPE_MONSTER)
 end
 function s.ffilter(c,fc,sub,mg,sg)
 	local tp=fc:GetControler()
