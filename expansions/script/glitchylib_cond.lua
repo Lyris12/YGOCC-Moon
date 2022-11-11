@@ -155,12 +155,20 @@ function Auxiliary.ByCardEffectCond(p,typ)
 	return	function(e,tp,eg,ep,ev,re,r,rp)
 				local c=e:GetHandler()
 				local p = (p==0) and tp or (p==1) and 1-tp or nil
-				return c:IsReason(REASON_EFFECT) and (not p or c:GetReasonPlayer()==p)
+				return c:IsReason(REASON_EFFECT) and (not p or rp==p)
 					and (not typ or (re and re:IsActiveType(typ)))
 			end
 end
 function Auxiliary.ByCardEffect(p,typ)
 	return aux.ByCardEffectCond(p,typ)
+end
+
+function Auxiliary.ByPlayerCardCond(p)
+	return	function(e,tp,eg,ep,ev,re,r,rp)
+				local c=e:GetHandler()
+				local p = (not p or p==1) and 1-tp or (p==0) and tp
+				return rp==p and c:IsPreviousControler(tp)
+			end
 end
 
 --Xyz Related

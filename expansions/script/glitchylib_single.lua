@@ -6,6 +6,7 @@ SUBJECT_THEM				=	1
 SUBJECT_THAT_TARGET			=	2
 SUBJECT_THOSE_TARGETS		=	2
 SUBJECT_ALL_THOSE_TARGETS	=	3
+SUBJECT_ALL					=	4
 
 -----------------------------------------------------------------------
 function Card.SingleEffect(c,code,val,reset,rc,range,cond)
@@ -95,9 +96,23 @@ function Auxiliary.UpdateStatsOperationTemplate(fn,subject,atk,reset,rc,range,co
 									chk=chk+1
 								end
 							end
-							return chk,chk>0
+							return g,chk,chk>0
 						end
 			return aux.TargetOperation(op)
+		
+		elseif subject==SUBJECT_THAT_TARGET or subject==SUBJECT_ALL_THOSE_TARGETS then
+			local hardchk=(subject==SUBJECT_ALL_THOSE_TARGETS)
+			local op =	function(g)
+							local chk=0
+							for tc in aux.Next(g) do
+								local eff,diff=fn(tc,atk,reset,rc,range,cond)
+								if not tc:IsImmuneToEffect(eff) and diff==atk then
+									chk=chk+1
+								end
+							end
+							return g,chk,chk>0
+						end
+			return aux.TargetOperation(op,nil,hardchk)
 		end
 	
 	else
@@ -140,7 +155,7 @@ function Auxiliary.UpdateStatsOperationTemplate(fn,subject,atk,reset,rc,range,co
 									chk=chk+1
 								end
 							end
-							return chk,chk>0
+							return g,chk,chk>0
 						end
 			return aux.TargetOperation(op,f,hardchk)
 		end
@@ -190,9 +205,23 @@ function Auxiliary.ChangeStatsOperationTemplate(fn,subject,atk,reset,rc,range,co
 									chk=chk+1
 								end
 							end
-							return chk,chk>0
+							return g,chk,chk>0
 						end
 			return aux.TargetOperation(op)
+		
+		elseif subject==SUBJECT_THAT_TARGET or subject==SUBJECT_ALL_THOSE_TARGETS then
+			local hardchk=(subject==SUBJECT_ALL_THOSE_TARGETS)
+			local op =	function(g)
+							local chk=0
+							for tc in aux.Next(g) do
+								local eff,_,diff=fn(tc,atk,reset,rc,range,cond)
+								if not tc:IsImmuneToEffect(eff) and diff==atk then
+									chk=chk+1
+								end
+							end
+							return g,chk,chk>0
+						end
+			return aux.TargetOperation(op,nil,hardchk)
 		end
 	
 	else
@@ -235,7 +264,7 @@ function Auxiliary.ChangeStatsOperationTemplate(fn,subject,atk,reset,rc,range,co
 									chk=chk+1
 								end
 							end
-							return chk,chk>0
+							return g,chk,chk>0
 						end
 			return aux.TargetOperation(op,f,hardchk)
 		end

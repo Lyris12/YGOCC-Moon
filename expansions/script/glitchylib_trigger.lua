@@ -105,6 +105,13 @@ function Card.DestroyedTrigger(c,forced,desc,ctg,prop,ctlim,cond,cost,tg,op,type
 	local e1=c:Trigger(forced,desc,ctg,EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL,prop,event,ctlim,cond,cost,tg,op,typechange,reset)
 	return e1
 end
+function Card.DestroyedAndSentToGYTrigger(c,forced,desc,ctg,prop,ctlim,cond,cost,tg,op,typechange,reset)
+	local event=EVENT_TO_GRAVE
+	local condition=function(e,tp,eg,ep,ev,re,r,rp) return e:GetHandler():IsReason(REASON_DESTROY) and (not cond or cond(e,tp,eg,ep,ev,re,r,rp)) end
+	local e1=c:Trigger(forced,desc,ctg,EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL,prop,event,ctlim,condition,cost,tg,op,typechange,reset)
+	return e1
+end
+
 function Card.LeaveTrigger(c,forced,desc,ctg,prop,ctlim,cond,cost,tg,op,typechange,reset)
 	local event=EVENT_LEAVE_FIELD
 	local e1=c:Trigger(forced,desc,ctg,EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL,prop,event,ctlim,cond,cost,tg,op,typechange,reset)
@@ -288,6 +295,13 @@ function Card.DestroyedFieldTrigger(c,evf,forced,desc,ctg,prop,range,ctlim,cond,
 	local e1=c:FieldTrigger(evf,forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op,typechange,reset,notreg,true)
 	return e1
 end
+function Card.DestroyedAndSentToGYFieldTrigger(c,evf,forced,desc,ctg,prop,range,ctlim,cond,cost,tg,op,typechange,reset,notreg)
+	local event=EVENT_TO_GRAVE
+	local filter=function(c,e,tp,eg,ep,ev,re,r,rp) return c:IsReason(REASON_DESTROY) and (not evf or evf(e,tp,eg,ep,ev,re,r,rp)) end
+	local e1=c:FieldTrigger(filter,forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op,typechange,reset,notreg,true)
+	return e1
+end
+
 function Card.LeaveFieldTrigger(c,evf,forced,desc,ctg,prop,range,ctlim,cond,cost,tg,op,typechange,reset,notreg)
 	local event=EVENT_LEAVE_FIELD
 	local e1=c:FieldTrigger(evf,forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op,typechange,reset,notreg,true)

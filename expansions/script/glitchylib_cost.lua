@@ -45,9 +45,9 @@ function Auxiliary.BanishCost(f,loc1,loc2,min,max,exc)
 	if not max then max=min end
 	return	function(e,tp,eg,ep,ev,re,r,rp,chk)
 				local exc=(not exc) and nil or e:GetHandler()
-				if chk==0 then return Duel.IsExistingMatchingCard(aux.BanishFilter(f,true),tp,loc1,loc2,min,exc,e,tp) end
+				if chk==0 then return Duel.IsExistingMatchingCard(aux.BanishFilter(f,true),tp,loc1,loc2,min,exc,e,tp,eg,ep,ev,re,r,rp) end
 				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-				local g=Duel.SelectMatchingCard(tp,aux.BanishFilter(f,true),tp,loc1,loc2,min,max,exc,e,tp)
+				local g=Duel.SelectMatchingCard(tp,aux.BanishFilter(f,true),tp,loc1,loc2,min,max,exc,e,tp,eg,ep,ev,re,r,rp)
 				if #g>0 then
 					local ct=Duel.Remove(g,POS_FACEUP,REASON_COST)
 					return g,ct
@@ -62,9 +62,9 @@ function Auxiliary.ToGraveCost(f,loc1,loc2,min,max,exc)
 	if not max then max=min end
 	return	function(e,tp,eg,ep,ev,re,r,rp,chk)
 				local exc=(not exc) and nil or e:GetHandler()
-				if chk==0 then return Duel.IsExistingMatchingCard(aux.ToGraveFilter(f,true),tp,loc1,loc2,min,exc,e,tp) end
+				if chk==0 then return Duel.IsExistingMatchingCard(aux.ToGraveFilter(f,true),tp,loc1,loc2,min,exc,e,tp,eg,ep,ev,re,r,rp) end
 				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-				local g=Duel.SelectMatchingCard(tp,aux.ToGraveFilter(f,true),tp,loc1,loc2,min,max,exc,e,tp)
+				local g=Duel.SelectMatchingCard(tp,aux.ToGraveFilter(f,true),tp,loc1,loc2,min,max,exc,e,tp,eg,ep,ev,re,r,rp)
 				if #g>0 then
 					local ct=Duel.SendtoGrave(g,REASON_COST)
 					return g,ct
@@ -80,9 +80,9 @@ function Auxiliary.ToDeckCost(f,loc1,loc2,min,max,exc,main_or_extra)
 	if not max then max=min end
 	return	function(e,tp,eg,ep,ev,re,r,rp,chk)
 				local exc=(not exc) and nil or e:GetHandler()
-				if chk==0 then return Duel.IsExistingMatchingCard(f,tp,loc1,loc2,min,exc,e,tp) end
+				if chk==0 then return Duel.IsExistingMatchingCard(f,tp,loc1,loc2,min,exc,e,tp,eg,ep,ev,re,r,rp) end
 				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-				local g=Duel.SelectMatchingCard(tp,f,tp,loc1,loc2,min,max,exc,e,tp)
+				local g=Duel.SelectMatchingCard(tp,f,tp,loc1,loc2,min,max,exc,e,tp,eg,ep,ev,re,r,rp)
 				if #g>0 then
 					local hg=g:Filter(Card.IsLocation,nil,LOCATION_GRAVE+LOCATION_REMOVED)
 					if #hg>0 then
@@ -97,17 +97,82 @@ end
 
 -----------------------------------------------------------------------
 --Self as Cost
+function Auxiliary.BanishFacedownSelfCost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost(POS_FACEDOWN) end
+	Duel.Remove(e:GetHandler(),POS_FACEDOWN,REASON_COST)
+end
 function Auxiliary.DiscardSelfCost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsDiscardable() end
 	Duel.SendtoGrave(e:GetHandler(),REASON_COST+REASON_DISCARD)
 end
 function Auxiliary.DetachSelfCost(min,max)
 	if not min then min=1 end
-	if not max then max=min end
-	return	function(e,tp,eg,ep,ev,re,r,rp,chk)
-				if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,min,REASON_COST) end
-				e:GetHandler():RemoveOverlayCard(tp,min,max,REASON_COST)
-			end
+	if not max or max<min then max=min end
+	
+	if min==max then
+		return	function(e,tp,eg,ep,ev,re,r,rp,chk)
+					if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,min,REASON_COST) end
+					e:GetHandler():RemoveOverlayCard(tp,min,min,REASON_COST)
+				end
+	else
+		return	function(e,tp,eg,ep,ev,re,r,rp,chk)
+					local c=e:GetHandler()
+					if chk==0 then
+						for i=min,max do
+							if c:CheckRemoveOverlayCard(tp,i,REASON_COST) then
+								return true
+							end
+						end
+						return false
+					end
+					local list={}
+					for i=min,max do
+						if c:CheckRemoveOverlayCard(tp,i,REASON_COST) then
+							table.insert(list,i)
+						end
+					end
+					if #list==0 then return end
+					if #list==max-min then
+						c:RemoveOverlayCard(tp,min,max,REASON_COST)
+					else
+						local ct=Duel.AnnounceNumber(tp,table.unpack(list))
+						c:RemoveOverlayCard(tp,ct,ct,REASON_COST)
+					end
+				end
+	end
+end
+function Auxiliary.RemoveCounterSelfCost(ctype,min,max)
+	if not min then min=1 end
+	if not max or max<min then max=min end
+	
+	if min==max then
+		return	function(e,tp,eg,ep,ev,re,r,rp,chk)
+					local c=e:GetHandler()
+					if chk==0 then return c:IsCanRemoveCounter(tp,ctype,min,REASON_COST) end
+					c:RemoveCounter(tp,ctype,min,REASON_COST)
+				end
+	else
+		return	function(e,tp,eg,ep,ev,re,r,rp,chk)
+					local c=e:GetHandler()
+					if chk==0 then
+						for i=min,max do
+							if c:IsCanRemoveCounter(tp,ctype,i,REASON_COST) then
+								return true
+							end
+						end
+						return false
+					end
+					local list={}
+					for i=min,max do
+						if c:IsCanRemoveCounter(tp,ctype,i,REASON_COST) then
+							table.insert(list,i)
+						end
+					end
+					if #list==0 then return end
+					local ct=Duel.AnnounceNumber(tp,table.unpack(list))
+					c:RemoveCounter(tp,ctype,ct,REASON_COST)
+				end
+	end
 end
 function Auxiliary.ToDeckSelfCost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToDeckAsCost() end

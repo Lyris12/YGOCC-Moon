@@ -3,29 +3,38 @@ GFILTER_DIFFERENT_NAMES = 1
 
 ACTION_TABLE = {[CATEGORY_DESTROY]=function(g) Duel.Destroy(g,REASON_EFFECT) end}
 
-CONJUNCTION_AND_IF_YOU_DO		=	1
-CONJUNCTION_THEN				=	2
-CONJUNCTION_ALSO				=	3
-CONJUNCTION_ALSO_AFTER_THAT		=	4
+CONJUNCTION_AND_IF_YOU_DO				=	0x1
+CONJUNCTION_THEN						=	0x2
+CONJUNCTION_ALSO						=	0x4
+CONJUNCTION_ALSO_AFTER_THAT				=	0x8
+CONJUNCTION_AND_IF_YOU_DO_YOU_CAN		=	0x1001
+CONJUNCTION_THEN_YOU_CAN				=	0x1002
+CONJUNCTION_ALSO_YOU_CAN				=	0x1004
+CONJUNCTION_ALSO_AFTER_THAT_YOU_CAN		=	0x1008
 
 --Complex Operation Builder
 function Auxiliary.CreateOperation(...)
 	local x={...}
 	return	function(e,tp,eg,ep,ev,re,r,rp)
+				local res,rct,rchk
 				for i,op in ipairs(x) do
 					if type(op)=="function" then
 						local conj = (i>2 and type(x[i-1])=="number") and x[i-1] or nil
-						local res,rct,rchk=op(e,tp,eg,ep,ev,re,r,rp,conj)
-						if (conj==CONJUNCTION_AND_IF_YOU_DO or conj==CONJUNCTION_THEN)
+						-- Debug.Message(conj)
+						-- Debug.Message(res)
+						-- Debug.Message(rct)
+						-- Debug.Message(rchk)
+						if i>2 and (conj==CONJUNCTION_AND_IF_YOU_DO or conj==CONJUNCTION_THEN)
 							and ((type(rchk)~="nil" and not rchk) or (type(rct)=="nil" and type(rchk)=="nil" and not res)) then
 							return
 						end
+						res,rct,rchk=op(e,tp,eg,ep,ev,re,r,rp,conj)
 					end
 				end
 			end
 end
 function Auxiliary.CheckSequentiality(conj)
-	if conj and (conj==CONJUNCTION_THEN or conj==CONJUNCTION_ALSO_AFTER_THAT) then
+	if conj and (conj&CONJUNCTION_THEN==CONJUNCTION_THEN or conj&CONJUNCTION_ALSO_AFTER_THAT==CONJUNCTION_ALSO_AFTER_THAT) then
 		Duel.BreakEffect()
 	end
 end
@@ -205,10 +214,10 @@ function Auxiliary.TargetOperation(op,f,hardchk,prechk,postchk)
 						local g=Duel.GetTargetCards():Filter(f,nil,e,tp,eg,ep,ev,re,r,rp)
 						if #g>0 and (not postchk or postchk(g,e,tp,eg,ep,ev,re,r,rp)) then
 							aux.CheckSequentiality(conj)
-							local ct,chk=op(g,e,tp,eg,ep,ev,re,r,rp)
-							return g,ct,chk
+							local res,ct,chk=op(g,e,tp,eg,ep,ev,re,r,rp)
+							return g,ct,(ct>0 and chk)
 						end
-						return g,0
+						return g,0,false
 					end
 		else
 			return	function (e,tp,eg,ep,ev,re,r,rp,conj)
@@ -216,10 +225,10 @@ function Auxiliary.TargetOperation(op,f,hardchk,prechk,postchk)
 						local g=Duel.GetTargetCards()
 						if #g>0 and (not postchk or postchk(g,e,tp,eg,ep,ev,re,r,rp)) then
 							aux.CheckSequentiality(conj)
-							local ct,chk=op(g,e,tp,eg,ep,ev,re,r,rp)
-							return g,ct,chk
+							local res,ct,chk=op(g,e,tp,eg,ep,ev,re,r,rp)
+							return g,ct,(ct>0 and chk)
 						end
-						return g,0
+						return g,0,false
 					end
 		end
 	else
@@ -233,10 +242,10 @@ function Auxiliary.TargetOperation(op,f,hardchk,prechk,postchk)
 						end	
 						if #g>0 and (not postchk or postchk(g,e,tp,eg,ep,ev,re,r,rp)) then
 							aux.CheckSequentiality(conj)
-							local ct,chk=op(g,e,tp,eg,ep,ev,re,r,rp)
-							return g,ct,chk
+							local res,ct,chk=op(g,e,tp,eg,ep,ev,re,r,rp)
+							return g,ct,(ct==#g and chk)
 						end
-						return g,0
+						return g,0,false
 					end
 	end
 end
@@ -254,16 +263,27 @@ function Auxiliary.DamageInfo(p,v)
 				return Auxiliary.Info(CATEGORY_DAMAGE,0,p,v)
 			end
 end
-function Auxiliary.HandlerInfo(ctg,ct,p,v,custom)
+function Auxiliary.DrawInfo(p,v)
+	return	function(_,e,tp)
+				return Auxiliary.Info(CATEGORY_DRAW,0,p,v)
+			end
+end
+function Auxiliary.MillInfo(p,v)
+	return	function(_,e,tp)
+				return Auxiliary.Info(CATEGORY_DECKDES,0,p,v)
+			end
+end
+
+function Auxiliary.HandlerInfo(ctg,custom)
 	if not custom then
 		return	function(_,e,tp)
-					local p=(p>1) and p or (p==0) and tp or (p==1) and 1-tp 
-					return Duel.SetOperationInfo(0,ctg,e:GetHandler(),ct,p,v)
+					local c=e:GetHandler()
+					return Duel.SetOperationInfo(0,ctg,c,1,c:GetControler(),c:GetLocation())
 				end
 	else
 		return	function(_,e,tp)
-					local p=(p>1) and p or (p==0) and tp or (p==1) and 1-tp 
-					return Duel.SetCustomOperationInfo(0,ctg,e:GetHandler(),ct,p,v,custom)
+					local c=e:GetHandler()
+					return Duel.SetCustomOperationInfo(0,ctg,c,1,c:GetControler(),c:GetLocation(),custom)
 				end
 	end
 end
@@ -279,8 +299,11 @@ function Auxiliary.SelfInfo(ctg)
 end
 
 -----------------------------------------------------------------------
-function Auxiliary.CardMovementOperationTemplate(fn,action_filter,loc,subject,loc1,loc2,min,max,exc)
+function Auxiliary.CardMovementOperationTemplate(fn,action_filter,loc,subject,loc1,loc2,min,max,exc,...)
 	if type(subject)=="function" or type(subject)=="nil" then
+		if action_filter then
+			subject=action_filter(subject)
+		end
 		if not min then min=1 end
 		if not max then max=min end
 		if not loc1 then loc1=LOCATION_MZONE end
@@ -289,14 +312,14 @@ function Auxiliary.CardMovementOperationTemplate(fn,action_filter,loc,subject,lo
 		return	function (e,tp,eg,ep,ev,re,r,rp,conj)
 					if exc then exc=e:GetHandler() end
 					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-					local g=Duel.SelectMatchingCard(tp,action_filter(subject),tp,loc1,loc2,min,max,exc,e,tp,eg,ep,ev,re,r,rp)
+					local g=Duel.SelectMatchingCard(tp,subject,tp,loc1,loc2,min,max,exc,e,tp,eg,ep,ev,re,r,rp)
 					if #g>0 then
 						aux.CheckSequentiality(conj)
 						if g:IsExists(Card.IsLocation,1,nil,LOCATION_ONFIELD+LOCATION_GRAVE+LOCATION_REMOVED) then
 							Duel.HintSelection(g:Filter(Card.IsLocation,nil,LOCATION_ONFIELD+LOCATION_GRAVE+LOCATION_REMOVED))
 						end
 						local ct=fn(g,e,tp,eg,ep,ev,re,r,rp)
-						return g,ct,aux.PLChk(g,nil,loc)
+						return g,ct,(ct>0 and aux.PLChk(g,nil,loc))
 					end
 					return g,0
 				end
@@ -307,21 +330,31 @@ function Auxiliary.CardMovementOperationTemplate(fn,action_filter,loc,subject,lo
 						local c=e:GetHandler()
 						aux.CheckSequentiality(conj)
 						local ct=fn(c,e,tp,eg,ep,ev,re,r,rp)
-						return c,1,aux.PLChk(c,nil,loc)
+						return c,1,(ct>0 and aux.PLChk(c,nil,loc))
 					end
 					
 		elseif subject==SUBJECT_IT then
 			local op =	function(g)
 							local chk=0
 							local ct=fn(g,e,tp,eg,ep,ev,re,r,rp)
-							return g,ct,aux.PLChk(g,nil,loc)
+							return g,ct,(ct>0 and aux.PLChk(g,nil,loc))
 						end
 			return aux.TargetOperation(op)
+			
+		elseif subject==SUBJECT_THAT_TARGET or subject==SUBJECT_ALL_THOSE_TARGETS then
+			local hardchk=(subject==SUBJECT_ALL_THOSE_TARGETS)
+			local op =	function(g)
+							local chk=0
+							local ct=fn(g,e,tp,eg,ep,ev,re,r,rp)
+							return g,ct,aux.PLChk(g,nil,loc)
+						end
+			return aux.TargetOperation(op,nil,hardchk)
 		end
 	
 	else
 		local truesub=subject[1]
 		if type(truesub)=="function" or type(truesub)=="nil" then
+			if action_filter then truesub=action_filter(truesub) end
 			if not min then min=1 end
 			if not max then max=min end
 			if (loc1|loc2)&LOCATION_GRAVE>0 then truesub=aux.NecroValleyFilter(truesub) end
@@ -330,7 +363,7 @@ function Auxiliary.CardMovementOperationTemplate(fn,action_filter,loc,subject,lo
 			local gf=GFILTER_TABLE[subject[2]]
 			return	function (e,tp,eg,ep,ev,re,r,rp,conj)
 						if exc then exc=e:GetHandler() end
-						local g=Duel.GetMatchingGroup(action_filter(truesub),tp,loc1,loc2,exc)
+						local g=Duel.GetMatchingGroup(truesub,tp,loc1,loc2,exc)
 						if #g<min then return end
 						Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 						local sg=g:SelectSubGroup(tp,gf,false,min,max,e,tp,eg,ep,ev,re,r,rp)
@@ -340,7 +373,7 @@ function Auxiliary.CardMovementOperationTemplate(fn,action_filter,loc,subject,lo
 								Duel.HintSelection(sg:Filter(Card.IsLocation,nil,LOCATION_ONFIELD+LOCATION_GRAVE+LOCATION_REMOVED))
 							end
 							local ct=fn(sg,e,tp,eg,ep,ev,re,r,rp)
-							return sg,ct,aux.PLChk(sg,nil,loc)
+							return sg,ct,(ct>0 and aux.PLChk(sg,nil,loc))
 						end
 						return sg,0
 					end
@@ -351,7 +384,7 @@ function Auxiliary.CardMovementOperationTemplate(fn,action_filter,loc,subject,lo
 			local op =	function(g)
 							local chk=0
 							local ct=fn(g,e,tp,eg,ep,ev,re,r,rp)
-							return g,ct,aux.PLChk(g,nil,loc)
+							return g,ct,aux.PLChk(g,nil,loc,ct)
 						end
 			return aux.TargetOperation(op,f,hardchk)
 		end
@@ -440,6 +473,15 @@ function Auxiliary.CardsInteractionOperationTemplate(fn,action_filter,subject,lo
 							return g,0,false,g2
 						end
 			return aux.TargetOperation(op)
+			
+		elseif subject==SUBJECT_THAT_TARGET or subject==SUBJECT_ALL_THOSE_TARGETS then
+			local hardchk=(subject==SUBJECT_ALL_THOSE_TARGETS)
+			local op =	function(g)
+							local chk=0
+							local ct=fn(g,e,tp,eg,ep,ev,re,r,rp)
+							return g,ct,aux.PLChk(g,nil,loc)
+						end
+			return aux.TargetOperation(op,nil,hardchk)
 		end
 	
 	else
@@ -599,7 +641,7 @@ function Auxiliary.AttachTarget(f,loc1,loc2,min,exc,f2,loc3,loc4,exc2,targeted)
 					if chk==0 then return #g>min and g:CheckSubGroup(check,min,max,e,tp,eg,ep,ev,re,r,rp) end
 					local p = (loc1>0 and loc2>0) and PLAYER_ALL or (loc1>0) and tp or 1-tp
 					if locs&LOCATION_ONFIELD>0 then
-						if not Duel.IsExistingMatchingCard(aux.NotConfirmed(f),tp,loc1,loc2,min,exc,e,tp,eg,ep,ev,re,rp) then
+						if not Duel.IsExistingMatchingCard(aux.NotConfirmed(f),tp,loc1,loc2,1,exc,e,tp,eg,ep,ev,re,rp) then
 							Duel.SetCustomOperationInfo(0,CATEGORY_ATTACH,g,min,p,locs)
 						else
 							Duel.SetCustomOperationInfo(0,CATEGORY_ATTACH,nil,min,p,locs)
@@ -633,21 +675,37 @@ function Auxiliary.BanishFilter(f,cost)
 			end
 end
 function Auxiliary.BanishTarget(f,loc1,loc2,min,exc)
+	f=aux.BanishFilter(f)
 	if not loc1 then loc1=LOCATION_ONFIELD end
 	if not loc2 then loc2=LOCATION_ONFIELD end
 	if not min then min=1 end
+	local locs = (loc1&(~loc2))|loc2
 	
-	return	function (e,tp,eg,ep,ev,re,r,rp,chk)
-				if exc then exc=e:GetHandler() end
-				if chk==0 then return Duel.IsExistingMatchingCard(aux.BanishFilter(f),tp,loc1,loc2,min,exc,e,tp) end
-				if loc1>0 and loc2>0 then
-					Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,min,PLAYER_ALL,loc1|(loc2&(~loc1)))
-				elseif loc1>0 then
-					Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,min,tp,loc1)
-				elseif loc2>0 then
-					Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,min,1-tp,loc1)
+	if locs&(LOCATION_HAND+LOCATION_DECK+LOCATION_EXTRA)>0 then
+		return	function (e,tp,eg,ep,ev,re,r,rp,chk)
+					if exc then exc=e:GetHandler() end
+					if chk==0 then return Duel.IsExistingMatchingCard(f,tp,loc1,loc2,min,exc,e,tp) end
+					local p = (loc1>0 and loc2>0) and PLAYER_ALL or (loc1>0) and tp or 1-tp
+					if locs&LOCATION_ONFIELD>0 then
+						local g=Duel.GetMatchingGroup(f,tp,loc1,loc2,exc,e,tp)
+						if not Duel.IsExistingMatchingCard(aux.NotConfirmed(f),tp,loc1,loc2,1,exc,e,tp) then
+							Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,min,p,locs)
+						else
+							Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,min,p,locs)
+						end
+					else
+						Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,min,p,locs)
+					end
 				end
-			end
+	else
+		return	function (e,tp,eg,ep,ev,re,r,rp,chk)
+					if exc then exc=e:GetHandler() end
+					if chk==0 then return Duel.IsExistingMatchingCard(f,tp,loc1,loc2,min,exc,e,tp) end
+					local p = (loc1>0 and loc2>0) and PLAYER_ALL or (loc1>0) and tp or 1-tp
+					local g=Duel.GetMatchingGroup(f,tp,loc1,loc2,exc,e,tp)
+					Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,min,p,locs)
+				end
+	end
 end
 function Auxiliary.BanishOperation(f,loc1,loc2,min,max,exc)
 	local op =	function(g)
@@ -656,6 +714,69 @@ function Auxiliary.BanishOperation(f,loc1,loc2,min,max,exc)
 	return aux.CardMovementOperationTemplate(op,aux.BanishFilter,LOCATION_REMOVED,f,loc1,loc2,min,max,exc)
 end
 
+-----------------------------------------------------------------------
+--Add Counter
+function Auxiliary.AddCounterFilter(ctype,ct,f)
+	return	function(c,...)
+				return (not f or f(c,...)) and c:IsCanAddCounter(ctype,ct)
+			end
+end
+function Auxiliary.AddCounterFilterTemplate(ctype,ct)
+	return	function(f)
+				return	function(c,...)
+							return (not f or f(c,...)) and c:IsCanAddCounter(ctype,ct)
+						end
+			end
+end
+function Auxiliary.AddCounterTarget(ctype,ct,f,loc1,loc2,min,exc)
+	if not ct then ct=1 end
+	
+	if type(f)=="function" or type(f)=="nil" then
+		if not loc1 then loc1=LOCATION_MZONE end
+		if not loc2 then loc2=0 end
+		local locs = (loc1&(~loc2))|loc2
+		if not min then min=1 end
+		return	function (e,tp,eg,ep,ev,re,r,rp,chk)
+					if exc then exc=e:GetHandler() end
+					local g=Duel.GetMatchingGroup(aux.AddCounterFilter(ctype,ct,f),tp,loc1,loc2,exc,e,tp,eg,ep,ev,re,r,rp)
+					if chk==0 then return #g>=min  end
+					if loc1>0 and loc2>0 then
+						Duel.SetCustomOperationInfo(0,CATEGORY_COUNTER|ctype,g,min,PLAYER_ALL,locs,ct)
+					elseif loc1>0 then
+						Duel.SetCustomOperationInfo(0,CATEGORY_COUNTER|ctype,g,min,tp,loc1,ct)
+					elseif loc2>0 then
+						Duel.SetCustomOperationInfo(0,CATEGORY_COUNTER|ctype,g,min,1-tp,loc2,ct)
+					end
+				end
+				
+	elseif type(f)=="number" then
+		if f==SUBJECT_THIS_CARD then
+			return	function (e,tp,eg,ep,ev,re,r,rp,chk)
+						local c=e:GetHandler()
+						if chk==0 then return c:IsCanAddCounter(ctype,ct) end
+						Duel.SetCustomOperationInfo(0,CATEGORY_COUNTER|ctype,c,1,c:GetControler(),c:GetLocation(),ct)
+					end
+		end
+	end
+end
+function Auxiliary.AddCounterOperation(ctype,ct,f,loc1,loc2,min,max,exc)
+	local op =	function(g)
+					local chk=0
+					if aux.GetValueType(g)=="Group" then
+						for tc in aux.Next(g) do
+							if tc:AddCounter(ctype,ct) then
+								chk=chk+1
+							end
+						end
+					elseif aux.GetValueType(g)=="Card" then
+						if g:AddCounter(ctype,ct) then
+							chk=chk+1
+						end
+					end	
+					return chk
+				end
+	return aux.CardMovementOperationTemplate(op,aux.AddCounterFilterTemplate(ctype,ct),nil,f,loc1,loc2,min,max,exc)
+end
 
 -----------------------------------------------------------------------
 --Damage
@@ -679,7 +800,7 @@ end
 --Destroy
 function Auxiliary.DestroyFilter(f)
 	return	function(c,e,...)
-				return (not f or f(c,e,...)) and c:IsDestructable(e)
+				return (not f or f(c,e,...)) and (c:IsOnField() or c:IsDestructable(e))
 			end
 end
 function Auxiliary.DestroyTarget(f,loc1,loc2,min,exc)
@@ -689,31 +810,64 @@ function Auxiliary.DestroyTarget(f,loc1,loc2,min,exc)
 	if not min then min=1 end
 	local locs = (loc1&(~loc2))|loc2
 	
-	if locs&(LOCATION_HAND+LOCATION_DECK+LOCATION_EXTRA)>0 then
-		f=aux.DestroyFilter(f)
-		return	function (e,tp,eg,ep,ev,re,r,rp,chk)
-					if exc then exc=e:GetHandler() end
-					if chk==0 then return Duel.IsExistingMatchingCard(f,tp,loc1,loc2,min,exc,e,tp) end
-					local p = (loc1>0 and loc2>0) and PLAYER_ALL or (loc1>0) and tp or 1-tp
-					if locs&LOCATION_ONFIELD>0 then
-						local g=Duel.GetMatchingGroup(f,tp,loc1,loc2,exc,e,tp)
-						if not Duel.IsExistingMatchingCard(aux.NotConfirmed(f),tp,loc1,loc2,min,exc,e,tp) then
-							Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,min,p,locs)
+	if not f or type(f)=="function" then
+		if locs&(LOCATION_HAND+LOCATION_DECK+LOCATION_EXTRA)>0 then
+			f=aux.DestroyFilter(f)
+			return	function (e,tp,eg,ep,ev,re,r,rp,chk)
+						if exc then exc=e:GetHandler() end
+						if chk==0 then return Duel.IsExistingMatchingCard(f,tp,loc1,loc2,min,exc,e,tp) end
+						local p = (loc1>0 and loc2>0) and PLAYER_ALL or (loc1>0) and tp or 1-tp
+						if locs&LOCATION_ONFIELD>0 then
+							local g=Duel.GetMatchingGroup(f,tp,loc1,loc2,exc,e,tp)
+							if not Duel.IsExistingMatchingCard(aux.NotConfirmed(f),tp,loc1,loc2,1,exc,e,tp) then
+								Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,min,p,locs)
+							else
+								Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,min,p,locs)
+							end
 						else
 							Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,min,p,locs)
 						end
-					else
-						Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,min,p,locs)
 					end
-				end
-	else
-		return	function (e,tp,eg,ep,ev,re,r,rp,chk)
-					if exc then exc=e:GetHandler() end
-					if chk==0 then return Duel.IsExistingMatchingCard(f,tp,loc1,loc2,min,exc,e,tp) end
-					local p = (loc1>0 and loc2>0) and PLAYER_ALL or (loc1>0) and tp or 1-tp
-					local g=Duel.GetMatchingGroup(f,tp,loc1,loc2,exc,e,tp)
-					Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,min,p,locs)
-				end
+		else
+			return	function (e,tp,eg,ep,ev,re,r,rp,chk)
+						if exc then exc=e:GetHandler() end
+						if chk==0 then return Duel.IsExistingMatchingCard(f,tp,loc1,loc2,min,exc,e,tp) end
+						local p = (loc1>0 and loc2>0) and PLAYER_ALL or (loc1>0) and tp or 1-tp
+						local g=Duel.GetMatchingGroup(f,tp,loc1,loc2,exc,e,tp)
+						Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,min,p,locs)
+					end
+		end
+	
+	elseif type(f)=="table" then
+		local subject=f[1]
+		if subject==SUBJECT_ALL then
+			f=f[2]
+			if locs&(LOCATION_HAND+LOCATION_DECK+LOCATION_EXTRA)>0 then
+				return	function (e,tp,eg,ep,ev,re,r,rp,chk)
+							if exc then exc=e:GetHandler() end
+							local g=Duel.GetMatchingGroup(f,tp,loc1,loc2,exc,e,tp)
+							if chk==0 then return #g>0 and not g:IsExists(aux.NOT(aux.DestroyFilter(f)),1,nil) end
+							local p = (loc1>0 and loc2>0) and PLAYER_ALL or (loc1>0) and tp or 1-tp
+							if locs&LOCATION_ONFIELD>0 then
+								if not Duel.IsExistingMatchingCard(aux.NotConfirmed(f),tp,loc1,loc2,1,exc,e,tp) then
+									Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,p,locs)
+								else
+									Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,1,p,locs)
+								end
+							else
+								Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,1,p,locs)
+							end
+						end
+			else
+				return	function (e,tp,eg,ep,ev,re,r,rp,chk)
+							if exc then exc=e:GetHandler() end
+							if chk==0 then return Duel.IsExistingMatchingCard(f,tp,loc1,loc2,1,exc,e,tp) end
+							local p = (loc1>0 and loc2>0) and PLAYER_ALL or (loc1>0) and tp or 1-tp
+							local g=Duel.GetMatchingGroup(f,tp,loc1,loc2,exc,e,tp)
+							Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,p,locs)
+						end
+			end
+		end
 	end
 end
 function Auxiliary.DestroyOperation(subject,loc1,loc2,min,max,exc)
@@ -753,6 +907,15 @@ function Auxiliary.DestroyOperation(subject,loc1,loc2,min,max,exc)
 							return g,ct,ct>0
 						end
 			return aux.TargetOperation(op)
+		
+		elseif subject==SUBJECT_THAT_TARGET or subject==SUBJECT_ALL_THOSE_TARGETS then
+			local hardchk=(subject==SUBJECT_ALL_THOSE_TARGETS)
+			local op =	function(g)
+							local chk=0
+							local ct=fn(g,e,tp,eg,ep,ev,re,r,rp)
+							return g,ct,ct>0
+						end
+			return aux.TargetOperation(op,nil,hardchk)
 		end
 	
 	else
@@ -786,9 +949,26 @@ function Auxiliary.DestroyOperation(subject,loc1,loc2,min,max,exc)
 			local op =	function(g)
 							local chk=0
 							local ct=Duel.Destroy(g,REASON_EFFECT)
-							return g,ct,ct==#g
+							return g,ct,ct>0
 						end
 			return aux.TargetOperation(op,f,hardchk)
+		
+		elseif truesub==SUBJECT_ALL then
+			local f=subject[2]
+			if not loc1 then loc1=LOCATION_MZONE end
+			if not loc2 then loc2=0 end
+			local locs = (loc1&(~loc2))|loc2
+			if locs&(LOCATION_HAND+LOCATION_DECK+LOCATION_EXTRA)>0 then f=aux.DestroyFilter(f) end
+			return	function (e,tp,eg,ep,ev,re,r,rp,conj)
+						if exc then exc=e:GetHandler() end
+						local g=Duel.Group(f,tp,loc1,loc2,exc,e,tp,eg,ep,ev,re,r,rp)
+						if #g>0 then
+							aux.CheckSequentiality(conj)
+							local ct=Duel.Destroy(g,REASON_EFFECT)
+							return g,ct,ct>0
+						end
+						return g,0
+					end
 		end
 	end
 end
@@ -830,20 +1010,110 @@ function Auxiliary.DiscardOperation(f,min,max,p)
 end
 
 --Draw
-function Auxiliary.DrawTarget(min)
+function Auxiliary.DrawTarget(min,p)
 	if not min then min=1 end
-	
+	if p<1 then
+		return	function (e,tp,eg,ep,ev,re,r,rp,chk)
+					local p=(not p or p==0) and tp or 1-tp
+					if chk==0 then return Duel.IsPlayerCanDraw(p,min) end
+					Duel.SetTargetPlayer(p)
+					Duel.SetTargetParam(min)
+					Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,p,min)
+				end
+	else
+		return	function (e,tp,eg,ep,ev,re,r,rp,chk)
+					if chk==0 then return Duel.IsPlayerCanDraw(tp,min) and Duel.IsPlayerCanDraw(1-tp,min) end
+					Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,PLAYER_ALL,min)
+				end
+	end
+end
+function Auxiliary.DrawOperation(min,max,p)
+	if not min then
+		return	function (e,tp,eg,ep,ev,re,r,rp)
+					local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
+					local ct=Duel.Draw(p,d,REASON_EFFECT)
+					return nil,ct,ct>0
+				end
+	else
+		if not max then max=min end
+		if p<1 then 
+			return	function (e,tp,eg,ep,ev,re,r,rp)
+						local p = (p==0 or not p) and tp or 1-tp 
+						local ct=Duel.Draw(p,min,REASON_EFFECT)
+						return nil,ct,ct>0
+					end
+		else
+			return	function (e,tp,eg,ep,ev,re,r,rp)
+						local ct1=Duel.Draw(tp,min,REASON_EFFECT)
+						local ct2=Duel.Draw(1-tp,min,REASON_EFFECT)
+						local ct=ct1+ct2
+						return nil,ct,ct>0
+					end
+		end
+	end
+end
+
+-----------------------------------------------------------------------
+--Excavate
+function Auxiliary.ExcavateTarget(min)
+	if not min then min=1 end
 	return	function (e,tp,eg,ep,ev,re,r,rp,chk)
-				if chk==0 then return Duel.IsPlayerCanDraw(tp,min) end
+				if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>=min end
 				Duel.SetTargetPlayer(tp)
 				Duel.SetTargetParam(min)
-				Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,min)
 			end
 end
-function Auxiliary.DrawOperation()
+function Auxiliary.ExcavateOperation(conj1,f,min,op1,conj2,op2,id,desc1,desc2)
+	if not conj1 then conj1=CONJUNCTION_ALSO end
+	if not conj2 then conj2=CONJUNCTION_ALSO end
+	if not min then min=1 end
+	
+	local hint
+	if not op1 or op1==CATEGORY_TOHAND then
+		f=aux.SearchFilter(f)
+		hint=HINTMSG_ATOHAND
+		op1=function(g,p) return Duel.Search(g,p) end
+	end
+	
+	if not op2 or op2==SEQ_DECKSHUFFLE then
+		op2=function(_,p) return Duel.ShuffleDeck(p) end
+	elseif op2==SEQ_DECKTOP then
+		op2=function(g,p) return Duel.SortDecktop(p,p,#g) end
+	elseif op2==SEQ_DECKBOTTOM then
+		op2=function(g,p)
+				Duel.SortDecktop(p,p,#g)
+				for i=1,#g do
+					local mg=Duel.GetDecktopGroup(p,1)
+					Duel.MoveSequence(mg:GetFirst(),SEQ_DECKBOTTOM)
+				end
+			end
+	end
+	
+	local check1 = (conj1&0x1000==0x1000) and function(p) return Duel.SelectYesNo(p,aux.Stringid(id,desc1)) end or aux.TRUE
+	local check2 = (conj2&0x1000==0x1000) and function(p) return Duel.SelectYesNo(p,aux.Stringid(id,desc2)) end or aux.TRUE
+	
 	return	function (e,tp,eg,ep,ev,re,r,rp)
 				local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
-				return Duel.Draw(p,d,REASON_EFFECT)
+				if Duel.GetFieldGroupCount(p,LOCATION_DECK,0)<d then return end
+				Duel.ConfirmDecktop(p,d)
+				local g=Duel.GetDecktopGroup(p,d)
+				if #g>0 then
+					Duel.DisableShuffleCheck()
+					if g:IsExists(f,min,nil) and check1(p) then
+						aux.CheckSequentiality(conj1)
+						Duel.Hint(HINT_SELECTMSG,p,hint)
+						local sg=g:FilterSelect(p,f,min,min,nil)
+						if #sg>0 then
+							op1(sg,p)
+							Duel.ShuffleHand(p)
+							g:Sub(sg)
+						end
+					end
+					if check2(p) then
+						aux.CheckSequentiality(conj2)
+						op2(g,p)
+					end
+				end
 			end
 end
 
@@ -887,6 +1157,120 @@ function Auxiliary.SearchOperation(f,loc1,loc2,min,max,exc)
 	return aux.CardMovementOperationTemplate(op,aux.SearchFilter,LOCATION_HAND+LOCATION_EXTRA,f,loc1,loc2,min,max,exc)
 end
 
+-----------------------------------------------------------------------
+--Send To GY
+function Auxiliary.ToGYFilter(f)
+	return	function(c,...)
+				return (not f or f(c,...)) and c:IsAbleToGrave()
+			end
+end
+function Auxiliary.SendToGYTarget(f,loc1,loc2,min,exc)
+	f=aux.ToGYFilter(f)
+	if not loc1 then loc1=LOCATION_ONFIELD end
+	if not loc2 then loc2=0 end
+	if not min then min=1 end
+	local locs = (loc1&(~loc2))|loc2
+	
+	if locs&(LOCATION_HAND+LOCATION_DECK+LOCATION_EXTRA)>0 then
+		return	function (e,tp,eg,ep,ev,re,r,rp,chk)
+					if exc then exc=e:GetHandler() end
+					if chk==0 then return Duel.IsExistingMatchingCard(f,tp,loc1,loc2,min,exc,e,tp) end
+					local p = (loc1>0 and loc2>0) and PLAYER_ALL or (loc1>0) and tp or 1-tp
+					if locs&LOCATION_ONFIELD>0 then
+						local g=Duel.GetMatchingGroup(f,tp,loc1,loc2,exc,e,tp)
+						if not Duel.IsExistingMatchingCard(aux.NotConfirmed(f),tp,loc1,loc2,1,exc,e,tp) then
+							Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g,min,p,locs)
+						else
+							Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,min,p,locs)
+						end
+					else
+						Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,min,p,locs)
+					end
+				end
+	else
+		return	function (e,tp,eg,ep,ev,re,r,rp,chk)
+					if exc then exc=e:GetHandler() end
+					if chk==0 then return Duel.IsExistingMatchingCard(f,tp,loc1,loc2,min,exc,e,tp) end
+					local p = (loc1>0 and loc2>0) and PLAYER_ALL or (loc1>0) and tp or 1-tp
+					local g=Duel.GetMatchingGroup(f,tp,loc1,loc2,exc,e,tp)
+					Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g,min,p,locs)
+				end
+	end
+end
+function Auxiliary.SendToGYOperation(f,loc1,loc2,min,max,exc)
+	local op =	function(g)
+					return Duel.SendtoGrave(g,REASON_EFFECT)
+				end
+	return aux.CardMovementOperationTemplate(op,aux.ToGYFilter,LOCATION_GRAVE,f,loc1,loc2,min,max,exc)
+end
+
+function Auxiliary.ReturnToGYTarget(f,loc1,loc2,min,exc)
+	if not f then f=aux.TRUE end
+	if loc1 then loc1=LOCATION_REMOVED else loc1=0 end
+	if loc2 then loc2=LOCATION_REMOVED else loc2=0 end
+	if not min then min=1 end
+	return	function (e,tp,eg,ep,ev,re,r,rp,chk)
+				if exc then exc=e:GetHandler() end
+				if chk==0 then return Duel.IsExistingMatchingCard(f,tp,loc1,loc2,min,exc,e,tp) end
+				local p = (loc1>0 and loc2>0) and PLAYER_ALL or (loc1>0) and tp or 1-tp
+				local g=Duel.GetMatchingGroup(f,tp,loc1,loc2,exc,e,tp)
+				Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g,min,p,LOCATION_REMOVED)
+		
+	end
+end
+function Auxiliary.ReturnToGYOperation(f,loc1,loc2,min,max,exc)
+	local op =	function(g)
+					return Duel.SendtoGrave(g,REASON_EFFECT+REASON_RETURN)
+				end
+	return aux.CardMovementOperationTemplate(op,nil,LOCATION_GRAVE,f,loc1,loc2,min,max,exc)
+end
+
+-----------------------------------------------------------------------
+--Send To Hand
+function Auxiliary.ToHandFilter(f)
+	return aux.SearchFilter(f)
+end
+function Auxiliary.SendToHandTarget(f,loc1,loc2,min,exc)
+	f=aux.SearchFilter(f)
+	if not loc1 then loc1=LOCATION_ONFIELD end
+	if not loc2 then loc2=0 end
+	if not min then min=1 end
+	local locs = (loc1&(~loc2))|loc2
+	
+	if locs&(LOCATION_HAND+LOCATION_DECK+LOCATION_EXTRA)>0 then
+		return	function (e,tp,eg,ep,ev,re,r,rp,chk)
+					if exc then exc=e:GetHandler() end
+					if chk==0 then return Duel.IsExistingMatchingCard(f,tp,loc1,loc2,min,exc,e,tp) end
+					local p = (loc1>0 and loc2>0) and PLAYER_ALL or (loc1>0) and tp or 1-tp
+					if locs&LOCATION_ONFIELD>0 then
+						local g=Duel.GetMatchingGroup(f,tp,loc1,loc2,exc,e,tp)
+						if not Duel.IsExistingMatchingCard(aux.NotConfirmed(f),tp,loc1,loc2,1,exc,e,tp) then
+							Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,min,p,locs)
+						else
+							Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,min,p,locs)
+						end
+					else
+						Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,min,p,locs)
+					end
+				end
+	else
+		return	function (e,tp,eg,ep,ev,re,r,rp,chk)
+					if exc then exc=e:GetHandler() end
+					if chk==0 then return Duel.IsExistingMatchingCard(f,tp,loc1,loc2,min,exc,e,tp) end
+					local p = (loc1>0 and loc2>0) and PLAYER_ALL or (loc1>0) and tp or 1-tp
+					local g=Duel.GetMatchingGroup(f,tp,loc1,loc2,exc,e,tp)
+					Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,min,p,locs)
+				end
+	end
+end
+function Auxiliary.SendToHandOperation(f,loc1,loc2,min,max,exc)
+	local op =	function(g)
+					return Duel.SendtoHand(g,nil,REASON_EFFECT)
+				end
+	return aux.CardMovementOperationTemplate(op,aux.SearchFilter,LOCATION_HAND,f,loc1,loc2,min,max,exc)
+end
+
+
 --To Deck
 function Auxiliary.ToDeckFilter(f,cost,loc)
 	return	function(c,...)
@@ -898,10 +1282,16 @@ end
 --Negates
 function Auxiliary.NegateCondition(monstercon,negateact,rplayer,rf,cond)
 	local negatecheck = negateact and Duel.IsChainNegatable or Duel.IsChainDisablable
+	if type(rf)=="boolean" and rf then
+		rf=function(rc,re) return re:IsActiveType(TYPE_MONSTER) or re:IsHasType(EFFECT_TYPE_ACTIVATE) end
+	elseif type(rf)=="number" then
+		local rtype=rf
+		rf=function(rc,re) return re:IsActiveType(rtype) end
+	end
 	return	function(e,tp,eg,ep,ev,re,r,rp)
 				return (not monstercon or not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED))
 					and (not rplayer or (rplayer==0 and rp==tp) or rp==1-tp)
-					and (not rf or (type(rf)=="number" and re:IsActiveType(rf)) or rf(re:GetHandler(),re))
+					and (not rf or rf(re:GetHandler(),re,e,tp,eg,ep,ev,r,rp))
 					and (not cond or cond(e,tp,eg,ep,ev,re,r,rp))
 					and negatecheck(ev)
 			end
@@ -909,7 +1299,7 @@ end
 function Auxiliary.NegateTarget(negateact,negatedop,tg)
 	local negcategory = negateact and CATEGORY_NEGATE or CATEGORY_DISABLE
 	
-	if negatedop==0 then
+	if type(negatedop)=="function" or negatedop==0 then
 		return	function(e,tp,eg,ep,ev,re,r,rp,chk)
 					if chk==0 then
 						return not tg or tg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -965,34 +1355,42 @@ function Auxiliary.NegateTarget(negateact,negatedop,tg)
 end
 function Auxiliary.NegateOperation(negateact,negatedop)
 	local negtype = negateact and Duel.NegateActivation or Duel.NegateEffect
-	if negatedop==0 then
+	if type(negatedop)=="function" then
 		return	function (e,tp,eg,ep,ev,re,r,rp)
-					return negtype(ev)
+					if negtype(ev) then
+						return negatedop(e,tp,eg,ep,ev,re,r,rp,1)
+					end
 				end
 	else
-		local actiontab = {
-			[CATEGORY_DESTROY]	=Duel.Destroy;
-			[CATEGORY_REMOVE]	=function(c,r) return Duel.Remove(c,POS_FACEUP,r) end;
-			[CATEGORY_TOHAND]	=function(c,r) return Duel.SendtoHand(c,nil,r) end;
-			[CATEGORY_TOGRAVE]	=Duel.SendtoGrave;
-			[CATEGORY_TODECK]	=function(c,r) return Duel.SendtoDeck(c,nil,SEQ_DECKSHUFFLE,r) end;
-		}
-		local chktab = {
-			[CATEGORY_DESTROY]	=function(g) return #g>0 end;
-			[CATEGORY_REMOVE]	=function(g) return aux.PLChk(g,nil,LOCATION_REMOVED) end;
-			[CATEGORY_TOHAND]	=function(g) return aux.PLChk(g,nil,LOCATION_HAND+LOCATION_EXTRA) end;
-			[CATEGORY_TOGRAVE]	=function(g) return aux.PLChk(g,nil,LOCATION_GRAVE) end;
-			[CATEGORY_TODECK]	=function(g) return aux.PLChk(g,nil,LOCATION_DECK+LOCATION_EXTRA) end;
-		}
-		local action=actiontab[negatedop]
-		local check=chktab[negatedop]
-		return	function (e,tp,eg,ep,ev,re,r,rp)
-					if negtype(ev) and re:GetHandler():IsRelateToChain(ev) then
-						local ct=action(eg,REASON_EFFECT)
-						return eg,ct,aux.PLChk(eg,nil,loc)
+		if negatedop==0 then
+			return	function (e,tp,eg,ep,ev,re,r,rp)
+						return negtype(ev)
 					end
-					return false
-				end
+		else
+			local actiontab = {
+				[CATEGORY_DESTROY]	=Duel.Destroy;
+				[CATEGORY_REMOVE]	=function(c,r) return Duel.Remove(c,POS_FACEUP,r) end;
+				[CATEGORY_TOHAND]	=function(c,r) return Duel.SendtoHand(c,nil,r) end;
+				[CATEGORY_TOGRAVE]	=Duel.SendtoGrave;
+				[CATEGORY_TODECK]	=function(c,r) return Duel.SendtoDeck(c,nil,SEQ_DECKSHUFFLE,r) end;
+			}
+			local chktab = {
+				[CATEGORY_DESTROY]	=function(g) return #g>0 end;
+				[CATEGORY_REMOVE]	=function(g) return aux.PLChk(g,nil,LOCATION_REMOVED) end;
+				[CATEGORY_TOHAND]	=function(g) return aux.PLChk(g,nil,LOCATION_HAND+LOCATION_EXTRA) end;
+				[CATEGORY_TOGRAVE]	=function(g) return aux.PLChk(g,nil,LOCATION_GRAVE) end;
+				[CATEGORY_TODECK]	=function(g) return aux.PLChk(g,nil,LOCATION_DECK+LOCATION_EXTRA) end;
+			}
+			local action=actiontab[negatedop]
+			local check=chktab[negatedop]
+			return	function (e,tp,eg,ep,ev,re,r,rp)
+						if negtype(ev) and re:GetHandler():IsRelateToChain(ev) then
+							local ct=action(eg,REASON_EFFECT)
+							return eg,ct,check
+						end
+						return false
+					end
+		end
 	end
 end
 
@@ -1259,6 +1657,23 @@ function Auxiliary.SSOperation(subject,loc1,loc2,min,max,exc,sumtype,sump,ign1,i
 							return g,ct,ct>0
 						end
 			return aux.TargetOperation(op,nil,nil,nil,chk)
+		
+		elseif subject==SUBJECT_THAT_TARGET or subject==SUBJECT_ALL_THOSE_TARGETS then
+			local hardchk=(subject==SUBJECT_ALL_THOSE_TARGETS)
+			local chk =	function(g,e,tp)
+							local sump = sump and sump==1 and 1-tp or tp
+							local recp = recp and recp==1 and 1-tp or tp
+							local zone = type(zone)=="number" and zone or zone(e,tp)
+							return Duel.GetLocationCount(recp,LOCATION_MZONE,sump,LOCATION_REASON_TOFIELD,zone)>=#g and (#g<2 or not Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT))
+						end
+			local op =	function(g,e,tp)
+							local sump = sump and sump==1 and 1-tp or tp
+							local recp = recp and recp==1 and 1-tp or tp
+							local zone = type(zone)=="number" and zone or zone(e,tp)
+							local ct=Duel.SpecialSummon(g,sumtype,sump,recp,ign1,ign2,pos,zone)
+							return g,ct,ct>0
+						end
+			return aux.TargetOperation(op,nil,hardchk,nil,chk)
 		end
 	
 	else
@@ -1320,12 +1735,16 @@ function Auxiliary.SSOperationMod(mod,subject,loc1,loc2,min,max,exc,modvals,sumt
 	end
 	if not mod then mod=SPSUM_MOD_NEGATE end
 	local spsum
-	if mod==SPSUM_MOD_NEGATE then
-		spsum=Duel.SpecialSummonNegate
-	elseif mod==SPSUM_MOD_REDIRECT then
-		spsum=Duel.SpecialSummonRedirect
-	elseif mod==SPSUM_MOD_CHANGE_ATKDEF then
-		spsum=Duel.SpecialSummonATKDEF
+	if type(mod)=="table" then
+		spsum=Duel.SpecialSummonMod
+	else
+		if mod==SPSUM_MOD_NEGATE then
+			spsum=Duel.SpecialSummonNegate
+		elseif mod==SPSUM_MOD_REDIRECT then
+			spsum=Duel.SpecialSummonRedirect
+		elseif mod==SPSUM_MOD_CHANGE_ATKDEF then
+			spsum=Duel.SpecialSummonATKDEF
+		end	
 	end
 	
 	if not sumtype then sumtype=0 end
@@ -1375,6 +1794,23 @@ function Auxiliary.SSOperationMod(mod,subject,loc1,loc2,min,max,exc,modvals,sumt
 							return g,ct,ct>0
 						end
 			return aux.TargetOperation(op,nil,nil,nil,chk)
+			
+		elseif subject==SUBJECT_THAT_TARGET or subject==SUBJECT_ALL_THOSE_TARGETS then
+			local hardchk=(subject==SUBJECT_ALL_THOSE_TARGETS)
+			local chk =	function(g,e,tp)
+							local sump = sump and sump==1 and 1-tp or tp
+							local recp = recp and recp==1 and 1-tp or tp
+							local zone = type(zone)=="number" and zone or zone(e,tp)
+							return Duel.GetLocationCount(recp,LOCATION_MZONE,sump,LOCATION_REASON_TOFIELD,zone)>=#g and (#g<2 or not Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT))
+						end
+			local op =	function(g,e,tp)
+							local sump = sump and sump==1 and 1-tp or tp
+							local recp = recp and recp==1 and 1-tp or tp
+							local zone = type(zone)=="number" and zone or zone(e,tp)
+							local ct=spsum(e,g,sumtype,sump,recp,ign1,ign2,pos,zone,table.unpack(modvals))
+							return g,ct,ct>0
+						end
+			return aux.TargetOperation(op,nil,hardchk,nil,chk)
 		end
 	
 	else
@@ -1622,6 +2058,35 @@ function Auxiliary.SSToEitherFieldOperation(subject,loc1,loc2,min,max,exc,sumtyp
 							return g,ct,ct>0
 						end
 			return aux.TargetOperation(op,nil,nil,nil,chk)
+		
+		elseif subject==SUBJECT_THAT_TARGET or subject==SUBJECT_ALL_THOSE_TARGETS then
+			local hardchk=(subject==SUBJECT_ALL_THOSE_TARGETS)
+			local chk =	function(g,e,tp)
+							local sump = sump and sump==1 and 1-tp or tp
+							local zone1 = type(zone1)=="number" and zone1 or zone1(e,tp)
+							local zone2 = type(zone2)=="number" and zone2 or zone2(e,tp)
+							local ft1=Duel.GetLocationCount(tp,LOCATION_MZONE,sump,LOCATION_REASON_TOFIELD,zone1)
+							local ft2=Duel.GetLocationCount(1-tp,LOCATION_MZONE,sump,LOCATION_REASON_TOFIELD,zone2)
+							return ft1+ft2>=#g and (#g<2 or not Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT))
+						end
+			local op =	function(g,e,tp)
+							local sump = sump and sump==1 and 1-tp or tp
+							local zone1 = type(zone1)=="number" and zone1 or zone1(e,tp)
+							local zone2 = type(zone2)=="number" and zone2 or zone2(e,tp)
+							local ct=0
+							for tc in aux.Next(g) do
+								local recp,finalzone=tp,zone1
+								if tc:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos,1-tp,zone2) and (not tc:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos,tp,zone1) or Duel.SelectYesNo(sump,aux.Stringid(61665245,2))) then
+									recp,finalzone=1-tp,zone2
+								end
+								if Duel.SpecialSummonStep(tc,sumtype,sump,recp,ign1,ign2,pos,finalzone) then
+									ct=ct+1
+								end
+							end
+							Duel.SpecialSummonComplete()
+							return g,ct,ct>0
+						end
+			return aux.TargetOperation(op,nil,hardchk,nil,chk)
 		end
 	
 	else
@@ -1884,6 +2349,25 @@ function Auxiliary.SSToEitherFieldOperationMod(mod,subject,loc1,loc2,min,max,exc
 							return g,ct,ct>0
 						end
 			return aux.TargetOperation(op,nil,nil,nil,chk)
+		
+		elseif subject==SUBJECT_THAT_TARGET or subject==SUBJECT_ALL_THOSE_TARGETS then
+			local hardchk=(subject==SUBJECT_ALL_THOSE_TARGETS)
+			local chk =	function(g,e,tp)
+							local sump = sump and sump==1 and 1-tp or tp
+							local zone1 = type(zone1)=="number" and zone1 or zone1(e,tp)
+							local zone2 = type(zone2)=="number" and zone2 or zone2(e,tp)
+							local ft1=Duel.GetLocationCount(tp,LOCATION_MZONE,sump,LOCATION_REASON_TOFIELD,zone1)
+							local ft2=Duel.GetLocationCount(1-tp,LOCATION_MZONE,sump,LOCATION_REASON_TOFIELD,zone2)
+							return ft1+ft2>=#g and (#g<2 or not Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT))
+						end
+			local op =	function(g,e,tp)
+							local sump = sump and sump==1 and 1-tp or tp
+							local zone1 = type(zone1)=="number" and zone1 or zone1(e,tp)
+							local zone2 = type(zone2)=="number" and zone2 or zone2(e,tp)
+							local ct=spsum(e,g,sumtype,sump,tp,ign1,ign2,pos,{zone1,zone2},table.unpack(modvals))
+							return g,ct,ct>0
+						end
+			return aux.TargetOperation(op,nil,hardchk,nil,chk)
 		end
 	
 	else
@@ -2093,7 +2577,81 @@ function Auxiliary.SSSelfOperation(complete_proc)
 end
 
 -----------------------------------------------
---SPECIAL SUMMON
+--SPECIAL SUMMON MODS
+function Duel.SpecialSummonMod(e,g,styp,sump,tp,ign1,ign2,pos,zone,...)
+	local mods={...}
+	for i,mod in ipairs(mods) do
+		local obj=type(mod)=="table" and mod[1] or mod
+		if obj==SPSUM_MOD_NEGATE then
+			mods[i][1]={EFFECT_DISABLE,EFFECT_DISABLE_EFFECT}
+		elseif obj==SPSUM_MOD_REDIRECT then
+			mods[i][1]=EFFECT_LEAVE_FIELD_REDIRECT
+		elseif obj==SPSUM_MOD_CHANGE_ATKDEF then
+			mods[i][1]={EFFECT_SET_ATTACK,EFFECT_SET_DEFENSE}
+		end
+	end
+	
+	if not zone then zone=0xff end
+	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
+	local ct=0
+	for dg in aux.Next(g) do
+		local finalzone=zone
+		if type(zone)=="table" then
+			finalzone=zone[tp+1]
+			if tc:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos,1-tp,zone[2-tp]) and (not tc:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos,tp,finalzone) or Duel.SelectYesNo(sump,aux.Stringid(61665245,2))) then
+				tp=1-tp
+				finalzone=zone[tp+1]
+			end
+		end
+		if Duel.SpecialSummonStep(dg,styp,sump,tp,ign1,ign2,pos,finalzone) then
+			ct=ct+1
+			for i,mod in ipairs(mods) do
+				local code=(type(mod)=="table") and mod[1] or mod
+				local val=(type(mod)=="table" and #mod>1) and mod[2] or nil
+				local reset=(type(mod)=="table" and #mod>2) and mod[3] or 0
+				local rc=(type(mod)=="table" and #mod>3) and mod[4] or e:GetHandler()
+				if #g==1 and g:GetFirst()==e:GetHandler() and rc==e:GetHandler() then
+					reset=reset|RESET_DISABLE
+				end
+				
+				if type(code)=="table" then
+					for j,cd in ipairs(code) do
+						local e1=Effect.CreateEffect(rc)
+						e1:SetType(EFFECT_TYPE_SINGLE)
+						e1:SetCode(cd)
+						if cd==EFFECT_LEAVE_FIELD_REDIRECT then
+							e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+						elseif cd==EFFECT_SET_ATTACK or cd==EFFECT_SET_DEFENSE then
+							e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+						end
+						if val then
+							e1:SetValue(val)
+						end
+						e1:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
+						dg:RegisterEffect(e1)
+					end
+				else
+					local e1=Effect.CreateEffect(rc)
+					e1:SetType(EFFECT_TYPE_SINGLE)
+					e1:SetCode(code)
+					if code==EFFECT_LEAVE_FIELD_REDIRECT then
+						e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+					elseif code==EFFECT_SET_ATTACK or code==EFFECT_SET_DEFENSE then
+						e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+					end
+					if val then
+						e1:SetValue(val)
+					end
+					e1:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
+					dg:RegisterEffect(e1)
+				end
+			end
+		end
+	end
+	Duel.SpecialSummonComplete()
+	return ct
+end
+
 function Duel.SpecialSummonATK(e,g,styp,sump,tp,ign1,ign2,pos,zone,atk,reset,rc)
 	if not zone then zone=0xff end
 	if not reset then reset=0 end
@@ -2185,9 +2743,14 @@ function Duel.SpecialSummonRedirect(e,g,styp,sump,tp,ign1,ign2,pos,zone,loc)
 	Duel.SpecialSummonComplete()
 	return ct
 end
-function Duel.SpecialSummonATKDEF(e,g,styp,sump,tp,ign1,ign2,pos,zone,atk,def)
+function Duel.SpecialSummonATKDEF(e,g,styp,sump,tp,ign1,ign2,pos,zone,atk,def,reset,rc)
 	if not zone then zone=0xff end
-	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
+	if not reset then reset=0 end
+	if not rc then rc=e:GetHandler() end
+	if aux.GetValueType(g)=="Card" then
+		if g==e:GetHandler() and rc==e:GetHandler() then reset=reset|RESET_DISABLE end
+		g=Group.FromCards(g)
+	end
 	local ct=0
 	for dg in aux.Next(g) do
 		local finalzone=zone
@@ -2200,10 +2763,10 @@ function Duel.SpecialSummonATKDEF(e,g,styp,sump,tp,ign1,ign2,pos,zone,atk,def)
 		end
 		if Duel.SpecialSummonStep(dg,styp,sump,tp,ign1,ign2,pos,finalzone) then
 			ct=ct+1
-			local e=Effect.CreateEffect(e:GetHandler())
+			local e=Effect.CreateEffect(rc)
 			e:SetType(EFFECT_TYPE_SINGLE)
-			e:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-			e:SetReset(RESET_EVENT+RESETS_STANDARD)
+			e:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+			e:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
 			if atk then
 				e:SetCode(EFFECT_SET_ATTACK)
 				e:SetValue(atk)
@@ -2219,4 +2782,135 @@ function Duel.SpecialSummonATKDEF(e,g,styp,sump,tp,ign1,ign2,pos,zone,atk,def)
 	end
 	Duel.SpecialSummonComplete()
 	return ct
+end
+
+-----------------------------------------------
+--FUSION SUMMON
+function Auxiliary.FusionMaterialFilter(f)
+	return	function(c,e,tp,...)
+				return not c:IsImmuneToEffect(e) and (not f or f(c,e,tp,...))
+			end
+end
+function Auxiliary.FusionMaterialFilter2(f)
+	return	function(c,e,tp,...)
+				return c:IsCanBeFusionMaterial() and not c:IsImmuneToEffect(e) and (c:IsControler(tp) or not c:IsFacedown()) and (not f or f(c,e,tp,...))
+			end
+end
+function Auxiliary.FusionSummonFilter(f)
+	return	function(c,e,tp,eg,ep,ev,re,r,rp,m,mf,chkf)
+				return c:IsMonster(TYPE_FUSION) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false)
+					and c:CheckFusionMaterial(m,nil,chkf) and (not mf or mf(c)) and (not f or f(c,e,tp,eg,ep,ev,re,r,rp))
+			end
+end
+function Auxiliary.FusionSummonTarget(ff,mf,...)
+	local x={...}
+
+	return	function(e,tp,eg,ep,ev,re,r,rp,chk)
+				if chk==0 then
+					local chkf=tp
+					local mg1
+					if mf then
+						mg1=Duel.GetFusionMaterial(tp):Filter(aux.FusionMaterialFilter(mf),nil,e,tp,eg,ep,ev,re,r,rp)
+					end
+					for _,mlist in ipairs(x) do
+						local mf2=mlist[1]
+						local loc1=#mlist>1 and mlist[2] or 0
+						local loc2=#mlist>2 and mlist[3] or 0
+						local checkexc=#mlist>3 and mlist[4] or nil
+						local exc=checkexc and e:GetHandler() or nil
+						local mg2=Duel.GetMatchingGroup(aux.FusionMaterialFilter2(mf2),tp,loc1,loc2,exc,e,tp,eg,ep,ev,re,r,rp)
+						mg1:Merge(mg2)
+					end
+					local res=Duel.IsExistingMatchingCard(aux.FusionSummonFilter(ff),tp,LOCATION_EXTRA,0,1,nil,e,tp,eg,ep,ev,re,r,rp,mg1,nil,chkf)
+					if not res then
+						local ce=Duel.GetChainMaterial(tp)
+						if ce~=nil then
+							local fgroup=ce:GetTarget()
+							local mg3=fgroup(ce,e,tp)
+							local mf=ce:GetValue()
+							res=Duel.IsExistingMatchingCard(aux.FusionSummonFilter(ff),tp,LOCATION_EXTRA,0,1,nil,e,tp,mg3,mf,chkf)
+						end
+					end
+					return res
+				end
+				Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
+				for _,mlist in ipairs(x) do
+					local loc1=#mlist>1 and mlist[2] or 0
+					local loc2=#mlist>2 and mlist[3] or 0
+					local catg=#mlist>4 and mlist[5] or 0
+					if catg~=0 then
+						local p = (loc1>0 and loc2>0) and PLAYER_ALL or (loc1>0) and tp or 1-tp
+						local locs = (loc1&(~loc2))|loc2
+						Duel.SetOperationInfo(0,catg,nil,1,p,locs)
+					end
+				end
+			end
+end
+
+function Auxiliary.FusionSummonOperation(ff,mf,...)
+	local x={...}
+	local customproc = (#x>0 and type(x[#x])=="function") and x[#x] or nil
+	if customproc then
+		table.remove(x,#x)
+	end
+	
+	if (type(mf)=="boolean" and mf==true) or type(mf)=="nil" then
+		mf=aux.TRUE
+	end
+
+	return	function(e,tp,eg,ep,ev,re,r,rp)
+				local chkf=tp
+				local mg1
+				if mf then
+					mg1=Duel.GetFusionMaterial(tp):Filter(aux.FusionMaterialFilter(mf),nil,e,tp,eg,ep,ev,re,r,rp)
+				end
+				for _,mlist in ipairs(x) do
+					local mf2=mlist[1]
+					local loc1=#mlist>1 and mlist[2] or 0
+					local loc2=#mlist>2 and mlist[3] or 0
+					local checkexc=#mlist>3 and mlist[4] or nil
+					local exc=checkexc and e:GetHandler() or nil
+					local mg2=Duel.GetMatchingGroup(aux.FusionMaterialFilter2(mf2),tp,loc1,loc2,exc,e,tp,eg,ep,ev,re,r,rp)
+					mg1:Merge(mg2)
+				end
+				local sg1=Duel.GetMatchingGroup(aux.FusionSummonFilter(ff),tp,LOCATION_EXTRA,0,nil,e,tp,eg,ep,ev,re,r,rp,mg1,nil,chkf)
+				local mg2=nil
+				local sg2=nil
+				local ce=Duel.GetChainMaterial(tp)
+				if ce~=nil then
+					local fgroup=ce:GetTarget()
+					mg2=fgroup(ce,e,tp)
+					local mf=ce:GetValue()
+					sg2=Duel.GetMatchingGroup(aux.FusionSummonFilter(ff),tp,LOCATION_EXTRA,0,nil,e,tp,eg,ep,ev,re,r,rp,mg2,mf,chkf)
+				end
+				local res=false
+				if #sg1>0 or (sg2~=nil and #sg2>0) then
+					local sg=sg1:Clone()
+					if sg2 then sg:Merge(sg2) end
+					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+					local tg=sg:Select(tp,1,1,nil)
+					local tc=tg:GetFirst()
+					if sg1:IsContains(tc) and (sg2==nil or not sg2:IsContains(tc) or not Duel.SelectYesNo(tp,ce:GetDescription())) then
+						local mat1=Duel.SelectFusionMaterial(tp,tc,mg1,gc,chkf)
+						tc:SetMaterial(mat1)
+						if customproc then
+							customproc(mat1,tc,REASON_EFFECT+REASON_MATERIAL+REASON_FUSION,e,tp,eg,ep,ev,re,r,rp)
+						else
+							Duel.SendtoGrave(mat1,REASON_EFFECT+REASON_MATERIAL+REASON_FUSION)
+						end
+						Duel.BreakEffect()
+						res=Duel.SpecialSummon(tc,SUMMON_TYPE_FUSION,tp,tp,false,false,POS_FACEUP)
+						tc:CompleteProcedure()
+						return tc,res,res>0,mat1
+					else
+						local mat2=Duel.SelectFusionMaterial(tp,tc,mg2,nil,chkf)
+						local fop=ce:GetOperation()
+						res=fop(ce,e,tp,tc,mat2)
+						tc:CompleteProcedure()
+						return tc,res,res>0,mat2
+					end
+					tc:CompleteProcedure()
+				end
+				return tc,res,res>0
+			end
 end

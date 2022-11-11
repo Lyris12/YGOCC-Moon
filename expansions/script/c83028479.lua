@@ -15,10 +15,10 @@ s.effect_text = [[
 function s.initial_effect(c)
 	--Token
 	local e0=c:SummonedFieldTrigger(nil,false,true,false,false,0,CATEGORY_SPECIAL_SUMMON+CATEGORY_DESTROY+CATEGORY_TOKEN,nil,LOCATION_HAND,{1,0},
-									aux.EventGroupCond(s.egf,1,nil,true),s.cost,aux.Check(s.check,aux.HandlerInfo(CATEGORY_DESTROY,1,0,LOCATION_HAND+LOCATION_MZONE),
+									aux.EventGroupCond(s.egf,1,nil,true),s.cost,aux.Check(s.check,aux.HandlerInfo(CATEGORY_DESTROY),
 									aux.Info(CATEGORY_SPECIAL_SUMMON,1,0,0),aux.Info(CATEGORY_TOKEN,1,0,0)),s.operation)
 	--SS
-	local e1=c:Ignition(3,CATEGORY_SPECIAL_SUMMON,nil,LOCATION_GRAVE,{1,1},nil,aux.LabelCost,aux.CostCheck(s.spcheck,s.spcost,aux.HandlerInfo(CATEGORY_SPECIAL_SUMMON,1,0,LOCATION_GRAVE)),s.spop)
+	local e1=c:Ignition(3,CATEGORY_SPECIAL_SUMMON,nil,LOCATION_GRAVE,{1,1},nil,aux.LabelCost,aux.CostCheck(s.spcheck,s.spcost,aux.HandlerInfo(CATEGORY_SPECIAL_SUMMON)),s.spop)
 	--activate limit
 	aux.GlobalCheck(s,function()
 		local e2=Effect.CreateEffect(c)

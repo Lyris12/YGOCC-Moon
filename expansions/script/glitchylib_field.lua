@@ -360,9 +360,21 @@ function Card.SSProc(c,desc,prop,range,ctlim,cond,tg,op,pos,p,zone)
 	e1:SetCode(EFFECT_SPSUMMON_PROC)
 	e1:SetRange(range)
 	if ctlim then
-		if type(ctlim)=="table" then
-			local flag=#ctlim>2 and ctlim[3] or EFFECT_COUNT_CODE_OATH
-			e1:SetCountLimit(ctlim[1],c:GetOriginalCode()+ctlim[2]*100+flag)
+		if type(ctlim)=="boolean" then
+			e1:HOPT(true)
+		elseif type(ctlim)=="table" then
+			if type(ctlim[1])=="boolean" then
+				local shopt=ctlim[2]
+				local oath=ctlim[3]
+				if shopt then
+					e1:SHOPT(oath)
+				else
+					e1:HOPT(oath)
+				end
+			else
+				local flag=#ctlim>2 and ctlim[3] or 0
+				e1:SetCountLimit(ctlim[1],c:GetOriginalCode()+ctlim[2]*100+flag)
+			end
 		else
 			e1:SetCountLimit(ctlim)
 		end
@@ -376,7 +388,7 @@ function Card.SSProc(c,desc,prop,range,ctlim,cond,tg,op,pos,p,zone)
 		e1:SetValue(zone)
 	end
 	if cond then
-		e1:SetCondition(cond)
+		e1:SetCondition(function(e,c) if c==nil then return true end return cond(e,c,e:GetHandlerPlayer()) end)
 	end
 	if tg then
 		e1:SetTarget(tg)

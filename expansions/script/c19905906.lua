@@ -1,15 +1,27 @@
---created by Meed
---MMS - Throne
+--MMS - Trono
+--Script by XGlitchy30
+
 local s,id,o=GetID()
 function s.initial_effect(c)
-	local tp=c:GetControler()
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e1:SetCode(EVENT_PHASE_START+PHASE_DRAW)
-	e1:SetCountLimit(1,5001+EFFECT_COUNT_CODE_DUEL)
-	e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
-	e1:SetOperation(function()
-		Duel.SendtoDeck(Duel.CreateToken(0,5000),0,SEQ_DECKTOP,REASON_RULE)
-	end)
-	Duel.RegisterEffect(e1,0)
+	c:EnableReviveLimit()
+	aux.AddFusionProcFun2(c,aux.Filter(Card.IsFusionSetCard,0xd71),aux.Filter(Card.IsFusionAttribute,ATTRIBUTE_LIGHT),true)
+	--destroy
+	c:SummonedTrigger(false,false,true,false,0,CATEGORY_DESTROY,EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY,true,
+		nil,
+		nil,
+		aux.Target(aux.TRUE,0,LOCATION_ONFIELD,1,1,nil,nil,CATEGORY_DESTROY),
+		aux.DestroyOperation(SUBJECT_IT)
+	)
+	--attack while in DEF
+	c:CanAttackWhileInDefensePosition()
+	--negate
+	c:CreateNegateEffect(true,1,nil,1,LOCATION_MZONE,true,
+		nil,
+		aux.ToDeckCost(s.cfilter,LOCATION_REMOVED)
+	)
+end
+function s.cfilter(c,e,tp,eg,ep,ev,re,r,rp)
+	if not c:IsFaceup() then return false end
+	local rtype=(re:GetActiveType()&0x7)
+	return c:IsType(rtype)
 end

@@ -209,11 +209,12 @@ function Duel.ShuffleIntoDeck(g,p)
 	end
 	return 0
 end
-function Auxiliary.PLChk(c,p,loc)
+function Auxiliary.PLChk(c,p,loc,min)
+	if not min then min=1 end
 	if aux.GetValueType(c)=="Card" then
 		return (not p or c:IsControler(p)) and (not loc or c:IsLocation(loc))
 	elseif aux.GetValueType(c)=="Group" then
-		return c:IsExists(aux.PLChk,1,nil,p,loc)
+		return c:IsExists(aux.PLChk,min,nil,p,loc)
 	else
 		return false
 	end
@@ -283,7 +284,7 @@ function Card.IsOriginalRace(c,rc)
 end
 
 function Card.HasRank(c)
-	return c:IsType(TYPE_XYZ) or c:IsOriginalType(TYPE_XYZ)
+	return c:IsType(TYPE_XYZ) or c:IsOriginalType(TYPE_XYZ) or c:IsHasEffect(EFFECT_ORIGINAL_LEVEL_RANK_DUALITY)
 end
 function Card.GetRating(c)
 	local list={false,false,false,false}
@@ -440,6 +441,12 @@ end
 function Auxiliary.Filter(f,...)
 	local ext_params={...}
 	return aux.FilterBoolFunction(f,table.unpack(ext_params))
+end
+function Auxiliary.FaceupFilter(f,...)
+	local ext_params={...}
+	return	function(target)
+				return target:IsFaceup() and f(target,table.unpack(ext_params))
+			end
 end
 function Auxiliary.MonsterFilter(f,...)
 	local ext_params={...}
@@ -886,8 +893,9 @@ function Card.Quick(c,forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op,tim
 	return e1
 end
 
-function Card.CreateNegateEffect(c,negateact,rp,rf,desc,range,ctlim,cond,cost,tg,negatedop)
+function Card.CreateNegateEffect(c,negateact,rp,rf,desc,range,ctlim,cond,cost,tg,negatedop,negatecat)
 	local negcategory = negateact and CATEGORY_NEGATE or CATEGORY_DISABLE
+	local negcategory2 = (negatecat and negatecat) or (type(negatedop)=="number" and negatedop) or 0
 	local negatedop = negatedop or 0
 	if c:IsOriginalType(TYPE_MONSTER) then
 		local range = range and range or (c:IsOriginalType(TYPE_MONSTER)) and LOCATION_MZONE or (c:IsOriginalType(TYPE_FIELD)) and LOCATION_FZONE or LOCATION_SZONE
@@ -895,7 +903,7 @@ function Card.CreateNegateEffect(c,negateact,rp,rf,desc,range,ctlim,cond,cost,tg
 		if desc then
 			e1:Desc(desc)
 		end
-		e1:SetCategory(negcategory+negatedop)
+		e1:SetCategory(negcategory+negcategory2)
 		e1:SetType(EFFECT_TYPE_QUICK_O)
 		if negateact then
 			e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
@@ -932,7 +940,7 @@ function Card.CreateNegateEffect(c,negateact,rp,rf,desc,range,ctlim,cond,cost,tg
 		if desc then
 			e1:Desc(desc)
 		end
-		e1:SetCategory(negcategory+negatedop)
+		e1:SetCategory(negcategory+negcategory2)
 		if not range then
 			e1:SetType(EFFECT_TYPE_ACTIVATE)
 		else
