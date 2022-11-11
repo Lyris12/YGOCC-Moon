@@ -1012,7 +1012,7 @@ end
 --Draw
 function Auxiliary.DrawTarget(min,p)
 	if not min then min=1 end
-	if p<1 then
+	if not p or p<1 then
 		return	function (e,tp,eg,ep,ev,re,r,rp,chk)
 					local p=(not p or p==0) and tp or 1-tp
 					if chk==0 then return Duel.IsPlayerCanDraw(p,min) end
@@ -1036,7 +1036,7 @@ function Auxiliary.DrawOperation(min,max,p)
 				end
 	else
 		if not max then max=min end
-		if p<1 then 
+		if not p or p<1 then 
 			return	function (e,tp,eg,ep,ev,re,r,rp)
 						local p = (p==0 or not p) and tp or 1-tp 
 						local ct=Duel.Draw(p,min,REASON_EFFECT)
