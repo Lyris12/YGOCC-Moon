@@ -16,7 +16,7 @@ function s.initial_effect(c)
 	e1:HOPT()
 	e1:SetCost(aux.DiscardCost(nil,1,1))
 	e1:SetTarget(aux.SearchTarget(s.filter,1,LOCATION_DECK+LOCATION_GRAVE))
-	e1:SetOperation(aux.SearchOperation(s.filter,1,1,LOCATION_DECK+LOCATION_GRAVE,true))
+	e1:SetOperation(aux.SearchOperation(s.filter,LOCATION_DECK+LOCATION_GRAVE,0,1,1))
 	c:RegisterEffect(e1)
 	--retrieve
 	local e3=Effect.CreateEffect(c)
