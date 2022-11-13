@@ -38,7 +38,7 @@ function s.filter(c)
 end
 
 function s.egfilter(c,tp)
-	return c:IsMonster(TYPE_DRIVE) and c:IsPreviousControler(tp) and (c:IsLocation(LOCATION_GRAVE) or c:IsLocation(LOCATION_REMOVED+LOCATION_EXTRA) and c:IsFaceup())
+	return c:IsMonster(TYPE_DRIVE) and c:IsPreviousControler(tp) and (c:IsLocation(LOCATION_GRAVE) or (c:IsLocation(LOCATION_REMOVED+LOCATION_EXTRA) and c:IsFaceup()))
 end
 function s.rthcond(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.egfilter,1,nil,tp)
@@ -63,7 +63,7 @@ function s.rthtg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.rthop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToChain() then return end
-	local g=eg:Filter(s.egfilter,nil,tp):Filter(s.thfil,nil,tp):Filter(Card.IsRelateToChain,nil)
+	local g=eg:Filter(s.egfilter,nil,tp):Filter(Card.IsAbleToHand,nil):Filter(Card.IsRelateToChain,nil)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local sg=g:Select(tp,1,1,nil)
 	if #sg>0 then

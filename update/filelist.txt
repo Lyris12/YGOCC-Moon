@@ -1,4 +1,4 @@
-﻿expansions/cards-new.cdb	eeee936570ef8bc42216d0b0be70c332
+﻿expansions/cards-new.cdb	a28141ce5feefa5d731754ff3998fe25
 expansions/lflist.conf	cc5f911d95b32cef46d32d93a5c5e8a2
 expansions/strings.conf	5110cdc28dfcf167b8fdd9b3505dd2d5
 expansions/pics/100000714.jpg	74ec20749932cad0249671d71e6d672b
@@ -8731,7 +8731,7 @@ expansions/script/c34852.lua	63e0abeacef216171d0ba913c624e68d
 expansions/script/c34853.lua	bbccd7ea6ccd0e424b4e2b0b3c17cf0f
 expansions/script/c34854.lua	8336cc3491f7ebed53d7489f255dfca1
 expansions/script/c34855.lua	898933e4d6cdafd7e9ceadba2e9e8b7f
-expansions/script/c34856.lua	378aeb99250e10003c5a2663976100bf
+expansions/script/c34856.lua	da0253016db697925563721444979d09
 expansions/script/c34857.lua	2752eef71193cab613caa9ddb41e7012
 expansions/script/c34858.lua	d06071aeff571dc2b6581f80a5e2b61c
 expansions/script/c34859.lua	579afe81b068ee4e5eb96d606bb5efc1
@@ -8739,10 +8739,10 @@ expansions/script/c34860.lua	8374425f3c61e2f957a942c0384b0beb
 expansions/script/c34861.lua	25ee3b5116b07a9ab3a6bdc9ddcafe72
 expansions/script/c34862.lua	25ee03ba1edc9200fafcb02d1a6dedca
 expansions/script/c34863.lua	609ab6ed6cade6f2fa55dcd681e9b743
-expansions/script/c34864.lua	e5fb646079d21c4fc90242867c1e071e
-expansions/script/c34865.lua	10eed1f52f9cd43b9729d225747dc84b
-expansions/script/c34866.lua	14971e4fc44ccbfce0c25b856ddcc8cb
-expansions/script/c34867.lua	9835ff5c66d4405b65f3de501b16b0d7
+expansions/script/c34864.lua	5e6b8aec146e2e1d7034a7de2b17607f
+expansions/script/c34865.lua	a28138e72bc75c4fec7da3aa1b2e445b
+expansions/script/c34866.lua	57e912f5a042b68010646c90d28fbba3
+expansions/script/c34867.lua	d1aab4ddeab8466677d662d8692b0ff7
 expansions/script/c34868.lua	ccc8171a42c2eda0f034411ae4b3e6b1
 expansions/script/c36429103.lua	991a976989b3c4abb46f7f8c6cb02553
 expansions/script/c36541431.lua	3198d895d1e05fc3111aac4e62e9e2eb
@@ -10711,6 +10711,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	1f5e9327afd8b197e7bc641fe8b9acda
+update/filelist.txt	9385298bd942572aed7fa363db71a4e5
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	14466aab8f801ff7f8046689d04687ed
+update/version.txt	500b23743eee5eb7d8fe77d638c18168

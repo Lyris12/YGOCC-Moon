@@ -3,6 +3,7 @@
 
 local s,id=GetID()
 function s.initial_effect(c)
+	aux.AddCodeList(c,34860)
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(0)
