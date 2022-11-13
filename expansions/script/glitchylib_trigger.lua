@@ -100,6 +100,11 @@ function Card.Trigger(c,forced,desc,ctg,defaultprop,prop,event,ctlim,cond,cost,t
 	return e1
 end
 
+function Card.BanishedTrigger(c,forced,desc,ctg,prop,ctlim,cond,cost,tg,op,typechange,reset)
+	local event=EVENT_REMOVE
+	local e1=c:Trigger(forced,desc,ctg,EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL,prop,event,ctlim,cond,cost,tg,op,typechange,reset)
+	return e1
+end
 function Card.DestroyedTrigger(c,forced,desc,ctg,prop,ctlim,cond,cost,tg,op,typechange,reset)
 	local event=EVENT_DESTROYED
 	local e1=c:Trigger(forced,desc,ctg,EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL,prop,event,ctlim,cond,cost,tg,op,typechange,reset)
@@ -290,6 +295,11 @@ function Card.FieldTrigger(c,evf,forced,desc,ctg,prop,event,range,ctlim,cond,cos
 	return e1
 end
 
+function Card.BanishedFieldTrigger(c,evf,forced,desc,ctg,prop,range,ctlim,cond,cost,tg,op,typechange,reset,notreg)
+	local event=EVENT_REMOVE
+	local e1=c:FieldTrigger(evf,forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op,typechange,reset,notreg,true)
+	return e1
+end
 function Card.DestroyedFieldTrigger(c,evf,forced,desc,ctg,prop,range,ctlim,cond,cost,tg,op,typechange,reset,notreg)
 	local event=EVENT_DESTROYED
 	local e1=c:FieldTrigger(evf,forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op,typechange,reset,notreg,true)

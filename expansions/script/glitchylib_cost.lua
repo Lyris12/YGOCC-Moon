@@ -72,6 +72,24 @@ function Auxiliary.ToGraveCost(f,loc1,loc2,min,max,exc)
 				return g,0
 			end
 end
+function Auxiliary.ToHandCost(f,loc1,loc2,min,max,exc)
+	if not loc1 then loc1=LOCATION_ONFIELD end
+	if not loc2 then loc2=0 end
+	if not min then min=1 end
+	if not max then max=min end
+	return	function(e,tp,eg,ep,ev,re,r,rp,chk)
+				local exc=(not exc) and nil or e:GetHandler()
+				if chk==0 then return Duel.IsExistingMatchingCard(aux.ToHandFilter(f,true),tp,loc1,loc2,min,exc,e,tp,eg,ep,ev,re,r,rp) end
+				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
+				local g=Duel.SelectMatchingCard(tp,aux.ToHandFilter(f,true),tp,loc1,loc2,min,max,exc,e,tp,eg,ep,ev,re,r,rp)
+				if #g>0 then
+					Duel.HintSelection(g)
+					local ct=Duel.SendtoHand(g,nil,REASON_COST)
+					return g,ct
+				end
+				return g,0
+			end
+end
 function Auxiliary.ToDeckCost(f,loc1,loc2,min,max,exc,main_or_extra)
 	f=aux.ToDeckFilter(f,true,main_or_extra)
 	if not loc1 then loc1=LOCATION_ONFIELD end
@@ -94,7 +112,20 @@ function Auxiliary.ToDeckCost(f,loc1,loc2,min,max,exc,main_or_extra)
 				return g,0
 			end
 end
-
+function Auxiliary.TributeCost(f,min,max,exc)
+	if not min then min=1 end
+	if not max then max=min end
+	return	function(e,tp,eg,ep,ev,re,r,rp,chk)
+				local exc=(not exc) and nil or e:GetHandler()
+				if chk==0 then return Duel.CheckReleaseGroup(tp,f,min,exc,e,tp,eg,ep,ev,re,r,rp) end
+				local rg=Duel.SelectReleaseGroup(tp,f,min,max,exc,e,tp,eg,ep,ev,re,r,rp)
+				if #rg>0 then
+					local ct=Duel.Release(rg,REASON_COST)
+					return rg,ct
+				end
+				return g,0
+			end
+end
 -----------------------------------------------------------------------
 --Self as Cost
 function Auxiliary.BanishFacedownSelfCost(e,tp,eg,ep,ev,re,r,rp,chk)

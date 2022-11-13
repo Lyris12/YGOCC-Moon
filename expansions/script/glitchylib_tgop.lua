@@ -912,7 +912,7 @@ function Auxiliary.DestroyOperation(subject,loc1,loc2,min,max,exc)
 			local hardchk=(subject==SUBJECT_ALL_THOSE_TARGETS)
 			local op =	function(g)
 							local chk=0
-							local ct=fn(g,e,tp,eg,ep,ev,re,r,rp)
+							local ct=Duel.Destroy(g,REASON_EFFECT)
 							return g,ct,ct>0
 						end
 			return aux.TargetOperation(op,nil,hardchk)
@@ -1227,8 +1227,10 @@ end
 
 -----------------------------------------------------------------------
 --Send To Hand
-function Auxiliary.ToHandFilter(f)
-	return aux.SearchFilter(f)
+function Auxiliary.ToHandFilter(f,cost)
+	return	function(c,...)
+				return (not f or f(c,...)) and (not cost and c:IsAbleToHand() or (cost and c:IsAbleToHandAsCost()))
+			end
 end
 function Auxiliary.SendToHandTarget(f,loc1,loc2,min,exc)
 	f=aux.SearchFilter(f)

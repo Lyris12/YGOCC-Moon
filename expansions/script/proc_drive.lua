@@ -10,6 +10,7 @@ SUMMON_TYPE_DRIVE				=SUMMON_TYPE_SPECIAL+348
 REASON_DRIVE	= 0x80000000000
 
 FLAG_ENGAGE = 348
+FLAG_ZERO_ENERGY = 349
 
 EFFECT_DRIVE_ORIGINAL_ENERGY 	= 34843
 EFFECT_DRIVE_ENERGY 			= 34844
@@ -210,6 +211,7 @@ function Auxiliary.EngageOperation(e,tp)
 	c:RegisterEffect(e1,true)
 	c:RegisterFlagEffect(FLAG_ENGAGE,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(DRIVE_STRINGS,3))
 	Duel.RaiseEvent(c,EVENT_ENGAGE,e,REASON_RULE,tp,tp,0)
+	Duel.RaiseSingleEvent(c,EVENT_ENGAGE,e,REASON_RULE,tp,tp,0)
 	--
 	local e5=Effect.CreateEffect(c)
 	e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
@@ -217,7 +219,14 @@ function Auxiliary.EngageOperation(e,tp)
 	e5:SetCode(EVENT_ADJUST)
 	e5:SetRange(LOCATION_HAND)
 	e5:SetCondition(Auxiliary.DriveSelfToGraveCon)
-	e5:SetOperation(function(ce) Duel.SendtoGrave(ce:GetHandler(),REASON_RULE) end)
+	e5:SetOperation(	function(ce)
+							local cc=ce:GetHandler()
+							cc:RegisterFlagEffect(FLAG_ZERO_ENERGY,RESET_EVENT+RESETS_STANDARD-RESET_TOGRAVE,EFFECT_FLAG_IGNORE_IMMUNE,1)
+							if Duel.SendtoGrave(cc,REASON_RULE)<=0 or not cc:IsLocation(LOCATION_GRAVE) then
+								cc:ResetFlagEffect(FLAG_ZERO_ENERGY)
+							end
+						end
+					)
 	e5:SetReset(RESET_EVENT+RESETS_STANDARD)
 	c:RegisterEffect(e5)
 	Duel.AdjustAll()
@@ -397,11 +406,23 @@ function Card.GetEnergy(c)
 	end
 	return energy
 end
+function Card.GetOriginalEnergy(c)
+	if not Auxiliary.Drives[c] then return false end
+	local energy=0
+	local te=c:IsHasEffect(EFFECT_DRIVE_ORIGINAL_ENERGY)
+	if type(te:GetValue())=='function' then
+		energy=te:GetValue()(te,c)
+	else
+		energy=te:GetValue()
+	end
+	return energy
+end
+
 function Card.IsHasEnergy(c)
 	return Auxiliary.Drives[c] and c:IsHasEffect(EFFECT_DRIVE_ENERGY)
 end
 function Card.IsEnergy(c,...)
-	for en in pairs({...}) do
+	for _,en in ipairs({...}) do
 		if c:GetEnergy()==en then return true end
 	end
 	return false
@@ -413,13 +434,18 @@ function Card.IsEnergyBelow(c,en)
 	return c:IsHasEnergy() and c:GetEnergy()<=en
 end
 function Card.IsCanUpdateEnergy(c,ct,p,r)
-	return ct>=0 or c:IsEnergyAbove(math.abs(ct))
+	return c:IsHasEnergy() and (ct>=0 or c:IsEnergyAbove(math.abs(ct)))
 end
 function Card.IsCanChangeEnergy(c,ct,p,r)
 	return c:IsHasEnergy() and not c:IsEnergy(ct)
 end
+function Card.IsCanResetEnergy(c,p,r)
+	local ct=c:GetOriginalEnergy()
+	return ct and c:IsHasEnergy() and not c:IsEnergy(ct)
+end
+
 function Card.UpdateEnergy(c,val,p,r,reset,rc)
-	local reset = (type(reset)=="number" or reset==false) and reset or 0
+	local reset = (type(reset)=="number" or not reset) and reset or 0
 	local rc = rc and rc or c
 	
 	local en=c:GetEnergy()
@@ -440,7 +466,7 @@ function Card.UpdateEnergy(c,val,p,r,reset,rc)
 	end
 end
 function Card.ChangeEnergy(c,val,p,r,reset,rc)
-	local reset = (type(reset)=="number" or reset==false) and reset or 0
+	local reset = (type(reset)=="number" or not reset) and reset or 0
 	local rc = rc and rc or c
 	
 	local en=c:GetEnergy()
@@ -454,7 +480,17 @@ function Card.ChangeEnergy(c,val,p,r,reset,rc)
 	end
 	c:RegisterEffect(e)
 	aux.CheckEnergyOperation(e,p)
-	return e
+	if reset then
+		return e,c:GetEnergy()
+	else
+		return e
+	end
+end
+function Card.ResetEnergy(c,p,r,reset,rc)
+	local val=c:GetOriginalEnergy()
+	if not val then return false end
+	local e,en=c:ChangeEnergy(val,p,r,reset,rc)
+	return e,en==val
 end
 
 --conditions
