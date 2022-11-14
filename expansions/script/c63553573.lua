@@ -17,7 +17,7 @@ function cid.initial_effect(c)
 	p1:SetTarget(cid.acttg)
 	p1:SetOperation(cid.actop)
 	c:RegisterEffect(p1)
-	aux.EnablePandemoniumAttribute(c,p1)
+	aux.EnablePandemoniumAttribute(c,p1,nil,TYPE_EFFECT+TYPE_TUNER)
 	--extra summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,1))
