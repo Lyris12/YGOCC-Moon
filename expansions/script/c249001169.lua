@@ -1,7 +1,7 @@
 --Dark Caller
 function c249001169.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,nil,4,2)
+	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_WARRIOR+RACE_SPELLCASTER),4,2)
 	c:EnableReviveLimit()
 	--draw
 	local e1=Effect.CreateEffect(c)
@@ -9,7 +9,7 @@ function c249001169.initial_effect(c)
 	e1:SetDescription(aux.Stringid(51960178,0))
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetCountLimit(1)
+	e1:SetCountLimit(1,249001169)
 	e1:SetCost(c249001169.cost)
 	e1:SetTarget(c249001169.target)
 	e1:SetOperation(c249001169.operation)

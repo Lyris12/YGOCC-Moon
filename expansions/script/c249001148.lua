@@ -1,4 +1,4 @@
---Cyber Dragon Variation
+--Cyber Dragon Variieren
 function c249001148.initial_effect(c)
 	--spsummon on attack
 	--local e1=Effect.CreateEffect(c)
@@ -21,6 +21,7 @@ function c249001148.initial_effect(c)
 	e2:SetCategory(CATEGORY_DRAW+CATEGORY_HANDES)
 	e2:SetCountLimit(1,249001148)
 	e2:SetCondition(c249001148.drcon)
+	e2:SetCost(c249001148.cost)
 	e2:SetTarget(c249001148.drtg)
 	e2:SetOperation(c249001148.drop)
 	c:RegisterEffect(e2)
@@ -33,6 +34,7 @@ function c249001148.initial_effect(c)
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e3:SetCountLimit(1,249001148)
 	e3:SetCondition(c249001148.spcon2)
+	e3:SetCost(c249001148.cost)
 	e3:SetTarget(c249001148.sptg2)
 	e3:SetOperation(c249001148.spop2)
 	c:RegisterEffect(e3)
@@ -44,6 +46,10 @@ function c249001148.initial_effect(c)
 	e4:SetRange(LOCATION_MZONE+LOCATION_GRAVE)
 	e4:SetValue(70095154)
 	c:RegisterEffect(e4)
+	Duel.AddCustomActivityCounter(249001148,ACTIVITY_SPSUMMON,c249001148.counterfilter)
+end
+function c249001148.counterfilter(c)
+	return not c:IsSetCard(0x4093)
 end
 --function c249001148.spcon(e,tp,eg,ep,ev,re,r,rp)
 --	local at=Duel.GetAttacker()
@@ -65,6 +71,20 @@ end
 --end
 function c249001148.drcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0
+end
+function c249001148.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetCustomActivityCount(2490001148,tp,ACTIVITY_SPSUMMON)==0 end
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)
+	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+	e1:SetReset(RESET_PHASE+PHASE_END)
+	e1:SetTargetRange(1,0)
+	e1:SetTarget(c249001148.splimit)
+	Duel.RegisterEffect(e1,tp)
+end
+function c249001148.splimit(e,c,sump,sumtype,sumpos,targetp,se)
+	return c:IsSetCard(0x4093)
 end
 function c249001148.drspfilter(c)
 	return c:IsSummonType(SUMMON_TYPE_SPECIAL)
