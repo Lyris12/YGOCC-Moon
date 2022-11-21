@@ -9,7 +9,7 @@ SUBJECT_ALL_THOSE_TARGETS	=	3
 SUBJECT_ALL					=	4
 
 -----------------------------------------------------------------------
-function Card.SingleEffect(c,code,val,reset,rc,range,cond)
+function Card.SingleEffect(c,code,val,reset,rc,range,cond,prop,desc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
 	local range = range and range or c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
 	local rc = rc and rc or c
@@ -20,10 +20,17 @@ function Card.SingleEffect(c,code,val,reset,rc,range,cond)
     end
 	
 	local e=Effect.CreateEffect(rc)
+	if desc then
+		e:Desc(desc)
+	end
 	e:SetType(typ)
 	if not SCRIPT_AS_EQUIP then
-		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+		local prop=prop and prop or 0
+		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE|prop)
 		e:SetRange(range)
+	end
+	if prop then
+		e:SetProperty(prop)
 	end
 	e:SetCode(code)
 	if val then
@@ -34,7 +41,9 @@ function Card.SingleEffect(c,code,val,reset,rc,range,cond)
 	end
 	if reset then
 		if type(reset)~="number" then reset=0 end
-		reset = rc==c and reset|RESET_DISABLE or reset
+		if prop&EFFECT_FLAG_CANNOT_DISABLE==0 then
+			reset = rc==c and reset|RESET_DISABLE or reset
+		end
 		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
 	end
 	return e
@@ -272,7 +281,7 @@ function Auxiliary.ChangeStatsOperationTemplate(fn,subject,atk,reset,rc,range,co
 end
 ----------------------------------------
 
-function Card.UpdateATK(c,atk,reset,rc,range,cond)
+function Card.UpdateATK(c,atk,reset,rc,range,cond,prop,desc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
 	local range = range and range or c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
 	local rc = rc and rc or c
@@ -311,7 +320,7 @@ function Auxiliary.UpdateATKOperation(subject,atk,reset,rc,range,cond,loc1,loc2,
 	return aux.UpdateStatsOperationTemplate(Card.UpdateATK,subject,atk,reset,rc,range,cond,loc1,loc2,min,max,exc)
 end
 
-function Card.UpdateDEF(c,def,reset,rc,range,cond)
+function Card.UpdateDEF(c,def,reset,rc,range,cond,prop,desc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
 	local range = range and range or c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
 	local rc = rc and rc or c
@@ -349,7 +358,7 @@ function Auxiliary.UpdateDEFOperation(subject,def,reset,rc,range,cond,loc1,loc2,
 	return aux.UpdateStatsOperationTemplate(Card.UpdateDEF,subject,def,reset,rc,range,cond,loc1,loc2,min,max,exc)
 end
 
-function Card.UpdateATKDEF(c,atk,def,reset,rc,range,cond)
+function Card.UpdateATKDEF(c,atk,def,reset,rc,range,cond,prop,desc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
 	local range = range and range or c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
 	local rc = rc and rc or c
@@ -408,7 +417,7 @@ function Auxiliary.UpdateATKDEFOperation(subject,atk,def,reset,rc,range,cond,loc
 						Duel.HintSelection(g)
 						local chk=0
 						for tc in aux.Next(g) do
-							local eff1,eff2,diff1,diff2=tc:UpdateATKDEF(atk,def,reset,rc,range,cond)
+							local eff1,eff2,diff1,diff2=tc:UpdateATKDEF(atk,def,reset,rc,range,cond,prop,desc)
 							if not tc:IsImmuneToEffect(eff1) and diff1==atk and not tc:IsImmuneToEffect(eff2) and diff2==def then
 								chk=chk+1
 							end
@@ -423,7 +432,7 @@ function Auxiliary.UpdateATKDEFOperation(subject,atk,def,reset,rc,range,cond,loc
 			return	function(e,tp,eg,ep,ev,re,r,rp,conj)
 						local c=e:GetHandler()
 						aux.CheckSequentiality(conj)
-						local eff1,eff2,diff1,diff2=tc:UpdateATKDEF(atk,def,reset,rc,range,cond)
+						local eff1,eff2,diff1,diff2=tc:UpdateATKDEF(atk,def,reset,rc,range,cond,prop,desc)
 						local chk = (not tc:IsImmuneToEffect(eff1) and diff1==atk and not tc:IsImmuneToEffect(eff2) and diff2==def)
 						return c,1,chk
 					end
@@ -432,7 +441,7 @@ function Auxiliary.UpdateATKDEFOperation(subject,atk,def,reset,rc,range,cond,loc
 			local op =	function(g)
 							local chk=0
 							for tc in aux.Next(g) do
-								local eff1,eff2,diff1,diff2=tc:UpdateATKDEF(atk,def,reset,rc,range,cond)
+								local eff1,eff2,diff1,diff2=tc:UpdateATKDEF(atk,def,reset,rc,range,cond,prop,desc)
 								if not tc:IsImmuneToEffect(eff1) and diff1==atk and not tc:IsImmuneToEffect(eff2) and diff2==def then
 									chk=chk+1
 								end
@@ -461,7 +470,7 @@ function Auxiliary.UpdateATKDEFOperation(subject,atk,def,reset,rc,range,cond,loc
 							Duel.HintSelection(sg)
 							local chk=0
 							for tc in aux.Next(sg) do
-								local eff1,eff2,diff1,diff2=tc:UpdateATKDEF(atk,def,reset,rc,range,cond)
+								local eff1,eff2,diff1,diff2=tc:UpdateATKDEF(atk,def,reset,rc,range,cond,prop,desc)
 								if not tc:IsImmuneToEffect(eff1) and diff1==atk and not tc:IsImmuneToEffect(eff2) and diff2==def then
 									chk=chk+1
 								end
@@ -477,7 +486,7 @@ function Auxiliary.UpdateATKDEFOperation(subject,atk,def,reset,rc,range,cond,loc
 			local op =	function(g)
 							local chk=0
 							for tc in aux.Next(g) do
-								local eff1,eff2,diff1,diff2=tc:UpdateATKDEF(atk,def,reset,rc,range,cond)
+								local eff1,eff2,diff1,diff2=tc:UpdateATKDEF(atk,def,reset,rc,range,cond,prop,desc)
 								if not tc:IsImmuneToEffect(eff1) and diff1==atk and not tc:IsImmuneToEffect(eff2) and diff2==def then
 									chk=chk+1
 								end
@@ -489,7 +498,7 @@ function Auxiliary.UpdateATKDEFOperation(subject,atk,def,reset,rc,range,cond,loc
 	end
 end
 
-function Card.ChangeATK(c,atk,reset,rc,range,cond)
+function Card.ChangeATK(c,atk,reset,rc,range,cond,prop,desc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
 	local range = range and range or c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
 	
@@ -527,7 +536,7 @@ function Auxiliary.ChangeATKOperation(subject,atk,reset,rc,range,cond,loc1,loc2,
 	return aux.ChangeStatsOperationTemplate(Card.ChangeATK,subject,atk,reset,rc,range,cond,loc1,loc2,min,max,exc)
 end
 
-function Card.ChangeDEF(c,def,reset,rc,range,cond)
+function Card.ChangeDEF(c,def,reset,rc,range,cond,prop,desc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
 	local range = range and range or c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
 	local rc = rc and rc or c
@@ -564,7 +573,7 @@ function Auxiliary.ChangeDEFOperation(subject,def,reset,rc,range,cond,loc1,loc2,
 	return aux.ChangeStatsOperationTemplate(Card.ChangeDEF,subject,def,reset,rc,range,cond,loc1,loc2,min,max,exc)
 end
 
-function Card.ChangeATKDEF(c,atk,def,reset,rc,range,cond)
+function Card.ChangeATKDEF(c,atk,def,reset,rc,range,cond,prop,desc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
 	local range = range and range or c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
 	local rc = rc and rc or c
@@ -624,7 +633,7 @@ function Auxiliary.ChangeATKDEFOperation(subject,atk,def,reset,rc,range,cond,loc
 						Duel.HintSelection(g)
 						local chk=0
 						for tc in aux.Next(g) do
-							local eff1,eff2,_1,diff1,_2,diff2=tc:ChangeATKDEF(atk,def,reset,rc,range,cond)
+							local eff1,eff2,_1,diff1,_2,diff2=tc:ChangeATKDEF(atk,def,reset,rc,range,cond,prop,desc)
 							if not tc:IsImmuneToEffect(eff1) and diff1==atk and not tc:IsImmuneToEffect(eff2) and diff2==def then
 								chk=chk+1
 							end
@@ -639,7 +648,7 @@ function Auxiliary.ChangeATKDEFOperation(subject,atk,def,reset,rc,range,cond,loc
 			return	function(e,tp,eg,ep,ev,re,r,rp,conj)
 						local c=e:GetHandler()
 						aux.CheckSequentiality(conj)
-						local eff1,eff2,_1,diff1,_2,diff2=tc:ChangeATKDEF(atk,def,reset,rc,range,cond)
+						local eff1,eff2,_1,diff1,_2,diff2=tc:ChangeATKDEF(atk,def,reset,rc,range,cond,prop,desc)
 						local chk = (not tc:IsImmuneToEffect(eff1) and diff1==atk and not tc:IsImmuneToEffect(eff2) and diff2==def)
 						return c,1,chk
 					end
@@ -648,7 +657,7 @@ function Auxiliary.ChangeATKDEFOperation(subject,atk,def,reset,rc,range,cond,loc
 			local op =	function(g)
 							local chk=0
 							for tc in aux.Next(g) do
-								local eff1,eff2,_1,diff1,_2,diff2=tc:ChangeATKDEF(atk,def,reset,rc,range,cond)
+								local eff1,eff2,_1,diff1,_2,diff2=tc:ChangeATKDEF(atk,def,reset,rc,range,cond,prop,desc)
 								if not tc:IsImmuneToEffect(eff1) and diff1==atk and not tc:IsImmuneToEffect(eff2) and diff2==def then
 									chk=chk+1
 								end
@@ -677,7 +686,7 @@ function Auxiliary.ChangeATKDEFOperation(subject,atk,def,reset,rc,range,cond,loc
 							Duel.HintSelection(sg)
 							local chk=0
 							for tc in aux.Next(sg) do
-								local eff1,eff2,_1,diff1,_2,diff2=tc:ChangeATKDEF(atk,def,reset,rc,range,cond)
+								local eff1,eff2,_1,diff1,_2,diff2=tc:ChangeATKDEF(atk,def,reset,rc,range,cond,prop,desc)
 								if not tc:IsImmuneToEffect(eff1) and diff1==atk and not tc:IsImmuneToEffect(eff2) and diff2==def then
 									chk=chk+1
 								end
@@ -693,7 +702,7 @@ function Auxiliary.ChangeATKDEFOperation(subject,atk,def,reset,rc,range,cond,loc
 			local op =	function(g)
 							local chk=0
 							for tc in aux.Next(g) do
-								local eff1,eff2,_1,diff1,_2,diff2=tc:ChangeATKDEF(atk,def,reset,rc,range,cond)
+								local eff1,eff2,_1,diff1,_2,diff2=tc:ChangeATKDEF(atk,def,reset,rc,range,cond,prop,desc)
 								if not tc:IsImmuneToEffect(eff1) and diff1==atk and not tc:IsImmuneToEffect(eff2) and diff2==def then
 									chk=chk+1
 								end
@@ -705,33 +714,33 @@ function Auxiliary.ChangeATKDEFOperation(subject,atk,def,reset,rc,range,cond,loc
 	end
 end
 
-function Card.HalveATK(c,reset,rc,range,cond)
+function Card.HalveATK(c,reset,rc,range,cond,prop,desc)
 	local atk=math.floor(c:GetAttack()/2)
-	return c:ChangeATK(atk,reset,rc,range,cond)
+	return c:ChangeATK(atk,reset,rc,range,cond,prop,desc)
 end
 function Auxiliary.HalveATKOperation(subject,reset,rc,range,cond,loc1,loc2,min,max,exc)
 	local atk=math.floor(c:GetAttack()/2)
 	return aux.ChangeStatsOperationTemplate(Card.ChangeATK,subject,atk,reset,rc,range,cond,loc1,loc2,min,max,exc)
 end
-function Card.HalveDEF(c,reset,rc,range,cond)
+function Card.HalveDEF(c,reset,rc,range,cond,prop,desc)
 	local def=math.floor(c:GetDefense()/2)
-	return c:ChangeDEF(def,reset,rc,range,cond)
+	return c:ChangeDEF(def,reset,rc,range,cond,prop,desc)
 end
 function Auxiliary.HalveDEFOperation(subject,reset,rc,range,cond,loc1,loc2,min,max,exc)
 	local def=math.floor(c:GetDefense()/2)
 	return aux.ChangeStatsOperationTemplate(Card.ChangeDEF,subject,def,reset,rc,range,cond,loc1,loc2,min,max,exc)
 end
-function Card.DoubleATK(c,reset,rc,range,cond)
+function Card.DoubleATK(c,reset,rc,range,cond,prop,desc)
 	local atk=c:GetAttack()*2
-	return c:ChangeATK(atk,reset,rc,range,cond)
+	return c:ChangeATK(atk,reset,rc,range,cond,prop,desc)
 end
 function Auxiliary.DoubleATKOperation(subject,reset,rc,range,cond,loc1,loc2,min,max,exc)
 	local atk=c:GetAttack()*2
 	return aux.ChangeStatsOperationTemplate(Card.ChangeATK,subject,atk,reset,rc,range,cond,loc1,loc2,min,max,exc)
 end
-function Card.DoubleDEF(c,reset,rc,range,cond)
+function Card.DoubleDEF(c,reset,rc,range,cond,prop,desc)
 	local def=c:GetDefense()*2
-	return c:ChangeDEF(def,reset,rc,range,cond)
+	return c:ChangeDEF(def,reset,rc,range,cond,prop,desc)
 end
 function Auxiliary.DoubleDEFOperation(subject,reset,rc,range,cond,loc1,loc2,min,max,exc)
 	local def=c:GetDefense()*2
@@ -780,7 +789,7 @@ function Auxiliary.AddTypeOperation(subject,attr,reset,rc,range,cond,loc1,loc2,m
 	return aux.ChangeStatsOperationTemplate(Card.AddType,subject,attr,reset,rc,range,cond,loc1,loc2,min,max,exc)
 end
 
-function Card.ChangeAttribute(c,attr,reset,rc,range,cond)
+function Card.ChangeAttribute(c,attr,reset,rc,range,cond,prop,desc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
 	local range = range and range or c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
 	
@@ -819,7 +828,7 @@ function Auxiliary.ChangeAttributeOperation(subject,attr,reset,rc,range,cond,loc
 	return aux.ChangeStatsOperationTemplate(Card.ChangeAttribute,subject,attr,reset,rc,range,cond,loc1,loc2,min,max,exc)
 end
 
-function Card.ChangeRace(c,race,reset,rc,range,cond)
+function Card.ChangeRace(c,race,reset,rc,range,cond,prop,desc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
 	local range = range and range or c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
 	
@@ -858,7 +867,7 @@ function Auxiliary.ChangeRaceOperation(subject,race,reset,rc,range,cond,loc1,loc
 	return aux.ChangeStatsOperationTemplate(Card.ChangeRace,subject,race,reset,rc,range,cond,loc1,loc2,min,max,exc)
 end
 
-function Card.UpdateLevel(c,lv,reset,rc,range,cond)
+function Card.UpdateLevel(c,lv,reset,rc,range,cond,prop,desc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
 	local range = range and range or c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
 	
@@ -897,7 +906,7 @@ function Auxiliary.UpdateLevelOperation(subject,lv,reset,rc,range,cond,loc1,loc2
 	return aux.UpdateStatsOperationTemplate(Card.UpdateAttribute,subject,lv,reset,rc,range,cond,loc1,loc2,min,max,exc)
 end
 
-function Card.ChangeLevel(c,lv,reset,rc,range,cond)
+function Card.ChangeLevel(c,lv,reset,rc,range,cond,prop,desc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
 	local range = range and range or c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
 	
@@ -937,7 +946,7 @@ function Auxiliary.ChangeLevelOperation(subject,lv,reset,rc,range,cond,loc1,loc2
 end
 
 --Effect
-function Card.EffectsCannotBeNegated(c,reset,rc,range,cond)
+function Card.EffectsCannotBeNegated(c,reset,rc,range,cond,prop,desc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
 	local rc = rc and rc or c
     local rct=1
@@ -958,7 +967,7 @@ function Card.EffectsCannotBeNegated(c,reset,rc,range,cond)
 	c:RegisterEffect(e)
 	return e
 end
-function Card.EffectActivationsCannotBeNegated(c,reset,rc,range,cond)
+function Card.EffectActivationsCannotBeNegated(c,reset,rc,range,cond,prop,desc)
 	if not SCRIPT_AS_EQUIP then return false end
 	local rc = rc and rc or c
     local rct=1
@@ -983,7 +992,7 @@ function Card.EffectActivationsCannotBeNegated(c,reset,rc,range,cond)
 	c:RegisterEffect(e)
 	return e
 end
-function Card.ActivatedEffectsCannotBeNegated(c,reset,rc,range,cond)
+function Card.ActivatedEffectsCannotBeNegated(c,reset,rc,range,cond,prop,desc)
 	if not SCRIPT_AS_EQUIP then return false end
 	local rc = rc and rc or c
     local rct=1
@@ -1072,7 +1081,7 @@ BATTLE_TIMING_FUNCTIONS_SINGLE={
 								end;
 }
 
-function Card.CanAttackDirectly(c,reset,rc,cond)
+function Card.CanAttackDirectly(c,reset,rc,cond,prop,desc)
 	local rc = rc and rc or c
     local rct=1
     if type(reset)=="table" then
@@ -1092,7 +1101,7 @@ function Card.CanAttackDirectly(c,reset,rc,cond)
 	c:RegisterEffect(e)
 	return e
 end
-function Card.CanAttackWhileInDefensePosition(c,reset,rc,cond)
+function Card.CanAttackWhileInDefensePosition(c,reset,rc,cond,prop,desc)
 	local rc = rc and rc or c
     local rct=1
     if type(reset)=="table" then
@@ -1113,7 +1122,7 @@ function Card.CanAttackWhileInDefensePosition(c,reset,rc,cond)
 	c:RegisterEffect(e)
 	return e
 end
-function Card.MustAttack(c,reset,rc,cond)
+function Card.MustAttack(c,reset,rc,cond,prop,desc)
 	local rc = rc and rc or c
     local rct=1
     if type(reset)=="table" then
@@ -1133,7 +1142,7 @@ function Card.MustAttack(c,reset,rc,cond)
 	c:RegisterEffect(e)
 	return e
 end
-function Card.ArmadesEffect(c,timing,protection,self,oppo,reset,rc,cond)
+function Card.ArmadesEffect(c,timing,protection,self,oppo,reset,rc,cond,prop,desc)
 	if not timing then timing=BATTLE_TIMING_BATTLES end
 	if not self then self=0 end
 	if not oppo then oppo=0 end
@@ -1179,9 +1188,21 @@ function Card.ArmadesEffect(c,timing,protection,self,oppo,reset,rc,cond)
 	c:RegisterEffect(e)
 	return e
 end
+function Card.SetMaximumNumberOfAttacks(c,ct,reset,rc,cond,prop,desc)
+	if not ct or type(ct)~="number" then ct=2 end
+	local e=c:SingleEffect(EFFECT_EXTRA_ATTACK,ct-1,reset,rc,nil,cond,prop,desc)
+	c:RegisterEffect(e)
+	return e
+end
+function Card.SetMaximumNumberOfAttacksOnMonsters(c,ct,reset,rc,cond,prop,desc)
+	if not ct or type(ct)~="number" then ct=2 end
+	local e=c:SingleEffect(EFFECT_EXTRA_ATTACK_MONSTER,ct-1,reset,rc,nil,cond,prop,desc)
+	c:RegisterEffect(e)
+	return e
+end
 
 --Protections
-function Card.BattleProtection(c,reset,rc,cond)
+function Card.BattleProtection(c,reset,rc,cond,prop,desc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
 	local rc = rc and rc or c
     local rct=1
@@ -1207,7 +1228,7 @@ function Card.BattleProtection(c,reset,rc,cond)
 	c:RegisterEffect(e)
 	return e
 end
-function Card.EffectProtection(c,protection,reset,rc,range,cond)
+function Card.EffectProtection(c,protection,reset,rc,range,cond,prop,desc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
 	local rc = rc and rc or c
     local rct=1
@@ -1261,7 +1282,7 @@ function Card.EffectProtection(c,protection,reset,rc,range,cond)
 	c:RegisterEffect(e)
 	return e
 end
-function Card.TargetProtection(c,protection,reset,rc,range,cond)
+function Card.TargetProtection(c,protection,reset,rc,range,cond,prop,desc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
 	local rc = rc and rc or c
     local rct=1
@@ -1315,7 +1336,7 @@ function Card.TargetProtection(c,protection,reset,rc,range,cond)
 	c:RegisterEffect(e)
 	return e
 end
-function Card.UnaffectedProtection(c,protection,reset,rc,range,cond)
+function Card.UnaffectedProtection(c,protection,reset,rc,range,cond,prop,desc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
 	local rc = rc and rc or c
     local rct=1
@@ -1370,7 +1391,7 @@ function Card.UnaffectedProtection(c,protection,reset,rc,range,cond)
 	return e
 end
 
-function Card.FirstTimeProtection(c,each_turn,battle,effect,protection,reset,rc,range,cond)
+function Card.FirstTimeProtection(c,each_turn,battle,effect,protection,reset,rc,range,cond,prop,desc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
 	local rc = rc and rc or c
     local rct=1
@@ -1440,7 +1461,7 @@ function Card.FirstTimeProtection(c,each_turn,battle,effect,protection,reset,rc,
 	return e
 end
 
-function Card.CannotBeTributed(c,reset,rc,range,cond)
+function Card.CannotBeTributed(c,reset,rc,range,cond,prop,desc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
 	local rc = rc and rc or c
     local rct=1
@@ -1474,7 +1495,7 @@ function Card.CannotBeTributed(c,reset,rc,range,cond)
 end
 
 --Restriction and Rules
-function Card.CannotBeMaterial(c,ed_types,f,reset,rc,range,cond)
+function Card.CannotBeMaterial(c,ed_types,f,reset,rc,range,cond,prop,desc)
 	local rc = rc and rc or c
     local rct=1
     if type(reset)=="table" then
@@ -1513,7 +1534,7 @@ function Card.CannotBeMaterial(c,ed_types,f,reset,rc,range,cond)
 	end
 end
 
-function Card.CannotBeSet(c,reset,rc,cond)
+function Card.CannotBeSet(c,reset,rc,cond,prop,desc)
 	local rc = rc and rc or c
     local rct=1
     if type(reset)=="table" then

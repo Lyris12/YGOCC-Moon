@@ -194,7 +194,18 @@ function Card.ArmadesEffectField(c,timing,protection,range,self,oppo,f1,cond,res
 	c:RegisterEffect(e)
 	return e
 end
-
+function Card.SetMaximumNumberOfAttacksField(c,ct,range,selfzones,oppozones,f,cond,reset,rc)
+	if not ct or type(ct)~="number" then ct=2 end
+	local e=c:FieldEffect(EFFECT_EXTRA_ATTACK,range,selfzones,oppozones,f,ct-1,cond,reset,rc)
+	c:RegisterEffect(e)
+	return e
+end
+function Card.SetMaximumNumberOfAttacksOnMonstersField(c,ct,range,selfzones,oppozones,f,cond,reset,rc)
+	if not ct or type(ct)~="number" then ct=2 end
+	local e=c:FieldEffect(EFFECT_EXTRA_ATTACK_MONSTER,range,selfzones,oppozones,f,ct-1,cond,reset,rc)
+	c:RegisterEffect(e)
+	return e
+end
 --Protections
 function Card.BattleProtectionField(c,range,selfzones,oppozones,f,cond,reset,rc)
 	local e=c:FieldEffect(EFFECT_INDESTRUCTABLE_BATTLE,range,selfzones,oppozones,f,1,cond,reset,rc)
