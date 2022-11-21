@@ -84,6 +84,7 @@ function c249000437.operation(e,tp,eg,ep,ev,re,r,rp)
 	if not c:IsRelateToEffect(e) then return end
 	local ac=Duel.AnnounceCardFilter(tp,TYPE_SYNCHRO,OPCODE_ISTYPE,c:GetOriginalCode(),OPCODE_ISCODE,OPCODE_OR)
 	local tc=Duel.CreateToken(tp,ac)
+	if tc:IsCode(249000437) then return end
 	while not c249000437.filter(tc,e,tp,c)
 	do
 		ac=Duel.AnnounceCardFilter(tp,TYPE_SYNCHRO,OPCODE_ISTYPE,c:GetOriginalCode(),OPCODE_ISCODE,OPCODE_OR)

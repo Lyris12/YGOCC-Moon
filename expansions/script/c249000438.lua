@@ -101,6 +101,7 @@ function c249000438.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local ac=Duel.AnnounceCardFilter(tp,tc:GetOriginalAttribute(),OPCODE_ISATTRIBUTE,TYPE_XYZ,OPCODE_ISTYPE,OPCODE_AND,c:GetOriginalCode(),OPCODE_ISCODE,OPCODE_OR)
 	local sc=Duel.CreateToken(tp,ac)
+	if sc:IsCode(249000438) then return end
 	while not (sc:IsType(TYPE_XYZ) and sc:GetRank() == rk +2 and sc:IsAttribute(att) and sc:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false) and not banned_list_table[ac])
 	do
 		ac=Duel.AnnounceCardFilter(tp,tc:GetOriginalAttribute(),OPCODE_ISATTRIBUTE,TYPE_XYZ,OPCODE_ISTYPE,OPCODE_AND,c:GetOriginalCode(),OPCODE_ISCODE,OPCODE_OR)

@@ -74,5 +74,9 @@ function c249001005.operation(e,tp,eg,ep,ev,re,r,rp)
 	local ct=Duel.Draw(tp,1,REASON_EFFECT)
 	if ct==0 then return end
 	local dc=Duel.GetOperatedGroup():GetFirst()
-	if dc:IsSetCard(0x73) then Duel.NegateAttack() end
+	if dc:IsSetCard(0x73) and Duel.SelectYesNo(tp,1621) then
+		Duel.BreakEffect()
+		Duel.ConfirmCards(1-tp,dc)
+		Duel.NegateAttack()
+	end
 end

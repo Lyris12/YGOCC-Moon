@@ -36,6 +36,7 @@ function c249001131.initial_effect(c)
 	e4:SetTargetRange(0,LOCATION_MZONE+LOCATION_GRAVE)
 	e4:SetCode(EFFECT_DISABLE)
 	e4:SetCondition(c249001131.econ)
+	e4:SetTarget(c249001131.distg)
 	c:RegisterEffect(e4)
 	--immune
 	local e5=Effect.CreateEffect(c)
@@ -182,11 +183,15 @@ function c249001131.econ(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetDecktopGroup(e:GetHandlerPlayer(),1)
 	return g and g:GetCount()>0 and g:GetFirst():IsFaceup()
 end
+function c249001131.distg(e,c)
+	return c:IsType(TYPE_MONSTER)
+end
 function c249001131.efilter(e,te)
 	return (te:IsActiveType(TYPE_SPELL) or te:IsActiveType(TYPE_TRAP)) and te:GetOwnerPlayer()~=e:GetHandlerPlayer()
 end
 function c249001131.tdcon(e,tp,eg,ep,ev,re,r,rp)
-	return tp==Duel.GetTurnPlayer()
+	local g=Duel.GetDecktopGroup(e:GetHandlerPlayer(),1)
+	return tp==Duel.GetTurnPlayer() and not (g and g:GetCount()>0 and g:GetFirst():IsFaceup())
 end
 function c249001131.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()

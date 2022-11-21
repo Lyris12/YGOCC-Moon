@@ -105,7 +105,7 @@ function c249001123.initial_effect(c)
 end
 c249001123.xyz_number=0
 function c249001123.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetBattleDamage(tp) >= Duel.GetLP(tp) and Duel.GetFlagEffect(tp,249001123)==0
+	return Duel.GetBattleDamage(tp) >= Duel.GetLP(tp) and Duel.GetFlagEffect(tp,249001123)==0 and not e:GetHandler():IsStatus(STATUS_CHAINING)
 end
 function c249001123.spcostfilter(c)
 	return c:IsSetCard(0x73) and c:IsAbleToDeckOrExtraAsCost() and not (c:IsLocation(LOCATION_REMOVED) and c:IsFacedown())
