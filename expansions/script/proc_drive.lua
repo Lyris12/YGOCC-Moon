@@ -460,7 +460,9 @@ function Card.UpdateEnergy(c,val,p,r,reset,rc)
 		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
 	end
 	c:RegisterEffect(e)
-	aux.CheckEnergyOperation(e,p)
+	if r&REASON_TEMPORARY==0 then
+		aux.CheckEnergyOperation(e,p)
+	end
 	if reset then
 		return e,c:GetEnergy()-en
 	else
@@ -483,7 +485,9 @@ function Card.ChangeEnergy(c,val,p,r,reset,rc)
 		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
 	end
 	c:RegisterEffect(e)
-	aux.CheckEnergyOperation(e,p)
+	if r&REASON_TEMPORARY==0 then
+		aux.CheckEnergyOperation(e,p)
+	end
 	if reset then
 		return e,c:GetEnergy()
 	else

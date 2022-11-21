@@ -30,10 +30,18 @@ function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(1)
 	local dc=Duel.GetEngagedCard(tp)
 	if chk==0 then
-		return dc and dc:IsMonster() and dc:IsSetCard(0x7eb) and dc:IsCanUpdateEnergy(-2,tp,REASON_COST)
-			and (not dc:HasLevel() or (dc:GetEnergy()-2)~=dc:GetLevel() or dc:IsSpecialSummonable(SUMMON_TYPE_DRIVE))
+		if not (dc and dc:IsMonster() and dc:IsSetCard(0x7eb) and dc:IsCanUpdateEnergy(-2,tp,REASON_COST)) then
+			return false
+		end
+		local lvchk=(not dc:HasLevel() or (dc:GetEnergy()-2)~=dc:GetLevel())
+		if not lvchk then
+			local eff=dc:UpdateEnergy(-2,tp,REASON_TEMPORARY,nil,e:GetHandler())
+			lvchk=dc:IsSpecialSummonable(SUMMON_TYPE_DRIVE)
+			eff:Reset()
+		end
+		return lvchk
 	end
-	dc:UpdateEnergy(-2,tp,REASON_COST,true)
+	dc:UpdateEnergy(-2,tp,REASON_COST,true,e:GetHandler())
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local dc=Duel.GetEngagedCard(tp)
