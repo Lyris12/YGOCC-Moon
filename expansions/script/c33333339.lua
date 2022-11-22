@@ -4,6 +4,7 @@
 local s,id,o=GetID()
 function s.initial_effect(c)
 	aux.AddOrigDriveType(c)
+	c:EnableReviveLimit()
 	c:MustFirstBeSummoned(SUMMON_TYPE_DRIVE)
 	--Drive Effects
 	aux.AddDriveProc(c,18)

@@ -202,6 +202,7 @@ function Auxiliary.EngageOperation(e,tp)
 	if not c:IsLocation(LOCATION_HAND) or not c:IsCanEngage(tp) then return end
 	Duel.Hint(HINT_CARD,tp,c:GetOriginalCode())
 	aux.CheckEnergyOperation(e,tp)
+	Duel.ConfirmCards(1-tp,c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_CANNOT_DISABLE)

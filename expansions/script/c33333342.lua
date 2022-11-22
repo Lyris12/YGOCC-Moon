@@ -24,7 +24,7 @@ function s.filter(c,tp)
 end
 function s.entg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local en=eg:Filter(s.filter,nil,tp)
-	if chk==0 then return #en==1 end
+	if chk==0 then return #en==1 and rp==tp end
 	Duel.SetTargetCard(en:GetFirst())
 	local c=e:GetHandler()
 	Duel.SetCustomOperationInfo(0,CATEGORY_ATKCHANGE,c,1,c:GetControler(),c:GetLocation())
