@@ -736,8 +736,10 @@ function Card.Ignition(c,desc,ctg,prop,range,ctlim,cond,cost,tg,op,reset,quickco
 		end
 		if cond then
 			e2:SetCondition(aux.AND(cond,quickcon))
+			e1:SetCondition(aux.NOT(aux.AND(cond,quickcon)))
 		else
 			e2:SetCondition(quickcon)
+			e1:SetCondition(aux.NOT(quickcon))
 		end
 		c:RegisterEffect(e2)
 		return e1,e2
