@@ -1,4 +1,4 @@
---created by Seth, coded by Lyris
+--created by Seth, coded by Lyris, bugfix by somen00b
 local cid,id=GetID()
 function cid.initial_effect(c)
 	c:EnableReviveLimit()
@@ -43,7 +43,6 @@ end
 	for tc in aux.Next(g) do
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e1:SetCode(EFFECT_DISABLE)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 		tc:RegisterEffect(e1)
@@ -59,14 +58,13 @@ end
 		local e0=Effect.CreateEffect(e:GetHandler())
 		e0:SetType(EFFECT_TYPE_SINGLE)
 		e0:SetCode(EFFECT_SET_ATTACK)
-		e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e0:SetValue(tc:GetAttack()/2)
+		e0:SetValue(math.ceil(tc:GetAttack()/2))
 		e0:SetReset(RESET_EVENT+RESETS_STANDARD)
-		tc:RegisterEffect(e0,true)
+		tc:RegisterEffect(e0)
 		local e4=e0:Clone()
 		e4:SetCode(EFFECT_SET_DEFENSE)
-		e4:SetValue(tc:GetDefense()/2)
-		tc:RegisterEffect(e4,true)
+		e4:SetValue(math.ceil(tc:GetDefense()/2))
+		tc:RegisterEffect(e4)
 	end
 end
 	function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)

@@ -12,10 +12,10 @@ function c249000777.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c249000777.costfilter(c)
-	return (c:IsSetCard(0x15D) or not c:IsSummonableCard()) and c:IsAbleToRemoveAsCost()
+	return (c:IsSetCard(0x22F) or not c:IsSummonableCard()) and c:IsAbleToRemoveAsCost()
 end
 function c249000777.costfilter2(c,e)
-	return c:IsSetCard(0x15D) and not c:IsPublic()
+	return c:IsSetCard(0x22F) and not c:IsPublic()
 end
 function c249000777.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -40,7 +40,7 @@ function c249000777.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 end
 function c249000777.filter(c,e,tp)
-	return c:IsSetCard(0x15D) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0x22F) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c249000777.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
