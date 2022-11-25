@@ -2655,22 +2655,21 @@ function Auxiliary.GlobalCheck(s,func)
 	end
 end
 function Auxiliary.SelectUnselectLoop(c,sg,mg,e,tp,minc,maxc,rescon)
-	local res
+	local res=not rescon
 	if #sg>=maxc then return false end
 	sg:AddCard(c)
 	if rescon then
-		local _,stop=rescon(sg,e,tp,mg)
-		if stop then 
+		local stop
+		res,stop=rescon(sg,e,tp,mg,c)
+		if stop then
 			sg:RemoveCard(c)
 			return false
 		end
 	end
 	if #sg<minc then
 		res=mg:IsExists(Auxiliary.SelectUnselectLoop,1,sg,sg,mg,e,tp,minc,maxc,rescon)
-	elseif #sg<maxc then
-		res=(not rescon or rescon(sg,e,tp,mg)) or mg:IsExists(Auxiliary.SelectUnselectLoop,1,sg,sg,mg,e,tp,minc,maxc,rescon)
-	else
-		res=(not rescon or rescon(sg,e,tp,mg))
+	elseif #sg<maxc and not res then
+		res=mg:IsExists(Auxiliary.SelectUnselectLoop,1,sg,sg,mg,e,tp,minc,maxc,rescon)
 	end
 	sg:RemoveCard(c)
 	return res
@@ -2678,7 +2677,15 @@ end
 function Auxiliary.SelectUnselectGroup(g,e,tp,minc,maxc,rescon,chk,seltp,hintmsg,finishcon,breakcon,cancelable)
 	local minc=minc or 1
 	local maxc=maxc or #g
-	if chk==0 then return g:IsExists(Auxiliary.SelectUnselectLoop,1,nil,Group.CreateGroup(),g,e,tp,minc,maxc,rescon) end
+	if chk==0 then
+		if #g<minc then return false end
+		local eg=g:Clone()
+		for c in g:Iter() do
+			if Auxiliary.SelectUnselectLoop(c,Group.CreateGroup(),eg,e,tp,minc,maxc,rescon) then return true end
+			eg:RemoveCard(c)
+		end
+		return false
+	end
 	local hintmsg=hintmsg and hintmsg or 0
 	local sg=Group.CreateGroup()
 	while true do
@@ -2695,6 +2702,12 @@ function Auxiliary.SelectUnselectGroup(g,e,tp,minc,maxc,rescon,chk,seltp,hintmsg
 		end
 	end
 	return sg
+end
+--check for Free Monster Zones
+function Auxiliary.ChkfMMZ(sumcount)
+	return	function(sg,e,tp,mg)
+				return Duel.GetMZoneCount(tp,sg)>=sumcount
+			end
 end
 --[[
 Function to perform "Either add it to the hand or do X"
@@ -2904,16 +2917,6 @@ function Duel.SelectReleaseGroupCost(tp,f,minc,maxc,use_hand,specialchk,ex,...)
 		fc:RegisterFlagEffect(59160188,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,0)
 	end
 	return sg
-end
-
-function Auxiliary.MZFilter(c,tp)
-	return c:IsLocation(LOCATION_MZONE) and c:GetSequence()<5 and c:IsControler(tp)
-end
---check for Free Monster Zones
-function Auxiliary.ChkfMMZ(sumcount)
-	return	function(sg,e,tp,mg)
-				return sg:FilterCount(Auxiliary.MZFilter,nil,tp)+Duel.GetLocationCount(tp,LOCATION_MZONE)>=sumcount
-			end
 end
 ----------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------
