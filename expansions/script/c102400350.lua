@@ -1,4 +1,4 @@
---created by Lyris, art by KrysFun of DeviantArt
+--created & coded by Lyris, art by KrysFun of DeviantArt
 --機氷竜サンドラ
 local s,id,o=GetID()
 function s.initial_effect(c)
@@ -42,7 +42,7 @@ function s.rchk(e,tp,eg)
 	end end
 end
 function s.rfilter(c,e,tp)
-	return c:IsSetCard(0xd76) and not c:IsPublic() and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp)
+	return c:IsSetCard(0xd76) and not c:IsPublic() and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp,c:GetCode())
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.rfilter,tp,LOCATION_HAND,0,1,nil,e,tp) end
@@ -55,12 +55,12 @@ function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
 	Duel.SelectMatchingCard(tp,s.rfilter,tp,LOCATION_HAND,0,1,1,nil,e,tp):GetFirst():RegisterEffect(e1)
 end
-function s.xfilter(c,code)
-	return c:IsType(TYPE_MONSTER) and c:IsCode(code) and (c:IsPublic() or c:IsFaceup())
+function s.xfilter(c,...)
+	return c:IsType(TYPE_MONSTER) and c:IsCode(...) and (c:IsPublic() or c:IsFaceup())
 end
-function s.filter(c,e,tp)
+function s.filter(c,e,tp,xcode)
 	return c:IsSetCard(0xd76) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-		and not Duel.IsExistingMatchingCard(s.xfilter,tp,LOCATION_MZONE+LOCATION_HAND,0,1,nil,c:GetCode())
+		and not Duel.IsExistingMatchingCard(s.xfilter,tp,LOCATION_MZONE+LOCATION_HAND,0,1,nil,c:GetCode(),xcode)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
@@ -74,12 +74,11 @@ function s.lim(e,c,sump,sumtype,sumpos,targetp)
 	return s[tp][c:GetRace()]>1
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
 	if Duel.GetFlagEffect(tp,id)==0 then
 		local rc=1
 		while rc<RACE_ALL do s[tp][rc]=0 rc=rc<<1 end
 		Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,2)
-		local e1=Effect.CreateEffect(c)
+		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_FIELD)
 		e1:SetCode(EFFECT_LIMIT_SPECIAL_SUMMON_POSITION)
 		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
