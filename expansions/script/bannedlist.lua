@@ -1,8 +1,8 @@
 if not banned_list_table then banned_list_table={} end
 local string=require'string'
 local ls=[[
-#[2022.3 YGOCC+2022.1 TCG]
-!2022.5 YGOCC
+#[2022.5 YGOCC+2022.12 TCG]
+!2022.12 YGOCC
 #Forbidden YGOCC
 20181405 0 --Terradication Geryonarsenal
 33700082 0 --Anifriends Seiryu of the East
@@ -54,8 +54,9 @@ local ls=[[
 63287035 1 --Horrible Reborn
 195208417 1 --False Reality Knight Thrax
 195208422 2 --False Reality Spirit Monk Dalos
-53313934 2 --Disstonant Luster Dragon
 26369260 2 --Psychostice Patrol
+--							New 7/6/2022
+53313934 1 --Disstonant Luster Dragon
 
 #RULE CARDS
 5000 1 --Manual Mode
@@ -64,7 +65,6 @@ local ls=[[
 76794549 0 --Astrograph Sorcerer
 9929398 0 --Blackwing - Gofu the Vague Shadow
 53804307 0 --Blaster, Dragon Ruler of Infernos
-34124316 0 --Cyber Jar
 15341821 0 --Dandylion
 8903700 0 --Djinn Releaser of Rituals
 51858306 0 --Eclipse Wyvern
@@ -84,7 +84,6 @@ local ls=[[
 23558733 0 --Phoenixian Cluster Amaryllis
 90411554 0 --Redox, Dragon Ruler of Boulders
 5592689 0 --Samsara Lotus
-20663556 0 --Substitoad
 88071625 0 --The Tyrant Neptune
 26400609 0 --Tidal, Dragon Ruler of Waterfalls
 44910027 0 --Victory Dragon
@@ -109,7 +108,6 @@ local ls=[[
 63504681 0 --Number 86: Heroic Champion - Rhongomyniad
 58820923 0 --Number 95: Galaxy-Eyes Dark Matter Dragon
 34945480 0 --Outer Entity Azathot
-18326736 0 --Tellarknight Ptolemaeus
 81122844 0 --Wind-Up Carrier Zenmaity
 85115440 0 --Zoodiac Broadbull
 7394770 0 --Brilliant Fusion
@@ -136,7 +134,6 @@ local ls=[[
 63166095 0 --Sky Striker Mobilize - Engage!
 45986603 0 --Snatch Steal
 54447022 0 --Soul Charge
-46448938 0 --Spellbook of Judgment
 11110587 0 --That Grass Looks Greener
 42829885 0 --The Forceful Sentry
 28566710 0 --Last Turn
@@ -148,7 +145,6 @@ local ls=[[
 64697231 0 --Trap Dustshoot
 80604091 0 --Ultimate Offering
 5851097 0 --Vanity's Emptiness
-9047460 0 --Blackwing - Steam the Cloak
 5560911 0 --Destrudo the Lost Dragon's Frisson
 67441435 0 --Glow-Up Bulb
 83190280 0 --Lunalight Tiger
@@ -162,7 +158,6 @@ local ls=[[
 61901281 1 --Black Dragon Collapserpent
 69015963 1 --Cyber-Stein
 14536035 1 --Dark Grepher
-58984738 1 --Dinomight Knight, the True Dracofighter
 82385847 1 --Dinowrestler Pankratops
 33396948 1 --Exodia the Forbidden One
 64034255 1 --Genex Ally Birdman
@@ -185,7 +180,6 @@ local ls=[[
 72892473 1 --Card Destruction
 59750328 1 --Card of Demise
 91623717 1 --Chain Strike
-81674782 1 --Dimensional Fissure
 15854426 1 --Divine Wind of Mist Valley
 14733538 1 --Draco Face-Off
 13035077 1 --Dragonic Diagram
@@ -211,10 +205,7 @@ local ls=[[
 35371948 1 --Trickstar Light Stage
 70368879 1 --Upstart Goblin
 61740673 1 --Imperial Order
-30241314 1 --Macro Cosmos
 32723153 1 --Magical Explosion
-89208725 1 --Metaverse
-23002292 1 --Red Reboot
 17078030 1 --Wall of Revealing Light
 43694650 1 --Danger!? Jackalope?
 99745551 1 --Danger!? Tsuchinoko?
@@ -228,7 +219,6 @@ local ls=[[
 9411399 2 --Destiny HERO - Malicious
 --							New 9/14/2020
 9742784 0 --Jet Synchron
-72291078 0 --Mecha Phantom Beast O-Lion
 94689206 0 --Block Dragon
 18144506 1 --Harpie's Feather Duster
 24224830 1 --Called by the Grave
@@ -250,7 +240,6 @@ local ls=[[
 46060017 0 --Zoodiac Barrage
 40177746 1 --Eva
 25725326 1 --Prank-Kids Meow-Meow-Mu
-57103969 1 --Fire Formation - Tenki
 --							New 2/7/2022
 6728559 0  --Archnemeses Protos
 40177746 0 --Eva
@@ -258,13 +247,9 @@ local ls=[[
 61740673 0 --Imperial Order
 76794549 1 --Astrograph Sorcerer
 5560911 1  --Destrudo the Lost Dragon's Frisson
-55623480 1 --Fairy Tail - Snow
 83190280 1 --Lunalight Tiger
-8491961 1  --Lyrilusc - Recital Starling
 43040603 1 --Monster Gate
 35261759 1 --Pot of Desires
-52947044 2 --Fusion Destiny
-1984618 2  --Nadir Servant
 --							New 3/24/2022
 20292186 0 --Artifact Scythe
 --							New 5/17/2022
@@ -276,14 +261,27 @@ local ls=[[
 3078576 1 --Yata-Garasu
 9742784 1 --Jet Synchron
 26118970 1 --Red Rose Dragon
-50588353 1 --Crystron Halqifibrax
-68431965 1 --Shooting Riser Dragon
 17330916 1 --Performapal Monkeyboard
 35261759 2 --Pot of Desires
-17078030 2 --Wall of Revealing Light
-57103969 2 --Fire Formation - Tenki
-77235086 2 --Cyber Angel Benten
-35371948 2 --Trickstar Light Stage
+--							New 7/6/2022
+76218313 0 --Dragon Buster Destruction Sword
+--							New 10/3/2022
+55623480 0 --Fairy Tail - Snow
+1357146 0 --Ronintoadin
+50588353 0 --Crystron Halqifibrax
+3040496 0 --Chaos Ruler, the Chaotic Magical Dragon
+23002292 0 --Red Reboot
+9047460 1 --Blackwing - Steam the Cloak
+34124316 1 --Cyber Jar
+72291078 1 --Mecha Phantom Beast O-Lion
+20663556 1 --Substitoad
+46448938 1 --Spellbook of Judgment
+43262273 1 --Appointer of the Red Lotus
+--							New 12/1/2022
+98095162 0 --Curious, the Lightsworn Dominion
+76375976 0 --Mystic Mine
+17266660 1 --Herald of Orange Light
+8491961 2 --Lyrilusc - Recital Starling
 ]]
 for id in ls:sub(ls:find("!"),ls:find("!",ls:find("!")+1) and ls:find("!",ls:find("!")+1)-1 or -1):gmatch("([0-9]+) 0") do
 	banned_list_table[tonumber(id)]=true
