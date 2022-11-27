@@ -54,7 +54,7 @@ function c249001187.filter(c)
 	return c:IsSetCard(0x230) and c:IsAbleToHand()
 end
 function c249001187.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c65848811.filter,tp,LOCATION_DECK,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c249001187.filter,tp,LOCATION_DECK,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
 function c249001187.thop(e,tp,eg,ep,ev,re,r,rp)
