@@ -102,7 +102,7 @@ function c249000436.costfilter(c)
 	return c:IsSetCard(0x1BE) and c:IsAbleToRemoveAsCost()
 end
 function c249000436.costfilter2(c,e)
-	return c:IsSetCard(0x1BE) and not c:IsPublic() and c~=e:GetHandler()
+	return c:IsSetCard(0x1BE) and not c:IsPublic()
 end
 function c249000436.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return (Duel.IsExistingMatchingCard(c249000436.costfilter,tp,LOCATION_GRAVE,0,1,nil)
@@ -129,14 +129,18 @@ function c249000436.mfilter1(c,e)
 	return c:IsCanBeFusionMaterial() and not c:IsImmuneToEffect(e) and c:IsAbleToGrave() and c:IsType(TYPE_MONSTER)
 end
 function c249000436.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE+LOCATION_HAND) and chck~=e:GetHandler() end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
 		and Duel.IsExistingMatchingCard(c249000436.mfilter1,tp,LOCATION_MZONE+LOCATION_HAND,0,1,nil,e) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,0)
 end
 function c249000436.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local g=Duel.SelectMatchingCard(tp,c249000436.mfilter1,tp,LOCATION_HAND+LOCATION_MZONE,0,1,1,nil,e)
+	local g
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then
+		g=Duel.SelectMatchingCard(tp,c249000436.mfilter1,tp,LOCATION_MZONE,0,1,1,nil,e)
+	else
+		g=Duel.SelectMatchingCard(tp,c249000436.mfilter1,tp,LOCATION_HAND+LOCATION_MZONE,0,1,1,nil,e)
+	end
 	if g:GetCount() < 1 then return end
 	local tc=g:GetFirst()
 	local key
@@ -146,7 +150,7 @@ function c249000436.operation(e,tp,eg,ep,ev,re,r,rp)
 	local material_table={}
 	local i=1
 	repeat
-		ac=Duel.AnnounceCardFilter(tp,TYPE_FUSION,OPCODE_ISTYPE,c:GetOriginalCode(),OPCODE_ISCODE,OPCODE_OR)
+		ac=Duel.AnnounceCardFilter(tp,TYPE_FUSION,OPCODE_ISTYPE,249000436,OPCODE_ISCODE,OPCODE_OR)
 		if ac==249000436 then return end
 		cc=Duel.CreateToken(tp,ac)
 		material_table={}

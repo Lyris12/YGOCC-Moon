@@ -13,7 +13,8 @@ function c249000544.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(5133471,1))
 	e2:SetCategory(CATEGORY_TOHAND)
-	e2:SetType(EFFECT_TYPE_IGNITION)
+	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_GRAVE)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetCondition(aux.exccon)
@@ -21,6 +22,12 @@ function c249000544.initial_effect(c)
 	e2:SetTarget(c249000544.thtg)
 	e2:SetOperation(c249000544.operation)
 	c:RegisterEffect(e2)
+	--act in hand
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetCode(EFFECT_TRAP_ACT_IN_HAND)
+	e3:SetCondition(c249000544.handcon)
+	c:RegisterEffect(e3)
 end
 function c249000544.costfilter(c,e,tp)
 	if not c:IsSetCard(0x41) or not c:IsAbleToGraveAsCost() or not c:IsFaceup() then return false end
@@ -76,4 +83,7 @@ function c249000544.operation(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsRelateToEffect(e) then
 		Duel.SendtoHand(tc,nil,REASON_EFFECT)
 	end
+end
+function c249000544.handcon(e)
+	return Duel.GetFieldGroupCount(e:GetHandlerPlayer(),LOCATION_MZONE,0)<Duel.GetFieldGroupCount(e:GetHandlerPlayer(),0,LOCATION_MZONE)
 end

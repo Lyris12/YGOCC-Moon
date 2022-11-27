@@ -70,11 +70,11 @@ function c249000437.filter(c,e,tp,mc)
 		and mt.sync and mt.minntct and mt.minntct==1 and mt.c249000437_tuner_filter and mt.c249000437_tuner_filter(mc)
 end
 function c249000437.tgfilter(c)
-	return c:IsAbleToRemove() and not c:IsType(TYPE_TUNER)
+	return c:IsAbleToRemove() and not c:IsType(TYPE_TUNER) and c:IsLevelAbove(5)
 end
 function c249000437.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1 and c:IsAbleToRemove() 
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and c:IsAbleToRemove() 
 		and Duel.IsExistingMatchingCard(c249000437.tgfilter,tp,LOCATION_GRAVE,0,1,c) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
 end
@@ -82,12 +82,12 @@ function c249000437.operation(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
-	local ac=Duel.AnnounceCardFilter(tp,TYPE_SYNCHRO,OPCODE_ISTYPE,c:GetOriginalCode(),OPCODE_ISCODE,OPCODE_OR)
+	local ac=Duel.AnnounceCardFilter(tp,TYPE_SYNCHRO,OPCODE_ISTYPE,249000437,OPCODE_ISCODE,OPCODE_OR)
 	local tc=Duel.CreateToken(tp,ac)
 	if tc:IsCode(249000437) then return end
 	while not c249000437.filter(tc,e,tp,c)
 	do
-		ac=Duel.AnnounceCardFilter(tp,TYPE_SYNCHRO,OPCODE_ISTYPE,c:GetOriginalCode(),OPCODE_ISCODE,OPCODE_OR)
+		ac=Duel.AnnounceCardFilter(tp,TYPE_SYNCHRO,OPCODE_ISTYPE,249000437,OPCODE_ISCODE,OPCODE_OR)
 		tc=Duel.CreateToken(tp,ac)
 		if tc:IsCode(249000437) then return end
 	end

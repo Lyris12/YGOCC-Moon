@@ -54,7 +54,7 @@ function c249001185.tgcon(e)
 end
 function c249001185.chainop(e,tp,eg,ep,ev,re,r,rp)
 	local rc=re:GetHandler()
-	if rc:IsSetCard(0xb4) and re:IsActiveType(TYPE_SPELL) and rc~=e:GetHandler() then
+	if rc:IsSetCard(0x22E) and re:IsActiveType(TYPE_SPELL) and rc~=e:GetHandler() then
 		Duel.SetChainLimit(c249001185.chainlm)
 	end
 end
