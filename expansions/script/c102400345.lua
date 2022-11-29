@@ -73,7 +73,7 @@ function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
 function s.sfilter(c,e,tp)
-	return c:IsSetCard(0xd76) c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0xd76) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.op(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)

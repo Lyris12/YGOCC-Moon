@@ -13,7 +13,6 @@ function s.initial_effect(c)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_HAND+LOCATION_MZONE)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e2:SetCondition(function(_,tp) return Duel.GetTurnPlayer()~=tp end)
 	e2:SetCost(s.cost)
 	e2:SetTarget(s.target)
 	e2:SetOperation(s.operation)
@@ -55,7 +54,7 @@ function s.rchk(e,tp,eg)
 	end end
 end
 function s.atkval(e,c)
-	if Duel.IsExistingMatchingCard(function(tc) return tc:GetFlagEffect(id)>0 end,0,LOCATION_HAND+LOCATION_MZONE,LOCATION_HAND+LOCATION_MZONE,1,nil) then return c:GetBaseDefense()
+	if Duel.IsExistingMatchingCard(function(tc) return tc:GetFlagEffect(id)>0 end,e:GetOwner():GetControler(),LOCATION_HAND+LOCATION_MZONE,LOCATION_HAND+LOCATION_MZONE,1,nil) then return c:GetBaseDefense()
 	else return 0 end
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
