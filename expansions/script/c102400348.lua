@@ -10,7 +10,7 @@ function s.initial_effect(c)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
 	e1:SetRange(LOCATION_EXTRA)
 	c:RegisterEffect(e1)
-	aux.AddContactFusionProcedure(c,aux.FilterBoolFunction(aux.IsInGroup,Duel.GetReleaseGroup(c:GetControler(),true)),LOCATION_ONFIELD,0,Duel.Release,REASON_COST)
+	aux.AddContactFusionProcedure(c,s.mfilter(c:GetControler(),LOCATION_ONFIELD,0,Duel.Release,REASON_COST)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_FIELD)
 	e4:SetCode(EFFECT_LIMIT_SPECIAL_SUMMON_POSITION)
@@ -62,6 +62,11 @@ function s.initial_effect(c)
 end
 function s.mchk(c,fc,sub,mg,sg)
 	return (not sg or #(sg-c)==0 or sg:IsExists(function(tc) return c:IsAttribute(ATTRIBUTE_WATER) and tc:IsSetCard(0xd76) or c:IsSetCard(0xd76) and tc:IsAttribute(ATTRIBUTE_WATER) end,1,c)) and aux.drccheck(g)
+end
+function s.mfilter(tp)
+	return	function(c)
+				return Duel.GetReleaseGroup(tp):IsContains(c)
+			end
 end
 function s.ctfilter(c,tp,rc)
 	return c:IsSummonPlayer(tp) and c:IsRace(rc)
