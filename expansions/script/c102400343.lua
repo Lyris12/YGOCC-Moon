@@ -2,18 +2,11 @@
 --機氷竜クリサ
 local s,id,o=GetID()
 function s.initial_effect(c)
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(0x10000000+id)
-	e1:SetRange(LOCATION_HAND+LOCATION_MZONE)
-	e1:SetCondition(function() return c:IsPublic() or c:IsSummonType(SUMMON_TYPE_SPECIAL) end)
-	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_HAND+LOCATION_MZONE)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e2:SetCost(s.cost)
 	e2:SetTarget(s.target)
 	e2:SetOperation(s.operation)
 	c:RegisterEffect(e2)
@@ -54,21 +47,21 @@ function s.rchk(e,tp,eg)
 	end end
 end
 function s.atkval(e,c)
-	if Duel.IsExistingMatchingCard(function(tc) return tc:GetFlagEffect(id)>0 end,e:GetOwner():GetControler(),LOCATION_HAND+LOCATION_MZONE,LOCATION_HAND+LOCATION_MZONE,1,nil) then return c:GetBaseDefense()
+	if Duel.IsExistingMatchingCard(function(tc) return tc:IsCode(id) and not tc:IsDisabled() and (tc:IsPublic() or tc:IsSummonType(SUMMON_TYPE_SPECIAL)) end,e:GetOwner():GetControler(),LOCATION_HAND+LOCATION_MZONE,LOCATION_HAND+LOCATION_MZONE,1,nil) then return c:GetBaseDefense()
 	else return 0 end
-end
-function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsReleasable() end
-	Duel.Release(e:GetHandler(),REASON_COST)
 end
 function s.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0xd76)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(s.filter,tp,LOCATION_MZONE,0,1,nil) end
+	local c=e:GetHandler()
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and not c:IsStatus(STATUS_CHAINING)
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+		and Duel.IsExistingTarget(s.filter,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	Duel.SelectTarget(tp,s.filter,tp,LOCATION_MZONE,0,1,1,nil)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
 end
 function s.lim(e,c,sump,sumtype,sumpos,targetp)
 	if sumpos and bit.band(sumpos,POS_FACEDOWN)>0 then return false end
@@ -91,8 +84,11 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_PHASE+PHASE_END,2)
 		Duel.RegisterEffect(e1,tp)
 	end
+	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) or Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)==0 then return end
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) then
+		Duel.BreakEffect()
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_SINGLE)
 		e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
@@ -105,6 +101,6 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.efilter(e,te)
 	local tc=te:GetHandler()
-	return te:GetOwner()~=e:GetOwner() and (te:IsActiveType(TYPE_SPELL+TYPE_TRAP) or Duel.GetTurnPlayer()~=tp
-		and tc:GetAttackedCount()==0 and not tc:IsStatus(STATUS_JUST_POS))
+	return te:GetOwner()~=e:GetOwner() and te:GetOwner():IsControler(1-tp) and (te:IsActiveType(TYPE_SPELL+TYPE_TRAP) or Duel.GetTurnPlayer()~=tp
+		and tc:GetAttackedCount()==0)
 end

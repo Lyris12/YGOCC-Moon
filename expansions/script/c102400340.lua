@@ -92,7 +92,9 @@ function s.op(e,tp,eg,ep,ev,re,r,rp)
 		if #g>0 and Duel.SelectEffectYesNo(tp,c) then
 			Duel.BreakEffect()
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-			Duel.Destroy(g:Select(tp,1,maxc,nil),REASON_EFFECT)
+			local sg=g:Select(tp,1,maxc,nil)
+			Duel.HintSelection(sg)
+			Duel.Destroy(sg,REASON_EFFECT)
 		end
 	end
 end
