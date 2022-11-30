@@ -69,7 +69,7 @@ end
 function s.atkcon(e)
 	local tp=e:GetHandler():GetControler()
 	local ct=Duel.GetMatchingGroupCount(s.pfilter,tp,LOCATION_HAND,0,nil)
-	return Duel.IsExistingMatchingCard(Card.IsAttackable,tp,0,LOCATION_MZONE,ct+1,nil)
+	return not Duel.IsExistingMatchingCard(Card.IsAttackable,tp,0,LOCATION_MZONE,ct+1,nil)
 end
 function s.rfilter(c,e,tp)
 	return c:IsSetCard(0xd76) and c:IsType(TYPE_MONSTER) and not c:IsPublic() and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp)
