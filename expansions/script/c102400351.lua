@@ -12,6 +12,7 @@ function s.initial_effect(c)
 	e2:SetCode(EFFECT_IMMUNE_EFFECT)
 	e2:SetRange(LOCATION_FZONE)
 	e2:SetValue(s.efilter)
+	e2:SetLabelObject(c)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_GRANT)
 	e3:SetRange(LOCATION_SZONE)
@@ -48,7 +49,7 @@ function s.initial_effect(c)
 	c:SetUniqueOnField(1,0,id)
 end
 function s.efilter(e,re)
-	return e:GetHandler()~=re:GetOwner()
+	return e:GetHandler()~=re:GetOwner() and re:GetOwner()~=e:GetLabelObject()
 end
 function s.cfilter(c,tp,rc)
 	return c:IsSummonPlayer(tp) and c:IsRace(rc)
@@ -66,7 +67,7 @@ function s.lim(e,c,sump,sumtype,sumpos,targetp)
 	if sumpos and bit.band(sumpos,POS_FACEDOWN)>0 then return false end
 	local tp=sump
 	if targetp then tp=targetp end
-	return c~=e:GetOwner() and s[tp][c:GetRace()]>1
+	return s[tp][c:GetRace()] and s[tp][c:GetRace()]>1
 end
 function s.filter(c,tp)
 	return c:IsCode(id-5) and c:IsType(TYPE_FIELD) and c:GetActivateEffect():IsActivatable(tp,true,true)

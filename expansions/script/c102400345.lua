@@ -45,7 +45,7 @@ function s.lim(e,c,sump,sumtype,sumpos,targetp)
 	if sumpos and bit.band(sumpos,POS_FACEDOWN)>0 then return false end
 	local tp=sump
 	if targetp then tp=targetp end
-	return s[tp][c:GetRace()]>1
+	return s[tp][c:GetRace()] and s[tp][c:GetRace()]>1
 end
 function s.rfilter(c)
 	return c:IsSetCard(0xd76) and not c:IsPublic()
@@ -76,6 +76,20 @@ function s.sfilter(c,e,tp)
 	return c:IsSetCard(0xd76) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.op(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if Duel.GetFlagEffect(tp,id)==0 then
+		local rc=1
+		while rc<RACE_ALL do s[tp][rc]=0 rc=rc<<1 end
+		Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,2)
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_FIELD)
+		e1:SetCode(EFFECT_LIMIT_SPECIAL_SUMMON_POSITION)
+		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+		e1:SetTargetRange(1,0)
+		e1:SetTarget(s.lim)
+		e1:SetReset(RESET_PHASE+PHASE_END,2)
+		Duel.RegisterEffect(e1,tp)
+	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil)
 	if Duel.SendtoHand(g,nil,REASON_EFFECT)==0 or not g:GetFirst():IsLocation(LOCATION_HAND) then return end

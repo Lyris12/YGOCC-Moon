@@ -51,6 +51,12 @@ function s.rchk(e,tp,eg)
 		end
 	end end
 end
+function s.lim(e,c,sump,sumtype,sumpos,targetp)
+	if sumpos and bit.band(sumpos,POS_FACEDOWN)>0 then return false end
+	local tp=sump
+	if targetp then tp=targetp end
+	return s[tp][c:GetRace()] and s[tp][c:GetRace()]>1
+end
 function s.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0xd76)
 end

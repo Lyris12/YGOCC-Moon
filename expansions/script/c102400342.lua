@@ -53,7 +53,7 @@ function s.lim(e,c,sump,sumtype,sumpos,targetp)
 	if sumpos and bit.band(sumpos,POS_FACEDOWN)>0 then return false end
 	local tp=sump
 	if targetp then tp=targetp end
-	return s[tp][c:GetRace()]>1
+	return s[tp][c:GetRace()] and s[tp][c:GetRace()]>1
 end
 function s.op(e,tp,eg,ep,ev,re,r,rp)
 	Duel.GetMatchingGroup(aux.AND(Card.IsFaceup,Card.IsSetCard),tp,LOCATION_MZONE,LOCATION_MZONE,nil,0xd76):ForEach(function(tc)
@@ -70,7 +70,9 @@ function s.filter(c,chk)
 		and (chk and c:IsType(TYPE_MONSTER) or c:IsType(TYPE_SPELL+TYPE_TRAP))
 end
 function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil,Duel.IsExistingMatchingCard(aux.NOT(Card.IsStatus),tp,0,LOCATION_MZONE,1,nil,STATUS_JUST_POS)) end
+	local chkn=Duel.GetTurnPlayer()~=tp and Duel.IsExistingMatchingCard(aux.NOT(Card.IsStatus),tp,0,LOCATION_MZONE,1,nil,STATUS_JUST_POS)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil,chkn) end
+	if chkn then e:SetLabel(1) else e:SetLabel(0) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
@@ -89,7 +91,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.RegisterEffect(e1,tp)
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil,Duel.IsExistingMatchingCard(aux.NOT(Card.IsStatus),tp,0,LOCATION_MZONE,1,nil,STATUS_JUST_POS))
+	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil,e:GetLabel()>0)
 	Duel.SendtoHand(g,nil,REASON_EFFECT)
 	Duel.ConfirmCards(1-tp,g)
 end
