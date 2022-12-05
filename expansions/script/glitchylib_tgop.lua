@@ -110,7 +110,7 @@ function Auxiliary.Target(f,loc1,loc2,min,max,exc,check,info,prechk,necrovalley,
 		f=aux.NecroValleyFilter(f)
 	end
 	return	function (e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-				local exc= (aux.GetValueType(exc)=="boolean" and exc) and e:GetHandler() or (exc) and exc or nil
+				local exc= (type(exc)=="boolean" and exc) and e:GetHandler() or (exc) and exc or nil
 				if chkc then
 					local plchk=((loc1~=0 and loc2==0 and chkc:IsControler(tp) and chkc:IsLocation(loc1)) or (loc2~=0 and loc1==0 and chkc:IsControler(1-tp) and chkc:IsLocation(loc2)))
 					return plchk and (not f or f(chkc,e,tp,eg,ep,ev,re,r,rp,chk))
@@ -161,7 +161,7 @@ function Auxiliary.TargetUpToTheNumberOfCards(f,loc1,loc2,min,exc,gf,gloc1,gloc2
 		f=aux.NecroValleyFilter(f)
 	end
 	return	function (e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-				local exc= (aux.GetValueType(exc)=="boolean" and exc) and e:GetHandler() or (exc) and exc or nil
+				local exc= (type(exc)=="boolean" and exc) and e:GetHandler() or (exc) and exc or nil
 				if chkc then
 					local plchk=((loc1~=0 and loc2==0 and chkc:IsControler(tp) and chkc:IsLocation(loc1)) or (loc2~=0 and loc1==0 and chkc:IsControler(1-tp) and chkc:IsLocation(loc2)))
 					return plchk and (not f or f(chkc,e,tp,eg,ep,ev,re,r,rp,chk))
@@ -339,7 +339,7 @@ function Auxiliary.CardMovementOperationTemplate(fn,action_filter,loc,subject,lo
 					end
 					
 		elseif subject==SUBJECT_IT then
-			local op =	function(g)
+			local op =	function(g,e,tp,eg,ep,ev,re,r,rp)
 							local chk=0
 							local ct=fn(g,e,tp,eg,ep,ev,re,r,rp)
 							return g,ct,(ct>0 and aux.PLChk(g,nil,loc))
@@ -348,7 +348,7 @@ function Auxiliary.CardMovementOperationTemplate(fn,action_filter,loc,subject,lo
 			
 		elseif subject==SUBJECT_THAT_TARGET or subject==SUBJECT_ALL_THOSE_TARGETS then
 			local hardchk=(subject==SUBJECT_ALL_THOSE_TARGETS)
-			local op =	function(g)
+			local op =	function(g,e,tp,eg,ep,ev,re,r,rp)
 							local chk=0
 							local ct=fn(g,e,tp,eg,ep,ev,re,r,rp)
 							return g,ct,aux.PLChk(g,nil,loc)
@@ -386,7 +386,7 @@ function Auxiliary.CardMovementOperationTemplate(fn,action_filter,loc,subject,lo
 		elseif truesub==SUBJECT_THAT_TARGET or truesub==SUBJECT_ALL_THOSE_TARGETS then
 			local f=subject[2]
 			local hardchk=(truesub==SUBJECT_ALL_THOSE_TARGETS)
-			local op =	function(g)
+			local op =	function(g,e,tp,eg,ep,ev,re,r,rp)
 							local chk=0
 							local ct=fn(g,e,tp,eg,ep,ev,re,r,rp)
 							return g,ct,aux.PLChk(g,nil,loc,ct)
@@ -468,7 +468,7 @@ function Auxiliary.CardsInteractionOperationTemplate(fn,action_filter,subject,lo
 					end
 					
 		elseif subject==SUBJECT_IT then
-			local op =	function(g)
+			local op =	function(g,e,tp,eg,ep,ev,re,r,rp)
 							local g2=sel(g,e,tp,eg,ep,ev,re,r,rp)
 							if #g2>0 then
 								aux.CheckSequentiality(conj)
@@ -481,7 +481,7 @@ function Auxiliary.CardsInteractionOperationTemplate(fn,action_filter,subject,lo
 			
 		elseif subject==SUBJECT_THAT_TARGET or subject==SUBJECT_ALL_THOSE_TARGETS then
 			local hardchk=(subject==SUBJECT_ALL_THOSE_TARGETS)
-			local op =	function(g)
+			local op =	function(g,e,tp,eg,ep,ev,re,r,rp)
 							local chk=0
 							local ct=fn(g,e,tp,eg,ep,ev,re,r,rp)
 							return g,ct,aux.PLChk(g,nil,loc)
@@ -522,7 +522,7 @@ function Auxiliary.CardsInteractionOperationTemplate(fn,action_filter,subject,lo
 		elseif truesub==SUBJECT_THAT_TARGET or truesub==SUBJECT_ALL_THOSE_TARGETS then
 			local f=subject[2]
 			local hardchk=(truesub==SUBJECT_ALL_THOSE_TARGETS)
-			local op =	function(g)
+			local op =	function(g,e,tp,eg,ep,ev,re,r,rp)
 							local g2=sel(g,e,tp,eg,ep,ev,re,r,rp)
 							if #g2>0 then
 								aux.CheckSequentiality(conj)
@@ -739,6 +739,14 @@ function Auxiliary.BanishOperation(f,loc1,loc2,min,max,exc)
 					return Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
 				end
 	return aux.CardMovementOperationTemplate(op,aux.BanishFilter,LOCATION_REMOVED,f,loc1,loc2,min,max,exc)
+end
+
+-----------------------------------------------------------------------
+--Control
+function Auxiliary.ControlFilter(f)
+	return	function(c,...)
+				return (not f or f(c,...)) and c:IsControlerCanBeChanged()
+			end
 end
 
 -----------------------------------------------------------------------
@@ -1569,6 +1577,50 @@ function Auxiliary.NSOperation(subject,loc1)
 end
 
 -----------------------------------------------------------------------
+--Restrictions
+
+function Auxiliary.PlayerCannotSSOperation(p,excf,reset,desc)
+	local rct=1
+    if type(reset)=="table" then
+        rct=reset[2]
+        reset=reset[1]
+    end
+	if not reset then reset=RESET_PHASE+PHASE_END end
+	
+	local s,o=0,0
+	if not p or p==0 then
+		s=s+1	
+	elseif p==1 then
+		o=o+1
+	elseif p==PLAYER_ALL then
+		s=s+1
+		o=o+1
+	end
+	
+	return	function(e,tp,eg,ep,ev,re,r,rp)
+				local c=e:GetHandler()
+				local e1=Effect.CreateEffect(c)
+				e1:SetType(EFFECT_TYPE_FIELD)
+				e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+				e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+				e1:SetTargetRange(s,o)
+				e1:SetTarget(aux.PlayerCannotSSFilter(excf))
+				e1:SetReset(reset,rct)
+				Duel.RegisterEffect(e1,tp)
+				if desc then
+					local id=c:GetOriginalCode()
+					aux.RegisterClientHint(c,nil,tp,s,o,aux.Stringid(id,desc),reset,rct)
+				end
+				return true
+			end
+end
+function Auxiliary.PlayerCannotSSFilter(f)
+	return	function(e,c,sump,sumtype,sumpos,targetp,se)
+				return not f or not f(c,e,sump,sumtype,sumpos,targetp,se)
+			end
+end
+
+-----------------------------------------------------------------------
 --Special Summons
 SPSUM_MOD_NEGATE   		= 0x1
 SPSUM_MOD_REDIRECT 		= 0x2
@@ -1577,6 +1629,12 @@ SPSUM_MOD_CHANGE_ATKDEF	=	0x4
 function Auxiliary.SSFilter(f,sumtype,sump,ign1,ign2,pos,recp,zone)
 	return	function(c,e,tp,...)
 				return (not f or f(c,e,tp,...)) and c:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos,recp,zone)
+			end
+end
+function Auxiliary.SSFromExtraDeckFilter(f,sumtype,sump,ign1,ign2,pos,recp,zone)
+	return	function(c,e,tp,...)
+				return (not f or f(c,e,tp,...)) and c:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos,recp,zone)
+					and Duel.GetLocationCountFromEx(recp,sump,nil,c,zone)>0
 			end
 end
 function Auxiliary.SSToEitherFieldFilter(f,sumtype,sump,ign1,ign2,pos,zone1,zone2)
@@ -1589,6 +1647,8 @@ end
 function Auxiliary.SSTarget(f,loc1,loc2,min,exc,sumtype,sump,ign1,ign2,pos,recp,zone)
 	if not loc1 then loc1=LOCATION_DECK end
 	if not loc2 then loc2=0 end
+	loc1 = loc1&(~LOCATION_EXTRA)
+	loc2 = loc2&(~LOCATION_EXTRA)
 	local locs = (loc1&(~loc2))|loc2
 	if not min then min=1 end
 	if not sumtype then sumtype=0 end
@@ -1604,7 +1664,12 @@ function Auxiliary.SSTarget(f,loc1,loc2,min,exc,sumtype,sump,ign1,ign2,pos,recp,
 						local recp = recp and recp==1 and 1-tp or tp
 						local zone = type(zone)=="number" and zone or zone(e,tp)
 						if exc then exc=e:GetHandler() end
-						if chk==0 then return Duel.GetLocationCount(recp,LOCATION_MZONE,sump,LOCATION_REASON_TOFIELD,zone)>=min and Duel.IsExistingMatchingCard(aux.SSFilter(f,sumtype,sump,ign1,ign2,pos,recp,zone),tp,loc1,loc2,min,exc,e,tp,eg,ep,ev,re,r,rp) end
+						if chk==0 then
+							local check = (e:GetLabel()==1) or (Duel.GetLocationCount(recp,LOCATION_MZONE,sump,LOCATION_REASON_TOFIELD,zone)>=min and Duel.IsExistingMatchingCard(aux.SSFilter(f,sumtype,sump,ign1,ign2,pos,recp,zone),tp,loc1,loc2,min,exc,e,tp,eg,ep,ev,re,r,rp))
+							e:SetLabel(0)
+							return check
+						end
+						e:SetLabel(0)
 						if loc1>0 and loc2>0 then
 							Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,min,PLAYER_ALL,locs)
 						elseif loc1>0 then
@@ -1620,8 +1685,11 @@ function Auxiliary.SSTarget(f,loc1,loc2,min,exc,sumtype,sump,ign1,ign2,pos,recp,
 						local zone = type(zone)=="number" and zone or zone(e,tp)
 						if exc then exc=e:GetHandler() end
 						if chk==0 then
-							return not Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) and Duel.GetLocationCount(recp,LOCATION_MZONE,sump,LOCATION_REASON_TOFIELD,zone)>=min and Duel.IsExistingMatchingCard(aux.SSFilter(f,sumtype,sump,ign1,ign2,pos,recp,zone),tp,loc1,loc2,min,exc,e,tp,eg,ep,ev,re,r,rp)
+							local check = (e:GetLabel()==1) or (not Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) and Duel.GetLocationCount(recp,LOCATION_MZONE,sump,LOCATION_REASON_TOFIELD,zone)>=min and Duel.IsExistingMatchingCard(aux.SSFilter(f,sumtype,sump,ign1,ign2,pos,recp,zone),tp,loc1,loc2,min,exc,e,tp,eg,ep,ev,re,r,rp))
+							e:SetLabel(0)
+							return check
 						end
+						e:SetLabel(0)
 						if loc1>0 and loc2>0 then
 							Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,min,PLAYER_ALL,locs)
 						elseif loc1>0 then
@@ -1639,7 +1707,12 @@ function Auxiliary.SSTarget(f,loc1,loc2,min,exc,sumtype,sump,ign1,ign2,pos,recp,
 						local zone = type(zone)=="number" and zone or zone(e,tp)
 						local c=e:GetHandler()
 						if exc then exc=c end
-						if chk==0 then return Duel.GetLocationCount(recp,LOCATION_MZONE,sump,LOCATION_REASON_TOFIELD,zone)>=min and c:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos,recp,zone) end
+						if chk==0 then
+							local check = (e:GetLabel()==1) or (Duel.GetLocationCount(recp,LOCATION_MZONE,sump,LOCATION_REASON_TOFIELD,zone)>=min and c:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos,recp,zone))
+							e:SetLabel(0)
+							return check
+						end
+						e:SetLabel(0)
 						Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,c:GetControler(),c:GetLocation())
 					end
 		end
@@ -1657,7 +1730,7 @@ function Auxiliary.SSOperationTemplate(f,loc1,loc2,min,max,exc,sumtype,sump,ign1
 					local g=Duel.SelectMatchingCard(tp,aux.SSFilter(f,sumtype,sump,ign1,ign2,pos,recp,zone),tp,loc1,loc2,min,max,exc,e,tp)
 					if #g>0 then
 						aux.CheckSequentiality(conj)
-						local ct=Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+						local ct=Duel.SpecialSummon(g,sumtype,sump,recp,ign1,ign2,pos,zone)
 						return Duel.GetOperatedGroup(),ct,ct>0
 					end
 					return g,0
@@ -1676,7 +1749,7 @@ function Auxiliary.SSOperationTemplate(f,loc1,loc2,min,max,exc,sumtype,sump,ign1
 					local g=Duel.SelectMatchingCard(tp,aux.SSFilter(f,sumtype,sump,ign1,ign2,pos,recp,zone),tp,loc1,loc2,min,ft,exc,e,tp)
 					if #g>0 then
 						aux.CheckSequentiality(conj)
-						local ct=Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+						local ct=Duel.SpecialSummon(g,sumtype,sump,recp,ign1,ign2,pos,zone)
 						return Duel.GetOperatedGroup(),ct,ct>0
 					end
 					return g,0
@@ -1692,7 +1765,7 @@ function Auxiliary.SSOperationTemplate(f,loc1,loc2,min,max,exc,sumtype,sump,ign1
 					local g=Duel.SelectMatchingCard(tp,aux.SSFilter(f,sumtype,sump,ign1,ign2,pos,recp,zone),tp,loc1,loc2,min,max,exc,e,tp)
 					if #g>0 then
 						aux.CheckSequentiality(conj)
-						local ct=Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+						local ct=Duel.SpecialSummon(g,sumtype,sump,recp,ign1,ign2,pos,zone)
 						return Duel.GetOperatedGroup(),ct,ct>0
 					end
 					return g,0
@@ -1712,7 +1785,7 @@ function Auxiliary.SSOperationTemplate(f,loc1,loc2,min,max,exc,sumtype,sump,ign1
 					local g=Duel.SelectMatchingCard(tp,aux.SSFilter(f,sumtype,sump,ign1,ign2,pos,recp,zone),tp,loc1,loc2,min,ft,exc,e,tp)
 					if #g>0 then
 						aux.CheckSequentiality(conj)
-						local ct=Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+						local ct=Duel.SpecialSummon(g,sumtype,sump,recp,ign1,ign2,pos,zone)
 						return Duel.GetOperatedGroup(),ct,ct>0
 					end
 					return g,0
@@ -1836,6 +1909,170 @@ function Auxiliary.SSOperation(subject,loc1,loc2,min,max,exc,sumtype,sump,ign1,i
 			return aux.TargetOperation(op,f,hardchk,nil,chk)
 		end
 	end
+end
+
+function Auxiliary.SSFromExtraDeckTarget(f,loc1,loc2,exc,sumtype,sump,ign1,ign2,pos,recp,zone)
+	local loc1 = loc1 and LOCATION_EXTRA or 0
+	local loc2 = loc2 and LOCATION_EXTRA or 0
+	if not sumtype then sumtype=0 end
+	if not ign1 then ign1=false end
+	if not ign2 then ign2=false end
+	if not pos then pos=POS_FACEUP end
+	if not zone then zone=0xff end
+	
+	if type(f)=="function" or type(f)=="nil" then
+		return	function (e,tp,eg,ep,ev,re,r,rp,chk)
+					local sump = sump and sump==1 and 1-tp or tp
+					local recp = recp and recp==1 and 1-tp or tp
+					local zone = type(zone)=="number" and zone or zone(e,tp)
+					if exc then exc=e:GetHandler() end
+					if chk==0 then
+						local check = (e:GetLabel()==1) or Duel.IsExistingMatchingCard(aux.SSFromExtraDeckFilter(f,sumtype,sump,ign1,ign2,pos,recp,zone),tp,loc1,loc2,1,exc,e,tp,eg,ep,ev,re,r,rp)
+						e:SetLabel(0)
+						return check
+					end
+					e:SetLabel(0)
+					if loc1>0 and loc2>0 then
+						Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,PLAYER_ALL,LOCATION_EXTRA)
+					elseif loc1>0 then
+						Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
+					elseif loc2>0 then
+						Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,1-tp,LOCATION_EXTRA)
+					end
+				end
+	elseif type(f)=="number" then
+		if f==SUBJECT_THIS_CARD then
+			return	function (e,tp,eg,ep,ev,re,r,rp,chk)
+						local sump = sump and sump==1 and 1-tp or tp
+						local recp = recp and recp==1 and 1-tp or tp
+						local zone = type(zone)=="number" and zone or zone(e,tp)
+						local c=e:GetHandler()
+						if exc then exc=c end
+						if chk==0 then
+							local check = (e:GetLabel()==1) or (Duel.GetLocationCountFromEx(recp,sump,nil,e:GetHandler(),zone)>0 and c:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos,recp,zone))
+							e:SetLabel(0)
+							return check
+						end
+						e:SetLabel(0)
+						Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,c:GetControler(),c:GetLocation())
+					end
+		end
+	end
+end
+function Auxiliary.SSFromExtraDeckOperation(subject,loc1,loc2,exc,sumtype,sump,ign1,ign2,pos,recp,zone)
+	local loc1 = loc1 and LOCATION_EXTRA or 0
+	local loc2 = loc2 and LOCATION_EXTRA or 0
+	if not sumtype then sumtype=0 end
+	if not ign1 then ign1=false end
+	if not ign2 then ign2=false end
+	if not pos then pos=POS_FACEUP end
+	if not zone then zone=0xff end
+	
+	local complete_proc=false
+	if sumtype==SUMMON_TYPE_FUSION or sumtype==SUMMON_TYPE_SYNCHRO or sumtype==SUMMON_TYPE_XYZ or sumtype==SUMMON_TYPE_LINK then
+		complete_proc=true
+	end	
+	
+	if type(subject)=="function" or type(subject)=="nil" then
+		return aux.SSFromExtraDeckOperationTemplate(subject,loc1,loc2,exc,sumtype,sump,ign1,ign2,pos,recp,zone,complete_proc)
+				
+	elseif type(subject)=="number" then
+		if subject==SUBJECT_THIS_CARD then
+			return	function (e,tp,eg,ep,ev,re,r,rp,conj)
+				local c=e:GetHandler()
+				local sump = sump and sump==1 and 1-tp or tp
+				local recp = recp and recp==1 and 1-tp or tp
+				local zone = type(zone)=="number" and zone or zone(e,tp)
+				if Duel.GetLocationCountFromEx(recp,sump,nil,e:GetHandler(),zone)<=0 or not c:IsRelateToChain() then return end
+				aux.CheckSequentiality(conj)
+				local ct=Duel.SpecialSummon(c,sumtype,sump,recp,ign1,ign2,pos,zone)
+				if ct~=0 and complete_proc then
+					c:CompleteProcedure()
+				end
+				return c,ct,ct>0
+			end
+					
+		elseif subject==SUBJECT_IT then
+			local chk =	function(g,e,tp)
+							local sump = sump and sump==1 and 1-tp or tp
+							local recp = recp and recp==1 and 1-tp or tp
+							local zone = type(zone)=="number" and zone or zone(e,tp)
+							return Duel.GetLocationCountFromEx(recp,sump,nil,g:GetFirst(),zone)>0
+						end
+			local op =	function(g,e,tp)
+							local sump = sump and sump==1 and 1-tp or tp
+							local recp = recp and recp==1 and 1-tp or tp
+							local zone = type(zone)=="number" and zone or zone(e,tp)
+							local ct=Duel.SpecialSummon(g,sumtype,sump,recp,ign1,ign2,pos,zone)
+							if ct>0 and complete_proc then
+								g:GetFirst():CompleteProcedure()
+							end
+							return g,ct,ct>0
+						end
+			return aux.TargetOperation(op,nil,nil,nil,chk)
+		
+		elseif subject==SUBJECT_THAT_TARGET then
+			local chk =	function(g,e,tp)
+							local sump = sump and sump==1 and 1-tp or tp
+							local recp = recp and recp==1 and 1-tp or tp
+							local zone = type(zone)=="number" and zone or zone(e,tp)
+							return Duel.GetLocationCountFromEx(recp,sump,nil,g:GetFirst(),zone)>0
+						end
+			local op =	function(g,e,tp)
+							local sump = sump and sump==1 and 1-tp or tp
+							local recp = recp and recp==1 and 1-tp or tp
+							local zone = type(zone)=="number" and zone or zone(e,tp)
+							local ct=Duel.SpecialSummon(g,sumtype,sump,recp,ign1,ign2,pos,zone)
+							if ct>0 and complete_proc then
+								g:GetFirst():CompleteProcedure()
+							end
+							return g,ct,ct>0
+						end
+			return aux.TargetOperation(op,nil,false,nil,chk)
+		end
+	
+	else
+		local truesub=subject[1]
+		if truesub==SUBJECT_THAT_TARGET then
+			local f=subject[2]
+			local chk =	function(g,e,tp)
+							local sump = sump and sump==1 and 1-tp or tp
+							local recp = recp and recp==1 and 1-tp or tp
+							local zone = type(zone)=="number" and zone or zone(e,tp)
+							return Duel.GetLocationCountFromEx(recp,sump,nil,g:GetFirst(),zone)>0
+						end
+			local op =	function(g,e,tp)
+							local sump = sump and sump==1 and 1-tp or tp
+							local recp = recp and recp==1 and 1-tp or tp
+							local zone = type(zone)=="number" and zone or zone(e,tp)
+							local ct=Duel.SpecialSummon(g,sumtype,sump,recp,ign1,ign2,pos,zone)
+							if ct>0 and complete_proc then
+								g:GetFirst():CompleteProcedure()
+							end
+							return g,ct,ct>0
+						end
+			return aux.TargetOperation(op,f,false,nil,chk)
+		end
+	end
+end
+function Auxiliary.SSFromExtraDeckOperationTemplate(f,loc1,loc2,exc,sumtype,sump,ign1,ign2,pos,recp,zone,complete_proc)
+	return	function (e,tp,eg,ep,ev,re,r,rp,conj)
+				local sump = sump and sump==1 and 1-tp or tp
+				local recp = recp and recp==1 and 1-tp or tp
+				local zone = type(zone)=="number" and zone or zone(e,tp)
+				if exc then exc=e:GetHandler() end
+				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+				local g=Duel.SelectMatchingCard(tp,aux.SSFromExtraDeckFilter(f,sumtype,sump,ign1,ign2,pos,recp,zone),tp,loc1,loc2,1,1,exc,e,tp,eg,ep,ev,re,r,rp)
+				if #g>0 then
+					aux.CheckSequentiality(conj)
+					local ct=Duel.SpecialSummon(g,sumtype,sump,recp,ign1,ign2,pos,zone)
+					if ct>0 and complete_proc then
+						g:GetFirst():CompleteProcedure()
+					end
+					return Duel.GetOperatedGroup(),ct,ct>0
+				end
+				return g,0
+			end
 end
 
 function Auxiliary.SSOperationMod(mod,subject,loc1,loc2,min,max,exc,modvals,sumtype,sump,ign1,ign2,pos,recp,zone,complete_proc)
@@ -2050,6 +2287,8 @@ end
 function Auxiliary.SSToEitherFieldTarget(f,loc1,loc2,min,exc,sumtype,sump,ign1,ign2,pos,zone1,zone2)
 	if not loc1 then loc1=LOCATION_DECK end
 	if not loc2 then loc2=0 end
+	loc1 = loc1&(~LOCATION_EXTRA)
+	loc2 = loc2&(~LOCATION_EXTRA)
 	local locs = (loc1&(~loc2))|loc2
 	if not min then min=1 end
 	if not sumtype then sumtype=0 end
@@ -2114,6 +2353,8 @@ function Auxiliary.SSToEitherFieldOperation(subject,loc1,loc2,min,max,exc,sumtyp
 		if not max then max=min end
 		if not loc1 then loc1=LOCATION_MZONE end
 		if not loc2 then loc2=0 end
+		loc1 = loc1&(~LOCATION_EXTRA)
+		loc2 = loc2&(~LOCATION_EXTRA)
 		local locs = (loc1&(~loc2))|loc2
 		if locs&LOCATION_GRAVE>0 then subject=aux.NecroValleyFilter(subject) end
 		return aux.SSToEitherFieldOperationTemplate(subject,loc1,loc2,min,max,exc,sumtype,sump,ign1,ign2,pos,zone1,zone2)
@@ -2415,6 +2656,8 @@ function Auxiliary.SSToEitherFieldOperationMod(mod,subject,loc1,loc2,min,max,exc
 		if not max then max=min end
 		if not loc1 then loc1=LOCATION_MZONE end
 		if not loc2 then loc2=0 end
+		loc1 = loc1&(~LOCATION_EXTRA)
+		loc2 = loc2&(~LOCATION_EXTRA)
 		local locs = (loc1&(~loc2))|loc2
 		if locs&LOCATION_GRAVE>0 then subject=aux.NecroValleyFilter(subject) end
 		return aux.SSOperationModTemplate(spsum,subject,loc1,loc2,min,max,exc,sumtype,sump,ign1,ign2,pos,zone1,zone2,table.unpack(modvals))
@@ -2629,6 +2872,7 @@ function Auxiliary.ZoneThisCardDoesNotPointTo(p)
 				return (~(e:GetHandler():GetLinkedZone(p)))&field
 			end
 end
+
 -----------------------------------------------
 --SELF
 --[[
@@ -2898,7 +3142,7 @@ function Duel.SpecialSummonATKDEF(e,g,styp,sump,tp,ign1,ign2,pos,zone,atk,def,re
 	return ct
 end
 
------------------------------------------------
+------------------------------------------------
 --FUSION SUMMON
 function Auxiliary.FusionMaterialFilter(f)
 	return	function(c,e,tp,...)

@@ -92,6 +92,7 @@ function Auxiliary.ExactLocationGroupCond(f,loc1,loc2,ct0,exc)
 			end
 end
 function Auxiliary.CompareLocationGroupCond(res,f,loc,exc)
+	if not f then f=aux.TRUE end
 	if not loc then loc=LOCATION_MZONE end
 	return	function(e,tp,eg,ep,ev,re,r,rp)
 				if not tp then

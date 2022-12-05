@@ -27,6 +27,12 @@ function Auxiliary.LabelCost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(1)
 	if chk==0 then return true end
 end
+function Auxiliary.CustomLabelCost(lab)
+	return	function(e,tp,eg,ep,ev,re,r,rp,chk)
+				e:SetLabel(lab)
+				if chk==0 then return true end
+			end
+end
 
 --Card Action Costs
 function Auxiliary.DiscardCost(f,min,max,exc)
@@ -222,6 +228,54 @@ function Auxiliary.TributeSelfCost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Release(e:GetHandler(),REASON_COST)
 end
 
+function Auxiliary.TributeForSummonFilter(f,sumtype,sump,ign1,ign2,pos,recp,zone)
+	local reason
+	if sumtype==SUMMON_TYPE_FUSION then
+		reason = REASON_FUSION
+	elseif sumtype==SUMMON_TYPE_SYNCHRO then
+		reason = REASON_SYNCHRO
+	elseif sumtype==SUMMON_TYPE_XYZ then
+		reason = REASON_XYZ
+	elseif sumtype==SUMMON_TYPE_LINK then
+		reason = REASON_LINK
+	end
+	if reason then
+		return	function(c,e,tp,...)
+					local pg=aux.GetMustBeMaterialGroup(sump,Group.CreateGroup(),sump,c,nil,reason)
+					return #pg<=0 and (not f or f(c,e,tp,...)) and c:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos,recp,zone)
+						and ((not c:IsLocation(LOCATION_EXTRA) and Duel.GetLocationCount(recp,LOCATION_MZONE,sump,LOCATION_REASON_TOFIELD,zone)>0)
+						or (c:IsLocation(LOCATION_EXTRA) and Duel.GetLocationCountFromEx(recp,sump,e:GetHandler(),c,zone)>0))
+				end
+	else
+		return	function(c,e,tp,...)
+					return (not f or f(c,e,tp,...)) and c:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos,recp,zone)
+						and ((not c:IsLocation(LOCATION_EXTRA) and Duel.GetLocationCount(recp,LOCATION_MZONE,sump,LOCATION_REASON_TOFIELD,zone)>0)
+						or (c:IsLocation(LOCATION_EXTRA) and Duel.GetLocationCountFromEx(recp,sump,e:GetHandler(),c,zone)>0))
+				end
+	end
+end
+function Auxiliary.TributeForSummonSelfCost(f,loc1,loc2,sumtype,sump,ign1,ign2,pos,recp,zone)
+	if not loc1 then loc1=LOCATION_DECK end
+	if not loc2 then loc2=0 end
+	
+	if not sumtype then sumtype=0 end
+	if not ign1 then ign1=false end
+	if not ign2 then ign2=false end
+	if not pos then pos=POS_FACEUP end
+	if not zone then zone=0xff end
+	
+	return	function(e,tp,eg,ep,ev,re,r,rp,chk)
+				local sump = sump and sump==1 and 1-tp or tp
+				local recp = recp and recp==1 and 1-tp or tp
+				local zone = type(zone)=="number" and zone or zone(e,tp)
+				e:SetLabel(1)
+				if chk==0 then
+					return e:GetHandler():IsReleasable() and Duel.IsExistingMatchingCard(aux.TributeForSummonFilter(f,sumtype,sump,ign1,ign2,pos,recp,zone),tp,loc1,loc2,1,nil,e,tp,eg,ep,ev,re,r,rp)
+				end
+				Duel.Release(e:GetHandler(),REASON_COST)
+			end
+end
+
 -----------------------------------------------------------------------
 --LP Payment Costs
 function Auxiliary.PayLPCost(lp)
@@ -239,6 +293,7 @@ function Auxiliary.AttackRestrictionCost(oath,reset,desc)
 	if oath then prop=prop|EFFECT_FLAG_OATH end
 	if desc then prop=prop|EFFECT_FLAG_CLIENT_HINT end
 	if not reset then reset=RESET_PHASE+PHASE_END end
+	
 	return	function(e,tp,eg,ep,ev,re,r,rp,chk)
 				local c=e:GetHandler()
 				if chk==0 then return c:GetAttackAnnouncedCount()==0 end
@@ -254,8 +309,10 @@ end
 function Auxiliary.SSRestrictionCost(f,oath,reset,id,cf,desc)
 	if id then
 		if not cf then
+			aux.AddSSCounter(id,f)
 			Duel.AddCustomActivityCounter(id,ACTIVITY_SPSUMMON,f)
 		else
+			aux.AddSSCounter(id,cf)
 			Duel.AddCustomActivityCounter(id,ACTIVITY_SPSUMMON,cf)
 		end
 	end
@@ -263,8 +320,8 @@ function Auxiliary.SSRestrictionCost(f,oath,reset,id,cf,desc)
 	if oath then prop=prop|EFFECT_FLAG_OATH end
 	if desc then prop=prop|EFFECT_FLAG_CLIENT_HINT end
 	if not reset then reset=RESET_PHASE+PHASE_END end
+	
 	return	function(e,tp,eg,ep,ev,re,r,rp,chk)
-				local id=e:GetHandler():GetOriginalCode()
 				if chk==0 then return Duel.GetCustomActivityCount(id,tp,ACTIVITY_SPSUMMON)==0 end
 				local e1=Effect.CreateEffect(e:GetHandler())
 				if desc then e1:Desc(desc) end
@@ -281,14 +338,20 @@ function Auxiliary.SSRestrictionCost(f,oath,reset,id,cf,desc)
 			end
 end
 
-function Card.ActivationCounter(c,f)
-	return Duel.AddCustomActivityCounter(c:GetOriginalCode(),ACTIVITY_CHAIN,f)
+function Auxiliary.AddActivationCounter(id,f)
+	return Duel.AddCustomActivityCounter(id,ACTIVITY_CHAIN,f)
 end
-function Card.SSCounter(c,f)
-	return Duel.AddCustomActivityCounter(c:GetOriginalCode(),ACTIVITY_SPSUMMON,f)
+function Auxiliary.AddSSCounter(id,f)
+	return Duel.AddCustomActivityCounter(id,ACTIVITY_SPSUMMON,f)
 end
 
 --old names
 function Auxiliary.SSLimit(f,desc,oath,reset,id,cf)
 	return Auxiliary.SSRestrictionCost(f,oath,reset,id,cf,desc)
+end
+function Card.ActivationCounter(c,f)
+	return Duel.AddCustomActivityCounter(c:GetOriginalCode(),ACTIVITY_CHAIN,f)
+end
+function Card.SSCounter(c,f)
+	return Duel.AddCustomActivityCounter(c:GetOriginalCode(),ACTIVITY_SPSUMMON,f)
 end

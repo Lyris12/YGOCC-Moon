@@ -41,7 +41,7 @@ function Card.SingleEffect(c,code,val,reset,rc,range,cond,prop,desc)
 	end
 	if reset then
 		if type(reset)~="number" then reset=0 end
-		if prop&EFFECT_FLAG_CANNOT_DISABLE==0 then
+		if prop and prop&EFFECT_FLAG_CANNOT_DISABLE==0 then
 			reset = rc==c and reset|RESET_DISABLE or reset
 		end
 		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
@@ -55,7 +55,7 @@ function Auxiliary.ForEach(f,loc1,loc2,exc,n)
 	if not n then n=1 end
 	return	function(e,c)
 				local tp=e:GetHandlerPlayer()
-				local exc= (aux.GetValueType(exc)=="boolean" and exc) and e:GetHandler() or (exc) and exc or nil
+				local exc= (type(exc)=="boolean" and exc) and e:GetHandler() or (exc) and exc or nil
 				return Duel.GetMatchingGroupCount(f,tp,loc1,loc2,exc,e,tp)*n
 			end
 end
@@ -903,7 +903,7 @@ function Card.UpdateLevel(c,lv,reset,rc,range,cond,prop,desc)
 	end
 end
 function Auxiliary.UpdateLevelOperation(subject,lv,reset,rc,range,cond,loc1,loc2,min,max,exc)
-	return aux.UpdateStatsOperationTemplate(Card.UpdateAttribute,subject,lv,reset,rc,range,cond,loc1,loc2,min,max,exc)
+	return aux.UpdateStatsOperationTemplate(Card.UpdateLevel,subject,lv,reset,rc,range,cond,loc1,loc2,min,max,exc)
 end
 
 function Card.ChangeLevel(c,lv,reset,rc,range,cond,prop,desc)
@@ -946,77 +946,7 @@ function Auxiliary.ChangeLevelOperation(subject,lv,reset,rc,range,cond,loc1,loc2
 end
 
 --Effect
-function Card.EffectsCannotBeNegated(c,reset,rc,range,cond,prop,desc)
-	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
-	local rc = rc and rc or c
-    local rct=1
-    if type(reset)=="table" then
-        rct=reset[2]
-        reset=reset[1]
-    end
-	local e=Effect.CreateEffect(rc)
-	e:SetType(typ)
-	e:SetCode(EFFECT_CANNOT_DISABLE)
-	if cond then
-		e:SetCondition(cond)
-	end
-	if reset then
-		if type(reset)~="number" then reset=0 end
-		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
-	end
-	c:RegisterEffect(e)
-	return e
-end
-function Card.EffectActivationsCannotBeNegated(c,reset,rc,range,cond,prop,desc)
-	if not SCRIPT_AS_EQUIP then return false end
-	local rc = rc and rc or c
-    local rct=1
-    if type(reset)=="table" then
-        rct=reset[2]
-        reset=reset[1]
-    end
-	local e=Effect.CreateEffect(rc)
-	e:SetType(EFFECT_TYPE_FIELD)
-	e:SetRange(LOCATION_SZONE)
-	e:SetCode(EFFECT_CANNOT_INACTIVATE)
-	e:SetCondition(aux.IsEquippedCond)
-	e:SetValue(	function (eff,ct)
-					local te=Duel.GetChainInfo(ct,CHAININFO_TRIGGERING_EFFECT)
-					return te:GetHandler()==eff:GetHandler():GetEquipTarget()
-				end
-			  )
-	if reset then
-		if type(reset)~="number" then reset=0 end
-		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
-	end
-	c:RegisterEffect(e)
-	return e
-end
-function Card.ActivatedEffectsCannotBeNegated(c,reset,rc,range,cond,prop,desc)
-	if not SCRIPT_AS_EQUIP then return false end
-	local rc = rc and rc or c
-    local rct=1
-    if type(reset)=="table" then
-        rct=reset[2]
-        reset=reset[1]
-    end
-	local e=Effect.CreateEffect(rc)
-	e:SetType(EFFECT_TYPE_FIELD)
-	e:SetRange(LOCATION_SZONE)
-	e:SetCode(EFFECT_CANNOT_DISEFFECT)
-	e:SetCondition(aux.IsEquippedCond)
-	e:SetValue(	function (eff,ct)
-					local te=Duel.GetChainInfo(ct,CHAININFO_TRIGGERING_EFFECT)
-					return te:GetHandler()==eff:GetHandler():GetEquipTarget()
-				end
-			  )
-	if reset then
-		if type(reset)~="number" then reset=0 end
-		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
-	end
-	c:RegisterEffect(e)
-	return e
-end
+
 
 --Battle Related
 PROTECTION_FROM_OPPONENT 			= 0x1
@@ -1532,6 +1462,13 @@ function Card.CannotBeMaterial(c,ed_types,f,reset,rc,range,cond,prop,desc)
 	else
 		return false
 	end
+end
+function Card.CannotBeTributedForATributeSummon(c,forced,reset,rc,cond,prop,desc)
+	if not prop then prop=0 end
+	if desc then prop=prop|EFFECT_FLAG_CLIENT_HINT end
+	local e=c:SingleEffect(EFFECT_UNRELEASABLE_SUM,1,reset,rc,nil,cond,prop,desc)
+	c:RegisterEffect(e,forced)
+	return e
 end
 
 function Card.CannotBeSet(c,reset,rc,cond,prop,desc)

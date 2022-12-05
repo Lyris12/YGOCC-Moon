@@ -2637,6 +2637,22 @@ function Card.CanAttack(c)
 	return c:IsAttackable()
 end
 
+function Auxiliary.RegisterClientHint(card,property,tp,player1,player2,str,reset,ct)
+	if not card then return end
+	property=property or 0
+	reset=reset or 0
+	local eff=Effect.CreateEffect(card)
+	eff:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CLIENT_HINT|property)
+	eff:SetTargetRange(player1,player2)
+	if str then
+		eff:SetDescription(str)
+	else
+		eff:SetDescription(aux.Stringid(card:GetOriginalCode(),1))
+	end
+	eff:SetReset(RESET_PHASE+PHASE_END|reset,ct or 1)
+	Duel.RegisterEffect(eff,tp)
+	return eff
+end
 function Auxiliary.FilterBoolFunctionEx(f,value)
 	return	function(target,scard,sumtype,tp)
 				return f(target,value,scard,sumtype,tp)

@@ -13,6 +13,8 @@ CATEGORY_UPDATE_SETCODE				= 0x400
 CATEGORY_LVCHANGE					= 0x800
 
 CATEGORIES_SEARCH = CATEGORY_SEARCH+CATEGORY_TOHAND
+CATEGORIES_FUSION_SUMMON = CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON
+CATEGORIES_TOKEN = CATEGORY_SPECIAL_SUMMON+CATEGORY_TOKEN
 
 CATEGORY_FLAG_SELF					= 0x1
 
@@ -450,10 +452,29 @@ function Auxiliary.FaceupFilter(f,...)
 				return target:IsFaceup() and f(target,table.unpack(ext_params))
 			end
 end
-function Auxiliary.MonsterFilter(f,...)
+function Auxiliary.ArchetypeFilter(set,f,...)
 	local ext_params={...}
 	return	function(target)
-				return target:IsMonster() and f(target,table.unpack(ext_params))
+				return target:IsSetCard(set) and (not f or f(target,table.unpack(ext_params)))
+			end
+end
+function Auxiliary.MonsterFilter(typ,f,...)
+	local ext_params={...}
+	if type(typ)=="function" then
+		if type(f)~="nil" then
+			table.insert(ext_params,1,f)
+		end
+		f=typ
+		typ=nil
+	end
+	return	function(target)
+				return target:IsMonster(typ) and f(target,table.unpack(ext_params))
+			end
+end
+function Auxiliary.RaceFilter(race,f,...)
+	local ext_params={...}
+	return	function(target)
+				return target:IsRace(race) and (not f or f(target,table.unpack(ext_params)))
 			end
 end
 function Auxiliary.STFilter(f,...)
@@ -659,6 +680,23 @@ function Auxiliary.AddThisCardBanishedAlreadyCheck(c)
 end
 
 -----------------------------------------------------------------------
+SCRIPT_REGISTER_FLAG = nil
+
+function Auxiliary.HOPT(oath)
+	if oath then
+		return {true,false,true}
+	else
+		return true
+	end
+end
+function Auxiliary.SHOPT(oath)
+	if oath then
+		return {true,true,true}
+	else
+		return {true,true}
+	end
+end
+
 function Card.Ignition(c,desc,ctg,prop,range,ctlim,cond,cost,tg,op,reset,quickcon)
 	if not range then range=c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE end
 	---
