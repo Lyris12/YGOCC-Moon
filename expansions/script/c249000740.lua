@@ -201,7 +201,7 @@ function c249000740.copytarget(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(58242947,1))
 	local g=Duel.SelectMatchingCard(tp,c249000740.copyfilter,tp,0xFF,0xFF,1,1,nil,tp,eg,ep,ev,re,r,rp,c,1)
 	local tc=g:GetFirst()
-	Duel.ConfirmCards(1-tp,tc)
+	Duel.Hint(HINT_CARD,0,tc:GetCode())
 	tc:ResetFlagEffect(2490007402)
 	local te=c249000740.effectcheck(tc,tp,eg,ep,ev,re,r,rp,c,false,1)
 	c249000740[Duel.GetCurrentChain()]=te
