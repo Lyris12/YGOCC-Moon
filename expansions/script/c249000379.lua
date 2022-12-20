@@ -3,22 +3,16 @@ function c249000379.initial_effect(c)
 	--pendulum summon
 	aux.EnablePendulumAttribute(c)
 	--indes
-	local e6=Effect.CreateEffect(c)
-	e6:SetType(EFFECT_TYPE_FIELD)
-	e6:SetCode(EFFECT_INDESTRUCTABLE_COUNT)
-	e6:SetRange(LOCATION_PZONE)
-	e6:SetTargetRange(LOCATION_PZONE,0)
-	e6:SetCountLimit(1)
-	e6:SetTarget(aux.TRUE)
-	e6:SetValue(c249000379.indval)
-	c:RegisterEffect(e6)
-	--inactivatable
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetCode(EFFECT_CANNOT_INACTIVATE)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetValue(c249000379.efilter)
+	e2:SetCode(EFFECT_INDESTRUCTABLE_COUNT)
+	e2:SetRange(LOCATION_PZONE)
+	e2:SetTargetRange(LOCATION_PZONE,0)
+	e2:SetCountLimit(1)
+	e2:SetTarget(aux.TRUE)
+	e2:SetValue(c249000379.indval)
 	c:RegisterEffect(e2)
+	--inactivatable
 	--draw
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(24943456,0))
@@ -41,12 +35,6 @@ function c249000379.initial_effect(c)
 end
 function c249000379.indval(e,re,r,rp)
 	return bit.band(r,REASON_EFFECT)~=0 and rp==1-e:GetHandlerPlayer()
-end
-function c249000379.efilter(e,ct)
-	local p=e:GetHandler():GetControler()
-	local te,tp=Duel.GetChainInfo(ct,CHAININFO_TRIGGERING_EFFECT,CHAININFO_TRIGGERING_PLAYER)
-	local tc=te:GetHandler()
-	return te:IsActiveType(TYPE_MONSTER) and tc:IsAttribute(ATTRIBUTE_LIGHT) and p==tp
 end
 function c249000379.drcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousLocation(LOCATION_MZONE) and e:GetHandler():IsReason(REASON_DESTROY)

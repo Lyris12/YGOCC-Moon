@@ -1,6 +1,6 @@
 --Number 0: Angel of Infinite Life
 function c249001123.initial_effect(c)
-	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_FAIRY),7,3)
+	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_FAIRY),7,4)
 	c:EnableReviveLimit()
 	--special summon (battle damage)
 	local e1=Effect.CreateEffect(c)
@@ -53,46 +53,15 @@ function c249001123.initial_effect(c)
 	e5:SetTargetRange(1,0)
 	e5:SetValue(1)
 	c:RegisterEffect(e5)
-	--indestructable by effect
-	local e6=Effect.CreateEffect(c)
-	e6:SetType(EFFECT_TYPE_SINGLE)
-	e6:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e6:SetRange(LOCATION_MZONE)
-	e6:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
-	e6:SetCondition(c249001123.efcon)
-	e6:SetProperty(EFFECT_FLAG_CANNOT_INACTIVATE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CANNOT_NEGATE)
-	e6:SetValue(1)
-	c:RegisterEffect(e6)
-	--cannot be target
-	local e7=Effect.CreateEffect(c)
-	e7:SetType(EFFECT_TYPE_SINGLE)
-	e7:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
-	e7:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e7:SetRange(LOCATION_MZONE)
-	e7:SetProperty(EFFECT_FLAG_CANNOT_INACTIVATE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CANNOT_NEGATE)
-	e7:SetCondition(c249001123.efcon)
-	e7:SetValue(aux.tgoval)
-	c:RegisterEffect(e7)
 	--Cost Change
 	local e8=Effect.CreateEffect(c)
 	e8:SetType(EFFECT_TYPE_FIELD)
 	e8:SetCode(EFFECT_LPCOST_CHANGE)
-	e8:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e8:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CANNOT_INACTIVATE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CANNOT_NEGATE)
 	e8:SetRange(LOCATION_MZONE)
-	e8:SetProperty(EFFECT_FLAG_CANNOT_INACTIVATE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CANNOT_NEGATE)
 	e8:SetTargetRange(1,0)
-	e8:SetValue(0)
+	e8:SetValue(c249001123.costchange)
 	c:RegisterEffect(e8)
-	--Draw 2 instead of 1
-	local e9=Effect.CreateEffect(c)
-	e9:SetType(EFFECT_TYPE_FIELD)
-	e9:SetCode(EFFECT_DRAW_COUNT)
-	e9:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e9:SetRange(LOCATION_MZONE)
-	e9:SetProperty(EFFECT_FLAG_CANNOT_INACTIVATE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CANNOT_NEGATE)
-	e9:SetTargetRange(1,0)
-	e9:SetValue(2)
-	c:RegisterEffect(e9)
 	--destroy replace
 	local e12=Effect.CreateEffect(c)
 	e12:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
@@ -140,9 +109,21 @@ function c249001123.spop(e,tp,eg,ep,ev,re,r,rp)
 			mg:AddCard(tc2)
 			Duel.Overlay(c,tc2)
 		end
+		tc2=Duel.GetFieldCard(tp,LOCATION_GRAVE,Duel.GetFieldGroupCount(tp,LOCATION_GRAVE,0)-1)
+		if tc2 then
+			mg:AddCard(tc2)
+			Duel.Overlay(c,tc2)
+		end
 		if mg:GetCount() > 0 then c:SetMaterial(mg) end
 		Duel.SpecialSummon(c,SUMMMON_TYPE_XYZ,tp,tp,false,false,POS_FACEUP)
 		c:CompleteProcedure()
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_INACTIVATE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CANNOT_NEGATE)
+		e1:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
+		e1:SetReset(RESEST_STANDARD+RESET_PHASE+PHASE_END)
+		e1:SetValue(aux.tgoval)
+		c:RegisterEffect(e1)
 		Duel.RegisterFlagEffect(tp,249001123,0,0,1)
 	end
 end
@@ -192,8 +173,12 @@ end
 function c249001123.checkop(e,tp,eg,ep,ev,re,r,rp)
 	e:GetLabelObject():SetLabel(ev+e:GetLabelObject():GetLabel())
 end
-function c249001123.efcon(e)
-	return e:GetHandler():GetOverlayCount()>0
+function c249001123.costchange(e,re,rp,val)
+	if re and re:GetHandler():IsType(TYPE_SPELL+TYPE_TRAP) and not re:GetHandler():IsCode(9236985,57496978) then
+		return 0
+	else
+		return val
+	end
 end
 function c249001123.efilter(e,ct)
 	local te=Duel.GetChainInfo(ct,CHAININFO_TRIGGERING_EFFECT)
@@ -201,9 +186,9 @@ function c249001123.efilter(e,ct)
 end
 function c249001123.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return c:IsReason(REASON_BATTLE+REASON_EFFECT) and not c:IsReason(REASON_REPLACE) and c:CheckRemoveOverlayCard(tp,1,REASON_EFFECT) end
+	if chk==0 then return c:IsReason(REASON_BATTLE+REASON_EFFECT) and not c:IsReason(REASON_REPLACE) and c:CheckRemoveOverlayCard(tp,2,REASON_EFFECT) end
 	if Duel.SelectEffectYesNo(tp,e:GetHandler(),96) then
-		c:RemoveOverlayCard(tp,1,1,REASON_EFFECT)
+		c:RemoveOverlayCard(tp,2,2,REASON_EFFECT)
 		return true
 	else return false end
 end

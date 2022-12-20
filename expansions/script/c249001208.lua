@@ -37,7 +37,7 @@ function c249001208.initial_effect(c)
 	--enable chain tuning
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
-	e1:SetCountLimit(1,249001208)
+	e1:SetCountLimit(1,2490012081)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCost(c249001208.cost)
 	e1:SetOperation(c249001208.operation)
@@ -50,15 +50,17 @@ function c249001208.initial_effect(c)
 	e2:SetValue(LOCATION_REMOVED)
 	e2:SetCondition(c249001208.rmcon)
 	c:RegisterEffect(e2)
-	--tuner
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e2:SetRange(LOCATION_PZONE)
-	e2:SetCountLimit(1)
-	e2:SetTarget(c249001208.tunertg)
-	e2:SetOperation(c249001208.tunerop)
-	c:RegisterEffect(e2)
+	--draw (pzone)
+	local e3=Effect.CreateEffect(c)
+	e3:SetCategory(CATEGORY_DRAW)
+	e3:SetType(EFFECT_TYPE_IGNITION)
+	e3:SetRange(LOCATION_PZONE)
+	e3:SetCountLimit(1,2490012082)
+	e3:SetCondition(c249001208.condition)
+	e3:SetCost(c249001208.cost)
+	e3:SetTarget(c249001208.target)
+	e3:SetOperation(c249001208.operation)
+	c:RegisterEffect(e3)
 end
 function c249001208.costfilter(c)
 	return c:IsSetCard(0x232) and c:IsAbleToRemoveAsCost() and c:IsType(TYPE_MONSTER) and (c:IsFaceup() or not c:IsLocation(LOCATION_EXTRA))
@@ -308,20 +310,18 @@ end
 function c249001208.tunerfilter(c)
 	return c:IsFaceup() and not c:IsType(TYPE_TUNER)
 end
-function c249001208.tunertg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsOnField() and c249001208.tunerfilter(chk) and chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) end
-	if chk==0 then return Duel.IsExistingTarget(c249001208.tunerfilter,tp,LOCATION_MZONE,0,1,nil) end
-	local g=Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_MZONE,0,1,1,nil)
+function c249001208.condition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsExistingMatchingCard(Card.IsSetCard,tp,LOCATION_PZONE,0,1,e:GetHandler(),0x232)
 end
-function c249001208.tunerop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_ADD_TYPE)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-		e1:SetValue(TYPE_TUNER)
-		tc:RegisterEffect(e1)
-	end
+function c249001208.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,e:GetHandler()) end
+	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD)
+end
+function c249001208.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
+	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
+end
+function c249001208.operation(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
+	Duel.Draw(tp,1,REASON_EFFECT)
 end

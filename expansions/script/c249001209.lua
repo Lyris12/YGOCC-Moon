@@ -4,18 +4,22 @@ function c249001209.initial_effect(c)
 	--enable chain overlay
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
-	e1:SetCountLimit(1,249001209)
+	e1:SetCountLimit(1,2490012091)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCost(c249001209.cost)
 	e1:SetOperation(c249001209.operation)
 	c:RegisterEffect(e1)
-	--remove overlay replace
+	--negate
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
-	e2:SetCode(EFFECT_OVERLAY_REMOVE_REPLACE)
+	e2:SetDescription(aux.Stringid(50275295,0))
+	e2:SetCategory(CATEGORY_DISABLE)
+	e2:SetType(EFFECT_TYPE_IGNITION)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetRange(LOCATION_PZONE)
-	e2:SetCondition(c249001209.rcon)
-	e2:SetOperation(c249001209.rop)
+	e2:SetCountLimit(1,2490012092)
+	e2:SetCost(c249001209.discost)
+	e2:SetTarget(c249001209.distg)
+	e2:SetOperation(c249001209.disop)
 	c:RegisterEffect(e2)
 end
 function c249001209.costfilter(c)
@@ -92,13 +96,34 @@ function c249001209.gop(e,tp,eg,ep,ev,re,r,rp)
 		tc=hg:GetNext()
 	end
 end
-function c249001209.rcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetFlagEffect(249001209+ep)==0
-		and bit.band(r,REASON_COST)~=0 and re:IsActivated() and re:IsActiveType(TYPE_XYZ)
-		and re:GetHandler():GetOverlayCount()>=ev-1
+function c249001209.discon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsExistingMatchingCard(Card.IsSetCard,tp,LOCATION_PZONE,0,1,e:GetHandler(),0x232)
 end
-function c249001209.rop(e,tp,eg,ep,ev,re,r,rp)
-	e:GetHandler():RegisterFlagEffect(249001209+ep,RESET_PHASE+PHASE_END,0,1)
-	Duel.Hint(HINT_CARD,1-tp,nil)
-	return 1
+function c249001209.discost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,e:GetHandler()) end
+	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD)
+end
+function c249001209.distg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and aux.NegateMonsterFilter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(aux.NegateMonsterFilter,tp,0,LOCATION_MZONE,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DISABLE)
+	local g=Duel.SelectTarget(tp,aux.NegateMonsterFilter,tp,0,LOCATION_MZONE,1,1,nil)
+	Duel.SetOperationInfo(0,CATEGORY_DISABLE,g,1,0,0)
+end
+function c249001209.disop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local tc=Duel.GetFirstTarget()
+	if tc:IsFaceup() and tc:IsRelateToEffect(e) and not tc:IsDisabled() then
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_DISABLE)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+		tc:RegisterEffect(e1)
+		local e2=Effect.CreateEffect(c)
+		e2:SetType(EFFECT_TYPE_SINGLE)
+		e2:SetCode(EFFECT_DISABLE_EFFECT)
+		e2:SetValue(RESET_TURN_SET)
+		e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+		tc:RegisterEffect(e2)
+	end
 end

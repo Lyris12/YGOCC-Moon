@@ -27,7 +27,7 @@ function s.initial_effect(c)
     local e4=e3:Clone()
     e4:SetType(EFFECT_TYPE_QUICK_O)
 	e4:SetCode(EVENT_FREE_CHAIN)
-	e4:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_END_PHASE)
+	e4:SetHintTiming(0,TIMINGS_CHECK_MONSTER_E)
 	e4:SetCondition(s.con)
 	c:RegisterEffect(e4)
 end

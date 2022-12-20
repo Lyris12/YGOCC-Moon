@@ -26,16 +26,6 @@ function c249000369.initial_effect(c)
 	e3:SetTarget(c249000369.sumtg)
 	e3:SetOperation(c249000369.sumop)
 	c:RegisterEffect(e3)
-	--draw
-	local e4=Effect.CreateEffect(c)
-	e4:SetCategory(CATEGORY_DRAW+CATEGORY_HANDES)
-	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e4:SetCode(EVENT_TO_GRAVE)
-	e4:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
-	e4:SetCondition(c249000369.drcon)
-	e4:SetTarget(c249000369.drtg)
-	e4:SetOperation(c249000369.drop)
-	c:RegisterEffect(e4)
 end
 function c249000369.matcon(e,c)
 	return e:GetHandler():GetLevel() > 4
@@ -89,24 +79,4 @@ function c249000369.sumop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 	Duel.SpecialSummonComplete()
-end
-function c249000369.drcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return c:IsReason(REASON_COST) and re:IsHasType(0x7e0) and re:IsActiveType(TYPE_MONSTER)
-		and c:IsPreviousLocation(LOCATION_OVERLAY)
-end
-function c249000369.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsPlayerCanDraw(tp,3) end
-	Duel.SetTargetPlayer(tp)
-	Duel.SetTargetParam(2)
-	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,2)
-	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,tp,1)
-end
-function c249000369.drop(e,tp,eg,ep,ev,re,r,rp)
-	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
-	if Duel.Draw(p,d,REASON_EFFECT)==2 then
-		Duel.ShuffleHand(p)
-		Duel.BreakEffect()
-		Duel.DiscardHand(p,nil,1,1,REASON_EFFECT+REASON_DISCARD)
-	end
 end

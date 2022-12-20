@@ -24,18 +24,6 @@ function c249001005.initial_effect(c)
 		e3:SetOperation(c249001005.addcount)
 		Duel.RegisterEffect(e3,0)
 	end
-	--negate attack
-	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(96427353,0))
-	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e4:SetCategory(CATEGORY_DRAW)
-	e4:SetCode(EVENT_ATTACK_ANNOUNCE)
-	e4:SetRange(LOCATION_GRAVE)
-	e4:SetCondition(c249001005.condition)
-	e4:SetCost(aux.bfgcost)
-	e4:SetTarget(c249001005.target)
-	e4:SetOperation(c249001005.operation)
-	c:RegisterEffect(e4)
 end
 function c249001005.resetcount(e,tp,eg,ep,ev,re,r,rp)
 	c249001005[0]=0
@@ -62,21 +50,4 @@ end
 function c249001005.droperation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_CARD,0,249001005)
 	if c249001005[tp] > 3 then Duel.Draw(tp,3,REASON_EFFECT) else Duel.Draw(tp,c249001005[tp],REASON_EFFECT) end
-end
-function c249001005.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()~=tp
-end
-function c249001005.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
-	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
-end
-function c249001005.operation(e,tp,eg,ep,ev,re,r,rp)
-	local ct=Duel.Draw(tp,1,REASON_EFFECT)
-	if ct==0 then return end
-	local dc=Duel.GetOperatedGroup():GetFirst()
-	if dc:IsSetCard(0x73) and Duel.SelectYesNo(tp,1621) then
-		Duel.BreakEffect()
-		Duel.ConfirmCards(1-tp,dc)
-		Duel.NegateAttack()
-	end
 end

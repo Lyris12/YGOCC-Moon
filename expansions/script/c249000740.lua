@@ -79,6 +79,7 @@ function c249000740.adjustop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EVENT_FREE_CHAIN)
 		e1:SetCountLimit(1)
 		e1:SetRange(LOCATION_MZONE)
+		e1:SetCondition(c249000740.copycondition)
 		e1:SetTarget(c249000740.copytarget)
 		e1:SetOperation(c249000740.copyoperation)
 		e1:SetReset(RESETS_STANDARD)
@@ -86,6 +87,9 @@ function c249000740.adjustop(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e1)
 		tc=g:GetNext()
 	end
+end
+function c249000740.copycondition(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():IsSetCard(0x1ED)
 end
 function c249000740.effectcheck(c,tp,eg,ep,ev,re,r,rp,handler,check,chain)
 	local t = {}
@@ -109,7 +113,7 @@ function c249000740.effectcheck(c,tp,eg,ep,ev,re,r,rp,handler,check,chain)
 			end
 		end
 		for key2,value2 in pairs(base_t) do
-			if value2:IsHasType(EFFECT_TYPE_IGNITION) and Duel.GetCurrentChain()<=chain and Duel.GetTurnPlayer()==tp and (Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2) then
+			if value2:IsHasType(EFFECT_TYPE_IGNITION) and value2:GetRange()&LOCATION_MZONE==LOCATION_MZONE and Duel.GetCurrentChain()<=chain and Duel.GetTurnPlayer()==tp and (Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2) then
 				se=value2:Clone()
 				te=Effect.CreateEffect(handler)
 				con=se:GetCondition()

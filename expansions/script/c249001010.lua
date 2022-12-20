@@ -100,7 +100,7 @@ function c249001010.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_PENDULUM)
 end
 function c249001010.filter2(c)
-	return c:IsSetCard(0x1B7) and (c:IsFaceup() or not c:IsLocation(LOCATION_GRAVE))
+	return c:IsSetCard(0x1B7) and (c:IsFaceup() or not c:IsLocation(LOCATION_GRAVE)) and c:IsType(TYPE_MONSTER)
 end
 function c249001010.target2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingMatchingCard(aux.NecroValleyFilter(c249001010.filter2),tp,LOCATION_GRAVE+LOCATION_EXTRA,0,1,nil) end
@@ -116,7 +116,7 @@ end
 function c249001010.pcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return (c:IsReason(REASON_BATTLE) or c:IsReason(REASON_EFFECT))
-		and c:IsPreviousPosition(POS_FACEUP)
+		and c:IsPreviousPosition(POS_FACEUP) and c:IsPreviousLocation(LOCATION_MZONE)
 end
 function c249001010.ptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return (Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,1)

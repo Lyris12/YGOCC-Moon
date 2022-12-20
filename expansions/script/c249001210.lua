@@ -1,6 +1,6 @@
 --Uru-Chain Fuser
 function c249001210.initial_effect(c)
-	aux.EnablePendulumAttribute(c)
+	aux.EnablePendulumAttribute(c,false)
 	--chain material
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(249001210,0))
@@ -15,24 +15,30 @@ function c249001210.initial_effect(c)
 	e2:SetDescription(aux.Stringid(249001210,1))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON)
 	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetCountLimit(1)
+	e2:SetCountLimit(2)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetTarget(c249001210.target)
 	e2:SetOperation(c249001210.operation2)
 	c:RegisterEffect(e2)
-	--destory (pzone)
+	--Activate
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(88279736,0))
-	e3:SetCategory(CATEGORY_DESTROY)
-	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_DELAY)
-	e3:SetRange(LOCATION_PZONE)
-	e3:SetCode(EVENT_BATTLE_DAMAGE)
-	e3:SetCountLimit(1)
-	e3:SetCondition(c249001210.descon)
-	e3:SetTarget(c249001210.destg)
-	e3:SetOperation(c249001210.desop)
+	e3:SetDescription(1160)
+	e3:SetType(EFFECT_TYPE_ACTIVATE)
+	e3:SetCode(EVENT_FREE_CHAIN)
+	e3:SetRange(LOCATION_HAND)
+	e3:SetCost(c249001210.reg)
 	c:RegisterEffect(e3)
+	--to hand
+	local e4=Effect.CreateEffect(c)
+	e4:SetDescription(aux.Stringid(3040496,0))
+	e4:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH+CATEGORY_DECKDES)
+	e4:SetType(EFFECT_TYPE_IGNITION)
+	e4:SetRange(LOCATION_PZONE)
+	e4:SetCountLimit(1,249001210)
+	e4:SetCondition(c249001210.thcon)
+	e4:SetTarget(c249001210.thtg)
+	e4:SetOperation(c249001210.thop)
+	c:RegisterEffect(e4)
 end
 function c249001210.costfilter(c)
 	return c:IsSetCard(0x232) and c:IsAbleToRemoveAsCost() and c:IsType(TYPE_MONSTER) and (c:IsFaceup() or not c:IsLocation(LOCATION_EXTRA))
@@ -86,7 +92,6 @@ function c249001210.chain_operation(e,te,tp,tc,mat,sumtype)
 	Duel.Remove(mat,POS_FACEUP,REASON_EFFECT+REASON_MATERIAL+REASON_FUSION)
 	Duel.BreakEffect()
 	Duel.SpecialSummon(tc,sumtype,tp,tp,false,false,POS_FACEUP)
-	e:Reset()
 end
 function c249001210.filter1(c,e)
 	return not c:IsImmuneToEffect(e)
@@ -146,20 +151,34 @@ function c249001210.operation2(e,tp,eg,ep,ev,re,r,rp)
 		tc:CompleteProcedure()
 	end
 end
-
-function c249001210.descon(e,tp,eg,ep,ev,re,r,rp)
-	return ep~=tp and eg:GetFirst():GetControler()==tp
+function c249001210.reg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	e:GetHandler():RegisterFlagEffect(249001210,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
-function c249001210.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) end
-	if chk==0 then return Duel.IsExistingTarget(aux.TRUE,tp,0,LOCATION_ONFIELD,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectTarget(tp,aux.TRUE,tp,0,LOCATION_ONFIELD,1,1,nil)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
+function c249001210.thcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():GetFlagEffect(249001210)~=0
 end
-function c249001210.desop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) then
-		Duel.Destroy(tc,REASON_EFFECT)
+function c249001210.thfilter(c)
+	return c:IsSetCard(0x232) and c:IsAbleToHand()
+end
+function c249001210.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsPlayerCanDiscardDeck(tp,3) end
+end
+function c249001210.thop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.IsPlayerCanDiscardDeck(tp,3) then
+		Duel.ConfirmDecktop(tp,3)
+		local g=Duel.GetDecktopGroup(tp,3)
+		if g:GetCount()>0 then
+			Duel.DisableShuffleCheck()
+			if g:IsExists(c249001210.thfilter,1,nil) and Duel.SelectYesNo(tp,aux.Stringid(3040496,1)) then
+				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+				local sg=g:FilterSelect(tp,c249001210.thfilter,1,1,nil)
+				Duel.SendtoHand(sg,nil,REASON_EFFECT)
+				Duel.ConfirmCards(1-tp,sg)
+				Duel.ShuffleHand(tp)
+				g:Sub(sg)
+			end
+			Duel.SendtoGrave(g,REASON_EFFECT+REASON_REVEAL)
+		end
 	end
 end

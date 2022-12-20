@@ -13,12 +13,6 @@ function c249000368.initial_effect(c)
 	e2:SetCode(EVENT_SUMMON_SUCCESS)
 	e2:SetOperation(c249000368.sumop)
 	c:RegisterEffect(e2)
-	--double attack
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetCode(EFFECT_EXTRA_ATTACK)
-	e3:SetValue(1)
-	c:RegisterEffect(e3)
 end
 function c249000368.matconfilter(c,e)
 	return c:IsSetCard(0x73) and c:GetCode()~=249000368

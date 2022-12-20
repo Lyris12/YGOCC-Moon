@@ -1,13 +1,13 @@
---created by Seth, coded by Lyris & Rawstone
+--created by Seth, coded by Lyris & Rawstone, bugfixes by somen00b
 local cid,id=GetID()
 function cid.initial_effect(c)
 	c:EnableReviveLimit()
-	aux.AddFusionProcCode2(c,cid.matfilter1,cid.matfilter2,true)
+	aux.AddFusionProcCode2(c,cid.matfilter1,cid.matfilter2,false,false)
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE)
 	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e0:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e0:SetValue(aux.fuslimit)
+	e0:SetValue(cid.splimit)
 	c:RegisterEffect(e0)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE)
@@ -45,7 +45,10 @@ function cid.initial_effect(c)
 	e5:SetOperation(cid.desop)
 	c:RegisterEffect(e5)
 end
-	function cid.value(e,c)
+function cid.splimit(e,se,sp,st)
+	return (st&SUMMON_TYPE_FUSION==SUMMON_TYPE_FUSION) or not e:GetHandler():IsLocation(LOCATION_EXTRA)
+end
+function cid.value(e,c)
 	return Duel.GetMatchingGroupCount(cid.atkfilter,e:GetHandlerPlayer(),LOCATION_REMOVED,0,nil)*300
 end
 	function cid.atkfilter(c)

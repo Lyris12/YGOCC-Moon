@@ -1,6 +1,6 @@
 --Majestic Protector Knight
 function c249000779.initial_effect(c)
-	c:EnableCounterPermit(0x1)
+	c:EnableCounterPermit(0x2b)
 	c:EnableReviveLimit()
 	--spsummon condition
 	local e0=Effect.CreateEffect(c)
@@ -122,7 +122,7 @@ function c249000779.spop(e,tp,eg,ep,ev,re,r,rp)
 		c:RegisterEffect(e1)
 		Duel.SpecialSummon(c,SUMMMON_TYPE_LINK,tp,tp,true,false,POS_FACEUP)
 		c:CompleteProcedure()
-		c:AddCounter(0x1,Duel.GetFieldGroupCount(tp,0,LOCATION_ONFIELD,nil)+1)
+		c:AddCounter(0x2b,Duel.GetFieldGroupCount(tp,0,LOCATION_ONFIELD,nil)+1)
 		Duel.RegisterFlagEffect(tp,249000779,0,0,1)
 	end
 end
@@ -143,7 +143,7 @@ function c249000779.spop2(e,tp,eg,ep,ev,re,r,rp)
 		c:RegisterEffect(e1)
 		Duel.SpecialSummon(c,SUMMON_TYPE_LINK,tp,tp,true,false,POS_FACEUP)
 		c:CompleteProcedure()
-		c:AddCounter(0x1,Duel.GetFieldGroupCount(tp,0,LOCATION_ONFIELD,nil)+1)
+		c:AddCounter(0x2b,Duel.GetFieldGroupCount(tp,0,LOCATION_ONFIELD,nil)+1)
 		Duel.RegisterFlagEffect(tp,249000779,0,0,1)
 	end
 end
@@ -177,13 +177,13 @@ function c249000779.checkop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c249000779.rcounterop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	c:RemoveCounter(tp,0x1,1,REASON_EFFECT)
+	c:RemoveCounter(tp,0x2b,1,REASON_EFFECT)
 end
 function c249000779.indescon(e)
-	return e:GetHandler():GetCounter(0x1)>0
+	return e:GetHandler():GetCounter(0x2b)>0
 end
 function c249000779.immunecon(e)
-	return e:GetHandler():GetCounter(0x1)>1
+	return e:GetHandler():GetCounter(0x2b)>1
 end
 function c249000779.efilter(e,te)
 	return te:GetOwnerPlayer()~=e:GetHandlerPlayer()
