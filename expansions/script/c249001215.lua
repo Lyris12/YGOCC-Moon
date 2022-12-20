@@ -47,10 +47,12 @@ function c249001215.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,tp)
 	if tg:IsAttribute(ATTRIBUTE_LIGHT) and Duel.IsPlayerCanDraw(tp,1)
 		and Duel.SelectYesNo(tp,aux.Stringid(249001215,0)) then
+		Duel.BreakEffect()
 		local ct=Duel.Draw(tp,1,REASON_EFFECT)
 		if ct==0 then return end
 		local dc=Duel.GetOperatedGroup():GetFirst()
 		if Duel.SelectYesNo(tp,1123) then
+			Duel.BreakEffect()
 			Duel.Recover(tp,1000,REASON_EFFECT)
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 			g=Duel.SelectMatchingCard(tp,Card.IsFaceup,tp,0,LOCATION_MZONE,1,1,nil)
@@ -67,11 +69,13 @@ function c249001215.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 	if tg:IsAttribute(ATTRIBUTE_DARK) and Duel.IsExistingMatchingCard(Card.IsAbleToRemove,tp,0,LOCATION_ONFIELD,1,nil) 
 		and Duel.SelectYesNo(tp,aux.Stringid(249001215,1)) then
+		Duel.BreakEffect()
 		g=Duel.SelectMatchingCard(tp,Card.IsAbleToRemove,tp,0,LOCATION_ONFIELD,1,1,nil)
 		Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
 	end
 	if tg:IsAttribute(ATTRIBUTE_FIRE) and Duel.IsExistingMatchingCard(Card.IsFaceup,tp,0,LOCATION_MZONE,1,nil) 
 		and Duel.SelectYesNo(tp,aux.Stringid(249001215,2)) then
+		Duel.BreakEffect()
 		g=Duel.GetMatchingGroup(Card.IsFaceup,tp,0,LOCATION_MZONE,nil)
 		if g:GetCount()>0 then
 			local tc=nil
@@ -85,12 +89,13 @@ function c249001215.operation(e,tp,eg,ep,ev,re,r,rp)
 				tc=tg:GetFirst()
 			end
 			if Duel.Destroy(tc,REASON_EFFECT)>0 then
-				Duel.Damage(1-tp,Math.ceil(tc:GetPreviousAttackOnField() / 2),REASON_EFFECT)
+				Duel.Damage(1-tp,math.ceil(tc:GetPreviousAttackOnField() / 2),REASON_EFFECT)
 			end
 		end
 	end
 	if tg:IsAttribute(ATTRIBUTE_WATER) and Duel.IsExistingMatchingCard(aux.NegateMonsterFilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) 
 		and Duel.SelectYesNo(tp,aux.Stringid(249001215,3)) then
+		Duel.BreakEffect()
 		g=Duel.SelectMatchingCard(tp,aux.NegateMonsterFilter,tp,LOCATION_MZONE,LOCATION_MZONE,0,1,1,nil)
 		if g:GetCount()>0 then
 			local tc=g:GetFirst()
@@ -110,6 +115,7 @@ function c249001215.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 	if tg:IsAttribute(ATTRIBUTE_WIND) and Duel.IsExistingMatchingCard(Card.IsType,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil,TYPE_SPELL+TYPE_TRAP) 
 		and Duel.SelectYesNo(tp,aux.Stringid(249001215,4)) then
+		Duel.BreakEffect()
 		g=Duel.SelectMatchingCard(tp,Card.IsType,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,2,nil,TYPE_SPELL+TYPE_TRAP)
 		if g:GetCount()>0 then
 			Duel.Destroy(g,REASON_EFFECT)
@@ -117,6 +123,7 @@ function c249001215.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 	if tg:IsAttribute(ATTRIBUTE_EARTH) and Duel.IsExistingMatchingCard(aux.NecroValleyFilter(Card.IsCanBeSpecialSummoned),tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil,e,tp,0,false,false) 
 		and Duel.SelectYesNo(tp,aux.Stringid(249001215,5)) then
+		Duel.BreakEffect()
 		local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(Card.IsCanBeSpecialSummoned),tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil,e,tp,0,false,false)
 		if g:GetCount()>0 then
 			local tc=g:GetFirst()
