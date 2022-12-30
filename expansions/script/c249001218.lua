@@ -76,7 +76,7 @@ function c249001218.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
 function c249001218.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsPlayerCanDiscardDeck(tp,3) end
+	if chk==0 then return Duel.IsPlayerCanDiscardDeck(tp,4) end
 	Duel.SetOperationInfo(0,CATEGORY_DECKDES,nil,0,tp,3)
 end
 function c249001218.thfilter(c,t,both)
@@ -88,7 +88,7 @@ function c249001218.setfilter(c)
 	return c:IsType(TYPE_TRAP) and c:IsSSetable()
 end
 function c249001218.operation(e,tp,eg,ep,ev,re,r,rp)
-	local ct=Duel.DiscardDeck(tp,3,REASON_EFFECT)
+	local ct=Duel.DiscardDeck(tp,4,REASON_EFFECT)
 	if ct==0 then return end
 	local og=Duel.GetOperatedGroup()
 	if og:IsExists(Card.IsType,1,nil,TYPE_MONSTER) and Duel.IsExistingMatchingCard(Card.IsFaceup,tp,0,LOCATION_MZONE,1,nil) 

@@ -9,11 +9,8 @@ function cid.initial_effect(c)
 	e1:SetOperation(cid.operation)
 	c:RegisterEffect(e1)
 	local e2=e1:Clone()
-	e2:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
+	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e2)
-	local e3=e1:Clone()
-	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
-	c:RegisterEffect(e3)
 	--tohand
 	local e4=Effect.CreateEffect(c)
 	e4:SetCategory(CATEGORY_REMOVE)
@@ -25,6 +22,21 @@ function cid.initial_effect(c)
 	e4:SetTarget(cid.thtg)
 	e4:SetOperation(cid.thop)
 	c:RegisterEffect(e4)
+	--spsummon
+	local e7=Effect.CreateEffect(c)
+	e7:SetDescription(aux.Stringid(id,0))
+	e7:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e7:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e7:SetCode(EVENT_TO_GRAVE)
+--  e1:SetProperty(EFFECT_FLAG_DELAY)
+	e7:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
+	e7:SetCondition(cid.spcon)
+	e7:SetTarget(cid.sptg)
+	e7:SetOperation(cid.spop)
+	c:RegisterEffect(e7)
+		local e8=e7:Clone()
+	e8:SetCondition(cid.spcon2)
+	c:RegisterEffect(e8) 
 end
 function cid.atktg(e,c)
 	return c:GetFieldID()<=e:GetLabel() and c:IsSetCard(0x57b)
@@ -64,5 +76,21 @@ function cid.thop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsFaceup() and tc:IsRelateToEffect(e) then
 		Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)
+	end
+end
+
+function cid.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():IsPreviousLocation(LOCATION_HAND) and bit.band(r,REASON_DISCARD)~=0
+end
+function cid.spcon2(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():IsPreviousLocation(LOCATION_DECK) 
+end
+function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
+end
+function cid.spop(e,tp,eg,ep,ev,re,r,rp)
+		if e:GetHandler():IsRelateToEffect(e) then
+		Duel.SpecialSummon(e:GetHandler(),0,tp,tp,false,false,POS_FACEUP)
 	end
 end

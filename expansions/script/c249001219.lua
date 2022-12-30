@@ -1,5 +1,6 @@
 --Chaotic Magic Circle
 function c249001219.initial_effect(c)
+	aux.AddCodeList(c,249001218)
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
