@@ -9,6 +9,15 @@ function c249001027.initial_effect(c)
 	e1:SetTarget(c249001027.target)
 	e1:SetOperation(c249001027.activate)
 	c:RegisterEffect(e1)
+	--destroy replace
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e2:SetCode(EFFECT_DESTROY_REPLACE)
+	e2:SetRange(LOCATION_GRAVE)
+	e2:SetTarget(c249001027.reptg)
+	e2:SetValue(c249001027.repval)
+	e2:SetOperation(c249001027.repop)
+	c:RegisterEffect(e2)
 end
 function c249001027.filter1(c,e,tp)
 	return c:IsSetCard(0x1B7) and c:IsType(TYPE_PENDULUM)
@@ -32,7 +41,8 @@ function c249001027.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g2=Duel.SelectMatchingCard(tp,c249001027.filter2,tp,LOCATION_DECK,0,1,1,nil,e,tp,g1:GetFirst():GetCode())
 	g1:Merge(g2)
 	Duel.ConfirmCards(1-tp,g1)
-	local cg=g1:RandomSelect(1-tp,1)
+	Duel.ShuffleDeck(tp)
+	local cg=g1:Select(1-tp,1,1,nil)
 	local tc=cg:GetFirst()
 	Duel.Hint(HINT_CARD,0,tc:GetCode())
 	local option
@@ -46,4 +56,18 @@ function c249001027.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 	g1:RemoveCard(tc)
 	Duel.SendtoExtraP(g1,nil,REASON_EFFECT)
+end
+function c249001027.repfilter(c,tp)
+	return c:IsFaceup() and c:IsControler(tp) and c:IsLocation(LOCATION_ONFIELD) and c:IsSetCard(0x1B7)
+		and c:IsReason(REASON_EFFECT+REASON_BATTLE) and not c:IsReason(REASON_REPLACE)
+end
+function c249001027.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():IsAbleToRemove() and eg:IsExists(c249001027.repfilter,1,nil,tp) end
+	return Duel.SelectEffectYesNo(tp,e:GetHandler(),96)
+end
+function c249001027.repval(e,c)
+	return c39996157.repfilter(c,e:GetHandlerPlayer())
+end
+function c249001027.repop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_EFFECT)
 end

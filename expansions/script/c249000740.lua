@@ -193,6 +193,7 @@ function c249000740.effectcheck(c,tp,eg,ep,ev,re,r,rp,handler,check,chain)
 end
 function c249000740.copyfilter(c,tp,eg,ep,ev,re,r,rp,handler,chain)
 	if c:IsCode(handler:GetCode()) then return false end
+	if c:GetFlagEffect(2490007402)==0 then return false end
 	if c:GetFlagEffect(2490007402)-1~=tp then return false end
 	if c:IsType(TYPE_MONSTER) and not c:IsSummonableCard() then return false end
 	if bit.band(c:GetType(),TYPE_EQUIP+TYPE_CONTINUOUS+TYPE_FIELD)~=0 or c:IsHasEffect(EFFECT_REMAIN_FIELD) then return false end
