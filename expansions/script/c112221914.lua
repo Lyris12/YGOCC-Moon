@@ -1,0 +1,78 @@
+--created by Hoshi, coded by Lyris
+local s,id=GetID()
+function s.initial_effect(c)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
+	e1:SetCountLimit(1,id+EFFECT_COUNT_CODE_OATH)
+	e1:SetOperation(s.activate)
+	c:RegisterEffect(e1)
+	aux.AddCodeList(c,id-14)
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e2:SetCode(EVENT_SUMMON_SUCCESS)
+	e2:SetRange(LOCATION_FZONE)
+	e2:SetOperation(function(e,tp,eg) local tc=eg:GetFirst() if tc and tc:IsCode(id-14) then Duel.SetChainLimitTillChainEnd(function(e,rp,p) return rp==tp end) end end)
+	c:RegisterEffect(e2)
+	local e4=e2:Clone()
+	e4:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
+	c:RegisterEffect(e4)
+	local e5=e2:Clone()
+	e5:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e5:SetOperation(function(e,tp,eg) if eg:IsExists(aux.AND(Card.IsFaceup,Card.IsCode),1,nil,id-14) then Duel.SetChainLimitTillChainEnd(function(e,rp,p) return rp==tp end) end end)
+	c:RegisterEffect(e5)
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_FIELD)
+	e3:SetCode(id)
+	e3:SetRange(LOCATION_FZONE)
+	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e3:SetTargetRange(1,1)
+	c:RegisterEffect(e3)
+	local e6=Effect.CreateEffect(c)
+	e6:SetType(EFFECT_TYPE_IGNITION)
+	e6:SetRange(LOCATION_FZONE)
+	e6:SetCountLimit(1)
+	e6:SetCategory(CATEGORY_EQUIP)
+	e6:SetDescription(1068)
+	e6:SetTarget(s.eqtg)
+	e6:SetOperation(s.eqop)
+	c:RegisterEffect(e6)
+end
+function s.sfilter(c)
+	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xcda) and c:IsAbleToHand()
+end
+function s.activate(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
+	local g=Duel.GetMatchingGroup(s.sfilter,tp,LOCATION_DECK,0,nil)
+	if #g==0 or not Duel.SelectYesNo(tp,1109) then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local sg=g:Select(tp,1,1,nil)
+	Duel.SendtoHand(sg,nil,REASON_EFFECT)
+	Duel.ConfirmCards(1-tp,sg)
+end
+function s.eqfilter(c,tp)
+	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xcda) and c:CheckUniqueOnField(tp) and not c:IsForbidden()
+end
+function s.eqtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
+		and Duel.IsExistingMatchingCard(s.eqfilter,tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_HAND,0,1,nil,tp)
+		and Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsCode),tp,LOCATION_MZONE,0,1,nil,id-14) end
+	Duel.SetOperationInfo(0,CATEGORY_EQUIP,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_HAND)
+end
+function s.eqop(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
+	local ec=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.eqfilter),tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_HAND,0,1,1,nil,tp):GetFirst()
+	if not ec then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
+	local tc=Duel.SelectMatchingCard(tp,aux.AND(Card.IsFaceup,Card.IsCode),tp,LOCATION_MZONE,0,1,1,nil,id-14):GetFirst()
+	if not tc or not Duel.Equip(tp,ec,tc,true) then return end
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e1:SetCode(EFFECT_EQUIP_LIMIT)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+	e1:SetValue(function(ef,cc) return cc==tc end)
+	ec:RegisterEffect(e1)
+end

@@ -1,0 +1,122 @@
+--created by Seth, coded by Lyris
+--Shadow NOVA - Jordan
+local s,id,o=GetID()
+function s.initial_effect(c)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_QUICK_O)
+	e1:SetCode(EVENT_BE_BATTLE_TARGET)
+	e1:SetRange(LOCATION_HAND)
+	e1:SetCountLimit(1,id)
+	e1:SetCategory(CATEGORY_ATKCHANGE)
+	e1:SetCondition(function(e,tp,eg,ep,ev,re,r) local a,b=Duel.GetBattleMonster(tp) return r~=REASON_REPLACE and b and b:GetAttack()>a:GetAttack() and a:IsControler(tp) and a:IsSetCard(0xe1f) end)
+	e1:SetCost(s.cost)
+	e1:SetOperation(s.op)
+	c:RegisterEffect(e1)
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_IGNITION)
+	e2:SetRange(LOCATION_GRAVE)
+	e2:SetCountLimit(1,id+o*10)
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:SetCost(s.scost)
+	e2:SetTarget(s.stg)
+	e2:SetOperation(s.sop)
+	c:RegisterEffect(e2)
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e3:SetCondition(function() return c:IsSummonType(SUMMON_VALUE_SELF) end)
+	e3:SetOperation(function() c:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_DISABLE,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(id,0)) end)
+	c:RegisterEffect(e3)
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_QUICK_O)
+	e4:SetCode(EVENT_FREE_CHAIN)
+	e4:SetRange(LOCATION_MZONE)
+	e4:SetCountLimit(1)
+	e4:SetDescription(562)
+	e4:SetHintTiming(TIMING_STANDBY_PHASE)
+	e4:SetCondition(function() return Duel.GetCurrentPhase()==PHASE_STANDBY and c:GetFlagEffect(id)>0 end)
+	e4:SetTarget(s.atg)
+	e4:SetOperation(s.aop)
+	c:RegisterEffect(e4)
+end
+function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return c:IsAbleToGraveAsCost() end
+	Duel.SendtoGrave(c,REASON_COST)
+end
+function s.op(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local a=Duel.GetAttacker()
+	local d=Duel.GetAttackTarget()
+	if not (a:IsRelateToBattle() and d and d:IsRelateToBattle()) or a:IsImmuneToEffect(e) or d:IsImmuneToEffect(e) then return end
+	local atk1=a:GetAttack()
+	local atk2=d:GetAttack()
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_SET_ATTACK_FINAL)
+	e1:SetValue(atk2)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+	a:RegisterEffect(e1)
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetCode(EFFECT_SET_ATTACK_FINAL)
+	e2:SetValue(atk1)
+	e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+	d:RegisterEffect(e2)
+end
+function s.cfilter(c)
+	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xe1f) and c:IsAbleToGraveAsCost()
+end
+function s.scost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_HAND,0,2,nil) end
+	Duel.DiscardHand(tp,s.cfilter,2,2,REASON_COST)
+end
+function s.stg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and c:IsCanBeSpecialSummoned(e,SUMMON_VALUE_SELF,tp,false,false) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
+end
+function s.sop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if c:IsRelateToEffect(e) then Duel.SpecialSummon(c,SUMMON_VALUE_SELF,tp,tp,false,false,POS_FACEUP) end
+end
+function s.atg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsFaceup,tp,0,LOCATION_MZONE,1,nil)
+		and Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsSetCard),tp,LOCATION_MZONE,0,1,nil,0xe1f) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATTRIBUTE)
+	e:SetLabel(Duel.AnnounceAttribute(tp,1,ATTRIBUTE_ALL))
+end
+function s.aop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_CHANGE_ATTRIBUTE)
+	e1:SetTargetRange(0,LOCATION_MZONE)
+	e1:SetValue(e:GetLabel())
+	e1:SetReset(RESET_PHASE+PHASE_END)
+	Duel.RegisterEffect(e1,tp)
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e3:SetCode(EFFECT_IMMUNE_EFFECT)
+	e3:SetValue(s.imval)
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_GRANT)
+	e2:SetTargetRange(LOCATION_MZONE,0)
+	e2:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0xe1f))
+	e2:SetLabelObject(e3)
+	e2:SetReset(RESET_PHASE+PHASE_END)
+	Duel.RegisterEffect(e2,tp)
+end
+function s.imval(e,re)
+	local rp=re:GetOwnerPlayer()
+	if not (rp~=e:GetOwnerPlayer() and re:IsActiveType(TYPE_MONSTER)) then return false end
+	local rc=re:GetHandler()
+	if rc:IsRelateToEffect(re) and rc:IsControler(rp) and (rc:IsFaceup() or not rc:IsLocation(LOCATION_MZONE)) then
+		return e:GetHandler():IsAttribute(rc:GetAttribute())
+	else
+		return e:GetHandler():IsAttribute(rc:GetOriginalAttribute())
+	end
+end

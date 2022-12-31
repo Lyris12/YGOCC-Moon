@@ -1,0 +1,39 @@
+language: cpp
+dist: trusty
+git:
+  submodules: false
+addons:
+  ssh_known_hosts:
+  - github.com
+  apt:
+    packages:
+    - libevent-dev
+    - libsqlite3-dev
+env:
+- DATABASE_FILE=expansions/Cards-non-QCD.cdb
+- DATABASE_FILE=expansions/official.cdb
+- DATABASE_FILE=expansions/pre-release.cdb
+
+before_install:
+- git clone --depth=1 --branch=server --recursive https://github.com/purerosefallen/ygopro
+- cd ygopro
+
+- git submodule foreach git checkout master
+- ln -s ./../expansions .
+
+- wget -O - https://github.com/premake/premake-core/releases/download/v5.0.0-alpha12/premake-5.0.0-alpha12-linux.tar.gz | tar zfx -
+- wget -O - https://www.lua.org/ftp/lua-5.3.4.tar.gz | tar zfx -; cd lua-5.3.4; sudo make linux install; cd ..
+- ./premake5 gmake
+- cd build
+- make config=release
+
+- cd ..
+- mv -f ./bin/release/ygopro .
+- strip ygopro
+- mkdir replay
+
+script:
+- echo "select id from datas;" | sqlite3 $DATABASE_FILE | xargs -I {} ./ygopro {} 2>&1 | tee ../redtext.txt
+- cd ..
+
+- bash -c "exit $(cat ./redtext.txt | wc -l)"
