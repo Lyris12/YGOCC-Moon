@@ -43,9 +43,9 @@ function c249001222.costfilter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsAbleToRemoveAsCost() and c:IsAttribute(ATTRIBUTE_LIGHT) and (c:IsFaceup() or not c:IsLocation(LOCATION_EXTRA))
 end
 function c249001222.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c249001218.costfilter,tp,LOCATION_HAND+LOCATION_EXTRA,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c249001222.costfilter,tp,LOCATION_HAND+LOCATION_EXTRA,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=Duel.SelectMatchingCard(tp,c249001218.costfilter,tp,LOCATION_HAND+LOCATION_EXTRA,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,c249001222.costfilter,tp,LOCATION_HAND+LOCATION_EXTRA,0,1,1,nil)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
 function c249001222.target(e,tp,eg,ep,ev,re,r,rp,chk)
