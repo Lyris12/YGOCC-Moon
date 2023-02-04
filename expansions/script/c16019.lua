@@ -1,150 +1,132 @@
 --Paracyclis Emperor, Ultimate Paralyze
---Automate ID
+
 local s,id=GetID()
 function s.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
-	aux.AddFusionProcFun2(c,aux.FilterBoolFunction(Card.IsFusionSetCard,0x3308),aux.FilterBoolFunction(Card.IsFusionSetCard,0x5308),true)
-	--special summon rule
-	local e0=Effect.CreateEffect(c)
-	e0:SetType(EFFECT_TYPE_FIELD)
-	e0:SetCode(EFFECT_SPSUMMON_PROC)
-	e0:SetProperty(EFFECT_FLAG_UNCOPYABLE)
-	e0:SetRange(LOCATION_EXTRA)
-	e0:SetCondition(s.sprcon)
-	e0:SetOperation(s.sprop)
-	e0:SetValue(SUMMON_TYPE_FUSION)
-	c:RegisterEffect(e0)
-	--destroy
-	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(id,1))
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e3:SetCondition(function(e) return e:GetHandler():IsSummonType(SUMMON_TYPE_FUSION) end)
-	e3:SetOperation(s.desop)
-	c:RegisterEffect(e3)
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_IGNITION)
-	e4:SetRange(LOCATION_MZONE)
-	e4:SetCost(s.retcost)
-	e4:SetOperation(s.retop)
-	e4:SetCountLimit(1,id)
-	c:RegisterEffect(e4)
+	aux.AddFusionProcFun2(c,s.matfilter(TYPE_LINK),s.matfilter(TYPE_FUSION),true)
+	aux.AddContactFusionProcedureGlitchy(c,0,false,SUMMON_TYPE_FUSION,Card.IsAbleToExtraAsCost,LOCATION_MZONE,0,nil,s.matop)
+	--change pos
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(16229315,0))
-	e1:SetType(EFFECT_TYPE_IGNITION)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCost(s.cost)
-	e1:SetOperation(s.operation)
+	e1:SetDescription(aux.Stringid(id,1))
+	e1:SetCategory(CATEGORY_POSITION+CATEGORY_TOGRAVE)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e1:SetCondition(aux.FusionSummonedCond)
+	e1:SetTarget(s.postg)
+	e1:SetOperation(s.posop)
 	c:RegisterEffect(e1)
+	--apply battle effects
+	local e2=Effect.CreateEffect(c)
+	e2:Desc(2)
+	e2:SetType(EFFECT_TYPE_IGNITION)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetCost(aux.TributeCost())
+	e2:SetOperation(s.retop)
+	e2:SetCountLimit(1,id)
+	c:RegisterEffect(e2)
 end
-function s.cfilter(c)
-	return (c:IsFusionSetCard(0x3308) or c:IsFusionSetCard(0x5308) and c:IsType(TYPE_MONSTER))
-		and c:IsCanBeFusionMaterial() and c:IsAbleToDeckOrExtraAsCost()
+function s.matfilter(typ)
+	return	function(c)
+				return c:IsFusionSetCard(0x308) and c:IsFusionType(typ)
+			end
 end
-function s.spfilter1(c,tp,g)
-	return g:IsExists(s.spfilter2,1,c,tp,c)
-end
-function s.spfilter2(c,tp,mc)
-	if mc:IsFusionSetCard(0x5308) then
-		return c:IsFusionSetCard(0x3308) and mc:IsType(TYPE_MONSTER)
-			and Duel.GetLocationCountFromEx(tp,tp,Group.FromCards(c,mc))>0
-	elseif mc:IsFusionSetCard(0x3308) then
-		return c:IsFusionSetCard(0x5308) and mc:IsType(TYPE_MONSTER)
-			and Duel.GetLocationCountFromEx(tp,tp,Group.FromCards(c,mc))>0
-	else
-		return false
-	end
-end
-function s.sprcon(e,c)
-	if c==nil then return true end
-	local tp=c:GetControler()
-	local g=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_ONFIELD,0,nil)
-	return g:IsExists(s.spfilter1,1,nil,tp,g)
-end
-function s.sprop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_ONFIELD,0,nil)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g1=g:FilterSelect(tp,s.spfilter1,1,1,nil,tp,g)
-	local mc=g1:GetFirst()
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g2=g:FilterSelect(tp,s.spfilter2,1,1,mc,tp,mc)
-	g1:Merge(g2)
-	local cg=g1:Filter(Card.IsFacedown,nil)
+function s.matop(g,e,tp,eg,ep,ev,re,r,rp,c)
+	local cg=g:Filter(Card.IsFacedown,nil)
 	if cg:GetCount()>0 then
-		Duel.ConfirmCards(1-tp,cg)
+		Duel.ConfirmCards(1-c:GetControler(),cg)
 	end
-	Duel.SendtoDeck(g1,nil,2,REASON_COST+REASON_FUSION+REASON_MATERIAL)
+	Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_COST|REASON_FUSION|REASON_MATERIAL)
 end
-function s.desop(e,tp)
-	local g=Duel.GetFieldGroup(tp,0,LOCATION_MZONE):Filter(Card.IsFaceup,nil)
-	Duel.ChangePosition(g,POS_FACEDOWN_DEFENSE)
-	local tg=Duel.GetOperatedGroup()
-	for tc in aux.Next(tg) do
-			local e1=Effect.CreateEffect(e:GetHandler())
-			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetCode(EFFECT_CANNOT_CHANGE_POSITION)
-			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-			e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END+RESET_SELF_TURN,1)
-			tc:RegisterEffect(e1)
+
+function s.tsfilter(c,tp)
+	return not c:IsCanTurnSetGlitchy(tp) and c:IsFaceup()
+end
+function s.postg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	local g1=Duel.GetMatchingGroup(Card.IsCanTurnSetGlitchy,tp,0,LOCATION_MZONE,nil,tp)
+	local g2=Duel.GetMatchingGroup(Card.IsAbleToGrave,tp,0,LOCATION_MZONE,g1,tp)
+	if #g1>0 then
+		Duel.SetOperationInfo(0,CATEGORY_POSITION,g1,#g1,1-tp,LOCATION_MZONE)
 	end
-	local ng=g:Clone()
-	for tc in aux.Next(ng) do
-		if tg:IsContains(tc) then ng:RemoveCard(tc) end
+	if #g2>0 then
+		Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g2,#g2,1-tp,LOCATION_MZONE)
 	end
-	Duel.SendtoGrave(ng,REASON_EFFECT)
 end
-function s.retcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsControler,1,nil,tp) end
-	local g=Duel.SelectReleaseGroup(tp,Card.IsControler,1,1,nil,tp)
-	Duel.Release(g,REASON_COST)
-end
-function s.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0x308)
-end
-function s.retop(e,tp,eg,ep,ev,re,r,rp)
+function s.posop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_MZONE,0,nil)
-	if #g>0 then
-		for tc in aux.Next(g) do
-			local e2=Effect.CreateEffect(c)
-			e2:SetType(EFFECT_TYPE_SINGLE)
-			e2:SetCode(EFFECT_PIERCE)
-			e2:SetReset(RESET_PHASE+PHASE_END+RESET_EVENT+RESETS_STANDARD)
-			tc:RegisterEffect(e2)
-			local e1=Effect.CreateEffect(tc)
-			e1:SetType(EFFECT_TYPE_FIELD)
-			e1:SetCode(EFFECT_CHANGE_DAMAGE)
-			e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-			e1:SetTargetRange(1,1)
-			e1:SetValue(s.val)
-			e1:SetReset(RESET_PHASE+PHASE_END+RESET_EVENT+RESETS_STANDARD)
-			Duel.RegisterEffect(e1,tp)
+	local g0=Duel.GetMatchingGroup(aux.TRUE,tp,0,LOCATION_MZONE,nil)
+	local g1=Duel.GetMatchingGroup(Card.IsCanTurnSetGlitchy,tp,0,LOCATION_MZONE,nil,tp)
+	if #g1>0 then
+		for tc in aux.Next(g0) do
+			local e1=Effect.CreateEffect(c)
+			e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SET_AVAILABLE)
+			e1:SetCode(EVENT_CHANGE_POS)
+			e1:SetLabelObject(e)
+			e1:SetCondition(s.regcon)
+			e1:SetOperation(s.register_poschange)
+			e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET+RESET_CHAIN)
+			tc:RegisterEffect(e1)
+		end
+		Duel.ChangePosition(g1,POS_FACEDOWN_DEFENSE)
+		local og=Duel.GetMatchingGroup(Card.HasFlagEffect,tp,0,LOCATION_MZONE,nil,id)
+		local g2=Duel.GetMatchingGroup(Card.IsAbleToGrave,tp,0,LOCATION_MZONE,og)
+		if #g2>0 then
+			Duel.SendtoGrave(g2,REASON_EFFECT)
 		end
 	end
-end
-function s.val(e,re,dam,r,rp,rc)
-	if r&REASON_BATTLE>0 and rc==e:GetHandler() then
-		return dam/2
-	else return dam end
-end
-function s.sfilter(c)
-	return c:IsRace(RACE_INSECT) and c:IsAbleToGraveAsCost()
-end
-function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.sfilter,tp,LOCATION_EXTRA,0,3,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=Duel.SelectMatchingCard(tp,s.sfilter,tp,LOCATION_EXTRA,0,3,3,nil)
-	if #g>0 then Duel.SendtoGrave(g,REASON_EFFECT) end
-end
-function s.operation(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if c:IsFaceup() and c:IsRelateToEffect(e) then
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	local tg=Duel.GetMatchingGroup(Card.IsPosition,tp,0,LOCATION_MZONE,nil,POS_FACEDOWN_DEFENSE)
+	for tc in aux.Next(tg) do
+		local e1=Effect.CreateEffect(c)
+		e1:Desc(3)
 		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_DIRECT_ATTACK)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-		c:RegisterEffect(e1)
+		e1:SetCode(EFFECT_CANNOT_CHANGE_POSITION)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_CLIENT_HINT)
+		e1:SetCondition(s.limcon)
+		if Duel.GetTurnPlayer()==tp then
+			e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END+RESET_OPPO_TURN,1)
+		else
+			e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END+RESET_OPPO_TURN,2)
+		end
+		e1:SetLabel(Duel.GetTurnCount(),tp)
+		tc:RegisterEffect(e1)
 	end
+end
+function s.regcon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return not c:IsPreviousPosition(POS_FACEDOWN_DEFENSE) and c:IsPosition(POS_FACEDOWN_DEFENSE) and re and re==e:GetLabelObject()
+end
+function s.register_poschange(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	c:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_CHAIN,EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_IGNORE_IMMUNE,1)
+end
+function s.limcon(e)
+	local ct,tp=e:GetLabel()
+	return Duel.GetTurnCount()>ct and Duel.GetTurnPlayer()==1-tp
+end
+
+function s.retop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	--halve damage
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_CHANGE_BATTLE_DAMAGE)
+	e1:SetTargetRange(LOCATION_MZONE,0)
+	e1:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x308))
+	e1:SetValue(HALF_DAMAGE)
+	e1:SetReset(RESET_PHASE+PHASE_END)
+	Duel.RegisterEffect(e1,tp)
+	--pierce
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetCode(EFFECT_PIERCE)
+	e2:SetTargetRange(LOCATION_MZONE,0)
+	e2:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x308))
+	e2:SetReset(RESET_PHASE+PHASE_END)
+	Duel.RegisterEffect(e2,tp)
+	--hints
+	Duel.RegisterHint(tp,id,PHASE_END,1,id,4)
+	Duel.RegisterHint(1-tp,id,PHASE_END,1,id,5)
+	Duel.RegisterHint(tp,id+100,PHASE_END,1,id,6)
 end

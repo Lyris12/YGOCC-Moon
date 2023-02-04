@@ -1,15 +1,14 @@
 --Paracyclis Perfect Defense, Starshield
---Automate ID
+
 local s,id=GetID()
 function s.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_POSITION)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e1:SetCode(EVENT_ATTACK_ANNOUNCE)
+	e1:SetCode(EVENT_BE_BATTLE_TARGET)
 	e1:SetRange(LOCATION_HAND)
-	e1:SetCountLimit(1,id)
 	e1:SetCondition(s.spcon)
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
@@ -26,47 +25,49 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetAttacker():IsControler(1-tp)
-		and Duel.GetAttackTarget() and Duel.GetAttackTarget():IsSetCard(0x308)
+	local d=Duel.GetAttackTarget()
+	return d and d:IsControler(tp) and d:IsFaceup() and d:IsSetCard(0x308)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.GetAttacker():IsCanTurnSet()
-		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.GetAttacker():IsCanTurnSetGlitchy(tp) and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	local a=Duel.GetAttacker()
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_POSITION,a,1,a:GetControler(),a:GetLocation())
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) then return end
+	if not c:IsRelateToChain() or Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then return end
 	if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
-		local ac=Duel.GetAttacker()
-		if ac:IsCanTurnSet() and Duel.NegateAttack() then
+		local a=Duel.GetAttacker()
+		if Duel.NegateAttack() and a:IsRelateToBattle() and a:IsCanTurnSetGlitchy(tp) then
 			Duel.BreakEffect()
-			if Duel.ChangePosition(ac,POS_FACEDOWN_DEFENSE)>0 then
-				local e1=Effect.CreateEffect(e:GetHandler())
-				e1:SetType(EFFECT_TYPE_SINGLE)
-				e1:SetCode(EFFECT_CANNOT_CHANGE_POSITION)
-				e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-				if Duel.GetTurnPlayer()==tp then
-					e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END+RESET_SELF_TURN,1)
-				else
-					e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END+RESET_SELF_TURN,2)
-				end
-				ac:RegisterEffect(e1)
+			Duel.ChangePosition(a,POS_FACEDOWN_DEFENSE)
+			local e1=Effect.CreateEffect(e:GetHandler())
+			e1:Desc(2)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetCode(EFFECT_CANNOT_CHANGE_POSITION)
+			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_CLIENT_HINT)
+			if Duel.GetTurnPlayer()==tp then
+				e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END+RESET_OPPO_TURN,1)
+			else
+				e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END+RESET_OPPO_TURN,2)
 			end
+			a:RegisterEffect(e1)
 		end
 	end
 end
-function s.repfilter(c,tp)
-	return c:IsFaceup() and (c:IsSetCard(0X3308) or c:IsSetCard(0X5308)) and c:IsLocation(LOCATION_MZONE)
-		and c:IsControler(tp) and c:IsReason(REASON_EFFECT+REASON_BATTLE) and not c:IsReason(REASON_REPLACE)
+
+function s.repfilter(c)
+	return c:IsFaceup() and c:IsSetCard(0x308) and c:IsType(TYPE_FUSION+TYPE_LINK) and c:IsLocation(LOCATION_MZONE)
+		and c:IsReason(REASON_EFFECT+REASON_BATTLE) and not c:IsReason(REASON_REPLACE)
 end
 function s.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToRemove() and eg:IsExists(s.repfilter,1,nil,tp) end
+	if chk==0 then return e:GetHandler():IsAbleToRemove() and eg:IsExists(s.repfilter,1,nil) end
 	return Duel.SelectEffectYesNo(tp,e:GetHandler(),96)
 end
 function s.repval(e,c)
-	return s.repfilter(c,e:GetHandlerPlayer())
+	return s.repfilter(c)
 end
 function s.repop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_EFFECT)
+	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_EFFECT+REASON_REPLACE)
 end

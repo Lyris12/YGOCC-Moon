@@ -19,12 +19,21 @@ function Auxiliary.CreateCost(...)
 end
 
 -----------------------------------------------------------------------
+function Auxiliary.ConfirmRuleCost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.ConfirmCards(1-tp,Group.FromCards(e:GetHandler()))
+end
 function Auxiliary.InfoCost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 end
 function Auxiliary.LabelCost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(1)
+	if chk==0 then return true end
+end
+function Auxiliary.LabelCost2(e,tp,eg,ep,ev,re,r,rp,chk)
+	local l1,l2=e:GetLabel()
+	e:SetLabel(1,l2)
 	if chk==0 then return true end
 end
 function Auxiliary.CustomLabelCost(lab)

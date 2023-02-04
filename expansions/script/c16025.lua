@@ -1,10 +1,11 @@
 --Paracyclis Capturer
---Automate ID
+
 local s,id=GetID()
 function s.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_DISABLE)
+	e1:Desc(0)
+	e1:SetCategory(CATEGORY_DISABLE+CATEGORY_POSITION+CATEGORY_TOGRAVE)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_CHAINING)
 	e1:SetCondition(s.condition)
@@ -14,32 +15,52 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function s.filter(c)
-	return (c:IsSetCard(0x3308) or c:IsSetCard(0x5308)) and c:IsType(TYPE_MONSTER) and c:IsFaceup()
+	return c:IsSetCard(0x308) and c:IsType(TYPE_MONSTER) and c:IsFaceup() and c:IsSummonType(SUMMON_TYPE_SPECIAL) and c:IsSummonLocation(LOCATION_EXTRA)
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	local loc=Duel.GetChainInfo(0,CHAININFO_TRIGGERING_LOCATION)
-	local tc=re:GetHandler()
-	return tc:IsControler(1-tp) and (not loc==LOCATION_MZONE or tc:IsCanTurnSet()) and Duel.IsChainDisablable(ev)
-		and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_MZONE,0,1,nil) and tc:IsType(TYPE_MONSTER)
+	local rc=re:GetHandler()
+	return rp==1-tp and re:IsActiveType(TYPE_MONSTER) and not rc:IsDisabled() and Duel.IsChainDisablable(ev)
+		and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_MZONE,0,1,nil)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
+	local rc=re:GetHandler()
+	local relation=rc:IsRelateToChain(ev)
+	if chk==0 then
+		return not relation or (rc:IsLocation(LOCATION_MZONE) and rc:IsCanTurnSetGlitchy(tp) or rc:IsAbleToGrave())
+	end
 	Duel.SetOperationInfo(0,CATEGORY_DISABLE,eg,1,0,0)
+	if relation and rc:IsLocation(LOCATION_MZONE) then
+		Duel.SetTargetCard(rc)
+		if rc:IsCanTurnSetGlitchy(tp) then
+			Duel.SetOperationInfo(0,CATEGORY_REMOVE,rc,1,rc:GetControler(),rc:GetLocation())
+		elseif rc:IsAbleToGrave() then
+			Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,rc,1,rc:GetControler(),rc:GetLocation())
+		end
+	end
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=re:GetHandler()
-	if not tc:IsDisabled() then
-		if Duel.NegateEffect(ev) and tc:IsRelateToEffect(re) then
-			if Duel.ChangePosition(tc,POS_FACEDOWN_DEFENSE)~=0 then
-				local e1=Effect.CreateEffect(e:GetHandler())
-				e1:SetType(EFFECT_TYPE_SINGLE)
-				e1:SetCode(EFFECT_CANNOT_CHANGE_POSITION)
-				e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-				e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END+RESET_SELF_TURN,1)
-				tc:RegisterEffect(e1)
+	if Duel.NegateEffect(ev) and tc:IsRelateToChain(ev) and tc:IsLocation(LOCATION_MZONE) then
+		if Duel.ChangePosition(tc,POS_FACEDOWN_DEFENSE)~=0 then
+			local e1=Effect.CreateEffect(e:GetHandler())
+			e1:Desc(1)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetCode(EFFECT_CANNOT_CHANGE_POSITION)
+			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_CLIENT_HINT)
+			e1:SetCondition(s.limcon)
+			if Duel.GetTurnPlayer()==tp then
+				e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END+RESET_OPPO_TURN,1)
 			else
-				Duel.SendtoGrave(tc,nil,REASON_EFFECT)
+				e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END+RESET_OPPO_TURN,2)
 			end
+			e1:SetLabel(Duel.GetTurnCount(),tp)
+			tc:RegisterEffect(e1)
+		elseif tc:IsRelateToChain() then
+			Duel.SendtoGrave(tc,nil,REASON_EFFECT)
 		end
 	end
+end
+function s.limcon(e)
+	local ct,tp=e:GetLabel()
+	return Duel.GetTurnCount()>ct and Duel.GetTurnPlayer()==1-tp
 end

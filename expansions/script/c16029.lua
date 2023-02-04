@@ -1,108 +1,119 @@
 --Paracyclis Outlaw, Shining Champion
-function c16029.initial_effect(c)
-	c:SetSPSummonOnce(16029)
+
+local s,id=GetID()
+function s.initial_effect(c)
+	c:SetSPSummonOnce(id)
 	--special summon
 	local e1=Effect.CreateEffect(c)
+	e1:Desc(0)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_SPSUMMON_PROC)
 	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
 	e1:SetRange(LOCATION_HAND)
-	e1:SetCondition(c16029.spcon)
-	e1:SetOperation(c16029.spop)
+	e1:SetCondition(s.spcon)
+	e1:SetTarget(s.sptg)
+	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
 	--SS opponents monster fd
 	local e2=Effect.CreateEffect(c)
-	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:Desc(1)
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_DECKDES)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e2:SetProperty(EFFECT_FLAG_DELAY)
+	e2:SetProperty(EFFECT_FLAG_DDD)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e2:SetTarget(c16029.fdtarget)
-	e2:SetOperation(c16029.fdop)
+	e2:SetTarget(s.fdtarget)
+	e2:SetOperation(s.fdop)
 	c:RegisterEffect(e2)
 	--Raidjin, but he discards an insect
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(16209,0))
+	e3:Desc(2)
 	e3:SetCategory(CATEGORY_POSITION)
 	e3:SetType(EFFECT_TYPE_QUICK_O)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e3:SetCode(EVENT_FREE_CHAIN)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1)
-	e3:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_END_PHASE)
-	e3:SetCost(c16029.setcost)
-	e3:SetTarget(c16029.settg)
-	e3:SetOperation(c16029.setop)
+	e3:SetHintTiming(0,RELEVANT_TIMINGS)
+	e3:SetCost(s.setcost)
+	e3:SetTarget(s.settg)
+	e3:SetOperation(s.setop)
 	c:RegisterEffect(e3)
 end
---SPSUMMON PROC
---filters
-function c16029.discardfilter(c)
+
+function s.discardfilter(c)
 	return c:IsSetCard(0x308) and c:IsType(TYPE_MONSTER) and c:IsLevelAbove(5) and c:IsDiscardable()
 end
-function c16029.fdownfilter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsFacedown()
-end
----------
-function c16029.spcon(e,c)
+function s.spcon(e,c)
 	if c==nil then return true end
-	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(c16029.discardfilter,c:GetControler(),LOCATION_HAND,0,1,c)
-		and (Duel.GetFieldGroupCount(c:GetControler(),LOCATION_ONFIELD,0)==0 or Duel.IsExistingMatchingCard(c16029.fdownfilter,c:GetControler(),0,LOCATION_MZONE,1,nil))
+	local tp=tp
+	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(s.discardfilter,tp,LOCATION_HAND,0,1,c)
+		and (Duel.GetFieldGroupCount(tp,LOCATION_ONFIELD,0)==0 or Duel.IsExistingMatchingCard(Card.IsFacedown,tp,0,LOCATION_MZONE,1,nil))
 end
-function c16029.spop(e,tp,eg,ep,ev,re,r,rp,c)
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,c)
+	local c=e:GetHandler()
+	local g=nil
+	local rg=Duel.GetMatchingGroup(s.discardfilter,tp,LOCATION_HAND,0,c)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DISCARD)
-	local g=Duel.SelectMatchingCard(tp,c16029.discardfilter,tp,LOCATION_HAND,0,1,1,c)
-	Duel.SendtoGrave(g,REASON_COST+REASON_DISCARD)
+	local g=rg:Select(tp,1,1,c)
+	if #g>0 then
+		g:KeepAlive()
+		e:SetLabelObject(g)
+		return true
+	end
+	return false
 end
---A LITERAL CLUSTERFUCK OF AN EFFECT
---filters
-function c16029.fdfilter(c,e,tp)
-	return c:IsType(TYPE_MONSTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEDOWN_DEFENSE,1-tp)
+function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
+	local g=e:GetLabelObject()
+	if not g then return end
+	Duel.SendtoGrave(g,REASON_DISCARD+REASON_COST)
+	g:DeleteGroup()
 end
----------
-function c16029.fdtarget(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFieldGroupCount(1-tp,LOCATION_DECK,0)>=5 and Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0 end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,0,1-tp,LOCATION_DECK)
+
+function s.fdfilter(c,e,tp)
+	return c:IsType(TYPE_MONSTER) and c:IsCanBeSpecialSummoned(e,0,1-tp,false,false,POS_FACEDOWN_DEFENSE,1-tp)
 end
-function c16029.fdop(e,tp,eg,ep,ev,re,r,rp)
+function s.fdtarget(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then
+		return Duel.GetFieldGroupCount(1-tp,LOCATION_DECK,0)>=5 and Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0
+			and Duel.IsPlayerCanSpecialSummon(1-tp)
+	end
+end
+function s.fdop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetFieldGroupCount(1-tp,LOCATION_DECK,0)<5 then return end
 	local g=Duel.GetDecktopGroup(1-tp,5)
 	Duel.ConfirmCards(tp,g)
-	if g:IsExists(c16029.fdfilter,1,nil,e,tp) and Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0 then
+	if g:IsExists(s.fdfilter,1,nil,e,tp) and Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0 then
 		Duel.BreakEffect()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local sg=g:FilterSelect(tp,c16029.fdfilter,1,1,nil,e,tp)
-		if #sg>0 and Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0 then
+		local sg=g:FilterSelect(tp,s.fdfilter,1,1,nil,e,tp)
+		if #sg>0 then
 			Duel.DisableShuffleCheck()
-			if Duel.SpecialSummon(sg,0,tp,1-tp,false,false,POS_FACEDOWN_DEFENSE)~=0 then
-				Duel.ConfirmCards(1-tp,sg)
-			end
+			Duel.SpecialSummon(sg,0,1-tp,1-tp,false,false,POS_FACEDOWN_DEFENSE)
 		end
-		Duel.SortDecktop(tp,1-tp,4)
-	else Duel.SortDecktop(tp,1-tp,5) end
+	end
+	Duel.SortDecktop(tp,1-tp,g:FilterCount(aux.PLChk,nil,1-tp,LOCATION_DECK))
 end
---FLIP FOR INSECT MEMES
---filters
-function c16029.dcfilter(c)
+
+function s.dcfilter(c)
 	return c:IsLevelBelow(4) and c:IsRace(RACE_INSECT) and c:IsDiscardable()
 end
-function c16029.setfilter(c)
-	return c:IsFaceup() and c:IsType(TYPE_MONSTER) and c:IsCanTurnSet()
+function s.setfilter(c,tp)
+	return c:IsFaceup() and c:IsType(TYPE_MONSTER) and c:IsCanTurnSetGlitchy(tp)
 end
----------
-function c16029.setcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c16029.dcfilter,tp,LOCATION_HAND,0,1,e:GetHandler()) end
-	Duel.DiscardHand(tp,c16029.dcfilter,1,1,REASON_COST+REASON_DISCARD)
+function s.setcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.dcfilter,tp,LOCATION_HAND,0,1,e:GetHandler()) end
+	Duel.DiscardHand(tp,s.dcfilter,1,1,REASON_COST+REASON_DISCARD)
 end
-function c16029.settg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and c16029.setfilter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c16029.setfilter,tp,0,LOCATION_MZONE,1,nil) end
+function s.settg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and s.setfilter(chkc,tp) end
+	if chk==0 then return Duel.IsExistingTarget(s.setfilter,tp,0,LOCATION_MZONE,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_POSCHANGE)
-	local g=Duel.SelectTarget(tp,c16029.setfilter,tp,0,LOCATION_MZONE,1,1,nil)
-	Duel.SetOperationInfo(0,CATEGORY_POSITION,g,1,0,0)
+	local g=Duel.SelectTarget(tp,s.setfilter,tp,0,LOCATION_MZONE,1,1,nil,tp)
+	Duel.SetOperationInfo(0,CATEGORY_POSITION,g,#g,1-tp,LOCATION_MZONE)
 end
-function c16029.setop(e,tp,eg,ep,ev,re,r,rp)
+function s.setop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsFaceup() and tc:IsRelateToEffect(e) then
+	if tc:IsRelateToChain() then
 		Duel.ChangePosition(tc,POS_FACEDOWN_DEFENSE)
 	end
 end

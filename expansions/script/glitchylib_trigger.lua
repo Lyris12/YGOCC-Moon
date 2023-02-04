@@ -132,6 +132,11 @@ function Card.SentToGYTrigger(c,forced,desc,ctg,prop,ctlim,cond,cost,tg,op,typec
 	local e1=c:Trigger(forced,desc,ctg,EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL,prop,event,ctlim,cond,cost,tg,op,typechange,reset)
 	return e1
 end
+function Card.SentToHandTrigger(c,forced,desc,ctg,prop,ctlim,cond,cost,tg,op,typechange,reset)
+	local event=EVENT_TO_HAND
+	local e1=c:Trigger(forced,desc,ctg,EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL,prop,event,ctlim,cond,cost,tg,op,typechange,reset)
+	return e1
+end
 function Card.SummonedTrigger(c,forced,ns,ss,fs,desc,ctg,prop,ctlim,cond,cost,tg,op,typechange,reset)
 	local event=(ns==true) and EVENT_SUMMON_SUCCESS or (ss==true) and EVENT_SPSUMMON_SUCCESS or (fs==true) and EVENT_FLIP_SUMMON_SUCCESS or EVENT_SUMMON_SUCCESS
 	local e1=c:Trigger(forced,desc,ctg,EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL,prop,event,ctlim,cond,cost,tg,op,typechange,reset,true)
@@ -324,6 +329,11 @@ function Card.PositionFieldTrigger(c,evf,forced,desc,ctg,prop,range,ctlim,cond,c
 end
 function Card.SentToGYFieldTrigger(c,evf,forced,desc,ctg,prop,range,ctlim,cond,cost,tg,op,typechange,reset,notreg)
 	local event=EVENT_TO_GRAVE
+	local e1=c:FieldTrigger(evf,forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op,typechange,reset,notreg,true)
+	return e1
+end
+function Card.SentToHandFieldTrigger(c,evf,forced,desc,ctg,prop,range,ctlim,cond,cost,tg,op,typechange,reset,notreg)
+	local event=EVENT_TO_HAND
 	local e1=c:FieldTrigger(evf,forced,desc,ctg,prop,event,range,ctlim,cond,cost,tg,op,typechange,reset,notreg,true)
 	return e1
 end

@@ -22,6 +22,123 @@ EFFECT_REVERSE_WHEN_IF=48928491
 
 UNIVERSAL_GLITCHY_TOKEN = 1231
 
+---------------------------------------------------------------------------------
+-------------------------------DELAYED EVENT-------------------------------------
+function Auxiliary.RegisterMergedDelayedEventGlitchy(c,code,event,f,flag)
+	local mt=getmetatable(c)
+	if mt[event]==true then return end
+	mt[event]=true
+	if not f then f=aux.TRUE end
+	if not flag then flag=c:GetOriginalCode() end
+	local g=Group.CreateGroup()
+	g:KeepAlive()
+	local ge1=Effect.CreateEffect(c)
+	ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	ge1:SetCode(event)
+	ge1:SetLabel(code)
+	ge1:SetLabelObject(g)
+	ge1:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy1(flag,f))
+	Duel.RegisterEffect(ge1,0)
+	local ge2=ge1:Clone()
+	ge2:SetCode(EVENT_CHAIN_END)
+	ge2:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy2(flag))
+	Duel.RegisterEffect(ge2,0)
+end
+function Auxiliary.MergedDelayEventCheckGlitchy1(id,f)
+	return	function(e,tp,eg,ep,ev,re,r,rp)
+				local g=e:GetLabelObject()
+				local evg=eg:Filter(f,nil,e,tp,eg,ep,ev,re,r,rp)
+				--Debug.Message(#evg)
+				for tc in aux.Next(evg) do
+					tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET,EFFECT_FLAG_SET_AVAILABLE,1)
+				end
+				g:Merge(evg)
+				if Duel.GetCurrentChain()==0 and not Duel.CheckEvent(EVENT_CHAIN_END) then
+					local _eg=g:Clone()
+					_eg=_eg:Filter(Card.HasFlagEffect,nil,id)
+					if #_eg>0 then
+						for tc in aux.Next(_eg) do
+							tc:ResetFlagEffect(id)
+						end
+						--Debug.Message('a')
+						Duel.RaiseEvent(_eg,EVENT_CUSTOM+e:GetLabel(),re,r,rp,ep,ev)
+					end
+					g:Clear()
+				end
+			end
+end
+function Auxiliary.MergedDelayEventCheckGlitchy2(id)
+	return	function(e,tp,eg,ep,ev,re,r,rp)
+				local g=e:GetLabelObject()
+				--Debug.Message('test')
+				if #g>0 then
+					local _eg=g:Clone()
+					_eg=_eg:Filter(Card.HasFlagEffect,nil,id)
+					if #_eg>0 then
+						for tc in aux.Next(_eg) do
+							tc:ResetFlagEffect(id)
+						end
+						--Debug.Message('b')
+						Duel.RaiseEvent(_eg,EVENT_CUSTOM+e:GetLabel(),re,r,rp,ep,ev)
+					end
+					g:Clear()
+				end
+			end
+end
+
+---------------------------------------------------------------------------------
+-------------------------------CONTACT FUSION---------------------------------
+function Auxiliary.AddContactFusionProcedureGlitchy(c,desc,rule,sumtype,filter,self_location,opponent_location,mat_operation,...)
+	if not sumtype then sumtype=SUMMON_TYPE_FUSION end
+	local self_location=self_location or 0
+	local opponent_location=opponent_location or 0
+	local operation_params={...}
+	
+	local prop=EFFECT_FLAG_UNCOPYABLE
+	if rule then
+		prop=prop|EFFECT_FLAG_CANNOT_DISABLE
+	end
+	local e2=Effect.CreateEffect(c)
+	e2:Desc(desc)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetCode(EFFECT_SPSUMMON_PROC)
+	e2:SetProperty(prop)
+	e2:SetRange(LOCATION_EXTRA)
+	e2:SetCondition(Auxiliary.ContactFusionCondition(filter,self_location,opponent_location,sumtype))
+	e2:SetOperation(Auxiliary.ContactFusionOperation(filter,self_location,opponent_location,sumtype,mat_operation,operation_params))
+	e2:SetValue(sumtype)
+	c:RegisterEffect(e2)
+	return e2
+end
+function Auxiliary.ContactFusionMaterialFilter(c,fc,filter,sumtype)
+	return c:IsCanBeFusionMaterial(fc,sumtype) and (not filter or filter(c,fc))
+end
+function Auxiliary.ContactFusionCondition(filter,self_location,opponent_location,sumtype)
+	return	function(e,c)
+				if c==nil then return true end
+				if c:IsType(TYPE_PENDULUM) and c:IsFaceup() then return false end
+				local tp=c:GetControler()
+				local mg=Duel.GetMatchingGroup(Auxiliary.ContactFusionMaterialFilter,tp,self_location,opponent_location,c,c,filter,sumtype)
+				return c:IsCanBeSpecialSummoned(e,sumtype,tp,false,false) and c:CheckFusionMaterial(mg,nil,tp|0x200)
+			end
+end
+function Auxiliary.ContactFusionOperation(filter,self_location,opponent_location,sumtype,mat_operation,operation_params)
+	if type(mat_operation)=="function" then
+		return	function(e,tp,eg,ep,ev,re,r,rp,c)
+					local mg=Duel.GetMatchingGroup(Auxiliary.ContactFusionMaterialFilter,tp,self_location,opponent_location,c,c,filter,sumtype)
+					local g=Duel.SelectFusionMaterial(tp,c,mg,nil,tp|0x200)
+					c:SetMaterial(g)
+					mat_operation(g,table.unpack(operation_params))
+				end
+	else
+		return	function(e,tp,eg,ep,ev,re,r,rp,c)
+					local mg=Duel.GetMatchingGroup(Auxiliary.ContactFusionMaterialFilter,tp,self_location,opponent_location,c,c,filter,sumtype)
+					local g=Duel.SelectFusionMaterial(tp,c,mg,nil,tp|0x200)
+					c:SetMaterial(g)
+					operation_params[1](g,e,tp,eg,ep,ev,re,r,rp,c)
+				end
+	end
+end
 
 ---------------------------------------------------------------------------------
 -------------------------------NORMAL SUMMON/SET---------------------------------
@@ -1518,7 +1635,14 @@ Duel.SendtoHand = function(tg,p,reason)
 	return ct1+ct2
 end
 
---Modified Functions: LINKS
+-------------------------------XYZ-----------------------------------
+local _XyzLevelFreeGoal = Auxiliary.XyzLevelFreeGoal
+
+Auxiliary.XyzLevelFreeGoal = function(g,tp,xyzc,gf)
+	return (not gf or gf(g,tp,xyzc)) and Duel.GetLocationCountFromEx(tp,tp,g,xyzc)>0
+end
+
+-------------------------------LINKS-----------------------------------
 function Auxiliary.ExtraLinkFilter0(c,ce,tg,lc)
 	return c:IsCanBeLinkMaterial(lc) and tg(ce,c)
 end
@@ -1803,3 +1927,4 @@ Auxiliary.LCheckGoal = function(sg,tp,lc,gf,lmat)
 	end
 	return _LCheckGoal(sg,tp,lc,gf,lmat)
 end
+

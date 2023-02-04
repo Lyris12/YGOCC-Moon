@@ -18,6 +18,16 @@ CATEGORIES_TOKEN = CATEGORY_SPECIAL_SUMMON+CATEGORY_TOKEN
 
 CATEGORY_FLAG_SELF					= 0x1
 
+--Rating types
+RATING_LEVEL	 = 	0x1
+RATING_RANK		=	0x2
+RATING_LINK		=	0x4
+RATING_FUTURE	=	0x8
+
+--Stat types
+STAT_ATTACK  = 0x1
+STAT_DEFENSE = 0x2
+
 --Effects
 GLOBAL_EFFECT_RESET	=	10203040
 
@@ -213,6 +223,21 @@ function Duel.ShuffleIntoDeck(g,p)
 	end
 	return 0
 end
+function Duel.PlaceOnTopOfDeck(g,p)
+	local ct=Duel.SendtoDeck(g,p,SEQ_DECKTOP,REASON_EFFECT)
+	if ct>0 then
+		local og=g:Filter(Card.IsLocation,nil,LOCATION_DECK)
+		for pp=tp,1-tp,1-2*tp do
+			local dg=og:Filter(Card.IsControler,nil,pp)
+			if #dg>1 then
+				Duel.SortDecktop(p,pp,#dg)
+			end
+		end
+		return ct
+	end
+	return 0
+end
+
 function Auxiliary.PLChk(c,p,loc,min)
 	if not min then min=1 end
 	if aux.GetValueType(c)=="Card" then
@@ -307,29 +332,79 @@ function Card.GetRating(c)
 	return list
 end
 	
-function Card.IsRating(c,n,lv,rk,link,fut)
-	if lv and aux.GetValueType(lv)=="boolean" then lv=n end
-	if rk and aux.GetValueType(rk)=="boolean" then rk=n end
-	if link and aux.GetValueType(link)=="boolean" then link=n end
-	if fut and aux.GetValueType(fut)=="boolean" then fut=n end
-	return (lv and c:HasLevel() and c:IsLevel(lv)) or (rk and c:IsOriginalType(TYPE_XYZ) and c:IsRank(rk)) or (link and c:IsOriginalType(TYPE_LINK) and c:IsLink(link))
-		or (fut and c:IsOriginalType(TYPE_TIMELEAP) and c:IsFuture(fut))
+function Card.IsRating(c,rtyp,...)
+	local x={...}
+	local lv=rtyp&RATING_LEVEL>0
+	local rk=rtyp&RATING_RANK>0
+	local link=rtyp&RATING_LINK>0
+	local fut=rtyp&RATING_FUTURE>0
+	for i,n in ipairs(x) do
+		if (lv and c:HasLevel() and c:IsLevel(n)) or (rk and c:HasRank() and c:IsRank(n)) or (link and c:IsOriginalType(TYPE_LINK) and c:IsLink(n))
+			or (fut and c:IsOriginalType(TYPE_TIMELEAP) and c:IsFuture(n)) then
+			return true
+		end
+	end
+	return false
 end
-function Card.IsRatingAbove(c,n,lv,rk,link,fut)
-	if lv and aux.GetValueType(lv)=="boolean" then lv=n end
-	if rk and aux.GetValueType(rk)=="boolean" then rk=n end
-	if link and aux.GetValueType(link)=="boolean" then link=n end
-	if fut and aux.GetValueType(fut)=="boolean" then fut=n end
-	return (lv and c:HasLevel() and c:IsLevelAbove(lv)) or (rk and c:IsOriginalType(TYPE_XYZ) and c:IsRankAbove(rk)) or (link and c:IsOriginalType(TYPE_LINK) and c:IsLinkAbove(link))
-		or (fut and c:IsOriginalType(TYPE_TIMELEAP) and c:IsFutureAbove(fut))
+function Card.IsRatingAbove(c,rtyp,...)
+	local x={...}
+	local lv=rtyp&RATING_LEVEL>0
+	local rk=rtyp&RATING_RANK>0
+	local link=rtyp&RATING_LINK>0
+	local fut=rtyp&RATING_FUTURE>0
+	for i,n in ipairs(x) do
+		if (lv and c:HasLevel() and c:IsLevelAbove(n)) or (rk and c:HasRank() and c:IsRankAbove(n)) or (link and c:IsOriginalType(TYPE_LINK) and c:IsLinkAbove(n))
+			or (fut and c:IsOriginalType(TYPE_TIMELEAP) and c:IsFutureAbove(n)) then
+			return true
+		end
+	end
 end
-function Card.IsRatingBelow(c,n,lv,rk,link,fut)
-	if lv and aux.GetValueType(lv)=="boolean" then lv=n end
-	if rk and aux.GetValueType(rk)=="boolean" then rk=n end
-	if link and aux.GetValueType(link)=="boolean" then link=n end
-	if fut and aux.GetValueType(fut)=="boolean" then fut=n end
-	return (lv and c:HasLevel() and c:IsLevelBelow(lv)) or (rk and c:IsOriginalType(TYPE_XYZ) and c:IsRankBelow(rk)) or (link and c:IsOriginalType(TYPE_LINK) and c:IsLinkBelow(link))
-		or (fut and c:IsOriginalType(TYPE_TIMELEAP) and c:IsFutureBelow(fut))
+function Card.IsRatingBelow(c,rtyp,...)
+	local x={...}
+	local lv=rtyp&RATING_LEVEL>0
+	local rk=rtyp&RATING_RANK>0
+	local link=rtyp&RATING_LINK>0
+	local fut=rtyp&RATING_FUTURE>0
+	for i,n in ipairs(x) do
+		if (lv and c:HasLevel() and c:IsLevelBelow(n)) or (rk and c:HasRank() and c:IsRankBelow(n)) or (link and c:IsOriginalType(TYPE_LINK) and c:IsLinkBelow(n))
+			or (fut and c:IsOriginalType(TYPE_TIMELEAP) and c:IsFutureBelow(n)) then
+			return true
+		end
+	end
+end
+
+function Card.IsStat(c,rtyp,...)
+	local x={...}
+	local atk=rtyp&STAT_ATTACK>0
+	local def=rtyp&STAT_DEFENSE>0
+	for i,n in ipairs(x) do
+		if (not atk or (c:HasAttack() and c:IsAttack(n))) and (not def or (c:HasDefense() and c:IsDefense(n))) then
+			return true
+		end
+	end
+	return false
+end
+function Card.IsStatBelow(c,rtyp,...)
+	local x={...}
+	local atk=rtyp&STAT_ATTACK>0
+	local def=rtyp&STAT_DEFENSE>0
+	for i,n in ipairs(x) do
+		if (not atk or (c:HasAttack() and c:IsAttackBelow(n))) or (not def or (c:HasDefense() and c:IsDefenseBelow(n))) then
+			return true
+		end
+	end
+	return false
+end
+function Card.IsStatAbove(c,rtyp,...)
+	local x={...}
+	local atk=rtyp&STAT_ATTACK>0
+	local def=rtyp&STAT_DEFENSE>0
+	for i,n in ipairs(x) do
+		if (not atk or (c:HasAttack() and c:IsAttackAbove(n))) or (not def or (c:HasDefense() and c:IsDefenseAbove(n))) then
+			return true
+		end
+	end
+	return false
 end
 
 function Card.ByBattleOrEffect(c,f,p)
@@ -338,8 +413,8 @@ function Card.ByBattleOrEffect(c,f,p)
 			end
 end
 
-function Card.IsContained(c,g)
-	return g:IsContains(c)
+function Card.IsContained(c,g,exc)
+	return g:IsContains(c) and (not exc or not exc:IsContains(c))
 end
 
 --Chain Info
@@ -394,7 +469,7 @@ end
 --Exception
 function Auxiliary.ActivateException(e,chk)
 	local c=e:GetHandler()
-	if c and e:IsHasType(EFFECT_TYPE_ACTIVATE) and not c:IsType(TYPE_CONTINUOUS+TYPE_FIELD+TYPE_EQUIP) and not c:IsHasEffect(EFFECT_REMAIN_FIELD) and (not chk or chk==0 or c:IsRelateToChain(0)) then
+	if c and e:IsHasType(EFFECT_TYPE_ACTIVATE) and not c:IsType(TYPE_CONTINUOUS+TYPE_FIELD+TYPE_EQUIP) and not c:IsHasEffect(EFFECT_REMAIN_FIELD) and (chk or c:IsRelateToChain(0)) then
 		return c
 	else
 		return nil
@@ -439,6 +514,12 @@ function Auxiliary.Option(id,tp,desc,...)
 	local sel=opval[op]
 	Duel.Hint(HINT_OPSELECTED,1-tp,ops[op])
 	return sel
+end
+
+function Duel.RegisterHint(p,flag,reset,rct,id,desc)
+	if not reset then reset=PHASE_END end
+	if not rct then rct=1 end
+	return Duel.RegisterFlagEffect(p,flag,RESET_PHASE+reset,EFFECT_FLAG_CLIENT_HINT,rct,0,aux.Stringid(id,desc))
 end
 
 --Filters
@@ -544,8 +625,8 @@ function Group.CheckSameProperty(g,f,...)
 end
 
 --Locations
-function Card.IsBanished(c)
-	return c:IsLocation(LOCATION_REMOVED)
+function Card.IsBanished(c,pos)
+	return c:IsLocation(LOCATION_REMOVED) and (not pos or c:IsPosition(pos))
 end
 function Card.IsInExtra(c,fu)
 	return c:IsLocation(LOCATION_EXTRA) and (fu==nil or fu and c:IsFaceup() or not fu and c:IsFacedown())
@@ -585,8 +666,19 @@ function Card.NotInExtraOrFaceup(c)
 	return not c:IsLocation(LOCATION_EXTRA) or c:IsFaceup()
 end
 
-function Card.GetPreviousZone(c)
-	return 1<<c:GetPreviousSequence()
+function Card.GetZone(c,tp)
+	local rzone = c:IsControler(tp) and (1 <<c:GetSequence()) or (1 << (16+c:GetSequence()))
+	if c:IsSequence(5,6) then
+		rzone = rzone | (c:IsControler(tp) and (1 << (16 + 11 - c:GetSequence())) or (1 << (11 - c:GetSequence())))
+	end
+	return rzone
+end
+function Card.GetPreviousZone(c,tp)
+	local rzone = c:IsControler(tp) and (1 <<c:GetPreviousSequence()) or (1 << (16+c:GetPreviousSequence()))
+	if c:GetPreviousSequence()==5 or c:GetPreviousSequence()==6 then
+		rzone = rzone | (c:IsControler(tp) and (1 << (16 + 11 - c:GetPreviousSequence())) or (1 << (11 - c:GetPreviousSequence())))
+	end
+	return rzone
 end
 function Duel.CheckPendulumZones(tp)
 	return Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,1)
@@ -666,6 +758,15 @@ function Duel.IsBattlePhase(tp)
 end
 function Duel.IsEndPhase(tp)
 	return (not tp or Duel.GetTurnPlayer()==tp) and Duel.GetCurrentPhase()==PHASE_END
+end
+
+--PositionChange
+function Card.IsCanTurnSetGlitchy(c)
+	if not c:IsPosition(POS_FACEDOWN_ATTACK) then
+		return c:IsCanTurnSet()
+	else
+		return not c:IsType(TYPE_LINK|TYPE_TOKEN) and not c:IsHasEffect(EFFECT_CANNOT_TURN_SET) and not Duel.IsPlayerAffectedByEffect(tp,EFFECT_CANNOT_TURN_SET)
+	end
 end
 
 --Location Check
