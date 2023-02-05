@@ -18,6 +18,11 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
+	local e1x=Effect.CreateEffect(c)
+	e1x:SetType(EFFECT_TYPE_SINGLE)
+	e1x:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE)
+	e1x:SetCode(id)
+	c:RegisterEffect(e1x)
 	aux.RegisterMergedDelayedEventGlitchy(c,id,EVENT_SPSUMMON_SUCCESS,s.filter)
 	--destroy
 	local e3=Effect.CreateEffect(c)
@@ -40,9 +45,18 @@ function s.initial_effect(c)
 	e2:SetCountLimit(1)
 	c:RegisterEffect(e2)
 end
+function s.lkfilter(c)
+	return c:IsFaceup() and c:IsHasEffect(id)
+end
 function s.filter(c)
-	local lg=e:GetHandler():GetLinkedGroup()
-	return lg and lg:IsContains(c)
+	local g=Duel.GetMatchingGroup(s.lkfilter,0,LOCATION_MZONE,LOCATION_MZONE,nil)
+	for tc in aux.Next(g) do
+		local lg=tc:GetLinkedGroup()
+		if lg and lg:IsContains(c) then
+			return true
+		end
+	end
+	return false
 end
 function s.egfilter(c,tp)
 	return c:IsCanTurnSetGlitchy(tp) and c:GetSummonPlayer()==1-tp
