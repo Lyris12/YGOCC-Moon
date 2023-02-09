@@ -74,13 +74,10 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	if tc and tc:IsRelateToChain() then
 		local rct = Duel.GetTurnPlayer()==tp and 2 or 1
 		local chk1,chk2,chk3,res=Duel.Negate(tc,e,{RESET_PHASE+PHASE_END+RESET_SELF_TURN,rct})
-		if res and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and Duel.IsExistingMatchingCard(aux.NecroValleyFilter(s.setfilter),tp,LOCATION_GRAVE,0,1,nil,e,tp,eg,ep,ev,re,r,rp)
-			and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
-			local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.setfilter),tp,LOCATION_GRAVE,0,1,1,nil,e,tp,eg,ep,ev,re,r,rp)
-			local tc=g:GetFirst()
-			if tc then
-				aux.PandSSet(tc,REASON_EFFECT)(e,tp,eg,ep,ev,re,r,rp)
+		if res then
+			local c=e:GetHandler()
+			if c:IsRelateToChain() and c:IsEngaged() and c:IsCanUpdateEnergy(tp,5,REASON_EFFECT) then
+				c:UpdateEnergy(5,tp,REASON_EFFECT,true)
 			end
 		end
 	end
