@@ -104,35 +104,35 @@ function Auxiliary.AddContactFusionProcedureGlitchy(c,desc,rule,sumtype,filter,s
 	e2:SetCode(EFFECT_SPSUMMON_PROC)
 	e2:SetProperty(prop)
 	e2:SetRange(LOCATION_EXTRA)
-	e2:SetCondition(Auxiliary.ContactFusionCondition(filter,self_location,opponent_location,sumtype))
-	e2:SetOperation(Auxiliary.ContactFusionOperation(filter,self_location,opponent_location,sumtype,mat_operation,operation_params))
+	e2:SetCondition(Auxiliary.ContactFusionConditionGlitchy(filter,self_location,opponent_location,sumtype))
+	e2:SetOperation(Auxiliary.ContactFusionOperationGlitchy(filter,self_location,opponent_location,sumtype,mat_operation,operation_params))
 	e2:SetValue(sumtype)
 	c:RegisterEffect(e2)
 	return e2
 end
-function Auxiliary.ContactFusionMaterialFilter(c,fc,filter,sumtype)
+function Auxiliary.ContactFusionMaterialFilterGlitchy(c,fc,filter,sumtype)
 	return c:IsCanBeFusionMaterial(fc,sumtype) and (not filter or filter(c,fc))
 end
-function Auxiliary.ContactFusionCondition(filter,self_location,opponent_location,sumtype)
+function Auxiliary.ContactFusionConditionGlitchy(filter,self_location,opponent_location,sumtype)
 	return	function(e,c)
 				if c==nil then return true end
 				if c:IsType(TYPE_PENDULUM) and c:IsFaceup() then return false end
 				local tp=c:GetControler()
-				local mg=Duel.GetMatchingGroup(Auxiliary.ContactFusionMaterialFilter,tp,self_location,opponent_location,c,c,filter,sumtype)
+				local mg=Duel.GetMatchingGroup(Auxiliary.ContactFusionMaterialFilterGlitchy,tp,self_location,opponent_location,c,c,filter,sumtype)
 				return c:IsCanBeSpecialSummoned(e,sumtype,tp,false,false) and c:CheckFusionMaterial(mg,nil,tp|0x200)
 			end
 end
-function Auxiliary.ContactFusionOperation(filter,self_location,opponent_location,sumtype,mat_operation,operation_params)
+function Auxiliary.ContactFusionOperationGlitchy(filter,self_location,opponent_location,sumtype,mat_operation,operation_params)
 	if type(mat_operation)=="function" then
 		return	function(e,tp,eg,ep,ev,re,r,rp,c)
-					local mg=Duel.GetMatchingGroup(Auxiliary.ContactFusionMaterialFilter,tp,self_location,opponent_location,c,c,filter,sumtype)
+					local mg=Duel.GetMatchingGroup(Auxiliary.ContactFusionMaterialFilterGlitchy,tp,self_location,opponent_location,c,c,filter,sumtype)
 					local g=Duel.SelectFusionMaterial(tp,c,mg,nil,tp|0x200)
 					c:SetMaterial(g)
 					mat_operation(g,table.unpack(operation_params))
 				end
 	else
 		return	function(e,tp,eg,ep,ev,re,r,rp,c)
-					local mg=Duel.GetMatchingGroup(Auxiliary.ContactFusionMaterialFilter,tp,self_location,opponent_location,c,c,filter,sumtype)
+					local mg=Duel.GetMatchingGroup(Auxiliary.ContactFusionMaterialFilterGlitchy,tp,self_location,opponent_location,c,c,filter,sumtype)
 					local g=Duel.SelectFusionMaterial(tp,c,mg,nil,tp|0x200)
 					c:SetMaterial(g)
 					operation_params[1](g,e,tp,eg,ep,ev,re,r,rp,c)
@@ -224,6 +224,8 @@ function Auxiliary.GlitchyCannotDisable(f)
 				return not f or f(e,c)
 			end
 end
+
+
 
 -----------------------------------------------------------------------
 -------------------------------TRIBUTE-------------------------------
