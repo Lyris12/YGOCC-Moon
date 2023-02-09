@@ -40,7 +40,8 @@ end
 Card.GetOriginalType=function(c)
 	local tpe=get_orig_type(c)
 	if Auxiliary.Pandemoniums[c] then
-		tpe=tpe|TYPE_PANDEMONIUM
+		local typ=c:GetFlagEffectLabel(1074)
+		tpe=tpe|TYPE_MONSTER|typ
 		if not Auxiliary.Pandemoniums[c]() then
 			tpe=tpe&~TYPE_PENDULUM
 		end
@@ -211,7 +212,7 @@ function Auxiliary.EnablePandemoniumAttribute(c,...)
 		Duel.RegisterEffect(ge1,0)
 	end
 	--register og type
-	c:RegisterFlagEffect(1074,0,0,0,typ)
+	c:RegisterFlagEffect(1074,0,EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_IGNORE_IMMUNE,0,typ)
 	--summon
 	local ge6=Effect.CreateEffect(c)
 	ge6:SetType(EFFECT_TYPE_FIELD)
@@ -567,7 +568,7 @@ function Auxiliary.PandActCon(actcon,card)
 				if c:IsHasEffect(EFFECT_ALLOW_EXTRA_PANDEMONIUM_ZONE) then
 					check=true
 				end
-				return (not Duel.IsExistingMatchingCard(Auxiliary.PaCheckFilter,tp,LOCATION_SZONE,0,1,card) or check)
+				return (check or not Duel.IsExistingMatchingCard(Auxiliary.PaCheckFilter,tp,LOCATION_SZONE,0,1,card))
 					and (not actcon or actcon(e,tp,eg,ep,ev,re,r,rp))
 			end
 end
@@ -588,7 +589,7 @@ function Auxiliary.PandEnableFUInED(tc,reason,tpe)
 				if pcall(Group.GetFirst,tc) then
 					local tg=tc:Clone()
 					for cc in aux.Next(tg) do
-						cc:SetCardData(CARDDATA_TYPE,TYPE_MONSTER+tpe+TYPE_PENDULUM)
+						cc:SetCardData(CARDDATA_TYPE,TYPE_MONSTER|tpe|TYPE_PENDULUM)
 						if not cc:IsOnField() or cc:GetDestination()==0 then
 							if (cc:GetFlagEffect(706)>0 or cc:GetFlagEffect(726)>0) then
 								cc:RegisterFlagEffect(716,RESET_EVENT+RESETS_STANDARD-RESET_TODECK,EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE,1)
@@ -597,7 +598,7 @@ function Auxiliary.PandEnableFUInED(tc,reason,tpe)
 						end
 					end
 				else
-					tc:SetCardData(CARDDATA_TYPE,TYPE_MONSTER+tpe+TYPE_PENDULUM)
+					tc:SetCardData(CARDDATA_TYPE,TYPE_MONSTER|tpe|TYPE_PENDULUM)
 					if not tc:IsOnField() or tc:GetDestination()==0 then
 						if (tc:GetFlagEffect(706)>0 or tc:GetFlagEffect(726)>0) then
 							tc:RegisterFlagEffect(716,RESET_EVENT+RESETS_STANDARD-RESET_TODECK,EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE,1)
@@ -613,7 +614,7 @@ end
 function Auxiliary.PandDisableFUInED(tc,tpe)
 	if not tpe then tpe=TYPE_EFFECT|TYPE_PANDEMONIUM end
 	return  function(e,tp,eg,ep,ev,re,r,rp)
-				tc:SetCardData(CARDDATA_TYPE,TYPE_MONSTER+tpe)
+				tc:SetCardData(CARDDATA_TYPE,TYPE_MONSTER|tpe)
 			end
 end
 function Auxiliary.PandSSetCon(tc,player,...)
@@ -631,71 +632,74 @@ function Auxiliary.PandSSetCon(tc,player,...)
 		end
 		table.remove(params)
 	end
-	return	function(c,e,tp,eg,ep,ev,re,r,rp)
-				local eparams={}
-				local ttp
-				if (player==nil or not player) then ttp=tp else if player<0 then ttp=tc:GetControler() end end
-				if #params>0 then
-					for pc=1,#params do
-						if params[pc]=="e" then eparams[pc]=e
-						elseif params[pc]=="tp" then eparams[pc]=ttp
-						elseif params[pc]=="eg" then eparams[pc]=eg
-						elseif params[pc]=="ep" then eparams[pc]=ep
-						elseif params[pc]=="ev" then eparams[pc]=ev
-						elseif params[pc]=="re" then eparams[pc]=re
-						elseif params[pc]=="r" then eparams[pc]=r
-						elseif params[pc]=="rp" then eparams[pc]=rp
-						else eparams[pc]=params[pc]
-						end
-					end
-				end
-				local check=true
-				local egroup={Duel.IsPlayerAffectedByEffect(ttp,EFFECT_CANNOT_SSET)}
-				for _,te in ipairs(egroup) do
-					local tg=te:GetTarget()
-					if not tg then
-						check=false
-					elseif tc and type(tc)=="function" then
-						local ct=0
-						local sg=Duel.GetMatchingGroup(tc,ttp,loc1,loc2,nil,table.unpack(eparams))
-						local tsg=sg:GetFirst()
-						while tsg do
-							if tg(te,tsg) then
-								ct=ct+1
-							end
-							tsg=sg:GetNext()
-						end
-						if ct==#sg then check=false end
-					elseif tc and tg(te,tc,ttp) then
-						check=false
-					else
-						if not tc then
+	if player==-1 then
+		return	function(e,c,og)
+					if c==nil then return true end
+					local ttp=c:GetControler()
+					local check=true
+					local egroup={Duel.IsPlayerAffectedByEffect(ttp,EFFECT_CANNOT_SSET)}
+					for _,te in ipairs(egroup) do
+						local tg=te:GetTarget()
+						if not tg then
 							check=false
+						elseif tc and aux.GetValueType(tc)=="Card" and tg(te,tc,ttp) then
+							check=false
+						elseif tc and type(tc)=="function" then
+							local ct=0
+							local sg=Duel.GetMatchingGroup(tc,ttp,loc1,loc2,nil,e,ttp)
+							local tsg=sg:GetFirst()
+							while tsg do
+								if tg(te,tsg) then
+									ct=ct+1
+								end
+								tsg=sg:GetNext()
+							end
+							if ct==#sg then check=false end
+						else
+							if not tc then
+								check=false
+							end
 						end
 					end
+					return (neglect_zone or Duel.GetLocationCount(ttp,LOCATION_SZONE)>0) and check
 				end
-				return (neglect_zone or Duel.GetLocationCount(ttp,LOCATION_SZONE)>0) and check
-			end
+	else
+		return	function(c,e,tp,eg,ep,ev,re,r,rp)
+					local ttp=player
+					if not ttp or ttp<0 then ttp=e:GetHandlerPlayer() end
+					local check=true
+					local egroup={Duel.IsPlayerAffectedByEffect(ttp,EFFECT_CANNOT_SSET)}
+					for _,te in ipairs(egroup) do
+						local tg=te:GetTarget()
+						if not tg then
+							check=false
+						elseif tc and aux.GetValueType(tc)=="Card" and tg(te,tc,ttp) then
+							check=false
+						elseif tc and type(tc)=="function" then
+							local ct=0
+							local sg=Duel.GetMatchingGroup(tc,ttp,loc1,loc2,nil,e,tp,eg,ep,ev,re,r,rp)
+							local tsg=sg:GetFirst()
+							while tsg do
+								if tg(te,tsg) then
+									ct=ct+1
+								end
+								tsg=sg:GetNext()
+							end
+							if ct==#sg then check=false end
+						else
+							if not tc then
+								check=false
+							end
+						end
+					end
+					return (neglect_zone or Duel.GetLocationCount(ttp,LOCATION_SZONE)>0) and check
+				end
+	end
 end	
-function Auxiliary.PandSSetFilter(tc,...)
+function Auxiliary.PandSSetFilter(f,...)
 	local params={...}
 	return	function(c,e,tp,eg,ep,ev,re,r,rp)
-				local eparams={}
-				if #params>0 then
-					for pc=1,#params do
-						if params[pc]=="e" then eparams[pc]=e
-						elseif params[pc]=="tp" then eparams[pc]=tp
-						elseif params[pc]=="eg" then eparams[pc]=eg
-						elseif params[pc]=="ep" then eparams[pc]=ep
-						elseif params[pc]=="ev" then eparams[pc]=ev
-						elseif params[pc]=="re" then eparams[pc]=re
-						elseif params[pc]=="r" then eparams[pc]=r
-						elseif params[pc]=="rp" then eparams[pc]=rp
-						else eparams[pc]=params[pc]
-						end
-					end
-				end
-				return (not tc or tc(c,e,tp,eg,ep,ev,re,r,rp)) and Auxiliary.PandSSetCon(c,nil,table.unpack(eparams))(nil,e,tp,eg,ep,ev,re,r,rp)
+				return (not f or f(c,e,tp,eg,ep,ev,re,r,rp)) and not c:IsForbidden() and Auxiliary.PandSSetCon(c,table.unpack(params))(nil,e,tp,eg,ep,ev,re,r,rp)
 			end
 end
 function Auxiliary.GetOriginalPandemoniumType(c)
@@ -703,6 +707,7 @@ function Auxiliary.GetOriginalPandemoniumType(c)
 end
 function Auxiliary.PandSSet(tc,reason,tpe)
 	return  function(e,tp,eg,ep,ev,re,r,rp,c)
+				local res=0
 				if pcall(Group.GetFirst,tc) then
 					local mixedset=false
 					local sg=Group.CreateGroup()
@@ -711,12 +716,12 @@ function Auxiliary.PandSSet(tc,reason,tpe)
 					for cc in aux.Next(tg) do
 						if cc:IsType(TYPE_PANDEMONIUM) or cc:GetFlagEffect(706)>0 then	
 							if not cc:IsLocation(LOCATION_HAND) then
-								cc:SetCardData(CARDDATA_TYPE,TYPE_TRAP+TYPE_CONTINUOUS)
+								cc:SetCardData(CARDDATA_TYPE,TYPE_TRAP)
 							end
 							local e1=Effect.CreateEffect(cc)
 							e1:SetType(EFFECT_TYPE_SINGLE)
 							e1:SetCode(EFFECT_MONSTER_SSET)
-							e1:SetValue(TYPE_TRAP+TYPE_CONTINUOUS)
+							e1:SetValue(TYPE_TRAP)
 							e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 							cc:RegisterEffect(e1,true)
 							if cc:IsLocation(LOCATION_SZONE) then
@@ -735,18 +740,18 @@ function Auxiliary.PandSSet(tc,reason,tpe)
 						end
 					end
 					if #sg>0 then
-						Duel.SSet(tp,sg,tp,false)
+						res=Duel.SSet(tp,sg,tp,false)
 						for cc in aux.Next(sg) do
 							local tpe=tpe or aux.GetOriginalPandemoniumType(cc)
 							if cc:IsType(TYPE_PANDEMONIUM) then
 								cc:RegisterFlagEffect(706,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SET_AVAILABLE,1)
 								if cc:IsPreviousLocation(LOCATION_HAND) then
-									cc:SetCardData(CARDDATA_TYPE,TYPE_TRAP+TYPE_CONTINUOUS)
+									cc:SetCardData(CARDDATA_TYPE,TYPE_TRAP)
 								end
 								if not cc:IsLocation(LOCATION_SZONE) then
 									local edcheck=0
 									if cc:IsLocation(LOCATION_EXTRA) then edcheck=TYPE_PENDULUM end
-									cc:SetCardData(CARDDATA_TYPE,TYPE_MONSTER+tpe+edcheck)
+									cc:SetCardData(CARDDATA_TYPE,TYPE_MONSTER|tpe|edcheck)
 								end
 							end
 						end
@@ -756,12 +761,12 @@ function Auxiliary.PandSSet(tc,reason,tpe)
 					local hand_chk=true
 					if not tc:IsLocation(LOCATION_HAND) then
 						hand_chk=false
-						tc:SetCardData(CARDDATA_TYPE,TYPE_TRAP+TYPE_CONTINUOUS)
+						tc:SetCardData(CARDDATA_TYPE,TYPE_TRAP)
 					end
 					local e1=Effect.CreateEffect(tc)
 					e1:SetType(EFFECT_TYPE_SINGLE)
 					e1:SetCode(EFFECT_MONSTER_SSET)
-					e1:SetValue(TYPE_TRAP+TYPE_CONTINUOUS)
+					e1:SetValue(TYPE_TRAP)
 					e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD)
 					tc:RegisterEffect(e1,true)
 					if tc:IsLocation(LOCATION_SZONE) then
@@ -771,19 +776,24 @@ function Auxiliary.PandSSet(tc,reason,tpe)
 							tc:RegisterFlagEffect(706,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SET_AVAILABLE,1)
 						end
 					else
-						Duel.SSet(tp,tc,tp,false)
+						res=Duel.SSet(tp,tc,tp,false)
 						tc:RegisterFlagEffect(706,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SET_AVAILABLE,1)
 					end
 					e1:Reset()
 					if hand_chk then
-						tc:SetCardData(CARDDATA_TYPE,TYPE_TRAP+TYPE_CONTINUOUS)
+						tc:SetCardData(CARDDATA_TYPE,TYPE_TRAP)
 					end
 					if not tc:IsLocation(LOCATION_SZONE) then
 						local edcheck=0
 						if tc:IsLocation(LOCATION_EXTRA) then edcheck=TYPE_PENDULUM end
-						tc:SetCardData(CARDDATA_TYPE,TYPE_MONSTER+tpe+edcheck)
+						tc:SetCardData(CARDDATA_TYPE,TYPE_MONSTER|tpe|edcheck)
+					else
+						if reason&REASON_RULE==0 then
+							Duel.ConfirmCards(1-tp,Group.FromCards(tc))
+						end
 					end
 				end
+				return res
 			end
 end
 function Auxiliary.PandActCheck(e)
@@ -904,13 +914,13 @@ function Auxiliary.PandAct(tc,...)
 				local p,zone=tp,0xff
 				if player then p=player end
 				if zonechk then zone=zonechk end
-				tc:SetCardData(CARDDATA_TYPE,TYPE_TRAP+TYPE_CONTINUOUS)
+				tc:SetCardData(CARDDATA_TYPE,TYPE_TRAP)
 				if not tc:IsOnField() or fromfield then
 					Duel.MoveToField(tc,tp,p,LOCATION_SZONE,POS_FACEUP,true,zone)
 					if not tc:IsLocation(LOCATION_SZONE) then
 						local edcheck=0
 						if tc:IsLocation(LOCATION_EXTRA) then edcheck=TYPE_PENDULUM end
-						tc:SetCardData(CARDDATA_TYPE,TYPE_MONSTER+TYPE_EFFECT+edcheck+aux.GetOriginalPandemoniumType(tc))
+						tc:SetCardData(CARDDATA_TYPE,TYPE_MONSTER|edcheck|aux.GetOriginalPandemoniumType(tc))
 						return
 					end
 				end
@@ -927,7 +937,7 @@ function Card.IsPandemoniumActivatable(c,tp,fp,neglect_loc,neglect_cond,neglect_
 	local e=c:GetActivateEffect()
 	if not c:IsType(TYPE_PANDEMONIUM) then return false end
 	
-	c:AssumeProperty(ASSUME_TYPE,TYPE_TRAP+TYPE_CONTINUOUS)
+	c:AssumeProperty(ASSUME_TYPE,TYPE_TRAP)
 	if c:IsForbidden() or c:IsHasEffect(EFFECT_CANNOT_TRIGGER) then return false end
 	if not c:CheckUniqueOnField(fp) then return false end
 	

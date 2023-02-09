@@ -57,7 +57,7 @@ function ref.setop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,ref.setcfilter,tp,LOCATION_HAND+LOCATION_MZONE,0,1,1,nil)
 	if g:GetCount()>0 and Duel.Release(g,REASON_EFFECT) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
-		local g=Duel.SelectMatchingCard(tp,aux.PandSSetFilter(ref.setfilter),tp,LOCATION_DECK,0,1,1,nil)
+		local g=Duel.SelectMatchingCard(tp,aux.PandSSetFilter(ref.setfilter),tp,LOCATION_DECK,0,1,1,nil,e,tp,eg,ep,ev,re,r,rp)
 		local tc=g:GetFirst()
 		if tc then
 			aux.PandSSet(tc,REASON_EFFECT,aux.GetOriginalPandemoniumType(tc))(e,tp,eg,ep,ev,re,r,rp)

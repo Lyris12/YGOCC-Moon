@@ -18,6 +18,7 @@ EFFECT_UPDATE_ENERGY			= 34845
 EFFECT_CHANGE_ENERGY			= 34846
 
 EVENT_ENGAGE					= EVENT_CUSTOM+34843
+EVENT_ENERGY_CHANGE				= EVENT_CUSTOM+29935986
 
 Auxiliary.Drives={}
 
@@ -150,6 +151,12 @@ function Auxiliary.DriveSelfToGraveCon(e)
 	end
 	return c:GetEnergy()==0
 end
+function Auxiliary.DriveSelfToGraveOp(cc)
+	cc:RegisterFlagEffect(FLAG_ZERO_ENERGY,RESET_EVENT+RESETS_STANDARD-RESET_TOGRAVE,EFFECT_FLAG_IGNORE_IMMUNE,1)
+	if Duel.SendtoGrave(cc,REASON_RULE)<=0 or not cc:IsLocation(LOCATION_GRAVE) then
+		cc:ResetFlagEffect(FLAG_ZERO_ENERGY)
+	end
+end
 
 --DRIVE SUMMON
 function Auxiliary.DriveCondition(e,c)
@@ -183,15 +190,15 @@ function Card.Engage(c,e,tp)
 	c:RegisterFlagEffect(FLAG_ENGAGE,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(DRIVE_STRINGS,3))
 	Duel.RaiseEvent(c,EVENT_ENGAGE,e,REASON_RULE,tp,tp,0)
 	--
-	local e5=Effect.CreateEffect(e:GetHandler())
-	e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e5:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
-	e5:SetCode(EVENT_ADJUST)
-	e5:SetRange(LOCATION_HAND)
-	e5:SetCondition(Auxiliary.DriveSelfToGraveCon)
-	e5:SetOperation(function(ce) Duel.SendtoGrave(ce:GetHandler(),REASON_RULE) end)
-	e5:SetReset(RESET_EVENT+RESETS_STANDARD)
-	c:RegisterEffect(e5)
+	-- local e5=Effect.CreateEffect(e:GetHandler())
+	-- e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	-- e5:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
+	-- e5:SetCode(EVENT_ADJUST)
+	-- e5:SetRange(LOCATION_HAND)
+	-- e5:SetCondition(Auxiliary.DriveSelfToGraveCon)
+	-- e5:SetOperation(function(ce) Duel.SendtoGrave(ce:GetHandler(),REASON_RULE) end)
+	-- e5:SetReset(RESET_EVENT+RESETS_STANDARD)
+	-- c:RegisterEffect(e5)
 end
 function Auxiliary.EngageCondition(e,tp)
 	local c=e:GetHandler()
@@ -214,24 +221,18 @@ function Auxiliary.EngageOperation(e,tp)
 	Duel.RaiseEvent(c,EVENT_ENGAGE,e,REASON_RULE,tp,tp,0)
 	Duel.RaiseSingleEvent(c,EVENT_ENGAGE,e,REASON_RULE,tp,tp,0)
 	--
-	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e5:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
-	e5:SetCode(EVENT_ADJUST)
-	e5:SetRange(LOCATION_HAND)
-	e5:SetCondition(Auxiliary.DriveSelfToGraveCon)
-	e5:SetOperation(	function(ce)
-							local cc=ce:GetHandler()
-							cc:RegisterFlagEffect(FLAG_ZERO_ENERGY,RESET_EVENT+RESETS_STANDARD-RESET_TOGRAVE,EFFECT_FLAG_IGNORE_IMMUNE,1)
-							if Duel.SendtoGrave(cc,REASON_RULE)<=0 or not cc:IsLocation(LOCATION_GRAVE) then
-								cc:ResetFlagEffect(FLAG_ZERO_ENERGY)
-							end
-						end
-					)
-	e5:SetReset(RESET_EVENT+RESETS_STANDARD)
-	c:RegisterEffect(e5)
+	-- local e5=Effect.CreateEffect(c)
+	-- e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	-- e5:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
+	-- e5:SetCode(EVENT_ADJUST)
+	-- e5:SetRange(LOCATION_HAND)
+	-- e5:SetCondition(Auxiliary.DriveSelfToGraveCon)
+	-- e5:SetOperation(Auxiliary.DriveSelfToGraveOp)
+	-- e5:SetReset(RESET_EVENT+RESETS_STANDARD)
+	-- c:RegisterEffect(e5)
 	Duel.AdjustAll()
 end
+
 
 function Duel.GetEngagedCard(tp)
 	local g=Duel.GetMatchingGroup(Card.IsEngaged,tp,LOCATION_HAND,0,nil)
@@ -290,7 +291,10 @@ end
 function Card.DriveEffect(c,energycost,desc,category,typ,property,event,condition,cost,target,operation,hold_registration)
 	local typ = typ or EFFECT_TYPE_IGNITION
 	local property = type(property)~="boolean" and property or property==true and EFFECT_FLAG_CARD_TARGET
-	local event = (not event and typ~=EFFECT_TYPE_IGNITON) and EVENT_FREE_CHAIN or event
+	local event = event
+	if typ~=EFFECT_TYPE_IGNITION and not event then
+		event=EVENT_FREE_CHAIN
+	end
 	local e=Effect.CreateEffect(c)
 	if desc then
 		e:Desc(desc)
@@ -336,7 +340,10 @@ end
 function Card.OverDriveEffect(c,desc,category,typ,property,event,condition,cost,target,operation,hold_registration)
 	local typ = typ or EFFECT_TYPE_IGNITION
 	local property = type(property)~="boolean" and property or property==true and EFFECT_FLAG_CARD_TARGET
-	local event = (not event and typ~=EFFECT_TYPE_IGNITON) and EVENT_FREE_CHAIN or nil
+	local event = event
+	if typ~=EFFECT_TYPE_IGNITION and not event then
+		event=EVENT_FREE_CHAIN
+	end
 	local e=Effect.CreateEffect(c)
 	if desc then
 		e:Desc(desc)
@@ -419,6 +426,10 @@ function Card.GetOriginalEnergy(c)
 	return energy
 end
 
+function Card.CheckZeroEnergySelfDestroy(c,ct)
+	return c:IsEnergyBelow(math.abs(ct)) --futureproofing
+end
+
 function Card.IsHasEnergy(c)
 	return Auxiliary.Drives[c] and c:IsHasEffect(EFFECT_DRIVE_ENERGY)
 end
@@ -463,6 +474,10 @@ function Card.UpdateEnergy(c,val,p,r,reset,rc)
 	c:RegisterEffect(e)
 	if r&REASON_TEMPORARY==0 then
 		aux.CheckEnergyOperation(e,p)
+		Duel.RaiseEvent(c,EVENT_ENERGY_CHANGE,e,r,p,c:GetControler(),c:GetEnergy()-en)
+		if c:GetEnergy()==0 then
+			Auxiliary.DriveSelfToGraveOp(c)
+		end
 	end
 	if reset then
 		return e,c:GetEnergy()-en
@@ -488,6 +503,10 @@ function Card.ChangeEnergy(c,val,p,r,reset,rc)
 	c:RegisterEffect(e)
 	if r&REASON_TEMPORARY==0 then
 		aux.CheckEnergyOperation(e,p)
+		Duel.RaiseEvent(c,EVENT_ENERGY_CHANGE,e,r,p,c:GetControler(),c:GetEnergy()-en)
+		if c:GetEnergy()==0 then
+			Auxiliary.DriveSelfToGraveOp(c)
+		end
 	end
 	if reset then
 		return e,c:GetEnergy()

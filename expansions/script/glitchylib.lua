@@ -92,6 +92,13 @@ function Auxiliary.AddContactFusionProcedureGlitchy(c,desc,rule,sumtype,filter,s
 	if not sumtype then sumtype=SUMMON_TYPE_FUSION end
 	local self_location=self_location or 0
 	local opponent_location=opponent_location or 0
+	
+	local condition
+	if type(mat_operation)=="table" then
+		condition=mat_operation[1]
+		mat_operation=mat_operation[#mat_operation]
+	end
+	
 	local operation_params={...}
 	
 	local prop=EFFECT_FLAG_UNCOPYABLE
@@ -104,7 +111,7 @@ function Auxiliary.AddContactFusionProcedureGlitchy(c,desc,rule,sumtype,filter,s
 	e2:SetCode(EFFECT_SPSUMMON_PROC)
 	e2:SetProperty(prop)
 	e2:SetRange(LOCATION_EXTRA)
-	e2:SetCondition(Auxiliary.ContactFusionConditionGlitchy(filter,self_location,opponent_location,sumtype))
+	e2:SetCondition(Auxiliary.ContactFusionConditionGlitchy(filter,self_location,opponent_location,sumtype,condition))
 	e2:SetOperation(Auxiliary.ContactFusionOperationGlitchy(filter,self_location,opponent_location,sumtype,mat_operation,operation_params))
 	e2:SetValue(sumtype)
 	c:RegisterEffect(e2)
@@ -113,13 +120,14 @@ end
 function Auxiliary.ContactFusionMaterialFilterGlitchy(c,fc,filter,sumtype)
 	return c:IsCanBeFusionMaterial(fc,sumtype) and (not filter or filter(c,fc))
 end
-function Auxiliary.ContactFusionConditionGlitchy(filter,self_location,opponent_location,sumtype)
+function Auxiliary.ContactFusionConditionGlitchy(filter,self_location,opponent_location,sumtype,condition)
 	return	function(e,c)
 				if c==nil then return true end
 				if c:IsType(TYPE_PENDULUM) and c:IsFaceup() then return false end
 				local tp=c:GetControler()
 				local mg=Duel.GetMatchingGroup(Auxiliary.ContactFusionMaterialFilterGlitchy,tp,self_location,opponent_location,c,c,filter,sumtype)
-				return c:IsCanBeSpecialSummoned(e,sumtype,tp,false,false) and c:CheckFusionMaterial(mg,nil,tp|0x200)
+				return (sumtype==0 or c:IsCanBeSpecialSummoned(e,sumtype,tp,false,false)) and c:CheckFusionMaterial(mg,nil,tp|0x200)
+					and (not condition or condition(e,c,tp,mg))
 			end
 end
 function Auxiliary.ContactFusionOperationGlitchy(filter,self_location,opponent_location,sumtype,mat_operation,operation_params)

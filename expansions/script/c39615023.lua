@@ -122,7 +122,7 @@ function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 		if g:GetCount()>0 and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and aux.PandSSetCon(cid.setfilter,nil,LOCATION_EXTRA)(nil,e,tp,eg,ep,ev,re,r,rp) and Duel.SelectYesNo(tp,1159) then
 			Duel.BreakEffect()
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
-			local sg=g:FilterSelect(tp,aux.PandSSetFilter(aux.TRUE),1,1,nil)
+			local sg=g:FilterSelect(tp,aux.PandSSetFilter(aux.TRUE),1,1,nil,e,tp,eg,ep,ev,re,r,rp)
 			aux.PandSSet(sg,REASON_EFFECT,aux.GetOriginalPandemoniumType(sg:GetFirst()))(e,tp,eg,ep,ev,re,r,rp)
 			Duel.ConfirmCards(1-tp,sg)
 		end

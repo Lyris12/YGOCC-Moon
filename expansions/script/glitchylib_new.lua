@@ -141,6 +141,23 @@ function Duel.Attach(c,xyz)
 	end
 end
 
+function Duel.EquipAndRegisterLimit(p,be_equip,equip_to,...)
+	local res=Duel.Equip(p,be_equip,equip_to,...)
+	if res and equip_to:GetEquipGroup():IsContains(be_equip) then
+		local e1=Effect.CreateEffect(equip_to)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetProperty(EFFECT_FLAG_OWNER_RELATE)
+		e1:SetCode(EFFECT_EQUIP_LIMIT)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+		e1:SetValue(function(e,c)
+						return e:GetOwner()==c
+					end
+				   )
+		be_equip:RegisterEffect(e1)
+	end
+	return res and equip_to:GetEquipGroup():IsContains(be_equip)
+end
+
 function Card.Recreate(c,...)
 	local x={...}
 	if #x==0 then return end
@@ -152,14 +169,23 @@ function Card.Recreate(c,...)
 	end
 end
 
+function Card.CheckNegateConjunction(c,e1,e2,e3)
+	return not c:IsImmuneToEffect(e1) and not c:IsImmuneToEffect(e2) and (not e3 or not c:IsImmuneToEffect(e3))
+end
 function Duel.Negate(tc,e,reset,notfield,forced)
-	if not reset then reset=0 end
+	local rct=1
+	if not reset then
+		reset=0
+	elseif type(reset)=="table" then
+		rct=reset[2]
+		reset=reset[1]
+	end
 	Duel.NegateRelatedChain(tc,RESET_TURN_SET)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e1:SetCode(EFFECT_DISABLE)
-	e1:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
+	e1:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
 	tc:RegisterEffect(e1,forced)
 	local e2=Effect.CreateEffect(e:GetHandler())
 	e2:SetType(EFFECT_TYPE_SINGLE)
@@ -168,18 +194,26 @@ function Duel.Negate(tc,e,reset,notfield,forced)
 	if not notfield then
 		e2:SetValue(RESET_TURN_SET)
 	end
-	e2:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
+	e2:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
 	tc:RegisterEffect(e2,forced)
 	if not notfield and tc:IsType(TYPE_TRAPMONSTER) then
-		local e=Effect.CreateEffect(e:GetHandler())
-		e:SetType(EFFECT_TYPE_SINGLE)
-		e:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e:SetCode(EFFECT_DISABLE_TRAPMONSTER)
-		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
-		tc:RegisterEffect(e,forced)
-		return e1,e2,e
+		local e3=Effect.CreateEffect(e:GetHandler())
+		e3:SetType(EFFECT_TYPE_SINGLE)
+		e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e3:SetCode(EFFECT_DISABLE_TRAPMONSTER)
+		e3:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
+		tc:RegisterEffect(e3,forced)
+		local res=tc:CheckNegateConjunction(e1,e2,e3)
+		if res then
+			Duel.AdjustInstantly(tc)
+		end
+		return e1,e2,e3,res
 	end
-	return e1,e2
+	local res=tc:CheckNegateConjunction(e1,e2)
+	if res then
+		Duel.AdjustInstantly(tc)
+	end
+	return e1,e2,nil,res
 end
 function Duel.NegateInGY(tc,e,reset)
 	if not reset then reset=0 end
@@ -259,6 +293,9 @@ end
 --Card Filters
 function Card.IsMonster(c,typ)
 	return c:IsType(TYPE_MONSTER) and (aux.GetValueType(typ)~="number" or c:IsType(typ))
+end
+function Card.IsSpell(c,typ)
+	return c:IsType(TYPE_SPELL) and (aux.GetValueType(typ)~="number" or c:IsType(typ))
 end
 function Card.IsST(c,typ)
 	return c:IsType(TYPE_ST) and (aux.GetValueType(typ)~="number" or c:IsType(typ))
@@ -639,6 +676,9 @@ function Card.IsInMMZ(c)
 end
 function Card.IsInEMZ(c)
 	return c:IsLocation(LOCATION_MZONE) and c:GetSequence()>=5
+end
+function Card.IsInBackrow(c)
+	return c:IsLocation(LOCATION_SZONE) and c:GetSequence()<5
 end
 function Card.IsSequence(c,seq)
 	return c:GetSequence()==seq

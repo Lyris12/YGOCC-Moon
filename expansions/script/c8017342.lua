@@ -60,7 +60,7 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 	if ct==4 and hg2:GetCount()>0 and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and aux.PandSSetCon(cid.setfilter,nil,LOCATION_DECK)(nil,e,tp,eg,ep,ev,re,r,rp) then
 		Duel.BreakEffect()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
-		local shg2=hg2:FilterSelect(tp,aux.PandSSetFilter(cid.setfilter,LOCATION_DECK),1,1,nil)
+		local shg2=hg2:FilterSelect(tp,aux.PandSSetFilter(cid.setfilter,LOCATION_DECK),1,1,nil,e,tp,eg,ep,ev,re,r,rp)
 		aux.PandSSet(shg2,REASON_EFFECT,aux.GetOriginalPandemoniumType(shg2:GetFirst()))(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(1-tp,shg2)
 	end

@@ -26,3 +26,48 @@ function aux.KillCounterOperation(kf,df,reset,id)
 				end
 			end
 end
+
+--[[
+Keep the count of monsters that have been Summoned
+]]
+function Auxiliary.EnableSummonCounter(c,ns,ss,fs,f,reset)
+	if not reset then reset=0 end
+	local id=c:GetOriginalCode()
+	local regtab={}
+	local g0=Effect.CreateEffect(c)
+	g0:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	g0:SetOperation(aux.SummonCounterOperation(f,reset,id))
+	if ns then
+		local g1=g0:Clone()
+		g1:SetCode(EVENT_SUMMON_SUCCESS)
+		table.insert(regtab,g1)
+	end
+	if ss then
+		local g1=g0:Clone()
+		g1:SetCode(EVENT_SPSUMMON_SUCCESS)
+		table.insert(regtab,g1)
+	end
+	if fs then
+		local g1=g0:Clone()
+		g1:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
+		table.insert(regtab,g1)
+	end
+	for _,e in ipairs(regtab) do
+		Duel.RegisterEffect(e,0)
+	end
+	g0:Reset()
+	return regtab
+end
+function Auxiliary.SummonCounterOperation(f,reset,id)
+	return	function(e,tp,eg,ep,ev,re,r,rp)
+				local g=eg:Filter(f,nil,e,tp,eg,ep,ev,re,r,rp)
+				for p=0,1 do
+					local ct=g:FilterCount(Card.IsSummonPlayer,nil,p)
+					if ct>0 then
+						for i=1,ct do
+							Duel.RegisterFlagEffect(p,id,reset,0,1)
+						end
+					end
+				end
+			end
+end

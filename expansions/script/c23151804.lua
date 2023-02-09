@@ -64,7 +64,7 @@ end
 function s.stop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 or not aux.PandSSetCon(s.stfilter,nil,LOCATION_DECK)(nil,e,tp,eg,ep,ev,re,r,rp) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,1601)
-	local tc=Duel.SelectMatchingCard(tp,aux.PandSSetFilter(s.stfilter),tp,LOCATION_DECK,0,1,1,nil):GetFirst()
+	local tc=Duel.SelectMatchingCard(tp,aux.PandSSetFilter(s.stfilter),tp,LOCATION_DECK,0,1,1,nil,e,tp,eg,ep,ev,re,r,rp):GetFirst()
 	if tc then
 		aux.PandSSet(tc,REASON_EFFECT)(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(1-tp,tc)

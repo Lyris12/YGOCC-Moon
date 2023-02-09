@@ -252,6 +252,11 @@ end
 
 -----------------------------------------------------------------------
 --Infos
+function Duel.SetCardOperationInfo(g,cat)
+	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
+	return Duel.SetOperationInfo(0,cat,g,#g,g:GetFirst():GetControler(),g:GetFirst():GetLocation())
+end
+
 function Auxiliary.Info(ctg,ct,p,v)
 	return	function(_,e,tp)
 				local p=(p>1) and p or (p==0) and tp or (p==1) and 1-tp 

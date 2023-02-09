@@ -55,12 +55,12 @@ function s.teop(e,tp,eg,ep,ev,re,r,rp)
 		aux.PandEnableFUInED(g,REASON_EFFECT)(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
-function s.cfilter(c,tp)
+function s.cfilter(c,e,tp,eg,ep,ev,re,r,rp)
 	return c:IsType(TYPE_PANDEMONIUM) and c:IsAbleToGraveAsCost() and (c:IsLocation(LOCATION_HAND) or c:IsFaceup())
-		and Duel.IsExistingMatchingCard(aux.PandSSetFilter(s.filter,c:GetOriginalCode(),LOCATION_DECK,0),tp,LOCATION_DECK,0,1,nil,c:GetOriginalCode())
+		and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil,c:GetOriginalCode(),e,tp,eg,ep,ev,re,r,rp)
 end
-function s.filter(c,code)
-	return c:IsCode(code) and c:IsType(TYPE_PANDEMONIUM)
+function s.filter(c,code,e,tp,eg,ep,ev,re,r,rp)
+	return c:IsCode(code) and c:IsType(TYPE_PANDEMONIUM) and aux.PandSSetCon(c,tp)(nil,e,tp,eg,ep,ev,re,r,rp)
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(100)
@@ -70,17 +70,17 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		if e:GetLabel()~=100 then return false end
 		e:SetLabel(0)
-		return Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_HAND+LOCATION_EXTRA,0,1,nil,tp)
+		return Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_HAND+LOCATION_EXTRA,0,1,nil,e,tp,eg,ep,ev,re,r,rp)
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_HAND+LOCATION_EXTRA,0,1,1,nil,tp)
+	local g=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_HAND+LOCATION_EXTRA,0,1,1,nil,e,tp,eg,ep,ev,re,r,rp)
 	e:SetLabel(g:GetFirst():GetOriginalCode())
 	Duel.SendtoGrave(g,REASON_COST)
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
-	local g=Duel.SelectMatchingCard(tp,aux.PandSSetFilter(s.filter,e:GetLabel(),LOCATION_DECK,0),tp,LOCATION_DECK,0,1,1,nil,e:GetLabel())
+	local g=Duel.SelectMatchingCard(tp,aux.PandSSetFilter(s.filter,e:GetLabel(),LOCATION_DECK,0),tp,LOCATION_DECK,0,1,1,nil,e:GetLabel(),e,tp,eg,ep,ev,re,r,rp)
 	if #g>0 then
 		aux.PandSSet(g,REASON_EFFECT,aux.GetOriginalPandemoniumType(g:GetFirst()))(e,tp,eg,ep,ev,re,r,rp,nil)
 		Duel.ConfirmCards(1-tp,g)
