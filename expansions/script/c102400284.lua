@@ -1,9 +1,8 @@
---Antemattr Panthr
---Scripted by: XGlitchy30
+--created by Lyris, coded by Glitchy
+--半物質のパンサ
 
 local s,id,o=GetID()
 function s.initial_effect(c)
-	--special summon
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(0)
 	e1:SetType(EFFECT_TYPE_FIELD)
@@ -13,7 +12,6 @@ function s.initial_effect(c)
 	e1:SetCondition(s.spcon)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
-	--banish
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_REMOVE+CATEGORY_ATKCHANGE)

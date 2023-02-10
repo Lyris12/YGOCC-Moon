@@ -18,7 +18,7 @@ function s.initial_effect(c)
 	e5:SetCode(EVENT_DESTROYED)
 	e5:SetCondition(function(e,tp,eg,ep,ev,re,r) return r&REASON_EFFECT>0 end)
 	e5:SetProperty(EFFECT_FLAG_DELAY)
-	e5:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e5:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TODECK)
 	e5:SetTarget(s.tg)
 	e5:SetOperation(s.op)
 	c:RegisterEffect(e5)
@@ -47,17 +47,36 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Destroy(e:GetHandler(),REASON_EFFECT)
 	end
 end
-function s.sfilter(c)
-	return c:IsSetCard(0xa6c) and c:IsSynchroSummonable(nil)
+function s.tdfilter(c,e,tp)
+	return c:IsLevelAbove(1) and c:IsAbleToDeck()
+end
+function s.check(g,sc,e,tp)
+	return g:IsExists(Card.IsSetCard,1,nil,0xa6c) and g:CheckWithSumEqual(Card.GetLevel,sc:GetLevel(),#g,#g)
+end
+function s.sfilter(c,e,tp,g)
+	return c:IsSetCard(0xa6c) and c:IsType(TYPE_SYNCHRO)
+		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_SYNCHRO,tp,false,false)
+		and g:CheckSubGroup(s.check,1,99,c,e,tp)
 end
 function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.sfilter,tp,LOCATION_EXTRA,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
+	if chk==0 then
+		local g=Duel.GetMatchingGroup(s.tdfilter,tp,LOCATION_GRAVE,0,nil)
+		return Duel.GetLocationCountFromEx(tp,tp,nil,TYPE_SYNCHRO)>0 and Duel.IsExistingMatchingCard(s.sfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,g)
+	end
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,1,tp,LOCATION_GRAVE)
 end
 function s.op(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(s.sfilter,tp,LOCATION_EXTRA,0,nil)
-	if #g>0 then
+	local mg=Duel.GetMatchingGroup(s.tdfilter,tp,LOCATION_GRAVE,0,nil,e,tp)
+	local sg=Duel.GetMatchingGroup(s.sfilter,tp,LOCATION_EXTRA,0,nil,e,tp,mg)
+	if Duel.GetLocationCountFromEx(tp,tp,nil,TYPE_SYNCHRO)<=0 or #mg==0 or #sg==0 then return end
+	local dg,sc
+	repeat
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		Duel.SynchroSummon(tp,g:Select(tp,1,1,nil):GetFirst(),nil)
-	end
+		sc=sg:Select(tp,1,1,nil):GetFirst()
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+		dg=mg:SelectSubGroup(tp,s.check,true,1,99,sc,e,tp)
+	until dg~=nil
+	Duel.SendtoDeck(dg,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
+	Duel.BreakEffect()
+	Duel.SpecialSummon(sc,SUMMON_TYPE_SYNCHRO,tp,tp,false,false,POS_FACEUP)
 end

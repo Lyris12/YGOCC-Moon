@@ -1,9 +1,8 @@
---Antemattr Divinr
---Scripted by: XGlitchy30
+--created by Lyris, coded by Glitchy
+--半物質のディヴァイナ
 
 local s,id,o=GetID()
 function s.initial_effect(c)
-	--attribute
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
@@ -14,7 +13,6 @@ function s.initial_effect(c)
 	local e1x=e1:Clone()
 	e1x:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e1x)
-	--banish
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_REMOVE)

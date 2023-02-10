@@ -43,7 +43,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 		e:SetCategory(CATEGORY_REMOVE)
 		e:SetOperation(s.remove)
 		local g=Duel.GetFieldGroup(tp,0,LOCATION_ONFIELD)
-		Duel.SelectOption
+		Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,0,0)
 	end
 end
 function s.destroy(e,tp,eg,ep,ev,re,r,rp)
