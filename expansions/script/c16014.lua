@@ -34,7 +34,7 @@ function s.lcheck(g,lg)
 end
 
 function s.spfun(c,e,tp)
-	return c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,1-tp)
+	return c:IsCanBeSpecialSummoned(e,0,1-tp,false,false,POS_FACEUP,1-tp)
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -55,17 +55,17 @@ function s.desop(e,tp)
 		local tg=g:Select(1-tp,5,5,nil)
 		if #tg>0 then
 			Duel.ConfirmCards(tp,tg)
-			local ft=Duel.GetLocationCount(1-tp,LOCATION_MZONE,tp)
+			local ft=Duel.GetLocationCount(1-tp,LOCATION_MZONE)
 			if ft>0 then
-				if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then
+				if Duel.IsPlayerAffectedByEffect(1-tp,CARD_BLUEEYES_SPIRIT) then
 					ft=1
 				end
 				local sg1=tg:Filter(s.spfun,nil,e,tp)
 				if #sg1>ft then
-					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-					sg1=sg1:Select(tp,ft,ft,nil)
+					Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_SPSUMMON)
+					sg1=sg1:Select(1-tp,ft,ft,nil)
 				end
-				if Duel.SpecialSummon(sg1,0,tp,1-tp,false,false,POS_FACEUP)>0 then
+				if Duel.SpecialSummon(sg1,0,1-tp,1-tp,false,false,POS_FACEUP)>0 then
 					local g1=Duel.GetMatchingGroup(Card.IsCanTurnSetGlitchy,tp,0,LOCATION_MZONE,nil,tp)
 					if #g1>0 then
 						Duel.BreakEffect()
