@@ -136,7 +136,7 @@ function s.sptg2(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.spop2(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(aux.Faceup(Card.IsAttribute),tp,LOCATION_MZONE,LOCATION_MZONE,nil,ATTRIBUTE_DARK)
-	if #g>0 and Duel.Destroy(g,REASON_EFFECT)==#g then
+	if #g>0 and Duel.Destroy(g,REASON_EFFECT)>0 then
 		local c=e:GetHandler()
 		if c:IsRelateToChain() and Duel.GetMZoneCount(tp)>0 then
 			Duel.SpecialSummonRedirect(e,c,0,tp,tp,false,false,POS_FACEUP)
