@@ -251,11 +251,7 @@ function Duel.GetEngagedCard(tp)
 end
 
 --CHECK ENERGY
-function Auxiliary.CheckEnergyOperation(e)
-	local tp=e:GetHandler():GetControler()
-	if Duel.GetTurnPlayer()~=tp then
-		tp=1-tp
-	end
+function Auxiliary.CheckEnergyOperation(e,tp)
 	local c = aux.GetValueType(e)=="Effect" and e:GetHandler() or e
 	local en=c:GetEnergy()
 	Duel.Hint(HINT_SOUND,0,aux.Stringid(DRIVE_STRINGS,4))
@@ -503,7 +499,7 @@ function Card.UpdateEnergy(c,val,p,r,reset,rc)
 	end
 	c:RegisterEffect(e)
 	if r&REASON_TEMPORARY==0 then
-		aux.CheckEnergyOperation(e,p)
+		aux.CheckEnergyOperation(c,p)
 		Duel.RaiseEvent(c,EVENT_ENERGY_CHANGE,e,r,p,c:GetControler(),c:GetEnergy()-en)
 		if c:GetEnergy()==0 then
 			Auxiliary.DriveSelfToGraveOp(c)
@@ -532,7 +528,7 @@ function Card.ChangeEnergy(c,val,p,r,reset,rc)
 	end
 	c:RegisterEffect(e)
 	if r&REASON_TEMPORARY==0 then
-		aux.CheckEnergyOperation(e,p)
+		aux.CheckEnergyOperation(c,p)
 		Duel.RaiseEvent(c,EVENT_ENERGY_CHANGE,e,r,p,c:GetControler(),c:GetEnergy()-en)
 		if c:GetEnergy()==0 then
 			Auxiliary.DriveSelfToGraveOp(c)
