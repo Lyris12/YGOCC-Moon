@@ -115,15 +115,19 @@ function Auxiliary.AddDriveProc(c,energy)
 	e1:SetCondition(Auxiliary.EngageCondition)
 	e1:SetOperation(Auxiliary.EngageOperation)
 	c:RegisterEffect(e1)
-	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(DRIVE_STRINGS,1))
-	e1:SetType(EFFECT_TYPE_IGNITION+EFFECT_TYPE_CONTINUOUS)
-	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_BOTH_SIDE)
-	e1:SetRange(LOCATION_HAND)
-	e1:SetCondition(Auxiliary.DriveEffectCondition())
-	e1:SetTarget(function(ce,tp,eg,ep,ev,re,r,rp,chk) if chk==0 then return true end Duel.SetChainLimit(aux.FALSE) end)
-	e1:SetOperation(Auxiliary.CheckEnergyOperation)
-	c:RegisterEffect(e1)
+	local echk=Effect.CreateEffect(c)
+	echk:SetDescription(aux.Stringid(DRIVE_STRINGS,1))
+	echk:SetType(EFFECT_TYPE_IGNITION+EFFECT_TYPE_CONTINUOUS)
+	echk:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE)
+	echk:SetRange(LOCATION_HAND)
+	echk:SetCondition(Auxiliary.DriveEffectConditionDeveloper())
+	echk:SetTarget(	function(ce,tp,eg,ep,ev,re,r,rp,chk)
+						if chk==0 then return true end
+						Duel.SetChainLimit(aux.FALSE)
+					end
+				  )
+	echk:SetOperation(Auxiliary.CheckEnergyOperationDeveloper)
+	c:RegisterEffect(echk)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_IGNORE_IMMUNE)
@@ -203,10 +207,12 @@ function Card.Engage(c,e,tp)
 end
 function Auxiliary.EngageCondition(e,tp)
 	local c=e:GetHandler()
+	if tp~=c:GetControler() then return false end
 	return c:IsLocation(LOCATION_HAND) and c:IsCanEngage(tp)
 end
-function Auxiliary.EngageOperation(e,tp)
+function Auxiliary.EngageOperation(e)
 	local c=e:GetHandler()
+	local tp=c:GetControler()
 	if not c:IsLocation(LOCATION_HAND) or not c:IsCanEngage(tp) then return end
 	Duel.Hint(HINT_CARD,tp,c:GetOriginalCode())
 	aux.CheckEnergyOperation(e,tp)
@@ -245,18 +251,41 @@ function Duel.GetEngagedCard(tp)
 end
 
 --CHECK ENERGY
-function Auxiliary.CheckEnergyOperation(e,tp)
+function Auxiliary.CheckEnergyOperation(e)
+	local tp=e:GetHandler():GetControler()
+	if Duel.GetTurnPlayer()~=tp then
+		tp=1-tp
+	end
 	local c = aux.GetValueType(e)=="Effect" and e:GetHandler() or e
 	local en=c:GetEnergy()
 	Duel.Hint(HINT_SOUND,0,aux.Stringid(DRIVE_STRINGS,4))
 	if en<=20 and en>0 then
 		c:SetTurnCounter(en)
 	else
-		Duel.Hint(HINT_NUMBER,tp,en)
+		Duel.AnnounceNumber(tp,en)
 	end
 end
+function Auxiliary.CheckEnergyOperationDeveloper(e)
+	local tp=e:GetHandler():GetControler()
+	if Duel.GetTurnPlayer()~=tp then
+		tp=1-tp
+	end
+	if not Duel.PlayerHasFlagEffect(tp,FLAG_ENGAGE) and not Duel.PlayerHasFlagEffect(tp,FLAG_ENGAGE+1) then
+		if Duel.SelectYesNo(tp,aux.Stringid(DRIVE_STRINGS,5)) then
+			Duel.RegisterFlagEffect(tp,FLAG_ENGAGE,0,0,1)
+		end
+		Duel.RegisterFlagEffect(tp,FLAG_ENGAGE+1,0,0,1)
+	end
+	aux.CheckEnergyOperation(e,tp)
+end
+
 
 --DRIVE EFFECTS
+function Auxiliary.DriveEffectConditionDeveloper(cond)
+	return	function(e,tp,eg,ep,ev,re,r,rp)
+				return not Duel.PlayerHasFlagEffect(tp,FLAG_ENGAGE) and e:GetHandler():IsEngaged() and (not cond or cond(e,tp,eg,ep,ev,re,r,rp))
+			end
+end
 function Auxiliary.DriveEffectCondition(cond)
 	return	function(e,tp,eg,ep,ev,re,r,rp)
 				return e:GetHandler():IsEngaged() and (not cond or cond(e,tp,eg,ep,ev,re,r,rp))
