@@ -1,5 +1,5 @@
---created & coded by Lyris
---サイバー・ドラゴン・ティマイオス
+--
+--Cyber Dragon Timaeus
 local s,id,o=GetID()
 function s.initial_effect(c)
 	local f1,f2,f3=Card.IsCanBeFusionMaterial,Duel.GetMatchingGroup,Duel.GetFusionMaterial

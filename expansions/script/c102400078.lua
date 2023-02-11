@@ -1,5 +1,5 @@
---created & coded by Lyris, art by Akira-san on MiniTokyo.net
---天剣主九ナコ
+--
+--Winged Swordsmaster Dawning
 local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()

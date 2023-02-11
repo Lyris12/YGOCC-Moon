@@ -1,5 +1,5 @@
---created & coded by Lyris, art at https://images.homedepot-static.com/productImages/ea33e713-a782-4db2-9bb5-dfd662f36d47/svn/black-hdx-general-purpose-aw64003-64_1000.jpg and from "Degenerate Circuit"
---サイバーダーク・エクステンション・コード
+--
+--Cyberdark Extension Cords
 local s,id,o=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)

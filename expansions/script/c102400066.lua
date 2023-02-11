@@ -1,5 +1,5 @@
---created & coded by Lyris, art by hiliuyun of DeviantArt
---剣主一リク
+--
+--Linc the Swordsmaster
 local s,id,o=GetID()
 function s.initial_effect(c)
 	local e0=Effect.CreateEffect(c)

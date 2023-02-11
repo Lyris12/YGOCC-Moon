@@ -1,5 +1,5 @@
---created & coded by Lyris, art from Metal Gear Rising: Revengance's Raiden
---剣主零マン
+--
+--Raymond the Swordsmaster
 local s,id,o=GetID()
 function s.initial_effect(c)
 	local e0=Effect.CreateEffect(c)

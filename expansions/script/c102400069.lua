@@ -1,5 +1,5 @@
---created & coded by Lyris, art from Heroes of Three Kingdoms
---剣主アレ四ゃンド王
+--
+--Alexiand the Swordsmaster
 local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()

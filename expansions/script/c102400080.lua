@@ -1,5 +1,5 @@
---created & coded by Lyris, art from Magic the Gathering's "Seraph of Dawn"
---天剣主翔
+--
+--Winged Swordsmaster's Flight
 local s,id,o=GetID()
 function s.initial_effect(c)
 	local e0=Effect.CreateEffect(c)

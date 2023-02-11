@@ -1,5 +1,5 @@
---created & coded by Lyris, art at http://1.bp.blogspot.com/_jynCnIdwsk4/TEfeWui5DkI/AAAAAAAACPE/F_CPSgOiC2g/s1600/sinhasan-battishi-story-katha-nice-793791.jpg
---剣主三タン
+--
+--Exyte the Swordsmaster
 local s,id,o=GetID()
 function s.initial_effect(c)
 	local e0=Effect.CreateEffect(c)

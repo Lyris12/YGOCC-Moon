@@ -1,5 +1,5 @@
---created & coded by Lyris, art from Slim Slots : Dragon Edition
---サイバー・ドラゴン・マック
+--
+--Cyber Dragon Mach
 local s,id,o=GetID()
 function s.initial_effect(c)
 	aux.EnableChangeCode(c,CARD_CYBER_DRAGON,LOCATION_MZONE+LOCATION_GRAVE)
