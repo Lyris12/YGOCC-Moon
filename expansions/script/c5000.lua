@@ -185,7 +185,7 @@ function s.ops(e,tp,eg,ep,ev,re,r,rp)
 	ge:SetCode(EVENT_FREE_CHAIN)
 	ge:SetOperation(s.global_manual_actions)
 	Duel.RegisterEffect(ge,1-tp)
-	--Remove Automatic Lost
+	--Remove Automatic Loss
 	local ge=Effect.CreateEffect(c)
 	ge:SetType(EFFECT_TYPE_FIELD)
 	ge:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
@@ -899,7 +899,7 @@ function s.chain_link_action(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	--
 	while true do
-		local sel=aux.Option(id+1,tp,8,true,true,true,{true,5006,2})
+		local sel=aux.Option(id+1,tp,8,true,true,true,{true,5006,2},{true,5006,5})
 		if sel==0 then
 			return
 		elseif sel==1 then
@@ -919,6 +919,48 @@ function s.chain_link_action(e,tp,eg,ep,ev,re,r,rp)
 			s.global_manual_actions(e,tp,eg,ep,ev,re,r,rp)
 		elseif sel==3 then
 			s.deck_manual_actions(e,tp,eg,ep,ev,re,r,rp)
+		elseif sel==4 then
+			local loc,ct
+			local ct1,ct2=Duel.GetFieldGroupCount(tp,LOCATION_DECK,0),Duel.GetFieldGroupCount(tp,LOCATION_EXTRA,0)
+			local locsel=aux.Option(5007,tp,6,ct1>0,ct2>0)
+			if locsel==0 then
+				loc=LOCATION_DECK
+				ct=ct1
+			else
+				loc=LOCATION_EXTRA
+				ct=ct2
+			end
+			
+			local numbers={}
+			for i=1,ct do
+				table.insert(numbers,i)
+			end
+			Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(5006,7))
+			local n=Duel.AnnounceNumber(tp,table.unpack(numbers))
+			
+		
+			local g
+			local shufflechk=Duel.SelectYesNo(tp,aux.Stringid(5006,6))
+			if locsel==0 then
+				if shufflechk then
+					Duel.ShuffleDeck(tp)
+				end
+				g=Duel.GetDecktopGroup(tp,n)
+			else
+				if shufflechk then
+					Duel.ShuffleExtra(tp)
+				end
+				g=Duel.GetExtraTopGroup(tp,n)
+			end
+			if #g>0 then
+				local elist=global_card_effect_table[g:GetFirst()]
+				for _,effect in ipairs(elist) do
+					if effect and effect.GetLabel and effect:GetLabel()==1 then
+						Duel.DisableShuffleCheck()
+						s.manual_actions(effect,tp,eg,ep,ev,re,r,rp,g)
+					end
+				end
+			end
 		end
 	end
 end
