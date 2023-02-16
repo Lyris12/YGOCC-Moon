@@ -5,20 +5,17 @@ local scard,s_id=GetID()
 
 function scard.initial_effect(c)
 	--search
-	Card.IsMantra=Card.IsMantra or (function(tc) return tc:GetCode()>30200 and tc:GetCode()<30230 end)
+	Card.IsMantra=Card.IsMantra or (function(tc) return tc:IsSetCard(0x7d0) or (tc:GetCode()>30200 and tc:GetCode()<30230) end)
 	local e2=Effect.CreateEffect(c)
+	e2:Desc(0)
 	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_GRAVE)
 	e2:SetCountLimit(1,s_id)
-	e2:SetCost(scard.thcost)
+	e2:SetCost(aux.bfgcost)
 	e2:SetTarget(scard.thtg)
 	e2:SetOperation(scard.thop)
 	c:RegisterEffect(e2)
-end
-function scard.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
-	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
 end
 function scard.thfilter(c)
 	return c:IsMantra() and c:IsAbleToHand()

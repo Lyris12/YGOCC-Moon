@@ -4,9 +4,10 @@
 local scard,s_id=GetID()
 
 function scard.initial_effect(c)
-	Card.IsMantra=Card.IsMantra or (function(tc) return tc:GetCode()>30200 and tc:GetCode()<30230 end)
+	Card.IsMantra=Card.IsMantra or (function(tc) return tc:IsSetCard(0x7d0) or (tc:GetCode()>30200 and tc:GetCode()<30230) end)
 	--Activate
 	local e1=Effect.CreateEffect(c)
+	e1:Desc(0)
 	e1:SetCategory(CATEGORY_DRAW)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
@@ -18,7 +19,7 @@ function scard.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function scard.filter(c)
-	return c:IsMantra() and (c:IsAttribute(ATTRIBUTE_DARK) or c:IsAttribute(ATTRIBUTE_EARTH)) and c:IsDiscardable()
+	return c:IsMantra() and c:IsMonster() and c:IsDiscardable()
 end
 function scard.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(scard.filter,tp,LOCATION_HAND,0,1,nil) end

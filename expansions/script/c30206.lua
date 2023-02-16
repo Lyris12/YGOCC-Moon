@@ -5,7 +5,7 @@ local scard,s_id=GetID()
 
 function scard.initial_effect(c)
 	c:SetUniqueOnField(1,0,s_id)
-	Card.IsMantra=Card.IsMantra or (function(tc) return tc:GetCode()>30200 and tc:GetCode()<30230 end)
+	Card.IsMantra=Card.IsMantra or (function(tc) return tc:IsSetCard(0x7d0) or (tc:GetCode()>30200 and tc:GetCode()<30230) end)
 	--activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
@@ -25,5 +25,5 @@ function scard.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function scard.infilter(e,c)
-	return c:IsType(0x60006) and c:IsMantra() and c:GetCode()~=s_id
+	return c:IsSpellTrapOnField() and c:IsMantra() and c~=e:GetHandler()
 end

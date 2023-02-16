@@ -112,11 +112,12 @@ function Effect.GetCustomCategory(e)
 	if not global_effect_category_table[e] then return 0,0 end
 	return global_effect_category_table[e][1], global_effect_category_table[e][2]
 end
-function Duel.SetCustomOperationInfo(ch,cat,g,ct,p,val,extra)
+function Duel.SetCustomOperationInfo(ch,cat,g,ct,p,val,...)
+	local extra={...}
 	if not global_effect_info_table[ch+1] or #global_effect_info_table[ch+1]>0 then
 		global_effect_info_table[ch+1]={}
 	end
-	table.insert(global_effect_info_table[ch+1],{cat,g,ct,p,val,extra})
+	table.insert(global_effect_info_table[ch+1],{cat,g,ct,p,val,table.unpack(extra)})
 end
 
 --Card Actions
@@ -235,9 +236,9 @@ end
 function Duel.PositionChange(c)
 	return Duel.ChangePosition(c,POS_FACEUP_DEFENSE,POS_FACEDOWN_DEFENSE,POS_FACEUP_ATTACK,POS_FACEUP_ATTACK)
 end
-function Duel.Search(g,tp)
+function Duel.Search(g,tp,p)
 	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
-	local ct=Duel.SendtoHand(g,tp,REASON_EFFECT)
+	local ct=Duel.SendtoHand(g,p,REASON_EFFECT)
 	local cg=g:Filter(aux.PLChk,nil,tp,LOCATION_HAND)
 	if #cg>0 then
 		Duel.ConfirmCards(1-tp,cg)
