@@ -1,4 +1,4 @@
-﻿expansions/cards-new.cdb	28d7b8f0257fa8932b005df6bbeb76ed
+﻿expansions/cards-new.cdb	274141cd357d4f6ecb51f91c4d934868
 expansions/lflist.conf	877f1b166afd75d9681021ed838fbbce
 expansions/strings.conf	4c1bd0f85558cf8583590328341519be
 expansions/pics/100000714.jpg	74ec20749932cad0249671d71e6d672b
@@ -8515,7 +8515,7 @@ expansions/script/c30039208.lua	c5bd7b8a035387c535e75cfdbab6d0ea
 expansions/script/c30039209.lua	e132b0b6f9390da0d8d3035e47bf5625
 expansions/script/c30039210.lua	b40cda908118df6ef998a7f39d750d81
 expansions/script/c30201.lua	07c465d575a64d6b33d4ecc5870bfcd7
-expansions/script/c30202.lua	18d6b4b456b2bacf103a1df5110ea053
+expansions/script/c30202.lua	6112b49ad706f4dd356ba23154ee70e0
 expansions/script/c30203.lua	f2f1b2cee5ab8ed7d321e714dfac8ef6
 expansions/script/c30204.lua	4cf8d4cd29c2d63e81d8906bb9eb7eec
 expansions/script/c30205.lua	856d47c1501ba816055cc6bf9deff110
@@ -11238,6 +11238,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	41acfbfda97a12c719ce829dbaa56912
+update/filelist.txt	7d0b2c7376145a1f652ddfde38777a4a
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	2a3b99eaea3244772124386dad742b26
+update/version.txt	dfbdcff5a098521a01d149be3e241d82

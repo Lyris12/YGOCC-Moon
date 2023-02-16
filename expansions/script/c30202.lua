@@ -91,7 +91,7 @@ end
 function scard.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local rc=re:GetHandler()
-	return not Duel.PlayerHasFlagEffect(tp,s_id) and rc and rc:IsMantra() and (c:IsReason(REASON_EFFECT) or (c:IsReason(REASON_COST) and re:IsActivated()))
+	return not Duel.PlayerHasFlagEffect(tp,s_id) and rc and rc:IsMantra() and c:IsReason(REASON_EFFECT|REASON_COST)
 end
 function scard.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
