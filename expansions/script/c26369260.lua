@@ -101,7 +101,7 @@ function s.sccost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsDestructable(e,REASON_COST,tp) end
 	Duel.Destroy(e:GetHandler(),REASON_COST)
 end
-function s.setfilter(c,tp,lab)
+function s.setfilter(c,e,tp,eg,ep,ev,re,r,rp,lab)
 	if c:IsForbidden() then return false end
 	if c:IsLocation(LOCATION_DECK+LOCATION_HAND) or c:IsLocation(LOCATION_EXTRA+LOCATION_REMOVED) and c:IsFacedown() then return false end
 	if c:IsType(TYPE_FIELD) then
@@ -109,13 +109,13 @@ function s.setfilter(c,tp,lab)
 	elseif c:IsType(TYPE_SPELL+TYPE_TRAP) then
 		return c:IsSSetable(false) and (lab==1 or Duel.GetLocationCount(tp,LOCATION_SZONE)>0)
 	elseif c:IsType(TYPE_PANDEMONIUM) then
-		return aux.PandSSetCon(c,tp,true)() and (lab==1 or Duel.GetLocationCount(tp,LOCATION_SZONE)>0)
+		return aux.PandSSetCon(c,tp,true)(nil,e,tp,eg,ep,ev,re,r,rp) and (lab==1 or Duel.GetLocationCount(tp,LOCATION_SZONE)>0)
 	end
 	return false
 end
 function s.sctg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
-		local res=eg:IsExists(s.setfilter,1,nil,tp,e:GetLabel())
+		local res=eg:IsExists(s.setfilter,1,nil,e,tp,eg,ep,ev,re,r,rp,e:GetLabel())
 		e:SetLabel(0)
 		return res
 	end
@@ -123,7 +123,7 @@ end
 function s.scop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
-	local g=eg:Filter(aux.NecroValleyFilter(s.setfilter),nil,tp,0)
+	local g=eg:Filter(aux.NecroValleyFilter(s.setfilter),nil,e,tp,eg,ep,ev,re,r,rp,0)
 	if #g<=0 then return end
 	local tc=(#g==1) and g:GetFirst() or g:Select(tp,1,1,nil):GetFirst()
 	if tc then

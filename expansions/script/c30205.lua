@@ -39,13 +39,12 @@ function scard.initial_effect(c)
 	c:RegisterEffect(e1z)
 end
 function scard.drawfilter(c,tp,re,r)
-	if r&REASON_COST>0 and not re:IsActivated() then return false end
 	if not c:IsReason(r) then return false end
 	local rc=re:GetHandler()
 	return rc and c:IsPreviousLocation(LOCATION_HAND) and c:GetPreviousControler()==tp and c:IsType(TYPE_MONSTER) and c:IsMantra()
 end
 function scard.notactcon(e,tp,eg,ep,ev,re,r,rp)
-	return re and (not re:IsHasType(EFFECT_TYPE_ACTIONS) or re:IsHasType(EFFECT_TYPE_CONTINUOUS)) and eg:IsExists(scard.drawfilter,1,nil,tp,re,REASON_EFFECT)
+	return re and (not re:IsHasType(EFFECT_TYPE_ACTIONS) or re:IsHasType(EFFECT_TYPE_CONTINUOUS)) and eg:IsExists(scard.drawfilter,1,nil,tp,re,REASON_EFFECT|REASON_COST)
 end
 function scard.op1(e,tp,eg,ep,ev,re,r,rp)
 	local ct=eg:FilterCount(scard.drawfilter,nil,tp,re,REASON_EFFECT)

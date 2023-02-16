@@ -666,7 +666,13 @@ function Auxiliary.PandSSetCon(tc,player,...)
 	else
 		return	function(c,e,tp,eg,ep,ev,re,r,rp)
 					local ttp=player
-					if not ttp or ttp<0 then ttp=e:GetHandlerPlayer() end
+					if not ttp or ttp<0 then
+						if aux.GetValueType(e)=="Effect" then
+							ttp=e:GetHandlerPlayer()
+						elseif tc then
+							ttp=tc:GetControler()
+						end
+					end
 					local check=true
 					local egroup={Duel.IsPlayerAffectedByEffect(ttp,EFFECT_CANNOT_SSET)}
 					for _,te in ipairs(egroup) do

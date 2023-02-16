@@ -29,7 +29,7 @@ end
 function scard.somefilter(c,e,tp,eg,ep,ev,re,r,rp)
 	if not re then return false end
 	local rc=re:GetHandler()
-	return rc and rc:IsMantra() and (c:IsReason(REASON_EFFECT) or (c:IsReason(REASON_COST) and re:IsActivated()))
+	return rc and rc:IsMantra() and c:IsReason(REASON_EFFECT|REASON_COST)
 	and c:IsAttribute(ATTRIBUTE_DARK) and c:IsMantra()
 	and c:GetPreviousControler()==tp and c:GetPreviousLocation()==LOCATION_HAND
 end

@@ -22,7 +22,7 @@ function scard.bcon(e,tp,eg,ep,ev,re,r,rp)
 	if not re then return false end
 	local c=e:GetHandler()
 	local rc=re:GetHandler()
-	return rc:IsMantra() and (c:IsReason(REASON_EFFECT) or (c:IsReason(REASON_COST) and re:IsActivated()))
+	return rc:IsMantra() and c:IsReason(REASON_EFFECT|REASON_COST)
 end
 function scard.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) end

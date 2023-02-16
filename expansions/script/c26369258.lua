@@ -72,18 +72,18 @@ function s.actop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SpecialSummon(c,0,tp,tp,true,false,POS_FACEUP)
 end
 
-function s.stfilter(c,tp)
-	return c:IsSetCard(0x2c2) and c:IsType(TYPE_PANDEMONIUM) and aux.PandSSetCon(c,tp,true)() and not c:IsForbidden()
+function s.stfilter(c,e,tp,eg,ep,ev,re,r,rp)
+	return c:IsSetCard(0x2c2) and c:IsType(TYPE_PANDEMONIUM) and aux.PandSSetCon(c,tp,true)(nil,e,tp,eg,ep,ev,re,r,rp) and not c:IsForbidden()
 end
 function s.sttg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
-		and Duel.IsExistingMatchingCard(s.stfilter,tp,LOCATION_DECK,0,1,nil,tp)
+		and Duel.IsExistingMatchingCard(s.stfilter,tp,LOCATION_DECK,0,1,nil,e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.stop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,1601)
-	local tc=Duel.SelectMatchingCard(tp,s.stfilter,tp,LOCATION_DECK,0,1,1,nil):GetFirst()
+	local tc=Duel.SelectMatchingCard(tp,s.stfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp,eg,ep,ev,re,r,rp):GetFirst()
 	if tc then
 		aux.PandSSet(tc,REASON_EFFECT)(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(1-tp,tc)

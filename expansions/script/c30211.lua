@@ -46,7 +46,7 @@ function scard.spcon(e,tp,eg,ep,ev,re,r,rp)
 	if not re then return false end
 	local c=e:GetHandler()
 	local rc=re:GetHandler()
-	return rc and rc:IsMantra() and re:IsActiveType(TYPE_MONSTER) and (c:IsReason(REASON_EFFECT) or (c:IsReason(REASON_COST) and re:IsActivated()))
+	return rc and rc:IsMantra() and re:IsActiveType(TYPE_MONSTER) and c:IsReason(REASON_EFFECT|REASON_COST)
 end
 function scard.filter(c,e,tp)
 	return c:IsMantra() and c:HasLevel() and c:IsLevelBelow(4) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

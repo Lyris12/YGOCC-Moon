@@ -26,7 +26,7 @@ end
 function scard.dcon(e,tp,eg,ep,ev,re,r,rp)
 	if not re then return false end
 	local c=e:GetHandler()
-	return re:IsActiveType(TYPE_MONSTER) and (c:IsReason(REASON_EFFECT) or (c:IsReason(REASON_COST) and re:IsActivated()))
+	return re:IsActiveType(TYPE_MONSTER) and c:IsReason(REASON_EFFECT|REASON_COST)
 		and c:GetPreviousLocation()&LOCATION_DECK==0
 end
 function scard.d2con(e,tp,eg,ep,ev,re,r,rp)
