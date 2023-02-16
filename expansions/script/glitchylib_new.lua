@@ -734,6 +734,11 @@ function Card.HasBeenInLinkedZone(c,cc)
 	return cc:GetLinkedGroup():IsContains(c) or (not c:IsLocation(LOCATION_MZONE) and cc:GetLinkedZone(c:GetPreviousControler())&c:GetPreviousZone()~=0)
 end
 
+--Materials
+function Auxiliary.GetMustMaterialGroup(p,eff)
+	return Duel.GetMustMaterial(p,eff)
+end
+
 
 --Once per turn
 function Effect.OPT(e,ct)

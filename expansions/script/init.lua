@@ -1987,7 +1987,7 @@ function Auxiliary.XSynMixCheck(mg,sg1,minc,maxc,syncard,smat,gc,mgchk)
 	local tp=syncard:GetControler()
 	local sg=Group.CreateGroup()
 	--Debug.Message(tostring(minc).." "..tostring(syncard:GetCode()))
-	if minc==0 and Auxiliary.XSynMixCheckGoal(tp,sg1,0,0,syncard,sg,smat,gc,mgchk) then return true end
+	if minc<=0 and Auxiliary.XSynMixCheckGoal(tp,sg1,0,0,syncard,sg,smat,gc,mgchk) then return true end
 	if maxc==0 then return false end
 	return mg:IsExists(Auxiliary.XSynMixCheckRecursive,1,nil,tp,sg,mg,0,minc,maxc,syncard,sg1,smat,gc,mgchk)
 end
@@ -2177,6 +2177,7 @@ function Auxiliary.XSynMixTarget(f,minc,maxc,gc,...)
 				end
 				g:Merge(gf)
 				if g:GetCount()>0 then
+					g:KeepAlive()
 					e:SetLabelObject(g)
 					return true
 				else return false end
