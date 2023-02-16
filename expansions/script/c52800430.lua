@@ -3,18 +3,6 @@
 
 local s,id=GetID()
 
-s.effect_text = [[
-● You can only use the ④ effect of "Carnivorous Swamp" once per turn.
-
-① When this card is Normal Summoned: You can change its battle position.
-② Each time a Level 4 or lower monster(s) is Summoned while this card is face-up in a Monster Zone or in a Field Zone, except by the effect of "Carnivorous Swamp", place 1 counter on this card for each one of those monsters.
-③ All monsters on the field and in both players' hands lose 2 Levels for each counter on this card.
-④ If this card has a counter(s) on it: You can place this card with a counter on it in your Field Zone as a Field Spell, and if you do, place counters on it equal to the number of counters it had in the Monster Zone, and if you do that, it gains these effects depending on the number of counters on it.
-● 1+: Once per turn, you can negate a monster effect activated on the field or in the hand by a monster with a Level/Rank/Future equal to or lower than the number of counters on this card.
-● 3+: Once per turn, during the End Phase: Banish the monster with the lowest Rating on the field (your choice, if tied)
-● 5+: You can remove any number of counters from this card; Special Summon 1 banished monster with a Rating equal to the number of counters you removed to activate this effect.
-]]
-
 function s.initial_effect(c)
 	c:EnableCounterPermit(0x102,LOCATION_MZONE+LOCATION_FZONE)
 	

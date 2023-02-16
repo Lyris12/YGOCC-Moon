@@ -2,15 +2,6 @@
 --Scripted by: XGlitchy30
 
 local s,id=GetID()
-
-s.effect_text = [[
-● You can only use the ① and ② effect of "Bee Blade" once per turn.
-
-① When this card is Summoned: You can Special Summon 1 Insect monster from your hand in a different battle position from this card.
-② (Quick Effect): You can discard 1 card, then target 1 other monster you control in this card's column or in an adjacent one; change this card's battle position, then change that target's battle position.
-③ Each time a monster(s) changes its battle position, that monster(s) gains 700 ATK/DEF, until the end of the turn.
-]]
-
 function s.initial_effect(c)
 	--SS
 	local e1,e1x,e1y=c:SummonedTrigger(false,true,true,true,0,CATEGORY_SPECIAL_SUMMON,false,{1,0},nil,nil,s.sptg,s.spop)

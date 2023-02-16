@@ -2,17 +2,6 @@
 --Scripted by: XGlitchy30
 
 local s,id=GetID()
-
-s.effect_text = [[
-● You can only use the ① effect of "Six-Packoach" once per turn.
-
-① You can target 1 face-up monster you control with an even Level; equip this card from your hand or field to that target.
-② The equipped monster can change its battle position 1 additional time during the same turn for every 2 Levels it has, also it gains 2600 DEF.
-③ When the equipped monster changes its battle position: You can target 1 other monster on the field; change its battle position, and if you do, apply 1 of these effects.
-● Unequip this card and Special Summon it, and if you do, destroy the monster this card was equipped to.
-● The monster this card is equipped to gains 600 ATK.
-]]
-
 function s.initial_effect(c)
 	c:Ignition(0,CATEGORY_EQUIP,EFFECT_FLAG_CARD_TARGET,LOCATION_MZONE+LOCATION_HAND,{1,0},nil,nil,s.eqtg,s.eqop)
 	--

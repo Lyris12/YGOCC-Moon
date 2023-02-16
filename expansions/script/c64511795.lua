@@ -3,11 +3,6 @@
 
 local s,id=GetID()
 
-s.effect_text = [[
-① When a monster(s) with a different Type from this card is Summoned: You can target 1 of those monsters; this card's Type becomes the Type of that target, also, if this card has 2500 or less ATK, it gains ATK equal to that target's current ATK.
-② Once per turn, while this card has 2500 or more ATK, you can (Quick Effect): Until the end of the turn, this card cannot be destroyed or targeted by your opponent's card effects, also this card's ATK is halved at the end of the turn.
-]]
-
 function s.initial_effect(c)
 	c:SummonedFieldTrigger(nil,false,true,true,true,0,{CATEGORY_ATKCHANGE,CATEGORY_UPDATE_RACE},EFFECT_FLAG_CARD_TARGET,LOCATION_MZONE,nil,aux.EventGroupCond(s.cf),nil,s.target,s.operation)
 	c:Quick(false,1,false,false,false,false,1,s.ptcon,nil,nil,s.ptop)

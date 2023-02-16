@@ -2,15 +2,6 @@
 --Scripted by: XGlitchy30
 
 local s,id=GetID()
-
-s.effect_text = [[
-● You can only use the ① effect of "Gloryhand" once per turn.
-
-① When a monster(s) your opponent controls is destroyed by battle or by the effect of a face-up monster you control and sent to the GY: You can Special Summon this card from GY (if it was there when the monster(s) was destroyed) or hand (even if not), and if you do, negate the effects of that destroyed monster(s) while it is in the GY.
-② Once per turn, you can either (Quick Effect): Target 1 monster you control that destroyed a monster(s) your opponent controlled while on a Monster Zone this turn (either by battle or with its effect); equip this card to that target, OR: Unequip this card and Special Summon it.
-③ The effects, the effect activations and activated effects of the equipped monster cannot be negated, also if the equipped monster would be destroyed by battle or card effect, destroy this card instead.
-]]
-
 function s.initial_effect(c)
 	local e1=c:SentToGYFieldTrigger(nil,false,0,CATEGORY_SPECIAL_SUMMON+CATEGORY_DISABLE,EFFECT_FLAG_DAMAGE_STEP,LOCATION_HAND+LOCATION_GRAVE,{1,0},aux.EventGroupCond(s.cf),false,aux.SSSelfTarget(true),s.op)
 	

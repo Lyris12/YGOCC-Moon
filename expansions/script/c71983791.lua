@@ -2,13 +2,6 @@
 --Scripted by: XGlitchy30
 
 local s,id=GetID()
-
-s.effect_text = [[
-● You can only use this effect of "Mad Mixer" once per turn.
-
-①  You can reveal 1 Fusion Monster from your Extra Deck; send this card from your hand or field to the GY, and if you do, Fusion Summon that revealed monster by using only monsters you control as Fusion Material, and including exactly 1 face-up monster your opponent controls which does not meet any material requirement. That Fusion Monster has its effects negated, also it loses ATK equal to the ATK of that opponent's monster used as material during each of your End Phases.
-]]
-
 function s.initial_effect(c)
 	c:Ignition(0,CATEGORY_TOGRAVE+CATEGORY_SPECIAL_SUMMON+CATEGORY_FUSION_SUMMON,false,LOCATION_HAND+LOCATION_MZONE,{1,0},nil,aux.LabelCost,s.tg,s.op)
 end

@@ -2,15 +2,6 @@
 --Scripted by: XGlitchy30
 
 local s,id=GetID()
-
-s.effect_text = [[
-● You can only use each effect of "Herburnt" once per turn.
-● You cannot Special Summon monsters from the Extra Deck during the turn you activate this card's ② effect, except FIRE monsters.
-
-① (Quick Effect): You can send this card from your hand to the GY, then target 1 FIRE monster you control; that target gains 700 ATK until the end of the turn, also the first time it would be destroyed by your opponent's card effect this turn, it is not destroyed.
-② If a Spell/Trap(s) on your field is destroyed while this card is in your GY (except during the Damage Step): You can Special Summon this card from your GY, and if you do, you can banish any number of Spells/Traps from your GY, and if you do that, Special Summon that many "Herburnt" from your Deck. All monsters Special Summoned by this effect are banished when they leave the field.
-]]
-
 function s.initial_effect(c)
 	c:Quick(false,0,CATEGORY_ATKCHANGE,EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP,false,LOCATION_HAND,{1,0},aux.ExceptOnDamageCalc,aux.ToGraveSelfCost,s.target,s.operation)
 	c:DestroyedFieldTrigger(nil,false,1,CATEGORY_SPECIAL_SUMMON+CATEGORY_REMOVE,false,LOCATION_GRAVE,{1,1},s.spcon,aux.SSLimit(s.counterfilter2,2,true),s.sptg,s.spop)

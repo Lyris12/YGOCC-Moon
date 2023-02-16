@@ -2,16 +2,6 @@
 --Scripted by: XGlitchy30
 
 local s,id=GetID()
-
-s.effect_text = [[
-● You can only Special Summon "Agriskullture Burncutter" once per turn with the ① effect.
-● You can only use the ② and ③ effect of "Agriskulture Burncutter" once per turn.
-
-① You can Special Summon this card (from your hand) to your Main Monster Zone that was previously occupied by a monster you controlled, and that was banished from that zone or sent from that zone to the GY this turn.
-② When this card is Special Summoned: You can target 1 monster in your GY, or that is among your banished cards, that was sent to the GY, or banished, from the Main Monster Zone this card was Special Summoned into; shuffle it into the Deck, and if you do, add from your Deck to your hand, 1 monster with the same Type and Attribute as that monster, but a lower Level.
-③ While this card is in your GY, except the turn this card was sent to the GY, if you have no banished "Agriskullture Burncutter": You can banish this card from your GY; the next time you Special Summon "Agriskullture Burncutter", shuffle all your banished "Agriskullture Burncutter" into the Deck, and if you shuffled at least 1, you can destroy 1 monster your opponent controls.
-]]
-
 function s.initial_effect(c)
 	c:SSProc(0,nil,nil,{1,0},s.zcon,nil,nil,nil,nil,s.zone)
 	local e2=c:SummonedTrigger(false,false,true,false,1,CATEGORY_TODECK+CATEGORY_SEARCH+CATEGORY_TOHAND,EFFECT_FLAG_CARD_TARGET,{1,1},nil,nil,s.target,s.operation)

@@ -2,14 +2,6 @@
 --Scripted by: XGlitchy30
 
 local s,id=GetID()
-
-s.effect_text = [[
-● You can only use the ② effect of "Fairy Droid" once per turn.
-
-① Cannot be destroyed by battle, nor targeted by your opponent's card effects if you have a Ritual Monster and a Ritual Spell both in your GY, or both among your banished cards.
-② You can discard 1 card; add 1 Ritual Spell or 1 Ritual Monster from your Deck to your hand, and if you do, the first time you Ritual Summon exactly 1 monster this turn with the effect of a Ritual Spell with the same original name as the card you added with this effect, or the first time you Ritual Summon exactly 1 Ritual Monster this turn with the same original name as the card you added with this effect, this card gains ATK equal to the original ATK of the Ritual Summoned monster.
-]]
-
 function s.initial_effect(c)
 	--Protection
 	local e1=c:BattleProtection()

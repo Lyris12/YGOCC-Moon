@@ -2,17 +2,6 @@
 --Scripted by: XGlitchy30
 
 local s,id=GetID()
-
-s.effect_text = [[
-● You can only Special Summon "Parapsyche Marmot(s)" once per turn with its ① effect.
-● You can only use the ② effect of "Parapsyche Marmot" once per turn.
-
-① You can Special Summon this card (from your hand or GY) by returning 1 other Beast monster or Continuous Trap you control or in your GY, except "Parapsyche Marmot", to the hand, but banish it when it leaves the field.
-② During the Main Phase: You can place 1 Beast monster or "Parapsyche" monster, except this card, from your hand or field face-up into your Spells & Traps Zone as a Continuous Trap, and if you do, apply 1 of these effects.
-● Special Summon 1 Beast monster from your Deck with the same name as 1 face-up Continuous Trap on the field, except the card you placed with this effect.
-● Choose 1 unoccupied Main Monster Zone on the field. That Zone becomes unusable until the end of the next turn.
-]]
-
 function s.initial_effect(c)
 	--special summon proc
 	local e1=Effect.CreateEffect(c)

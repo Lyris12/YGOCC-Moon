@@ -2,15 +2,6 @@
 --Scripted by: XGlitchy30
 
 local s,id=GetID()
-
-s.effect_text = [[
-● You can only use the ③ effect of "Pulstar Ruler - Lanknoir Armor" once per turn.
-
-① If you control a Warrior monster with a lower Level, this card cannot be targeted for an attack or by your opponent's card effects.
-② Each time a Warrior monster(s) in your hand is destroyed, or a Warrior monster(s) is banished face-up from your GY, this card gains 1000 ATK 
-③ (Quick Effect): You can make this card lose exactly 2000 ATK and DEF, and if it does, add to your hand or Special Summon 1 "Pulstar" monster from your Deck with the same Attribute, but with a lower Level.
-]]
-
 function s.initial_effect(c)
 	--cannot be target
 	local e2=Effect.CreateEffect(c)

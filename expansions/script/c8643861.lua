@@ -2,18 +2,6 @@
 --Scripted by: XGlitchy30
 
 local s,id=GetID()
-
-s.effect_text = [[
-● Cannot be Special Summoned, except by its own effect.
-● You can only use the ② effect of "Protosdragia, the Primal Life" once per turn.
-
-① If this card you control would be banished, returned to the hand or shuffled into the Deck by an opponent's card effect, you can respectively banish, return to the hand, or shuffle into the Deck, 1 other card you control instead.
-② During the End Phase of the turn this face-up card you controlled was sent from the field to the GY because of an opponent's card effect or because it was destroyed by battle: You can Special Summon this card from your GY, and if you do, apply 1 of these effects depending on the original type of the card that sent this card to the GY.
-● Monster: Special Summon from your Deck or Extra Deck, 1 monster with the same original Attribute, original Type, original ATK or original DEF as the monster that sent this card to the GY, except "Protosdragia, the Primal Life".
-● Spell: Add from your Deck to your hand, 1 Spell with the same Type (Normal, Continuous, Field, Ritual, Equip, Quick-Play) as the Spell that sent this card to the GY.
-● Trap: Set directly from your Deck, 1 Trap with the same Type (Normal, Continuous, Counter) as the Trap that sent this card to the GY.
-]]
-
 function s.initial_effect(c)
 	aux.AddCodeList(c,id)
 	--cannot special summon

@@ -2,14 +2,6 @@
 --Scripted by: XGlitchy30
 
 local s,id=GetID()
-
-s.effect_text = [[
-● You can only use the ② effect of "Statue of Perpetuity" once per turn.
-
-① You can Tribute Summon/Set Level 5 or higher monsters from your GY, but if you do, you can only use only "Statue(s) of Perpetuity" as Tributes. You cannot apply this effect immediately after an effect that allows you to perform a Normal Summon/Set resolves.
-② When this card is Tributed for a Tribute Summon, and sent to the GY: You can Special Summon this card from your GY, then, if that Tribute Summoned monster was Summoned from the hand, you can Tribute Summon/Set 1 monster in addition to your Normal Summon/Set this turn (You can only gain this effect once per turn).
-]]
-
 function s.initial_effect(c)
 	--summon proc
 	local e1=Effect.CreateEffect(c)

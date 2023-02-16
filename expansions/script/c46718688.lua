@@ -2,17 +2,6 @@
 --Scripted by: XGlitchy30
 
 local s,id=GetID()
-
-s.effect_text = [[
-● You can only use each effect of "Pollutant Anemone" once per turn.
-① When this card is Normal or Special Summoned: You can activate 1 Field Spell from either player's GY to your field, and if you do, replace its effects with the following ones.
-● The first time this card would be destroyed by an opponent's card effect, it is not destroyed.
-● All monsters on the field, except "Pollutant Anemone", lose 1300 ATK/DEF
-● "Pollutant Anemone" gains 1300 ATK/DEF.
-
-② If this card leaves the field: Destroy 1 Field Spell on your field, and if you do, all monsters your opponent currently controls lose 1300 ATK/DEF.
-]]
-
 function s.initial_effect(c)
     --Activate Field Spell
 	local e1,e1x=c:SummonedTrigger(false,true,true,false,0,nil,true,{1,0},false,false,aux.ActivateFieldSpellTarget(s.filter,LOCATION_GRAVE,LOCATION_GRAVE),s.op)

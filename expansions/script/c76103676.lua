@@ -2,19 +2,6 @@
 --Scripted by: XGlitchy30
 
 local s,id=GetID()
-
-s.effect_text = [[
-●You can only use each effect of "Sparkling Finisher" once per turn.
-
-① Apply 1 of the following effects depending on your opponent's LP.
-● Equal to or higher than 8000: Inflict 2 damage to your opponent, also they send a monster with 2 or less ATK from their hand or Extra Deck to the GY (if any).
-● Lower than 8000 but higher than or equal to 4100: Inflict 200 damage to your opponent, plus 200 damage for each "Sparks" in your GY.
-● Lower than 4000 but higher than or equal to 2100: Inflict 2000 damage to your opponent, also you can draw 1 card, and if you do, take 2000 damage.
-● Equal to or lower than 2000: Banish 3 "Sparks" from your GY, and if you do, your opponent's LP become 20000, and if they do, inflict 20000 damage to your opponent at the end of the turn.
-
-② You can banish this card from your GY; add 1 "Sparkling Finisher" from your Deck to your hand, then you can add any number of "Sparks" from your Deck and/or GY to your hand.
-]]
-
 function s.initial_effect(c)
 	c:Activate(0,CATEGORY_DAMAGE+CATEGORY_TOGRAVE+CATEGORY_DRAW+CATEGORY_REMOVE,false,false,{1,0},nil,nil,s.tg,s.op)
 	c:Ignition(3,CATEGORY_SEARCH+CATEGORY_TOHAND,false,LOCATION_GRAVE,{1,1},nil,aux.bfgcost,aux.SearchTarget(s.thf,1),s.thop)

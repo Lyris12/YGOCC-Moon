@@ -3,16 +3,6 @@
 
 local s,id=GetID()
 
-s.effect_text = [[
-● You can only use each effect of "Tempest Shocker" once per turn.
-● You can only Special Summon "Tempest Shocker" once per turn with its ① effect.
-
-① If you control a face-up Spell/Trap, you can Special Summon this card (from your hand) to either field in face-up Defense Position. 
-② If Summoned this way: Destroy all face-up Spells/Traps on this card's owner field.
-③ Negate the effects of all other face-up Field Spells and Continuous Spells/Traps on this card's owner field.
-④ When another Thunder monster(s) is Normal or Special Summoned to your field (except during the Damage Step): You can Set from your GY to your field, 1 Field Spell or 1 Continuous Spell/Trap. (It can be activated this turn if it is a Trap).
-]]
-
 function s.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

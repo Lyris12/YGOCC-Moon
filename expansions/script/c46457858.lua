@@ -2,13 +2,6 @@
 --Scripted by: XGlitchy30
 
 local s,id=GetID()
-
-s.effect_text = [[
-● You can only use the ① effect of "Intellectualizard" once per Duel.
-
-① You can send 1 Reptile or Dinosaur monster you control to the GY; Special Summon this card from your GY, and if you do, you can add from your Deck to your hand, 1 Reptile or Dinosaur monster with a different original Type and a lower original Level than the monster you sent to the GY to activate this effect.
-]]
-
 function s.initial_effect(c)
 	--SS + Search
 	local e1=c:Ignition(0,CATEGORY_SPECIAL_SUMMON+CATEGORY_SEARCH+CATEGORY_TOHAND,nil,LOCATION_GRAVE,{1,0,EFFECT_COUNT_CODE_DUEL},nil,

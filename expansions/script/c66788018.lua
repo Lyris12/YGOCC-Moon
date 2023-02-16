@@ -3,14 +3,6 @@
 
 local s,id=GetID()
 
-s.effect_text = [[
-● You can only use the ① effect of "Suddencut" once per turn.
-● Cannot be Set in a Spell & Trap Cards Zone.
-● While you control a monster(s) with the lowest ATK on the field, you can activate this card from your hand during your opponent's turn.
-
-① If your opponent controls more monsters than you do, and you control at least 1 face-up monster: Destroy 1 face-up monster on the field, and if you do, the ATK of all Special Summoned monsters on the field becomes equal to the ATK on the field of the destroyed monster, then, if you destroyed the monster that had the lowest ATK on the field and that monster is now banished, in the GY, or face-up in the Extra Deck, its effects are negated until the end of the turn, as well as the effects on the field of monsters whose ATK is equal to or lower than the ATK it had on the field.
-]]
-
 function s.initial_effect(c)
 	c:CannotBeSet()
 	c:Activate(0,CATEGORY_DESTROY+CATEGORY_ATKCHANGE,EFFECT_FLAG_DAMAGE_STEP,false,{1,0},s.condition,nil,s.target,s.operation,aux.LocationGroupCond(s.hf,LOCATION_MZONE,0,1))

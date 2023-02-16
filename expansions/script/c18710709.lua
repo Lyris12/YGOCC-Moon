@@ -2,17 +2,6 @@
 --Scripted by: XGlitchy30
 
 local s,id=GetID()
-
-s.effect_text = [[
-● Cannot be Normal Summoned/Set.
-● You can only use the ④ effect of "Absolute Searuler" once per turn.
-
-① Must be Special Summoned (from your hand) by paying LP equal to the highest ATK or DEF (whichever is higher) among all face-up monsters you control, and making the ATK/DEF of all face-up monsters you control become 0.
-② Other monsters with 0 ATK/DEF are unaffected by your opponent's card effects, also they cannot change their battle positions.
-③ Any battle damage you would take from battles involving a monster with 0 ATK/DEF you control is reduced by 1000 for each monster with 0 ATK/DEF on the field
-④ If another monster(s) whose ATK or DEF is higher than 0 is Summoned: You can make the ATK/DEF of that monster(s) become 0, and if you do, negate the effects of that monster(s), also negate the effects of a number of face-up cards you control, equal to the number of monsters that were Summoned and whose ATK or DEF is higher than 0.
-]]
-
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	--Special summon limitation

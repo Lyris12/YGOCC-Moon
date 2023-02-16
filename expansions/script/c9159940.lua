@@ -3,14 +3,6 @@
 
 local s,id=GetID()
 
-s.effect_text = [[
-● Cannot be Normal Summoned while there is a face-up monster on the field.
-● You can only use each effect of "Ancient Fogrest Protector" once per turn.
-
-① During the Main Phase: When you activate this effect, you can also return this card you control to the hand; Special Summon 1 Level 3 or lower Beast, Beast-Warrior, Winged-Beast, Insect or Fairy monster from your hand or Deck, also you cannot Special Summon monsters for the rest of the turn, except Beast, Beast-Warrior, Winged-Beast, Insect and Fairy monsters. If you returned this card to the hand when you activated this effect, your opponent cannot activate cards or effects in response to this effect's activation.
-② When this card is flipped face-up: Target 1 face-up Beast, Beast-Warrior, Winged-Beast, Insect or Fairy monster you control; it cannot be destroyed by battle, nor targeted by an opponent's card effect, until the end of the next turn.
-]]
-
 function s.initial_effect(c)
 	--sumlimit
 	local e1=Effect.CreateEffect(c)

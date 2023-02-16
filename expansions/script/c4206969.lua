@@ -2,15 +2,6 @@
 --Scripted by: XGlitchy30
 
 local s,id=GetID()
-
-s.effect_text = [[
-● You can only activate 1 "Hiddinsidia Pit" per turn.
-
-① When you Normal or Flip Summon exactly 1 monster with 1500 or less ATK, you can activate this card from your hand.
-② When exactly 1 monster is Normal or Flip Summoned: You can choose 1 occupied Monster Zone on the field; destroy the monster that occupies the chosen Zone, and if you do, if this card was Set before activation and the destroyed monster is now in the GY and it was in a Main Monster Zone, that Main Monster Zone cannot be used as long as the destroyed monster remains in the GY.
-③ If this Set card in your Spells & Traps Zone is destroyed by an opponent's card effect and sent to the GY: You can choose 1 unused Main Monster Zone on the field. The first time a monster is Normal Summoned or Set in the chosen Zone, destroy that monster.
-]]
-
 function s.initial_effect(c)
 	--activate
 	local e1=Effect.CreateEffect(c)

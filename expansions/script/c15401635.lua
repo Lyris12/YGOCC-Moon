@@ -2,15 +2,6 @@
 --Scripted by: XGlitchy30
 
 local s,id=GetID()
-
-s.effect_text = [[
-● You can only use each effect of "Shadow of the Pulstar Ruler" once per turn.
-
-① If exactly 1 Warrior monster you control would be destroyed by battle or by an opponent's card effect, you can destroy this card in your hand instead.
-② If exactly 1 "Pulstar" monster you control would be destroyed by battle or by an opponent's card effect, you can banish this card from your GY instead.
-③ If you control another face-up "Pulstar" monster with a higher Level: You can Tribute this card; Special Summon 1 Warrior monster from your Deck with the same Attribute, Level, original ATK and original DEF as 1 face-up "Pulstar" monster you control.
-]]
-
 function s.initial_effect(c)
 	--replace
 	local e1=Effect.CreateEffect(c)

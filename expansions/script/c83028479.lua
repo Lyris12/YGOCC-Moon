@@ -2,16 +2,6 @@
 --Scripted by: XGlitchy30
 
 local s,id=GetID()
-
-s.effect_text = [[
-● You can only use each effect of "Dinoscientist" once per turn.
-● You can only activate 1 Spell during the turn you activate this card's ① effect.
-
-① When a Reptile or Dinosaur monster is Normal Summoned while this card is in your hand: You can destroy this card in your hand and up to 1 other monster in your hand and/or field, then Special Summon an equal number of "DiNA Token" (DARK/Level 2/Dinosaur/ATK 100/DEF 500).
-② If this card is in your GY: You can Tribute any number of "DiNA Token"; Special Summon an equal number of Reptile and Dinosaur monsters from your GY, including this card, but banish them when they leave the field.
-
-]]
-
 function s.initial_effect(c)
 	--Token
 	local e0=c:SummonedFieldTrigger(nil,false,true,false,false,0,CATEGORY_SPECIAL_SUMMON+CATEGORY_DESTROY+CATEGORY_TOKEN,nil,LOCATION_HAND,{1,0},

@@ -2,15 +2,6 @@
 --Scripted by: XGlitchy30
 
 local s,id=GetID()
-
-s.effect_text = [[
-● You can only use the ③ effect of "Brathunder" once per turn.
-
-① Cannot be targeted for attacks while you control another monster.
-② Any battle damage you take is doubled.
-③ If another monster you control is destroyed by battle: Negate the activated effects of monsters in your opponent's possession, until the end of their turn.
-]]
-
 function s.initial_effect(c)
 	--Cannot be attack target
 	local e1=Effect.CreateEffect(c)

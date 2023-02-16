@@ -2,14 +2,6 @@
 --Scripted by: XGlitchy30
 
 local s,id=GetID()
-
-s.effect_text = [[
-● You can only use the ① effect of "Parapsyche Mirror" once per turn.
-
-① If this card is Normal or Special Summoned: You can target 1 face-up Attack Position monster your opponent controls in this card's column; change that monster to face-up Defense Position, and if you do, your opponent cannot activate its effects nor change its position while this card remains face-up on the field.
-② When a monster you control is targeted for an attack by an opponent's monster: You can Special Summon this card from your hand, and if you do, you can change the attack target to 1 face-up "Parapsyche" monster you control and proceed to damage calculation.
-]]
-
 function s.initial_effect(c)
 	--target
 	local e1=Effect.CreateEffect(c)

@@ -2,18 +2,6 @@
 --Scripted by: XGlitchy30
 
 local s,id=GetID()
-
-s.effect_text = [[
-● You can only activate 1 "Healer's Potion" per Duel.
-● You can only use the ② effect of "Healer's Potion" once per turn.
-
-① Gain 1000 LP for each time you took battle damage during this Duel (max. 8000).
-② You can discard this card, then target 1 face-up monster on the field; it gains 1000 DEF, also it gains these effects.
-● If this card would be destroyed by battle, it loses ATK equal to the exact difference between its DEF and the ATK of the monster that it battled, instead.
-● When this card would be destroyed by a card effect, it loses exactly 1000 DEF instead.
-● If the ATK of this card is 0, send it to the GY.
-]]
-
 function s.initial_effect(c)	
 	Duel.EnableGlobalFlag(GLOBALFLAG_SELF_TOGRAVE)
 	--Activate

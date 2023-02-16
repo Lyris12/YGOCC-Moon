@@ -3,12 +3,6 @@
 
 local s,id=GetID()
 
-s.effect_text = [[
-● You can only use the ① effect of "Limb Crawler" once per turn.
-① You can target 1 face-up monster you control with 1000 or more ATK and DEF; that target loses exactly 1000 ATK and DEF, and if it does, Special Summon this card from your hand, and if you do that, this card gains 1000 ATK and DEF.
-② A monster that was Special Summoned from the Extra Deck by using this card as material cannot activate its effects during the turn it is Special Summoned, also it gains 1000 ATK and DEF.
-]]
-
 function s.initial_effect(c)
 	--ss
 	local e1=Effect.CreateEffect(c)

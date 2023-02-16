@@ -3,14 +3,6 @@
 
 local s,id=GetID()
 
-s.effect_text = [[
-● You can only control 1 "Darkness Fhollower"
-● You can only use the ② effect of "Darkness Fhollower" once per turn.
-
-① Each time a DARK monster(s) on the field destroys a card(s) (either by battle or by card effect) or is destroyed, draw 1 card, then banish 1 card from your hand.
-② During the Main Phase: You can equip 1 Level 1 DARK monster from the field, or that is banished, to this card, and if you do, this card gains the effects of that monster as long as it is equipped to it.
-]]
-
 function s.initial_effect(c)
 	c:SetUniqueOnField(1,0,id)
 	--draw

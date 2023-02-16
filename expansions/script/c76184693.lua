@@ -3,14 +3,6 @@
 
 local s,id=GetID()
 
-s.effect_text = [[
-● You can only use the ② effect of "Sizeclop" once per turn.
-● If this card's Level is 7 or more, you can activate the ② effect as a Quick Effect.
-
-① You can Special Summon this card (from your hand) by discarding 1 Level 3 or lower monster, but its Level becomes the Level of the discarded monster.
-② During the Main Phase: You can target 1 face-up monster on the field with a lower Level than this card; destroy that face-up monster, and if you do, this card's Level becomes equal to the sum between this card's current Level and the Level the destroyed monster had on the field.
-]]
-
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(0)
