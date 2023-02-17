@@ -79,6 +79,6 @@ function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(cid.spfilter),tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
 	if #g>0 then
-		Duel.SpecialSummonATKDEF(e,g,0,tp,tp,false,false,POS_FACEUP_ATTACK,0,0)
+		Duel.SpecialSummonATKDEF(e,g,0,tp,tp,false,false,POS_FACEUP_ATTACK,nil,0,0)
 	end
 end
