@@ -4195,7 +4195,7 @@ function rscf.XyzLevelFreeCondition22(f,gf,minct,maxct,alterf,desc,op)
 				end
 				mg=mg:Filter(rscf.XyzLevelFreeFilter2,nil,c,f)
 				if mgextra and #mgextra>0 then mg:Merge(mgextra) end
-				local sg=Auxiliary.GetMustMaterialGroup(tp,EFFECT_MUST_BE_XMATERIAL)
+				local sg=Duel.GetMustMaterial(tp,EFFECT_MUST_BE_XMATERIAL)
 				if sg:IsExists(Auxiliary.MustMaterialCounterFilter,1,nil,mg) then return false end
 				Duel.SetSelectedCard(sg)
 				Auxiliary.GCheckAdditional=Auxiliary.TuneMagicianCheckAdditionalX(EFFECT_TUNE_MAGICIAN_X)
@@ -4226,7 +4226,7 @@ function rscf.XyzLevelFreeTarget22(f,gf,minct,maxct,alterf,desc,op)
 					mg=Duel.GetFieldGroup(tp,LOCATION_MZONE,0)
 					mg3=Duel.GetMatchingGroup(rscf.ExtraXyzMaterialsFilter,tp,0xff,0xff,mg,c,tp,f)
 				end
-				local sg=Auxiliary.GetMustMaterialGroup(tp,EFFECT_MUST_BE_XMATERIAL)
+				local sg=Duel.GetMustMaterial(tp,EFFECT_MUST_BE_XMATERIAL)
 				local mg2=mg:Filter(rscf.XyzLevelFreeFilter2,nil,c,f)
 				mg3:Merge(mg2)
 				--other material

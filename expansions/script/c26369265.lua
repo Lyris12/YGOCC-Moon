@@ -99,7 +99,7 @@ function s.BigbangCondition(e,c,matg,mustg)
 			mg2=Duel.GetMatchingGroup(Auxiliary.BigbangExtraFilter,tp,0xff,0xff,nil,c,tp,table.unpack(plist))
 		end
 		if #mg2>0 then mg:Merge(mg2) end
-		local fg=aux.GetMustMaterialGroup(tp,EFFECT_MUST_BE_BIGBANG_MATERIAL)
+		local fg=Duel.GetMustMaterial(tp,EFFECT_MUST_BE_BIGBANG_MATERIAL)
 		if mustg and aux.GetValueType(mustg)=="Group" then
 			fg:Merge(mustg)
 		end
