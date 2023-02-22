@@ -45,7 +45,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToChain() and s.cfilter(tc) then
 		local e1,e2,oatk,atk,odef,def=tc:ChangeATKDEF(0,0,true,e:GetHandler())
-		if not tc:IsImmuneToEffect(e1) and oatk~=0 and atk==0 and not tc:IsImmuneToEffect(e2) and odef~=0 and def==0 then
+		if (not tc:IsImmuneToEffect(e1) and oatk~=0 and atk==0) or (not tc:IsImmuneToEffect(e2) and odef~=0 and def==0) then
 			Duel.BreakEffect()
 			Duel.Damage(1-tp,500,REASON_EFFECT)
 		end

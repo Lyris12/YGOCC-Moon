@@ -1,4 +1,4 @@
-﻿expansions/cards-new.cdb	274141cd357d4f6ecb51f91c4d934868
+﻿expansions/cards-new.cdb	bbc511ea56568cce89b0b9e3adc2b723
 expansions/lflist.conf	877f1b166afd75d9681021ed838fbbce
 expansions/strings.conf	4c1bd0f85558cf8583590328341519be
 expansions/pics/100000714.jpg	74ec20749932cad0249671d71e6d672b
@@ -9705,7 +9705,7 @@ expansions/script/c46457858.lua	dfa12a1f3d059c84342507608f173a6a
 expansions/script/c46718688.lua	0d0a741283a48c891e70ff02bfe2679e
 expansions/script/c46718689.lua	d6fe178bbfa12e0d643235b75ccd5087
 expansions/script/c47511800.lua	d1f4259be1171e28a1dec91563d9dbb2
-expansions/script/c47511801.lua	1e2173d65ed5b8210f9d3b8f8ee2048a
+expansions/script/c47511801.lua	2ca0fcf8ab70a3cb8b471ea9a271dc0e
 expansions/script/c47511802.lua	115c532d95f515c585d130bcde5108f4
 expansions/script/c47511803.lua	c0871ea9899b71b1c7efecda28b6aa92
 expansions/script/c47511804.lua	bcb4a2259b3d728f09fbd891d4d48ca3
@@ -9717,7 +9717,7 @@ expansions/script/c47511809.lua	4bd16d9c84785507f379eb9dee102cfd
 expansions/script/c47511810.lua	3e193e5d5dcab19c36404a720e2ed984
 expansions/script/c47511811.lua	2fd41b55c65151e7789cd3f1592eac1f
 expansions/script/c47511812.lua	840bfe234fb57979caf0e5b194ca1daf
-expansions/script/c47511813.lua	96c94cea8ac465411b75f0e52e5e91ac
+expansions/script/c47511813.lua	9653e8e93fd1c5c2e6e9a247bc96ce2e
 expansions/script/c47695418.lua	a7e3b3b7423b37cee77c691df6326e44
 expansions/script/c48022718.lua	4afa492b051375752ee07cc71bbac98f
 expansions/script/c4879029.lua	23a01e7db39784873b6bcab0154b681c
@@ -11132,7 +11132,7 @@ expansions/script/glitchylib_cond.lua	809c75647364292c1e2f1ecea58e029d
 expansions/script/glitchylib_cost.lua	8c64ad3732560801b2346407829ed757
 expansions/script/glitchylib_field.lua	e1b561bca268b0f50957c7878a9d830d
 expansions/script/glitchylib_global.lua	5abf72fd505f279a15701d3dbb169653
-expansions/script/glitchylib_new.lua	560c8f40fbc26833992f64dedc5ce787
+expansions/script/glitchylib_new.lua	1f2c2b0cde457665947967cf0f2407b7
 expansions/script/glitchylib_single.lua	6073726c5c3aa297548ea9b45b81ed10
 expansions/script/glitchylib_tgop.lua	f5ea427b6d0b21443da2e7c01d379690
 expansions/script/glitchylib_trigger.lua	99fade1f52aa59cb9e27589b81e2c57f
@@ -11239,6 +11239,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	4313a883f7bce5b5e1a36e05beacc0d8
+update/filelist.txt	7aa0acc23a79e7f4fb2f425cc535e514
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	173b6db37652714d6247b9c313966f77
+update/version.txt	26edd4dbbd28c32b490e038cd7ee9166

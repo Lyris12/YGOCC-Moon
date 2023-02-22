@@ -627,7 +627,7 @@ function Card.HasFlagEffectLabel(c,id,val)
 	end
 	return false
 end
-function Duel.PlayerHasFlagEffectLabel(p,id,val)
+function Duel.PlayerHasFlagEffectLabel(tp,id,val)
 	if Duel.GetFlagEffect(tp,id)==0 then return false end
 	for _,label in ipairs({Duel.GetFlagEffectLabel(tp,id)}) do
 		if label==val then
