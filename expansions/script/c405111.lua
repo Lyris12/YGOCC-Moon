@@ -49,10 +49,8 @@ function c405111.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c405111.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local g=eg:Filter(c405111.atkfilter,nil,e,1-tp)
-	local dg=Group.CreateGroup()
 	local c=e:GetHandler()
-	local tc=g:GetFirst()
-	while tc do
+	for tc in aux.Next(g) do
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
