@@ -1,19 +1,20 @@
---
+--Zero HERO Necro Man
 --Automate ID
 
 local scard,s_id=GetID()
 
 function scard.initial_effect(c)
-	Card.IsZHERO=Card.IsZHERO or (function(tc) return (tc:GetCode()>30400 and tc:GetCode()<30420) and tc:IsSetCard(0x8) end)
+	Duel.RegisterCustomSetCard(c,30401,30419,CUSTOM_ARCHE_ZERO_HERO)
+	Card.IsZHERO=Card.IsZHERO or (function(tc) return (tc:GetCode()>30400 and tc:GetCode()<30420) or (tc:IsSetCard(0x8) and tc:IsCustomSetCard(CUSTOM_ARCHE_ZERO_HERO)) end)
 	--spsummon
 	local e1=Effect.CreateEffect(c)
+	e1:Desc(0)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
-	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_CARD_TARGET)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET|EFFECT_FLAG_DD)
 	e1:SetTarget(scard.sptg)
 	e1:SetOperation(scard.spop)
-	e1:SetCountLimit(1,s_id)
 	c:RegisterEffect(e1)
 	local e2=e1:Clone()
 	e2:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
@@ -42,16 +43,17 @@ function scard.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		and Duel.IsExistingTarget(scard.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectTarget(tp,scard.filter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
+	Duel.SetCardOperationInfo(g,CATEGORY_SPECIAL_SUMMON)
 end
 function scard.spop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) then
+	if tc and tc:IsRelateToChain() then
 		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
+
 function scard.cfilter(c)
-	return c:IsSetCard(0x8)
+	return c:IsMonster() and c:IsSetCard(0x8)
 end
 function scard.atkval(e,c)
 	return Duel.GetMatchingGroupCount(scard.cfilter,0,LOCATION_GRAVE,LOCATION_GRAVE,nil)*500

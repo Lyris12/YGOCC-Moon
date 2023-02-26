@@ -3,14 +3,19 @@ EFFECT_CANNOT_ACTIVATE_LMARKER=8000
 EFFECT_CANNOT_DEACTIVATE_LMARKER=8001
 EFFECT_PRE_LOCATION=8002
 EFFECT_NO_ARCHETYPE=8003
-EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL 	= 8004
-EFFECT_GLITCHY_EXTRA_LINK_MATERIAL	    = 8005
-EFFECT_GLITCHY_EXTRA_MATERIAL_FLAG		= 8006
-EFFECT_GLITCHY_HACK_CODE 				= 8007
-EFFECT_NAME_DECLARED					= 8008
-EFFECT_GLITCHY_CANNOT_DISABLE			= 8009
-EFFECT_GLITCHY_FUSION_SUBSTITUTE 		= 8010
-EFFECT_GLITCHY_CANNOT_CHANGE_ATK		= 8011
+EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL 			= 8004
+EFFECT_GLITCHY_EXTRA_LINK_MATERIAL	    		= 8005
+EFFECT_GLITCHY_EXTRA_MATERIAL_FLAG				= 8006
+EFFECT_GLITCHY_HACK_CODE 						= 8007
+EFFECT_NAME_DECLARED							= 8008
+EFFECT_GLITCHY_CANNOT_DISABLE					= 8009
+EFFECT_GLITCHY_FUSION_SUBSTITUTE 				= 8010
+EFFECT_GLITCHY_CANNOT_CHANGE_ATK				= 8011
+EFFECT_GLITCHY_ADD_CUSTOM_SETCODE				= 8012
+EFFECT_GLITCHY_ADD_ORIGINAL_CUSTOM_SETCODE		= 8013
+EFFECT_GLITCHY_PREVIOUS_CUSTOM_SETCODE			= 8014
+EFFECT_GLITCHY_ADD_FUSION_CUSTOM_SETCODE		= 8015
+EFFECT_GLITCHY_ADD_LINK_CUSTOM_SETCODE			= 8016
 
 FLAG_UNCOUNTED_NORMAL_SUMMON			= 8000
 FLAG_UNCOUNTED_NORMAL_SET				= 8001
@@ -22,6 +27,184 @@ EFFECT_REVERSE_WHEN_IF=48928491
 
 UNIVERSAL_GLITCHY_TOKEN = 1231
 
+-------------------------------------------------------------------------------------
+-------------------------------TABLES-------------------------------------------------
+function Auxiliary.FindInTable(tab,a,...)
+	local extras={...}
+	if a then
+		table.insert(extras,a)
+	end
+	
+	for _,param in ipairs(extras) do
+		for _,elem in ipairs(tab) do
+			if elem==param then
+				return true
+			end
+		end
+	end
+	
+	return false
+end
+
+-------------------------------------------------------------------------------------
+-------------------------------CUSTOM ARCHETYPES-------------------------------------
+function Auxiliary.IsCustomSetCardTemplate(effect_code,c,hex,...)
+	if not c:IsHasEffect(effect_code) then return false end
+	
+	local setcodes={...}
+	if hex then
+		table.insert(setcodes,1,hex)
+	end
+	
+	local ct=#setcodes
+	
+	local egroup={c:IsHasEffect(effect_code)}
+	for _,e in ipairs(egroup) do
+		if e and e.GetValue and aux.GetValueType(e)=="Effect" then
+			local value=e:GetValue()
+			if value then
+				local settype0,setsubtype0 = value&0xfff, value%0xf000
+				for i=1,ct do
+					local setc=setcodes[i]
+					local settype1,setsubtype1 = setc&0xfff, setc%0xf000
+					if settype1==settype0 and (setsubtype1==0 or setsubtype1==setsubtype0) then
+						return true
+					end
+				end
+			end
+		end
+	end
+	
+	return false
+end
+function Card.IsCustomSetCard(c,hex,...)
+	return aux.IsCustomSetCardTemplate(EFFECT_GLITCHY_ADD_CUSTOM_SETCODE,c,hex,...)
+end
+function Card.IsOriginalCustomSetCard(c,hex,...)
+	return aux.IsCustomSetCardTemplate(EFFECT_GLITCHY_ADD_ORIGINAL_CUSTOM_SETCODE,c,hex,...)
+end
+function Card.IsPreviousCustomSetCard(c,hex,...)
+	return aux.IsCustomSetCardTemplate(EFFECT_GLITCHY_PREVIOUS_CUSTOM_SETCODE,c,hex,...)
+end
+function Card.IsFusionCustomSetCard(c,hex,...)
+	return aux.IsCustomSetCardTemplate(EFFECT_GLITCHY_ADD_FUSION_CUSTOM_SETCODE,c,hex,...)
+end
+function Card.IsLinkCustomSetCard(c,hex,...)
+	return aux.IsCustomSetCardTemplate(EFFECT_GLITCHY_ADD_LINK_CUSTOM_SETCODE,c,hex,...)
+end
+
+function Card.GetCustomSetCard(c)
+	if not c:IsHasEffect(EFFECT_GLITCHY_ADD_CUSTOM_SETCODE) then return false end
+	
+	local setcodes={}
+	local egroup={c:IsHasEffect(EFFECT_GLITCHY_ADD_CUSTOM_SETCODE)}
+	for _,e in ipairs(egroup) do
+		if e and e.GetValue and aux.GetValueType(e)=="Effect" then
+			local value=e:GetValue()
+			if value then
+				table.insert(setcodes,value)
+			end
+		end
+	end
+	
+	if #setcodes>0 then
+		return table.unpack(setcodes)
+	else
+		return 0
+	end
+end
+
+aux.RegisteredCustomSetCards = {}
+function Duel.RegisterCustomSetCard(c,id1,id2,hex,...)
+	local setcodes={}
+	if hex then
+		table.insert(setcodes,1,hex)
+	end
+	
+	for i,setcode in ipairs(setcodes) do
+		if c then
+			local e1=Effect.CreateEffect(c)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_IGNORE_IMMUNE|EFFECT_FLAG_UNCOPYABLE|EFFECT_FLAG_SET_AVAILABLE)
+			e1:SetCode(EFFECT_GLITCHY_ADD_ORIGINAL_CUSTOM_SETCODE)
+			e1:SetValue(setcode)
+			c:RegisterEffect(e1,true)
+		end
+		
+		if #aux.RegisteredCustomSetCards==0 or not aux.FindInTable(aux.RegisteredCustomSetCards,setcode) then
+			table.insert(aux.RegisteredCustomSetCards,setcode)
+			local e2=Effect.GlobalEffect()
+			e2:SetType(EFFECT_TYPE_FIELD)
+			e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_IGNORE_IMMUNE|EFFECT_FLAG_UNCOPYABLE|EFFECT_FLAG_SET_AVAILABLE|EFFECT_FLAG_IGNORE_RANGE)
+			e2:SetCode(EFFECT_GLITCHY_ADD_CUSTOM_SETCODE)
+			e2:SetTarget(	function(e,card)
+								local codes={card:GetCode()}
+								for i,code in ipairs(codes) do
+									if code>=id1 and code<=id2 then
+										return true
+									end
+								end
+								return false
+							end
+						)
+			e2:SetValue(setcode)
+			Duel.RegisterEffect(e2,0)
+			local e3=e2:Clone()
+			e3:SetCode(EFFECT_GLITCHY_ADD_FUSION_CUSTOM_SETCODE)
+			e3:SetTarget(	function(e,card)
+								local codes={card:GetFusionCode()}
+								for i,code in ipairs(codes) do
+									if code>=id1 and code<=id2 then
+										return true
+									end
+								end
+								return false
+							end
+						 )
+			Duel.RegisterEffect(e3,0)
+			local e4=e2:Clone()
+			e4:SetCode(EFFECT_GLITCHY_ADD_LINK_CUSTOM_SETCODE)
+			e4:SetTarget(	function(e,card)
+								local codes={card:GetLinkCode()}
+								for i,code in ipairs(codes) do
+									if code>=id1 and code<=id2 then
+										return true
+									end
+								end
+								return false
+							end
+						 )
+			Duel.RegisterEffect(e4,0)
+			
+			local e5=Effect.GlobalEffect()
+			e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+			e5:SetProperty(EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_IGNORE_IMMUNE|EFFECT_FLAG_UNCOPYABLE)
+			e5:SetCode(EVENT_LEAVE_FIELD_P)
+			e5:SetOperation(aux.RegisterPreviousCustomSetCard)
+			Duel.RegisterEffect(e5,0)
+		end
+	end
+
+end
+function Auxiliary.RegisterPreviousCustomSetCard(e,tp,eg,ep,ev,re,r,rp)
+	for c in aux.Next(eg) do
+		local egroup={c:IsHasEffect(EFFECT_GLITCHY_ADD_CUSTOM_SETCODE)}
+		for _,e in ipairs(egroup) do
+			if e and e.GetValue and aux.GetValueType(e)=="Effect" then
+				local value=e:GetValue()
+				if value then
+					local e1=Effect.CreateEffect(c)
+					e1:SetType(EFFECT_TYPE_SINGLE)
+					e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_IGNORE_IMMUNE|EFFECT_FLAG_UNCOPYABLE|EFFECT_FLAG_SET_AVAILABLE)
+					e1:SetCode(EFFECT_GLITCHY_PREVIOUS_CUSTOM_SETCODE)
+					e1:SetValue(value)
+					e1:SetReset(RESET_EVENT|RESET_TOFIELD)
+					c:RegisterEffect(e1,true)
+				end
+			end
+		end
+	end
+end
 ---------------------------------------------------------------------------------
 -------------------------------DELAYED EVENT-------------------------------------
 function Auxiliary.RegisterMergedDelayedEventGlitchy(c,code,event,f,flag)
