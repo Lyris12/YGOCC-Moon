@@ -37,13 +37,25 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e3)
 	--immune
 	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE)
-	e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e4:SetCode(EFFECT_IMMUNE_EFFECT)
+	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e4:SetCode(EVENT_ADJUST)
 	e4:SetRange(LOCATION_MZONE)
-	e4:SetCondition(cid.atkcond(7600))
-	e4:SetValue(cid.immfilter)
+	e4:SetOperation(cid.getattack)
 	c:RegisterEffect(e4)
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_SINGLE)
+	e5:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e5:SetCode(EFFECT_IMMUNE_EFFECT)
+	e5:SetRange(LOCATION_MZONE)
+	e5:SetLabelObject(e4)
+	e5:SetCondition(cid.atkcond(7600))
+	e5:SetValue(cid.immfilter)
+	c:RegisterEffect(e5)
+end
+function cid.getattack(e,tp,eg,ep,ev,re,r,rp)
+	local atk=e:GetHandler():GetAttack()
+	e:SetLabel(atk)
 end
 function cid.sfilter(c)
 	return c:IsSetCard(0x777) and aux.FilterEqualFunction(Card.GetVibe,1)
@@ -53,8 +65,15 @@ function cid.efilter(e,re,rp)
 end
 function cid.atkcond(val)
 	return function(e)
-		return e:GetHandler():IsAttackAbove(val)
-	end
+			if val==7600 then
+				return e:GetLabelObject():GetLabel()>=val
+			else
+				return e:GetHandler():IsAttackAbove(val)
+			end
+		end
+end
+function cid.immfilter(e,re)
+	return e:GetOwnerPlayer()~=re:GetOwnerPlayer()
 end
 function cid.spfilter(c,e,tp)
 	return c:IsSetCard(0x777) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_ATTACK)
@@ -119,7 +138,4 @@ function cid.rmop(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsRelateToEffect(e) then
 		Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)
 	end
-end
-function cid.immfilter(e,re)
-	return e:GetOwnerPlayer()~=re:GetOwnerPlayer()
 end
