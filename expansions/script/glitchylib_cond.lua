@@ -73,7 +73,7 @@ function Auxiliary.LocationGroupCond(f,loc1,loc2,min,max,exc)
 				if not tp then
 					tp=e:GetHandlerPlayer()
 				end
-				local exc=(not exc) and nil or e:GetHandler()
+				local exc=(exc) and e:GetHandler() or nil
 				local ct=Duel.GetMatchingGroupCount(f,tp,loc1,loc2,exc,e,tp,eg,ep,ev,re,r,rp)
 				return ct>=min and (not max or ct<=max)
 			end
@@ -99,7 +99,7 @@ function Auxiliary.CompareLocationGroupCond(res,f,loc,exc)
 					tp=e:GetHandlerPlayer()
 				end
 				local res = (res and res==1) and 1-tp or tp
-				local exc=(not exc) and nil or e:GetHandler()
+				local exc=(exc) and e:GetHandler() or nil
 				local ct1=Duel.GetMatchingGroupCount(f,tp,loc,0,exc,e,tp,eg,ep,ev,re,r,rp)
 				local ct2=Duel.GetMatchingGroupCount(f,tp,0,loc,exc,e,tp,eg,ep,ev,re,r,rp)
 				local winner

@@ -156,6 +156,6 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if not tc or not tc:IsRelateToChain() or not tc:IsSetCard(0x209) or Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	if Duel.SpecialSummon(tc,SUMMON_TYPE_DRIVE,tp,tp,false,false,POS_FACEUP_DEFENSE)>0 then
-		en:CompleteProcedure()
+		tc:CompleteProcedure()
 	end
 end

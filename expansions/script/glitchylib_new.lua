@@ -23,6 +23,7 @@ CUSTOM_ARCHE_ZERO_HERO				= 0x1
 
 --Custom Cards
 CARD_ZERO_HERO_MAGMA_MAN			= 30409
+CARD_STARFORCE_KNIGHT				= 39301
 
 --Custom Counters
 COUNTER_ICE_PRISON					= 0x1301
@@ -97,16 +98,6 @@ function Duel.Group(f,tp,loc1,loc2,exc,...)
 end
 function Duel.HintMessage(tp,msg)
 	return Duel.Hint(HINT_SELECTMSG,tp,msg)
-end
-function Auxiliary.Faceup(f)
-	return	function(c,...)
-				return (not f or f(c,...)) and c:IsFaceup()
-			end
-end
-function Auxiliary.Facedown(f)
-	return	function(c,...)
-				return (not f or f(c,...)) and c:IsFacedown()
-			end
 end
 
 --Custom Categories
@@ -539,6 +530,9 @@ function Effect.Desc(e,id,...)
 end
 
 function Auxiliary.Option(id,tp,desc,...)
+	if id<2 then
+		id,tp=tp,id
+	end
 	local list={...}
 	local off=1
 	local ops={}
@@ -577,6 +571,34 @@ end
 function Auxiliary.Filter(f,...)
 	local ext_params={...}
 	return aux.FilterBoolFunction(f,table.unpack(ext_params))
+end
+function Auxiliary.BuildFilter(f,...)
+	local ext_params={...}
+	return	function(c)
+				for _,func in ipairs(ext_params) do
+					if type(func)=="function" then
+						if not func(c) then
+							return false
+						end
+					elseif type(func)=="table" then
+						if not func[1](c,func[2]) then
+							return false
+						end
+					end
+				end
+				return true
+			end
+	
+end
+function Auxiliary.Faceup(f)
+	return	function(c,...)
+				return (not f or f(c,...)) and c:IsFaceup()
+			end
+end
+function Auxiliary.Facedown(f)
+	return	function(c,...)
+				return (not f or f(c,...)) and c:IsFacedown()
+			end
 end
 function Auxiliary.FaceupFilter(f,...)
 	local ext_params={...}
@@ -617,11 +639,31 @@ function Auxiliary.STFilter(f,...)
 end
 
 --Flag Effects
-function Card.HasFlagEffect(c,id)
-	return c:GetFlagEffect(id)>0
+function Card.HasFlagEffect(c,id,...)
+	local flags={...}
+	if id then
+		table.insert(flags,id)
+	end
+	for _,flag in ipairs(flags) do
+		if c:GetFlagEffect(flag)>0 then
+			return true
+		end
+	end
+	
+	return false
 end
-function Duel.PlayerHasFlagEffect(p,id)
-	return Duel.GetFlagEffect(p,id)>0
+function Duel.PlayerHasFlagEffect(p,id,...)
+	local flags={...}
+	if id then
+		table.insert(flags,id)
+	end
+	for _,flag in ipairs(flags) do
+		if Duel.GetFlagEffect(p,flag)>0 then
+			return true
+		end
+	end
+	
+	return false
 end
 function Card.UpdateFlagEffectLabel(c,id,ct)
 	if not ct then ct=1 end

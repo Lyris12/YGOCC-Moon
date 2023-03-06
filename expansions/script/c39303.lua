@@ -1,30 +1,34 @@
-function c39303.initial_effect(c)
-	aux.AddFusionProcCode2(c,39301,39302,true,false)
+--Starforce Ultra Hyper Knight
+
+local s,id=GetID()
+function s.initial_effect(c)
+	aux.AddFusionProcCode2(c,CARD_STARFORCE_KNIGHT,id-1,true,true)
 	c:EnableReviveLimit()
 	--Remove
-	local e3=Effect.CreateEffect(c)
-	e3:SetCategory(CATEGORY_TOHAND)
-	e3:SetType(EFFECT_TYPE_IGNITION)
-	e3:SetRange(LOCATION_MZONE)
-	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e3:SetTarget(c39303.rmtg)
-	e3:SetOperation(c39303.rmop)
-	e3:SetCountLimit(1,39303)
-	c:RegisterEffect(e3)
+	local e1=Effect.CreateEffect(c)
+	e1:Desc(0)
+	e1:SetCategory(CATEGORY_TOHAND)
+	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetTarget(s.rmtg)
+	e1:SetOperation(s.rmop)
+	e1:SetCountLimit(1,id)
+	c:RegisterEffect(e1)
 end
-function c39303.filter(c)
-	return c:GetCode()>39300 and c:GetCode()<39326 and c:IsAbleToHand() and not c:IsCode(39311,39312)
+function s.filter(c)
+	return c:IsSetCard(0x24f) and c:IsAbleToHand() 
 end
-function c39303.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c39303.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c39303.filter,tp,LOCATION_GRAVE,0,1,nil) end
+function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.filter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(s.filter,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=Duel.SelectTarget(tp,c39303.filter,tp,LOCATION_GRAVE,0,1,1,nil)
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
+	local g=Duel.SelectTarget(tp,s.filter,tp,LOCATION_GRAVE,0,1,1,nil)
+	Duel.SetCardOperationInfo(g,CATEGORY_TOHAND)
 end
-function c39303.rmop(e,tp,eg,ep,ev,re,r,rp)
+function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) then
+	if tc:IsRelateToChain() then
 		Duel.SendtoHand(tc,nil,REASON_EFFECT)
 	end
 end

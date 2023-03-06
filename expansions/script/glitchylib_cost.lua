@@ -252,13 +252,13 @@ function Auxiliary.TributeForSummonFilter(f,sumtype,sump,ign1,ign2,pos,recp,zone
 		return	function(c,e,tp,...)
 					local pg=aux.GetMustBeMaterialGroup(sump,Group.CreateGroup(),sump,c,nil,reason)
 					return #pg<=0 and (not f or f(c,e,tp,...)) and c:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos,recp,zone)
-						and ((not c:IsLocation(LOCATION_EXTRA) and Duel.GetLocationCount(recp,LOCATION_MZONE,sump,LOCATION_REASON_TOFIELD,zone)>0)
+						and ((not c:IsLocation(LOCATION_EXTRA) and Duel.GetMZoneCount(recp,e:GetHandler(),sump,LOCATION_REASON_TOFIELD,zone)>0)
 						or (c:IsLocation(LOCATION_EXTRA) and Duel.GetLocationCountFromEx(recp,sump,e:GetHandler(),c,zone)>0))
 				end
 	else
 		return	function(c,e,tp,...)
 					return (not f or f(c,e,tp,...)) and c:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos,recp,zone)
-						and ((not c:IsLocation(LOCATION_EXTRA) and Duel.GetLocationCount(recp,LOCATION_MZONE,sump,LOCATION_REASON_TOFIELD,zone)>0)
+						and ((not c:IsLocation(LOCATION_EXTRA) and Duel.GetMZoneCount(recp,e:GetHandler(),sump,LOCATION_REASON_TOFIELD,zone)>0)
 						or (c:IsLocation(LOCATION_EXTRA) and Duel.GetLocationCountFromEx(recp,sump,e:GetHandler(),c,zone)>0))
 				end
 	end
