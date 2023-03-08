@@ -1,4 +1,4 @@
-﻿expansions/cards-new.cdb	f13e6b6c57f0864c8662a947314aaa9b
+﻿expansions/cards-new.cdb	21a022125f4ed862d60ef2f3d246de6a
 expansions/lflist.conf	148b4b692842e652bec8e4107e5c3b46
 expansions/strings.conf	0f24eb69fbfb35f4b6d506c9971c1092
 expansions/pics/100000714.jpg	74ec20749932cad0249671d71e6d672b
@@ -890,7 +890,7 @@ expansions/pics/131792008.png	159fc98e552993b1fc518ab11f47ccf3
 expansions/pics/131792009.jpg	8dcd1fc68f81335d32f7ef4fbea2db18
 expansions/pics/131792009.png	0f34d505b4fa1ecd70b235e015e8e19b
 expansions/pics/131792010.jpg	dfaefa6aadd86ecf579071e8125e9b61
-expansions/pics/131792010.png	c29331fa7bdd56aefd34af362a1cc0a2
+expansions/pics/131792010.png	2d73e7afaa4d0608d8f898efdc762a3a
 expansions/pics/131792011.jpg	2cd53204df158d536f20c30800f54197
 expansions/pics/131792011.png	ffa9a560457215a5e144b499447eff7f
 expansions/pics/131792012.jpg	e0f7967ad6e32c5a1994ccd5b3bb5487
@@ -6573,7 +6573,7 @@ expansions/script/c131792006.lua	6eef201142156eb43154fb2ef1969d56
 expansions/script/c131792007.lua	b4d8ee2fb90f7ed608702f85f6fdd48b
 expansions/script/c131792008.lua	c9711e4720c49bef2aef35999727e807
 expansions/script/c131792009.lua	52968fd5a80a7e8e7e0aaf86120d7970
-expansions/script/c131792010.lua	1ba1be2edcf459962167be27dc43bf57
+expansions/script/c131792010.lua	507d458f58c5b1d319476ab7f3cd7dfe
 expansions/script/c131792011.lua	c0c5f5d5fda8de5affdf17b55807de35
 expansions/script/c131792012.lua	b6bf0681df08e4329297dd756efb2700
 expansions/script/c131792013.lua	6b222ff197304f183be51eb5fe6628af
@@ -11235,6 +11235,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	f47a61637a8b5ed87acbc92b83cc378a
+update/filelist.txt	cdd2a97b08e70ece1424dad46cea4f1e
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	b320b62c9238102710993b5609bd7d56
+update/version.txt	a704f5f99d0a50c727607795d33847c5
