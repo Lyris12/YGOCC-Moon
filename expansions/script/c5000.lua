@@ -1,5 +1,5 @@
 --Manual Mode
---Scripted by: XGlitchy30
+--Scripted by: XGlitchy30 & Lyris
 
 local counter_list={0x1, 0x3, 0x4, 0x5}
 -- for line in io.lines('strings.conf') do
@@ -33,6 +33,120 @@ function s.initial_effect(c)
 	e1:SetOperation(s.ops)
 	c:RegisterEffect(e1)
 end
+function s.give_actions(c,tc)
+	tc:ResetEffect(tc:GetOriginalCode(),RESET_CARD)
+	for _,ct in ipairs(counter_list) do
+		tc:EnableCounterPermit(ct,LOCATION_ALL)
+	end
+	--Manual Actions
+	local e0=Effect.CreateEffect(c)
+	e0:SetDescription(aux.Stringid(id,14))
+	e0:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e0:SetCode(EVENT_FREE_CHAIN)
+	e0:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_BOTH_SIDE)
+	e0:SetRange(LOCATION_ALL-LOCATION_DECK)
+	e0:SetLabel(1)
+	e0:SetOperation(s.manual_actions)
+	tc:RegisterEffect(e0)
+	local e0=Effect.CreateEffect(c)
+	e0:SetDescription(aux.Stringid(id,14))
+	e0:SetType(EFFECT_TYPE_IGNITION)
+	e0:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_BOTH_SIDE)
+	e0:SetRange(LOCATION_ONFIELD)
+	e0:SetTarget(function(effect,_,_,_,_,_,_,_,chk)
+					if chk==0 then return true end
+					Duel.SetChainLimit(aux.FALSE)
+				end
+				)
+	e0:SetCondition(function(effect)
+						return effect:GetHandler():IsFacedown() or effect:GetHandler():IsControler(1-Duel.GetTurnPlayer())
+					end)
+	e0:SetOperation(s.manual_actions)
+	tc:RegisterEffect(e0)
+	--Generic Chains
+	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(id,15))
+	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_CANNOT_NEGATE)
+	e1:SetType(EFFECT_TYPE_QUICK_O)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetRange(LOCATION_ONFIELD+LOCATION_HAND+LOCATION_GRAVE+LOCATION_REMOVED+LOCATION_EXTRA)
+	e1:SetCost(s.chain_link_cost)
+	e1:SetTarget(s.chain_link_tg)
+	e1:SetOperation(s.chain_link_action)
+	tc:RegisterEffect(e1)
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id+2,15))
+	e2:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_CANNOT_NEGATE)
+	e2:SetType(EFFECT_TYPE_ACTIVATE)
+	e2:SetCode(EVENT_FREE_CHAIN)
+	e2:SetCost(s.chain_link_cost)
+	e2:SetTarget(s.chain_link_tg)
+	e2:SetOperation(s.chain_link_action)
+	tc:RegisterEffect(e2)
+	--Spells/Traps tweaks
+	local e3=Effect.CreateEffect(c)
+	e3:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_CANNOT_NEGATE+EFFECT_FLAG_SET_AVAILABLE)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetCode(EFFECT_TRAP_ACT_IN_HAND)
+	tc:RegisterEffect(e3)
+	local e4=e3:Clone()
+	e4:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
+	tc:RegisterEffect(e4)
+	local e5=e3:Clone()
+	e5:SetCode(EFFECT_QP_ACT_IN_SET_TURN)
+	tc:RegisterEffect(e5)
+	local e6=e3:Clone()
+	e6:SetCode(EFFECT_QP_ACT_IN_NTPHAND)
+	tc:RegisterEffect(e6)
+	local kp=Effect.CreateEffect(tc)
+	kp:SetType(EFFECT_TYPE_SINGLE)
+	kp:SetCode(EFFECT_REMAIN_FIELD)
+	tc:RegisterEffect(kp)
+	--Battle Phase tweaks
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_CANNOT_NEGATE)
+	e3:SetCode(EFFECT_EXTRA_ATTACK)
+	e3:SetValue(99)
+	tc:RegisterEffect(e3)
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_SINGLE)
+	e4:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_CANNOT_NEGATE)
+	e4:SetCode(EFFECT_DEFENSE_ATTACK)
+	e4:SetValue(1)
+	tc:RegisterEffect(e4)
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_SINGLE)
+	e5:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_CANNOT_NEGATE)
+	e5:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
+	e5:SetValue(1)
+	tc:RegisterEffect(e5)
+	local e6=Effect.CreateEffect(c)
+	e6:SetType(EFFECT_TYPE_SINGLE)
+	e6:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_CANNOT_NEGATE)
+	e6:SetCode(EFFECT_DIRECT_ATTACK)
+	tc:RegisterEffect(e6)
+	local e7=Effect.CreateEffect(c)
+	e7:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	e7:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_CANNOT_NEGATE)
+	e7:SetCode(EVENT_PRE_BATTLE_DAMAGE)
+	e7:SetOperation(s.damageproc)
+	tc:RegisterEffect(e7)
+	local e8=Effect.CreateEffect(c)
+	e8:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	e8:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_CANNOT_NEGATE)
+	e8:SetCode(EVENT_ATTACK_ANNOUNCE)
+	e8:SetLabelObject(e4)
+	e8:SetCondition(function (eff) return eff:GetHandler():IsDefensePos() end)
+	e8:SetOperation(function (eff,p) local sel=Duel.SelectOption(p,aux.Stringid(id+5,2),aux.Stringid(id+5,3)) if sel==0 then eff:GetLabelObject():SetValue(0) else eff:GetLabelObject():SetValue(1) end end)
+	tc:RegisterEffect(e8)
+	local e9=Effect.CreateEffect(c)
+	e9:SetType(EFFECT_TYPE_SINGLE)
+	e9:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_IGNORE_IMMUNE)
+	e9:SetCode(EFFECT_EXTRA_TOMAIN_KOISHI)
+	e9:SetValue(1)
+	tc:RegisterEffect(e9)
+end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,id)==0 end
 	Duel.RegisterFlagEffect(tp,id,0,0,1)
@@ -60,120 +174,7 @@ function s.ops(e,tp,eg,ep,ev,re,r,rp)
 	
 	--
 	local g=Duel.GetMatchingGroup(aux.TRUE,tp,LOCATION_ALL-LOCATION_REMOVED,LOCATION_ALL-LOCATION_REMOVED,Group.FromCards(c,tk))
-	for tc in aux.Next(g) do
-		tc:ResetEffect(tc:GetOriginalCode(),RESET_CARD)
-		for _,ct in ipairs(counter_list) do
-			tc:EnableCounterPermit(ct,LOCATION_ALL)
-		end
-		--Manual Actions
-		local e0=Effect.CreateEffect(c)
-		e0:SetDescription(aux.Stringid(id,14))
-		e0:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e0:SetCode(EVENT_FREE_CHAIN)
-		e0:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_BOTH_SIDE)
-		e0:SetRange(LOCATION_ALL-LOCATION_DECK)
-		e0:SetLabel(1)
-		e0:SetOperation(s.manual_actions)
-		tc:RegisterEffect(e0)
-		local e0=Effect.CreateEffect(c)
-		e0:SetDescription(aux.Stringid(id,14))
-		e0:SetType(EFFECT_TYPE_IGNITION)
-		e0:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_BOTH_SIDE)
-		e0:SetRange(LOCATION_ONFIELD)
-		e0:SetTarget(function(effect,_,_,_,_,_,_,_,chk)
-						if chk==0 then return true end
-						Duel.SetChainLimit(aux.FALSE)
-					end
-					)
-		e0:SetCondition(function(effect)
-							return effect:GetHandler():IsFacedown()
-						end)
-		e0:SetOperation(s.manual_actions)
-		tc:RegisterEffect(e0)
-		--Generic Chains
-		local e1=Effect.CreateEffect(c)
-		e1:SetDescription(aux.Stringid(id,15))
-		e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_CANNOT_NEGATE)
-		e1:SetType(EFFECT_TYPE_QUICK_O)
-		e1:SetCode(EVENT_FREE_CHAIN)
-		e1:SetRange(LOCATION_ONFIELD+LOCATION_HAND+LOCATION_GRAVE+LOCATION_REMOVED+LOCATION_EXTRA)
-		e1:SetCost(s.chain_link_cost)
-		e1:SetTarget(s.chain_link_tg)
-		e1:SetOperation(s.chain_link_action)
-		tc:RegisterEffect(e1)
-		local e2=Effect.CreateEffect(c)
-		e2:SetDescription(aux.Stringid(id+2,15))
-		e2:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_CANNOT_NEGATE)
-		e2:SetType(EFFECT_TYPE_ACTIVATE)
-		e2:SetCode(EVENT_FREE_CHAIN)
-		e2:SetCost(s.chain_link_cost)
-		e2:SetTarget(s.chain_link_tg)
-		e2:SetOperation(s.chain_link_action)
-		tc:RegisterEffect(e2)
-		--Spells/Traps tweaks
-		local e3=Effect.CreateEffect(c)
-		e3:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_CANNOT_NEGATE+EFFECT_FLAG_SET_AVAILABLE)
-		e3:SetType(EFFECT_TYPE_SINGLE)
-		e3:SetCode(EFFECT_TRAP_ACT_IN_HAND)
-		tc:RegisterEffect(e3)
-		local e4=e3:Clone()
-		e4:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
-		tc:RegisterEffect(e4)
-		local e5=e3:Clone()
-		e5:SetCode(EFFECT_QP_ACT_IN_SET_TURN)
-		tc:RegisterEffect(e5)
-		local e6=e3:Clone()
-		e6:SetCode(EFFECT_QP_ACT_IN_NTPHAND)
-		tc:RegisterEffect(e6)
-		local kp=Effect.CreateEffect(tc)
-		kp:SetType(EFFECT_TYPE_SINGLE)
-		kp:SetCode(EFFECT_REMAIN_FIELD)
-		tc:RegisterEffect(kp)
-		--Battle Phase tweaks
-		local e3=Effect.CreateEffect(c)
-		e3:SetType(EFFECT_TYPE_SINGLE)
-		e3:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_CANNOT_NEGATE)
-		e3:SetCode(EFFECT_EXTRA_ATTACK)
-		e3:SetValue(99)
-		tc:RegisterEffect(e3)
-		local e4=Effect.CreateEffect(c)
-		e4:SetType(EFFECT_TYPE_SINGLE)
-		e4:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_CANNOT_NEGATE)
-		e4:SetCode(EFFECT_DEFENSE_ATTACK)
-		e4:SetValue(1)
-		tc:RegisterEffect(e4)
-		local e5=Effect.CreateEffect(c)
-		e5:SetType(EFFECT_TYPE_SINGLE)
-		e5:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_CANNOT_NEGATE)
-		e5:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-		e5:SetValue(1)
-		tc:RegisterEffect(e5)
-		local e6=Effect.CreateEffect(c)
-		e6:SetType(EFFECT_TYPE_SINGLE)
-		e6:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_CANNOT_NEGATE)
-		e6:SetCode(EFFECT_DIRECT_ATTACK)
-		tc:RegisterEffect(e6)
-		local e7=Effect.CreateEffect(c)
-		e7:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-		e7:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_CANNOT_NEGATE)
-		e7:SetCode(EVENT_PRE_BATTLE_DAMAGE)
-		e7:SetOperation(s.damageproc)
-		tc:RegisterEffect(e7)
-		local e8=Effect.CreateEffect(c)
-		e8:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-		e8:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_CANNOT_NEGATE)
-		e8:SetCode(EVENT_ATTACK_ANNOUNCE)
-		e8:SetLabelObject(e4)
-		e8:SetCondition(function (eff) return eff:GetHandler():IsDefensePos() end)
-		e8:SetOperation(function (eff,p) local sel=Duel.SelectOption(p,aux.Stringid(id+5,2),aux.Stringid(id+5,3)) if sel==0 then eff:GetLabelObject():SetValue(0) else eff:GetLabelObject():SetValue(1) end end)
-		tc:RegisterEffect(e8)
-		local e9=Effect.CreateEffect(c)
-		e9:SetType(EFFECT_TYPE_SINGLE)
-		e9:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_IGNORE_IMMUNE)
-		e9:SetCode(EFFECT_EXTRA_TOMAIN_KOISHI)
-		e9:SetValue(1)
-		tc:RegisterEffect(e9)
-	end
+	for tc in aux.Next(g) do s.give_actions(c,tc) end
 	--Global Manual Actions
 	local ge=Effect.CreateEffect(c)
 	ge:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
@@ -244,20 +245,13 @@ function s.manual_actions(e,tp,eg,ep,ev,re,r,rp,g)
 	local b13=Duel.IsExistingMatchingCard(aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,c)
 	local b14=c:IsExists(function(fc) return fc:GetOverlayCount()>0 end,1,nil)
 	local b15=Duel.IsExistingMatchingCard(aux.TRUE,tp,LOCATION_MZONE,0,1,c)
+	local b16=c:IsExists(Card.IsLocation,1,nil,LOCATION_ONFIELD+LOCATION_GRAVE+LOCATION_REMOVED)
+	local b17=c:IsExists(Card.IsLocation,1,nil,LOCATION_SZONE)
 	--
-	local sel=aux.Option(id,tp,0,false,b2,b22,b4,b7,b5,b6,b6,b6,b3,b8,b9,b3,b10,{b11,id+1,14},{b12,id+1,15},{b9,id+4,0},{true,id+4,1},{b13,id+4,7},{b14,id+4,9},{b15,id+5,4},{b14,id+5,7})
-	--Change Position
-	if sel==0 and not g then
-		local fc=c:Filter(Card.IsOnField,nil)
-		for tc in aux.Next(fc) do
-			local p=tc:GetFlagEffect(id)>0 and 1-tc:GetOwner() or tc:GetOwner()
-			if tp~=tc:GetControler() then
-				Duel.HintSelection(Group.FromCards(tc))
-				if not Duel.SelectYesNo(1-tp,aux.Stringid(id+6,4)) then return end
-			end
-			local pos=Duel.SelectPosition(tp,tc,POS_FACEUP+POS_FACEDOWN)
-			Duel.ChangePosition(tc,pos)
-		end
+	local sel=aux.Option(id,tp,0,b16 and aux.Stringid(5000,0),b2,b22,b4,b7,b5,b6,b6,b6,b3,b8,b9,b3,b10,{b11,id+1,14},{b12,id+1,15},{b9,id+4,0},{true,id+4,1},{b13,id+4,7},{b14,id+4,9},{b15,id+5,4},{b14,id+5,7},{b15,id+5,4},{b1 and (b9 and b22 or b17 and b3),id+6,5})
+	--Target
+	if sel==0 then
+		Duel.HintSelection(c)
 	--Destroy
 	elseif sel==1 then
 		local fc=c:Filter(aux.NOT(Card.IsLocation),nil,LOCATION_GRAVE+LOCATION_REMOVED)
@@ -389,6 +383,24 @@ function s.manual_actions(e,tp,eg,ep,ev,re,r,rp,g)
 				if not Duel.SelectYesNo(1-tp,aux.Stringid(id+2,6)) then return end
 			end
 			Duel.ConfirmCards(1-tp,tc)
+			if tc:IsLocation(LOCATION_HAND) and Duel.SelectYesNo(tp,66) then
+				local e1=Effect.CreateEffect(tc)
+				e1:SetType(EFFECT_TYPE_SINGLE)
+				e1:SetDescription(66)
+				e1:SetCode(EFFECT_PUBLIC)
+				e1:SetProperty(EFFECT_FLAG_CLIENT_HINT+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SET_AVAILABLE)
+				e1:SetLabel(3)
+				e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+				tc:RegisterEffect(e1)
+			elseif tc:IsLocation(LOCATION_HAND) then
+				local elist=global_card_effect_table[tc]
+				for _,ce in ipairs(elist) do
+					if ce and ce.GetLabel and ce:GetLabel()==3 then
+						ce:Reset()
+					end
+				end
+				Duel.ShuffleHand(tp)
+			end
 		end
 	--Change Position
 	elseif sel==11 then
@@ -399,7 +411,7 @@ function s.manual_actions(e,tp,eg,ep,ev,re,r,rp,g)
 				Duel.HintSelection(Group.FromCards(tc))
 				if not Duel.SelectYesNo(1-tp,aux.Stringid(id+2,7)) then return end
 			end
-			local pos=Duel.SelectPosition(tp,tc,POS_FACEUP+POS_FACEDOWN-c:GetPosition())
+			local pos=Duel.SelectPosition(tp,tc,POS_FACEUP+POS_FACEDOWN-tc:GetPosition())
 			Duel.ChangePosition(tc,pos)
 		end
 	--Set as Spell/Trap
@@ -512,7 +524,7 @@ function s.manual_actions(e,tp,eg,ep,ev,re,r,rp,g)
 				if not Duel.SelectYesNo(1-tp,aux.Stringid(id+2,13)) then return end
 			end
 			while true do
-				local opt=aux.Option(id+3,tp,0,true,true,true,true,true,true,true,true,true,true,true,true,{true,id+1,8})
+				local opt=aux.Option(id+3,tp,0,tc:IsDefenseAbove(0),true,tc:IsDefenseAbove(0),not tc:IsType(TYPE_LINK),true,true,true,true,true,true,true,true,{true,id+1,8})
 				local effect,value=0,0
 				if opt<=10 then
 					local clonecheck,cloneval=false,false
@@ -712,6 +724,19 @@ function s.manual_actions(e,tp,eg,ep,ev,re,r,rp,g)
 			g:RemoveCard(summat)
 			Duel.Overlay(summat,g)
 		end
+	--Move Zones
+	elseif sel==22 then
+		for tc in aux.Next(c) do
+			local p=tc:GetFlagEffect(5000)>0 and 1-tc:GetOwner() or tc:GetOwner()
+			local sl,ol=tc:GetLocation(),0
+			local rs=sl==LOCATION_SZONE and 8 or 0
+			if tp~=tc:GetControler() then
+				Duel.HintSelection(Group.FromCards(tc))
+				if not Duel.SelectYesNo(1-tp,sl==LOCATION_MZONE and aux.Stringid(5006,6) or aux.Stringid(5006,7)) then return end
+				sl,ol,rs=ol,sl,rs+16
+			end
+			Duel.MoveSequence(tc,math.log(Duel.SelectDisableField(tp,1,sl,ol,0)>>rs,2))
+		end
 	end
 end
 
@@ -766,6 +791,7 @@ function s.global_manual_actions(e,tp,eg,ep,ev,re,r,rp)
 		end
 		local ct=Duel.AnnounceNumber(TP,table.unpack(nlist))
 		local g=Duel.GetDecktopGroup(tp,ct)
+		Duel.DisableShuffleCheck()
 		Duel.SendtoGrave(g,REASON_RULE)
 	--Excavate
 	elseif sel==3 then
@@ -854,7 +880,8 @@ function s.global_manual_actions(e,tp,eg,ep,ev,re,r,rp)
 		end
 		local ct=Duel.AnnounceNumber(TP,table.unpack(nlist))
 		for i=1,ct do
-			local tk=Duel.CreateToken(tp,73915051)
+			local tk=Duel.CreateToken(tp,73915053)
+			s.give_actions(c,tk)
 			local pos=Duel.SelectPosition(tp,tk,POS_FACEUP)
 			Duel.SpecialSummonStep(tk,0,tp,tp,true,true,pos)
 		end
@@ -999,6 +1026,7 @@ function s.drawphase(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_PHASE+PHASE_DRAW+RESET_SELF_TURN)
 		e1:SetValue(val)
 		Duel.RegisterEffect(e1,p)
+		if Duel.GetDrawCount(p)==0 and val>0 then Duel.Draw(p,val,REASON_RULE) end
 	elseif sel==2 then
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_FIELD)
