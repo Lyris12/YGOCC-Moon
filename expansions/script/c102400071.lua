@@ -64,8 +64,8 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetCondition(s.rcon)
 		e2:SetReset(RESET_EVENT+RESETS_STANDARD)
 		tc:RegisterEffect(e2,true)
-		Duel.SpecialSummonComplete()
 	end
+	Duel.SpecialSummonComplete()
 end
 function s.rcon(e)
 	return e:GetOwner():IsHasCardTarget(e:GetHandler())

@@ -21,7 +21,7 @@ function s.initial_effect(c)
 end
 function s.filter1(c,e,tp)
 	local rk=c:GetRank()
-	return rk>0 and c:IsFaceup() and c:IsRace(RACE_WARRIOR)
+	return rk>0 and c:IsFaceup()
 		and Duel.IsExistingMatchingCard(s.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,c,c:GetRank()+1)
 		and Duel.GetLocationCountFromEx(tp,tp,c)>0
 end

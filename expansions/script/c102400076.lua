@@ -21,6 +21,19 @@ function s.initial_effect(c)
 	local e4=e2:Clone()
 	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e4)
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_QUICK_O+EFFECT_TYPE_XMATERIAL)
+	e5:SetCode(EVENT_FREE_CHAIN)
+	e5:SetRange(LOCATION_MZONE)
+	e5:SetCountLimit(1)
+	e5:SetDescription(1111)
+	e5:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e5:SetCategory(CATEGORY_POSITION+CATEGORY_TODECK)
+	e5:SetHintTiming(0,TIMINGS_CHECK_MONSTER)
+	e5:SetCost(s.cost)
+	e5:SetTarget(s.tdtg)
+	e5:SetOperation(s.tdop)
+	c:RegisterEffect(e5)
 end
 function s.filter(c)
 	return c:IsSetCard(0xbb2) and c:IsAbleToDeck()
@@ -40,5 +53,32 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp,chk)
 	if g:IsExists(Card.IsLocation,1,nil,LOCATION_DECK) then Duel.ShuffleDeck(tp) end
 	if g:FilterCount(Card.IsLocation,nil,LOCATION_DECK+LOCATION_EXTRA)==3 then
 		Duel.Draw(tp,1,REASON_EFFECT)
+	end
+end
+function s.dfilter(c)
+	return s.filter(c) and c:IsType(TYPE_MONSTER)
+end
+function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return c:CheckRemoveOverlayCard(tp,1,REASON_COST) end
+	c:RemoveOverlayCard(tp,1,1,REASON_COST)
+end
+function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.dfilter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(s.dfilter,tp,LOCATION_GRAVE,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+	local g=Duel.SelectTarget(tp,s.dfilter,tp,LOCATION_GRAVE,0,1,1,nil)
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,#g,0,0)
+end
+function s.tdop(e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
+	Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
+	local ct=g:FilterCount(aux.NOT(Card.IsLocation),nil,LOCATION_GRAVE)
+	local g=Duel.GetMatchingGroup(Card.IsCanTurnSet,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
+	if g:FilterCount(Card.IsLocation,nil,LOCATION_DECK+LOCATION_EXTRA)>0 and ct>0 and #g>0
+		and Duel.SelectEffectYesNo(tp,e:GetOwner()) then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_POSCHANGE)
+		local sg=g:Select(tp,1,ct,nil)
+		Duel.HintSelection(sg)
+		Duel.ChangePosition(sg,POS_FACEDOWN_DEFENSE)
 	end
 end

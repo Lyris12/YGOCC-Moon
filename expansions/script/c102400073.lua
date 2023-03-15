@@ -1,4 +1,4 @@
---created & coded by Lyris, art at http://i.ytimg.com/vi/2tvp5emvTzc/0.jpg
+--created by Lyris
 --剣主トレーニング
 local s,id,o=GetID()
 function s.initial_effect(c)

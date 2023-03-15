@@ -1,9 +1,9 @@
---
---Winged Swordsmaster Dawning
+--created & coded by Lyris, art by Akira-san on MiniTokyo.net
+--天剣主九ナコ
 local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
-	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0xbb2),4,2)
+	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0xbb2),4,2,nil,nil,99)
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE)
 	e0:SetCode(EFFECT_PIERCE)
@@ -17,7 +17,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
-	e2:SetCategory(CATEGORY_POSITION+CATEGORY_DESTROY)
+	e2:SetCategory(CATEGORY_POSITION+CATEGORY_DISABLE)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_CHAINING)
 	e2:SetCountLimit(1)
@@ -45,29 +45,25 @@ function s.val(e)
 	return Duel.GetMatchingGroupCount(s.afilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,e:GetHandler())*100
 end
 function s.discon(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and rp~=tp
+	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and rp~=tp and Duel.IsChainDisablable(ev)
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
-function s.filter(c)
-	return c:IsFaceup() and c:IsCanTurnSet()
-end
 function s.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local rc=re:GetHandler()
-	if chk==0 then return rc:IsDestructable() and Duel.IsExistingMatchingCard(s.filter,tp,0,LOCATION_MZONE,1,rc) end
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_POSITION,Duel.GetMatchingGroup(s.filter,tp,0,LOCATION_MZONE,eg:GetFirst()),1,0,0)
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsCanTurnSet,tp,0,LOCATION_MZONE,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_DISABLE,eg,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_POSITION,Duel.GetMatchingGroup(Card.IsCanTurnSet,tp,0,LOCATION_MZONE,nil),1,0,0)
 end
 function s.disop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if re:GetHandler():IsRelateToEffect(re) and Duel.Destroy(eg,REASON_EFFECT)~=0 then
+	if Duel.NegateEffect(ev) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_POSCHANGE)
 		local g=Duel.SelectMatchingCard(tp,s.filter,tp,0,LOCATION_MZONE,1,1,nil)
 		Duel.HintSelection(g)
-		local tc=g:GetFirst()
-		if tc then Duel.ChangePosition(tc,POS_FACEUP_DEFENSE) end
+		Duel.ChangePosition(g,POS_FACEDOWN_DEFENSE)
 	end
 end
 function s.sfilter(c,e,tp)
