@@ -12,7 +12,7 @@ function s.initial_effect(c)
 		nil,
 		s.operation
 	)
-	local d2=c:DriveEffect(-5,1,CATEGORY_DRAW,EFFECT_TYPE_IGNITION,EFFECT_FLAG_PLAYER_TARGET,nil,
+	local d2=c:DriveEffect(-4,1,CATEGORY_DRAW,EFFECT_TYPE_IGNITION,EFFECT_FLAG_PLAYER_TARGET,nil,
 		nil,
 		s.drawcost,
 		aux.DrawTarget(),

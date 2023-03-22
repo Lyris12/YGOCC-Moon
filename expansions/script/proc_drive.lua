@@ -498,15 +498,16 @@ function Card.UpdateEnergy(c,val,p,r,reset,rc)
 		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
 	end
 	c:RegisterEffect(e)
+	local diff=c:GetEnergy()-en
 	if r&REASON_TEMPORARY==0 then
 		aux.CheckEnergyOperation(c,p)
-		Duel.RaiseEvent(c,EVENT_ENERGY_CHANGE,e,r,p,c:GetControler(),c:GetEnergy()-en)
+		Duel.RaiseEvent(c,EVENT_ENERGY_CHANGE,e,r,p,c:GetControler(),diff)
 		if c:GetEnergy()==0 then
 			Auxiliary.DriveSelfToGraveOp(c)
 		end
 	end
 	if reset then
-		return e,c:GetEnergy()-en
+		return e,diff
 	else
 		return e
 	end
@@ -527,15 +528,16 @@ function Card.ChangeEnergy(c,val,p,r,reset,rc)
 		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
 	end
 	c:RegisterEffect(e)
+	local new_en=c:GetEnergy()
 	if r&REASON_TEMPORARY==0 then
 		aux.CheckEnergyOperation(c,p)
-		Duel.RaiseEvent(c,EVENT_ENERGY_CHANGE,e,r,p,c:GetControler(),c:GetEnergy()-en)
+		Duel.RaiseEvent(c,EVENT_ENERGY_CHANGE,e,r,p,c:GetControler(),new_en-en)
 		if c:GetEnergy()==0 then
 			Auxiliary.DriveSelfToGraveOp(c)
 		end
 	end
 	if reset then
-		return e,c:GetEnergy()
+		return e,new_en
 	else
 		return e
 	end

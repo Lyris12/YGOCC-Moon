@@ -24,19 +24,6 @@ function s.initial_effect(c)
 		s.sptg,
 		s.spop
 	)
-	--search
-	local f=aux.MonsterFilter(Card.IsSetCard,0x660)
-	local e1=Effect.CreateEffect(c)
-	e1:Desc(5)
-	e1:SetCategory(CATEGORIES_SEARCH)
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetProperty(EFFECT_FLAG_DDD)
-	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e1:HOPT()
-	e1:SetCondition(s.sccon)
-	e1:SetTarget(aux.SearchTarget(f))
-	e1:SetOperation(aux.SearchOperation(f))
-	c:RegisterEffect(e1)
 	--draw
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(6)

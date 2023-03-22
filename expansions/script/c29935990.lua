@@ -5,7 +5,7 @@ local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddFusionProcFunRep(c,s.ffilter,2,true)
-	aux.AddContactFusionProcedureGlitchy(c,0,true,0,Card.IsAbleToDeckOrExtraAsCost,LOCATION_MZONE,0,{s.ffcon,aux.tdcfop(c)})
+	aux.AddContactFusionProcedureGlitchy(c,0,true,0,s.contactfilter,LOCATION_MZONE,0,aux.tdcfop(c))
 	--ss condition
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -31,21 +31,13 @@ function s.initial_effect(c)
 	e3:HOPT()
 	e3:SetTarget(aux.SendToGYTarget(nil,LOCATION_ONFIELD,LOCATION_ONFIELD))
 	e3:SetOperation(aux.SendToGYOperation(nil,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1))
-	c:RegisterEffect(e3)
-	--global counter
-	if not s.global_check then
-		s.global_check=true
-		aux.EnableSummonCounter(c,false,true,false,s.glfilter,RESET_PHASE+PHASE_END)
-	end		
+	c:RegisterEffect(e3)		
 end
-function s.glfilter(c)
-	return c:IsSummonType(SUMMON_TYPE_DRIVE)
+function s.contactfilter(c)
+	return c:IsAbleToDeckOrExtraAsCost() and c:IsSummonType(SUMMON_TYPE_DRIVE)
 end
 function s.ffilter(c,fc,sub,mg,sg)
 	return c:IsFusionSetCard(0x48a) and (not sg or not sg:IsExists(Card.IsFusionCode,1,c,c:GetFusionCode()))
-end
-function s.ffcon(e,c,tp,mg)
-	return Duel.PlayerHasFlagEffect(tp,id)
 end
 
 function s.splimit(e,se,sp,st)

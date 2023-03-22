@@ -6,7 +6,7 @@ function s.initial_effect(c)
 	aux.AddOrigDriveType(c)
 	--Drive Effects
 	aux.AddDriveProc(c,9)
-	local d1=c:DriveEffect(-3,0,CATEGORY_TOGRAVE+CATEGORY_RECOVER,EFFECT_TYPE_QUICK_O,nil,nil,
+	local d1=c:DriveEffect(-3,0,CATEGORY_REMOVE|CATEGORY_RECOVER,EFFECT_TYPE_QUICK_O,EFFECT_FLAG_CARD_TARGET,nil,
 		nil,
 		nil,
 		s.tgtg,
@@ -47,17 +47,25 @@ function s.initial_effect(c)
 	)
 end
 function s.tgfilter(c)
-	return c:IsMonster() and c:IsAttribute(ATTRIBUTE_WATER) and c:IsAbleToGrave()
+	return c:IsMonster() and c:IsAttribute(ATTRIBUTE_WATER) and c:IsAbleToRemove()
 end
-function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.tgfilter,tp,LOCATION_DECK,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
+function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.tgfilter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(s.tgfilter,tp,LOCATION_GRAVE,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+	local g=Duel.SelectTarget(tp,s.tgfilter,tp,LOCATION_GRAVE,0,1,1,nil)
+	if #g>0 then
+		local tc=g:GetFirst()
+		Duel.SetCardOperationInfo(g,CATEGORY_REMOVE)
+		Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,math.max(tc:GetAttack(),tc:GetDefense()))
+	end
 end
 function s.tgop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=Duel.SelectMatchingCard(tp,s.tgfilter,tp,LOCATION_DECK,0,1,1,nil)
-	if #g>0 and Duel.SendtoGrave(g,REASON_EFFECT)>0 and g:GetFirst():IsLocation(LOCATION_GRAVE) and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
-		Duel.Recover(tp,1000,REASON_EFFECT)
+	local tc=Duel.GetFirstTarget()
+	if tc:IsRelateToChain() and Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)>0 and tc:IsLocation(LOCATION_REMOVED) then
+		local val=math.max(tc:GetAttack(),tc:GetDefense())
+		if val<=0 then val=0 end
+		Duel.Recover(tp,val,REASON_EFFECT)
 	end
 end
 

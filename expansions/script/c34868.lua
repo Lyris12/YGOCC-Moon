@@ -34,7 +34,8 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.Select(HINTMSG_ATOHAND,false,tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil,lv,rc,attr)
 	if #g>0 and Duel.SendtoHand(g,nil,REASON_EFFECT)>0 and g:GetFirst():IsLocation(LOCATION_HAND) then
 		Duel.ConfirmCards(1-tp,g)
-		if tc:IsMonster(TYPE_DRIVE) and tc:IsRelateToChain() then
+		if tc:IsMonster(TYPE_DRIVE) and tc:IsRelateToChain() and tc:IsAbleToDeck() then
+			Duel.BreakEffect()
 			Duel.SendtoDeck(tc,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
 		end
 	end

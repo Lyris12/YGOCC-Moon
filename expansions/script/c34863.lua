@@ -5,7 +5,7 @@ local s,id,o=GetID()
 function s.initial_effect(c)
 	aux.AddOrigDriveType(c)
 	--Drive Effects
-	aux.AddDriveProc(c,4)
+	aux.AddDriveProc(c,6)
 	local d1=c:DriveEffect(-2,0,CATEGORY_TOHAND,EFFECT_TYPE_IGNITION,EFFECT_FLAG_CARD_TARGET,nil,
 		nil,
 		nil,
@@ -78,5 +78,5 @@ function s.drawop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 function s.thfilter(c)
-	return c:IsMonster() and c:IsRace(RACE_MACHINE) and (c:IsAttack(500) or c:IsDefense(500)) and not c:IsCode(id)
+	return c:IsMonster() and c:IsAttribute(ATTRIBUTE_EARTH) and c:IsRace(RACE_MACHINE) and (c:IsAttack(500) or c:IsDefense(500)) and not c:IsCode(id)
 end

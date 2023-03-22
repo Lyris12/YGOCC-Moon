@@ -8,7 +8,7 @@ function s.initial_effect(c)
 	aux.AddDriveProc(c,2)
 	local d1=c:DriveEffect(0,0,CATEGORY_DESTROY,EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O,EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY,EVENT_ENGAGE,
 		nil,
-		nil,
+		s.cost,
 		aux.Target(Card.IsFaceup,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil,nil,CATEGORY_DESTROY),
 		aux.DestroyOperation({SUBJECT_THAT_TARGET,Card.IsFaceup})
 	)
@@ -43,14 +43,21 @@ function s.initial_effect(c)
 	e2:SetTarget(s.damtg)
 	e2:SetOperation(s.damop)
 	c:RegisterEffect(e2)
-	--search 2
-	c:SentToGYTrigger(false,4,CATEGORY_TOHAND,EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY,true,
-		s.thcon,
-		nil,
-		aux.Target(s.filter,LOCATION_GRAVE,0,1,1,nil,nil,CATEGORY_TOHAND),
-		aux.SendToHandOperation(SUBJECT_IT)
-	)
 end
+function s.cfilter(c)
+	return c:IsMonster(TYPE_DRIVE) and not c:IsPublic() and not c:IsCode(id)
+end
+function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then
+		return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_HAND,0,1,nil)
+	end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
+	local g=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_HAND,0,1,1,nil)
+	if #g>0 then
+		Duel.ConfirmCards(1-tp,g)
+	end
+end
+
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(aux.FaceupFilter(Card.IsAttribute,ATTRIBUTE_FIRE),tp,LOCATION_MZONE,0,nil)
 	if chk==0 then return #g>0 end
@@ -102,11 +109,4 @@ function s.damop(e,tp,eg,ep,ev,re,r,rp)
 		if dam<0 then dam=0 end
 		Duel.Damage(p,dam,REASON_EFFECT)
 	end
-end
-
-function s.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():HasFlagEffect(FLAG_ZERO_ENERGY)
-end
-function s.filter(c)
-	return c:IsMonster() and not c:IsType(TYPE_DRIVE) and c:IsAbleToHand()
 end
