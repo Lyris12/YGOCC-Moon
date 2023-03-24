@@ -207,62 +207,85 @@ function Auxiliary.RegisterPreviousCustomSetCard(e,tp,eg,ep,ev,re,r,rp)
 end
 ---------------------------------------------------------------------------------
 -------------------------------DELAYED EVENT-------------------------------------
-function Auxiliary.RegisterMergedDelayedEventGlitchy(c,code,event,f,flag)
-	local mt=getmetatable(c)
-	if mt[event]==true then return end
-	mt[event]=true
+function Auxiliary.RegisterMergedDelayedEventGlitchy(c,code,event,f,flag,range,evgcheck)
 	if not f then f=aux.TRUE end
 	if not flag then flag=c:GetOriginalCode() end
 	local g=Group.CreateGroup()
 	g:KeepAlive()
-	local ge1=Effect.CreateEffect(c)
-	ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	ge1:SetCode(event)
-	ge1:SetLabel(code)
-	ge1:SetLabelObject(g)
-	ge1:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy1(flag,f))
-	Duel.RegisterEffect(ge1,0)
-	local ge2=ge1:Clone()
-	ge2:SetCode(EVENT_CHAIN_END)
-	ge2:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy2(flag))
-	Duel.RegisterEffect(ge2,0)
+	if range then
+		local ge1=Effect.CreateEffect(c)
+		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge1:SetCode(event)
+		ge1:SetRange(range)
+		ge1:SetLabel(code)
+		ge1:SetLabelObject(g)
+		ge1:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy1(flag,f,range,evgcheck))
+		Duel.RegisterEffect(ge1,0)
+		local ge2=ge1:Clone()
+		ge2:SetCode(EVENT_CHAIN_END)
+		ge2:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy2(flag,range,evgcheck))
+		Duel.RegisterEffect(ge2,0)
+	else
+		local mt=getmetatable(c)
+		if mt[event]==true then return end
+		mt[event]=true
+		local ge1=Effect.CreateEffect(c)
+		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge1:SetCode(event)
+		ge1:SetLabel(code)
+		ge1:SetLabelObject(g)
+		ge1:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy1(flag,f,nil,evgcheck))
+		Duel.RegisterEffect(ge1,0)
+		local ge2=ge1:Clone()
+		ge2:SetCode(EVENT_CHAIN_END)
+		ge2:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy2(flag,nil,evgcheck))
+		Duel.RegisterEffect(ge2,0)
+	end
 end
-function Auxiliary.MergedDelayEventCheckGlitchy1(id,f)
+function Auxiliary.MergedDelayEventCheckGlitchy1(id,f,range,evgcheck)
 	return	function(e,tp,eg,ep,ev,re,r,rp)
+				if range and not e:GetOwner():IsLocation(range) then return end
+				local label = (range) and e:GetOwner():GetFieldID() or 0
 				local g=e:GetLabelObject()
 				local evg=eg:Filter(f,nil,e,tp,eg,ep,ev,re,r,rp)
 				--Debug.Message(#evg)
 				for tc in aux.Next(evg) do
-					tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET,EFFECT_FLAG_SET_AVAILABLE,1)
+					tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET,EFFECT_FLAG_SET_AVAILABLE,1,label)
 				end
 				g:Merge(evg)
 				if Duel.GetCurrentChain()==0 and not Duel.CheckEvent(EVENT_CHAIN_END) then
 					local _eg=g:Clone()
-					_eg=_eg:Filter(Card.HasFlagEffect,nil,id)
+					_eg=_eg:Filter(Card.HasFlagEffectLabel,nil,id,label)
 					if #_eg>0 then
 						for tc in aux.Next(_eg) do
 							tc:ResetFlagEffect(id)
 						end
-						--Debug.Message('a')
-						Duel.RaiseEvent(_eg,EVENT_CUSTOM+e:GetLabel(),re,r,rp,ep,ev)
+						if not evgcheck or evgcheck(_eg,e,tp,ep,ev,re,r,rp) then
+							--Debug.Message('a')
+							Duel.RaiseEvent(_eg,EVENT_CUSTOM+e:GetLabel(),re,r,rp,ep,ev)
+						end
 					end
 					g:Clear()
 				end
 			end
 end
-function Auxiliary.MergedDelayEventCheckGlitchy2(id)
+function Auxiliary.MergedDelayEventCheckGlitchy2(id,range,evgcheck)
 	return	function(e,tp,eg,ep,ev,re,r,rp)
+				if range and not e:GetOwner():IsLocation(range) then return end
+				local label = (range) and e:GetOwner():GetFieldID() or 0
 				local g=e:GetLabelObject()
 				--Debug.Message('test')
 				if #g>0 then
 					local _eg=g:Clone()
-					_eg=_eg:Filter(Card.HasFlagEffect,nil,id)
+					_eg=_eg:Filter(Card.HasFlagEffectLabel,nil,id,label)
 					if #_eg>0 then
 						for tc in aux.Next(_eg) do
 							tc:ResetFlagEffect(id)
 						end
 						--Debug.Message('b')
-						Duel.RaiseEvent(_eg,EVENT_CUSTOM+e:GetLabel(),re,r,rp,ep,ev)
+						if not evgcheck or evgcheck(_eg,e,tp,ep,ev,re,r,rp) then
+							Duel.RaiseEvent(_eg,EVENT_CUSTOM+e:GetLabel(),re,r,rp,ep,ev)
+						end
 					end
 					g:Clear()
 				end

@@ -1,92 +1,116 @@
---The Skydian's Determination
+--Roland Zorael's' Skydianborn Gears
 --Scripted by: XGlitchy30
-local cid,id=GetID()
-function cid.initial_effect(c)
+
+local s,id=GetID()
+function s.initial_effect(c)
 	--Activate
 	local e0=Effect.CreateEffect(c)
 	e0:SetDescription(aux.Stringid(id,0))
 	e0:SetType(EFFECT_TYPE_ACTIVATE)
 	e0:SetCode(EVENT_FREE_CHAIN)
+	e0:HOPT(true)
 	c:RegisterEffect(e0)
 	--Activate(destroy)
+	aux.RegisterMergedDelayedEventGlitchy(c,id,EVENT_SPSUMMON_SUCCESS,s.cncfilter,id,LOCATION_SZONE,s.evgchk)
+	aux.RegisterMergedDelayedEventGlitchy(c,id+1,EVENT_SPSUMMON_SUCCESS,s.cncfilter,id+1,LOCATION_SZONE,aux.NOT(s.evgchk))
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,1))
 	e1:SetCategory(CATEGORY_DESTROY)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e1:SetCode(EVENT_CUSTOM+id)
 	e1:SetRange(LOCATION_SZONE)
-	e1:SetCountLimit(1,id)
-	e1:SetCondition(cid.cncon)
-	e1:SetTarget(cid.cntg)
-	e1:SetOperation(cid.cnop)
+	e1:SetCost(aux.LabelCost)
+	e1:SetTarget(s.cntg(false))
+	e1:SetOperation(s.cnop(false))
 	c:RegisterEffect(e1)
-	--special summon
+	local e1x=e1:Clone()
+	e1x:Desc(2)
+	e1x:SetCode(EVENT_CUSTOM+id+1)
+	e1x:SetTarget(s.cntg(true))
+	e1x:SetOperation(s.cnop(true))
+	c:RegisterEffect(e1x)
+	--equip
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,2))
-	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:SetDescription(aux.Stringid(id,3))
+	e2:SetCategory(CATEGORY_EQUIP)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e2:SetRange(LOCATION_GRAVE)
 	e2:SetCode(EVENT_FREE_CHAIN)
-	e2:SetCountLimit(1,id+100)
-	e2:SetCondition(cid.spcon)
+	e2:SetRange(LOCATION_GRAVE)
+	e2:SetHintTiming(0,RELEVANT_TIMINGS)
 	e2:SetCost(aux.bfgcost)
-	e2:SetTarget(cid.sptg)
-	e2:SetOperation(cid.spop)
+	e2:SetTarget(s.eqtg)
+	e2:SetOperation(s.eqop)
 	c:RegisterEffect(e2)
 end
 --Activate (DESTROY)
 --filters
-function cid.cncfilter(c)
-	return c:IsFaceup() and c:IsRace(RACE_WARRIOR) and c:IsType(TYPE_FUSION+TYPE_SYNCHRO+TYPE_XYZ+TYPE_LINK)
+function s.cncfilter(c)
+	return c:IsFaceup() and c:IsRace(RACE_WARRIOR) and c:IsType(TYPE_FUSION|TYPE_SYNCHRO|TYPE_XYZ|TYPE_LINK)
 end
+function s.evgchk(evg)
+	return evg:IsExists(Card.IsSetCard,1,nil,0x223)
+end
+		
 ---------
-function cid.cncon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(cid.cncfilter,1,nil)
-end
-function cid.cntg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsOnField() and chkc:IsFaceup() end
-	if chk==0 then return true end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
-end
-function cid.cnop(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
-	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) and Duel.Destroy(tc,REASON_EFFECT) then
-		if not eg:IsExists(Card.IsSetCard,1,nil,0x223) then
-			Duel.BreakEffect()
-			Duel.Destroy(e:GetHandler(),REASON_EFFECT)
+function s.cntg(selfdestroy)
+	return	function(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+		local c=e:GetHandler()
+		local exc = selfdestroy and c or nil
+		if chkc then return chkc:IsOnField() and chkc:IsFaceup() end
+		if chk==0 then
+			if e:GetLabel()~=1 then return false end
+			e:SetLabel(0)
+			return not e:IsHasType(EFFECT_TYPE_ACTIVATE) or Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,exc)
 		end
+		e:SetLabel(0)
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+		local g=Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,exc)
+		if selfdestroy and c:IsRelateToChain() then
+			g:AddCard(c)
+		end
+		Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,#g,0,0)
 	end
 end
---SPSUMMON
---filters
-function cid.filter2(c,e,tp)
-	return c:IsSetCard(0x223) and c:IsType(TYPE_MONSTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+function s.cnop(selfdestroy)
+	return	function(e,tp,eg,ep,ev,re,r,rp)
+				local tc=Duel.GetFirstTarget()
+				if tc:IsRelateToChain() and tc:IsFaceup() and Duel.Destroy(tc,REASON_EFFECT)>0 and selfdestroy then
+					local c=e:GetHandler()
+					if c:IsRelateToChain() then
+						if c:IsDestructable(e) then
+							Duel.BreakEffect()
+						end
+						Duel.Destroy(e:GetHandler(),REASON_EFFECT)
+					end
+				end
+			end
 end
----------
-function cid.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()==tp and (Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2)
+
+function s.filter(c,tp)
+	local eqc=c:GetEquipTarget()
+	return eqc and c:IsFaceup() and c:IsType(TYPE_EQUIP) and c:IsSetCard(0xd0a2) and not c:IsForbidden()
+		and Duel.GetMatchingGroupCount(s.eqfilter,tp,LOCATION_MZONE,LOCATION_MZONE,eqc,c)>0
 end
-function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingTarget(cid.filter2,tp,LOCATION_GRAVE,0,1,e:GetHandler(),e,tp) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectTarget(tp,aux.NecroValleyFilter(cid.filter2),tp,LOCATION_GRAVE,0,1,1,e:GetHandler(),e,tp)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
+function s.eqfilter(c,ec)
+	return c:IsFaceup() and ec:CheckEquipTarget(c)
 end
-function cid.spop(e,tp,eg,ep,ev,re,r,rp)
+function s.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_SZONE) and chkc:IsControler(tp) and s.filter(chkc,tp) end
+	if chk==0 then return Duel.IsExistingTarget(s.filter,tp,LOCATION_SZONE,0,1,nil,tp) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
+	local g=Duel.SelectTarget(tp,s.filter,tp,LOCATION_SZONE,0,1,1,nil,tp)
+	Duel.SetCardOperationInfo(g,CATEGORY_EQUIP)
+end
+function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and tc and tc:IsRelateToEffect(e) then
-		if Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP) then
-			local e1=Effect.CreateEffect(e:GetHandler())
-			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetCode(EFFECT_CANNOT_TRIGGER)
-			e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-			tc:RegisterEffect(e1)
+	if tc:IsRelateToChain() then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
+		local sg=Duel.SelectMatchingCard(tp,s.eqfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,tc:GetEquipTarget(),tc)
+		if #sg>0 then
+			Duel.HintSelection(sg)
+			Duel.Equip(tp,tc,sg:GetFirst())
 		end
-		Duel.SpecialSummonComplete()
 	end
 end
