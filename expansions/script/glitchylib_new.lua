@@ -29,8 +29,11 @@ CARD_STARFORCE_KNIGHT				= 39301
 COUNTER_ICE_PRISON					= 0x1301
 
 --Desc
-STRING_CANNOT_CHANGE_POSITION 	= 	700
-STRING_CANNOT_TRIGGER			=	701
+STRING_CANNOT_CHANGE_POSITION 			= 	700
+STRING_CANNOT_TRIGGER					=	701
+STRING_BANISH_REDIRECT					=	702
+STRING_CANNOT_BE_DESTROYED_BY_BATTLE	=	703
+STRING_CANNOT_BE_DESTROYED_BY_EFFECT	=	704
 
 --Rating types
 RATING_LEVEL	 = 	0x1
@@ -41,6 +44,10 @@ RATING_FUTURE	=	0x8
 --Stat types
 STAT_ATTACK  = 0x1
 STAT_DEFENSE = 0x2
+
+--COIN RESULTS
+COIN_HEADS = 1
+COIN_TAILS = 0
 
 --Effects
 GLOBAL_EFFECT_RESET	=	10203040
@@ -565,6 +572,11 @@ function Duel.RegisterHint(p,flag,reset,rct,id,desc)
 	if not reset then reset=PHASE_END end
 	if not rct then rct=1 end
 	return Duel.RegisterFlagEffect(p,flag,RESET_PHASE+reset,EFFECT_FLAG_CLIENT_HINT,rct,0,aux.Stringid(id,desc))
+end
+
+--Excavate
+function Duel.IsPlayerCanExcavateAndSpecialSummon(tp)
+	return Duel.IsPlayerCanSpecialSummon(tp) and not Duel.IsPlayerAffectedByEffect(tp,CARD_EHERO_BLAZEMAN)
 end
 
 --Filters

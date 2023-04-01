@@ -2919,7 +2919,7 @@ function Auxiliary.SSSelfTarget(loc_clause)
 					return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 						and (not loc_clause or ((c:IsLocation(loc_clause[1]) and not eg:IsContains(c)) or (c:IsLocation(loc_clause[2]))))
 				end
-				Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
+				Duel.SetCardOperationInfo(c,CATEGORY_SPECIAL_SUMMON)
 			end
 end
 function Auxiliary.SSSelfOperation(complete_proc)
