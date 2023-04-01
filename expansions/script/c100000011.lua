@@ -108,14 +108,14 @@ function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 			return true
 		end
 		e:SetLabel(0)
-		local attg=Duel.GetMatchingGroup(s.attfilter,tp,LOCATION_MZONE|LOCATION_GRAVE,0,nil)
+		local attg=Duel.GetMatchingGroup(s.attfilter,tp,LOCATION_REMOVED,0,nil)
 		return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil,tp,attg)
 	end
 	e:SetLabel(0)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
-	local attg=Duel.GetMatchingGroup(s.attfilter,tp,LOCATION_MZONE|LOCATION_GRAVE,0,nil)
+	local attg=Duel.GetMatchingGroup(s.attfilter,tp,LOCATION_REMOVED,0,nil)
 	local g=Duel.Select(HINTMSG_ATOHAND,false,tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil,tp,attg)
 	if #g>0 then
 		Duel.Search(g,tp)
