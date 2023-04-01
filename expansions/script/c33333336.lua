@@ -24,7 +24,7 @@ function s.initial_effect(c)
 	--boost
 	c:UpdateATKDEFField(500,500,LOCATION_MZONE,LOCATION_MZONE,0,s.target)
 	--search
-	c:Ignition(3,CATEGORIES_SEARCH,nil,LOCATION_MZONE,1,
+	c:Ignition(3,CATEGORIES_SEARCH+CATEGORY_DRAW,nil,LOCATION_MZONE,1,
 		nil,
 		aux.DiscardCost(),
 		s.thtg,
@@ -81,15 +81,8 @@ end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_GRAVE,0,1,nil)
-			and (not Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,0x7ec),tp,LOCATION_MZONE,0,1,nil) or Duel.IsPlayerCanDraw(tp,1))
 	end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_GRAVE)
-	if Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,0x7ec),tp,LOCATION_MZONE,0,1,nil) then
-		e:SetCategory(CATEGORIES_SEARCH+CATEGORY_DRAW)
-		Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
-	else
-		e:SetCategory(CATEGORIES_SEARCH)
-	end
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.Select(HINTMSG_ATOHAND,false,tp,aux.NecroValleyFilter(s.thfilter),tp,LOCATION_GRAVE,0,1,1,nil)
