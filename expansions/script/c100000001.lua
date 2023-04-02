@@ -63,18 +63,19 @@ function s.dcop(e,tp,eg,ep,ev,re,r,rp)
 	local d=Duel.TossDice(tp,1)
 	if d~=4 then
 		local options={}
-		local types={TYPE_SPELL,TYPE_TRAP}
+		local types, available_types = {TYPE_SPELL,TYPE_TRAP}, {}
 		local g=Duel.GetFieldGroup(tp,LOCATION_DECK,0)
 		local dcount=#g
 		if dcount==0 then return end
 		for i,typ in ipairs(types) do
 			if g:IsExists(s.thfilter,1,nil,typ) then
 				table.insert(options,i+70)
+				table.insert(available_types,typ)
 			end
 		end
 		if #options==0 then return end
 		local op=Duel.SelectOption(tp,table.unpack(options))+1
-		local typ=types[op]
+		local typ=available_types[op]
 		local sg=g:Filter(s.thfilter,nil,typ)
 		if #sg==0 then
 			Duel.ConfirmDecktop(tp,dcount)

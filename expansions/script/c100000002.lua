@@ -17,7 +17,7 @@ function s.initial_effect(c)
 	--During your opponent's turn (Quick Effect): You can roll a six-sided die and apply the result. 
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
-	e2:SetCategory(CATEGORY_DICE|CATEGORIES_SEARCH|CATEGORY_SPECIAL_SUMMON|CATEGORY_TOGRAVE)
+	e2:SetCategory(CATEGORY_DICE|CATEGORIES_SEARCH|CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_MZONE)
@@ -40,7 +40,7 @@ function s.dctg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then
 		local lower = Duel.IsPlayerCanSendtoHand(tp) and Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil)
-		local upper = Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp) and (c:IsCanOverlay(tp) or c:IsAbleToGrave())
+		local upper = Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp) and c:IsCanOverlay(tp)
 		return lower or upper
 	end
 	Duel.SetOperationInfo(0,CATEGORY_DICE,nil,0,tp,1)
@@ -79,16 +79,11 @@ function s.dcop(e,tp,eg,ep,ev,re,r,rp)
 	else
 		local g=Duel.Select(HINTMSG_SPSUMMON,false,tp,s.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp)
 		if #g>0 and Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)>0 then
-			local sc=Duel.GetOperatedGroup():GetFirst()
 			local c=e:GetHandler()
 			if not c:IsRelateToChain() then return end
-			local b1 = sc and sc:IsLocation(LOCATION_MZONE) and c:IsCanOverlay(tp)
-			local b2 = c:IsAbleToGrave()
-			local op=aux.Option(tp,id,2,b1,b2)
-			if op==0 and not sc:IsImmuneToEffect(e) then
+			local sc=Duel.GetOperatedGroup():GetFirst()
+			if sc and sc:IsLocation(LOCATION_MZONE) and c:IsCanOverlay(tp) and not sc:IsImmuneToEffect(e) then
 				Duel.Attach(c,sc)
-			elseif op==1 then
-				Duel.SendtoGrave(c,REASON_EFFECT)
 			end
 		end
 	end

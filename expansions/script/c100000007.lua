@@ -32,7 +32,7 @@ function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return rp==1-tp and (re:IsActiveType(TYPE_MONSTER) or re:IsHasType(EFFECT_TYPE_ACTIVATE)) and Duel.IsChainNegatable(ev)
 end
 function s.cfilter(c,tp)
-	return c:IsFaceup() and c:IsMonster(TYPE_XYZ) and not c:IsStatus(STATUS_BATTLE_DESTROYED) and c:GetOverlayCount()>0
+	return c:IsFaceup() and c:IsMonster(TYPE_XYZ) and c:IsSetCard(0xe50) and not c:IsStatus(STATUS_BATTLE_DESTROYED) and c:GetOverlayCount()>0
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,nil,tp) end
