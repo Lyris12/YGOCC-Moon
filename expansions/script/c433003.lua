@@ -6,7 +6,7 @@ function cid.initial_effect(c)
 	aux.AddOrigTimeleapType(c,false)
 	aux.AddTimeleapProc(c,5,cid.sumcon,cid.tlfilter,nil)
 	c:EnableReviveLimit() 
-	--Look at me mom I'm Armades
+	--actlimit
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_FIELD)
 	e0:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
@@ -16,8 +16,8 @@ function cid.initial_effect(c)
 	e0:SetValue(1)
 	e0:SetCondition(cid.armacon)
 	c:RegisterEffect(e0)
-	--Is this Harpie Dancer?
-		local e1=Effect.CreateEffect(c)
+	--harpie
+	local e1=Effect.CreateEffect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SUMMON)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
@@ -26,7 +26,7 @@ function cid.initial_effect(c)
 	e1:SetTarget(cid.harptg)
 	e1:SetOperation(cid.harpop)
 	c:RegisterEffect(e1)
-	--Oh boi time for BIG ATTACK
+	--atk
 	local e2=Effect.CreateEffect(c)
 	e2:SetCategory(CATEGORY_ATKCHANGE)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
@@ -37,7 +37,7 @@ function cid.initial_effect(c)
 	e2:SetCost(cid.atkcost)
 	e2:SetOperation(cid.atkop)
 	c:RegisterEffect(e2)
-	--:clap: :clap: REVIVE REVIEW :clap: :clap:
+	--revive
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_FIELD)
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)

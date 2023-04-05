@@ -1,13 +1,13 @@
---Saintly Rainbow MOMMY (a.k.a. GODTIER AORG SUPPORT GIRL)
+--Saintly Rainbow Ruler
 --Scripted by: XGlitchy30, Made By Swaggy
 local cid,id=GetID()
 ---------------------------
 function cid.initial_effect(c)
-	--Time Loop Shizzle
+	--Time Loop
 	c:EnableReviveLimit()
 	aux.AddOrigTimeleapType(c,false)
 	aux.AddTimeleapProc(c,5,cid.sumcon,cid.tlfilter,nil)
-	--Big Milk Draw
+	--Draw
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_PREDRAW)
@@ -15,7 +15,7 @@ function cid.initial_effect(c)
 	e1:SetCondition(cid.drawcon)
 	e1:SetOperation(cid.drawct)
 	c:RegisterEffect(e1)
-	--Thicc Thighs protect from damage
+	--protect from damage
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
@@ -35,7 +35,7 @@ function cid.initial_effect(c)
 	e3:SetTarget(cid.atktg)
 	e3:SetOperation(cid.atkop)
 	c:RegisterEffect(e3)
-	--Cum Back on the field
+	--Come Back on the field
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(id,2))
 	e4:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -50,7 +50,7 @@ function cid.initial_effect(c)
 end
 cid.drawcount=0
 cid.maxval=0
---Other Tom Lipsia garbage
+
 function cid.sumcon(e,c)
 	local tp=c:GetControler()
 	local g=Duel.GetFieldGroup(tp,LOCATION_MZONE,0):Filter(Card.IsType,nil,TYPE_MONSTER)
@@ -63,7 +63,7 @@ end
 function cid.tlfilter(c,e,mg)
 	return c:IsAttribute(ATTRIBUTE_LIGHT) and c:GetLevel()==e:GetHandler():GetFuture()-1
 end
---BIG MILK DRAW
+--DRAW
 function cid.drawcon(e,tp,eg,ep,ev,re,r,rp)
 	return tp==Duel.GetTurnPlayer() and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0
 		and Duel.GetDrawCount(tp)>-1
@@ -80,7 +80,7 @@ function cid.drawct(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetValue(dt+1)
 	Duel.RegisterEffect(e1,tp)
 end
---THICC THIGHS
+--
 function cid.tgcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_TIMELEAP)
 end
@@ -99,7 +99,7 @@ end
 function cid.damop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ChangeBattleDamage(tp,0)
 end
---PLOT ARMOR
+--
 function cid.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
 	if chk==0 then return Duel.IsExistingTarget(Card.IsType,tp,0,LOCATION_MZONE,1,nil,TYPE_MONSTER)
@@ -169,7 +169,7 @@ function cid.btcon(e)
 	local tc=e:GetLabelObject()
 	return c and tc and c:GetFlagEffect(id+100)>0 and tc:GetFlagEffect(id+200)>0
 end
---AYYYYYYYYY
+--
 function cid.spcfilter(c,tp)
 	return c:GetSummonLocation()==LOCATION_EXTRA and c:GetPreviousControler()==tp
 		and c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousPosition(POS_FACEUP)
@@ -197,19 +197,3 @@ function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 		c:RegisterEffect(e1,true)
 	end
 end
---AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
--- ⠄⠄⠄⢰⣧⣼⣯⠄⣸⣠⣶⣶⣦⣾⠄⠄⠄⠄⡀⠄⢀⣿⣿⠄⠄⠄⢸⡇⠄⠄	
--- ⠄⠄⠄⣾⣿⠿⠿⠶⠿⢿⣿⣿⣿⣿⣦⣤⣄⢀⡅⢠⣾⣛⡉⠄⠄⠄⠸⢀⣿⠄
--- ⠄⠄⢀⡋⣡⣴⣶⣶⡀⠄⠄⠙⢿⣿⣿⣿⣿⣿⣴⣿⣿⣿⢃⣤⣄⣀⣥⣿⣿⠄
--- ⠄⠄⢸⣇⠻⣿⣿⣿⣧⣀⢀⣠⡌⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠿⠿⣿⣿⣿⠄
--- ⠄⢀⢸⣿⣷⣤⣤⣤⣬⣙⣛⢿⣿⣿⣿⣿⣿⣿⡿⣿⣿⡍⠄⠄⢀⣤⣄⠉⠋⣰
--- ⠄⣼⣖⣿⣿⣿⣿⣿⣿⣿⣿⣿⢿⣿⣿⣿⣿⣿⢇⣿⣿⡷⠶⠶⢿⣿⣿⠇⢀⣤
--- ⠘⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣽⣿⣿⣿⡇⣿⣿⣿⣿⣿⣿⣷⣶⣥⣴⣿⡗
--- ⢀⠈⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⠄
--- ⢸⣿⣦⣌⣛⣻⣿⣿⣧⠙⠛⠛⡭⠅⠒⠦⠭⣭⡻⣿⣿⣿⣿⣿⣿⣿⣿⡿⠃⠄
--- ⠘⣿⣿⣿⣿⣿⣿⣿⣿⡆⠄⠄⠄⠄⠄⠄⠄⠄⠹⠈⢋⣽⣿⣿⣿⣿⣵⣾⠃⠄
--- ⠄⠘⣿⣿⣿⣿⣿⣿⣿⣿⠄⣴⣿⣶⣄⠄⣴⣶⠄⢀⣾⣿⣿⣿⣿⣿⣿⠃⠄⠄
--- ⠄⠄⠈⠻⣿⣿⣿⣿⣿⣿⡄⢻⣿⣿⣿⠄⣿⣿⡀⣾⣿⣿⣿⣿⣛⠛⠁⠄⠄⠄
--- ⠄⠄⠄⠄⠈⠛⢿⣿⣿⣿⠁⠞⢿⣿⣿⡄⢿⣿⡇⣸⣿⣿⠿⠛⠁⠄⠄⠄⠄⠄
--- ⠄⠄⠄⠄⠄⠄⠄⠉⠻⣿⣿⣾⣦⡙⠻⣷⣾⣿⠃⠿⠋⠁⠄⠄⠄⠄⠄⢀⣠⣴
--- ⣿⣿⣿⣶⣶⣮⣥⣒⠲⢮⣝⡿⣿⣿⡆⣿⡿⠃⠄⠄⠄⠄⠄⠄⠄⣠⣴⣿⣿⣿
