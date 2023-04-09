@@ -58,7 +58,7 @@ function s.costcheck(c,tp,g)
 	return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil,tp,g,c)
 end
 function s.thfilter(c,tp,g,cg)
-	if cg and not cg:IsHasEffect(EFFECT_TO_GRAVE_REDIRECT) then
+	if cg then
 		g:AddCard(cg)
 	end
 	return c:IsMonster() and c:IsRace(RACE_BEAST) and c:IsAbleToHand() and not g:IsExists(Card.IsAttribute,1,nil,c:GetAttribute())
