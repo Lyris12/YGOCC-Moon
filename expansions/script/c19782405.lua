@@ -114,7 +114,7 @@ end
 function cid.plop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 	local tc=Duel.GetFirstTarget()
-	if not Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true) or not tc:IsLocation(LOCATION_SZONE) or not c:IsFaceup() then return end
+	if not Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true) or not tc:IsLocation(LOCATION_SZONE) or not tc:IsFaceup() then return end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCode(EFFECT_CHANGE_TYPE)

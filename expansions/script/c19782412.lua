@@ -83,7 +83,7 @@ function s.tdcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.filter(c,chk)
 	if not c:IsAbleToDeck() then return false end
-	return c:IsMonster() and c:IsSetCard(0xd7c) or (chk and c:IsCode(id))
+	return (not chk and c:IsMonster() and c:IsSetCard(0xd7c)) or (chk and c:IsCode(id))
 end
 function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and chkc~=e:GetHandler() and s.filter(chkc) end
