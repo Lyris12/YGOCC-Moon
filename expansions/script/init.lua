@@ -187,8 +187,8 @@ dofile("expansions/script/proc_evolve.lua") --Evolves
 dofile("expansions/script/proc_drive.lua") --Drive
 dofile("expansions/script/muse_proc.lua") --"Muse"
 dofile("expansions/script/tables.lua") --Special Tables
--- dofile("expansions/script/proc_harmony.lua") --Harmonies
--- dofile("expansions/script/proc_accent.lua") --Accents
+dofile("expansions/script/proc_harmony.lua") --Harmonies
+dofile("expansions/script/proc_accent.lua") --Accents
 -- dofile("expansions/script/proc_bypath.lua") --Bypaths
 -- dofile("expansions/script/proc_toxia.lua") --Toxias
 -- dofile("expansions/script/proc_annotee.lua") --Annotees
@@ -216,7 +216,6 @@ end
 Card.IsType=function(c,tpe,scard,sumtype,p)
 	local custpe=tpe>>32
 	local otpe=tpe&0xffffffff
-	
 	--fix for changing type in deck
 	if c:IsLocation(LOCATION_DECK) and c:IsHasEffect(EFFECT_ADD_TYPE) and not scard and not sumtype and not p then
 		local egroup={c:IsHasEffect(EFFECT_ADD_TYPE)}

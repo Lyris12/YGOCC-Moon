@@ -10,6 +10,7 @@ TYPE_ACCENT							=0x100000000000
 TYPE_CUSTOM							=TYPE_CUSTOM|TYPE_ACCENT
 CTYPE_ACCENT						=0x1000
 CTYPE_CUSTOM						=CTYPE_CUSTOM|CTYPE_ACCENT
+SUMMON_TYPE_ACCENT					=SUMMON_TYPE_SPECIAL+0x1a
 
 REASON_ACCENT						=0x4000000000
 
@@ -56,26 +57,18 @@ Card.GetPreviousTypeOnField=function(c)
 end
 Card.GetPreviousLocation=function(c)
 	local lc=get_prev_location(c)
-	if lc==LOCATION_REMOVED and c:IsLocation(LOCATION_DECK) and c:IsReason(REASON_ACCENT) then
+	if lc==LOCATION_REMOVED and c:IsLocation(LOCATION_GRAVE) and c:GetFlagEffect(562)>0 then
 		if c:IsType(TYPE_MONSTER) then lc=LOCATION_MZONE
 		else lc=LOCATION_SZONE end
 	end
 	if lc==LOCATION_SZONE then
 		if c:GetPreviousSequence()==5 then lc=lc|LOCATION_FZONE
-		elseif c:IsType(TYPE_PENDULUM) and (c:GetPreviousSequence()==0 or c:GetPreviousSequence()==4) and not c:GetPreviousEquipTarget() then lc=lc|LOCATION_PZONE end
+		elseif c:IsType(TYPE_PENDULUM) and (c:GetPreviousSequence()==0 or c:GetPreviousSequence()==4 or c:GetPreviousSequence()>5) and not c:GetPreviousEquipTarget() then lc=lc|LOCATION_PZONE end
 	end
 	return lc
 end
 Card.IsPreviousLocation=function(c,loc)
 	return c:GetPreviousLocation()&loc>0
-end
-Card.GetReason=function(c)
-	local rs=get_reason(c)
-	local rc=c:GetReasonCard() or nil
-	if rc and Auxiliary.Accents[rc] then
-		rs=rs|REASON_ACCENT
-	end
-	return rs
 end
 
 --Custom Functions
@@ -106,6 +99,13 @@ function Card.IsAccentCode(c,...)
 	end
 	return false
 end
+function Auxiliary.AccentSummonCon(e,tp,eg,ep,ev,re,r,rp)
+    for i=1,Duel.GetCurrentChain() do
+        local te=Duel.GetChainInfo(i,CHAININFO_TRIGGERING_EFFECT)
+        if te:IsActiveType(TYPE_MONSTER) then return true end
+	end
+	return false
+end
 function Auxiliary.AddOrigAccentType(c,isfusion)
 	table.insert(Auxiliary.Accents,c)
 	Auxiliary.Customs[c]=true
@@ -122,40 +122,43 @@ function Auxiliary.AddAccentProc(c,f,...)
 	ge0:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	ge0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	ge0:SetCode(EVENT_SPSUMMON_SUCCESS)
-	ge0:SetCondition(function(e) return e:GetHandler():IsSummonType(0x1a) end)
-	ge0:SetOperation(function(e) local c=e:GetHandler() c:CompleteProcedure() c:RegisterFlagEffect(10003000,RESET_EVENT+0x1120000,0,1) end)
+	ge0:SetCondition(function(e) return e:GetHandler():IsSummonType(SUMMON_TYPE_ACCENT) end)
+	ge0:SetOperation(function(e) e:GetHandler():RegisterFlagEffect(10003000,RESET_EVENT+0x1120000,0,1) end)
 	c:RegisterEffect(ge0)
 	local ge1=Effect.CreateEffect(c)
 	ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	ge1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	ge1:SetCode(EVENT_CHAIN_SOLVED)
 	ge1:SetRange(0xff)
-	ge1:SetOperation(Auxiliary.AccentShuffleOp)
+	ge1:SetOperation(Auxiliary.AccentReturnOp)
 	Duel.RegisterEffect(ge1,0)
 	local ge2=ge1:Clone()
 	ge2:SetCode(EVENT_ADJUST)
 	Duel.RegisterEffect(ge2,0)
 end
-function Auxiliary.MaterialFilter(c,atc)
-	return not c:IsLocation(LOCATION_REMOVED) or c:GetReason()&REASON_MATERIAL+REASON_ACCENT~=REASON_MATERIAL+REASON_ACCENT or c:GetReasonCard()~=atc or c:IsFacedown()
+function Auxiliary.AMaterialFilter(c,...)
+	return c:IsFaceup() and c:IsCode(...)
 end
-function Auxiliary.AccentShuffleOp(e,tp,eg,ep,ev,re,r,rp)
+function Auxiliary.AccentReturnOp(e,tp,eg,ep,ev,re,r,rp)
 	local ag=Duel.GetMatchingGroup(Card.IsType,tp,0xff,0xff,nil,TYPE_ACCENT)
 	local g=nil
-	local c=ag:GetFirst()
-	local sumable
-	while c do
-		sumable=true
-		if not c:IsOnField() and c:GetFlagEffect(10003000)~=0 then
-			g=c:GetMaterial()
-			if g:IsExists(Auxiliary.MaterialFilter,1,nil,c) then sumable=false end
-			if sumable then
-				Duel.SendtoDeck(g,nil,2,REASON_ACCENT)
-			end
-			c:ResetFlagEffect(10003000)
+	local sg=Group.CreateGroup()
+	for c in aux.Next(ag) do if not c:IsOnField() and c:GetFlagEffect(10003000)~=0 then
+		g=c:GetMaterial()
+		for mc in aux.Next(g) do
+			local tg=Duel.GetMatchingGroup(aux.AMaterialFilter,tp,LOCATION_REMOVED,LOCATION_REMOVED,nil,mc:GetCode())
+			sg:Merge(tg)
 		end
-		c=ag:GetNext()
+		c:ResetFlagEffect(10003000)
+	end end
+	for tc in aux.Next(sg) do
+		tc:RegisterFlagEffect(562,RESET_EVENT+RESETS_STANDARD-RESET_TOGRAVE,0,1)
 	end
+	Duel.SendtoGrave(sg,0)
+	for tc in aux.Next(sg) do
+		Duel.RaiseSingleEvent(tc,EVENT_TO_GRAVE,e,r,rp,tp,ev)
+	end
+	Duel.RaiseEvent(sg,EVENT_TO_GRAVE,e,r,rp,tp,ev)
 end
 function Card.CheckAccentSubstitute(c,fc)
 	local tef={c:IsHasEffect(EFFECT_ACCENT_SUBSTITUTE)}
@@ -177,15 +180,34 @@ function Auxiliary.AddAccentProcMix(c,sub,insf,...)
 	for i=1,#val do
 		if type(val[i])=='function' then
 			fun[i]=function(c,fc,sub,mg,sg) return val[i](c,fc,sub,mg,sg) end
+		elseif type(val[i])=='table' then
+			fun[i]=function(c,fc,sub,mg,sg)
+				for _,fcode in ipairs(val[i]) do
+					if type(fcode)=='function' then
+						if fcode(c,fc,sub,mg,sg) then return true end
+					else
+						if c:IsAccentCode(fcode) or (sub and c:CheckAccentSubstitute(fc)) then return true end
+					end
+				end
+				return false
+			end
+			for _,fcode in ipairs(val[i]) do
+				if type(fcode)~='function' then mat[fcode]=true end
+			end
 		else
 			fun[i]=function(c,fc,sub) return c:IsAccentCode(val[i]) or (sub and c:CheckAccentSubstitute(fc)) end
-			table.insert(mat,val[i])
+			mat[val[i]]=true
 		end
 	end
-	if #mat>0 and c.material_count==nil then
-		local mt=getmetatable(c)
-		mt.material_count=#mat
+	local mt=getmetatable(c)
+	if mt.material==nil then
 		mt.material=mat
+	end
+	if mt.material_count==nil then
+		mt.material_count={#fun,#fun}
+	end
+	for index,_ in pairs(mat) do
+		Auxiliary.AddCodeList(c,index)
 	end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -199,66 +221,58 @@ function Auxiliary.AConditionMix(insf,sub,...)
 	--g:Material group
 	--gc:Material already used
 	--chkf: check field, default:PLAYER_NONE
+	--chkf&0x100: Not accent summon
+	--chkf&0x200: Concat accent
 	local funs={...}
 	return	function(e,g,gc,chkfnf)
 				if g==nil then return insf and Auxiliary.MustMaterialCheck(nil,e:GetHandlerPlayer(),EFFECT_MUST_BE_AMATERIAL) end
-				local chkf=chkfnf&0xff
 				local c=e:GetHandler()
 				local tp=c:GetControler()
-				local notaccent=chkfnf>>8~=0
-				local sub=sub or notaccent
-				local mg=g:Filter(Auxiliary.AConditionFilterMix,c,c,sub,table.unpack(funs))
+				local notaccent=chkfnf&0x100>0
+				local concat_accent=chkfnf&0x200>0
+				local sub=(sub or notaccent) and not concat_accent
+				local mg=g:Filter(Auxiliary.AConditionFilterMix,c,c,sub,concat_accent,table.unpack(funs))
 				if gc then
 					if not mg:IsContains(gc) then return false end
 					Duel.SetSelectedCard(Group.FromCards(gc))
 				end
-				return mg:CheckSubGroup(Auxiliary.ACheckMixGoal,#funs,#funs,tp,c,sub,chkf,table.unpack(funs))
+				return mg:CheckSubGroup(Auxiliary.ACheckMixGoal,#funs,#funs,tp,c,sub,chkfnf,table.unpack(funs))
 			end
 end
 function Auxiliary.AOperationMix(insf,sub,...)
 	local funs={...}
 	return	function(e,tp,eg,ep,ev,re,r,rp,gc,chkfnf)
-				local chkf=chkfnf&0xff
 				local c=e:GetHandler()
 				local tp=c:GetControler()
-				local notaccent=chkfnf>>8~=0
-				local sub=sub or notaccent
-				local mg=eg:Filter(Auxiliary.AConditionFilterMix,c,c,sub,table.unpack(funs))
+				local notaccent=chkfnf&0x100>0
+				local concat_accent=chkfnf&0x200>0
+				local sub=(sub or notaccent) and not concat_accent
+				local mg=eg:Filter(Auxiliary.AConditionFilterMix,c,c,sub,concat_accent,table.unpack(funs))
 				if gc then Duel.SetSelectedCard(Group.FromCards(gc)) end
 				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
-				local sg=mg:SelectSubGroup(tp,Auxiliary.ACheckMixGoal,false,#funs,#funs,tp,c,sub,chkf,table.unpack(funs))
-				Duel.SetFusionMaterial(sg)
+				local sg=mg:SelectSubGroup(tp,Auxiliary.ACheckMixGoal,true,#funs,#funs,tp,c,sub,chkfnf,table.unpack(funs))
+				Duel.SetFusionMaterial(sg or Group.CreateGroup())
 			end
 end
-function Auxiliary.AConditionFilterMix(c,fc,sub,...)
-	if not c:IsCanBeAccentedMaterial(fc) then return false end
+function Auxiliary.AConditionFilterMix(c,fc,sub,concat_accent,...)
+	local accent_type=concat_accent and SUMMON_TYPE_SPECIAL or SUMMON_TYPE_ACCENT
+	if not c:IsCanBeAccentedMaterial(fc,accent_type) then return false end
 	for i,f in ipairs({...}) do
 		if f(c,fc,sub) then return true end
 	end
 	return false
 end
-function Auxiliary.ACheckMix(c,mg,sg,fc,sub,fun1,fun2,...)
-	if fun2 then
-		sg:AddCard(c)
-		local res=false
-		if fun1(c,fc,false,mg,sg) then
-			res=mg:IsExists(Auxiliary.ACheckMix,1,sg,mg,sg,fc,sub,fun2,...)
-		elseif sub and fun1(c,fc,true,mg,sg) then
-			res=mg:IsExists(Auxiliary.ACheckMix,1,sg,mg,sg,fc,false,fun2,...)
-		end
-		sg:RemoveCard(c)
-		return res
-	else
-		return fun1(c,fc,sub,mg,sg)
-	end
-end
 --if sg1 is subset of sg2 then not Auxiliary.ACheckAdditional(tp,sg1,fc) -> not Auxiliary.ACheckAdditional(tp,sg2,fc)
 Auxiliary.ACheckAdditional=nil
-function Auxiliary.ACheckMixGoal(sg,tp,fc,sub,chkf,...)
+Auxiliary.AGoalCheckAdditional=nil
+function Auxiliary.ACheckMixGoal(sg,tp,fc,sub,chkfnf,...)
+	local chkf=chkfnf&0xff
 	if not Auxiliary.MustMaterialCheck(sg,tp,EFFECT_MUST_BE_AMATERIAL) then return false end
 	local g=Group.CreateGroup()
-	return sg:IsExists(Auxiliary.ACheckMix,1,nil,sg,g,fc,sub,...) and (chkf==PLAYER_NONE or Duel.GetLocationCountFromEx(tp,tp,sg,fc)>0)
+	return sg:IsExists(Auxiliary.FCheckMix,1,nil,sg,g,fc,sub,...) and (chkf==PLAYER_NONE or Duel.GetLocationCountFromEx(tp,tp,sg,fc)>0)
 		and (not Auxiliary.ACheckAdditional or Auxiliary.ACheckAdditional(tp,sg,fc))
+		and (not Auxiliary.AGoalCheckAdditional or Auxiliary.AGoalCheckAdditional(tp,sg,fc))
+		and aux.dncheck(sg)
 end
 --Accent monster, mixed material * minc to maxc + material + ...
 function Auxiliary.AddAccentProcMixRep(c,sub,insf,fun1,minc,maxc,...)
@@ -269,15 +283,34 @@ function Auxiliary.AddAccentProcMixRep(c,sub,insf,fun1,minc,maxc,...)
 	for i=1,#val do
 		if type(val[i])=='function' then
 			fun[i]=function(c,fc,sub,mg,sg) return val[i](c,fc,sub,mg,sg) end
+		elseif type(val[i])=='table' then
+			fun[i]=function(c,fc,sub,mg,sg)
+					for _,fcode in ipairs(val[i]) do
+						if type(fcode)=='function' then
+							if fcode(c,fc,sub,mg,sg) then return true end
+						else
+							if c:IsAccentCode(fcode) or (sub and c:CheckAccentSubstitute(fc)) then return true end
+						end
+					end
+					return false
+			end
+			for _,fcode in ipairs(val[i]) do
+				if type(fcode)~='function' then mat[fcode]=true end
+			end
 		else
 			fun[i]=function(c,fc,sub) return c:IsAccentCode(val[i]) or (sub and c:CheckAccentSubstitute(fc)) end
-			table.insert(mat,val[i])
+			mat[val[i]]=true
 		end
 	end
-	if #mat>0 and c.material_count==nil then
-		local mt=getmetatable(c)
-		mt.material_count=#mat
+	local mt=getmetatable(c)
+	if mt.material==nil then
 		mt.material=mat
+	end
+	if mt.material_count==nil then
+		mt.material_count={#fun+minc-1,#fun+maxc-1}
+	end
+	for index,_ in pairs(mat) do
+		Auxiliary.AddCodeList(c,index)
 	end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -291,40 +324,40 @@ function Auxiliary.AConditionMixRep(insf,sub,fun1,minc,maxc,...)
 	local funs={...}
 	return	function(e,g,gc,chkfnf)
 				if g==nil then return insf and Auxiliary.MustMaterialCheck(nil,e:GetHandlerPlayer(),EFFECT_MUST_BE_AMATERIAL) end
-				local chkf=chkfnf&0xff
 				local c=e:GetHandler()
 				local tp=c:GetControler()
-				local notaccent=chkfnf>>8~=0
-				local sub=sub or notaccent
-				local mg=g:Filter(Auxiliary.AConditionFilterMix,c,c,sub,fun1,table.unpack(funs))
+				local notaccent=chkfnf&0x100>0
+				local concat_accent=chkfnf&0x200>0
+				local sub=(sub or notaccent) and not concat_accent
+				local mg=g:Filter(Auxiliary.FConditionFilterMix,c,c,sub,concat_accent,fun1,table.unpack(funs))
 				if gc then
 					if not mg:IsContains(gc) then return false end
 					local sg=Group.CreateGroup()
-					return Auxiliary.ASelectMixRep(gc,tp,mg,sg,c,sub,chkf,fun1,minc,maxc,table.unpack(funs))
+					return Auxiliary.ASelectMixRep(gc,tp,mg,sg,c,sub,chkfnf,fun1,minc,maxc,table.unpack(funs))
 				end
 				local sg=Group.CreateGroup()
-				return mg:IsExists(Auxiliary.ASelectMixRep,1,nil,tp,mg,sg,c,sub,chkf,fun1,minc,maxc,table.unpack(funs))
+				return mg:IsExists(Auxiliary.ASelectMixRep,1,nil,tp,mg,sg,c,sub,chkfnf,fun1,minc,maxc,table.unpack(funs))
 			end
 end
 function Auxiliary.AOperationMixRep(insf,sub,fun1,minc,maxc,...)
 	local funs={...}
 	return	function(e,tp,eg,ep,ev,re,r,rp,gc,chkfnf)
-				local chkf=chkfnf&0xff
 				local c=e:GetHandler()
 				local tp=c:GetControler()
-				local notaccent=chkfnf>>8~=0
-				local sub=sub or notaccent
-				local mg=eg:Filter(Auxiliary.AConditionFilterMix,c,c,sub,fun1,table.unpack(funs))
+				local notaccent=chkfnf&0x100>0
+				local concat_accent=chkfnf&0x200>0
+				local sub=(sub or notaccent) and not concat_accent
+				local mg=eg:Filter(Auxiliary.FConditionFilterMix,c,c,sub,concat_accent,fun1,table.unpack(funs))
 				local sg=Group.CreateGroup()
 				if gc then sg:AddCard(gc) end
 				while #sg<maxc+#funs do
-					local cg=mg:Filter(Auxiliary.ASelectMixRep,sg,tp,mg,sg,c,sub,chkf,fun1,minc,maxc,table.unpack(funs))
+					local cg=mg:Filter(Auxiliary.ASelectMixRep,sg,tp,mg,sg,c,sub,chkfnf,fun1,minc,maxc,table.unpack(funs))
 					if #cg==0 then break end
-					local finish=Auxiliary.ACheckMixRepGoal(tp,sg,c,sub,chkf,fun1,minc,maxc,table.unpack(funs))
+					local finish=Auxiliary.ACheckMixRepGoal(tp,sg,c,sub,chkfnf,fun1,minc,maxc,table.unpack(funs))
 					local cancel_group=sg:Clone()
 					if gc then cancel_group:RemoveCard(gc) end
 					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
-					local tc=cg:SelectUnselect(cancel_group,tp,finish,false,minc+#funs,maxc+#funs)
+					local tc=cg:SelectUnselect(cancel_group,tp,finish,#sg==0,minc+#funs,maxc+#funs)
 					if not tc then break end
 					if sg:IsContains(tc) then
 						sg:RemoveCard(tc)
@@ -332,109 +365,44 @@ function Auxiliary.AOperationMixRep(insf,sub,fun1,minc,maxc,...)
 						sg:AddCard(tc)
 					end
 				end
-				Duel.SetFusionMaterial(sg)
+				Duel.SetFusionMaterial(sg or Group.CreateGroup())
 			end
 end
-function Auxiliary.ACheckMixRep(sg,g,fc,sub,chkf,fun1,minc,maxc,fun2,...)
-	if fun2 then
-		return sg:IsExists(Auxiliary.ACheckMixRepFilter,1,g,sg,g,fc,sub,chkf,fun1,minc,maxc,fun2,...)
-	else
-		local ct1=sg:FilterCount(fun1,g,fc,sub,mg,sg)
-		local ct2=sg:FilterCount(fun1,g,fc,false,mg,sg)
-		return ct1==#sg-#g and ct1-ct2<=1
-	end
-end
-function Auxiliary.ACheckMixRepFilter(c,sg,g,fc,sub,chkf,fun1,minc,maxc,fun2,...)
-	if fun2(c,fc,sub,mg,sg) then
-		g:AddCard(c)
-		local sub=sub and fun2(c,fc,false,mg,sg)
-		local res=Auxiliary.ACheckMixRep(sg,g,fc,sub,chkf,fun1,minc,maxc,...)
-		g:RemoveCard(c)
-		return res
-	end
-	return false
-end
-function Auxiliary.ACheckMixRepGoal(tp,sg,fc,sub,chkf,fun1,minc,maxc,...)
+function Auxiliary.ACheckMixRepGoalCheck(tp,sg,fc,chkfnf)
 	if not Auxiliary.MustMaterialCheck(sg,tp,EFFECT_MUST_BE_AMATERIAL) then return false end
+	if Auxiliary.AGoalCheckAdditional and not Auxiliary.AGoalCheckAdditional(tp,sg,fc) then return false end
+	return true
+end
+function Auxiliary.ACheckMixRepGoal(tp,sg,fc,sub,chkfnf,fun1,minc,maxc,...)
+	local chkf=chkfnf&0xff
 	if #sg<minc+#{...} or #sg>maxc+#{...} then return false end
+	if not (chkf==PLAYER_NONE or Duel.GetLocationCountFromEx(tp,tp,sg,fc)>0) then return false end
+	if Auxiliary.ACheckAdditional and not Auxiliary.ACheckAdditional(tp,sg,fc) then return false end
+	if not Auxiliary.ACheckMixRepGoalCheck(tp,sg,fc,chkfnf) then return false end
 	local g=Group.CreateGroup()
-	return Auxiliary.ACheckMixRep(sg,g,fc,sub,chkf,fun1,minc,maxc,...) and (chkf==PLAYER_NONE or Duel.GetLocationCountFromEx(tp,tp,sg,fc)>0)
-		and (not Auxiliary.ACheckAdditional or Auxiliary.ACheckAdditional(tp,sg,fc))
+	return Auxiliary.ACheckMixRep(sg,g,fc,sub,chkf,fun1,minc,maxc,...)
+		and aux.dncheck(sg)
 end
-function Auxiliary.ACheckMixRepTemplate(c,cond,tp,mg,sg,g,fc,sub,chkf,fun1,minc,maxc,...)
-	for i,f in ipairs({...}) do
-		if f(c,fc,sub,mg,sg) then
-			g:AddCard(c)
-			local sub=sub and f(c,fc,false,mg,sg)
-			local t={...}
-			table.remove(t,i)
-			local res=cond(tp,mg,sg,g,fc,sub,chkf,fun1,minc,maxc,table.unpack(t))
-			g:RemoveCard(c)
-			if res then return true end
-		end
-	end
-	if maxc>0 then
-		if fun1(c,fc,sub,mg,sg) then
-			g:AddCard(c)
-			local sub=sub and fun1(c,fc,false,mg,sg)
-			local res=cond(tp,mg,sg,g,fc,sub,chkf,fun1,minc-1,maxc-1,...)
-			g:RemoveCard(c)
-			if res then return true end
-		end
-	end
-	return false
-end
-function Auxiliary.ACheckMixRepSelectedCond(tp,mg,sg,g,...)
-	if #g<#sg then
-		return sg:IsExists(Auxiliary.ACheckMixRepSelected,1,g,tp,mg,sg,g,...)
-	else
-		return Auxiliary.ACheckSelectMixRep(tp,mg,sg,g,...)
-	end
-end
-function Auxiliary.ACheckMixRepSelected(c,...)
-	return Auxiliary.ACheckMixRepTemplate(c,Auxiliary.ACheckMixRepSelectedCond,...)
-end
-function Auxiliary.ACheckSelectMixRep(tp,mg,sg,g,fc,sub,chkf,fun1,minc,maxc,...)
+function Auxiliary.ACheckSelectMixRep(tp,mg,sg,g,fc,sub,chkfnf,fun1,minc,maxc,...)
+	local chkf=chkfnf&0xff
 	if Auxiliary.ACheckAdditional and not Auxiliary.ACheckAdditional(tp,g,fc) then return false end
 	if chkf==PLAYER_NONE or Duel.GetLocationCountFromEx(tp,tp,g,fc)>0 then
-		if minc<=0 and #{...}==0 then return true end
-		return mg:IsExists(Auxiliary.ACheckSelectMixRepAll,1,g,tp,mg,sg,g,fc,sub,chkf,fun1,minc,maxc,...)
+		if minc<=0 and #{...}==0 and Auxiliary.ACheckMixRepGoalCheck(tp,g,fc,chkfnf) then return true end
+		return mg:IsExists(Auxiliary.FCheckSelectMixRepAll,1,g,tp,mg,sg,g,fc,sub,chkfnf,fun1,minc,maxc,...)
 	else
-		return mg:IsExists(Auxiliary.ACheckSelectMixRepM,1,g,tp,mg,sg,g,fc,sub,chkf,fun1,minc,maxc,...)
+		return mg:IsExists(Auxiliary.FCheckSelectMixRepM,1,g,tp,mg,sg,g,fc,sub,chkfnf,fun1,minc,maxc,...)
 	end
 end
-function Auxiliary.ACheckSelectMixRepAll(c,tp,mg,sg,g,fc,sub,chkf,fun1,minc,maxc,fun2,...)
-	if fun2 then
-		if fun2(c,fc,sub,mg,sg) then
-			g:AddCard(c)
-			local sub=sub and fun2(c,fc,false,mg,sg)
-			local res=Auxiliary.ACheckSelectMixRep(tp,mg,sg,g,fc,sub,chkf,fun1,minc,maxc,...)
-			g:RemoveCard(c)
-			return res
-		end
-	elseif maxc>0 and fun1(c,fc,sub,mg,sg) then
-		g:AddCard(c)
-		local sub=sub and fun1(c,fc,false,mg,sg)
-		local res=Auxiliary.ACheckSelectMixRep(tp,mg,sg,g,fc,sub,chkf,fun1,minc-1,maxc-1)
-		g:RemoveCard(c)
-		return res
-	end
-	return false
-end
-function Auxiliary.ACheckSelectMixRepM(c,tp,...)
-	return c:IsControler(tp) and c:IsLocation(LOCATION_MZONE)
-		and Auxiliary.ACheckMixRepTemplate(c,Auxiliary.ACheckSelectMixRep,tp,...)
-end
-function Auxiliary.ASelectMixRep(c,tp,mg,sg,fc,sub,chkf,...)
+function Auxiliary.ASelectMixRep(c,tp,mg,sg,fc,sub,chkfnf,...)
 	sg:AddCard(c)
 	local res=false
-	if Auxiliary.ACheckAdditional and not Auxiliary.aCheckAdditional(tp,sg,fc) then
+	if Auxiliary.ACheckAdditional and not Auxiliary.ACheckAdditional(tp,sg,fc) then
 		res=false
-	elseif Auxiliary.ACheckMixRepGoal(tp,sg,fc,sub,chkf,...) then
+	elseif Auxiliary.ACheckMixRepGoal(tp,sg,fc,sub,chkfnf,...) then
 		res=true
 	else
 		local g=Group.CreateGroup()
-		res=sg:IsExists(Auxiliary.ACheckMixRepSelected,1,nil,tp,mg,sg,g,fc,sub,chkf,...)
+		res=sg:IsExists(Auxiliary.ACheckMixRepSelected,1,nil,tp,mg,sg,g,fc,sub,chkfnf,...)
 	end
 	sg:RemoveCard(c)
 	return res
@@ -453,15 +421,9 @@ function Auxiliary.AddAccentProcCode4(c,code1,code2,code3,code4,sub,insf)
 end
 --Accent monster, name * n
 function Auxiliary.AddAccentProcCodeRep(c,code1,cc,sub,insf)
-	if c:IsStatus(STATUS_COPYING_EFFECT) then return end
 	local code={}
 	for i=1,cc do
 		code[i]=code1
-	end
-	if c.material_count==nil then
-		local mt=getmetatable(c)
-		mt.material_count=1
-		mt.material={code1}
 	end
 	Auxiliary.AddAccentProcMix(c,sub,insf,table.unpack(code))
 end
@@ -512,4 +474,38 @@ end
 --Accent monster, name + name + condition * minc to maxc
 function Auxiliary.AddAccentProcCode2FunRep(c,code1,code2,f,minc,maxc,sub,insf)
 	Auxiliary.AddAccentProcMixRep(c,sub,insf,f,minc,maxc,code1,code2)
+end
+function Auxiliary.AddContactAccentProcedure(c,filter,self_location,opponent_location,mat_operation,...)
+	local self_location=self_location or 0
+	local opponent_location=opponent_location or 0
+	local operation_params={...}
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetCode(EFFECT_SPSUMMON_PROC)
+	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e2:SetRange(LOCATION_EXTRA)
+	e2:SetCondition(Auxiliary.ContactAccentCondition(filter,self_location,opponent_location))
+	e2:SetOperation(Auxiliary.ContactAccentOperation(filter,self_location,opponent_location,mat_operation,operation_params))
+	c:RegisterEffect(e2)
+	return e2
+end
+function Auxiliary.ContactAccentedMaterialFilter(c,fc,filter)
+	return c:IsCanBeAccentedMaterial(fc,SUMMON_TYPE_SPECIAL) and (not filter or filter(c,fc))
+end
+function Auxiliary.ContactAccentCondition(filter,self_location,opponent_location)
+	return	function(e,c)
+				if c==nil then return true end
+				if c:IsType(TYPE_PENDULUM) and c:IsFaceup() then return false end
+				local tp=c:GetControler()
+				local mg=Duel.GetMatchingGroup(Auxiliary.ContactAccentedMaterialFilter,tp,self_location,opponent_location,c,c,filter)
+				return c:CheckAccentMaterial(mg,nil,tp|0x200)
+			end
+end
+function Auxiliary.ContactAccentOperation(filter,self_location,opponent_location,mat_operation,operation_params)
+	return	function(e,tp,eg,ep,ev,re,r,rp,c)
+				local mg=Duel.GetMatchingGroup(Auxiliary.ContactAccentedMaterialFilter,tp,self_location,opponent_location,c,c,filter)
+				local g=Duel.SelectFusionMaterial(tp,c,mg,nil,tp|0x200)
+				c:SetMaterial(g)
+				mat_operation(g,table.unpack(operation_params))
+			end
 end
