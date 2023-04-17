@@ -28,7 +28,7 @@ function s.tg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_OVERLAY)
 end
 function s.op2(e,tp,eg,ep,ev,re,r,rp)
-	local og=Duel.GetOverlayGroup(tp,1,0)
+	local g=Duel.GetOverlayGroup(tp,1,0)
 	local b1=Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and g:IsExists(s.filter,1,nil,e,tp)
 	local b2=Duel.IsExistingMatchingCard(s.xfilter,tp,LOCATION_MZONE,0,1,nil)
 		and Duel.IsExistingMatchingCard(s.afilter,tp,LOCATION_GRAVE+LOCATION_HAND,0,1,nil)
