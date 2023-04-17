@@ -36,7 +36,7 @@ end
 function s.filter(c,e,tp)
 	return c:IsSetCard(0xbb2) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE,tp,e:GetHandler():GetLinkedZone(tp))
 end
-function s.ctcon(e,tp,eg,ep,ev,re,r,rp)
+function s.con(e,tp,eg,ep,ev,re,r,rp)
 	return re:IsActiveType(TYPE_MONSTER) and re:GetHandler():IsSetCard(0xbb2)
 end
 function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
