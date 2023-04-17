@@ -43,7 +43,7 @@ function s.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0xbb2) and c:IsAbleToHand()
 end
 function s.sfilter(c,e,tp,code)
-	return c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsCode(code)
+	return c:IsSetCard(0xbb2) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsCode(code)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_MZONE,0,1,nil) end
