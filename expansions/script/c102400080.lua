@@ -54,10 +54,12 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_MZONE,0,1,1,nil)
 	Duel.HintSelection(g)
 	local tc=g:GetFirst()
-	local sg=Duel.GetMatchingGroup(s.sfilter,tp,LOCATION_HAND,0,nil,e,tp,tc:GetCode())
 	if Duel.SendtoHand(tc,nil,REASON_EFFECT)>0 and tc:IsLocation(LOCATION_HAND)
-		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and #sg>0 and Duel.SelectEffectYesNo(tp,e:GetHandler()) then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		Duel.SpecialSummon(sg:Select(tp,1,1,nil),0,tp,tp,false,false,POS_FACEUP)
+		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
+		local sg=Duel.GetMatchingGroup(s.sfilter,tp,LOCATION_HAND,0,nil,e,tp,tc:GetCode())
+		if #sg>0 and Duel.SelectEffectYesNo(tp,e:GetHandler()) then
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+			Duel.SpecialSummon(sg:Select(tp,1,1,nil),0,tp,tp,false,false,POS_FACEUP)
+		end
 	end
 end
