@@ -5772,7 +5772,7 @@ expansions/pics/field/9945450.png	fe7fd4ac74fb26b3a21242e38957e79d
 expansions/pics/field/9966600.png	4ce347628a00ddeb739a28fcb3e83e2e
 expansions/pics/field/997680.png	5a7e47e03063862450fc83e5b58b3368
 expansions/script/Astralost.lua	664a865e6fd22816d3c61a152d5d229f
-expansions/script/bannedlist.lua	ce3236721520468b0a0da6d153033cc3
+expansions/script/bannedlist.lua	1c93617162a4ad8af1a53979bb7154fd
 expansions/script/c100000000.lua	41020e997d841c53446aaf1bea95fdf2
 expansions/script/c100000001.lua	661a65a4da008603564b432e1a92ef2d
 expansions/script/c100000002.lua	3a64fae058e7d9e84015846cfafbcde5
@@ -11366,6 +11366,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	f38491b6b2db140368c0e7485629a4e7
+update/filelist.txt	585411092679a5748f5d00e794fe3357
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	f55bfc3489e6e4187acf3c1f6a66a199
+update/version.txt	44bcd5180a34ffb959bd94e393a5cf93
