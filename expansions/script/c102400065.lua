@@ -75,7 +75,7 @@ function s.posop(e,tp,eg,ep,ev,re,r,rp)
 		e3:SetReset(RESET_EVENT+RESETS_STANDARD)
 		e3:SetValue(math.ceil(tc:GetAttack()/2))
 		tc:RegisterEffect(e3)
-		end
+	end
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

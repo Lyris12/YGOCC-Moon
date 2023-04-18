@@ -67,18 +67,17 @@ function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.dfilter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(s.dfilter,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g=Duel.SelectTarget(tp,s.dfilter,tp,LOCATION_GRAVE,0,1,1,nil)
+	local g=Duel.SelectTarget(tp,s.dfilter,tp,LOCATION_GRAVE,0,1,99,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,#g,0,0)
 end
 function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
 	Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
 	local ct=g:FilterCount(aux.NOT(Card.IsLocation),nil,LOCATION_GRAVE)
-	local g=Duel.GetMatchingGroup(Card.IsCanTurnSet,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
-	if g:FilterCount(Card.IsLocation,nil,LOCATION_DECK+LOCATION_EXTRA)>0 and ct>0 and #g>0
-		and Duel.SelectEffectYesNo(tp,e:GetOwner()) then
+	local tg=Duel.GetMatchingGroup(Card.IsCanTurnSet,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
+	if ct>0 and #tg>0 and Duel.SelectYesNo(tp,1111) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_POSCHANGE)
-		local sg=g:Select(tp,1,ct,nil)
+		local sg=tg:Select(tp,1,ct,nil)
 		Duel.HintSelection(sg)
 		Duel.ChangePosition(sg,POS_FACEDOWN_DEFENSE)
 	end
