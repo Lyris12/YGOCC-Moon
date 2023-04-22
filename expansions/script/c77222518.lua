@@ -42,12 +42,13 @@ function s.regop(e,tp,eg,ep,ev,re,r,rp)
 		c:RegisterFlagEffect(0,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(id,0))
 	end
 	if c:GetMaterial():GetFirst():IsAttribute(ATTRIBUTE_WIND)  then
-		--● WIND: Once per turn, when your opponent activates a monster effect: You can return that opponent's monster to the hand.
+		--● WIND: Once per turn, if your opponent activates a monster effect: You can return that opponent's monster to the hand.
 		local e2=Effect.CreateEffect(c)
 		e2:SetDescription(aux.Stringid(id,1))
 		e2:SetCategory(CATEGORY_TOHAND)
 		e2:SetType(EFFECT_TYPE_QUICK_O)
 		e2:SetCode(EVENT_CHAINING)
+		e2:SetProperty(EFFECT_FLAG_DELAY)
 		e2:SetRange(LOCATION_MZONE)
 		e2:SetCountLimit(1)
 		e2:SetCondition(s.thcond)

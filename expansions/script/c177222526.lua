@@ -15,7 +15,7 @@ function s.initial_effect(c)
 	e1:SetOperation(s.sumop)
 	e1:SetValue(SUMMON_TYPE_TIMELEAP)
 	c:RegisterEffect(e1)
-	--During the Main Phase (Quick Effect): You can banish both this card you control and 5 random face-down cards from your opponent's Extra Deck until your next Standby Phase.
+	--During the Main Phase (Quick Effect): You can banish both this card you control and the top 5 cards of your opponent's Deck until your next Standby Phase.
 	local e2=Effect.CreateEffect(c)
 	e2:SetCategory(CATEGORY_REMOVE)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
@@ -75,20 +75,20 @@ function s.sumop(e,tp,eg,ep,ev,re,r,rp,c)
 	aux.TimeleapHOPT(tp)
 end
 function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local g=Duel.GetDecktopGroup(1-tp,5)
 	local c=e:GetHandler()
-	if chk==0 then return c:IsAbleToRemove()
-		and Duel.IsExistingMatchingCard(Card.IsAbleToRemove,tp,0,LOCATION_EXTRA,5,nil) end
-	local g=Duel.GetMatchingGroup(Card.IsAbleToRemove,tp,0,LOCATION_EXTRA,nil)
+	if chk==0 then return c:IsAbleToRemove() and g:FilterCount(Card.IsAbleToRemove,nil)==5
+		and Duel.IsExistingMatchingCard(Card.IsAbleToRemove,tp,0,LOCATION_DECK,5,nil) end
+	local g=Duel.GetMatchingGroup(Card.IsAbleToRemove,tp,0,LOCATION_DECK,nil)
 	g:AddCard(c)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,6,0,0)
 end
 function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local g=Duel.GetFieldGroup(1-tp,LOCATION_EXTRA,0)
+	local g=Duel.GetDecktopGroup(1-tp,5)
 	if #g<5 or not c:IsRelateToEffect(e) or not c:IsControler(tp) then return end
-	local hg=g:RandomSelect(1-tp,5)
-	if #hg~=5 then return end
-	local rg=hg+c
+	local rg=g+c
+	Duel.DisableShuffleCheck()
 	if Duel.Remove(rg,POS_FACEUP,REASON_EFFECT+REASON_TEMPORARY)~=0 then
 		local fid=c:GetFieldID()
 		local og=Duel.GetOperatedGroup()
@@ -128,11 +128,12 @@ function s.retop(e,tp,eg,ep,ev,re,r,rp)
 	local sg=g:Filter(s.retfilter,nil,e:GetLabel(),e:GetHandler())
 	g:DeleteGroup()
 	local tc=sg:GetFirst()
+	Duel.DisableShuffleCheck()
 	while tc do
 		if tc==e:GetHandler() then
 			Duel.ReturnToField(tc)
 		else
-			Duel.SendtoDeck(tc,tc:GetPreviousControler(),REASON_EFFECT)
+			Duel.SendtoDeck(tc,tc:GetPreviousControler(),SEQ_DECKTOP,REASON_EFFECT)
 		end
 		tc=sg:GetNext()
 	end
