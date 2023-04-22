@@ -893,7 +893,7 @@ function Card.UpdateLevel(c,lv,reset,rc,range,cond,prop,desc)
 	if reset then
 		if type(reset)~="number" then reset=0 end
 		reset = rc==c and reset|RESET_DISABLE or reset
-		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
+		e:SetReset(RESET_EVENT|RESETS_STANDARD|reset,rct)
 	end
 	c:RegisterEffect(e)
 	if reset then
@@ -1315,7 +1315,7 @@ function Card.UnaffectedProtection(c,protection,reset,rc,range,cond,prop,desc)
 	if reset then
 		if type(reset)~="number" then reset=0 end
 		
-		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
+		e:SetReset(RESET_EVENT|RESETS_STANDARD|reset,rct)
 	end
 	c:RegisterEffect(e)
 	return e

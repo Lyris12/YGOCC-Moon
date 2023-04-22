@@ -158,6 +158,10 @@ function Auxiliary.ToDeckCost(f,loc1,loc2,min,max,exc,main_or_extra)
 					if #hg>0 then
 						Duel.HintSelection(hg)
 					end
+					local cfg=g:Filter(Card.IsLocation,nil,LOCATION_HAND)
+					if #cfg>0 then
+						Duel.ConfirmCards(1-tp,cfg)
+					end
 					local ct=Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_COST)
 					return g,ct
 				end
@@ -374,7 +378,7 @@ function Auxiliary.AttackRestrictionCost(oath,reset,desc)
 				c:RegisterEffect(e1)
 			end
 end
-function Auxiliary.SSRestrictionCost(f,oath,reset,id,cf,desc)
+function Auxiliary.SSRestrictionCost(f,oath,reset,id,cf,desc,cost)
 	if id then
 		if not cf then
 			aux.AddSSCounter(id,f)
@@ -390,7 +394,7 @@ function Auxiliary.SSRestrictionCost(f,oath,reset,id,cf,desc)
 	if not reset then reset=RESET_PHASE+PHASE_END end
 	
 	return	function(e,tp,eg,ep,ev,re,r,rp,chk)
-				if chk==0 then return Duel.GetCustomActivityCount(id,tp,ACTIVITY_SPSUMMON)==0 end
+				if chk==0 then return Duel.GetCustomActivityCount(id,tp,ACTIVITY_SPSUMMON)==0 and (not cost or cost(e,tp,eg,ep,ev,re,r,rp,chk)) end
 				local e1=Effect.CreateEffect(e:GetHandler())
 				if desc then e1:Desc(desc) end
 				e1:SetType(EFFECT_TYPE_FIELD)
@@ -403,6 +407,9 @@ function Auxiliary.SSRestrictionCost(f,oath,reset,id,cf,desc)
 								end
 							)
 				Duel.RegisterEffect(e1,tp)
+				if cost then
+					cost(e,tp,eg,ep,ev,re,r,rp,chk)
+				end
 			end
 end
 

@@ -207,55 +207,105 @@ function Auxiliary.RegisterPreviousCustomSetCard(e,tp,eg,ep,ev,re,r,rp)
 end
 ---------------------------------------------------------------------------------
 -------------------------------DELAYED EVENT-------------------------------------
-function Auxiliary.RegisterMergedDelayedEventGlitchy(c,code,event,f,flag,range,evgcheck)
+function Auxiliary.RegisterMergedDelayedEventGlitchy(c,code,event,f,flag,range,evgcheck,check_if_already_in_location)
+	if type(event)~="table" then event={event} end
 	if not f then f=aux.TRUE end
 	if not flag then flag=c:GetOriginalCode() end
+	local se
+	if check_if_already_in_location then
+		if check_if_already_in_location&LOCATION_GRAVE>0 then
+			se=aux.AddThisCardInGraveAlreadyCheck(c)
+		end
+	end
+	
 	local g=Group.CreateGroup()
 	g:KeepAlive()
+	if se~=nil then
+		se:SetLabelObject(g)
+	end
 	if range then
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(event)
-		ge1:SetRange(range)
-		ge1:SetLabel(code)
-		ge1:SetLabelObject(g)
-		ge1:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy1(flag,f,range,evgcheck))
-		Duel.RegisterEffect(ge1,0)
+		local ge1
+		for _,ev in ipairs(event) do
+			ge1=Effect.CreateEffect(c)
+			ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+			ge1:SetCode(ev)
+			ge1:SetRange(range)
+			ge1:SetLabel(code)
+			if se==nil then
+				ge1:SetLabelObject(g)
+			else
+				ge1:SetLabelObject(se)
+			end
+			ge1:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy1(flag,f,range,evgcheck,se))
+			Duel.RegisterEffect(ge1,0)
+		end
 		local ge2=ge1:Clone()
 		ge2:SetCode(EVENT_CHAIN_END)
-		ge2:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy2(flag,range,evgcheck))
+		ge2:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy2(flag,range,evgcheck,se))
 		Duel.RegisterEffect(ge2,0)
 	else
 		local mt=getmetatable(c)
 		if mt[event]==true then return end
 		mt[event]=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(event)
-		ge1:SetLabel(code)
-		ge1:SetLabelObject(g)
-		ge1:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy1(flag,f,nil,evgcheck))
-		Duel.RegisterEffect(ge1,0)
+		local ge1
+		for _,ev in ipairs(event) do
+			local ge1=Effect.CreateEffect(c)
+			ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+			ge1:SetCode(ev)
+			ge1:SetLabel(code)
+			if se==nil then
+				ge1:SetLabelObject(g)
+			else
+				ge1:SetLabelObject(se)
+			end
+			ge1:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy1(flag,f,nil,evgcheck,se))
+			Duel.RegisterEffect(ge1,0)
+		end
 		local ge2=ge1:Clone()
 		ge2:SetCode(EVENT_CHAIN_END)
-		ge2:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy2(flag,nil,evgcheck))
+		ge2:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy2(flag,nil,evgcheck,se))
 		Duel.RegisterEffect(ge2,0)
 	end
 end
-function Auxiliary.MergedDelayEventCheckGlitchy1(id,f,range,evgcheck)
+function Auxiliary.MergedDelayEventCheckGlitchy1(id,f,range,evgcheck,se)
 	return	function(e,tp,eg,ep,ev,re,r,rp)
-				if range and not e:GetOwner():IsLocation(range) then return end
-				local label = (range) and e:GetOwner():GetFieldID() or 0
-				local g=e:GetLabelObject()
-				local evg=eg:Filter(f,nil,e,tp,eg,ep,ev,re,r,rp)
+				local c=e:GetOwner()
+				if range then
+					if range==LOCATION_ENGAGED then
+						if not c:IsLocation(LOCATION_HAND) or not c:IsEngaged() then
+							return
+						end
+					else
+						if not c:IsLocation(range) then
+							return
+						end
+					end
+				end
+				local label = (range) and c:GetFieldID() or 0
+				local engage_label = (range==LOCATION_ENGAGED) and c:GetEngagedID() or 0
+				local g
+				if se==nil then
+					g=e:GetLabelObject()
+				else
+					g=e:GetLabelObject():GetLabelObject()
+				end
+				if aux.GetValueType(g)~="Group" then return end
+				local evg=eg:Filter(f,nil,e,tp,eg,ep,ev,re,r,rp,se)
 				--Debug.Message(#evg)
 				for tc in aux.Next(evg) do
 					tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET,EFFECT_FLAG_SET_AVAILABLE,1,label)
+					if engage_label~=0 then
+						tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET,EFFECT_FLAG_SET_AVAILABLE,1,engage_label)
+					end
 				end
 				g:Merge(evg)
+				--Debug.Message('gsize '..tostring(#g))
 				if Duel.GetCurrentChain()==0 and not Duel.CheckEvent(EVENT_CHAIN_END) then
 					local _eg=g:Clone()
 					_eg=_eg:Filter(Card.HasFlagEffectLabel,nil,id,label)
+					if engage_label~=0 then
+						_eg=_eg:Filter(Card.HasFlagEffectLabel,nil,id,engage_label)
+					end
 					if #_eg>0 then
 						for tc in aux.Next(_eg) do
 							tc:ResetFlagEffect(id)
@@ -269,15 +319,38 @@ function Auxiliary.MergedDelayEventCheckGlitchy1(id,f,range,evgcheck)
 				end
 			end
 end
-function Auxiliary.MergedDelayEventCheckGlitchy2(id,range,evgcheck)
+function Auxiliary.MergedDelayEventCheckGlitchy2(id,range,evgcheck,se)
 	return	function(e,tp,eg,ep,ev,re,r,rp)
-				if range and not e:GetOwner():IsLocation(range) then return end
-				local label = (range) and e:GetOwner():GetFieldID() or 0
-				local g=e:GetLabelObject()
+				local c=e:GetOwner()
+				if range then					
+					if range==LOCATION_ENGAGED then
+						if not c:IsLocation(LOCATION_HAND) or not c:IsEngaged() then
+							return
+						end
+					else
+						if not c:IsLocation(range) then
+							return
+						end
+					end
+				end
+				local label = (range) and c:GetFieldID() or 0
+				local engage_label = (range==LOCATION_ENGAGED) and c:GetEngagedID() or 0
+				local g
+				if se==nil then
+					g=e:GetLabelObject()
+				else
+					g=e:GetLabelObject():GetLabelObject()
+				end
+				if aux.GetValueType(g)~="Group" then return end
 				--Debug.Message('test')
 				if #g>0 then
 					local _eg=g:Clone()
 					_eg=_eg:Filter(Card.HasFlagEffectLabel,nil,id,label)
+					--Debug.Message(#_eg)
+					if engage_label~=0 then
+						_eg=_eg:Filter(Card.HasFlagEffectLabel,nil,id,engage_label)
+						Debug.Message(#_eg)
+					end
 					if #_eg>0 then
 						for tc in aux.Next(_eg) do
 							tc:ResetFlagEffect(id)
@@ -1849,6 +1922,50 @@ Duel.SendtoHand = function(tg,p,reason)
 		end
 	end
 	return ct1+ct2
+end
+-------------------------------SYNCHRO-------------------------------
+function Auxiliary.SynchroMaterialCustomForNonTuner(c,customf,loc1,loc2,tg,tg_alt,op,op_alt)
+	local ifTuner=Effect.CreateEffect(c)
+	ifTuner:SetType(EFFECT_TYPE_SINGLE)
+	ifTuner:SetProperty(EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_UNCOPYABLE)
+	ifTuner:SetCode(EFFECT_SYNCHRO_MATERIAL_CUSTOM)
+	ifTuner:SetValue(1)
+	ifTuner:SetCondition(aux.IsTunerCond)
+	ifTuner:SetTarget(tg)
+	ifTuner:SetOperation(op)
+	c:RegisterEffect(ifTuner)
+	local ifNonTuner=Effect.CreateEffect(c)
+	ifNonTuner:SetType(EFFECT_TYPE_SINGLE)
+	ifNonTuner:SetProperty(EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_UNCOPYABLE)
+	ifNonTuner:SetCode(EFFECT_SYNCHRO_MATERIAL_CUSTOM)
+	ifNonTuner:SetValue(1)
+	ifNonTuner:SetLabelObject(c)
+	ifNonTuner:SetTarget(tg_alt)
+	ifNonTuner:SetOperation(op_alt)
+	local grant=Effect.CreateEffect(c)
+	grant:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_GRANT)
+	grant:SetProperty(EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_UNCOPYABLE|EFFECT_FLAG_IGNORE_IMMUNE)
+	grant:SetRange(LOCATION_MZONE)
+	grant:SetTargetRange(loc1,loc2)
+	grant:SetCondition(aux.NOT(aux.IsTunerCond))
+	grant:SetTarget(customf)
+	grant:SetLabelObject(ifNonTuner)
+	c:RegisterEffect(grant)
+	local ed=Effect.CreateEffect(c)
+	ed:SetType(EFFECT_TYPE_FIELD)
+	ed:SetProperty(EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_UNCOPYABLE|EFFECT_FLAG_IGNORE_IMMUNE)
+	ed:SetCode(EFFECT_EXTRA_SYNCHRO_MATERIAL)
+	ed:SetRange(LOCATION_MZONE)
+	ed:SetTargetRange(loc1,loc2)
+	ed:SetCondition(aux.NOT(aux.IsTunerCond))
+	ed:SetTarget(customf)
+	ed:SetValue(1)
+	c:RegisterEffect(ed)
+	return ifTuner,ifNonTuner,grant,ed
+end
+function Auxiliary.IsTunerCond(e)
+	local c=e:GetHandler()
+	return c:IsType(TYPE_TUNER)
 end
 
 -------------------------------XYZ-----------------------------------

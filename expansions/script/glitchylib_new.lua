@@ -11,6 +11,7 @@ CATEGORY_UPDATE_ATTRIBUTE			= 0x100
 CATEGORY_UPDATE_RACE				= 0x200
 CATEGORY_UPDATE_SETCODE				= 0x400
 CATEGORY_LVCHANGE					= 0x800
+CATEGORY_PAYLP						= 0x1000
 
 CATEGORIES_SEARCH = CATEGORY_SEARCH|CATEGORY_TOHAND
 CATEGORIES_FUSION_SUMMON = CATEGORY_SPECIAL_SUMMON|CATEGORY_FUSION_SUMMON
@@ -27,6 +28,7 @@ CARD_STARFORCE_KNIGHT				= 39301
 
 --Custom Counters
 COUNTER_ICE_PRISON					= 0x1301
+COUNTER_ENGAGED_MASS				= 0xe67
 
 --Desc
 STRING_CANNOT_CHANGE_POSITION 			= 	700
@@ -34,6 +36,23 @@ STRING_CANNOT_TRIGGER					=	701
 STRING_BANISH_REDIRECT					=	702
 STRING_CANNOT_BE_DESTROYED_BY_BATTLE	=	703
 STRING_CANNOT_BE_DESTROYED_BY_EFFECT	=	704
+STRING_CANNOT_ATTACK					=	705
+STRING_TREATED_AS_TUNER					=	706
+STRING_UNAFFECTED_BY_OPPONENT_EFFECT	=	707
+STRING_TEMPORARILY_BANISHED				=   708
+
+STRING_ASK_REPLACE_UPDATE_ENERGY_COST	= 	900
+STRING_ASK_ENGAGE						=	901
+STRING_ASK_UPDATE_ENERGY				=	902
+STRING_ASK_IGNORE_OVERDRIVE_COST		= 	903
+
+STRING_INPUT_ENERGY						=	2000
+STRING_INPUT_LEVEL						=	2001
+
+HINTMSG_ENERGY							=	2100
+
+--Locations
+LOCATION_ENGAGED	=	0x1000
 
 --Rating types
 RATING_LEVEL	 = 	0x1
@@ -60,10 +79,15 @@ EFFECT_FLAG_DDD = EFFECT_FLAG_DELAY|EFFECT_FLAG_DAMAGE_STEP|EFFECT_FLAG_DAMAGE_C
 EXTRA_MONSTER_ZONE=0x60
 
 --resets
-RESETS_REDIRECT_FIELD = 0x047e0000
+RESETS_REDIRECT_FIELD 			= 0x047e0000
+RESETS_STANDARD_UNION 			= RESETS_STANDARD&(~(RESET_TOFIELD|RESET_LEAVE))
+RESETS_STANDARD_TOFIELD 		= RESETS_STANDARD&(~(RESET_TOFIELD))
 
 --timings
 RELEVANT_TIMINGS = TIMINGS_CHECK_MONSTER|TIMING_MAIN_END|TIMING_END_PHASE
+
+--win
+WIN_REASON_CUSTOM = 0xff
 
 --constants aliases
 TYPE_ST			= TYPE_SPELL|TYPE_TRAP
@@ -73,6 +97,7 @@ RACES_BEASTS = RACE_BEAST|RACE_BEASTWARRIOR|RACE_WINDBEAST
 ARCHE_FUSION		= 0x46
 ARCHE_PANDEMONIUM	= 0xf80
 ARCHE_BIGBANG		= 0xbba
+ARCHE_HYPERDRIVE	= 0x660
 
 LOCATION_ALL = LOCATION_DECK|LOCATION_HAND|LOCATION_MZONE|LOCATION_SZONE|LOCATION_GRAVE|LOCATION_REMOVED|LOCATION_EXTRA
 LOCATION_GB  = LOCATION_GRAVE|LOCATION_REMOVED
@@ -153,6 +178,92 @@ function Duel.Attach(c,xyz)
 	end
 end
 
+function Duel.Banish(g,pos,r)
+	if not pos then pos=POS_FACEUP end
+	if not r then r=REASON_EFFECT end
+	return Duel.Remove(g,pos,r)
+end
+function Duel.BanishUntil(g,pos,phase,id,phasect,phasenext,rc,r)
+	local e, tp = self_reference_effect, current_triggering_player
+	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
+	if not phase then phase=PHASE_END end
+	if not phasect then phasect=1 end
+	if not rc then rc=e:GetHandler() end
+	if not r then r=REASON_EFFECT end
+	local ct=Duel.Remove(g,pos,r|REASON_TEMPORARY)
+	if ct>0 then
+		local og=g:Filter(Card.IsLocation,nil,LOCATION_REMOVED)
+		if #og>0 then
+			og:KeepAlive()
+			local turnct,turnct2=0,phasect
+			local ph = phase&(PHASE_DRAW|PHASE_STANDBY|PHASE_MAIN1|PHASE_BATTLE_START|PHASE_BATTLE_STEP|PHASE_DAMAGE|PHASE_DAMAGE_CAL|PHASE_BATTLE|PHASE_MAIN2|PHASE_END)
+			local player = phase&(RESET_SELF_TURN|RESET_OPPO_TURN)
+			if (player==RESET_SELF_TURN and Duel.GetTurnPlayer()~=tp) or (player==RESET_OPPO_TURN and Duel.GetTurnPlayer()~=1-tp) then
+				turnct=1
+			elseif Duel.GetCurrentPhase()>ph then
+				turnct=1
+			end
+			if phasenext then
+				if Duel.GetCurrentPhase()==phase
+				and (player==0 or (player==RESET_SELF_TURN and Duel.GetTurnPlayer()==tp) or (player==RESET_OPPO_TURN and Duel.GetTurnPlayer()==1-tp)) then
+					turnct=turnct+1
+					turnct2=turnct2+1
+				end
+			end
+			for tc in aux.Next(og) do
+				tc:RegisterFlagEffect(id,RESET_EVENT|RESETS_STANDARD|RESET_PHASE|phase,EFFECT_FLAG_SET_AVAILABLE|EFFECT_FLAG_CLIENT_HINT,turnct2,0,STRING_TEMPORARILY_BANISHED)
+			end	
+			local e1=Effect.CreateEffect(rc)
+			e1:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
+			e1:SetCode(EVENT_PHASE|phase)
+			e1:SetReset(RESET_PHASE|phase,phasect)
+			e1:SetCountLimit(1)
+			e1:SetLabel(Duel.GetTurnCount()+turnct*phasect)
+			e1:SetLabelObject(og)
+			e1:SetCondition(aux.TimingCondition(ph,player))
+			e1:SetOperation(aux.ReturnLabelObjectToFieldOp(id))
+			Duel.RegisterEffect(e1,tp)
+		end
+	end
+	return ct
+end
+function Auxiliary.TimingCondition(phase,player)
+	return	function(e,tp,eg,ep,ev,re,r,rp)
+				return Duel.GetCurrentPhase()==phase and (player==0 or (player==RESET_SELF_TURN and Duel.GetTurnPlayer()==tp) or (player==RESET_OPPO_TURN and Duel.GetTurnPlayer()==1-tp))
+					and Duel.GetTurnCount()==e:GetLabel()
+			end
+end
+function Auxiliary.ReturnLabelObjectToFieldOp(id)
+	return	function(e,tp,eg,ep,ev,re,r,rp)
+				local g=e:GetLabelObject()
+				local sg=g:Filter(Card.HasFlagEffect,nil,id)
+				local rg=Group.CreateGroup()
+				for p=tp,1-tp,1-2*tp do
+					local sg1=sg:Filter(Card.IsPreviousControler,nil,p)
+					if #sg1>0 then
+						local ft=Duel.GetLocationCount(p,LOCATION_MZONE)
+						if ft>0 then
+							if ft<#sg1 then
+								Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
+								local tg=sg1:Select(tp,ft,ft,nil)
+								if #tg>0 then
+									rg:Merge(tg)
+								end
+							else
+								rg:Merge(sg1)
+							end
+						end
+					end
+				end
+				if #rg>0 then
+					for tc in aux.Next(rg) do
+						Duel.ReturnToField(tc)
+					end
+				end
+				g:DeleteGroup()
+			end
+end
+
 function Duel.EquipAndRegisterLimit(p,be_equip,equip_to,...)
 	local res=Duel.Equip(p,be_equip,equip_to,...)
 	if res and equip_to:GetEquipGroup():IsContains(be_equip) then
@@ -160,7 +271,7 @@ function Duel.EquipAndRegisterLimit(p,be_equip,equip_to,...)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetProperty(EFFECT_FLAG_OWNER_RELATE)
 		e1:SetCode(EFFECT_EQUIP_LIMIT)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+		e1:SetReset(RESET_EVENT|RESETS_STANDARD)
 		e1:SetValue(function(e,c)
 						return e:GetOwner()==c
 					end
@@ -314,6 +425,10 @@ function Card.IsST(c,typ)
 end
 function Card.MonsterOrFacedown(c)
 	return c:IsMonster() or c:IsFacedown()
+end
+
+function Card.IsAppropriateEquipSpell(c,ec,tp)
+	return c:IsSpell(TYPE_EQUIP) and c:CheckEquipTarget(ec) and c:CheckUniqueOnField(tp) and not c:IsForbidden()
 end
 
 function Card.HasAttack(c)
@@ -471,6 +586,16 @@ function Duel.GetTargetParam()
 	return Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)
 end
 
+--Cloned Effects
+function Effect.SpecialSummonEventClone(e,c,notreg)
+	local ex=e:Clone()
+	ex:SetCode(EVENT_SPSUMMON_SUCCESS)
+	if not notreg then
+		c:RegisterEffect(ex)
+	end
+	return ex
+end
+
 --Columns
 function Card.GlitchyGetColumnGroup(c,left,right,without_center)
 	local left = (left and aux.GetValueType(left)=="number" and left>=0) and left or 0
@@ -534,6 +659,10 @@ function Effect.Desc(e,id,...)
 	local x = {...}
 	local code = #x>0 and x[1] or e:GetOwner():GetOriginalCode()
 	return e:SetDescription(aux.Stringid(code,id))
+end
+function Card.AskPlayer(c,tp,desc)
+	local string = desc<=15 and aux.Stringid(c:GetOriginalCode(),desc) or desc
+	return Duel.SelectYesNo(tp,string)
 end
 
 function Auxiliary.Option(id,tp,desc,...)
@@ -634,7 +763,7 @@ function Auxiliary.MonsterFilter(typ,f,...)
 		typ=nil
 	end
 	return	function(target)
-				return target:IsMonster(typ) and f(target,table.unpack(ext_params))
+				return target:IsMonster(typ) and (not f or f(target,table.unpack(ext_params)))
 			end
 end
 function Auxiliary.RaceFilter(race,f,...)
@@ -646,7 +775,7 @@ end
 function Auxiliary.STFilter(f,...)
 	local ext_params={...}
 	return	function(target)
-				return target:IsST() and f(target,table.unpack(ext_params))
+				return target:IsST() and (not f or f(target,table.unpack(ext_params)))
 			end
 end
 
@@ -729,6 +858,24 @@ function Group.CheckSameProperty(g,f,...)
 	return true, chk
 end
 
+--Labels
+function Effect.SetLabelPair(e,l1,l2)
+	if l1 and l2 then
+		e:SetLabel(l1,l2)
+	elseif l1 then
+		local _,o2=e:GetLabel()
+		e:SetLabel(l1,o2)
+	else
+		local o1,_=e:GetLabel()
+		e:SetLabel(o1,l2)
+	end
+end
+
+--LP
+function Duel.LoseLP(p,val)
+	return Duel.SetLP(tp,Duel.GetLP(tp)-math.abs(val))
+end
+
 --Locations
 function Card.IsBanished(c,pos)
 	return c:IsLocation(LOCATION_REMOVED) and (not pos or c:IsPosition(pos))
@@ -799,6 +946,20 @@ function Card.WasInLinkedZone(c,cc)
 end
 function Card.HasBeenInLinkedZone(c,cc)
 	return cc:GetLinkedGroup():IsContains(c) or (not c:IsLocation(LOCATION_MZONE) and cc:GetLinkedZone(c:GetPreviousControler())&c:GetPreviousZone()~=0)
+end
+
+--Location Groups
+function Duel.GetDeck(p)
+	return Duel.GetFieldGroup(p,LOCATION_DECK,0)
+end
+function Duel.GetDeckCount(p)
+	return Duel.GetFieldGroupCount(p,LOCATION_DECK,0)
+end
+function Duel.GetExtraDeck(p)
+	return Duel.GetFieldGroup(p,LOCATION_EXTRA,0)
+end
+function Duel.GetExtraDeckCount(p)
+	return Duel.GetFieldGroupCount(p,LOCATION_EXTRA,0)
 end
 
 --Materials
@@ -881,6 +1042,8 @@ function Card.IsCanTurnSetGlitchy(c)
 		return not c:IsType(TYPE_LINK|TYPE_TOKEN) and not c:IsHasEffect(EFFECT_CANNOT_TURN_SET) and not Duel.IsPlayerAffectedByEffect(tp,EFFECT_CANNOT_TURN_SET)
 	end
 end
+
+--Previous
 
 --Location Check
 function Auxiliary.AddThisCardBanishedAlreadyCheck(c)

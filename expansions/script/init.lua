@@ -1,6 +1,7 @@
 --Not yet finalized values
 --Custom constants
 self_reference_effect				= nil
+current_triggering_player			= nil
 current_reason_effect				= nil
 
 EFFECT_DEFAULT_CALL					=31993443
@@ -150,6 +151,10 @@ REASON_EXTRA					=REASON_FUSION+REASON_SYNCHRO+REASON_XYZ+REASON_LINK
 function Card.IsCustomType(c,tpe,scard,sumtype,p)
 	return (c:GetType(scard,sumtype,p)>>32)&tpe>0
 end
+function Card.IsPreviousCustomTypeOnField(c,tpe)
+	local custpe=tpe>>32
+	return (c:GetPreviousTypeOnField()>>32)&custpe>0
+end
 function Card.IsCustomReason(c,rs)
 	return (c:GetReason()>>32)&rs>0
 end
@@ -216,6 +221,7 @@ end
 Card.IsType=function(c,tpe,scard,sumtype,p)
 	local custpe=tpe>>32
 	local otpe=tpe&0xffffffff
+	
 	--fix for changing type in deck
 	if c:IsLocation(LOCATION_DECK) and c:IsHasEffect(EFFECT_ADD_TYPE) and not scard and not sumtype and not p then
 		local egroup={c:IsHasEffect(EFFECT_ADD_TYPE)}
@@ -232,20 +238,35 @@ Card.IsType=function(c,tpe,scard,sumtype,p)
 	if custpe<=0 then return false end
 	return c:IsCustomType(custpe,scard,sumtype,p)
 end
-Card.IsRitualType=function(c,typ)
-	return (c:GetRitualType(c)&typ)>0
+Card.IsRitualType=function(c,tpe)
+	local custpe=tpe>>32
+	local otpe=tpe&0xffffffff
+	local stpe=c:GetRitualType()
+	return stpe&otpe>0 or (stpe>>32)&custpe>0
 end
-Card.IsFusionType=function(c,typ)
-	return (c:GetFusionType(c)&typ)>0
+Card.IsFusionType=function(c,tpe)
+	local custpe=tpe>>32
+	local otpe=tpe&0xffffffff
+	local stpe=c:GetFusionType()
+	return stpe&otpe>0 or (stpe>>32)&custpe>0
 end
-Card.IsSynchroType=function(c,typ)
-	return (c:GetSynchroType(c)&typ)>0
+Card.IsSynchroType=function(c,tpe)
+	local custpe=tpe>>32
+	local otpe=tpe&0xffffffff
+	local stpe=c:GetSynchroType()
+	return stpe&otpe>0 or (stpe>>32)&custpe>0
 end
-Card.IsXyzType=function(c,typ)
-	return (c:GetXyzType(c)&typ)>0
+Card.IsXyzType=function(c,tpe)
+	local custpe=tpe>>32
+	local otpe=tpe&0xffffffff
+	local stpe=c:GetXyzType()
+	return stpe&otpe>0 or (stpe>>32)&custpe>0
 end
-Card.IsLinkType=function(c,typ)
-	return (c:GetLinkType(c)&typ)>0
+Card.IsLinkType=function(c,tpe)
+	local custpe=tpe>>32
+	local otpe=tpe&0xffffffff
+	local stpe=c:GetLinkType()
+	return stpe&otpe>0 or (stpe>>32)&custpe>0
 end
 
 Card.RemoveCounter=function(c,p,typ,ct,r)
@@ -1525,6 +1546,9 @@ function Effect.GLGetReset(e)
 	local rct=global_reset_effect_table[e][2]
 	return reset,rct
 end
+function Effect.GetReset(e)
+	return e:GLGetReset()
+end
 
 function Auxiliary.SetOperationResultAsLabel(op)
 	return	function(e,tp,eg,ep,ev,re,r,rp)
@@ -2350,7 +2374,8 @@ if not global_card_effect_table_global_check then
 		if condition and ((e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G) or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()==EFFECT_TYPE_XMATERIAL or e:GetType()==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or e:GetType()&EFFECT_TYPE_GRANT~=0)) then	
 			local newcon =	function(...)
 								local x={...}
-								self_reference_effect=e
+								self_reference_effect=x[1]
+								current_triggering_player = #x>1 and x[2] or x[1]:GetHandlerPlayer()
 								if global_override_reason_effect_check then
 									current_reason_effect = #x>=6 and x[6] or nil
 									if aux.GetValueType(current_reason_effect)=="Effect" and current_reason_effect:IsHasCheatCode(GECC_OVERRIDE_REASON_EFFECT) then
@@ -2365,7 +2390,8 @@ if not global_card_effect_table_global_check then
 		if cost and not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()==EFFECT_TYPE_XMATERIAL or e:GetType()==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or e:GetType()&EFFECT_TYPE_GRANT~=0) then
 			local newcost =	function(...)
 								local x={...}
-								self_reference_effect=e
+								self_reference_effect=x[1]
+								current_triggering_player = #x>1 and x[2] or x[1]:GetHandlerPlayer()
 								if global_override_reason_effect_check then
 									current_reason_effect = #x>=6 and x[6] or nil
 									if aux.GetValueType(current_reason_effect)=="Effect" and current_reason_effect:IsHasCheatCode(GECC_OVERRIDE_REASON_EFFECT) then
@@ -2381,7 +2407,8 @@ if not global_card_effect_table_global_check then
 			if e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()==EFFECT_TYPE_XMATERIAL or e:GetType()==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or e:GetType()&EFFECT_TYPE_GRANT~=0) then
 				local newtg =	function(...)
 									local x={...}
-									self_reference_effect=e
+									self_reference_effect=x[1]
+									current_triggering_player = #x>2 and x[2] or x[1]:GetHandlerPlayer()
 									if global_override_reason_effect_check then
 										current_reason_effect = #x>=6 and x[6] or nil
 										if aux.GetValueType(current_reason_effect)=="Effect" and current_reason_effect:IsHasCheatCode(GECC_OVERRIDE_REASON_EFFECT) then
@@ -2397,7 +2424,8 @@ if not global_card_effect_table_global_check then
 		if op and ((e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G) or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()==EFFECT_TYPE_XMATERIAL or e:GetType()==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or e:GetType()&EFFECT_TYPE_GRANT~=0)) then
 			local newop =	function(...)
 								local x={...}
-								self_reference_effect=e
+								self_reference_effect = x[1]
+								current_triggering_player = x[2]
 								if global_override_reason_effect_check then
 									current_reason_effect = #x>=6 and x[6] or nil
 									if aux.GetValueType(current_reason_effect)=="Effect" and current_reason_effect:IsHasCheatCode(GECC_OVERRIDE_REASON_EFFECT) then
@@ -2413,6 +2441,7 @@ if not global_card_effect_table_global_check then
 			if type(val)=="function" and ((e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G) or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()==EFFECT_TYPE_XMATERIAL or e:GetType()==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or e:GetType()&EFFECT_TYPE_GRANT~=0)) then
 				local newval =	function(...)
 									self_reference_effect=e
+									current_triggering_player = self_reference_effect:GetHandlerPlayer()
 									return val(...)
 								end
 				e:SetValue(newval)
@@ -2540,7 +2569,8 @@ if not global_duel_effect_table_global_check then
 							if condition and ((e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G) or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()&EFFECT_TYPE_GRANT~=0)) then
 								local newcon =	function(...)
 													local x={...}
-													self_reference_effect=e
+													self_reference_effect=x[1]
+													current_triggering_player = #x>1 and x[2] or x[1]:GetHandlerPlayer()
 													if global_override_reason_effect_check then
 														current_reason_effect = #x>=6 and x[6] or nil
 														if aux.GetValueType(current_reason_effect)=="Effect" and current_reason_effect:IsHasCheatCode(GECC_OVERRIDE_REASON_EFFECT) then
@@ -2555,7 +2585,8 @@ if not global_duel_effect_table_global_check then
 							if cost and ((e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G) or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()&EFFECT_TYPE_GRANT~=0)) then
 								local newcost =	function(...)
 													local x={...}
-													self_reference_effect=e
+													self_reference_effect=x[1]
+													current_triggering_player = #x>1 and x[2] or x[1]:GetHandlerPlayer()
 													if global_override_reason_effect_check then
 														current_reason_effect = #x>=6 and x[6] or nil
 														if aux.GetValueType(current_reason_effect)=="Effect" and current_reason_effect:IsHasCheatCode(GECC_OVERRIDE_REASON_EFFECT) then
@@ -2571,7 +2602,8 @@ if not global_duel_effect_table_global_check then
 								if e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()&EFFECT_TYPE_GRANT~=0) then
 									local newtg =	function(...)
 														local x={...}
-														self_reference_effect=e
+														self_reference_effect=x[1]
+														current_triggering_player = #x>2 and x[2] or x[1]:GetHandlerPlayer()
 														if global_override_reason_effect_check then
 															current_reason_effect = #x>=6 and x[6] or nil
 															if aux.GetValueType(current_reason_effect)=="Effect" and current_reason_effect:IsHasCheatCode(GECC_OVERRIDE_REASON_EFFECT) then
@@ -2587,7 +2619,8 @@ if not global_duel_effect_table_global_check then
 							if op and ((e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G) or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()&EFFECT_TYPE_GRANT~=0)) then
 								local newop =	function(...)
 													local x={...}
-													self_reference_effect=e
+													self_reference_effect=x[1]
+													current_triggering_player = #x>1 and x[2] or x[1]:GetHandlerPlayer()
 													if global_override_reason_effect_check then
 														current_reason_effect = #x>=6 and x[6] or nil
 														if aux.GetValueType(current_reason_effect)=="Effect" and current_reason_effect:IsHasCheatCode(GECC_OVERRIDE_REASON_EFFECT) then
@@ -2603,6 +2636,7 @@ if not global_duel_effect_table_global_check then
 								if type(val)=="function" and ((e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G) or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()&EFFECT_TYPE_GRANT~=0)) then
 									local newval =	function(...)
 														self_reference_effect=e
+														current_triggering_player = e:GetHandlerPlayer()
 														return val(...)
 													end
 									e:SetValue(newval)
@@ -2626,11 +2660,11 @@ end
 ----------------------------------------------------------------------------------------------------------------
 --AUXS AND FUNCTIONS PORTED FROM EDOPRO (CAN BE EXPANDED FOR FACILITATING SCRIPT COMPATIBILITY BETWEEN THE SIMS)
 ----------------------------------------------------------------------------------------------------------------
-function Card.HasLevel(c)
+function Card.HasLevel(c,general)
 	if c:IsType(TYPE_MONSTER) then
 		return ((c:GetType()&TYPE_LINK~=TYPE_LINK and c:GetType()&TYPE_TIMELEAP~=TYPE_TIMELEAP and c:GetType()&TYPE_XYZ~=TYPE_XYZ) or c:IsHasEffect(EFFECT_GRANT_LEVEL) or c:IsHasEffect(EFFECT_ORIGINAL_LEVEL_RANK_DUALITY))
 			and not c:IsStatus(STATUS_NO_LEVEL)
-	elseif c:IsOriginalType(TYPE_MONSTER) then
+	elseif general and c:IsOriginalType(TYPE_MONSTER) then
 		return not (c:IsOriginalType(TYPE_XYZ+TYPE_LINK+TYPE_TIMELEAP) or c:IsStatus(STATUS_NO_LEVEL))
 	end
 	return false

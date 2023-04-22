@@ -12,18 +12,20 @@ REASON_DRIVE	= 0x80000000000
 FLAG_ENGAGE = 348
 FLAG_ZERO_ENERGY = 349
 
-EFFECT_DRIVE_ORIGINAL_ENERGY 	= 34843
-EFFECT_DRIVE_ENERGY 			= 34844
-EFFECT_UPDATE_ENERGY			= 34845
-EFFECT_CHANGE_ENERGY			= 34846
+EFFECT_DRIVE_ORIGINAL_ENERGY 		= 34843
+EFFECT_DRIVE_ENERGY 				= 34844
+EFFECT_UPDATE_ENERGY				= 34845
+EFFECT_CHANGE_ENERGY				= 34846
+EFFECT_REPLACE_UPDATE_ENERGY_COST	= 34847
+EFFECT_IGNORE_OVERDRIVE_COST		= 34848
 
 EVENT_ENGAGE					= EVENT_CUSTOM+34843
 EVENT_ENERGY_CHANGE				= EVENT_CUSTOM+29935986
 
 Auxiliary.Drives={}
 
-local get_type, get_orig_type, get_prev_type_field, get_reason, get_fusion_type, get_synchro_type, get_xyz_type, get_link_type, get_ritual_type = 
-	Card.GetType, Card.GetOriginalType, Card.GetPreviousTypeOnField, Card.GetReason, Card.GetFusionType, Card.GetSynchroType, Card.GetXyzType, Card.GetLinkType, Card.GetRitualType
+local get_type, get_orig_type, get_prev_type_field, get_active_type, is_active_type, get_reason, get_fusion_type, get_synchro_type, get_xyz_type, get_link_type, get_ritual_type = 
+	Card.GetType, Card.GetOriginalType, Card.GetPreviousTypeOnField, Effect.GetActiveType, Effect.IsActiveType, Card.GetReason, Card.GetFusionType, Card.GetSynchroType, Card.GetXyzType, Card.GetLinkType, Card.GetRitualType
 
 Card.GetType=function(c,scard,sumtype,p)
 	local tpe=scard and get_type(c,scard,sumtype,p) or get_type(c)
@@ -47,6 +49,17 @@ Card.GetPreviousTypeOnField=function(c)
 		
 	end
 	return tpe
+end
+Effect.GetActiveType=function(e)
+	local tpe=get_active_type(e)
+	local c = e:GetType()&0x7f0>0 and e:GetHandler() or e:GetOwner()
+	if not (e:IsHasType(EFFECT_TYPE_ACTIVATE) and c:IsType(TYPE_PENDULUM)) and c:IsType(TYPE_DRIVE) then
+		tpe=tpe|TYPE_DRIVE
+	end
+	return tpe
+end
+Effect.IsActiveType=function(e,typ)
+	return e:GetActiveType()&typ>0
 end
 
 Card.GetReason=function(c)
@@ -175,8 +188,11 @@ function Card.IsCanEngage(c,tp,ignore_ruling)
 end
 function Card.IsEngaged(c)
 	for _,e in ipairs({c:IsHasEffect(EFFECT_PUBLIC)}) do
-		if e and e.GetLabel and e:GetLabel()==FLAG_ENGAGE then
-			return true
+		if e and e.GetLabel then
+			local label,_=e:GetLabel()
+			if label==FLAG_ENGAGE then
+				return true
+			end
 		end
 	end
 	return c:HasFlagEffect(FLAG_ENGAGE)
@@ -185,13 +201,14 @@ function Card.Engage(c,e,tp)
 	if not c:IsLocation(LOCATION_HAND) or not c:IsCanEngage(tp) then return end
 	Duel.Hint(HINT_CARD,tp,c:GetOriginalCode())
 	aux.CheckEnergyOperation(c,tp)
+	local eid=e:GetFieldID()
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_PUBLIC)
-	e1:SetLabel(FLAG_ENGAGE)
+	e1:SetLabel(FLAG_ENGAGE,eid)
 	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 	c:RegisterEffect(e1)
-	c:RegisterFlagEffect(FLAG_ENGAGE,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(DRIVE_STRINGS,3))
+	c:RegisterFlagEffect(FLAG_ENGAGE,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CLIENT_HINT,1,eid,aux.Stringid(DRIVE_STRINGS,3))
 	Duel.RaiseEvent(c,EVENT_ENGAGE,e,REASON_EFFECT,tp,tp,0)
 	Duel.RaiseSingleEvent(c,EVENT_ENGAGE,e,REASON_EFFECT,tp,tp,0)
 	--
@@ -205,6 +222,18 @@ function Card.Engage(c,e,tp)
 	-- e5:SetReset(RESET_EVENT+RESETS_STANDARD)
 	-- c:RegisterEffect(e5)
 end
+function Card.GetEngagedID(c)
+	for _,e in ipairs({c:IsHasEffect(EFFECT_PUBLIC)}) do
+		if e and e.GetLabel then
+			local label1,label2=e:GetLabel()
+			if label==FLAG_ENGAGE then
+				return label2
+			end
+		end
+	end
+	return 0
+end
+
 function Auxiliary.EngageCondition(e,tp)
 	local c=e:GetHandler()
 	if tp~=c:GetControler() then return false end
@@ -217,14 +246,15 @@ function Auxiliary.EngageOperation(e)
 	Duel.Hint(HINT_CARD,tp,c:GetOriginalCode())
 	aux.CheckEnergyOperation(e,tp)
 	Duel.ConfirmCards(1-tp,c)
+	local eid=e:GetFieldID()
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_CANNOT_DISABLE)
 	e1:SetCode(EFFECT_PUBLIC)
-	e1:SetLabel(FLAG_ENGAGE)
+	e1:SetLabel(FLAG_ENGAGE,eid)
 	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 	c:RegisterEffect(e1,true)
-	c:RegisterFlagEffect(FLAG_ENGAGE,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(DRIVE_STRINGS,3))
+	c:RegisterFlagEffect(FLAG_ENGAGE,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CLIENT_HINT,1,eid,aux.Stringid(DRIVE_STRINGS,3))
 	Duel.RaiseEvent(c,EVENT_ENGAGE,e,REASON_RULE,tp,tp,0)
 	Duel.RaiseSingleEvent(c,EVENT_ENGAGE,e,REASON_RULE,tp,tp,0)
 	--
@@ -248,6 +278,10 @@ function Duel.GetEngagedCard(tp)
 	else
 		return
 	end
+end
+function Duel.GetEngagedCards()
+	local g=Duel.GetMatchingGroup(Card.IsEngaged,tp,LOCATION_HAND,LOCATION_HAND,nil)
+	return g
 end
 
 --CHECK ENERGY
@@ -293,40 +327,123 @@ function Auxiliary.OverDriveEffectCondition(cond)
 				return c:IsEngaged() and c:GetEnergy()<c:GetLevel() and (not cond or cond(e,tp,eg,ep,ev,re,r,rp))
 			end
 end
-function Auxiliary.DriveEffectCost(ct,cost)
+DRIVE_SIMPLE_COST = false
+function Auxiliary.DriveEffectCost(ct,cost,setlabel,ct2)
 	return	function(e,tp,eg,ep,ev,re,r,rp,chk)
+				DRIVE_SIMPLE_COST=true
+				if setlabel then e:SetLabel(1) end
 				local c=e:GetHandler()
-				if chk==0 then return c:IsCanUpdateEnergy(ct,tp,REASON_COST) and (not cost or cost(e,tp,eg,ep,ev,re,r,rp,chk)) end
-				c:UpdateEnergy(ct,tp,REASON_COST)
+				if chk==0 then
+					local check = c:IsCanUpdateEnergy(ct,tp,REASON_COST,e,ct2) and (not cost or cost(e,tp,eg,ep,ev,re,r,rp,chk))
+					DRIVE_SIMPLE_COST=false
+					return check
+				end
+				c:UpdateEnergy(ct,tp,REASON_COST,true,c,e,ct2)
 				if cost then
 					cost(e,tp,eg,ep,ev,re,r,rp,chk)
 				end
 			end
 end
-function Auxiliary.OverDriveEffectCost(cost)
+function Auxiliary.OverDriveEffectCost(cost,setlabel)
 	return	function(e,tp,eg,ep,ev,re,r,rp,chk)
+				DRIVE_SIMPLE_COST=true
+				if setlabel then e:SetLabel(1) end
 				local c=e:GetHandler()
-				if chk==0 then return (not cost or cost(e,tp,eg,ep,ev,re,r,rp,chk)) end
-				c:ChangeEnergy(0,tp,REASON_COST)
+				local enchk=c:IsCanChangeEnergy(0,tp,REASON_COST)
+				local egroup={Duel.IsPlayerAffectedByEffect(tp,EFFECT_IGNORE_OVERDRIVE_COST)}
+				if chk==0 then
+					local ov_alt=false
+					if enchk then
+						for _,ce in ipairs{egroup} do
+							if aux.GetValueType(ce)=="Effect" and ce:CheckCountLimit(tp) then
+								ov_alt=true
+								break
+							end
+						end
+					end
+					local check = (enchk or ov_alt) and (not cost or cost(e,tp,eg,ep,ev,re,r,rp,chk))
+					DRIVE_SIMPLE_COST=false
+					return check
+				end
+				local available_effects = {}
+				local g=Group.CreateGroup()
+				Debug.Message(#egroup)
+				for _,ce in ipairs(egroup) do
+					if aux.GetValueType(ce)=="Effect" and ce:CheckCountLimit(tp) then
+						g:AddCard(ce:GetOwner())
+						table.insert(available_effects,ce)
+					end
+				end
+				if #available_effects>0 and (not enchk or Duel.SelectYesNo(tp,STRING_ASK_IGNORE_OVERDRIVE_COST)) then
+					local tc=g:Select(tp,1,1,nil):GetFirst()
+					local specific_available_effects, options = {}, {}
+					local ce
+					for _,aveff in ipairs(available_effects) do
+						if aveff:GetOwner()==tc then
+							table.insert(specific_available_effects,aveff)
+							table.insert(options,aveff:GetDescription())
+						end
+					end
+					if #specific_available_effects>1 then
+						ce=specific_available_effects[Duel.SelectOption(tp,table.unpack(options))+1]
+					else
+						ce=specific_available_effects[1]
+					end
+					Duel.Hint(HINT_CARD,tp,tc:GetOriginalCode())
+					ce:UseCountLimit(tp)
+				else
+					c:ChangeEnergy(0,tp,REASON_COST,true)
+				end
 				if cost then
 					cost(e,tp,eg,ep,ev,re,r,rp,chk)
 				end
 			end
 end
 
-function Card.DriveEffect(c,energycost,desc,category,typ,property,event,condition,cost,target,operation,hold_registration)
+if not DRIVE_EFFECTS_TABLE then
+	DRIVE_EFFECTS_TABLE = {}
+end
+if not OVERDRIVE_EFFECTS_TABLE then
+	OVERDRIVE_EFFECTS_TABLE = {}
+end
+function Card.DriveEffect(c,energycost,desc,category,typ,property,event,condition,cost,target,operation,hold_registration,setlabelcost,shopt)
+	local energy_for_legal_activation
+	if type(energycost)=="table" then
+		energy_for_legal_activation = energycost[2]
+		energycost = energycost[1]
+		if energy_for_legal_activation==true then
+			energy_for_legal_activation = math.abs(energycost) + 1
+		end
+	end
 	local typ = typ or EFFECT_TYPE_IGNITION
 	local property = type(property)~="boolean" and property or property==true and EFFECT_FLAG_CARD_TARGET
 	local event = event
+	local hint1,hint2
+	
 	if typ~=EFFECT_TYPE_IGNITION and not event then
 		event=EVENT_FREE_CHAIN
+	elseif type(event)=="table" then
+		local ct=#event
+		hint2 = event[ct]
+		event = event[1]
+		if ct==3 then
+			hint1 = event[2]
+		end
+	elseif typ==EFFECT_TYPE_QUICK_O then
+		hint2 = RELEVANT_TIMINGS
 	end
+	
 	local e=Effect.CreateEffect(c)
 	if desc then
 		e:Desc(desc)
 	end
 	if category then
-		e:SetCategory(category)
+		if type(category)=="table" then
+			e:SetCategory(category[1])
+			e:SetCustomCategory(category[2])
+		else
+			e:SetCategory(category)
+		end
 	end
 	e:SetType(typ)
 	if property then
@@ -335,13 +452,20 @@ function Card.DriveEffect(c,energycost,desc,category,typ,property,event,conditio
 	if event then
 		e:SetCode(event)
 	end
+	if hint then
+		e:SetHintTiming(hint1,hint2)
+	end
 	e:SetRange(LOCATION_HAND)
 	if typ~=EFFECT_TYPE_SINGLE and typ~=EFFECT_TYPE_FIELD and typ&EFFECT_TYPE_CONTINUOUS==0 then
-		e:HOPT()
+		if not shopt then
+			e:HOPT()
+		else
+			e:SHOPT()
+		end
 	end
 	e:SetCondition(aux.DriveEffectCondition(condition))
 	if energycost~=0 then
-		e:SetCost(aux.DriveEffectCost(energycost,cost))
+		e:SetCost(aux.DriveEffectCost(energycost,cost,setlabelcost,energy_for_legal_activation))
 	elseif cost then
 		e:SetCost(cost)
 	end
@@ -361,9 +485,14 @@ function Card.DriveEffect(c,energycost,desc,category,typ,property,event,conditio
 	if not hold_registration then
 		c:RegisterEffect(e)
 	end
+	table.insert(DRIVE_EFFECTS_TABLE,e)
 	return e
 end
-function Card.OverDriveEffect(c,desc,category,typ,property,event,condition,cost,target,operation,hold_registration)
+function Effect.IsDriveEffect(e)
+	return aux.FindInTable(DRIVE_EFFECTS_TABLE,e)
+end
+
+function Card.OverDriveEffect(c,desc,category,typ,property,event,condition,cost,target,operation,hold_registration,setlabelcost,shopt)
 	local typ = typ or EFFECT_TYPE_IGNITION
 	local property = type(property)~="boolean" and property or property==true and EFFECT_FLAG_CARD_TARGET
 	local event = event
@@ -375,7 +504,12 @@ function Card.OverDriveEffect(c,desc,category,typ,property,event,condition,cost,
 		e:Desc(desc)
 	end
 	if category then
-		e:SetCategory(category)
+		if type(category)=="table" then
+			e:SetCategory(category[1])
+			e:SetCustomCategory(category[2])
+		else
+			e:SetCategory(category)
+		end
 	end
 	e:SetType(typ)
 	if property then
@@ -385,9 +519,13 @@ function Card.OverDriveEffect(c,desc,category,typ,property,event,condition,cost,
 		e:SetCode(event)
 	end
 	e:SetRange(LOCATION_HAND)
-	e:HOPT()
+	if not shopt then
+		e:HOPT()
+	else
+		e:SHOPT()
+	end
 	e:SetCondition(aux.OverDriveEffectCondition(condition))
-	e:SetCost(aux.OverDriveEffectCost(cost))
+	e:SetCost(aux.OverDriveEffectCost(cost,setlabelcost))
 	if target then
 		e:SetTarget(target)
 	end
@@ -395,7 +533,12 @@ function Card.OverDriveEffect(c,desc,category,typ,property,event,condition,cost,
 	if not hold_registration then
 		c:RegisterEffect(e)
 	end
+	table.insert(DRIVE_EFFECTS_TABLE,e)
+	table.insert(OVERDRIVE_EFFECTS_TABLE,e)
 	return e
+end
+function Effect.IsOverDriveEffect(e)
+	return aux.FindInTable(OVERDRIVE_EFFECTS_TABLE,e)
 end
 --ENERGY
 function Card.GetEnergy(c)
@@ -453,7 +596,7 @@ function Card.GetOriginalEnergy(c)
 end
 
 function Card.CheckZeroEnergySelfDestroy(c,ct)
-	return c:IsEnergyBelow(math.abs(ct)) --futureproofing
+	return ct<0 and c:IsEnergyBelow(math.abs(ct)) --futureproofing
 end
 
 function Card.IsHasEnergy(c)
@@ -471,10 +614,38 @@ end
 function Card.IsEnergyBelow(c,en)
 	return c:IsHasEnergy() and c:GetEnergy()<=en
 end
-function Card.IsCanUpdateEnergy(c,ct,p,r)
-	return c:IsHasEnergy() and (ct>=0 or c:IsEnergyAbove(math.abs(ct)))
+
+function Duel.GetTotalEnergy()
+	local g=Duel.GetEngagedCards()
+	if not g or #g<=0 then return 0 end
+	local ct=0
+	for tc in aux.Next(g) do
+		ct=ct+tc:GetEnergy()
+	end
+	return ct
 end
-function Card.IsCanChangeEnergy(c,ct,p,r)
+
+function Card.IsCanUpdateEnergy(c,ct,p,r,e,ct2)
+	if not c:IsHasEnergy() then return false end
+	if not ct2 then ct2=ct end
+	local enchk = ct>=0 or c:IsEnergyAbove(math.abs(ct2))
+	if DRIVE_SIMPLE_COST and not enchk and r&REASON_COST==REASON_COST and r&REASON_REPLACE==0 then
+		local egroup={Duel.IsPlayerAffectedByEffect(p,EFFECT_REPLACE_UPDATE_ENERGY_COST)}
+		for _,ce in ipairs(egroup) do
+			if ce and ce.SetLabel then
+				local cond=ce:GetCondition()
+				if ce:CheckCountLimit(p) and (not cond or cond(ce,c,e,p,ct)) then
+					enchk=true
+				end
+			end
+		end
+	end
+	return enchk
+end
+function Card.IsCanIncreaseOrDecreaseEnergy(c,ct,p,r)
+	return c:IsCanUpdateEnergy(ct,p,r) or c:IsCanUpdateEnergy(-ct,p,r)
+end
+function Card.IsCanChangeEnergy(c,ct,p,r,e)
 	return c:IsHasEnergy() and not c:IsEnergy(ct)
 end
 function Card.IsCanResetEnergy(c,p,r)
@@ -482,20 +653,60 @@ function Card.IsCanResetEnergy(c,p,r)
 	return ct and c:IsHasEnergy() and not c:IsEnergy(ct)
 end
 
-function Card.UpdateEnergy(c,val,p,r,reset,rc)
+function Card.UpdateEnergy(c,val,p,r,reset,rc,e,val2)
 	local reset = (type(reset)=="number" or not reset) and reset or 0
 	local rc = rc and rc or c
+	if not val2 then val2=val end
+	
+	local enchk = val>=0 or c:IsEnergyAbove(math.abs(val2))
+	if r&REASON_COST==REASON_COST and r&REASON_REPLACE==0 then
+		local available_effects = {}
+		local g=Group.CreateGroup()
+		local egroup={Duel.IsPlayerAffectedByEffect(p,EFFECT_REPLACE_UPDATE_ENERGY_COST)}
+		for _,ce in ipairs(egroup) do
+			if ce and ce.SetLabel then
+				local cond=ce:GetCondition()
+				if ce:CheckCountLimit(p) and (not cond or cond(ce,c,e,p,ct)) then
+					g:AddCard(ce:GetOwner())
+					table.insert(available_effects,ce)
+				end
+			end
+		end
+		if #available_effects>0 and (not enchk or Duel.SelectYesNo(p,STRING_ASK_REPLACE_UPDATE_ENERGY_COST)) then
+			local tc=g:Select(p,1,1,nil):GetFirst()
+			local specific_available_effects, options = {}, {}
+			local ce
+			for _,aveff in ipairs(available_effects) do
+				if aveff:GetOwner()==tc then
+					table.insert(specific_available_effects,aveff)
+					table.insert(options,aveff:GetDescription())
+				end
+			end
+			if #specific_available_effects>1 then
+				ce=specific_available_effects[Duel.SelectOption(p,table.unpack(options))+1]
+			else
+				ce=specific_available_effects[1]
+			end
+			local op=ce:GetOperation()
+			local res=op(ce,c,e,p,ct)
+			if res then
+				ce:UseCountLimit(p)
+			end
+			return res
+		end
+	end
 	
 	local en=c:GetEnergy()
 	local e=Effect.CreateEffect(rc)
 	e:SetType(EFFECT_TYPE_SINGLE)
 	e:SetCode(EFFECT_UPDATE_ENERGY)
+	e:SetCondition(aux.ResetIfNotEngaged(c:GetEngagedID()))
 	e:SetValue(val)
 	if reset then
 		if r&REASON_EFFECT>0 then
 			reset = rc==c and reset|RESET_DISABLE or reset
 		end
-		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
+		e:SetReset(RESET_EVENT|RESETS_STANDARD|reset)
 	end
 	c:RegisterEffect(e)
 	local diff=c:GetEnergy()-en
@@ -512,6 +723,19 @@ function Card.UpdateEnergy(c,val,p,r,reset,rc)
 		return e
 	end
 end
+function Card.IncreaseOrDecreaseEnergy(c,val,p,r,reset,rc,e,val2)
+	local n={}
+	for i=-1,1,2 do
+		local signed_val=math.abs(val)*i
+		if c:IsCanUpdateEnergy(signed_val,p,r) then
+			table.insert(n,signed_val)
+		end
+	end
+	if #n==0 then return end
+	local val=Duel.AnnounceNumber(tp,table.unpack(n))
+	return c:UpdateEnergy(val,p,r,reset,rc,e,val2)
+end
+	
 function Card.ChangeEnergy(c,val,p,r,reset,rc)
 	local reset = (type(reset)=="number" or not reset) and reset or 0
 	local rc = rc and rc or c
@@ -520,12 +744,13 @@ function Card.ChangeEnergy(c,val,p,r,reset,rc)
 	local e=Effect.CreateEffect(rc)
 	e:SetType(EFFECT_TYPE_SINGLE)
 	e:SetCode(EFFECT_CHANGE_ENERGY)
+	e:SetCondition(aux.ResetIfNotEngaged(c:GetEngagedID()))
 	e:SetValue(val)
 	if reset then
 		if r&REASON_EFFECT>0 then
 			reset = rc==c and reset|RESET_DISABLE or reset
 		end
-		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
+		e:SetReset(RESET_EVENT|RESETS_STANDARD|reset)
 	end
 	c:RegisterEffect(e)
 	local new_en=c:GetEnergy()
@@ -537,7 +762,7 @@ function Card.ChangeEnergy(c,val,p,r,reset,rc)
 		end
 	end
 	if reset then
-		return e,new_en
+		return e,new_en,new_en-en
 	else
 		return e
 	end
@@ -549,13 +774,39 @@ function Card.ResetEnergy(c,p,r,reset,rc)
 	return e,en==val
 end
 
+--announce
+function Duel.AnnounceEnergyUpdate(p,c,min,max,up,r,e)
+	if not min then min=1 end
+	if not max then max=c:GetEnergy() end
+	if min<0 and max<0 and math.abs(min)<math.abs(max) then
+		min,max = max,min
+	end
+	if not up then up=p end
+	if not r then r=REASON_EFFECT end
+	local n={}
+	for i=min,max do
+		if i~=0 and c:IsCanUpdateEnergy(i,up,r,e) then
+			table.insert(n,i)
+		end
+	end
+	Duel.HintMessage(tp,STRING_INPUT_ENERGY)
+	local ct=Duel.AnnounceNumber(tp,table.unpack(n))
+	return ct
+end
+
 --conditions
 function Auxiliary.IsExistingEngagedCond(p)
-	return	function(e,tp)
-				local tp = type(tp)~=nil and tp or e:GetHandlerPlayer()
-				local p = (not p or p==0) and tp or 1-tp
-				return Duel.GetEngagedCard(p)~=nil
-			end
+	if p then
+		return	function(e,tp)
+					local tp = type(tp)~=nil and tp or e:GetHandlerPlayer()
+					local p = (p==0) and tp or 1-tp
+					return Duel.GetEngagedCard(p)~=nil
+				end
+	else
+		return	function(e)
+					return Duel.GetEngagedCards():GetCount()>0
+				end
+	end
 end
 function Card.DueToHavingZeroEnergy(c)
 	return c:IsReason(REASON_RULE) and c:HasFlagEffect(FLAG_ZERO_ENERGY)
@@ -563,4 +814,66 @@ end
 function Auxiliary.DueToHavingZeroEnergyCond(e)
 	local c=e:GetHandler()
 	return c:IsReason(REASON_RULE) and c:HasFlagEffect(FLAG_ZERO_ENERGY)
+end
+function Auxiliary.ResetIfNotEngaged(eid)
+	return	function(e)
+				local c=e:GetHandler()
+				if not c:IsLocation(LOCATION_HAND) then return true end
+				if not c:IsEngaged() or c:GetEngagedID()~=eid then
+					e:Reset()
+					return false
+				end
+				return true
+			end
+end
+
+--costs
+function Auxiliary.UpdateEnergyCost(min,max,f)
+	if not min then min=1 end
+	if max and min~=max then
+		if min<0 and max<0 and math.abs(min)<math.abs(max) then
+			min,max = max,min
+		end
+		return	function(e,tp,eg,ep,ev,re,r,rp,chk)
+					local c=e:GetHandler()
+					local ec=Duel.GetEngagedCard(tp)
+					if chk==0 then
+						if not ec or (f and not f(ec,e,tp,eg,ep,ev,re,r,rp)) then return false end
+						for i=min,max do
+							if i~=0 and ec:IsCanUpdateEnergy(i,tp,REASON_COST,e) then
+								return true
+							end
+						end
+						return false
+					end
+					local ct=Duel.AnnounceEnergyUpdate(tp,ec,min,max,tp,REASON_COST,e)
+					ec:UpdateEnergy(ct,tp,REASON_COST,true,c,e)
+				end
+	else
+		return	function(e,tp,eg,ep,ev,re,r,rp,chk)
+					local c=e:GetHandler()
+					local ec=Duel.GetEngagedCard(tp)
+					local min=min
+					if type(min)=="function" then
+						min=min(ec,e,tp,eg,ep,ev,re,r,rp)
+					end
+					if chk==0 then
+						if not ec or (f and not f(ec,e,tp,eg,ep,ev,re,r,rp)) then return false end
+						return ec:IsCanUpdateEnergy(min,tp,REASON_COST,e)
+					end
+					ec:UpdateEnergy(min,tp,REASON_COST,true,c,e)
+				end
+	end
+end
+
+--operations
+function Duel.SearchAndEngage(tc,e,tp)
+	if Duel.SendtoHand(tc,nil,REASON_EFFECT)>0 and aux.PLChk(tc,tp,LOCATION_HAND) then
+		Duel.ConfirmCards(1-tp,Group.FromCards(tc))
+		if tc:IsMonster(TYPE_DRIVE) and tc:IsCanEngage(tp) and Duel.SelectYesNo(tp,STRING_ASK_ENGAGE) then
+			tc:Engage(e,tp)
+			return tc:IsEngaged()
+		end
+	end
+	return false
 end
