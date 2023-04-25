@@ -57,12 +57,12 @@ end
 		end
 		local e0=Effect.CreateEffect(e:GetHandler())
 		e0:SetType(EFFECT_TYPE_SINGLE)
-		e0:SetCode(EFFECT_SET_ATTACK)
+		e0:SetCode(EFFECT_SET_ATTACK_FINAL)
 		e0:SetValue(math.ceil(tc:GetAttack()/2))
 		e0:SetReset(RESET_EVENT+RESETS_STANDARD)
 		tc:RegisterEffect(e0)
 		local e4=e0:Clone()
-		e4:SetCode(EFFECT_SET_DEFENSE)
+		e4:SetCode(EFFECT_SET_DEFENSE_FINAL)
 		e4:SetValue(math.ceil(tc:GetDefense()/2))
 		tc:RegisterEffect(e4)
 	end

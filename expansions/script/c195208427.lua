@@ -79,6 +79,6 @@ end
 		e1:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 		e1:SetValue(aux.tgoval)
-		tc:RegisterEffect(e1)
+		tc:RegisterEffect(e1,true)
 	end
 end
