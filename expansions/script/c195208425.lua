@@ -116,14 +116,16 @@ end
 	if chk==0 then return #g>0 end
 	Duel.SetOperationInfo(0,CATEGORY_ATKCHANGE,g,#g,nil,0)
 end
-	function s.atkop(e,tp,eg,ep,ev,re,r,rp)
+function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local ct=e:GetLabel()
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_UPDATE_ATTACK)
-	e1:SetTargetRange(0,LOCATION_MZONE)
-	e1:SetValue(ct*-300)
-	Duel.RegisterEffect(e1,tp)
+	for tc in aux.Next(Duel.GetMatchingGroup(Card.IsFaceup,tp,0,LOCATION_MZONE,nil)) do
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_UPDATE_ATTACK)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e1:SetValue(ct*-300)
+		tc:RegisterEffect(e1)
+	end
 end
 	function s.cofilt(c)
 	return c:IsSetCard(0x83e) and c:IsAbleToRemoveAsCost()
