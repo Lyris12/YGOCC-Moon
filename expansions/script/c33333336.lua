@@ -76,7 +76,7 @@ function s.target(e,c)
 end
 
 function s.thfilter(c)
-	return c:IsSetCard(0x7eb) and c:IsAbleToHand()
+	return c:IsSetCard(0x7ea) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then

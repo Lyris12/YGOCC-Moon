@@ -69,12 +69,13 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET)
 	e1:SetValue(TYPE_SPELL+TYPE_CONTINUOUS)
 	tc:RegisterEffect(e1)
-	if c:IsRelateToChain() and c:IsFaceup() and Duel.GetMatchingGroupCount(cid.sfilter,tp,LOCATION_SZONE,LOCATION_SZONE,nil)>0 then
+	local g=Duel.GetMatchingGroupCount(cid.sfilter,tp,LOCATION_SZONE,LOCATION_SZONE,nil)
+	if c:IsRelateToChain() and c:IsFaceup() and #g>0 then
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_SINGLE)
 		e2:SetCode(EFFECT_UPDATE_ATTACK)
-		e2:SetValue(function(e,tc) return Duel.GetMatchingGroupCount(cid.sfilter,tp,LOCATION_SZONE,LOCATION_SZONE,nil)*400 end)
-		e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+		e2:SetValue(#g*400)
+		e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_DISABLE+RESET_PHASE+PHASE_END)
 		c:RegisterEffect(e2)
 	end
 end
