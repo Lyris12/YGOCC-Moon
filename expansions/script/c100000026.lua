@@ -67,6 +67,11 @@ end
 function s.valcheck(e,c)
 	local g=c:GetMaterial()
 	local mg=g:Filter(Card.IsFusionType,nil,TYPE_FUSION)
+	for tc in aux.Next(mg) do
+		local atk, def = math.max(0,math.ceil(tc:GetAttack()/2)), math.max(0,math.ceil(tc:GetDefense()/2))
+		tc:RegisterFlagEffect(id+100,0,EFFECT_FLAG_IGNORE_IMMUNE|EFFECT_FLAG_SET_AVAILABLE,1,atk)
+		tc:RegisterFlagEffect(id+100,0,EFFECT_FLAG_IGNORE_IMMUNE|EFFECT_FLAG_SET_AVAILABLE,1,def)
+	end
 	mg:KeepAlive()
 	e:GetLabelObject():SetLabelObject(mg)
 end
@@ -84,15 +89,21 @@ function s.atkop(e,tp)
 				else
 					Duel.ConfirmCards(1-tp,Group.FromCards(tc))
 				end
-				local atk, def = math.ceil(tc:GetAttack()/2), math.ceil(tc:GetDefense()/2)
+				local atk,def=tc:GetFlagEffectLabel(id+100)
 				if not atk then atk=0 end
 				if not def then def=0 end
 				e:SetLabel(atk,def)
+			end
+			for rc in aux.Next(g) do
+				rc:ResetFlagEffect(id+100)
 			end
 			g:DeleteGroup()
 		end
 	else
 		if g then
+			for tc in aux.Next(g) do
+				tc:ResetFlagEffect(id+100)
+			end
 			g:DeleteGroup()
 		end
 	end
