@@ -25,6 +25,7 @@ CUSTOM_ARCHE_ZERO_HERO				= 0x1
 --Custom Cards
 CARD_ZERO_HERO_MAGMA_MAN			= 30409
 CARD_STARFORCE_KNIGHT				= 39301
+CARD_ZEROST_BEAST_ZEROTL 			= 100000025
 
 --Custom Counters
 COUNTER_ICE_PRISON					= 0x1301
@@ -40,14 +41,20 @@ STRING_CANNOT_ATTACK					=	705
 STRING_TREATED_AS_TUNER					=	706
 STRING_UNAFFECTED_BY_OPPONENT_EFFECT	=	707
 STRING_TEMPORARILY_BANISHED				=   708
+STRING_INCREASE_DICE_RESULT				=   709
+STRING_DECREASE_DICE_RESULT				=   710
 
 STRING_ASK_REPLACE_UPDATE_ENERGY_COST	= 	900
 STRING_ASK_ENGAGE						=	901
 STRING_ASK_UPDATE_ENERGY				=	902
 STRING_ASK_IGNORE_OVERDRIVE_COST		= 	903
 
+STRING_ADD_TO_HAND						=	1190
+STRING_SEND_TO_GY						=	1191
+
 STRING_INPUT_ENERGY						=	2000
 STRING_INPUT_LEVEL						=	2001
+STRING_INPUT_DICE_ROLL					=	2002
 
 HINTMSG_ENERGY							=	2100
 
@@ -98,6 +105,7 @@ ARCHE_FUSION		= 0x46
 ARCHE_PANDEMONIUM	= 0xf80
 ARCHE_BIGBANG		= 0xbba
 ARCHE_HYPERDRIVE	= 0x660
+ARCHE_ZEROST		= 0x1e4
 
 LOCATION_ALL = LOCATION_DECK|LOCATION_HAND|LOCATION_MZONE|LOCATION_SZONE|LOCATION_GRAVE|LOCATION_REMOVED|LOCATION_EXTRA
 LOCATION_GB  = LOCATION_GRAVE|LOCATION_REMOVED
@@ -680,13 +688,22 @@ function Auxiliary.Option(id,tp,desc,...)
 		local localdesc=desc+truect-1
 		if aux.GetValueType(b)=="table" then
 			check=b[1]
-			localid=b[2]
-			localdesc=b[3]
+			if #b==3 then
+				localid=b[2]
+				localdesc=b[3]
+			else
+				localid=false
+				localdesc=b[2]
+			end
 		else
 			truect=truect+1
 		end
 		if check==true then
-			ops[off]=aux.Stringid(localid,localdesc)
+			if localid then
+				ops[off]=aux.Stringid(localid,localdesc)
+			else
+				ops[off]=localdesc
+			end
 			opval[off]=ct-1
 			off=off+1
 		end
@@ -823,6 +840,24 @@ function Card.HasFlagEffectLabel(c,id,val)
 	end
 	return false
 end
+function Card.HasFlagEffectLabelLower(c,id,val)
+	if not c:HasFlagEffect(id) then return false end
+	for _,label in ipairs({c:GetFlagEffectLabel(id)}) do
+		if label<val then
+			return true
+		end
+	end
+	return false
+end
+function Card.HasFlagEffectLabelHigher(c,id,val)
+	if not c:HasFlagEffect(id) then return false end
+	for _,label in ipairs({c:GetFlagEffectLabel(id)}) do
+		if label>val then
+			return true
+		end
+	end
+	return false
+end
 function Duel.PlayerHasFlagEffectLabel(tp,id,val)
 	if Duel.GetFlagEffect(tp,id)==0 then return false end
 	for _,label in ipairs({Duel.GetFlagEffectLabel(tp,id)}) do
@@ -869,6 +904,12 @@ function Effect.SetLabelPair(e,l1,l2)
 		local o1,_=e:GetLabel()
 		e:SetLabel(o1,l2)
 	end
+end
+function Effect.GetSpecificLabel(e,pos)
+	if not pos then pos=1 end
+	local tab={e:GetLabel()}
+	if #tab<pos then return end
+	return tab[pos]
 end
 
 --LP
@@ -1396,4 +1437,158 @@ function Card.CreateNegateEffect(c,negateact,rp,rf,desc,range,ctlim,cond,cost,tg
 		e1:SetOperation(aux.NegateOperation(negateact,negatedop))
 		c:RegisterEffect(e1)
 	end
+end
+
+--ARCHETYPAL FUNCTIONS
+----ZEROST
+--[[Scripts the following effect template:
+● You can only use 1 "Zerost Moby" effect per turn, and only once that turn.
+
+① If this card is in your hand or GY: You can roll a six-sided die, banish other monsters from your field and/or GY equal to the result, and if you do, Special Summon this card, and if you do that, its ATK/DEF become equal to the number of monsters banished by this effect x 400.
+② If this card is banished by the effect of a "Zerost" card: ...]]
+function aux.AddZerostMonsterEffects(c,category,property,target,operation)
+	if not property then property=0 end
+	local e1=Effect.CreateEffect(c)
+	e1:Desc(0)
+	e1:SetCategory(CATEGORY_DICE|CATEGORY_REMOVE|CATEGORY_SPECIAL_SUMMON)
+	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetRange(LOCATION_HAND|LOCATION_GRAVE)
+	e1:SHOPT()
+	e1:SetTarget(aux.ZerostFirstMonsterEffectTarget)
+	e1:SetOperation(aux.ZerostFirstMonsterEffectOperation)
+	c:RegisterEffect(e1)
+	local e2=Effect.CreateEffect(c)
+	e2:Desc(1)
+	if category then
+		e2:SetCategory(category)
+	end
+	e2:SetType(EFFECT_TYPE_SINGLE|EFFECT_TYPE_TRIGGER_O)
+	e2:SetProperty(EFFECT_FLAG_DELAY|property)
+	e2:SetCode(EVENT_REMOVE)
+	e2:SHOPT()
+	e2:SetCondition(aux.ZerostSecondMonsterEffectCondition)
+	e2:SetTarget(target)
+	e2:SetOperation(operation)
+	c:RegisterEffect(e2)
+	--
+	local prop=EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_IGNORE_IMMUNE|EFFECT_FLAG_SET_AVAILABLE
+	if e2:IsHasProperty(EFFECT_FLAG_UNCOPYABLE) then prop=prop|EFFECT_FLAG_UNCOPYABLE end
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_TRIGGER_O)
+	e3:SetProperty(prop)
+	e3:SetCode(CARD_ZEROST_BEAST_ZEROTL)
+	e3:SetLabelObject(e2)
+	e3:SetLabel(c:GetOriginalCode())
+	c:RegisterEffect(e3)
+	local s=getmetatable(c)
+	if s.toss_dice==nil then
+		s.toss_dice=true
+	end
+	return e1,e2
+end
+function Auxiliary.ZerostFirstMonsterEffectFilter(c,tp,zonechk)
+	return (c:IsLocation(LOCATION_MZONE) or c:IsMonster()) and c:IsAbleToRemove() and (not zonechk or Duel.GetMZoneCount(tp,c)>0)
+end
+function Auxiliary.ZerostFirstMonsterEffectTarget(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then
+		return Duel.IsExistingMatchingCard(aux.ZerostFirstMonsterEffectFilter,tp,LOCATION_MZONE|LOCATION_GRAVE,0,1,c,tp,true) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	end
+	Duel.SetOperationInfo(0,CATEGORY_DICE,nil,0,tp,1)
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,tp,LOCATION_MZONE|LOCATION_GRAVE)
+	Duel.SetCardOperationInfo(c,CATEGORY_SPECIAL_SUMMON)
+end
+function Auxiliary.ZerostFirstMonsterEffectOperation(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local dc=Duel.TossDice(tp,1)
+	local g=Duel.Group(aux.NecroValleyFilter(aux.ZerostFirstMonsterEffectFilter),tp,LOCATION_MZONE|LOCATION_GRAVE,0,aux.ExceptThis(c),tp)
+	if #g>=dc then
+		local rg=Group.CreateGroup()
+		if Duel.GetMZoneCount(tp)<=0 then
+			Duel.HintMessage(tp,HINTMSG_REMOVE)
+			local rg0=g:FilterSelect(tp,function(card,p) return Duel.GetMZoneCount(p,card)>0 end,1,1,nil,tp)
+			rg:Merge(rg0)
+			g:Sub(rg0)
+			dc=dc-1
+		end
+		if dc>0 then
+			Duel.HintMessage(tp,HINTMSG_REMOVE)
+			local rg1=g:Select(tp,dc,dc,nil)
+			rg:Merge(rg1)
+		end
+		if #rg>0 then
+			Duel.HintSelection(rg)
+			local ct=Duel.Banish(rg)
+			if ct>0 and c:IsRelateToChain() and Duel.GetMZoneCount(tp)>0 and Duel.SpecialSummonStep(c,0,tp,tp,false,false,POS_FACEUP) then
+				local e1=Effect.CreateEffect(c)
+				e1:SetType(EFFECT_TYPE_SINGLE)
+				e1:SetCode(EFFECT_SET_ATTACK)
+				e1:SetValue(ct*400)
+				e1:SetReset(RESET_EVENT|RESETS_STANDARD|RESET_DISABLE)
+				c:RegisterEffect(e1)
+				local e2=e1:Clone()
+				e2:SetCode(EFFECT_SET_DEFENSE)
+				c:RegisterEffect(e2)
+			end
+			Duel.SpecialSummonComplete()
+		end
+	end
+end
+function Auxiliary.ZerostSecondMonsterEffectCondition(e,tp,eg,ep,ev,re,r,rp)
+	if r&REASON_EFFECT==0 or not re then return false end
+	local rc=re:GetHandler()
+	return rc and rc:IsSetCard(ARCHE_ZEROST)
+end
+
+function Auxiliary.AddZerostDiceModifier(c,id,etyp)
+	if not etyp then etyp=EFFECT_TYPE_IGNITION end
+	local e2=Effect.CreateEffect(c)
+	e2:Desc(1)
+	e2:SetType(etyp)
+	if etyp==EFFECT_TYPE_QUICK_O then
+		e2:SetCode(EVENT_FREE_CHAIN)
+		e2:SetHintTiming(0,RELEVANT_TIMINGS)
+	end
+	e2:SetRange(LOCATION_GRAVE)
+	e2:SetCost(aux.bfgcost)
+	e2:SetOperation(Auxiliary.RegisterZerostDiceModifier(id))
+	c:RegisterEffect(e2)
+	return e2
+end
+function Auxiliary.RegisterZerostDiceModifier(id)
+	return	function(e,tp,eg,ep,ev,re,r,rp)
+				local e1=Effect.CreateEffect(e:GetHandler())
+				e1:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
+				e1:SetCode(EVENT_TOSS_DICE_NEGATE)
+				e1:SetOperation(Auxiliary.ZerostDiceModifierOperation(id))
+				Duel.RegisterEffect(e1,tp)
+			end
+end
+function Auxiliary.ZerostDiceModifierOperation(id)
+	return	function(e,tp,eg,ep,ev,re,r,rp)
+				if not re or not re:IsActivated() then return end
+				if Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
+					Duel.Hint(HINT_CARD,0,e:GetHandler():GetOriginalCode())
+					local dc={Duel.GetDiceResult()}
+					local ac=1
+					local ct=(ev&0xff)+(ev>>16&0xff)
+					if ct>1 then
+						Duel.Hint(HINT_SELECTMSG,tp,STRING_INPUT_DICE_ROLL)
+						local _,idx=Duel.AnnounceNumber(tp,table.unpack(aux.idx_table,1,ct))
+						ac=idx+1
+					end
+					local val=dc[ac]
+					local increase=true
+					local reduce=val>1
+					local opt=aux.Option(tp,0,0,{increase,STRING_INCREASE_DICE_RESULT},{reduce,STRING_DECREASE_DICE_RESULT})
+					if opt==0 then
+						val=val+1
+					else
+						val=val-1
+					end
+					dc[ac]=val
+					Duel.SetDiceResult(table.unpack(dc))
+				end
+				e:Reset()
+			end
 end

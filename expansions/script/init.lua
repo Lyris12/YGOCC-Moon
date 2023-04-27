@@ -2222,6 +2222,9 @@ end
 global_override_reason_effect_check = false
 
 --Global Card Effect Table
+function Card.GetEffects(c)
+	return global_card_effect_table[c]
+end
 if not global_card_effect_table_global_check then
 	global_card_effect_table_global_check=true
 	global_card_effect_table={}
@@ -2458,6 +2461,18 @@ if not global_card_effect_table_global_check then
 		end
 		return self.register_global_card_effect_table(self,e,forced)
 	end
+end
+function Auxiliary.OperationRegistrationProcedure(e,tp,eg,ep,ev,re,r,rp)
+	self_reference_effect = e
+	current_triggering_player = tp
+	if global_override_reason_effect_check then
+		current_reason_effect = re
+		if aux.GetValueType(current_reason_effect)=="Effect" and current_reason_effect:IsHasCheatCode(GECC_OVERRIDE_REASON_EFFECT) then
+			re=current_reason_effect:GetCheatCodeValue(GECC_OVERRIDE_REASON_EFFECT)
+			current_reason_effect=re
+		end
+	end
+	return e,tp,eg,ep,ev,re,r,rp
 end
 
 --Global Card Effect Table (for Duel.RegisterEffect)

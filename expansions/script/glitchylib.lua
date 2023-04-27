@@ -365,6 +365,7 @@ function Auxiliary.MergedDelayEventCheckGlitchy2(id,range,evgcheck,se)
 			end
 end
 
+
 ---------------------------------------------------------------------------------
 -------------------------------CONTACT FUSION---------------------------------
 function Auxiliary.AddContactFusionProcedureGlitchy(c,desc,rule,sumtype,filter,self_location,opponent_location,mat_operation,...)
