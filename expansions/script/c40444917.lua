@@ -57,10 +57,7 @@ function s.eqlimit(e,c)
 	return c==e:GetLabelObject()
 end
 function s.mtop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local ct=c:GetEquipCount()
-	local fixct=((c:IsDirectAttacked() and 1) or 0)
-	return ct-fixct
+	return e:GetHandler():GetEquipCount()-1
 end
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

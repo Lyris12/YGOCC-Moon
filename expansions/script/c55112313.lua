@@ -26,10 +26,10 @@ function s.initial_effect(c)
 	e5:SetCode(EFFECT_UPDATE_DEFENSE)
 	c:RegisterEffect(e5)
 	local e6=Effect.CreateEffect(c)
-	e6:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
-	e6:SetCode(EVENT_PRE_BATTLE_DAMAGE)
-	e6:SetCondition(s.rdcon)
-	e6:SetOperation(s.rdop)
+	e6:SetType(EFFECT_TYPE_EQUIP)
+	e6:SetCode(EFFECT_CHANGE_BATTLE_DAMAGE)
+	--e6:SetCondition(s.rdcon)
+	e6:SetValue(aux.ChangeBattleDamage(1,HALF_DAMAGE))
 	c:RegisterEffect(e6)
 end
 function s.eqatkcon(e) 
@@ -85,10 +85,6 @@ end
 function s.splimit(e,c)
 	return not c:IsType(TYPE_BIGBANG) and c:IsLocation(LOCATION_EXTRA)
 end
-function s.rdcon(e,tp,eg,ep,ev,re,r,rp)
-	local ec=e:GetHandler():GetEquipTarget()
-	return ep~=tp and ec and (Duel.GetAttacker()==ec or Duel.GetAttackTarget()==ec)
-end
-function s.rdop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.ChangeBattleDamage(ep,ev/2)
-end
+--function s.rdcon(e,tp,eg,ep,ev,re,r,rp)
+--	return ep~=tp
+--end
