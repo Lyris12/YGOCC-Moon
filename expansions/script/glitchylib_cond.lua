@@ -59,6 +59,7 @@ function Auxiliary.ExceptOnDamageCalc()
 end
 function Auxiliary.TurnPlayerCond(tp)
 	return	function(e,p)
+				if not p then p=e:GetHandlerPlayer() end
 				local tp = (not tp or tp==0) and p or 1-p
 				return Duel.GetTurnPlayer()==tp
 			end

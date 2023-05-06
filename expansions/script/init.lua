@@ -175,25 +175,25 @@ dofile("expansions/script/glitchylib_cond.lua") --Glitchy's Conditions
 dofile("expansions/script/glitchylib_cost.lua") --Glitchy's Costs
 dofile("expansions/script/glitchylib_tgop.lua") --Glitchy's Target+Operations
 
-dofile("expansions/script/proc_evolute.lua") --Evolutes
-dofile("expansions/script/proc_conjoin.lua") --Conjoints
-dofile("expansions/script/proc_pandemonium.lua") --Pandemoniums
-dofile("expansions/script/proc_polarity.lua") --Polarities
-dofile("expansions/script/proc_spatial.lua") --Spatials
-dofile("expansions/script/proc_skill.lua") --Skills
-dofile("expansions/script/proc_deckmaster.lua") --Deck Masters
-dofile("expansions/script/proc_bigbang.lua") --Bigbangs
-dofile("expansions/script/proc_timeleap.lua") --Time Leaps
-dofile("expansions/script/proc_relay.lua") --Relays
-dofile("expansions/script/proc_runic.lua") --Runic
-dofile("expansions/script/proc_magick.lua") --Magick
-dofile("expansions/script/proc_xros.lua") --Xroses
-dofile("expansions/script/proc_evolve.lua") --Evolves
-dofile("expansions/script/proc_drive.lua") --Drive
+dofile("expansions/script/proc_evolute.lua") --Evolutes				0 x 1 0000 0000
+dofile("expansions/script/proc_pandemonium.lua") --Pandemoniums		0 x 2 0000 0000
+dofile("expansions/script/proc_polarity.lua") --Polarities			0 x 4 0000 0000
+dofile("expansions/script/proc_spatial.lua") --Spatials				0 x 8 0000 0000
+dofile("expansions/script/proc_doublesided.lua") --Doublesided		0 x 10 0000 0000
+dofile("expansions/script/proc_skill.lua") --Skills					0 x 20 0000 0000
+dofile("expansions/script/proc_conjoin.lua") --Conjoints			0 x 40 0000 0000
+dofile("expansions/script/proc_bigbang.lua") --Bigbangs				0 x 80 0000 0000
+dofile("expansions/script/proc_timeleap.lua") --Time Leaps			0 x 100 0000 0000
+dofile("expansions/script/proc_relay.lua") --Relays					0 x 200 0000 0000
+dofile("expansions/script/proc_harmony.lua") --Harmonies			0 x 800 0000 0000
+dofile("expansions/script/proc_accent.lua") --Accents				0 x 1000 0000 0000
+dofile("expansions/script/proc_magick.lua") --Magick				0 x 8 0000 0000 0000
+dofile("expansions/script/proc_xros.lua") --Xroses					0 x 10 0000 0000 0000
+dofile("expansions/script/proc_evolve.lua") --Evolves				0 x 20 0000 0000 0000
+dofile("expansions/script/proc_drive.lua") --Drive 					0 x 40 0000 0000 0000
 dofile("expansions/script/muse_proc.lua") --"Muse"
+dofile("expansions/script/proc_runic.lua") --Runic
 dofile("expansions/script/tables.lua") --Special Tables
-dofile("expansions/script/proc_harmony.lua") --Harmonies
-dofile("expansions/script/proc_accent.lua") --Accents
 -- dofile("expansions/script/proc_bypath.lua") --Bypaths
 -- dofile("expansions/script/proc_toxia.lua") --Toxias
 -- dofile("expansions/script/proc_annotee.lua") --Annotees

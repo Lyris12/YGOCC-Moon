@@ -11,7 +11,9 @@ SUBJECT_ALL					=	4
 -----------------------------------------------------------------------
 function Card.SingleEffect(c,code,val,reset,rc,range,cond,prop,desc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
-	local range = range and range or c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	if not reset and not range then
+		range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	end
 	local rc = rc and rc or c
     local rct=1
     if type(reset)=="table" then
@@ -24,7 +26,7 @@ function Card.SingleEffect(c,code,val,reset,rc,range,cond,prop,desc)
 		e:Desc(desc)
 	end
 	e:SetType(typ)
-	if not SCRIPT_AS_EQUIP then
+	if range and not SCRIPT_AS_EQUIP then
 		local prop=prop and prop or 0
 		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE|prop)
 		e:SetRange(range)
@@ -283,7 +285,9 @@ end
 
 function Card.UpdateATK(c,atk,reset,rc,range,cond,prop,desc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
-	local range = range and range or c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	if not reset and not range then
+		range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	end
 	local rc = rc and rc or c
     local rct=1
     if type(reset)=="table" then
@@ -294,7 +298,7 @@ function Card.UpdateATK(c,atk,reset,rc,range,cond,prop,desc)
 	local att=c:GetAttack()
 	local e=Effect.CreateEffect(rc)
 	e:SetType(typ)
-	if not SCRIPT_AS_EQUIP then
+	if range and not SCRIPT_AS_EQUIP then
 		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 		e:SetRange(range)
 	end
@@ -306,7 +310,7 @@ function Card.UpdateATK(c,atk,reset,rc,range,cond,prop,desc)
 	if reset then
 		if type(reset)~="number" then reset=0 end
 		reset = rc==c and reset|RESET_DISABLE or reset
-		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
+		e:SetReset(RESET_EVENT|RESETS_STANDARD|reset,rct)
 	end
 	c:RegisterEffect(e)
 	
@@ -322,7 +326,9 @@ end
 
 function Card.UpdateDEF(c,def,reset,rc,range,cond,prop,desc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
-	local range = range and range or c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	if not reset and not range then
+		range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	end
 	local rc = rc and rc or c
     local rct=1
     if type(reset)=="table" then
@@ -333,7 +339,7 @@ function Card.UpdateDEF(c,def,reset,rc,range,cond,prop,desc)
 	local df=c:GetDefense()
 	local e=Effect.CreateEffect(rc)
 	e:SetType(typ)
-	if not SCRIPT_AS_EQUIP then
+	if range and not SCRIPT_AS_EQUIP then
 		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 		e:SetRange(range)
 	end
@@ -360,7 +366,9 @@ end
 
 function Card.UpdateATKDEF(c,atk,def,reset,rc,range,cond,prop,desc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
-	local range = range and range or c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	if not reset and not range then
+		range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	end
 	local rc = rc and rc or c
     local rct=1
     if type(reset)=="table" then
@@ -376,7 +384,7 @@ function Card.UpdateATKDEF(c,atk,def,reset,rc,range,cond,prop,desc)
 	local oatk,odef=c:GetAttack(),c:GetDefense()
 	local e=Effect.CreateEffect(rc)
 	e:SetType(typ)
-	if not SCRIPT_AS_EQUIP then
+	if range and not SCRIPT_AS_EQUIP then
 		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 		e:SetRange(range)
 	end
@@ -500,7 +508,9 @@ end
 
 function Card.ChangeATK(c,atk,reset,rc,range,cond,prop,desc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
-	local range = range and range or c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	if not reset and not range then
+		range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	end
 	
 	local rc = rc and rc or c
     local rct=1
@@ -511,7 +521,7 @@ function Card.ChangeATK(c,atk,reset,rc,range,cond,prop,desc)
 	local oatk=c:GetAttack()
 	local e=Effect.CreateEffect(rc)
 	e:SetType(typ)
-	if not SCRIPT_AS_EQUIP then
+	if range and not SCRIPT_AS_EQUIP then
 		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 		e:SetRange(range)
 	end
@@ -523,7 +533,7 @@ function Card.ChangeATK(c,atk,reset,rc,range,cond,prop,desc)
 	if reset then
 		if type(reset)~="number" then reset=0 end
 		reset = rc==c and reset|RESET_DISABLE or reset
-		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
+		e:SetReset(RESET_EVENT|RESETS_STANDARD|reset,rct)
 	end
 	c:RegisterEffect(e)
 	if not reset then
@@ -538,7 +548,9 @@ end
 
 function Card.ChangeDEF(c,def,reset,rc,range,cond,prop,desc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
-	local range = range and range or c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	if not reset and not range then
+		range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	end
 	local rc = rc and rc or c
     local rct=1
     if type(reset)=="table" then
@@ -548,7 +560,7 @@ function Card.ChangeDEF(c,def,reset,rc,range,cond,prop,desc)
 	local odef=c:GetDefense()
 	local e=Effect.CreateEffect(rc)
 	e:SetType(typ)
-	if not SCRIPT_AS_EQUIP then
+	if range and not SCRIPT_AS_EQUIP then
 		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 		e:SetRange(range)
 	end
@@ -575,7 +587,9 @@ end
 
 function Card.ChangeATKDEF(c,atk,def,reset,rc,range,cond,prop,desc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
-	local range = range and range or c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	if not reset and not range then
+		range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	end
 	local rc = rc and rc or c
     local rct=1
     if type(reset)=="table" then
@@ -592,7 +606,7 @@ function Card.ChangeATKDEF(c,atk,def,reset,rc,range,cond,prop,desc)
 	local odef=c:GetDefense()
 	local e=Effect.CreateEffect(rc)
 	e:SetType(typ)
-	if not SCRIPT_AS_EQUIP then
+	if range and not SCRIPT_AS_EQUIP then
 		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 		e:SetRange(range)
 	end
@@ -749,7 +763,9 @@ end
 
 function Card.AddType(c,ctyp,reset,rc,range,cond,prop)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
-	local range = range and range or c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	if not reset and not range then
+		range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	end
 	
 	local rc = rc and rc or c
     local rct=1
@@ -761,7 +777,7 @@ function Card.AddType(c,ctyp,reset,rc,range,cond,prop)
 	local otyp=c:GetType()
 	local e=Effect.CreateEffect(rc)
 	e:SetType(typ)
-	if not SCRIPT_AS_EQUIP then
+	if range and not SCRIPT_AS_EQUIP then
 		local prop = prop and prop or 0
 		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE|prop)
 		e:SetRange(range)
@@ -791,7 +807,9 @@ end
 
 function Card.ChangeAttribute(c,attr,reset,rc,range,cond,prop,desc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
-	local range = range and range or c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	if not reset and not range then
+		range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	end
 	
 	local rc = rc and rc or c
     local rct=1
@@ -803,7 +821,7 @@ function Card.ChangeAttribute(c,attr,reset,rc,range,cond,prop,desc)
 	local oatt=c:GetAttribute()
 	local e=Effect.CreateEffect(rc)
 	e:SetType(typ)
-	if not SCRIPT_AS_EQUIP then
+	if range and not SCRIPT_AS_EQUIP then
 		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 		e:SetRange(range)
 	end
@@ -830,7 +848,9 @@ end
 
 function Card.ChangeRace(c,race,reset,rc,range,cond,prop,desc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
-	local range = range and range or c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	if not reset and not range then
+		range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	end
 	
 	local rc = rc and rc or c
     local rct=1
@@ -842,7 +862,7 @@ function Card.ChangeRace(c,race,reset,rc,range,cond,prop,desc)
 	local orac=c:GetRace()
 	local e=Effect.CreateEffect(rc)
 	e:SetType(typ)
-	if not SCRIPT_AS_EQUIP then
+	if range and not SCRIPT_AS_EQUIP then
 		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 		e:SetRange(range)
 	end
@@ -869,7 +889,9 @@ end
 
 function Card.UpdateLevel(c,lv,reset,rc,range,cond,prop,desc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
-	local range = range and range or c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	if not reset and not range then
+		range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	end
 	
 	local rc = rc and rc or c
     local rct=1
@@ -881,7 +903,7 @@ function Card.UpdateLevel(c,lv,reset,rc,range,cond,prop,desc)
 	local olv=c:GetLevel()
 	local e=Effect.CreateEffect(rc)
 	e:SetType(typ)
-	if not SCRIPT_AS_EQUIP then
+	if range and not SCRIPT_AS_EQUIP then
 		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 		e:SetRange(range)
 	end
@@ -908,7 +930,9 @@ end
 
 function Card.ChangeLevel(c,lv,reset,rc,range,cond,prop,desc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
-	local range = range and range or c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	if not reset and not range then
+		range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	end
 	
 	local rc = rc and rc or c
     local rct=1
@@ -920,7 +944,7 @@ function Card.ChangeLevel(c,lv,reset,rc,range,cond,prop,desc)
 	local olv=c:GetLevel()
 	local e=Effect.CreateEffect(rc)
 	e:SetType(typ)
-	if not SCRIPT_AS_EQUIP then
+	if range and not SCRIPT_AS_EQUIP then
 		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 		e:SetRange(range)
 	end
@@ -1166,7 +1190,7 @@ function Card.EffectProtection(c,protection,reset,rc,range,cond,prop,desc)
         rct=reset[2]
         reset=reset[1]
     end
-	local range = range and range or c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	local range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
 	local e=Effect.CreateEffect(c)
 	e:SetType(typ)
 	if not SCRIPT_AS_EQUIP then
@@ -1220,7 +1244,7 @@ function Card.TargetProtection(c,protection,reset,rc,range,cond,prop,desc)
         rct=reset[2]
         reset=reset[1]
     end
-	local range = range and range or c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	local range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
 	local e=Effect.CreateEffect(c)
 	e:SetType(typ)
 	if not SCRIPT_AS_EQUIP then
@@ -1274,7 +1298,7 @@ function Card.UnaffectedProtection(c,protection,reset,rc,range,cond,prop,desc)
         rct=reset[2]
         reset=reset[1]
     end
-	local range = range and range or c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	local range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
 	local e=Effect.CreateEffect(c)
 	e:SetType(typ)
 	if not SCRIPT_AS_EQUIP then
@@ -1329,7 +1353,7 @@ function Card.FirstTimeProtection(c,each_turn,battle,effect,protection,reset,rc,
         rct=reset[2]
         reset=reset[1]
     end
-	local range = range and range or c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	local range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
 	local e=Effect.CreateEffect(c)
 	e:SetType(typ)
 	if not SCRIPT_AS_EQUIP then
@@ -1399,7 +1423,7 @@ function Card.CannotBeTributed(c,reset,rc,range,cond,prop,desc)
         rct=reset[2]
         reset=reset[1]
     end
-	local range = range and range or c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	local range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
 	--
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(typ)

@@ -73,7 +73,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToChain() then
 		local rct = Duel.GetTurnPlayer()==tp and 2 or 1
-		local chk1,chk2,chk3,res=Duel.Negate(tc,e,{RESET_PHASE+PHASE_END+RESET_SELF_TURN,rct})
+		local chk1,chk2,res=Duel.Negate(tc,e,{RESET_PHASE+PHASE_END+RESET_SELF_TURN,rct})
 		if res then
 			local c=e:GetHandler()
 			if c:IsRelateToChain() and c:IsEngaged() and c:IsCanUpdateEnergy(tp,5,REASON_EFFECT) then

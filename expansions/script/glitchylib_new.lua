@@ -23,13 +23,15 @@ CATEGORY_FLAG_SELF					= 0x1
 CUSTOM_ARCHE_ZERO_HERO				= 0x1
 
 --Custom Cards
-CARD_ZERO_HERO_MAGMA_MAN			= 30409
-CARD_STARFORCE_KNIGHT				= 39301
-CARD_ZEROST_BEAST_ZEROTL 			= 100000025
+CARD_ZERO_HERO_MAGMA_MAN				= 30409
+CARD_STARFORCE_KNIGHT					= 39301
+CARD_ZEROST_BEAST_ZEROTL 				= 100000025
+CARD_IN_THE_FOREST_BLACK_AS_MY_MEMORY	= 1
 
 --Custom Counters
 COUNTER_ICE_PRISON					= 0x1301
 COUNTER_ENGAGED_MASS				= 0xe67
+COUNTER_SORROW						= 0xd44
 
 --Desc
 STRING_CANNOT_CHANGE_POSITION 			= 	700
@@ -43,11 +45,14 @@ STRING_UNAFFECTED_BY_OPPONENT_EFFECT	=	707
 STRING_TEMPORARILY_BANISHED				=   708
 STRING_INCREASE_DICE_RESULT				=   709
 STRING_DECREASE_DICE_RESULT				=   710
+STRING_IGNORE_BATTLE_TARGET				=	711
 
 STRING_ASK_REPLACE_UPDATE_ENERGY_COST	= 	900
 STRING_ASK_ENGAGE						=	901
 STRING_ASK_UPDATE_ENERGY				=	902
 STRING_ASK_IGNORE_OVERDRIVE_COST		= 	903
+STRING_ASK_DISABLE						= 	904
+STRING_ASK_ATKCHANGE					= 	905
 
 STRING_ADD_TO_HAND						=	1190
 STRING_SEND_TO_GY						=	1191
@@ -57,6 +62,7 @@ STRING_INPUT_LEVEL						=	2001
 STRING_INPUT_DICE_ROLL					=	2002
 
 HINTMSG_ENERGY							=	2100
+HINTMSG_TRANSFORM						=	2101
 
 --Locations
 LOCATION_ENGAGED	=	0x1000
@@ -105,6 +111,9 @@ ARCHE_FUSION		= 0x46
 ARCHE_PANDEMONIUM	= 0xf80
 ARCHE_BIGBANG		= 0xbba
 ARCHE_HYPERDRIVE	= 0x660
+
+ARCHE_DREAMY_FOREST	= 0xd43
+ARCHE_DREARY_FOREST	= 0xd44
 ARCHE_ZEROST		= 0x1e4
 
 LOCATION_ALL = LOCATION_DECK|LOCATION_HAND|LOCATION_MZONE|LOCATION_SZONE|LOCATION_GRAVE|LOCATION_REMOVED|LOCATION_EXTRA
@@ -344,7 +353,7 @@ function Duel.Negate(tc,e,reset,notfield,forced)
 	if res then
 		Duel.AdjustInstantly(tc)
 	end
-	return e1,e2,nil,res
+	return e1,e2,res
 end
 function Duel.NegateInGY(tc,e,reset)
 	if not reset then reset=0 end
@@ -598,6 +607,14 @@ end
 function Effect.SpecialSummonEventClone(e,c,notreg)
 	local ex=e:Clone()
 	ex:SetCode(EVENT_SPSUMMON_SUCCESS)
+	if not notreg then
+		c:RegisterEffect(ex)
+	end
+	return ex
+end
+function Effect.UpdateDefenseClone(e,c,notreg)
+	local ex=e:Clone()
+	ex:SetCode(EFFECT_UPDATE_DEFENSE)
 	if not notreg then
 		c:RegisterEffect(ex)
 	end
@@ -1440,13 +1457,41 @@ function Card.CreateNegateEffect(c,negateact,rp,rf,desc,range,ctlim,cond,cost,tg
 end
 
 --ARCHETYPAL FUNCTIONS
+----DREAMY/DREARY FOREST
+function Auxiliary.AddDreamyDrearyTransformation(c,status)
+	local side = status==ARCHE_DREARY_FOREST and SIDE_REVERSE or SIDE_OBVERSE
+	local e1=Effect.CreateEffect(c)
+	e1:Desc(2)
+	e1:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_TRIGGER_O)
+	e1:SetCode(EVENT_PHASE|PHASE_END)
+	e1:SetRange(LOCATION_MZONE)
+	e1:HOPT()
+	e1:SetCondition(Auxiliary.DreamyDrearyTransformationCondition(status))
+	e1:SetTarget(aux.IsCanTransformTargetFunction)
+	e1:SetOperation(aux.TransformOperationFunction(side))
+	c:RegisterEffect(e1)
+	return e1
+end
+function Auxiliary.DreamyDrearyTransformationCondition(status)
+	if status==ARCHE_DREARY_FOREST then
+		return	function(e,tp,eg,ep,ev,re,r,rp)
+					return Duel.GetTurnPlayer()==tp
+				end
+	elseif status==ARCHE_DREAMY_FOREST then
+		return	function(e,tp,eg,ep,ev,re,r,rp)
+					return Duel.GetTurnPlayer()==1-tp
+						and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,ARCHE_DREAMY_FOREST,ARCHE_DREARY_FOREST),tp,LOCATION_ONFIELD,0,1,e:GetHandler())
+				end
+	end
+end
+
 ----ZEROST
 --[[Scripts the following effect template:
 ● You can only use 1 "Zerost Moby" effect per turn, and only once that turn.
 
 ① If this card is in your hand or GY: You can roll a six-sided die, banish other monsters from your field and/or GY equal to the result, and if you do, Special Summon this card, and if you do that, its ATK/DEF become equal to the number of monsters banished by this effect x 400.
 ② If this card is banished by the effect of a "Zerost" card: ...]]
-function aux.AddZerostMonsterEffects(c,category,property,target,operation)
+function Auxiliary.AddZerostMonsterEffects(c,category,property,target,operation)
 	if not property then property=0 end
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(0)
@@ -1454,8 +1499,8 @@ function aux.AddZerostMonsterEffects(c,category,property,target,operation)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_HAND|LOCATION_GRAVE)
 	e1:SHOPT()
-	e1:SetTarget(aux.ZerostFirstMonsterEffectTarget)
-	e1:SetOperation(aux.ZerostFirstMonsterEffectOperation)
+	e1:SetTarget(Auxiliary.ZerostFirstMonsterEffectTarget)
+	e1:SetOperation(Auxiliary.ZerostFirstMonsterEffectOperation)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(1)
@@ -1466,7 +1511,7 @@ function aux.AddZerostMonsterEffects(c,category,property,target,operation)
 	e2:SetProperty(EFFECT_FLAG_DELAY|property)
 	e2:SetCode(EVENT_REMOVE)
 	e2:SHOPT()
-	e2:SetCondition(aux.ZerostSecondMonsterEffectCondition)
+	e2:SetCondition(Auxiliary.ZerostSecondMonsterEffectCondition)
 	e2:SetTarget(target)
 	e2:SetOperation(operation)
 	c:RegisterEffect(e2)

@@ -45,7 +45,7 @@ end
 function s.disop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToChain() and aux.NegateAnyFilter(tc) then
-		local chk1,chk2,chk3,res=Duel.Negate(tc,e)
+		local chk1,chk2,res=Duel.Negate(tc,e)
 		if res and tc:IsRelateToChain() then
 			Duel.Destroy(tc,REASON_EFFECT)
 		end

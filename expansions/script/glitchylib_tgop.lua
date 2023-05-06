@@ -1632,18 +1632,41 @@ SPSUM_MOD_REDIRECT 		= 0x2
 SPSUM_MOD_CHANGE_ATKDEF	=	0x4
 
 function Auxiliary.SSFilter(f,sumtype,sump,ign1,ign2,pos,recp,zone)
+	if not sumtype then sumtype=0 end
+	if not ign1 then ign1=false end
+	if not ign2 then ign2=false end
+	if not pos then pos=POS_FACEUP end
+	if not zone then zone=0xff end
 	return	function(c,e,tp,...)
+				local sump = sump and sump==1 and 1-tp or tp
+				local recp = recp and recp==1 and 1-tp or tp
+				local zone = type(zone)=="number" and zone or zone(e,tp)
 				return (not f or f(c,e,tp,...)) and c:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos,recp,zone)
 			end
 end
 function Auxiliary.SSFromExtraDeckFilter(f,sumtype,sump,ign1,ign2,pos,recp,zone)
+	if not sumtype then sumtype=0 end
+	if not ign1 then ign1=false end
+	if not ign2 then ign2=false end
+	if not pos then pos=POS_FACEUP end
+	if not zone then zone=0xff end
 	return	function(c,e,tp,...)
+				local sump = sump and sump==1 and 1-tp or tp
+				local recp = recp and recp==1 and 1-tp or tp
+				local zone = type(zone)=="number" and zone or zone(e,tp)
 				return (not f or f(c,e,tp,...)) and c:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos,recp,zone)
 					and Duel.GetLocationCountFromEx(recp,sump,nil,c,zone)>0
 			end
 end
 function Auxiliary.SSToEitherFieldFilter(f,sumtype,sump,ign1,ign2,pos,zone1,zone2)
+	if not sumtype then sumtype=0 end
+	if not ign1 then ign1=false end
+	if not ign2 then ign2=false end
+	if not pos then pos=POS_FACEUP end
+	if not zone then zone=0xff end
 	return	function(c,e,tp,...)
+				local sump = sump and sump==1 and 1-tp or tp
+				local zone = type(zone)=="number" and zone or zone(e,tp)
 				return (not f or f(c,e,tp,...))
 					and (c:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos,tp,zone1) or c:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos,1-tp,zone2))
 			end
