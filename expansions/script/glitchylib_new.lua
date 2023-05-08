@@ -1623,7 +1623,7 @@ function Auxiliary.ZerostDiceModifierOperation(id)
 						ac=idx+1
 					end
 					local val=dc[ac]
-					local increase=true
+					local increase=val<6
 					local reduce=val>1
 					local opt=aux.Option(tp,0,0,{increase,STRING_INCREASE_DICE_RESULT},{reduce,STRING_DECREASE_DICE_RESULT})
 					if opt==0 then

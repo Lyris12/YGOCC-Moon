@@ -55,6 +55,8 @@ function cid.initial_effect(c)
 	e6:SetOperation(cid.lpop)
 	c:RegisterEffect(e6)
 end
+cid.toss_dice = true
+
 function cid.splimit(e, se, sp, st)
 	return se:IsHasType(EFFECT_TYPE_ACTIONS)
 end
