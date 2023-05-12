@@ -157,7 +157,7 @@ function s.qeop(e,tp,eg,ep,ev,re,r,rp)
 			Duel.HintMessage(tp,HINTMSG_ATOHAND)
 			local sg=g2:Select(tp,1,1,nil)
 			if #sg>0 then
-				Duel.Search(g2,tp)
+				Duel.Search(sg,tp)
 			end
 		end
 	end
