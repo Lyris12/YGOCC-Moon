@@ -1,5 +1,5 @@
---created by Lyris
---機光襲雷－ザ☆ドラゴン
+--created by Lyris, art from "The Wyvern"
+--ザ☆機光襲雷
 local s,id,o=GetID()
 function s.initial_effect(c)
 	local tp=c:GetControler()

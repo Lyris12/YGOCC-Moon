@@ -1,4 +1,4 @@
---created by LionHeartKIng, coded by Lyris, art from Yu-Gi-Oh! BAM's "Mirror" Power-up & "Cyber Dragon"
+--created by Lyris / LionHeartKIng, coded by Lyris
 --襲雷竜－鋼
 local s,id,o=GetID()
 function s.initial_effect(c)

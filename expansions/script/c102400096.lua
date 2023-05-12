@@ -1,4 +1,4 @@
---created by MegaSausage of Discord, coded by Lyris, art from Super Smash Brothers Ultimate
+--created by Discord \ MegaSausage, coded by Lyris, art from Super Smash Brothers Ultimate
 --剣主のストーム
 local s,id,o=GetID()
 function s.initial_effect(c)

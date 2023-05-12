@@ -1,4 +1,4 @@
---created by LionHeartKIng
+--created by LionHeartKIng, coded by Lyris
 --フェイトヒーロー・カナリス
 local s,id,o=GetID()
 function s.initial_effect(c)

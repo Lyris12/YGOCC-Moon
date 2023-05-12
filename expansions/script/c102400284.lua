@@ -1,4 +1,4 @@
---created by Lyris, coded by Glitchy
+--created by Lyris, coded by Discord \ XGlitchy30
 --半物質のパンサ
 
 local s,id,o=GetID()

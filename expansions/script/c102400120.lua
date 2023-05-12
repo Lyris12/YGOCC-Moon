@@ -1,4 +1,4 @@
---created by NovaTsukimori, coded by Lyris, art by Meerin of DeviantArt
+--created by Lyris / NovaTsukimori, coded by Lyris, art by Meerin of DeviantArt
 --襲雷メカドラゴン・イーチー
 local s,id,o=GetID()
 function s.initial_effect(c)

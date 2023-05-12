@@ -1,4 +1,4 @@
---created & coded by Lyris, art found by Mio Devles
+--created & coded by Lyris, art found by Mio Devles of Discord
 --ハーピィズペットエレガントドラゴン
 local s,id,o=GetID()
 function s.initial_effect(c)

@@ -1,4 +1,4 @@
---created by Nadège, coded by Lyris, art from "Angel O7"; Creator's family name withheld for privacy reasons
+--created & coded by Nadège, art from "Angel O7"; Creator's family name withheld for privacy reasons
 --エンジェルO8
 local s,id,o=GetID()
 function s.initial_effect(c)

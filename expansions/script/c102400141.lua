@@ -1,4 +1,4 @@
---created by NovaTsukimori, coded by Lyris, art from Sailor Moon R Episode 9
+--created by Lyris / NovaTsukimori, coded by Lyris, art from Sailor Moon R Episode 9
 --襲雷サンサーラ･ボルト
 local s,id,o=GetID()
 function s.initial_effect(c)

@@ -1,4 +1,4 @@
---created by LionHeartKIng, coded by Lyris, art from Dragon Story
+--created by Lyris / LionHeartKIng, coded by Lyris, art from Dragon Story
 --機光襲雷竜－プランク
 local s,id,o=GetID()
 function s.initial_effect(c)

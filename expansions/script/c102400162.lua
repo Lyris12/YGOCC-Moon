@@ -1,4 +1,4 @@
---created by LeonDuvall of Discord, coded by Lyris, art from Cardfight!! Vanguard's "Quaking Heavenly Dragon, Astraios Dragon"
+--created by Lyris & Discord \ LeonDuvall, coded by Lyris, art from Cardfight!! Vanguard's "Quaking Heavenly Dragon, Astraios Dragon"
 --YC.Orgの襲雷タクティシャン・ライリス
 local s,id,o=GetID()
 function s.initial_effect(c)

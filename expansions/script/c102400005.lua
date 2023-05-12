@@ -1,4 +1,4 @@
---created & coded by Lyris
+--created & coded by Lyris, art from "Silver Wing"
 --インライトメント・エアトス翼
 local s,id,o=GetID()
 function s.initial_effect(c)

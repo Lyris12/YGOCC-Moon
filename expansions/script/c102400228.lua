@@ -1,4 +1,4 @@
---created by LeonDuvall of Discord, coded by XGlitchy30 of Discord
+--created by Discord \ LeonDuvall, coded by Discord \ XGlitchy30
 --Remnance, YC.Org Vassault Cavalier
 local s,id,o=GetID()
 function s.initial_effect(c)

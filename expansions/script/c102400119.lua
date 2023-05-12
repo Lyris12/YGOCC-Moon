@@ -1,4 +1,4 @@
---created by NovaTsukimori, coded by Lyris, art at https://www.zerochan.net/632949
+--created by Lyris / NovaTsukimori, coded by Lyris, art at https://www.zerochan.net/632949
 --襲雷メカドラゴン・ニ
 local s,id,o=GetID()
 function s.initial_effect(c)

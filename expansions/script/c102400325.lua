@@ -1,4 +1,4 @@
---created by Meed, coded by Lyris
+--created by Meed, coded by Lyris, art found by FoxyRainbow of DeviantArt
 --大死神
 local s,id,o=GetID()
 function s.initial_effect(c)

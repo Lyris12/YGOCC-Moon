@@ -1,4 +1,4 @@
---
+--created & coded by Lyris
 --Cyber Dragon Timaeus
 local s,id,o=GetID()
 function s.initial_effect(c)

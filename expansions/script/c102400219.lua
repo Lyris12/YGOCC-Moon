@@ -1,4 +1,4 @@
---created by LeonDuvall of Discord, coded by XGlitchy30 of Discord, art from Cardfight!! Vanguard's "Arch-aider, Malkuth-melekh"
+--created by Discord \ LeonDuvall, coded by Discord \ XGlitchy30, art from Cardfight!! Vanguard's "Arch-aider, Malkuth-melekh"
 --Glitchy, Angelic Guardian of YC.Org
 local s,id,o=GetID()
 function s.initial_effect(c)

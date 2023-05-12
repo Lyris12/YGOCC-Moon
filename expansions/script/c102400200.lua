@@ -1,4 +1,4 @@
---created by MegaSausage of Discord, coded by Lyris
+--created & coded by Discord \ MegaSausage
 --ローマ・キー・XLIX
 local s,id,o=GetID()
 function s.initial_effect(c)

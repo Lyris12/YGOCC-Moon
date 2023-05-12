@@ -1,4 +1,4 @@
---created by silverdimension of Discord, coded by Lyris
+--created by Discord \ silverdimension, coded by Lyris
 --アバター・オブ・インライトメント
 local s,id,o=GetID()
 function s.initial_effect(c)

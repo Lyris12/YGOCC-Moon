@@ -1,4 +1,4 @@
---created by Ace/Verloren of Discord
+--created & coded by Discord \ Ace/Verloren, art from "Absorouter Dragon"
 --Dominus Dragon
 local s,id,o=GetID()
 function s.initial_effect(c)

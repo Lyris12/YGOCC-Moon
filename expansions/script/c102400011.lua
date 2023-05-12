@@ -1,4 +1,4 @@
---created & coded by Lyris
+--created & coded by Lyris, art from "Crystal Beast Cobalt Eagle"
 --インライトメント・眼光炯々ゲイザー
 local s,id,o=GetID()
 function s.initial_effect(c)

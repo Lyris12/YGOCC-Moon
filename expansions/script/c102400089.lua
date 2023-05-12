@@ -1,4 +1,4 @@
---created & coded by Lyris, art from Cardfight!! Vanguard's "Dragonic Waterfall"
+--created & coded by Lyris, art from Shadowverse's "Glacial Dragon"
 --ハートブレイカー・ドラゴン
 local s,id,o=GetID()
 function s.initial_effect(c)

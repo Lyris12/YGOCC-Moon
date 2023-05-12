@@ -1,4 +1,4 @@
---created by LeonDuvall of Discord, coded by Lyris
+--created by Discord \ LeonDuvall, coded by Lyris
 --Disstonant Meed, YC.Org Spymaster
 local s,id,o=GetID()
 function s.initial_effect(c)

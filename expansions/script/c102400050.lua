@@ -1,5 +1,5 @@
---created by Lyris
---機夜光襲雷－ザ☆ワイバーン
+--created by Lyris, art from "The Star Dragon"
+--ザ☆機夜光襲雷
 local s,id,o=GetID()
 function s.initial_effect(c)
 	local tp=c:GetControler()

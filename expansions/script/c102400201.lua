@@ -1,4 +1,4 @@
---created by MegaSausage of Discord
+--created by Discord \ MegaSausage
 --ローマ・キー・CDXX
 local s,id,o=GetID()
 function s.initial_effect(c)

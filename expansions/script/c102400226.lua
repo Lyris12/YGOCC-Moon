@@ -1,4 +1,4 @@
---created by LeonDuvall of Discord, coded by Lyris
+--created & coded by Discord \ LeonDuvall
 --Stratauramram, YC.Org Pilot
 local s,id,o=GetID()
 function s.initial_effect(c)

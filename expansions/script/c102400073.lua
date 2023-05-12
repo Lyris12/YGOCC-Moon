@@ -1,4 +1,4 @@
---created by Lyris
+--created & coded by Lyris
 --剣主トレーニング
 local s,id,o=GetID()
 function s.initial_effect(c)

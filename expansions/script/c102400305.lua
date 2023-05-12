@@ -1,4 +1,4 @@
---created by Walrus of Discord, coded by Lyris
+--created by Discord \ Walrus, coded by Lyris, art from Shadowverse's "Blood Drinker's Brand"
 --マーク・オブ・カオス
 local s,id,o=GetID()
 function s.initial_effect(c)
