@@ -27,6 +27,9 @@ CARD_ZERO_HERO_MAGMA_MAN				= 30409
 CARD_STARFORCE_KNIGHT					= 39301
 CARD_ZEROST_BEAST_ZEROTL 				= 100000025
 CARD_IN_THE_FOREST_BLACK_AS_MY_MEMORY	= 1
+CARD_CHEVALIER_DU_VAISSEAU				= 100000032
+CARD_ROI_DU_VAISSEAU					= 100000035
+CARD_REVERIE_DU_VAISSEAU				= 100000039
 
 --Custom Counters
 COUNTER_ICE_PRISON					= 0x1301
@@ -53,6 +56,7 @@ STRING_ASK_UPDATE_ENERGY				=	902
 STRING_ASK_IGNORE_OVERDRIVE_COST		= 	903
 STRING_ASK_DISABLE						= 	904
 STRING_ASK_ATKCHANGE					= 	905
+STRING_ASK_SEARCH						= 	906
 
 STRING_ADD_TO_HAND						=	1190
 STRING_SEND_TO_GY						=	1191
@@ -63,6 +67,7 @@ STRING_INPUT_DICE_ROLL					=	2002
 
 HINTMSG_ENERGY							=	2100
 HINTMSG_TRANSFORM						=	2101
+HINTMSG_TOEXTRA							=	2102
 
 --Locations
 LOCATION_ENGAGED	=	0x1000
@@ -114,6 +119,7 @@ ARCHE_HYPERDRIVE	= 0x660
 
 ARCHE_DREAMY_FOREST	= 0xd43
 ARCHE_DREARY_FOREST	= 0xd44
+ARCHE_VAISSEAU		= 0x4a8
 ARCHE_ZEROST		= 0x1e4
 
 LOCATION_ALL = LOCATION_DECK|LOCATION_HAND|LOCATION_MZONE|LOCATION_SZONE|LOCATION_GRAVE|LOCATION_REMOVED|LOCATION_EXTRA
@@ -147,6 +153,9 @@ function Duel.Group(f,tp,loc1,loc2,exc,...)
 end
 function Duel.HintMessage(tp,msg)
 	return Duel.Hint(HINT_SELECTMSG,tp,msg)
+end
+function Auxiliary.Necro(f)
+	return aux.NecroValleyFilter(f)
 end
 
 --Custom Categories
@@ -436,6 +445,9 @@ function Card.IsMonster(c,typ)
 end
 function Card.IsSpell(c,typ)
 	return c:IsType(TYPE_SPELL) and (aux.GetValueType(typ)~="number" or c:IsType(typ))
+end
+function Card.IsTrap(c,typ)
+	return c:IsType(TYPE_TRAP) and (aux.GetValueType(typ)~="number" or c:IsType(typ))
 end
 function Card.IsST(c,typ)
 	return c:IsType(TYPE_ST) and (aux.GetValueType(typ)~="number" or c:IsType(typ))
@@ -979,6 +991,40 @@ function Card.NotInExtraOrFaceup(c)
 	return not c:IsLocation(LOCATION_EXTRA) or c:IsFaceup()
 end
 
+function Card.IsFusionSummoned(c)
+	return c:IsSummonType(SUMMON_TYPE_FUSION)
+end
+function Card.IsRitualSummoned(c)
+	return c:IsSummonType(SUMMON_TYPE_RITUAL)
+end
+function Card.IsSynchroSummoned(c)
+	return c:IsSummonType(SUMMON_TYPE_SYNCHRO)
+end
+function Card.IsXyzSummoned(c)
+	return c:IsSummonType(SUMMON_TYPE_XYZ)
+end
+function Card.IsPendulumSummoned(c)
+	return c:IsSummonType(SUMMON_TYPE_PENDULUM)
+end
+function Card.IsLinkSummoned(c)
+	return c:IsSummonType(SUMMON_TYPE_LINK)
+end
+function Card.IsPandemoniumSummoned(c)
+	return c:IsSummonType(SUMMON_TYPE_PANDEMONIUM)
+end
+function Card.IsTimeleapSummoned(c)
+	return c:IsSummonType(SUMMON_TYPE_TIMELEAP)
+end
+function Card.IsBigbangSummoned(c)
+	return c:IsSummonType(SUMMON_TYPE_BIGBANG)
+end
+function Card.IsDriveSummoned(c)
+	return c:IsSummonType(SUMMON_TYPE_DRIVE)
+end
+function Card.IsSelfSummoned(c)
+	return c:IsSummonType(SUMMON_TYPE_SPECIAL+1)
+end
+
 function Card.GetZone(c,tp)
 	local rzone = c:IsControler(tp) and (1 <<c:GetSequence()) or (1 << (16+c:GetSequence()))
 	if c:IsSequence(5,6) then
@@ -1018,6 +1064,12 @@ function Duel.GetExtraDeck(p)
 end
 function Duel.GetExtraDeckCount(p)
 	return Duel.GetFieldGroupCount(p,LOCATION_EXTRA,0)
+end
+function Duel.GetPendulums(p)
+	return Duel.GetFieldGroup(p,LOCATION_PZONE,0)
+end
+function Duel.GetPendulumsCount(p)
+	return Duel.GetFieldGroupCount(p,LOCATION_PZONE,0)
 end
 
 --Materials
@@ -1102,6 +1154,40 @@ function Card.IsCanTurnSetGlitchy(c)
 end
 
 --Previous
+function Card.IsPreviousCodeOnField(c,code,...)
+	local codes={...}
+	table.insert(codes,1,code)
+	local precodes={c:GetPreviousCodeOnField()}
+	for _,prename in ipairs(precodes) do
+		for _,name in ipairs(codes) do
+			if prename==name then
+				return true
+			end
+		end
+	end
+	return false
+end
+function Card.IsPreviousTypeOnField(c,typ)
+	return c:GetPreviousTypeOnField()&typ==typ
+end
+function Card.IsPreviousLevelOnField(c,lv)
+	return c:GetPreviousLevelOnField()==lv
+end
+function Card.IsPreviousRankOnField(c,lv)
+	return c:GetPreviousRankOnField()==lv
+end
+function Card.IsPreviousAttributeOnField(c,att)
+	return c:GetPreviousAttributeOnField()&att==att
+end
+function Card.IsPreviousRaceOnField(c,rac)
+	return c:GetPreviousRaceOnField()&rac==rac
+end
+function Card.IsPreviousAttackOnField(c,atk)
+	return c:GetPreviousAttackOnField()==atk
+end
+function Card.IsPreviousDefenseOnField(c,def)
+	return c:GetPreviousDefenseOnField()==def
+end
 
 --Location Check
 function Auxiliary.AddThisCardBanishedAlreadyCheck(c)
@@ -1483,6 +1569,23 @@ function Auxiliary.DreamyDrearyTransformationCondition(status)
 						and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,ARCHE_DREAMY_FOREST,ARCHE_DREARY_FOREST),tp,LOCATION_ONFIELD,0,1,e:GetHandler())
 				end
 	end
+end
+
+----VAISSEAU
+function Auxiliary.RegisterVaisseauPendulumEffectFlag(c,pe)
+	local prop=EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_IGNORE_IMMUNE|EFFECT_FLAG_SET_AVAILABLE
+	if pe:IsHasProperty(EFFECT_FLAG_UNCOPYABLE) then prop=prop|EFFECT_FLAG_UNCOPYABLE end
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_TRIGGER_O)
+	e3:SetProperty(prop)
+	e3:SetCode(CARD_ROI_DU_VAISSEAU)
+	e3:SetLabelObject(pe)
+	e3:SetLabel(c:GetOriginalCode())
+	c:RegisterEffect(e3)
+end
+function Auxiliary.VaisseauQECondition(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return Duel.GetTurnPlayer()==1-tp or c:IsSummonType(SUMMON_TYPE_RITUAL)
 end
 
 ----ZEROST

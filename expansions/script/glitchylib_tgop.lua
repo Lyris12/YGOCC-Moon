@@ -1395,9 +1395,23 @@ end
 
 --To Deck
 function Auxiliary.ToDeckFilter(f,cost,loc)
-	return	function(c,...)
-				return (not f or f(c,...)) and (not cost and c:IsAbleToDeck() or (cost and ((not loc and c:IsAbleToDeckOrExtraAsCost()) or (loc==LOCATION_DECK and c:IsAbleToDeckAsCost()) or (loc==LOCATION_EXTRA and c:IsAbleToExtraAsCost()))))
+	if not cost then
+		return	function(c,...)
+			return (not f or f(c,...)) and c:IsAbleToDeck()
+		end
+	else
+		local check=Card.IsAbleToDeckOrExtraAsCost
+		if loc then
+			if loc==LOCATION_DECK then
+				check=Card.IsAbleToDeckAsCost
+			elseif loc==LOCATION_EXTRA then
+				check=Card.IsAbleToExtraAsCost
 			end
+		end
+		return	function(c,...)
+					return (not f or f(c,...)) and check(c)
+				end
+	end
 end
 
 -----------------------------------------------------------------------
@@ -3069,7 +3083,6 @@ function Duel.SpecialSummonNegate(e,g,styp,sump,tp,ign1,ign2,pos,zone,reset,rc)
 	if not reset then reset=0 end
 	if not rc then rc=e:GetHandler() end
 	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
-	local ct=0
 	for dg in aux.Next(g) do
 		local finalzone=zone
 		if type(zone)=="table" then
@@ -3080,27 +3093,24 @@ function Duel.SpecialSummonNegate(e,g,styp,sump,tp,ign1,ign2,pos,zone,reset,rc)
 			end
 		end
 		if Duel.SpecialSummonStep(dg,styp,sump,tp,ign1,ign2,pos,finalzone) then
-			ct=ct+1
 			local e1=Effect.CreateEffect(rc)
 			e1:SetType(EFFECT_TYPE_SINGLE)
 			e1:SetCode(EFFECT_DISABLE)
-			e1:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
+			e1:SetReset(RESET_EVENT|RESETS_STANDARD|reset)
 			dg:RegisterEffect(e1,true)
 			local e2=Effect.CreateEffect(rc)
 			e2:SetType(EFFECT_TYPE_SINGLE)
 			e2:SetCode(EFFECT_DISABLE_EFFECT)
-			e2:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
+			e2:SetReset(RESET_EVENT|RESETS_STANDARD|reset)
 			dg:RegisterEffect(e2,true)
 		end
 	end
-	Duel.SpecialSummonComplete()
-	return ct
+	return Duel.SpecialSummonComplete()
 end
 function Duel.SpecialSummonRedirect(e,g,styp,sump,tp,ign1,ign2,pos,zone,loc,desc)
 	if not zone then zone=0xff end
 	if not loc then loc=LOCATION_REMOVED end
 	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
-	local ct=0
 	for dg in aux.Next(g) do
 		local finalzone=zone
 		if type(zone)=="table" then
@@ -3111,23 +3121,21 @@ function Duel.SpecialSummonRedirect(e,g,styp,sump,tp,ign1,ign2,pos,zone,loc,desc
 			end
 		end
 		if Duel.SpecialSummonStep(dg,styp,sump,tp,ign1,ign2,pos,finalzone) then
-			ct=ct+1
 			local e=Effect.CreateEffect(e:GetHandler())
 			e:SetType(EFFECT_TYPE_SINGLE)
 			e:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
 			if desc then
 				e:SetDescription(desc)
-				e:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CLIENT_HINT)
+				e:SetProperty(EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_CLIENT_HINT)
 			else
 				e:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 			end
 			e:SetValue(loc)
-			e:SetReset(RESET_EVENT+RESETS_REDIRECT_FIELD)
+			e:SetReset(RESET_EVENT|RESETS_REDIRECT_FIELD)
 			dg:RegisterEffect(e,true)
 		end
 	end
-	Duel.SpecialSummonComplete()
-	return ct
+	return Duel.SpecialSummonComplete()
 end
 function Duel.SpecialSummonATKDEF(e,g,styp,sump,tp,ign1,ign2,pos,zone,atk,def,reset,rc)
 	if not zone then zone=0xff end
@@ -3137,7 +3145,6 @@ function Duel.SpecialSummonATKDEF(e,g,styp,sump,tp,ign1,ign2,pos,zone,atk,def,re
 		if g==e:GetHandler() and rc==e:GetHandler() then reset=reset|RESET_DISABLE end
 		g=Group.FromCards(g)
 	end
-	local ct=0
 	for dg in aux.Next(g) do
 		local finalzone=zone
 		if type(zone)=="table" then
@@ -3148,11 +3155,10 @@ function Duel.SpecialSummonATKDEF(e,g,styp,sump,tp,ign1,ign2,pos,zone,atk,def,re
 			end
 		end
 		if Duel.SpecialSummonStep(dg,styp,sump,tp,ign1,ign2,pos,finalzone) then
-			ct=ct+1
 			local e=Effect.CreateEffect(rc)
 			e:SetType(EFFECT_TYPE_SINGLE)
 			e:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
-			e:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
+			e:SetReset(RESET_EVENT|RESETS_STANDARD|reset)
 			if atk then
 				e:SetCode(EFFECT_SET_ATTACK)
 				e:SetValue(atk)
@@ -3166,8 +3172,7 @@ function Duel.SpecialSummonATKDEF(e,g,styp,sump,tp,ign1,ign2,pos,zone,atk,def,re
 			end
 		end
 	end
-	Duel.SpecialSummonComplete()
-	return ct
+	return Duel.SpecialSummonComplete()
 end
 
 ------------------------------------------------

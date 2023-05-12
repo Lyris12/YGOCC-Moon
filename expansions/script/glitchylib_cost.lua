@@ -154,7 +154,7 @@ function Auxiliary.ToDeckCost(f,loc1,loc2,min,max,exc,main_or_extra)
 				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 				local g=Duel.SelectMatchingCard(tp,f,tp,loc1,loc2,min,max,exc,e,tp,eg,ep,ev,re,r,rp)
 				if #g>0 then
-					local hg=g:Filter(Card.IsLocation,nil,LOCATION_GRAVE+LOCATION_REMOVED)
+					local hg=g:Filter(Card.IsLocation,nil,LOCATION_GRAVE|LOCATION_REMOVED|LOCATION_EXTRA):Filter(Card.IsPublic,nil)
 					if #hg>0 then
 						Duel.HintSelection(hg)
 					end
