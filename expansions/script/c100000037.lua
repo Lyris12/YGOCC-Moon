@@ -3,6 +3,7 @@
 
 local s,id=GetID()
 function s.initial_effect(c)
+	aux.AddCodeList(c,CARD_CHEVALIER_DU_VAISSEAU)
 	--[[This card can be used to Ritual Summon any face-up Insect Ritual Monster from your Extra Deck.
 	You must also Tribute monsters from your hand or field whose total Levels equal or exceed the Level of the Ritual Monster you Ritual Summon.
 	If you Ritual Summon a "Vaisseau" Ritual Monster, you can add 1 "Chevalier du Vaisseau" from your Deck to your Extra Deck, face-up, as the entire requirement, instead.]]
