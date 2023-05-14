@@ -40,12 +40,12 @@ end
 function s.spfilter(c,e,tp,zonechk)
 	if not zonechk then
 		return c:IsFaceup() and c:IsMonster(TYPE_PENDULUM) and c:IsSetCard(ARCHE_VAISSEAU)
-			and Duel.GetLocationCountFromEx(tp,tp,nil,c)>0 and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,false,false)
+			and Duel.GetLocationCountFromEx(tp,tp,nil,c)>0 and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,false,true)
 	else
 		for i=0,6 do
 			local zone = (i<5) and 1<<i or (i==5) and 0x200040 or 0x400020
 			if c:IsFaceup() and c:IsMonster(TYPE_PENDULUM) and c:IsSetCard(ARCHE_VAISSEAU)
-				and Duel.GetLocationCountFromEx(tp,tp,nil,c,zone)>0 and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,false,false)
+				and Duel.GetLocationCountFromEx(tp,tp,nil,c,zone)>0 and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,false,true)
 				and Duel.IsExistingMatchingCard(s.spfilter2,tp,LOCATION_DECK,0,1,c,e,tp,zone) then
 				return true
 			end
@@ -81,7 +81,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		local ng=Duel.Select(HINTMSG_SPSUMMON,false,tp,s.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp)
 		if #ng>0 then
 			Duel.BreakEffect()
-			if Duel.SpecialSummonNegate(e,ng,SUMMON_TYPE_RITUAL,tp,tp,false,false,POS_FACEUP)>0 then
+			if Duel.SpecialSummonNegate(e,ng,SUMMON_TYPE_RITUAL,tp,tp,false,true,POS_FACEUP)>0 then
 				ng:GetFirst():CompleteProcedure()
 			end
 		end
