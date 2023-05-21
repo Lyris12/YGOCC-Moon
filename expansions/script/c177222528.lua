@@ -2,7 +2,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	aux.AddOrigTimeleapType(c,false)
-	--aux.AddTimeleapProc(c,6,s.sumcon,s.tlfilter)
+	aux.AddTimeleapProc(c,6,aux.FALSE,aux.FALSE)
 	c:EnableReviveLimit()
 	--You can also Time Leap Summon this card using a Level 4 "Karakuri" monster.
 	local e1=Effect.CreateEffect(c)

@@ -94,18 +94,20 @@ function s.ngcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.ngtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return c:IsAbleToExtra() end
+	if chk==0 then return not c:IsStatus(STATUS_BATTLE_DESTROYED) and c:IsAbleToExtra() end
 	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_TODECK,eg,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,c,1,0,0)
+	if re:GetHandler():IsAbleToDeck() and re:GetHandler():IsRelateToEffect(re) then
+		Duel.SetOperationInfo(0,CATEGORY_TODECK,eg,1,0,0)
+	end
 end
 function s.ngop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsControler(tp) then
-		if Duel.SendtoDeck(c,nil,0,REASON_EFFECT) then
+		if c:IsRelateToEffect(e) and Duel.SendtoDeck(c,nil,0,REASON_EFFECT) then
 			if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then
 				re:GetHandler():CancelToGrave()
-				Duel.SendtoDeck(re:GetHandler(),REASON_EFFECT)
+				Duel.SendtoDeck(re:GetHandler(),nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
 			end
 		end
 	end

@@ -4,7 +4,7 @@ function s.initial_effect(c)
 	--You can only Special Summon "Chronovert Absolute Dragon(s)" once per turn.
 	c:SetSPSummonOnce(id)
 	aux.AddOrigTimeleapType(c,false)
-	--aux.AddTimeleapProc(c,10,s.sumcon,s.tlfilter)
+	aux.AddTimeleapProc(c,11,aux.FALSE,aux.FALSE)
 	c:EnableReviveLimit()
 	--Must be Time Leap Summoned.
 	local e0=Effect.CreateEffect(c)

@@ -91,7 +91,6 @@ end
 function s.disop(e,tp,eg,ep,ev,re,r,rp)
 	local rc=re:GetHandler()
 	if Duel.NegateActivation(ev) and rc:IsRelateToEffect(re) and rc:IsAbleToChangeControler() then
-		Duel.BreakEffect()
 		rc:CancelToGrave()
 		Duel.Overlay(e:GetHandler(),rc)
 	end

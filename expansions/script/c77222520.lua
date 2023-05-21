@@ -2,7 +2,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	aux.AddOrigTimeleapType(c,false)
-	--aux.AddTimeleapProc(c,2,s.sumcon,s.tlfilter)
+	aux.AddTimeleapProc(c,2,aux.FALSE,aux.FALSE)
 	c:EnableReviveLimit()
 	--You can also Time Leap Summon this card by using any Normal Summoned monster whose effects are negated.
 	local e1=Effect.CreateEffect(c)

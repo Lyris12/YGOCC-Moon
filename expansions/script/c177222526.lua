@@ -2,7 +2,7 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	aux.AddOrigTimeleapType(c,false)
-	--aux.AddTimeleapProc(c,7,s.sumcon,s.tlfilter)
+	aux.AddTimeleapProc(c,7,aux.FALSE,aux.FALSE)
 	c:EnableReviveLimit()
 	--You can also Time Leap Summon this card using a Level 2 or lower Psychic monster with 0 DEF.
 	local e1=Effect.CreateEffect(c)
