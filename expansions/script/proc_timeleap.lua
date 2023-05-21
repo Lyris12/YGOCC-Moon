@@ -369,7 +369,7 @@ function Auxiliary.TimeleapTarget(filter,...)
 				sg:Merge(bg)
 				local finish=false
 				local options={}
-				if #eset>0 then
+				if #eset>0 and Duel.GetFlagEffect(tp,830)<=0 then
 					local cond=1
 					if Duel.GetFlagEffect(tp,828)<=0 then
 						table.insert(options,aux.Stringid(433005,15))
@@ -406,7 +406,6 @@ function Auxiliary.TimeleapTarget(filter,...)
 					if exsumcheck~=nil then
 						Duel.RegisterFlagEffect(tp,829,RESET_PHASE+PHASE_END,0,1)
 						Duel.Hint(HINT_CARD,0,exsumcheck:GetOwner():GetOriginalCode())
-						exsumcheck:Reset()
 					end
 					sg:KeepAlive()
 					e:SetLabelObject(sg)
