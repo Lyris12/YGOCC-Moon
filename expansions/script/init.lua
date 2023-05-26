@@ -295,7 +295,11 @@ end
 Auxiliary.kaiju_procs={}
 global_target_range_effect_table={}
 Effect.SetTargetRange=function(e,self,oppo)
-	global_target_range_effect_table[e]={self,oppo}
+	local table_oppo = oppo
+	if type(oppo)==nil then
+		table_oppo=false
+	end
+	global_target_range_effect_table[e]={self,table_oppo}
 	if e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G then
 		if oppo==1 then
 			table.insert(Auxiliary.kaiju_procs,e)
@@ -1534,7 +1538,7 @@ function Group.Includes(g1,g2)
 end
 
 function Effect.GLGetTargetRange(e)
-	if not global_target_range_effect_table[e] then return 0,0 end
+	if not global_target_range_effect_table[e] then return false,false end
 	local s=global_target_range_effect_table[e][1]
 	local o=global_target_range_effect_table[e][2]
 	return s,o
@@ -2221,8 +2225,32 @@ end
 --EFFECT TABLES
 global_override_reason_effect_check = false
 
+function Effect.WasReset(e,c)
+	local reset
+	if aux.GetValueType(c)=="Card" then
+		reset={c:IsHasEffect(GLOBAL_EFFECT_RESET)}
+	else
+		reset={Duel.IsPlayerAffectedByEffect(e:GetOwnerPlayer(),GLOBAL_EFFECT_RESET)}
+	end
+	for _,r in ipairs(reset) do
+		local obj=r:GetLabelObject()
+		if obj and obj==e then
+			return false
+		end
+	end
+	
+	return true
+end
 --Global Card Effect Table
 function Card.GetEffects(c)
+	local eset=global_card_effect_table[c]
+	local ct=#eset
+	for i = 1,ct do
+		local e=eset[i]
+		if e:WasReset(c) then
+			table.remove(global_card_effect_table[c],i)
+		end
+	end
 	return global_card_effect_table[c]
 end
 if not global_card_effect_table_global_check then
@@ -2258,6 +2286,19 @@ if not global_card_effect_table_global_check then
 				-- mt.checked_card_code_list=true
 			-- end
 		-- end
+		
+		local reset,rct=e:GLGetReset()
+		if reset then 					
+			local r=Effect.GlobalEffect()
+			r:SetType(EFFECT_TYPE_SINGLE)
+			r:SetProperty(EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_SET_AVAILABLE|EFFECT_FLAG_IGNORE_IMMUNE)
+			r:SetCode(GLOBAL_EFFECT_RESET)
+			r:SetTargetRange(1,0)
+			r:SetLabelObject(e)
+			r:SetReset(reset,rct)
+			r:GetOwnerPlayer(tp)
+			Card.register_global_card_effect_table(self,r,true)							
+		end
 		
 		if e:GetType()&(EFFECT_TYPE_ACTIONS)==0 then
 			local e = e:IsHasType(EFFECT_TYPE_GRANT) and e:GetLabelObject() or e
@@ -2490,15 +2531,16 @@ if not global_duel_effect_table_global_check then
 									global_reset_duel_effect_table={}
 								end							
 								local r=Effect.GlobalEffect()
+								r:SetType(EFFECT_TYPE_FIELD)
 								r:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 								r:SetCode(GLOBAL_EFFECT_RESET)
 								r:SetTargetRange(1,0)
 								r:SetLabelObject(e)
 								r:SetReset(reset,rct)
+								r:GetOwnerPlayer(tp)
 								Duel.register_global_duel_effect_table(r,tp)
 								global_reset_duel_effect_table[e]=true								
 							end
-								
 							
 							if e:GetType()&(EFFECT_TYPE_ACTIONS)==0 then
 								local e = e:IsHasType(EFFECT_TYPE_GRANT) and e:GetLabelObject() or e
@@ -2519,10 +2561,10 @@ if not global_duel_effect_table_global_check then
 									
 								if e:GetCode()==EFFECT_EXTRA_SUMMON_COUNT or e:GetCode()==EFFECT_EXTRA_SET_COUNT then
 									local s,o=e:GLGetTargetRange()
-									if s~=0 and s&LOCATION_GRAVE==0 then
+									if s and s~=0 and s&LOCATION_GRAVE==0 then
 										s=s|LOCATION_GRAVE
 									end
-									if o~=0 and o&LOCATION_GRAVE==0 then
+									if o and o~=0 and o&LOCATION_GRAVE==0 then
 										o=o|LOCATION_GRAVE
 									end
 								

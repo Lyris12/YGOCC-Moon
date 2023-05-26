@@ -33,7 +33,7 @@ function c400008.initial_effect(c)
 	--search
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(58984738,1))
-	e4:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
+	e4:SetCategory(CATEGORY_TOHAND)
 	e4:SetType(EFFECT_TYPE_QUICK_O)
 	e4:SetCode(EVENT_FREE_CHAIN)
 	e4:SetRange(LOCATION_MZONE)
@@ -61,13 +61,11 @@ function c400008.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c400008.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,c400008.thfilter,tp,LOCATION_GRAVE,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,aux.Necro(c400008.thfilter),tp,LOCATION_GRAVE,0,1,1,nil)
 	local tc=g:GetFirst()
 	if tc then
-		if tc:IsAbleToHand() then
-			Duel.SendtoHand(tc,nil,REASON_EFFECT)
-			Duel.ConfirmCards(1-tp,tc)
-		end
+		Duel.SendtoHand(tc,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,tc)
 	end
 end
 function c400008.cost(e,tp,eg,ep,ev,re,r,rp,chk)

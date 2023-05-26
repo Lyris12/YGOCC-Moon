@@ -12,6 +12,7 @@ CATEGORY_UPDATE_RACE				= 0x200
 CATEGORY_UPDATE_SETCODE				= 0x400
 CATEGORY_LVCHANGE					= 0x800
 CATEGORY_PAYLP						= 0x1000
+CATEGORY_ACTIVATES_ON_NORMAL_SET	= 0x2000
 
 CATEGORIES_SEARCH = CATEGORY_SEARCH|CATEGORY_TOHAND
 CATEGORIES_FUSION_SUMMON = CATEGORY_SPECIAL_SUMMON|CATEGORY_FUSION_SUMMON
@@ -49,6 +50,8 @@ STRING_TEMPORARILY_BANISHED				=   708
 STRING_INCREASE_DICE_RESULT				=   709
 STRING_DECREASE_DICE_RESULT				=   710
 STRING_IGNORE_BATTLE_TARGET				=	711
+STRING_FAST_ACTIVATION					=	712
+STRING_GAINED_ADDITIONAL_ATTACK			=	713
 
 STRING_ASK_REPLACE_UPDATE_ENERGY_COST	= 	900
 STRING_ASK_ENGAGE						=	901
@@ -60,6 +63,7 @@ STRING_ASK_SEARCH						= 	906
 
 STRING_ADD_TO_HAND						=	1190
 STRING_SEND_TO_GY						=	1191
+STRING_SET								=	1153
 
 STRING_INPUT_ENERGY						=	2000
 STRING_INPUT_LEVEL						=	2001
@@ -119,6 +123,7 @@ ARCHE_HYPERDRIVE	= 0x660
 
 ARCHE_DREAMY_FOREST	= 0xd43
 ARCHE_DREARY_FOREST	= 0xd44
+ARCHE_TRAPPIT		= 0x54a
 ARCHE_VAISSEAU		= 0x4a8
 ARCHE_ZEROST		= 0x1e4
 
@@ -165,6 +170,7 @@ if not global_effect_category_table_global_check then
 	global_effect_info_table={}
 end
 function Effect.SetCustomCategory(e,cat,flags)
+	if not cat then cat=0 end
 	if not flags then flags=0 end
 	if not global_effect_category_table[e] then global_effect_category_table[e]={} end
 	global_effect_category_table[e][1]=cat
@@ -173,6 +179,10 @@ end
 function Effect.GetCustomCategory(e)
 	if not global_effect_category_table[e] then return 0,0 end
 	return global_effect_category_table[e][1], global_effect_category_table[e][2]
+end
+function Effect.IsHasCustomCategory(e,cat1,cat2)
+	local ocat1,ocat2=e:GetCustomCategory()
+	return (cat1 and ocat1&cat1>0) or (cat2 and ocat2&cat2>0)
 end
 function Duel.SetCustomOperationInfo(ch,cat,g,ct,p,val,...)
 	local extra={...}
@@ -439,6 +449,12 @@ function Auxiliary.AfterShuffle(g)
 	end
 end
 
+--Battle Phase
+function Card.IsCapableOfAttacking(c,tp)
+	if not tp then tp=Duel.GetTurnPlayer() end
+	return not c:IsForbidden() and not c:IsHasEffect(EFFECT_CANNOT_ATTACK) and not c:IsHasEffect(EFFECT_ATTACK_DISABLED) and not Duel.IsPlayerAffectedByEffect(tp,EFFECT_SKIP_BP)
+end
+
 --Card Filters
 function Card.IsMonster(c,typ)
 	return c:IsType(TYPE_MONSTER) and (aux.GetValueType(typ)~="number" or c:IsType(typ))
@@ -448,6 +464,12 @@ function Card.IsSpell(c,typ)
 end
 function Card.IsTrap(c,typ)
 	return c:IsType(TYPE_TRAP) and (aux.GetValueType(typ)~="number" or c:IsType(typ))
+end
+function Card.IsNormalSpell(c)
+	return c:GetType()&(TYPE_SPELL|TYPE_CONTINUOUS|TYPE_RITUAL|TYPE_EQUIP|TYPE_QUICKPLAY|TYPE_FIELD)==TYPE_SPELL
+end
+function Card.IsNormalTrap(c)
+	return c:GetType()&(TYPE_TRAP|TYPE_CONTINUOUS|TYPE_COUNTER)==TYPE_TRAP
 end
 function Card.IsST(c,typ)
 	return c:IsType(TYPE_ST) and (aux.GetValueType(typ)~="number" or c:IsType(typ))
@@ -624,6 +646,14 @@ function Effect.SpecialSummonEventClone(e,c,notreg)
 	end
 	return ex
 end
+function Effect.FlipSummonEventClone(e,c,notreg)
+	local ex=e:Clone()
+	ex:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
+	if not notreg then
+		c:RegisterEffect(ex)
+	end
+	return ex
+end
 function Effect.UpdateDefenseClone(e,c,notreg)
 	local ex=e:Clone()
 	ex:SetCode(EFFECT_UPDATE_DEFENSE)
@@ -713,8 +743,8 @@ function Auxiliary.Option(id,tp,desc,...)
 	local truect=1
 	for ct,b in ipairs(list) do
 		local check=b
-		local localid=id
-		local localdesc=desc+truect-1
+		local localid
+		local localdesc
 		if aux.GetValueType(b)=="table" then
 			check=b[1]
 			if #b==3 then
@@ -725,6 +755,8 @@ function Auxiliary.Option(id,tp,desc,...)
 				localdesc=b[2]
 			end
 		else
+			localid=id
+			localdesc=desc+truect-1
 			truect=truect+1
 		end
 		if check==true then
@@ -896,6 +928,10 @@ function Duel.PlayerHasFlagEffectLabel(tp,id,val)
 	end
 	return false
 end
+
+--Flip Summon
+
+
 --Gain Effect
 function Auxiliary.GainEffectType(c,oc,reset)
 	if not oc then oc=c end
@@ -1053,11 +1089,23 @@ function Card.HasBeenInLinkedZone(c,cc)
 end
 
 --Location Groups
+function Duel.GetHand(p)
+	return Duel.GetFieldGroup(p,LOCATION_HAND,0)
+end
+function Duel.GetHandCount(p)
+	return Duel.GetFieldGroupCount(p,LOCATION_HAND,0)
+end
 function Duel.GetDeck(p)
 	return Duel.GetFieldGroup(p,LOCATION_DECK,0)
 end
 function Duel.GetDeckCount(p)
 	return Duel.GetFieldGroupCount(p,LOCATION_DECK,0)
+end
+function Duel.GetGY(p)
+	return Duel.GetFieldGroup(p,LOCATION_GY,0)
+end
+function Duel.GetGYCount(p)
+	return Duel.GetFieldGroupCount(p,LOCATION_GY,0)
 end
 function Duel.GetExtraDeck(p)
 	return Duel.GetFieldGroup(p,LOCATION_EXTRA,0)
@@ -1092,13 +1140,12 @@ function Effect.HOPT(e,oath)
 	local c=e:GetOwner()
 	local cid=c:GetOriginalCode()
 	if not aux.HOPTTracker[c] then
-		aux.HOPTTracker[c]=0
+		aux.HOPTTracker[c]=-1
 	end
+	aux.HOPTTracker[c]=aux.HOPTTracker[c]+1
 	if type(aux.HOPTTracker[c])=="number" then
 		cid=cid+aux.HOPTTracker[c]*100
 	end
-	aux.HOPTTracker[c]=aux.HOPTTracker[c]+1
-	
 	local flag=0
 	if oath then
 		flag=flag|EFFECT_COUNT_CODE_OATH
