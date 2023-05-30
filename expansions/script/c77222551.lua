@@ -32,7 +32,7 @@ function s.initial_effect(c)
 end
 function s.tlfilter(c)
 	return (c:IsType(TYPE_EFFECT) and c:IsLevel(1) and c:IsFaceup()) or (c:IsFaceup() and c:IsSetCard(0x724) and not c:IsCode(id))
-		and c:IsAbleToDeck() and c:IsCanBeTimeleapMaterial() --and (Duel.GetLocationCountFromEx(tp,tp,c,TYPE_TIMELEAP)>0
+		and c:IsAbleToDeck() --and c:IsCanBeTimeleapMaterial() and (Duel.GetLocationCountFromEx(tp,tp,c,TYPE_TIMELEAP)>0
 end
 function s.sumcon(e)
 	local c=e:GetHandler()

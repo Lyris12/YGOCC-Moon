@@ -2,8 +2,19 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	aux.AddOrigTimeleapType(c,false)
-	aux.AddTimeleapProc(c,8,s.sumcon,s.tlfilter,s.sumop)
+	aux.AddTimeleapProc(c,8,aux.FALSE,aux.FALSE)
 	c:EnableReviveLimit()
+	--Time Leap Summon
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_FIELD)
+	e0:SetCode(EFFECT_SPSUMMON_PROC)
+	e0:SetProperty(EFFECT_FLAG_UNCOPYABLE)
+	e0:SetRange(LOCATION_EXTRA)
+	e0:SetCondition(s.sumcon)
+	e0:SetTarget(s.sumtg)
+	e0:SetOperation(s.sumop)
+	e0:SetValue(SUMMON_TYPE_TIMELEAP)
+	c:RegisterEffect(e0)
 	--During the Main Phase (Quick Effect): You can target 1 WIND monster you control and 1 card your opponent controls; return them to the hand.
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_TOHAND)
@@ -27,16 +38,29 @@ function s.initial_effect(c)
 		Duel.RegisterEffect(ge1,0)
 	end)
 end
-function s.sumcon(e,c)
-	return Duel.GetFlagEffect(e:GetHandlerPlayer(),id)>0
-end
-function s.tlfilter(c,e,mg)
+function s.sumcon(e)
+	local c=e:GetHandler()
 	local tp=c:GetControler()
-	local ef=e:GetHandler():GetFuture()
-	return c:IsAttribute(ATTRIBUTE_WIND) and c:IsLevelBelow(ef-1) and c:IsAbleToHand() and c:IsFaceup()
+	return Duel.GetFlagEffect(0,id)>0 and Duel.IsExistingMatchingCard(s.tlfilter,tp,LOCATION_MZONE,0,1,nil,tp)
 end
---The monster used as material for this card's Time Leap Summon is returned to the hand instead of being banished.
-function s.sumop(e,tp,eg,ep,ev,re,r,rp,c,g)
+function s.tlfilter(c,tp)
+	return c:IsAttribute(ATTRIBUTE_WIND) and c:IsLevel(7) and c:IsAbleToHand() and c:IsFaceup() and Duel.GetFlagEffect(tp,EFFECT_EXTRA_TIMELEAP_MATERIAL)<=0
+end
+function s.sumtg(e,tp,eg,ep,ev,re,r,rp,chk,c)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+	local g=Duel.SelectMatchingCard(tp,s.tlfilter,tp,LOCATION_MZONE,0,0,1,true,nil,tp)
+	if #g==0 then return false end
+	if #g>0 then
+		g:KeepAlive()
+		e:SetLabelObject(g)
+		return true
+	end
+end
+function s.sumop(e,tp,eg,ep,ev,re,r,rp,c)
+	local g=e:GetLabelObject()
+	if not g then return end
+	c:SetMaterial(g)
+	--The monster used as material for this card's Time Leap Summon is returned to the hand instead of being banished.
 	Duel.SendtoHand(g,REASON_MATERIAL+REASON_TIMELEAP)
 	aux.TimeleapHOPT(tp)
 end

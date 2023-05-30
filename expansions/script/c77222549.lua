@@ -47,7 +47,7 @@ end
 function s.tlfilter(c)
 	local tp=c:GetControler()
 	return c:IsFaceup() and ((c:IsLevel(8) and c:IsAttribute(ATTRIBUTE_LIGHT) and Duel.GetFlagEffect(tp,EFFECT_EXTRA_TIMELEAP_MATERIAL)<=0) or c:IsCode(177222522))
-		and c:IsAbleToDeck() and c:IsCanBeTimeleapMaterial() --and Duel.GetLocationCountFromEx(tp,tp,c,TYPE_TIMELEAP)>0
+		and c:IsAbleToDeck() --and c:IsCanBeTimeleapMaterial() and Duel.GetLocationCountFromEx(tp,tp,c,TYPE_TIMELEAP)>0
 end
 function s.sumtg(e,tp,eg,ep,ev,re,r,rp,chk,c)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)

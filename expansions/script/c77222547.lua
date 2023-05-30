@@ -22,7 +22,7 @@ function s.initial_effect(c)
 	e2:SetValue(s.repval)
 	e2:SetOperation(s.repop)
 	c:RegisterEffect(e2)
-	Duel.AddCustomActivityCounter(id,ACTIVITY_CHAIN,s.chainfilter)
+	Duel.AddCustomActivityCounter(id,ACTIVITY_CHAIN,aux.FilterBoolFunction(aux.NOT(Effect.IsActiveType),TYPE_MONSTER))
 end
 function s.filter(c)
 	return c:IsFaceup() and c:IsType(TYPE_TIMELEAP) and c:IsAbleToExtra()
@@ -45,7 +45,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp)
 		if #g>0 then
-			if Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)>0 and not Duel.GetCustomActivityCount(id,1-tp,ACTIVITY_CHAIN)~=0 then
+			if Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)>0 and Duel.GetCustomActivityCount(id,1-tp,ACTIVITY_CHAIN)==0 then
 				Duel.BreakEffect()
 				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 				local g=Duel.SelectMatchingCard(tp,Card.IsAbleToDeck,tp,LOCATION_HAND+LOCATION_ONFIELD,0,1,1,c)
@@ -73,7 +73,4 @@ function s.repval(e,c)
 end
 function s.repop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SendtoDeck(e:GetHandler(),nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
-end
-function s.chainfilter(re,tp,cid)
-	return not re:IsActiveType(TYPE_MONSTER)
 end
