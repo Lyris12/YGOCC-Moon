@@ -36,6 +36,7 @@ function s.initial_effect(c)
 	e1:SetCode(EFFECT_SPSUMMON_PROC)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetRange(LOCATION_HAND+LOCATION_GRAVE)
+	e1:SetCountLimit(1,id+100)
 	e1:SetCondition(s.sprcon)
 	e1:SetTarget(s.sprtg)
 	e1:SetOperation(s.sprop)
@@ -156,7 +157,7 @@ function s.tgfilter(c,e,tp,eg,ep,ev,re,r,rp)
 	return c:IsAbleToGrave() and Duel.IsExistingMatchingCard(s.opfilter,tp,LOCATION_DECK,0,1,c,e,tp,eg,ep,ev,re,r,rp)
 end
 function s.opfilter(c,e,tp,eg,ep,ev,re,r,rp)
-	return c:IsSetCard(0x9b5) and (c:IsAbleToHand() or (c:IsMonster(TYPE_PANDEMONIUM) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and c:IsPandemoniumActivatable(tp,tp,true,false,false,false,eg,ep,ev,re,r,rp))) 
+	return c:IsSetCard(0x9b5) and (c:IsAbleToHand() or (c:IsMonster(TYPE_PANDEMONIUM) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and c:IsPandemoniumActivatable(tp,tp,true,false,false,false,eg,ep,ev,re,r,rp))) and not c:IsCode(20181418) 
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
