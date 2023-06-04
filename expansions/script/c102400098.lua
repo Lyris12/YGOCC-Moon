@@ -2,6 +2,7 @@
 --機光襲雷竜－ソールスティス
 local s,id,o=GetID()
 function s.initial_effect(c)
+	--If a "Blitzkrieg" monster(s) is destroyed: You can add 1 "Blitzkrieg" Pendulum Monster from your Deck to your Extra Deck face-up. You can only use each effect of "Blitzkrieg Meklight Dragon - Soulstice" once per turn. "Blitzkrieg Meklight - Dawn" + "Blitzkrieg Dragon - Sun" (Quick Effect): You can target 1 "Blitzkrieg" card you control; destroy it, and if you do, add 1 "Lyris Force" Spell from your Deck to your hand. If this card in a Monster Zone is destroyed: You can place it in your Pendulum Zone. You can only use each effect of "Blitzkrieg Meklight Dragon - Soulstice" once per turn.
 	local tp=c:GetControler()
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)

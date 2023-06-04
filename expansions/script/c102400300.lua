@@ -2,6 +2,7 @@
 --終わりの存在者
 local s,id,o=GetID()
 function s.initial_effect(c)
+	--If there are at least 5 banished DARK monsters, you can Special Summoned this card (from your hand). When your opponent activates a card or effect (Quick Effect): You can banish 1 DARK monster from your hand; negate the activation, and if you do, banish it. During your Main Phase, if this card is in your GY: You can shuffle as many of your banished cards into the Deck as possible; banish this card face-down, and if you do, draw 1 card. You can only use each effect of "The Being of the End" once per turn.
 	local tp=c:GetControler()
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)

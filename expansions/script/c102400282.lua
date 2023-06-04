@@ -1,6 +1,5 @@
 --created by Lyris, coded by Discord \ XGlitchy30
 --半物質のディヴァイナ
-
 local s,id,o=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
@@ -38,7 +37,6 @@ function s.attop(e,tp,eg,ep,ev,re,r,rp)
 		c:RegisterEffect(e1)
 	end
 end
-
 function s.rmfilter(c,tp)
 	return c:IsFaceup() and c:IsAbleToRemove() and Duel.IsExistingMatchingCard(s.matchfilter,tp,LOCATION_MZONE,0,1,c,c:GetAttribute())
 end

@@ -2,6 +2,7 @@
 --リージル・ネールラス
 local s,id,o=GetID()
 function s.initial_effect(c)
+	--You can Special Summon this card (from your hand) to your opponent's field in Attack Position by banishing 2 monsters from their GY, then shift control to this card's owner during the End Phase. If this card is Normal or Special Summoned: Monsters its owner's opponent controls lose 500 ATK/DEF for each "Rigil" monster they control, also, if this card was Summoned using its own procedure, your opponent's current face-up cards are unaffected by your Trap effects until the end of the next turn. You can only use this effect of "Rigil Nayrulas" once per turn.
 	local tp=c:GetControler()
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)

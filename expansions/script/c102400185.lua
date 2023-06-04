@@ -2,6 +2,7 @@
 --フェイトヒーロー・アンドロウツォン
 local s,id,o=GetID()
 function s.initial_effect(c)
+	--If this card is Normal or Special Summoned (except during the Damage Step): You can Fusion Summon 1 "Fated Hero" Fusion Monster from your Extra Deck, using monsters from your hand or field as Fusion Material, including this card. You can only use this effect of "Fated Hero Androutson" once per turn. Once per turn, during your Main Phase: You can increase this card's Level by 1, and if you do, if this card's Level becomes 5 or higher, immediately after this effect resolves, Normal Summon 1 "Fated Hero" monster.
 	local tp=c:GetControler()
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)

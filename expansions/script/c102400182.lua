@@ -2,6 +2,7 @@
 --フェイトヒーロー・ボウボウリナ
 local s,id,o=GetID()
 function s.initial_effect(c)
+	--If you control a "Fated Hero" monster, you can Special Summon this card (from your hand). You can only Special Summon "Fated Heroine Bouboulina" once per turn this way. Once per turn, during the End Phase, if this card is in the GY because it was used as Fusion Material and sent there this turn: You can Special Summon 1 "Fated Hero" monster from your hand, except "Fated Heroine Bouboulina".
 	local tp=c:GetControler()
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)

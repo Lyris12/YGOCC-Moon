@@ -2,6 +2,7 @@
 --ザ☆機光襲雷
 local s,id,o=GetID()
 function s.initial_effect(c)
+	--Each time a Monster Card(s) is destroyed, decrease this card's Energy by 1 for each destroyed card. (Quick Effect): You can increase this card's Energy by 1, then target 1 "Blitzkrieg" Monster Card you control; Take 1 "Blitzkrieg" monster in your Deck or face-up Extra Deck, and either place it in your Pendulum Zone or Special Summon it, then destroy that target. You can only use this effect of "The Blitzkrieg Meklight" once per turn. If your opponent declares an attack that targets this card, destroy this card. After this card is Special Summoned, your "Blitzkrieg" cards cannot be destroyed by your opponent's card effects for the rest of that turn, except Monster Cards.
 	local tp=c:GetControler()
 	local ef=Effect.CreateEffect(c)
 	ef:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)

@@ -1,4 +1,4 @@
---created by Lyris, art by Ray-V-Xyz of DeviantArt
+--created & coded by Lyris, art by Ray-V-Xyz of DeviantArt
 --サイバー・ダーク・リーセプター
 local s,id,o=GetID()
 function s.initial_effect(c)

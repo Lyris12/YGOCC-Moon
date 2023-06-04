@@ -2,6 +2,7 @@
 --半物質の腐敗
 local s,id,o=GetID()
 function s.initial_effect(c)
+	--Target up to 5 of your banished "Antemattr" monsters; return them to the GY, then if you targeted 3 or more monsters, you can add 1 "Antemattr" monster from your Deck to your hand, also, banish 1 "Antemattr" monster from your Extra Deck after that, plus an additional "Antemattr" monster if you targeted 5 monsters.
 	local tp=c:GetControler()
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)

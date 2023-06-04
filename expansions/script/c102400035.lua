@@ -1,4 +1,4 @@
---created by Lyris, art by 塵埃路こまき of Pixiv
+--created & coded by Lyris, art by 塵埃路こまき of Pixiv
 --天威の龍人霊
 local s,id,o=GetID()
 function s.initial_effect(c)

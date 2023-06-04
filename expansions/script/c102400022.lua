@@ -2,6 +2,7 @@
 --Happy Hadoken
 local s,id,o=GetID()
 function s.initial_effect(c)
+	--If you have an even number of cards in your Deck (Quick Effect): You can place 1 other card from your hand on the top of the Deck; excavate 3 cards from the bottom of your Deck, add 1 excavated "Hadoken" card to your hand, except "Happy Hadoken", also, shuffle the other excavated cards into the Deck, then Special Summon this card from your hand or GY, but place it on the bottom of the Deck if it leaves the field. Once per turn: You can excavate 3 cards from the bottom of your Deck, and if you do,  place the excavated cards on the top of the Deck in the same order.
 	local tp=c:GetControler()
 	local ef=Effect.CreateEffect(c)
 	ef:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)

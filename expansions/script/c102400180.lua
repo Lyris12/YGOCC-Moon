@@ -2,6 +2,7 @@
 --フェイトヒーロー・ミアオーリス
 local s,id,o=GetID()
 function s.initial_effect(c)
+	--If this card is Normal or Special Summoned: You can send 1 "Fated Hero" monster from your Deck to the GY, except "Fated Hero Miaoulis". Once per turn, during your Main Phase: You can increase this card's Level by 1, and if you do, if this card's Level becomes 5 or higher, Fusion Summon 1 "Fated Hero" monster from your Extra Deck, using monsters you control as Fusion Materials, including this card.
 	local tp=c:GetControler()
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)

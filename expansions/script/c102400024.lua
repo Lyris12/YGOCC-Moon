@@ -2,6 +2,7 @@
 --Synth Hadoken
 local s,id,o=GetID()
 function s.initial_effect(c)
+	--If you have an even number of cards in your Deck (Quick Effect): You can place 1 other "Hadoken" card from your GY or that is banished on the bottom of your Deck; Spatial Summon 1 Spatial Monster from your Extra Deck, using "Hadoken" monsters in your hand or Deck. Once per turn: You can excavate cards from the bottom of your Deck until you excavate a "Hadoken" card, add that card to your hand, also, place the other excavated cards on top of your Deck in the same order.
 	local tp=c:GetControler()
 	local ef=Effect.CreateEffect(c)
 	ef:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)

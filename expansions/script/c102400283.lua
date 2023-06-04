@@ -2,6 +2,7 @@
 --半物質のリッチ
 local s,id,o=GetID()
 function s.initial_effect(c)
+	--You can Special Summon this card (from your hand) by returning 1 of your banished "Antemattr" monsters to the Deck or Extra Deck. During your Main Phase: You can banish both 1 of your Spatial Monsters and 1 Spell/Trap your opponent controls. You can only use this effect of "Antemattr Lich" once per turn.
 	local tp=c:GetControler()
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)

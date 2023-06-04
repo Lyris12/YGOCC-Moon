@@ -2,6 +2,7 @@
 --Seeker Hadoken
 local s,id,o=GetID()
 function s.initial_effect(c)
+	--If you have an even number of cards in your Deck (Quick Effect): You can place 1 other "Hadoken" card from your GY or that is banished on the bottom of the Deck; all your current "Hadoken" monsters gain 500 ATK/DEF, then Special Summon this card from your hand or GY, but place it on the bottom of the Deck if it leaves the field. Once per turn: You can excavate 3 cards from the bottom of your Deck, and if you do, Special Summon 1 excavated "Hadoken" monster, except "Seeker Hadoken", also place the rest on the top of your Deck in the same order.
 	local tp=c:GetControler()
 	local ef=Effect.CreateEffect(c)
 	ef:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)

@@ -2,6 +2,7 @@
 --半物質のエクスプローラ
 local s,id,o=GetID()
 function s.initial_effect(c)
+	--If this card is Normal or Special Summoned: You can add 1 "Antemattr" monster from your Deck to your hand, except "Antemattr Explorr". You can only use this effect of "Antemattr Explorr" once per turn. Once per turn: You can reveal 1 "Antemattr" monster in your hand; until the end of this turn, the ATK/DEF of this card become the same as that revealed monster's, but it cannot attack.
 	local tp=c:GetControler()
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)

@@ -1,6 +1,5 @@
 --created by Lyris, coded by Discord \ XGlitchy30
 --半物質のパンサ
-
 local s,id,o=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
@@ -42,7 +41,6 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
 		Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_COST)
 	end
 end
-
 function s.rmfilter(c,atk)
 	return c:IsFaceup() and c:IsAbleToRemove() and c:GetAttack()<atk
 end

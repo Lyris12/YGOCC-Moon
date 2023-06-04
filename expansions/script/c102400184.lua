@@ -2,6 +2,7 @@
 --フェイトヒーロー・カライスコ
 local s,id,o=GetID()
 function s.initial_effect(c)
+	--2 LIGHT Warrior monsters The total Levels of this card's Fusion Materials must equal 6 or more. Once per battle, during damage calculation, if this card battles an opponent's monster (Quick Effect): You can halve the ATK of that opponent's monster, during that damage calculation only. Once per turn, if this card was Fusion Summoned using monsters whose combined Level equals 10 or more: You can inflict 800 damage to your opponent.
 	local tp=c:GetControler()
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)

@@ -86,7 +86,6 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e1)
 	end
 end
-
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local ec=eg:GetFirst()
 	return #eg==1 and ec:IsFaceup() and ec:IsSetCard(0x96b,0x700) and ec:IsSummonType(SUMMON_TYPE_LINK) and ec:GetSummonPlayer()==tp
@@ -155,7 +154,6 @@ function s.spop2(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(sc,0,tp,sump,false,false,POS_FACEUP_DEFENSE,sel_zone)
 	end
 end
-
 function s.pzcon(e,tp,eg,ep,ev,re,r,rp)
 	local rc=e:GetHandler():GetReasonCard()
 	return r&REASON_LINK>0 and rc and rc:IsFaceup() and rc:IsType(TYPE_LINK) and rc:IsSetCard(0x96b,0x700)

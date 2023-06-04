@@ -2,6 +2,7 @@
 --半物質のシード
 local s,id,o=GetID()
 function s.initial_effect(c)
+	--You can banish this card from your hand; shuffle up to 3 "Antemattr" monsters from your GY and/or that are banished into the Deck, except "Antemattr Seed", then draw 1 card. If this card is banished: You can change all your opponent's monsters to face-down Defense Position, also, you can change the Space of 1 of your Spatial Monsters after that. You can only use each effect of "Antemattr Seed" once per turn.
 	local tp=c:GetControler()
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)

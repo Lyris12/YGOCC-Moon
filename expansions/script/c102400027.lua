@@ -2,6 +2,7 @@
 --Undying Hadoken (Altered)
 local s,id,o=GetID()
 function s.initial_effect(c)
+	--2 LIGHT monsters Once per turn: You can Special Summon 1 "Hadoken" monster from your Deck, then place 1 card from your hand or field on the bottom of your Deck, except "Undying Hadoken" or the Summoned monster. Once per turn: You can excavate 6 cards from the bottom of your Deck, and if you do, Special Summon 1 excavated "Hadoken" monster, also place the rest on top of your Deck in the same order.
 	local tp=c:GetControler()
 	local ef=Effect.CreateEffect(c)
 	ef:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)

@@ -2,6 +2,7 @@
 --半物質のヴォイド
 local s,id,o=GetID()
 function s.initial_effect(c)
+	--While your opponent controls more monsters than you do, you can use 1 of those monsters as Space Material, as if you controlled it. You can only Special Summon from the Extra Deck once during the turn you use this effect. You can banish 1 card from your hand; add 1 "Antemattr" card with a different name from your Deck to your hand, except "Antemattr Void". You can only use this effect of "Antemattr Void" once per turn.
 	local tp=c:GetControler()
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)

@@ -67,7 +67,6 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-
 function s.confilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x96b,0xa5e) and c:GetSummonLocation()&LOCATION_EXTRA>0 and c:IsStatus(STATUS_SPSUMMON_TURN)
 end
