@@ -32,7 +32,7 @@ function s.stg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.sop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_OPERATECARD)
-	local tc=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.filter),tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil):GetFirst()
+	local tc=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.filter),tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil,e,tp):GetFirst()
 	if not tc then return end
 	if tc:IsLocation(LOCATION_DECK) then
 		if Duel.SendtoHand(tc,nil,REASON_EFFECT)==0 then return end
