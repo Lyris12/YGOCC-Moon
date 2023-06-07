@@ -26,7 +26,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function s.splim(e,se,sp,st)
-	return not e:GetHandler:IsLocation(LOCATION_EXTRA)
+	return not e:GetHandler():IsLocation(LOCATION_EXTRA)
 end
 function s.sprop(c)
 	return  function(g)
