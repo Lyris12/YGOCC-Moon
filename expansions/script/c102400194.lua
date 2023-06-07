@@ -21,7 +21,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function s.filter(c,e,tp)
-	if not c:IsRace(RACE_MACHINE) then return false end
+	if not (c:IsAttribute(ATTRIBUTE_DARK+ATTRIBUTE_LIGHT) and c:IsRace(RACE_MACHINE)) then return false end
 	if c:IsLocation(LOCATION_GRAVE) then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 	else return c:IsAbleToHand() end
