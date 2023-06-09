@@ -207,7 +207,7 @@ function Auxiliary.RegisterPreviousCustomSetCard(e,tp,eg,ep,ev,re,r,rp)
 end
 ---------------------------------------------------------------------------------
 -------------------------------DELAYED EVENT-------------------------------------
-function Auxiliary.RegisterMergedDelayedEventGlitchy(c,code,event,f,flag,range,evgcheck,check_if_already_in_location)
+function Auxiliary.RegisterMergedDelayedEventGlitchy(c,code,event,f,flag,range,evgcheck,check_if_already_in_location,operation)
 	if type(event)~="table" then event={event} end
 	if not f then f=aux.TRUE end
 	if not flag then flag=c:GetOriginalCode() end
@@ -227,7 +227,7 @@ function Auxiliary.RegisterMergedDelayedEventGlitchy(c,code,event,f,flag,range,e
 		local ge1
 		for _,ev in ipairs(event) do
 			ge1=Effect.CreateEffect(c)
-			ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+			ge1:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
 			ge1:SetCode(ev)
 			ge1:SetRange(range)
 			ge1:SetLabel(code)
@@ -236,38 +236,41 @@ function Auxiliary.RegisterMergedDelayedEventGlitchy(c,code,event,f,flag,range,e
 			else
 				ge1:SetLabelObject(se)
 			end
-			ge1:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy1(flag,f,range,evgcheck,se))
+			ge1:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy1(ev,flag,f,range,evgcheck,se,operation))
 			Duel.RegisterEffect(ge1,0)
 		end
 		local ge2=ge1:Clone()
 		ge2:SetCode(EVENT_CHAIN_END)
-		ge2:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy2(flag,range,evgcheck,se))
+		ge2:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy2(flag,range,evgcheck,se,operation))
 		Duel.RegisterEffect(ge2,0)
 	else
 		local mt=getmetatable(c)
-		if mt[event]==true then return end
-		mt[event]=true
 		local ge1
 		for _,ev in ipairs(event) do
-			local ge1=Effect.CreateEffect(c)
-			ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-			ge1:SetCode(ev)
-			ge1:SetLabel(code)
-			if se==nil then
-				ge1:SetLabelObject(g)
-			else
-				ge1:SetLabelObject(se)
+			if mt[ev]~=true then
+				mt[ev]=true
+				ge1=Effect.CreateEffect(c)
+				ge1:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
+				ge1:SetCode(ev)
+				ge1:SetLabel(code)
+				if se==nil then
+					ge1:SetLabelObject(g)
+				else
+					ge1:SetLabelObject(se)
+				end
+				ge1:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy1(ev,flag,f,nil,evgcheck,se,operation))
+				Duel.RegisterEffect(ge1,0)
 			end
-			ge1:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy1(flag,f,nil,evgcheck,se))
-			Duel.RegisterEffect(ge1,0)
 		end
-		local ge2=ge1:Clone()
-		ge2:SetCode(EVENT_CHAIN_END)
-		ge2:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy2(flag,nil,evgcheck,se))
-		Duel.RegisterEffect(ge2,0)
+		if ge1 then
+			local ge2=ge1:Clone()
+			ge2:SetCode(EVENT_CHAIN_END)
+			ge2:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy2(flag,nil,evgcheck,se,operation))
+			Duel.RegisterEffect(ge2,0)
+		end
 	end
 end
-function Auxiliary.MergedDelayEventCheckGlitchy1(id,f,range,evgcheck,se)
+function Auxiliary.MergedDelayEventCheckGlitchy1(event,id,f,range,evgcheck,se,operation)
 	return	function(e,tp,eg,ep,ev,re,r,rp)
 				local c=e:GetOwner()
 				if range then
@@ -290,36 +293,58 @@ function Auxiliary.MergedDelayEventCheckGlitchy1(id,f,range,evgcheck,se)
 					g=e:GetLabelObject():GetLabelObject()
 				end
 				if aux.GetValueType(g)~="Group" then return end
-				local evg=eg:Filter(f,nil,e,tp,eg,ep,ev,re,r,rp,se)
+				local evg=eg:Filter(f,nil,e,tp,eg,ep,ev,re,r,rp,se,event)
 				--Debug.Message(#evg)
+				local flagID=id
+				if type(id)=="function" then
+					flagID=id(event)
+				end
 				for tc in aux.Next(evg) do
-					tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET,EFFECT_FLAG_SET_AVAILABLE,1,label)
+					tc:RegisterFlagEffect(flagID,RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET,EFFECT_FLAG_SET_AVAILABLE,1,label)
 					if engage_label~=0 then
-						tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET,EFFECT_FLAG_SET_AVAILABLE,1,engage_label)
+						tc:RegisterFlagEffect(flagID,RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET,EFFECT_FLAG_SET_AVAILABLE,1,engage_label)
 					end
 				end
 				g:Merge(evg)
 				--Debug.Message('gsize '..tostring(#g))
 				if Duel.GetCurrentChain()==0 and not Duel.CheckEvent(EVENT_CHAIN_END) then
-					local _eg=g:Clone()
-					_eg=_eg:Filter(Card.HasFlagEffectLabel,nil,id,label)
-					if engage_label~=0 then
-						_eg=_eg:Filter(Card.HasFlagEffectLabel,nil,id,engage_label)
+					--Debug.Message('nochain')
+					local flags
+					if type(id)=="function" then
+						flags={id()}
+					else
+						flags={id}
 					end
-					if #_eg>0 then
-						for tc in aux.Next(_eg) do
-							tc:ResetFlagEffect(id)
+					local G=Group.CreateGroup()
+					for _,cid in ipairs(flags) do
+						local _eg=g:Clone()
+						_eg=_eg:Filter(Card.HasFlagEffectLabel,nil,cid,label)
+						if engage_label~=0 then
+							_eg=_eg:Filter(Card.HasFlagEffectLabel,nil,cid,engage_label)
 						end
-						if not evgcheck or evgcheck(_eg,e,tp,ep,ev,re,r,rp) then
+						--Debug.Message("NOCHAIN_FILTERED_COUNT "..tostring(cid)..": "..tostring(#_eg))
+						G:Merge(_eg)
+					end
+					if #G>0 then
+						if not evgcheck or evgcheck(G,e,tp,ep,ev,re,r,rp) then
 							--Debug.Message('a')
-							Duel.RaiseEvent(_eg,EVENT_CUSTOM+e:GetLabel(),re,r,rp,ep,ev)
+							local customev=ev
+							if operation then
+								customev=operation(e,tp,G,ep,ev,re,r,rp,se,event)
+							end
+							Duel.RaiseEvent(G,EVENT_CUSTOM+e:GetLabel(),re,r,rp,ep,customev)
+						end
+						for tc in aux.Next(G) do
+							for _,cid in ipairs(flags) do
+								tc:ResetFlagEffect(cid)
+							end
 						end
 					end
 					g:Clear()
 				end
 			end
 end
-function Auxiliary.MergedDelayEventCheckGlitchy2(id,range,evgcheck,se)
+function Auxiliary.MergedDelayEventCheckGlitchy2(id,range,evgcheck,se,operation)
 	return	function(e,tp,eg,ep,ev,re,r,rp)
 				local c=e:GetOwner()
 				if range then					
@@ -344,20 +369,38 @@ function Auxiliary.MergedDelayEventCheckGlitchy2(id,range,evgcheck,se)
 				if aux.GetValueType(g)~="Group" then return end
 				--Debug.Message('test')
 				if #g>0 then
-					local _eg=g:Clone()
-					_eg=_eg:Filter(Card.HasFlagEffectLabel,nil,id,label)
-					--Debug.Message(#_eg)
-					if engage_label~=0 then
-						_eg=_eg:Filter(Card.HasFlagEffectLabel,nil,id,engage_label)
-						Debug.Message(#_eg)
+					local flags
+					if type(id)=="function" then
+						flags={id()}
+					else
+						flags={id}
 					end
-					if #_eg>0 then
-						for tc in aux.Next(_eg) do
-							tc:ResetFlagEffect(id)
+					local G=Group.CreateGroup()
+					for _,cid in ipairs(flags) do
+						local _eg=g:Clone()
+						--Debug.Message("FLAG: "..tostring(cid))
+						_eg=_eg:Filter(Card.HasFlagEffectLabel,nil,cid,label)
+						--Debug.Message("FILTERED GROUP COUNT: "..tostring(#_eg))
+						if engage_label~=0 then
+							_eg=_eg:Filter(Card.HasFlagEffectLabel,nil,cid,engage_label)
+							Debug.Message(#_eg)
 						end
+						G:Merge(_eg)
+					end
+					if #G>0 then
 						--Debug.Message('b')
-						if not evgcheck or evgcheck(_eg,e,tp,ep,ev,re,r,rp) then
-							Duel.RaiseEvent(_eg,EVENT_CUSTOM+e:GetLabel(),re,r,rp,ep,ev)
+						if not evgcheck or evgcheck(G,e,tp,ep,ev,re,r,rp) then
+							local customev=ev
+							if operation then
+								customev=operation(e,tp,G,ep,ev,re,r,rp,se)
+							end
+							Duel.RaiseEvent(G,EVENT_CUSTOM+e:GetLabel(),re,r,rp,ep,customev)
+						end
+						for tc in aux.Next(G) do
+							for _,cid in ipairs(flags) do
+								--Debug.Message("RESETTED: "..tostring(cid))
+								tc:ResetFlagEffect(cid)
+							end
 						end
 					end
 					g:Clear()
@@ -1977,288 +2020,349 @@ Auxiliary.XyzLevelFreeGoal = function(g,tp,xyzc,gf)
 end
 
 -------------------------------LINKS-----------------------------------
-function Auxiliary.ExtraLinkFilter0(c,ce,tg,lc)
-	return c:IsCanBeLinkMaterial(lc) and tg(ce,c)
-end
 
-local _LinkCondition, _LinkTarget, _LinkOperation, _LCheckGoal =
-Auxiliary.LinkCondition, Auxiliary.LinkTarget, Auxiliary.LinkOperation, Auxiliary.LCheckGoal
+local _LExtraFilter,_LCheckGoal,_GetLinkCount = aux.LExtraFilter,aux.LCheckGoal,aux.GetLinkCount
 
-Auxiliary.LinkCondition = function(f,minc,maxc,gf)
-	return	function(e,c,og,lmat,min,max)
-				if c==nil then return true end
-				if c:IsType(TYPE_PENDULUM) and c:IsFaceup() then return false end
-				local minc=minc
-				local maxc=maxc
-				if min then
-					if min>minc then minc=min end
-					if max<maxc then maxc=max end
-					if minc>maxc then return false end
-				end
-				local tp=c:GetControler()
-				local mg=nil
-				if og then
-					mg=og:Filter(Auxiliary.LConditionFilter,nil,f,c,e)
-				else
-					mg=Auxiliary.GetLinkMaterials(tp,f,c,e)
-				end
-				if lmat~=nil then
-					if not Auxiliary.LConditionFilter(lmat,f,c,e) then return false end
-					mg:AddCard(lmat)
-				end
-				local fg=Duel.GetMustMaterial(tp,EFFECT_MUST_BE_LMATERIAL)
-				if fg:IsExists(Auxiliary.MustMaterialCounterFilter,1,nil,mg) then return false end
-				Duel.SetSelectedCard(fg)
-				
-				if Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_LINK_MATERIAL) then
-					local egroup={Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_LINK_MATERIAL)}
-					local all_mats=Group.CreateGroup()
-					for _,ce in ipairs(egroup) do
-						if ce and ce.GetLabel then
-							local id=ce:GetLabel()
-							local chk_lnk=ce:GetValue()
-							if aux.GetValueType(chk_lnk)=="function" then
-								chk_lnk=chk_lnk(ce,c,mg,nil,tp)
-							end
-							if chk_lnk then
-								local mats=Duel.GetMatchingGroup(aux.ExtraLinkFilter0,tp,0xff,0xff,nil,ce,ce:GetTarget(),c)
-								if #mats>0 then
-									for ec1 in aux.Next(mats) do
-										if not mg:IsContains(ec1) then
-											if ec1:GetFlagEffect(1006)<=0 then
-												ec1:RegisterFlagEffect(1006,RESET_CHAIN,0,1)
-											end
-											local flag=Effect.CreateEffect(ce:GetHandler())
-											flag:SetType(EFFECT_TYPE_SINGLE)
-											flag:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-											flag:SetCode(EFFECT_GLITCHY_EXTRA_MATERIAL_FLAG)
-											flag:SetValue(id)
-											flag:SetReset(RESET_CHAIN)
-											ec1:RegisterEffect(flag)
-										end
-									end
-									all_mats:Merge(mats)
-								end
-							end
-						end
-					end
-					all_mats:Merge(mg)
-					local res=all_mats:CheckSubGroup(Auxiliary.LCheckGoal,minc,maxc,tp,c,gf,lmat)
-					for ec2 in aux.Next(all_mats) do
-						if ec2:GetFlagEffect(1006)>0 then
-							ec2:ResetFlagEffect(1006)
-						end
-						for _,flag in ipairs({ec2:IsHasEffect(EFFECT_GLITCHY_EXTRA_MATERIAL_FLAG)}) do
-							if flag and flag.GetLabel then
-								flag:Reset()
-							end
-						end
-					end
-					return res
-				else			
-					return mg:CheckSubGroup(Auxiliary.LCheckGoal,minc,maxc,tp,c,gf,lmat)
-				end
-			end
-end
-
-Auxiliary.LinkTarget = function(f,minc,maxc,gf)
-	return	function(e,tp,eg,ep,ev,re,r,rp,chk,c,og,lmat,min,max)
-				local minc=minc
-				local maxc=maxc
-				if min then
-					if min>minc then minc=min end
-					if max<maxc then maxc=max end
-					if minc>maxc then return false end
-				end
-				local mg=nil
-				if og then
-					mg=og:Filter(Auxiliary.LConditionFilter,nil,f,c,e)
-				else
-					mg=Auxiliary.GetLinkMaterials(tp,f,c,e)
-				end
-				if lmat~=nil then
-					if not Auxiliary.LConditionFilter(lmat,f,c,e) then return false end
-					mg:AddCard(lmat)
-				end
-				local fg=Duel.GetMustMaterial(tp,EFFECT_MUST_BE_LMATERIAL)
-				Duel.SetSelectedCard(fg)
-				
-				if not Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_LINK_MATERIAL) then
-					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_LMATERIAL)
-					local cancel=Duel.IsSummonCancelable()
-					local sg=mg:SelectSubGroup(tp,Auxiliary.LCheckGoal,cancel,minc,maxc,tp,c,gf,lmat)
-					if sg then
-						sg:KeepAlive()
-						e:SetLabelObject(sg)
-						return true
-					else
-						return false
-					end
-				else
-					local egroup={Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_LINK_MATERIAL)}
-					local all_mats=Group.CreateGroup()
-					for _,ce in ipairs(egroup) do
-						if ce and ce.GetLabel then
-							local id=ce:GetLabel()
-							local chk_lnk=ce:GetValue()
-							if aux.GetValueType(chk_lnk)=="function" then
-								chk_lnk=chk_lnk(ce,c,mg,nil,tp)
-							end
-							if chk_lnk then
-								local mats=Duel.GetMatchingGroup(aux.ExtraLinkFilter0,tp,0xff,0xff,nil,ce,ce:GetTarget(),c)
-								if #mats>0 then
-									for ec1 in aux.Next(mats) do
-										if not mg:IsContains(ec1) then
-											if ec1:GetFlagEffect(1006)<=0 then
-												ec1:RegisterFlagEffect(1006,RESET_CHAIN,0,1)
-											end
-											local flag=Effect.CreateEffect(ce:GetHandler())
-											flag:SetType(EFFECT_TYPE_SINGLE)
-											flag:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-											flag:SetCode(EFFECT_GLITCHY_EXTRA_MATERIAL_FLAG)
-											flag:SetValue(id)
-											flag:SetReset(RESET_CHAIN)
-											ec1:RegisterEffect(flag)
-										end
-									end
-									all_mats:Merge(mats)
-								end
-							end
-						end
-					end
-					all_mats:Merge(mg)
-					
-					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_LMATERIAL)
-					local cancel=Duel.IsSummonCancelable()
-					local chosen_mats=all_mats:SelectSubGroup(tp,Auxiliary.LCheckGoal,cancel,minc,maxc,tp,c,gf,lmat)
-					for ec2 in aux.Next(all_mats) do
-						if ec2:GetFlagEffect(1006)>0 then
-							ec2:ResetFlagEffect(1006)
-						end
-						for _,flag in ipairs({ec2:IsHasEffect(EFFECT_GLITCHY_EXTRA_MATERIAL_FLAG)}) do
-							if flag and flag.GetLabel then
-								flag:Reset()
-							end
-						end
-					end
-					
-					local extra_mats=Group.CreateGroup()
-					local valid_effs,extra_opt={},{}
-					for mc in aux.Next(chosen_mats) do
-						for _,ce in ipairs(egroup) do
-							if --[[not mg:IsContains(mc) and ]]ce and ce.GetLabel and ce:GetTarget()(ce,mc) then
-								--register card as possible extra material
-								extra_mats:AddCard(mc)
-								mc:RegisterFlagEffect(1006,RESET_CHAIN,0,1)
-								--register description
-								local d=ce:GetDescription()
-								for _,desc in ipairs(extra_opt) do
-									if desc==d then
-										d=false
-										break
-									end
-								end
-								if d then
-									table.insert(extra_opt,d)
-									table.insert(valid_effs,ce)
-								end
-							end
-						end
-					end
-					if #extra_opt>0 and (chosen_mats:IsExists(aux.NOT(aux.IsInGroup),1,nil,mg) or Duel.SelectYesNo(tp,aux.Stringid(1006,0))) then
-						local ecount=0
-						while aux.GetValueType(extra_mats)=="Group" and #extra_mats>0 and #extra_opt>0 and (ecount==0 or chosen_mats:IsExists(aux.PureExtraFilterLoop,1,nil,EFFECT_GLITCHY_EXTRA_LINK_MATERIAL) or Duel.SelectYesNo(tp,aux.Stringid(1006,0))) do
-							local opt=Duel.SelectOption(tp,table.unpack(extra_opt))+1
-							local eff=valid_effs[opt]
-							local _,max=eff:GetValue()(eff,nil)
-							if not max or max==0 then max=#extra_mats end
-							local emats=extra_mats:SelectSubGroup(tp,aux.ExtraMaterialFilterGoal,false,1,max,extra_mats)
-							--local emats=extra_mats:FilterSelect(tp,aux.ExtraMaterialFilterSelect,1,max,nil,eff,eff:GetTarget())
-							if #emats>0 then
-								for tc in aux.Next(emats) do
-									local e1=Effect.CreateEffect(tc)
-									e1:SetType(EFFECT_TYPE_SINGLE)
-									e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_CANNOT_DISABLE)
-									e1:SetCode(EFFECT_GLITCHY_EXTRA_LINK_MATERIAL)
-									e1:SetLabel(ecount)
-									e1:SetOperation(eff:GetOperation())
-									e1:SetReset(RESET_CHAIN)
-									tc:RegisterEffect(e1,true)
-									extra_mats:RemoveCard(tc)
-								end
-							end
-							table.remove(extra_opt,opt)
-							table.remove(valid_effs,opt)
-							ecount=ecount+1
-						end
-					end
-					for ec4 in aux.Next(chosen_mats) do
-						if ec4:GetFlagEffect(1006)>0 and not ec4:IsHasEffect(EFFECT_GLITCHY_EXTRA_LINK_MATERIAL) then
-							ec4:ResetFlagEffect(1006)
-						end
-					end
-					
-					if chosen_mats then
-						chosen_mats:KeepAlive()
-						e:SetLabelObject(chosen_mats)
-						return true
-					else
-						return false
-					end
-				end
-			end
-end
-
-Auxiliary.LinkOperation = function(f,minc,maxc,gf)
-	return	function(e,tp,eg,ep,ev,re,r,rp,c,og,lmat,min,max)
-				local g=e:GetLabelObject()
-				c:SetMaterial(g)
-				Auxiliary.LExtraMaterialCount(g,c,tp)
-				
-				local rg=g:Filter(aux.FilterEqualFunction(Card.GetFlagEffect,0,1006),nil)
-				g:Sub(rg)
-				local opt=0
-				Duel.SendtoGrave(rg,REASON_MATERIAL+REASON_LINK)
-				
-				local ecount=0
-				while #g>0 do
-					local extra_g=Group.CreateGroup()
-					local extra_op=false
-					for tc in aux.Next(g) do
-						local ce=tc:IsHasEffect(EFFECT_GLITCHY_EXTRA_LINK_MATERIAL)
-						if ce and ce.GetLabel then
-							extra_g:AddCard(tc)
-							if not extra_op then
-								extra_op=ce:GetOperation()
-							end
-						end
-					end
-					if #extra_g>0 then
-						g:Sub(extra_g)
-						for tc in aux.Next(extra_g) do
-							tc:ResetFlagEffect(1006)
-						end
-						extra_op(extra_g)
-						extra_g:DeleteGroup()
-					end
-					ecount=ecount+1
-				end
-
-				g:DeleteGroup()
-			end
-end
-
-Auxiliary.LCheckGoal = function(sg,tp,lc,gf,lmat)
-	for _,e in ipairs({Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_LINK_MATERIAL)}) do
-		local id=e:GetLabel()
-		local val=e:GetValue()
-		if val then
-			local _,valmax=val(e,nil)
-			if not (not sg or not sg:IsExists(aux.ExtraMaterialMaxCheck,valmax+1,nil,id)) then
-				return false
-			end
+Auxiliary.LExtraFilter=function(c,f,lc,tp)
+	if not c:IsCanBeLinkMaterial(lc) or f and not f(c) then return false end
+	local le={c:IsHasEffect(EFFECT_EXTRA_LINK_MATERIAL,tp)}
+	for _,te in pairs(le) do
+		if not c:IsOnField() or not c:IsFacedown() or te:IsHasProperty(EFFECT_FLAG_SET_AVAILABLE) then
+			local tf=te:GetValue()
+			local related,valid=tf(te,lc,nil,c,tp)
+			if related then return true end
 		end
 	end
-	return _LCheckGoal(sg,tp,lc,gf,lmat)
+	return false
 end
+Auxiliary.LCheckGoal=function(sg,tp,lc,gf,lmat)
+	if lc:IsHasEffect(EFFECT_AVAILABLE_LMULTIPLE) then
+		return sg:CheckWithSumEqual(Auxiliary.GetLinkCount,lc:GetLink(),#sg,#sg,lc)
+			and Duel.GetLocationCountFromEx(tp,tp,sg,lc)>0 and (not gf or gf(sg,lc,tp))
+			and not sg:IsExists(Auxiliary.LUncompatibilityFilter,1,nil,sg,lc,tp)
+			and (not lmat or sg:IsContains(lmat))
+	else
+		return _LCheckGoal(sg,tp,lc,gf,lmat)
+	end
+end
+function Auxiliary.GetLinkCount(c,lc)
+	if lc then
+		local egroup={lc:IsHasEffect(EFFECT_AVAILABLE_LMULTIPLE)}
+		for k,w in ipairs(egroup) do
+			local lab=w:GetLabel()
+			if c:IsHasEffect(EFFECT_MULTIPLE_LMATERIAL) then
+				local av_val={}
+				local lmat={c:IsHasEffect(EFFECT_MULTIPLE_LMATERIAL)}
+				for _,ec in ipairs(lmat) do
+					if ec:GetLabel()==lab then
+						table.insert(av_val,ec:GetValue())
+					end
+				end
+				for maxval=1,10 do
+					local val=av_val[maxval]
+					av_val[maxval]=nil
+					if c:IsType(TYPE_LINK) and c:GetLink()>1 then
+						return 1+0x10000*val and 1+0x10000*c:GetLink()
+					else
+						return 1+0x10000*val
+					end
+				end
+			elseif c:IsType(TYPE_LINK) and c:GetLink()>1 then
+				return 1+0x10000*c:GetLink()
+			else 
+				return 1
+			end
+		end
+	else
+		return _GetLinkCount(c)
+	end
+end
+
+
+
+
+-- function Auxiliary.ExtraLinkFilter0(c,ce,tg,lc)
+	-- return c:IsCanBeLinkMaterial(lc) and tg(ce,c)
+-- end
+
+-- local _LinkCondition, _LinkTarget, _LinkOperation, _LCheckGoal =
+-- Auxiliary.LinkCondition, Auxiliary.LinkTarget, Auxiliary.LinkOperation, Auxiliary.LCheckGoal
+
+-- Auxiliary.LinkCondition = function(f,minc,maxc,gf)
+	-- return	function(e,c,og,lmat,min,max)
+				-- if c==nil then return true end
+				-- if c:IsType(TYPE_PENDULUM) and c:IsFaceup() then return false end
+				-- local minc=minc
+				-- local maxc=maxc
+				-- if min then
+					-- if min>minc then minc=min end
+					-- if max<maxc then maxc=max end
+					-- if minc>maxc then return false end
+				-- end
+				-- local tp=c:GetControler()
+				-- local mg=nil
+				-- if og then
+					-- mg=og:Filter(Auxiliary.LConditionFilter,nil,f,c,e)
+				-- else
+					-- mg=Auxiliary.GetLinkMaterials(tp,f,c,e)
+				-- end
+				-- if lmat~=nil then
+					-- if not Auxiliary.LConditionFilter(lmat,f,c,e) then return false end
+					-- mg:AddCard(lmat)
+				-- end
+				-- local fg=Duel.GetMustMaterial(tp,EFFECT_MUST_BE_LMATERIAL)
+				-- if fg:IsExists(Auxiliary.MustMaterialCounterFilter,1,nil,mg) then return false end
+				-- Duel.SetSelectedCard(fg)
+				
+				-- if Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_LINK_MATERIAL) then
+					-- local egroup={Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_LINK_MATERIAL)}
+					-- local all_mats=Group.CreateGroup()
+					-- for _,ce in ipairs(egroup) do
+						-- if ce and ce.GetLabel then
+							-- local id=ce:GetLabel()
+							-- local chk_lnk=ce:GetValue()
+							-- if aux.GetValueType(chk_lnk)=="function" then
+								-- chk_lnk=chk_lnk(ce,c,mg,nil,tp)
+							-- end
+							-- if chk_lnk then
+								-- local mats=Duel.GetMatchingGroup(aux.ExtraLinkFilter0,tp,0xff,0xff,nil,ce,ce:GetTarget(),c)
+								-- if #mats>0 then
+									-- for ec1 in aux.Next(mats) do
+										-- if not mg:IsContains(ec1) then
+											-- if ec1:GetFlagEffect(1006)<=0 then
+												-- ec1:RegisterFlagEffect(1006,RESET_CHAIN,0,1)
+											-- end
+											-- local flag=Effect.CreateEffect(ce:GetHandler())
+											-- flag:SetType(EFFECT_TYPE_SINGLE)
+											-- flag:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+											-- flag:SetCode(EFFECT_GLITCHY_EXTRA_MATERIAL_FLAG)
+											-- flag:SetValue(id)
+											-- flag:SetReset(RESET_CHAIN)
+											-- ec1:RegisterEffect(flag)
+										-- end
+									-- end
+									-- all_mats:Merge(mats)
+								-- end
+							-- end
+						-- end
+					-- end
+					-- all_mats:Merge(mg)
+					-- local res=all_mats:CheckSubGroup(Auxiliary.LCheckGoal,minc,maxc,tp,c,gf,lmat)
+					-- for ec2 in aux.Next(all_mats) do
+						-- if ec2:GetFlagEffect(1006)>0 then
+							-- ec2:ResetFlagEffect(1006)
+						-- end
+						-- for _,flag in ipairs({ec2:IsHasEffect(EFFECT_GLITCHY_EXTRA_MATERIAL_FLAG)}) do
+							-- if flag and flag.GetLabel then
+								-- flag:Reset()
+							-- end
+						-- end
+					-- end
+					-- return res
+				-- else			
+					-- return mg:CheckSubGroup(Auxiliary.LCheckGoal,minc,maxc,tp,c,gf,lmat)
+				-- end
+			-- end
+-- end
+
+-- Auxiliary.LinkTarget = function(f,minc,maxc,gf)
+	-- return	function(e,tp,eg,ep,ev,re,r,rp,chk,c,og,lmat,min,max)
+				-- local minc=minc
+				-- local maxc=maxc
+				-- if min then
+					-- if min>minc then minc=min end
+					-- if max<maxc then maxc=max end
+					-- if minc>maxc then return false end
+				-- end
+				-- local mg=nil
+				-- if og then
+					-- mg=og:Filter(Auxiliary.LConditionFilter,nil,f,c,e)
+				-- else
+					-- mg=Auxiliary.GetLinkMaterials(tp,f,c,e)
+				-- end
+				-- if lmat~=nil then
+					-- if not Auxiliary.LConditionFilter(lmat,f,c,e) then return false end
+					-- mg:AddCard(lmat)
+				-- end
+				-- local fg=Duel.GetMustMaterial(tp,EFFECT_MUST_BE_LMATERIAL)
+				-- Duel.SetSelectedCard(fg)
+				
+				-- if not Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_LINK_MATERIAL) then
+					-- Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_LMATERIAL)
+					-- local cancel=Duel.IsSummonCancelable()
+					-- local sg=mg:SelectSubGroup(tp,Auxiliary.LCheckGoal,cancel,minc,maxc,tp,c,gf,lmat)
+					-- if sg then
+						-- sg:KeepAlive()
+						-- e:SetLabelObject(sg)
+						-- return true
+					-- else
+						-- return false
+					-- end
+				-- else
+					-- local egroup={Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_LINK_MATERIAL)}
+					-- local all_mats=Group.CreateGroup()
+					-- for _,ce in ipairs(egroup) do
+						-- if ce and ce.GetLabel then
+							-- local id=ce:GetLabel()
+							-- local chk_lnk=ce:GetValue()
+							-- if aux.GetValueType(chk_lnk)=="function" then
+								-- chk_lnk=chk_lnk(ce,c,mg,nil,tp)
+							-- end
+							-- if chk_lnk then
+								-- local mats=Duel.GetMatchingGroup(aux.ExtraLinkFilter0,tp,0xff,0xff,nil,ce,ce:GetTarget(),c)
+								-- if #mats>0 then
+									-- for ec1 in aux.Next(mats) do
+										-- if not mg:IsContains(ec1) then
+											-- if ec1:GetFlagEffect(1006)<=0 then
+												-- ec1:RegisterFlagEffect(1006,RESET_CHAIN,0,1)
+											-- end
+											-- local flag=Effect.CreateEffect(ce:GetHandler())
+											-- flag:SetType(EFFECT_TYPE_SINGLE)
+											-- flag:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+											-- flag:SetCode(EFFECT_GLITCHY_EXTRA_MATERIAL_FLAG)
+											-- flag:SetValue(id)
+											-- flag:SetReset(RESET_CHAIN)
+											-- ec1:RegisterEffect(flag)
+										-- end
+									-- end
+									-- all_mats:Merge(mats)
+								-- end
+							-- end
+						-- end
+					-- end
+					-- all_mats:Merge(mg)
+					
+					-- Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_LMATERIAL)
+					-- local cancel=Duel.IsSummonCancelable()
+					-- local chosen_mats=all_mats:SelectSubGroup(tp,Auxiliary.LCheckGoal,cancel,minc,maxc,tp,c,gf,lmat)
+					-- for ec2 in aux.Next(all_mats) do
+						-- if ec2:GetFlagEffect(1006)>0 then
+							-- ec2:ResetFlagEffect(1006)
+						-- end
+						-- for _,flag in ipairs({ec2:IsHasEffect(EFFECT_GLITCHY_EXTRA_MATERIAL_FLAG)}) do
+							-- if flag and flag.GetLabel then
+								-- flag:Reset()
+							-- end
+						-- end
+					-- end
+					
+					-- local extra_mats=Group.CreateGroup()
+					-- local valid_effs,extra_opt={},{}
+					-- for mc in aux.Next(chosen_mats) do
+						-- for _,ce in ipairs(egroup) do
+							-- if --[[not mg:IsContains(mc) and ]]ce and ce.GetLabel and ce:GetTarget()(ce,mc) then
+								-- --register card as possible extra material
+								-- extra_mats:AddCard(mc)
+								-- mc:RegisterFlagEffect(1006,RESET_CHAIN,0,1)
+								-- --register description
+								-- local d=ce:GetDescription()
+								-- for _,desc in ipairs(extra_opt) do
+									-- if desc==d then
+										-- d=false
+										-- break
+									-- end
+								-- end
+								-- if d then
+									-- table.insert(extra_opt,d)
+									-- table.insert(valid_effs,ce)
+								-- end
+							-- end
+						-- end
+					-- end
+					-- if #extra_opt>0 and (chosen_mats:IsExists(aux.NOT(aux.IsInGroup),1,nil,mg) or Duel.SelectYesNo(tp,aux.Stringid(1006,0))) then
+						-- local ecount=0
+						-- while aux.GetValueType(extra_mats)=="Group" and #extra_mats>0 and #extra_opt>0 and (ecount==0 or chosen_mats:IsExists(aux.PureExtraFilterLoop,1,nil,EFFECT_GLITCHY_EXTRA_LINK_MATERIAL) or Duel.SelectYesNo(tp,aux.Stringid(1006,0))) do
+							-- local opt=Duel.SelectOption(tp,table.unpack(extra_opt))+1
+							-- local eff=valid_effs[opt]
+							-- local _,max=eff:GetValue()(eff,nil)
+							-- if not max or max==0 then max=#extra_mats end
+							-- local emats=extra_mats:SelectSubGroup(tp,aux.ExtraMaterialFilterGoal,false,1,max,extra_mats)
+							-- --local emats=extra_mats:FilterSelect(tp,aux.ExtraMaterialFilterSelect,1,max,nil,eff,eff:GetTarget())
+							-- if #emats>0 then
+								-- for tc in aux.Next(emats) do
+									-- local e1=Effect.CreateEffect(tc)
+									-- e1:SetType(EFFECT_TYPE_SINGLE)
+									-- e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_CANNOT_DISABLE)
+									-- e1:SetCode(EFFECT_GLITCHY_EXTRA_LINK_MATERIAL)
+									-- e1:SetLabel(ecount)
+									-- e1:SetOperation(eff:GetOperation())
+									-- e1:SetReset(RESET_CHAIN)
+									-- tc:RegisterEffect(e1,true)
+									-- extra_mats:RemoveCard(tc)
+								-- end
+							-- end
+							-- table.remove(extra_opt,opt)
+							-- table.remove(valid_effs,opt)
+							-- ecount=ecount+1
+						-- end
+					-- end
+					-- for ec4 in aux.Next(chosen_mats) do
+						-- if ec4:GetFlagEffect(1006)>0 and not ec4:IsHasEffect(EFFECT_GLITCHY_EXTRA_LINK_MATERIAL) then
+							-- ec4:ResetFlagEffect(1006)
+						-- end
+					-- end
+					
+					-- if chosen_mats then
+						-- chosen_mats:KeepAlive()
+						-- e:SetLabelObject(chosen_mats)
+						-- return true
+					-- else
+						-- return false
+					-- end
+				-- end
+			-- end
+-- end
+
+-- Auxiliary.LinkOperation = function(f,minc,maxc,gf)
+	-- return	function(e,tp,eg,ep,ev,re,r,rp,c,og,lmat,min,max)
+				-- local g=e:GetLabelObject()
+				-- c:SetMaterial(g)
+				-- Auxiliary.LExtraMaterialCount(g,c,tp)
+				
+				-- local rg=g:Filter(aux.FilterEqualFunction(Card.GetFlagEffect,0,1006),nil)
+				-- g:Sub(rg)
+				-- local opt=0
+				-- Duel.SendtoGrave(rg,REASON_MATERIAL+REASON_LINK)
+				
+				-- local ecount=0
+				-- while #g>0 do
+					-- local extra_g=Group.CreateGroup()
+					-- local extra_op=false
+					-- for tc in aux.Next(g) do
+						-- local ce=tc:IsHasEffect(EFFECT_GLITCHY_EXTRA_LINK_MATERIAL)
+						-- if ce and ce.GetLabel then
+							-- extra_g:AddCard(tc)
+							-- if not extra_op then
+								-- extra_op=ce:GetOperation()
+							-- end
+						-- end
+					-- end
+					-- if #extra_g>0 then
+						-- g:Sub(extra_g)
+						-- for tc in aux.Next(extra_g) do
+							-- tc:ResetFlagEffect(1006)
+						-- end
+						-- extra_op(extra_g)
+						-- extra_g:DeleteGroup()
+					-- end
+					-- ecount=ecount+1
+				-- end
+
+				-- g:DeleteGroup()
+			-- end
+-- end
+
+-- Auxiliary.LCheckGoal = function(sg,tp,lc,gf,lmat)
+	-- for _,e in ipairs({Duel.IsPlayerAffectedByEffect(tp,EFFECT_GLITCHY_EXTRA_LINK_MATERIAL)}) do
+		-- local id=e:GetLabel()
+		-- local val=e:GetValue()
+		-- if val then
+			-- local _,valmax=val(e,nil)
+			-- if not (not sg or not sg:IsExists(aux.ExtraMaterialMaxCheck,valmax+1,nil,id)) then
+				-- return false
+			-- end
+		-- end
+	-- end
+	-- return _LCheckGoal(sg,tp,lc,gf,lmat)
+-- end
 

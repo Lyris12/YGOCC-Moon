@@ -201,16 +201,27 @@ function Auxiliary.TransformOperationFunction(side)
 end
 
 --Pre-Transformation Checks
-function Auxiliary.AddPreTransformationCheck(c,e,condition)
-	local ce=Effect.CreateEffect(c)
-	ce:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
-	ce:SetProperty((e:GetProperty()&(~EFFECT_FLAG_DELAY))|EFFECT_FLAG_CANNOT_DISABLE)
-	ce:SetCode(EVENT_PRE_TRANSFORMED)
-	ce:SetRange(e:GetRange())
-	ce:SetOperation(aux.PreTransformationCheckOperation(condition))
-	c:RegisterEffect(ce,true)
-	e:SetLabelObject(ce)
-	return ce
+function Auxiliary.AddPreTransformationCheck(c,e,condition,duel)
+	if not duel then
+		local ce=Effect.CreateEffect(c)
+		ce:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
+		ce:SetProperty((e:GetProperty()&(~EFFECT_FLAG_DELAY))|EFFECT_FLAG_CANNOT_DISABLE)
+		ce:SetCode(EVENT_PRE_TRANSFORMED)
+		ce:SetRange(e:GetRange())
+		ce:SetOperation(aux.PreTransformationCheckOperation(condition))
+		c:RegisterEffect(ce,true)
+		e:SetLabelObject(ce)
+		return ce
+	else
+		local ce=Effect.CreateEffect(c)
+		ce:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
+		ce:SetProperty((e:GetProperty()&(~EFFECT_FLAG_DELAY)))
+		ce:SetCode(EVENT_PRE_TRANSFORMED)
+		ce:SetOperation(aux.PreTransformationCheckOperation(condition))
+		Duel.RegisterEffect(ce,0)
+		e:SetLabelObject(ce)
+		return ce
+	end
 end
 function Auxiliary.PreTransformationCheckOperation(condition)
 	return	function(e,tp,eg,ep,ev,re,r,rp)

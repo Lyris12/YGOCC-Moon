@@ -72,6 +72,7 @@ STRING_INPUT_DICE_ROLL					=	2002
 HINTMSG_ENERGY							=	2100
 HINTMSG_TRANSFORM						=	2101
 HINTMSG_TOEXTRA							=	2102
+HINTMSG_FLIPSUMMON						=	2103
 
 --Locations
 LOCATION_ENGAGED	=	0x1000
@@ -104,6 +105,7 @@ EXTRA_MONSTER_ZONE=0x60
 RESETS_REDIRECT_FIELD 			= 0x047e0000
 RESETS_STANDARD_UNION 			= RESETS_STANDARD&(~(RESET_TOFIELD|RESET_LEAVE))
 RESETS_STANDARD_TOFIELD 		= RESETS_STANDARD&(~(RESET_TOFIELD))
+RESETS_STANDARD_EXC_GRAVE 		= RESETS_STANDARD&~(RESET_LEAVE|RESET_TOGRAVE)
 
 --timings
 RELEVANT_TIMINGS = TIMINGS_CHECK_MONSTER|TIMING_MAIN_END|TIMING_END_PHASE
@@ -132,9 +134,10 @@ LOCATION_GB  = LOCATION_GRAVE|LOCATION_REMOVED
 
 MAX_RATING = 14
 
+REASON_EXCAVATE	= REASON_REVEAL
+
 RESET_TURN_SELF = RESET_SELF_TURN
 RESET_TURN_OPPO = RESET_OPPO_TURN
-RESETS_STANDARD_EXC_GRAVE = RESETS_STANDARD&~(RESET_LEAVE|RESET_TOGRAVE)
 
 --Shortcuts
 function Duel.IsExists(target,f,tp,loc1,loc2,min,exc,...)
@@ -161,6 +164,16 @@ function Duel.HintMessage(tp,msg)
 end
 function Auxiliary.Necro(f)
 	return aux.NecroValleyFilter(f)
+end
+function Card.Activation(c,oath)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	if oath then
+		e1:HOPT(true)
+	end
+	c:RegisterEffect(e1)
+	return e1
 end
 
 --Custom Categories
@@ -316,6 +329,19 @@ function Duel.EquipAndRegisterLimit(p,be_equip,equip_to,...)
 	end
 	return res and equip_to:GetEquipGroup():IsContains(be_equip)
 end
+function Duel.EquipAndRegisterCustomLimit(f,p,be_equip,equip_to,...)
+	local res=Duel.Equip(p,be_equip,equip_to,...)
+	if res and equip_to:GetEquipGroup():IsContains(be_equip) then
+		local e1=Effect.CreateEffect(equip_to)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetProperty(EFFECT_FLAG_OWNER_RELATE)
+		e1:SetCode(EFFECT_EQUIP_LIMIT)
+		e1:SetReset(RESET_EVENT|RESETS_STANDARD)
+		e1:SetValue(f)
+		be_equip:RegisterEffect(e1)
+	end
+	return res and equip_to:GetEquipGroup():IsContains(be_equip)
+end
 
 function Card.Recreate(c,...)
 	local x={...}
@@ -401,6 +427,12 @@ function Duel.Search(g,tp,p)
 	if #cg>0 then
 		Duel.ConfirmCards(1-tp,cg)
 	end
+	return ct,#cg,cg
+end
+function Duel.Bounce(g)
+	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
+	local ct=Duel.SendtoHand(g,nil,REASON_EFFECT)
+	local cg=g:Filter(aux.PLChk,nil,nil,LOCATION_HAND)
 	return ct,#cg,cg
 end
 
@@ -1125,6 +1157,49 @@ function Auxiliary.GetMustMaterialGroup(p,eff)
 	return Duel.GetMustMaterial(p,eff)
 end
 
+--Normal Summon/set
+function Card.IsSummonableOrSettable(c)
+	return c:IsSummonable(true,nil) or c:IsMSetable(true,nil)
+end
+function Duel.SummonOrSet(tp,tc,ignore_limit,min)
+	if not ignore_limit then ignore_limit=true end
+	if tc:IsSummonable(ignore_limit,min) and (not tc:IsMSetable(ignore_limit,min) or Duel.SelectPosition(tp,tc,POS_FACEUP_ATTACK|POS_FACEDOWN_DEFENSE)==POS_FACEUP_ATTACK) then
+		Duel.Summon(tp,tc,ignore_limit,min)
+	else
+		Duel.MSet(tp,tc,ignore_limit,min)
+	end
+end
+
+--Set Monster/Spell/Trap
+function Card.IsCanBeSet(c,e,tp,ignore_mzone,ignore_szone)
+	if c:IsMonster() then
+		return c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEDOWN_DEFENSE) and (not ignore_mzone or Duel.GetMZoneCount(tp)>0)
+	elseif c:IsST() then
+		return c:IsSSetable(ignore_szone)
+	end
+end
+function Duel.Set(tp,g)
+	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
+	local ct=0
+	local mg=g:Filter(Card.IsMonster,nil)
+	if #mg>0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
+		for tc in aux.Next(mg) do
+			if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEDOWN_DEFENSE) then
+				Duel.ConfirmCards(1-tp,tc)
+			end
+		end
+	end
+	local sg=g:Filter(Card.IsST,nil)
+	if #sg>0 then
+		for tc in aux.Next(sg) do
+			if tc:IsType(TYPE_FIELD) or Duel.GetLocationCount(tp,LOCATION_SZONE)>0 then
+				ct=ct+Duel.SSet(tp,tc)
+			end
+		end
+	end
+	ct=ct+Duel.SpecialSummonComplete()
+	return ct
+end
 
 --Once per turn
 function Effect.OPT(e,ct)
@@ -1193,6 +1268,7 @@ end
 
 --PositionChange
 function Card.IsCanTurnSetGlitchy(c)
+	if c:IsPosition(POS_FACEDOWN_DEFENSE) then return false end
 	if not c:IsPosition(POS_FACEDOWN_ATTACK) then
 		return c:IsCanTurnSet()
 	else
@@ -1234,6 +1310,33 @@ function Card.IsPreviousAttackOnField(c,atk)
 end
 function Card.IsPreviousDefenseOnField(c,def)
 	return c:GetPreviousDefenseOnField()==def
+end
+
+--Remain on field
+function Auxiliary.RemainOnFieldCost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	local c=e:GetHandler()
+	local cid=Duel.GetChainInfo(0,CHAININFO_CHAIN_ID)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_REMAIN_FIELD)
+	e1:SetProperty(EFFECT_FLAG_OATH)
+	e1:SetReset(RESET_CHAIN)
+	c:RegisterEffect(e1)
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
+	e2:SetCode(EVENT_CHAIN_DISABLED)
+	e2:SetOperation(aux.RemainOnFieldCostFunction)
+	e2:SetLabel(cid)
+	e2:SetReset(RESET_CHAIN)
+	Duel.RegisterEffect(e2,tp)
+end
+function Auxiliary.RemainOnFieldCostFunction(e,tp,eg,ep,ev,re,r,rp)
+	local cid=Duel.GetChainInfo(ev,CHAININFO_CHAIN_ID)
+	if cid~=e:GetLabel() then return end
+	if e:GetOwner():IsRelateToChain(ev) then
+		e:GetOwner():CancelToGrave(false)
+	end
 end
 
 --Location Check
