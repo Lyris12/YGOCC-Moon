@@ -62,7 +62,7 @@ function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	return c:GetPreviousLocation()&LOCATION_DECK==LOCATION_DECK and c:GetPreviousControler()==tp and not c:IsReason(REASON_DRAW)
 end
 function s.atkfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0xe50)
+	return c:IsFaceup() and c:IsSetCard(0xe50,0xe51)
 end
 function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.atkfilter(chkc) end

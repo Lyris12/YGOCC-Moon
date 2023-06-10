@@ -26,7 +26,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function s.filter(c,e,tp)
-	return c:IsLevel(3) and c:IsRace(RACE_BEAST) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsMonster() and c:IsSetCard(0xe51) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
@@ -85,7 +85,7 @@ function s.thfilter(c,tp,g,cg)
 	if cg then
 		g:Merge(cg)
 	end
-	return c:IsMonster() and c:IsRace(RACE_BEAST) and c:IsAbleToHand() and not g:IsExists(Card.IsAttribute,1,nil,c:GetAttribute())
+	return c:IsMonster() and c:IsSetCard(0xe51) and c:IsAbleToHand() and not g:IsExists(Card.IsAttribute,1,nil,c:GetAttribute())
 end
 function s.attfilter(c)
 	return c:IsFaceup() and c:IsMonster() and c:GetAttribute()~=0

@@ -109,6 +109,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if not c:IsRelateToChain() or Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return end
 	local g=Duel.GetOperatedGroup()
 	if g:IsExists(s.chkfilter,1,nil) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) then
+		Duel.BreakEffect()
 		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
 	end
 end

@@ -30,7 +30,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function s.filter(c)
-	return c:IsFaceup() and c:IsRace(RACE_BEAST)
+	return c:IsFaceup() and c:IsRace(RACE_BEAST|RACE_PSYCHIC)
 end
 function s.attfilter(c)
 	return c:IsFaceup() and c:GetAttribute()~=0
@@ -43,7 +43,7 @@ function s.spsumcon(e,c)
 end
 
 function s.cfilter(c,tp,se)
-	return c:GetPreviousLocation()&LOCATION_MZONE==LOCATION_MZONE and c:GetPreviousPosition()&POS_FACEUP>0 and c:GetPreviousControler()==tp and c:GetPreviousRaceOnField()&RACE_BEAST==RACE_BEAST
+	return c:GetPreviousLocation()&LOCATION_MZONE==LOCATION_MZONE and c:GetPreviousPosition()&POS_FACEUP>0 and c:GetPreviousControler()==tp and c:IsPreviousSetCard(0xe50,0xe51)
 		and (se==nil or c:GetReasonEffect()~=se)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)

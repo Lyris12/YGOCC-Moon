@@ -33,7 +33,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function s.spfilter(c,tp)
-	return c:IsFaceup() and c:IsControler(tp) and c:IsRace(RACE_BEAST)
+	return c:IsFaceup() and c:IsControler(tp) and c:IsSetCard(0xe50,0xe51)
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.spfilter,1,nil,tp)
@@ -52,7 +52,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 function s.cfilter(c)
-	return c:IsFaceup() and c:IsMonster(TYPE_XYZ) and c:IsRace(RACE_BEAST) and c:GetOverlayCount()>0
+	return c:IsFaceup() and c:IsMonster(TYPE_XYZ) and (c:IsSetCard(0xe50) or c:IsRace(RACE_BEAST)) and c:GetOverlayCount()>0
 end
 function s.costcheck(c,tp,g)
 	return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil,tp,g,c)
@@ -61,7 +61,7 @@ function s.thfilter(c,tp,g,cg)
 	if cg then
 		g:AddCard(cg)
 	end
-	return c:IsMonster() and c:IsRace(RACE_BEAST) and c:IsAbleToHand() and not g:IsExists(Card.IsAttribute,1,nil,c:GetAttribute())
+	return c:IsMonster() and c:IsSetCard(0xe51) and c:IsAbleToHand() and not g:IsExists(Card.IsAttribute,1,nil,c:GetAttribute())
 end
 function s.attfilter(c)
 	return c:IsFaceup() and c:IsMonster() and c:GetAttribute()~=0

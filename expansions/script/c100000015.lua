@@ -29,7 +29,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function s.dcfilter(c)
-	return c:IsMonster() and c:IsLevel(3) and c:IsRace(RACE_BEAST) and c:IsDiscardable(REASON_EFFECT)
+	return c:IsMonster() and c:IsRace(RACE_BEAST|RACE_PSYCHIC) and c:IsDiscardable(REASON_EFFECT)
 end
 function s.drawtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(s.dcfilter,tp,LOCATION_HAND,0,nil)

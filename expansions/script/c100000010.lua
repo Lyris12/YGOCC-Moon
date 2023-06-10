@@ -29,7 +29,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function s.ovfilter(c)
-	return c:IsFaceup() and c:IsXyzType(TYPE_XYZ) and c:IsRankBelow(3)
+	return c:IsFaceup() and c:IsXyzType(TYPE_XYZ) and c:IsSetCard(0xe50) and c:IsRankBelow(3)
 end
 function s.xyzop(e,tp,chk,mc)
 	local ct=mc:GetOverlayCount()

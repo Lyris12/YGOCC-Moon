@@ -50,7 +50,7 @@ function s.attfilter(c)
 	return c:IsFaceup() and c:IsMonster() and c:GetAttribute()~=0
 end
 function s.tgfilter(c,tp,g)
-	return c:IsMonster() and c:IsLevel(3) and c:IsRace(RACE_BEAST) and c:IsAbleToGrave()
+	return c:IsMonster() and c:IsSetCard(0xe51) and c:IsAbleToGrave()
 		and not g:IsExists(Card.IsAttribute,1,nil,c:GetAttribute())
 end
 function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -79,7 +79,7 @@ function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 function s.filter(c)
-	return c:IsFaceup() and c:IsRace(RACE_BEAST)
+	return c:IsFaceup() and c:IsRace(RACE_BEAST|RACE_PSYCHIC)
 end
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==1-tp and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_MZONE,0,1,e:GetHandler())

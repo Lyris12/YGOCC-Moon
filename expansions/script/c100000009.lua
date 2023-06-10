@@ -4,7 +4,7 @@
 local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
-	aux.AddSynchroMixProcedure(c,aux.Tuner(nil),aux.Tuner(nil),nil,aux.NonTuner(Card.IsRace,RACE_BEAST),2,2)
+	aux.AddSynchroMixProcedure(c,aux.Tuner(Card.IsRace,RACE_BEAST|RACE_PSYCHIC),aux.Tuner(Card.IsRace,RACE_BEAST|RACE_PSYCHIC),nil,aux.NonTuner(Card.IsRace,RACE_BEAST),2,2)
 	--After this card was Synchro Summoned, you cannot Special Summon monsters for the rest of this turn, except Beast monsters.
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE|EFFECT_TYPE_CONTINUOUS)

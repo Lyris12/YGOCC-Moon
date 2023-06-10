@@ -42,7 +42,7 @@ function s.indct(e,re,r,rp)
 end
 
 function s.cfilter(c,tp)
-	return c:IsFaceup() and c:IsMonster(TYPE_XYZ) and c:IsSetCard(0xe50) and c:IsSummonType(SUMMON_TYPE_XYZ) and c:IsSummonPlayer(tp)
+	return c:IsFaceup() and c:IsMonster(TYPE_XYZ) and c:IsSetCard(0xe50,0xe51) and c:IsSummonType(SUMMON_TYPE_XYZ) and c:IsSummonPlayer(tp)
 end
 function s.sccon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp and eg:IsExists(s.cfilter,1,nil,tp)
