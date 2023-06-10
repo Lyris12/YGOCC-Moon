@@ -11213,7 +11213,7 @@ expansions/script/Elemerge.lua	4475491ee094a20d129be9c6638155d1
 expansions/script/GardrenialCommons.lua	df2b3e36ef0489fd6749fea0b4ed75f8
 expansions/script/glitchylib.lua	a96793f3067d47ab5170d97fc3b4f918
 expansions/script/glitchylib_adjust_events.lua	620dcaecb767f65089869854803c5e8b
-expansions/script/glitchylib_cond.lua	781d8f5e8166d0f5c899c7628894fcdb
+expansions/script/glitchylib_cond.lua	9c3b76eb77a5908daed3650e8e0def29
 expansions/script/glitchylib_core.lua	58c0be0a5ca56ea19df105c1788b1ee5
 expansions/script/glitchylib_cost.lua	55bb096a32e026afddf2745ef63c5162
 expansions/script/glitchylib_field.lua	e1b561bca268b0f50957c7878a9d830d
@@ -11238,7 +11238,7 @@ expansions/script/proc_chroma.lua	e10f8331d1565332b41c77ee8138ea05
 expansions/script/proc_conjoin.lua	73b4306e063882fcb59786484763394c
 expansions/script/proc_corona.lua	447ba131b9de38718dc740bccedaf965
 expansions/script/proc_deckmaster.lua	b0cd59261bcd72b81e00df8e18958ace
-expansions/script/proc_doublesided.lua	578b0b9cf2b895773f29e63a59f84cdf
+expansions/script/proc_doublesided.lua	6681e02a551997cc51a346cdd133d415
 expansions/script/proc_drive.lua	ea6dee592a7993db94bbcb01bb5e338b
 expansions/script/proc_evolute.lua	9faab2a40e0785a698f63bbde6be9478
 expansions/script/proc_evolve.lua	a8659d78e04a57260b621122f07ea2ed
@@ -11327,6 +11327,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	a51811f2d10998b1f2d45477b53acb30
+update/filelist.txt	d5c185c0d38d50f8d9a2e93782259f7c
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	5d665f1edd9ce6972621df37e2429621
+update/version.txt	e3f8d24e2280cacc04eb85b4d3d0ac1a

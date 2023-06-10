@@ -54,6 +54,9 @@ function Auxiliary.EndPhaseCond(tp)
 				return Duel.IsEndPhase(tp)
 			end
 end
+function Auxiliary.ExceptOnDamageStep()
+	return Auxiliary.ExceptOnDamageCalc()
+end
 function Auxiliary.ExceptOnDamageCalc()
 	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated()
 end

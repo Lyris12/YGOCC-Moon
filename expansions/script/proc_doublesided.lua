@@ -9,8 +9,9 @@ SIDE_REVERSE	= 0x2
 EVENT_TRANSFORMED		= EVENT_CUSTOM+100000041
 EVENT_PRE_TRANSFORMED	= EVENT_CUSTOM+100000042
 
-FLAG_PRE_TRANSFORMED	=	100000042
-
+FLAG_PRE_TRANSFORMED						=	100000042
+FLAG_ALLOW_DOUBLESIDED_REVERSE_REGISTRATION	=	100000043
+	
 Auxiliary.DoubleSided={}
 
 local get_type, get_orig_type, get_prev_type_field, get_active_type, is_active_type, get_reason, get_fusion_type, get_synchro_type, get_xyz_type, get_link_type, get_ritual_type = 
@@ -107,7 +108,7 @@ function Auxiliary.AddOrigDoubleSidedType(c)
 	Auxiliary.DoubleSided[c]=true
 end
 function Auxiliary.AddDoubleSidedProc(c,side,id,prechk)
-	if c:IsStatus(STATUS_COPYING_EFFECT) then return end
+	if c:IsStatus(STATUS_COPYING_EFFECT) and not c:HasFlagEffect(FLAG_ALLOW_DOUBLESIDED_REVERSE_REGISTRATION) then return end
 	aux.AddOrigDoubleSidedType(c)
 	local s=getmetatable(c)
 	if side==SIDE_OBVERSE then
@@ -182,12 +183,16 @@ function Duel.Transform(c,side,e,tp,r)
 	Duel.RaiseSingleEvent(c,EVENT_PRE_TRANSFORMED,e,r,tp,tp,0)
 	local res=c:SetEntityCode(tcode,true)
 	if res then
-		c:ReplaceEffect(tcode,0,0) 
+		c:RegisterFlagEffect(FLAG_ALLOW_DOUBLESIDED_REVERSE_REGISTRATION,0,EFFECT_FLAG_IGNORE_IMMUNE,1)
+		if not s.transform_token_initialized then
+			s.transform_token_initialized=true
+			Duel.CreateToken(0,tcode)
+		end
 		Duel.SetMetatable(c, _G["c"..tcode])
+		c:ReplaceEffect(tcode,0,0)
+		c:ResetFlagEffect(FLAG_ALLOW_DOUBLESIDED_REVERSE_REGISTRATION)
 		Duel.RaiseEvent(c,EVENT_TRANSFORMED,e,r,tp,tp,0)
 		Duel.RaiseSingleEvent(c,EVENT_TRANSFORMED,e,r,tp,tp,0)
-	else
-		e1:Reset()
 	end
 	return res
 end
@@ -265,8 +270,15 @@ function Auxiliary.RevertToObverseSideOperation(e,tp,eg,ep,ev,re,r,rp)
 	local tcode=c.obverse_side
 	if not tcode then return end
 	c:SetEntityCode(tcode)
-	c:ReplaceEffect(tcode,0,0)
+	local s=getmetatable(c)
+	c:RegisterFlagEffect(FLAG_ALLOW_DOUBLESIDED_REVERSE_REGISTRATION,0,EFFECT_FLAG_IGNORE_IMMUNE,1)
+	if not s.transform_token_initialized then
+		s.transform_token_initialized=true
+		Duel.CreateToken(0,tcode)
+	end
 	Duel.SetMetatable(c,_G["c"..tcode])
+	c:ReplaceEffect(tcode,0,0)
+	c:ResetFlagEffect(FLAG_ALLOW_DOUBLESIDED_REVERSE_REGISTRATION)
 end
 
 --Conditions
