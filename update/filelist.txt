@@ -1,4 +1,4 @@
-﻿expansions/cards-new.cdb	913a8f27fe520bd69a65e6ca6fe8df6c
+﻿expansions/cards-new.cdb	d2b007be0a0b5c12823af510a4480716
 expansions/lflist.conf	1f84f607a5046d9bc67d03a84f7820cc
 expansions/strings.conf	ef704926dd390ac27721fff42121a44d
 expansions/pics/100000000.png	b67e8ff2c7f674f012be790c136b43e5
@@ -5836,7 +5836,7 @@ expansions/script/c100000095.lua	ee2998e960aa5569b4ce42bf3dd92e2a
 expansions/script/c100000096.lua	664e88894b7b3f6e5864688ee31f37a2
 expansions/script/c100000097.lua	86264cd66699444f55cebeb7f56c1306
 expansions/script/c100000098.lua	84c7e0724e858a0dcc1d1041b93c6887
-expansions/script/c100000099.lua	5498ae2baf28ce0a385b1b5072c87792
+expansions/script/c100000099.lua	d14493757edf32a6f3b0c0290eab77ba
 expansions/script/c100000714.lua	d76fba87c5edb765a2be2d5bd214a793
 expansions/script/c100000736.lua	4b60d073e942c60222e137d3f350e025
 expansions/script/c100000737.lua	21f0e03236994964f5cb4a517edb0523
@@ -11211,7 +11211,7 @@ expansions/script/c99998880.lua	0509e063b69a276531dad386fda3f633
 expansions/script/Deptheaven.lua	451894d4b7a9a2b13929be6cc70876c1
 expansions/script/Elemerge.lua	4475491ee094a20d129be9c6638155d1
 expansions/script/GardrenialCommons.lua	df2b3e36ef0489fd6749fea0b4ed75f8
-expansions/script/glitchylib.lua	a96793f3067d47ab5170d97fc3b4f918
+expansions/script/glitchylib.lua	80f9213da9ce4f4e6ffd168c8d59fbf9
 expansions/script/glitchylib_adjust_events.lua	620dcaecb767f65089869854803c5e8b
 expansions/script/glitchylib_cond.lua	9c3b76eb77a5908daed3650e8e0def29
 expansions/script/glitchylib_core.lua	58c0be0a5ca56ea19df105c1788b1ee5
@@ -11327,6 +11327,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	fa61411d77a1e2dc48e02403fa9cfc39
+update/filelist.txt	b6d2592ac76fb7c723b29430eff1c0da
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	1f42fb326f6b3504cf34498e5a03193f
+update/version.txt	e80df6a7337711cc3958052370e5bfcc

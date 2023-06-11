@@ -273,6 +273,7 @@ end
 function Auxiliary.MergedDelayEventCheckGlitchy1(event,id,f,range,evgcheck,se,operation)
 	return	function(e,tp,eg,ep,ev,re,r,rp)
 				local c=e:GetOwner()
+				local tp=c:GetControler()
 				if range then
 					if range==LOCATION_ENGAGED then
 						if not c:IsLocation(LOCATION_HAND) or not c:IsEngaged() then
@@ -347,6 +348,7 @@ end
 function Auxiliary.MergedDelayEventCheckGlitchy2(id,range,evgcheck,se,operation)
 	return	function(e,tp,eg,ep,ev,re,r,rp)
 				local c=e:GetOwner()
+				local tp=c:GetControler()
 				if range then					
 					if range==LOCATION_ENGAGED then
 						if not c:IsLocation(LOCATION_HAND) or not c:IsEngaged() then
