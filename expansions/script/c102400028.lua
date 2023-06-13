@@ -1,8 +1,12 @@
 --created & coded by Lyris, art from Shadowverse's Evolved "Cutthroat, Discord Convict"
 --Psychic Hadoken (Altered)
 local s,id,o=GetID()
+if not s.global_check then
+	s.global_check=true
+	local f=Card.IsHadoken
+	function Card.IsHadoken(c) return f and f(c) or c:IsCode(id) end
+end
 function s.initial_effect(c)
-	local f=Card.IsHadoken function Card.IsHadoken(tc) return f and f(tc) or tc==c end
 	c:EnableReviveLimit()
 	aux.AddSpatialProc(c,aux.drccheck,aux.TRUE,2,99)
 	local e1=Effect.CreateEffect(c)
@@ -24,6 +28,7 @@ function s.initial_effect(c)
 	e2:SetOperation(s.operation)
 	c:RegisterEffect(e2)
 end
+s.spt_other_space=102400026
 function s.cfilter(c)
 	return c:IsFaceupEx() and c:IsHadoken() and c:IsAbleToDeckAsCost()
 end

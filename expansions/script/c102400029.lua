@@ -1,8 +1,12 @@
 --created & coded by Lyris, art from Shadowverse's "Arc"
 --Hadoken Ark Box
 local s,id,o=GetID()
+if not s.global_check then
+	s.global_check=true
+	local f=Card.IsHadoken
+	function Card.IsHadoken(c) return f and f(c) or c:IsCode(id) end
+end
 function s.initial_effect(c)
-	local f=Card.IsHadoken function Card.IsHadoken(tc) return f and f(tc) or tc==c end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
@@ -12,8 +16,8 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)<3
-		and Duel.IsPlayerCanSpecialSummon(tp) end
+	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>2
+		and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil,e,tp) end
 end
 function s.filter(c,e,tp)
 	return c:IsHadoken() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

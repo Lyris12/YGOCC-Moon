@@ -2,16 +2,21 @@
 --終わりの存在者
 local s,id,o=GetID()
 function s.initial_effect(c)
-	--If there are at least 5 banished DARK monsters, you can Special Summoned this card (from your hand). When your opponent activates a card or effect (Quick Effect): You can banish 1 DARK monster from your hand; negate the activation, and if you do, banish it. During your Main Phase, if this card is in your GY: You can shuffle as many of your banished cards into the Deck as possible; banish this card face-down, and if you do, draw 1 card. You can only use each effect of "The Being of the End" once per turn.
-	local tp=c:GetControler()
-	local e0=Effect.CreateEffect(c)
-	e0:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e0:SetCode(EVENT_PHASE_START+PHASE_DRAW)
-	e0:SetCountLimit(1,5001+EFFECT_COUNT_CODE_DUEL)
-	e0:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
-	e0:SetOperation(function()
-		local tk=Duel.CreateToken(tp,5000)
-		Duel.SendtoDeck(tk,nil,SEQ_DECKTOP,REASON_RULE)
-	end)
-	Duel.RegisterEffect(e0,tp)
+	--If there are at least 5 banished DARK monsters, you can Special Summon this card (from your hand).
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_SPSUMMON_PROC)
+	e1:SetRange(LOCATION_HAND)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e1:SetCondition(s.spcon)
+	c:RegisterEffect(e1)
+	--You can only use each effect of "The Being of the End" once per turn.
+	--When your opponent activates a card or effect (Quick Effect): You can banish 1 DARK monster from your hand; negate the activation, and if you do, banish it.
+e2
+	--During your Main Phase, if this card is in your GY: You can shuffle as many of your banished cards into the Deck as possible; banish this card face-down, and if you do, draw 1 card.
+e3
+end
+function s.()
+end
+function s.()
 end

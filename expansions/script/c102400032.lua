@@ -1,8 +1,12 @@
 --created & coded by Lyris, art from Shadowverse's "Craftsman's Pride"
 --Hadokenstruction
 local s,id,o=GetID()
+if not s.global_check then
+	s.global_check=true
+	local f=Card.IsHadoken
+	function Card.IsHadoken(c) return f and f(c) or c:IsCode(id) end
+end
 function s.initial_effect(c)
-	local f=Card.IsHadoken function Card.IsHadoken(tc) return f and f(tc) or tc==c end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
@@ -21,7 +25,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>2 and Duel.IsPlayerCanDraw(tp) end
+	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0 and Duel.IsPlayerCanDraw(tp) end
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)<3 then return end

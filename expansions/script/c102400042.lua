@@ -1,4 +1,4 @@
---created & coded by Lyris, art found by jspenc29
+--created & coded by Lyris, art found by jspenc29 of DuelingBook
 --地下覇王の融合
 local s,id,o=GetID()
 function s.initial_effect(c)

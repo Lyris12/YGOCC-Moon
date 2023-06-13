@@ -1,18 +1,91 @@
---created by Lyris, art from Shadowverse's "Gun Collector"
+--created & coded by Lyris, art from Shadowverse's "Gun Collector"
 --Sniper Hadoken
 local s,id,o=GetID()
+if not s.global_check then
+	s.global_check=true
+	local f=Card.IsHadoken
+	function Card.IsHadoken(c) return f and f(c) or c:IsCode(id) end
+end
 function s.initial_effect(c)
-	--If you have an even number of cards in your Deck (Quick Effect): You can place 1 other "Hadoken" card from your hand on the bottom of your Deck, then target up to 2 cards your opponent controls or in their GY; place them on the bottom of the Deck, then Special Summon this card from your hand or GY, but place it on the bottom of the Deck if it leaves the field. Once per turn: You can excavate 3 cards from the bottom of your Deck, and if you do, you can destroy cards your opponent controls, up to the number of excavated "Hadoken" cards, also, place the excavated cards on top of the Deck in the same order.
-	local tp=c:GetControler()
-	local ef=Effect.CreateEffect(c)
-	ef:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	ef:SetCode(EVENT_PHASE_START+PHASE_DRAW)
-	ef:SetCountLimit(1,5001+EFFECT_COUNT_CODE_DUEL)
-	ef:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
-	ef:SetOperation(function()
-		local tk=Duel.CreateToken(tp,5000)
-		Duel.SendtoDeck(tk,nil,SEQ_DECKBOTTOM,REASON_RULE)
-		c5000.ops(ef,tp)
-	end)
-	Duel.RegisterEffect(ef,tp)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_QUICK_O)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetRange(LOCATION_GRAVE+LOCATION_HAND)
+	e1:SetCategory(CATEGORY_TODECK+CATEGORY_SPECIAL_SUMMON)
+	e1:SetCondition(s.spcon)
+	e1:SetCost(s.spcost)
+	e1:SetTarget(s.sptg)
+	e1:SetOperation(s.spop)
+	c:RegisterEffect(e1)
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_IGNITION)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1)
+	e2:SetCategory(CATEGORY_DESTROY)
+	e2:SetTarget(s.destg)
+	e2:SetOperation(s.desop)
+	c:RegisterEffect(e2)
+end
+function s.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)%2==0
+end
+function s.cfilter(c)
+	return c:IsHadoken() and c:IsAbleToDeckAsCost()
+end
+function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_HAND,0,1,c) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+	Duel.SendtoDeck(Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_HAND,0,1,1,c),nil,SEQ_DECKBOTTOM,REASON_COST)
+end
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_ONFIELD+LOCATION_GRAVE) and chkc:IsControler(1-tp)
+		and chkc:IsAbleToDeck() end
+	local c=e:GetHandler()
+	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToDeck,tp,0,LOCATION_ONFIELD+LOCATION_GRAVE,1,nil)
+		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+	local g=Duel.SelectTarget(tp,Card.IsAbleToDeck,tp,0,LOCATION_ONFIELD+LOCATION_GRAVE,1,2,nil)
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,#g,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
+end
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local g=Duel.GetTargetsRelateToChain()
+	if #g>0 and Duel.SendtoDeck(g,nil,SEQ_DECKBOTTOM,REASON_EFFECT)>0
+		and g:IsExists(Card.IsLocation,1,nil,LOCATION_DECK) and c:IsRelateToEffect(e) then
+		Duel.BreakEffect()
+		if Duel.SpecialSummonStep(c,0,tp,tp,false,false,POS_FACEUP) then
+			local e1=Effect.CreateEffect(c)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
+			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+			e1:SetReset(RESET_EVENT+RESETS_REDIRECT)
+			e1:SetValue(LOCATION_DECKBOT)
+			c:RegisterEffect(e1)
+		end
+		Duel.SpecialSummonComplete()
+	end
+end
+function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>2
+		and Duel.IsExistingMatchingCard(Card.IsHadoken,tp,LOCATION_DECK,0,1,nil) end
+end
+function s.desop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)<3 then return end
+	local g=Group.CreateGroup()
+	for i=1,3 do
+		local tc=Duel.GetFieldCard(tp,LOCATION_DECK,i)
+		Duel.ConfirmCards(1-tp,tc)
+		g:AddCard(tc)
+	end
+	local ct=g:FilterCount(Card.IsHadoken,nil)
+	local dg=Duel.GetFieldGroup(tp,0,LOCATION_ONFIELD)
+	if ct>0 and #dg>0 and Duel.SelectEffectYesNo(tp,e:GetHandler()) then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+		local sg=dg:Select(tp,1,ct,nil)
+		Duel.HintSelection(sg)
+		Duel.Destroy(sg,REASON_EFFECT)
+	end
+	for i=1,3 do Duel.MoveSequence(Duel.GetFieldCard(tp,LOCATION_DECK,SEQ_DECKBOTTOM),SEQ_DECKTOP) end
 end
