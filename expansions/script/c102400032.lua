@@ -30,13 +30,13 @@ end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)<3 then return end
 	local ct=0
-	for i=1,3 do
+	for i=0,2 do
 		local tc=Duel.GetFieldCard(tp,LOCATION_DECK,i)
-		Duel.ConfirmCards(1-tp,tc)
+		for p=0,1 do Duel.ConfirmCards(p,tc,true) end
 		if tc:IsHadoken() then ct=ct+1 end
 	end
 	Duel.Draw(tp,ct,REASON_EFFECT)
-	for i=1,#g do Duel.MoveSequence(Duel.GetFieldCard(tp,LOCATION_DECK,SEQ_DECKBOTTOM),SEQ_DECKTOP) end
+	for i=1,3 do Duel.MoveSequence(Duel.GetFieldCard(tp,LOCATION_DECK,0),SEQ_DECKTOP) end
 	Duel.SortDecktop(tp,tp,3)
 end
 function s.filter(c)

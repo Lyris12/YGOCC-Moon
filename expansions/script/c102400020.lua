@@ -45,7 +45,8 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local tc=Duel.GetFieldCard(tp,LOCATION_DECK,1)
+	local tc=Duel.GetFieldCard(tp,LOCATION_DECK,0)
+	Duel.DisableShuffleCheck()
 	if not (Duel.SendtoHand(tc,nil,REASON_EFFECT)>0 and tc:IsLocation(LOCATION_HAND)
 		and c:IsRelateToEffect(e)) then return end
 	Duel.BreakEffect()
@@ -70,9 +71,9 @@ end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)<3 then return end
 	local g=Group.CreateGroup()
-	for i=1,3 do
+	for i=0,2 do
 		local tc=Duel.GetFieldCard(tp,LOCATION_DECK,i)
-		Duel.ConfirmCards(1-tp,tc)
+		for p=0,1 do Duel.ConfirmCards(p,tc,true) end
 		g:AddCard(tc)
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
@@ -86,5 +87,5 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		else Duel.SendtoGrave(tc,REASON_RULE) end
 		g:RemoveCard(tc)
 	end
-	for i=1,#g do Duel.MoveSequence(Duel.GetFieldCard(tp,LOCATION_DECK,SEQ_DECKBOTTOM),SEQ_DECKTOP) end
+	for i=1,#g do Duel.MoveSequence(Duel.GetFieldCard(tp,LOCATION_DECK,0),SEQ_DECKTOP) end
 end

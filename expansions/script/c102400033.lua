@@ -63,20 +63,21 @@ end
 function s.setop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)<3 then return end
 	local g=Group.CreateGroup()
-	for i=1,3 do
+	for i=0,2 do
 		local tc=Duel.GetFieldCard(tp,LOCATION_DECK,i)
-		Duel.ConfirmCards(1-tp,tc)
+		for p=0,1 do Duel.ConfirmCards(p,tc,true) end
 		g:AddCard(tc)
 	end
 	local mg=g:Filter(s.sfilter,nil,e,tp)
 	if #mg>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
 		local sc=mg:Select(tp,1,1,nil):GetFirst()
+		Duel.DisableShuffleCheck()
 		if sc:IsType(TYPE_MONSTER) then
 			Duel.SpecialSummon(sc,0,tp,tp,false,false,POS_FACEDOWN_DEFENSE)
 			Duel.ConfirmCards(1-tp,sc)
 		else Duel.SSet(tp,sc) end
 		g:RemoveCard(sc)
 	end
-	for i=1,#g do Duel.MoveSequence(Duel.GetFieldCard(tp,LOCATION_DECK,SEQ_DECKBOTTOM),SEQ_DECKTOP) end
+	for i=1,#g do Duel.MoveSequence(Duel.GetFieldCard(tp,LOCATION_DECK,0),SEQ_DECKTOP) end
 end

@@ -343,5 +343,7 @@ function Auxiliary.SpatialOperation(e,tp,eg,ep,ev,re,r,rp,c,smat,mg)
 	Duel.SendtoGrave(rg,REASON_MATERIAL+REASON_SPATIAL)
 	g:DeleteGroup()
 	local ospc=Duel.CreateToken(tp,c.spt_other_space)
-	if Group.CreateGroup(ospc):SelectSubGroup(tp,aux.TRUE,true) then c:SwitchSpace() end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local spch=Group.CreateGroup(c,ospc):SelectSubGroup(tp,aux.TRUE,true,1,1)
+	if spch and spch:GetFirst()==ospc then c:SwitchSpace() end
 end

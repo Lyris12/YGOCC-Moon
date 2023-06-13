@@ -8,12 +8,19 @@ if not s.global_check then
 end
 function s.initial_effect(c)
 	c:EnableReviveLimit(c)
-	aux.AddOrigSpatialType()
+	aux.AddOrigSpatialType(c)
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_SINGLE)
+	e0:SetCode(EFFECT_CHANGE_CODE)
+	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e0:SetValue(102400025)
+	c:RegisterEffect(e0)
 	aux.AddSpatialProc(c,nil,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_LIGHT),2,2)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1)
+	e1:SetDescription(1152)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TODECK)
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
@@ -22,6 +29,7 @@ function s.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1)
+	e2:SetDescription(1107)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_DECKDES)
 	e2:SetTarget(s.xptg)
 	e2:SetOperation(s.xpop)
@@ -46,6 +54,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
 	if Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)>0 then
+		Duel.ShuffleDeck(tp)
 		local sg=Duel.GetMatchingGroup(s.dfilter,tp,LOCATION_HAND+LOCATION_ONFIELD,0,g)
 		if #sg==0 then return end
 		Duel.BreakEffect()
@@ -63,8 +72,8 @@ end
 function s.xpop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)<6 then return end
 	local g=Group.CreateGroup()
-	for i=1,6 do g:AddCard(Duel.GetFieldCard(tp,LOCATION_DECK,i)) end
-	for p=0,1 do Duel.ConfirmCards(p,g) end
+	for i=0,5 do g:AddCard(Duel.GetFieldCard(tp,LOCATION_DECK,i)) end
+	for p=0,1 do Duel.ConfirmCards(p,g,true) end
 	local mg=g:Filter(s.sfilter,nil,e,tp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and #mg>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
@@ -73,5 +82,5 @@ function s.xpop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
 		g:Sub(sg)
 	end
-	for i=1,#g do Duel.MoveSequence(Duel.GetFieldCard(tp,LOCATION_DECK,SEQ_DECKBOTTOM),SEQ_DECKTOP) end
+	for i=1,#g do Duel.MoveSequence(Duel.GetFieldCard(tp,LOCATION_DECK,0),SEQ_DECKTOP) end
 end

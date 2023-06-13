@@ -42,7 +42,7 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-		and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil)
+		and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil) end
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -60,9 +60,9 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.BreakEffect()
 	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)<3 then return end
 	local g=Group.CreateGroup()
-	for i=1,3 do
+	for i=0,2 do
 		local tc=Duel.GetFieldCard(tp,LOCATION_DECK,i)
-		Duel.ConfirmCards(1-tp,tc)
+		for p=0,1 do Duel.ConfirmCards(p,tc,true) end
 		g:AddCard(tc)
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
@@ -81,12 +81,12 @@ end
 function s.drop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)<3 then return end
 	local g=Group.CreateGroup()
-	for i=1,3 do
+	for i=0,2 do
 		local tc=Duel.GetFieldCard(tp,LOCATION_DECK,i)
-		Duel.ConfirmCards(1-tp,tc)
+		for p=0,1 do Duel.ConfirmCards(p,tc,true) end
 		g:AddCard(tc)
 	end
 	local ct=g:FilterCount(Card.IsHadoken,nil)
 	Duel.Draw(tp,ct,REASON_EFFECT)
-	for i=1,3 do Duel.MoveSequence(Duel.GetFieldCard(tp,LOCATION_DECK,SEQ_DECKBOTTOM),SEQ_DECKTOP) end
+	for i=1,3 do Duel.MoveSequence(Duel.GetFieldCard(tp,LOCATION_DECK,0),SEQ_DECKTOP) end
 end

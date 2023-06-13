@@ -44,7 +44,7 @@ end
 function s.sptcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return c:IsAbleToDeckAsCost() end
-	Duel.HintSelection(Group.FromCards(c)))
+	Duel.HintSelection(Group.FromCards(c))
 	Duel.SendtoDeck(c,nil,SEQ_DECKBOTTOM,REASON_COST)
 end
 function s.filter(c,e,tp)
@@ -135,21 +135,21 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		thcard=tc
 	end end
 	if seq>dcount then
-		for p=0,1 do Duel.ConfirmCards(p,Duel.GetFieldGroup(tp,LOCATION_DECK,0)) end
+		for p=0,1 do Duel.ConfirmCards(p,Duel.GetFieldGroup(tp,LOCATION_DECK,0),true) end
 		return
 	end
 	local tg=Group.CreateGroup()
-	for i=1,seq do
+	for i=0,seq do
 		local tc=Duel.GetFieldCard(tp,LOCATION_DECK,i)
-		if seq<6 then for p=0,1 do Duel.ConfirmCards(p,tc) end end
+		if seq<6 then for p=0,1 do Duel.ConfirmCards(p,tc,true) end end
 		tg:AddCard(tc)
 	end
-	if seq>5 then for p=0,1 do Duel.ConfirmCards(p,tg) end end
+	if seq>5 then for p=0,1 do Duel.ConfirmCards(p,tg,true) end end
 	if thcard:IsAbleToHand() then
 		Duel.DisableShuffleCheck()
 		Duel.SendtoHand(thcard,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,thcard)
 		tg:RemoveCard(thcard)
 	end
-	for i=1,#tg do Duel.MoveSequence(Duel.GetFieldCard(tp,LOCATION_DECK,SEQ_DECKBOTTOM),SEQ_DECKTOP) end
+	for i=1,#tg do Duel.MoveSequence(Duel.GetFieldCard(tp,LOCATION_DECK,0),SEQ_DECKTOP) end
 end
