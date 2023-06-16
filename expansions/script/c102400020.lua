@@ -1,11 +1,7 @@
 --created & coded by Lyris, art from Shadowverse's "Cassim, the Courageous"
 --Brave Hadoken
 local s,id,o=GetID()
-if not s.global_check then
-	s.global_check=true
-	local f=Card.IsHadoken
-	function Card.IsHadoken(c) return f and f(c) or c:IsCode(id) end
-end
+Card.IsHadoken=Card.IsHadoken or function(c) return c:GetCode()>102400019 and c:GetCode()<102400034 end
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_QUICK_O)

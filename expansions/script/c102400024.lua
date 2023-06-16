@@ -1,11 +1,7 @@
 --created & coded by Lyris, art from Shadowverse's "Vyrmedea, Synthetic Voice"
 --Synth Hadoken
 local s,id,o=GetID()
-if not s.global_check then
-	s.global_check=true
-	local f=Card.IsHadoken
-	function Card.IsHadoken(c) return f and f(c) or c:IsCode(id) end
-end
+Card.IsHadoken=Card.IsHadoken or function(c) return c:GetCode()>102400019 and c:GetCode()<102400034 end
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
@@ -150,6 +146,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoHand(thcard,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,thcard)
 		tg:RemoveCard(thcard)
+		Duel.ShuffleHand(tp)
 	end
 	for i=1,#tg do Duel.MoveSequence(Duel.GetFieldCard(tp,LOCATION_DECK,0),SEQ_DECKTOP) end
 end
