@@ -5,25 +5,29 @@ bigbang_limit_mats_operation = nil
 bigbang_force_mats_operation = nil
 
 --Custom constants
-EFFECT_CANNOT_BE_BIGBANG_MATERIAL	=624
-EFFECT_MUST_BE_BIGBANG_MATERIAL		=625
-EFFECT_EXTRA_BIGBANG_MATERIAL		=626
+EFFECT_CANNOT_BE_BIGBANG_MATERIAL   =624
+EFFECT_MUST_BE_BIGBANG_MATERIAL  =625
+EFFECT_EXTRA_BIGBANG_MATERIAL   =626
 EFFECT_IGNORE_BIGBANG_SUMREQ		=627
+EFFECT_BASE_BIGBANG_ATTACK  =628
+EFFECT_BASE_BIGBANG_DEFENSE   =629
+EFFECT_UPDATE_BIGBANG_ATTACK		=630
+EFFECT_UPDATE_BIGBANG_DEFENSE   =631
 TYPE_BIGBANG						=0x8000000000
-TYPE_CUSTOM							=TYPE_CUSTOM|TYPE_BIGBANG
-CTYPE_BIGBANG						=0x80
+TYPE_CUSTOM		  =TYPE_CUSTOM|TYPE_BIGBANG
+CTYPE_BIGBANG				  =0x80
 CTYPE_CUSTOM						=CTYPE_CUSTOM|CTYPE_BIGBANG
 
-SUMMON_TYPE_BIGBANG					=SUMMON_TYPE_SPECIAL+340
+SUMMON_TYPE_BIGBANG  =SUMMON_TYPE_SPECIAL+340
 
-REASON_BIGBANG						=0x8000000000
+REASON_BIGBANG			=0x8000000000
 
 --Custom Type Table
 Auxiliary.Bigbangs={} --number as index = card, card as index = function() is_synchro
 table.insert(aux.CannotBeEDMatCodes,EFFECT_CANNOT_BE_BIGBANG_MATERIAL)
 
 --overwrite constants
-TYPE_EXTRA							=TYPE_EXTRA|TYPE_BIGBANG
+TYPE_EXTRA			  =TYPE_EXTRA|TYPE_BIGBANG
 
 --overwrite functions
 local get_type, get_orig_type, get_prev_type_field, get_reason, get_fusion_type, get_synchro_type, get_xyz_type, get_link_type, get_ritual_type =
@@ -130,6 +134,7 @@ function Card.IsCanBeBigbangMaterial(c,ec)
 end
 function Card.GetVibe(c)
 	---1 = Negative; +0 = Neutral; +1 = Positive
+	if not c:IsDefenseAbove(0) then return nil end
 	local stat=c:GetAttack()-c:GetDefense()
 	if stat==0 then return stat
 	else return stat/math.abs(stat) end
@@ -143,11 +148,37 @@ end
 function Card.IsNeutral(c)
 	return c:GetVibe()==0
 end
-function Card.GetBigbangAttack(c)
-	return c:GetAttack()*math.abs(c:GetVibe())
+function Card.GetBigbangAttack(c,bc,mg)
+	local val=0
+	local te=c:IsHasEffect(EFFECT_BASE_BIGBANG_ATTACK)
+	if te and te:GetTarget()(c,bc,mg) then 
+		local nval=te:GetValue()
+		if type(nval)=='number' then val=nval else val=nval(c,bc,mg) end
+	else val=c:GetAttack()*math.abs(c:GetVibe()) end
+	if c:IsHasEffect(EFFECT_UPDATE_BIGBANG_ATTACK) then
+		local tef={c:IsHasEffect(EFFECT_UPDATE_BIGBANG_ATTACK)}
+		for _,upe in ipairs(tef) do
+			local nval = upe:GetValue()
+			if type(nval)=='number' then val=val+nval else val=nval(c,bc,mg)+val end
+		end
+	end
+	return val
 end
-function Card.GetBigbangDefense(c)
-	return c:GetDefense()*math.abs(c:GetVibe())
+function Card.GetBigbangDefense(c,bc,mg)
+	local val=0
+	local te=c:IsHasEffect(EFFECT_BASE_BIGBANG_DEFENSE)
+	if te and te:GetTarget()(c,bc,mg) then 
+		local nval=te:GetValue()
+		if type(nval)=='number' then val=nval else val=nval(c,bc,mg) end
+	else val=c:GetDefense()*math.abs(c:GetVibe()) end
+	if c:IsHasEffect(EFFECT_UPDATE_BIGBANG_DEFENSE) then
+		local tef={c:IsHasEffect(EFFECT_UPDATE_BIGBANG_DEFENSE)}
+		for _,upe in ipairs(tef) do
+			local nval = upe:GetValue()
+			if type(nval)=='number' then val=val+nval else val=nval(c,bc,mg)+val end
+		end
+	end
+	return val
 end
 function Auxiliary.AddOrigBigbangType(c,issynchro)
 	table.insert(Auxiliary.Bigbangs,c)
@@ -189,10 +220,6 @@ function Auxiliary.AddBigbangProc(c,...)
 end
 function Auxiliary.BigbangCondition(...)
 	local funs={...}
-	local max=0
-	for i=1,#funs do
-		max=max+funs[i][3]
-	end
 	return  function(e,c,matg,mustg)
 				if c==nil then return true end
 				if (c:IsType(TYPE_PENDULUM) or c:IsType(TYPE_PANDEMONIUM)) and c:IsFaceup() then return false end
@@ -200,7 +227,7 @@ function Auxiliary.BigbangCondition(...)
 				local mg,mg2
 				if matg and aux.GetValueType(matg)=="Group" then
 					mg=matg:Filter(Card.IsCanBeBigbangMaterial,nil,c)  ---matg:Filter(aux.NOT(Card.IsDestructable),nil,e) THIS Card.IsDestructable CHECK MUST NOT BE PERFORMED SINCE BIGBANG MATERIALS ARE NOT DESTROYED BY AN EFFECT
-					mg2=matg:Filter(Auxiliary.BigbangExtraFilter,nil,c,tp,table.unpack(funs))			
+					mg2=matg:Filter(Auxiliary.BigbangExtraFilter,nil,c,tp,table.unpack(funs))	 
 				else
 					mg=Duel.GetMatchingGroup(Card.IsCanBeBigbangMaterial,tp,LOCATION_MZONE,0,nil,c)
 					mg2=Duel.GetMatchingGroup(Auxiliary.BigbangExtraFilter,tp,0xff,0xff,nil,c,tp,table.unpack(funs))
@@ -212,14 +239,14 @@ function Auxiliary.BigbangCondition(...)
 				end
 				if fg:IsExists(aux.MustMaterialCounterFilter,1,nil,mg) then return false end
 				Duel.SetSelectedCard(fg)
-				return mg:IsExists(Auxiliary.BigbangRecursiveFilter,1,nil,tp,Group.CreateGroup(),mg,c,0,max,table.unpack(funs))
+				return mg:IsExists(Auxiliary.BigbangRecursiveFilter,1,nil,tp,Group.CreateGroup(),mg,c,0,table.unpack(funs))
 			end
 end
 function Auxiliary.BigbangExtraFilter(c,lc,tp,...)
 	local flist={...}
 	local check=false
 	for i=1,#flist do
-		if flist[i][1](c) then
+		if flist[i][1](c,nil) then
 			check=true
 		end
 	end
@@ -233,29 +260,30 @@ function Auxiliary.BigbangExtraFilter(c,lc,tp,...)
 	if c:IsLocation(LOCATION_ONFIELD) and not c:IsFaceup() then return false end
 	return c:IsCanBeBigbangMaterial(lc) and (not flist or #flist<=0 or check)
 end
-function Auxiliary.BigbangRecursiveFilter(c,tp,sg,mg,bc,ct,max,...)
+function Auxiliary.BigbangRecursiveFilter(c,tp,sg,mg,bc,ct,...)
 	sg:AddCard(c)
 	ct=ct+1
-	local funs,chk={...},false
+	local funs,max,chk={...},0
 	for i=1,#funs do
-		if funs[i][1](c) then
+		max=max+funs[i][3]
+		if funs[i][1](c,sg) then
 			chk=true
 		end
 	end
-	local res=chk and (Auxiliary.BigbangCheckGoal(tp,sg,bc,ct,...) or (ct<max and mg:IsExists(Auxiliary.BigbangRecursiveFilter,1,sg,tp,sg,mg,bc,ct,max,...)))
+	if max>99 then max=99 end
+	local res=chk and (Auxiliary.BigbangCheckGoal(tp,sg,bc,ct,...)
+		or (ct<max and mg:IsExists(Auxiliary.BigbangRecursiveFilter,1,sg,tp,sg,mg,bc,ct,...)))
 	sg:RemoveCard(c)
 	ct=ct-1
 	return res
 end
 function Auxiliary.BigbangCheckGoal(tp,sg,bc,ct,...)
-	local funs,min,max={...},0,0
+	local funs,min={...},0
 	for i=1,#funs do
-		local locf,locmin,locmax=funs[i][1],funs[i][2],funs[i][3]
-		if not sg:IsExists(locf,locmin,nil) or sg:IsExists(locf,locmax+1,nil) then return false end
-		min=min+locmin
-		max=max+locmax
+		if not sg:IsExists(funs[i][1],funs[i][2],nil,sg) then return false end
+		min=min+funs[i][2]
 	end
-	return ct>=min and ct<=max and Duel.GetLocationCountFromEx(tp,tp,sg,bc)>0 and (bc:IsHasEffect(EFFECT_IGNORE_BIGBANG_SUMREQ) or (sg:CheckWithSumGreater(Card.GetBigbangAttack,bc:GetAttack()) and sg:CheckWithSumGreater(Card.GetBigbangDefense,bc:GetDefense())))
+	return ct>=min and Duel.GetLocationCountFromEx(tp,tp,sg,bc)>0 and (bc:IsHasEffect(EFFECT_IGNORE_BIGBANG_SUMREQ) or (sg:CheckWithSumGreater(Card.GetBigbangAttack,bc:GetAttack(),bc,sg) and sg:CheckWithSumGreater(Card.GetBigbangDefense,bc:GetDefense(),bc,sg)))
 		and not sg:IsExists(Auxiliary.BigbangUncompatibilityFilter,1,nil,sg,bc,tp)
 end
 function Auxiliary.BigbangUncompatibilityFilter(c,sg,lc,tp)
@@ -308,9 +336,9 @@ function Auxiliary.BigbangTarget(...)
 				local finish=false
 				while not (#sg>=max) do
 					finish=Auxiliary.BigbangCheckGoal(tp,sg,c,#sg,table.unpack(funs))
-					local cg=mg:Filter(Auxiliary.BigbangRecursiveFilter,sg,tp,sg,mg,c,#sg,max,table.unpack(funs))
+					local cg=mg:Filter(Auxiliary.BigbangRecursiveFilter,sg,tp,sg,mg,c,#sg,table.unpack(funs))
 					if #cg==0 then break end
-					local cancel=not finish
+					local cancel=Duel.IsSummonCancelable() and not finish
 					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 					local tc=cg:SelectUnselect(sg,tp,finish,cancel,min,max)
 					if not tc then break end
