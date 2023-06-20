@@ -12,10 +12,11 @@ function c33700073.initial_effect(c)
 	c:RegisterEffect(e1)
 	--spsummon
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetRange(LOCATION_HAND)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-   -- e2:SetTarget(c33700073.sptg)
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:SetTarget(c33700073.sptg)
 	e2:SetOperation(c33700073.spop)
 	c:RegisterEffect(e2)
 	--atk up
@@ -81,9 +82,9 @@ function c33700073.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c33700073.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if Duel.GetMZoneCount(tp)>0 and  Duel.SelectYesNo(tp,aux.Stringid(33700073,0)) then
-	Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
-end
+	if c:IsRelateToEffect(e) then
+		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+	end
 end
 function c33700073.atkop(e,tp,eg,ep,ev,re,r,rp)
    local c=e:GetHandler()
