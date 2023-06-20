@@ -45,7 +45,7 @@ function s.discardfilter(c)
 end
 function s.spcon(e,c)
 	if c==nil then return true end
-	local tp=tp
+	local tp=c:GetControler()
 	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(s.discardfilter,tp,LOCATION_HAND,0,1,c)
 		and (Duel.GetFieldGroupCount(tp,LOCATION_ONFIELD,0)==0 or Duel.IsExistingMatchingCard(Card.IsFacedown,tp,0,LOCATION_MZONE,1,nil))
 end
