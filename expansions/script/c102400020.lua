@@ -33,8 +33,8 @@ function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	local tc=Duel.GetFieldCard(tp,LOCATION_DECK,1)
-	if chk==0 then return tc:IsAbleToHand()
+	local tc=Duel.GetFieldCard(tp,LOCATION_DECK,0)
+	if chk==0 then return tc:IsAbleToHand() and (c:IsLocation(LOCATION_HAND) or Duel.GetFlagEffect(tp,id)==0)
 		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,tc,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
@@ -46,14 +46,8 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if not (Duel.SendtoHand(tc,nil,REASON_EFFECT)>0 and tc:IsLocation(LOCATION_HAND)
 		and c:IsRelateToEffect(e)) then return end
 	Duel.BreakEffect()
-	if Duel.SpecialSummonStep(c,0,tp,tp,false,false,POS_FACEUP) then
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
-		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e1:SetReset(RESET_EVENT+RESETS_REDIRECT)
-		e1:SetValue(LOCATION_DECKBOT)
-		c:RegisterEffect(e1)
+	if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP) then
+		Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
 	end
 	Duel.SpecialSummonComplete()
 end
