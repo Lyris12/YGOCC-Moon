@@ -25,15 +25,21 @@ function ref.initial_effect(c)
 end
 ref.has_text_race=RACE_MACHINE+RACE_PYRO
 
-function ref.sstg(e,tp,eg,ep,ev,re,r,rp,chk)
+function ref.sstg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local val=Duel.GetFlagEffect(tp,id)
+	if chkc then return val==2 and chkc:IsAbleToHand() end
 	if chk==0 then if val>6 then return false end
 		return ((val==0) and Duel.IsPlayerCanDraw(tp,1))
 			or (val>0)
 	end
 	if (val==0 or val==4) then Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,1,tp,1) end
 	if val>1 then Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,800) end
-	if val==2 then Duel.SetOperationInfo(0,CATEGORY_TOHAND,Duel.GetFieldGroup(tp,LOCATION_ONFIELD,LOCATION_ONFIELD),1,0,0) end
+	if val==2 then
+		e:SetProperty(EFFECT_FLAG_CARD_TARGET)
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
+		local g=Duel.SelectTarget(tp,Card.IsAbleToHand,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
+		Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
+	end
 	e:GetHandler():SetHint(CHINT_NUMBER,val)
 end
 function ref.ssop(e,tp)
@@ -41,9 +47,10 @@ function ref.ssop(e,tp)
 	if val==0 then Duel.Draw(tp,1,REASON_EFFECT) end
 	if val>0 then Duel.Recover(tp,800,REASON_EFFECT) end
 	if val==2 then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
-		local g=Duel.SelectMatchingCard(tp,Card.IsAbleToHand,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
-		if #g>0 then Duel.SendtoHand(g,nil,REASON_EFFECT) end
+		--Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
+		--local g=Duel.SelectMatchingCard(tp,Card.IsAbleToHand,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
+		local tc=Duel.GetFirstTarget()
+		if tc:IsRelateToEffect(e) then Duel.SendtoHand(tc,nil,REASON_EFFECT) end
 	end
 	Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
 end

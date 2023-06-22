@@ -15,9 +15,7 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function cid.condition(e, tp, eg, ep, ev, re, r, rp)
-	if tp==ep or not Duel.IsChainDisablable(ev) then return false end
-	local ex,tg,tc=Duel.GetOperationInfo(ev,CATEGORY_DISABLE)
-	return ex and tg~=nil and tc+tg:FilterCount(Card.IsControler, nil, tp)-#tg>0
+	return re:IsHasCategory(CATEGORY_DISABLE+CATEGORY_NEGATE) and ep==1-tp and Duel.IsChainDisablable(ev)
 end
 function cid.cost(e, tp, eg, ep, ev, re, r, rp, chk)
 	local c=e:GetHandler()
@@ -37,7 +35,7 @@ function cid.cost(e, tp, eg, ep, ev, re, r, rp, chk)
 	Duel.RegisterEffect(e1, tp)
 end
 function cid.target(e, tp, eg, ep, ev, re, r, rp, chk)
-	if chk==0 then return not re:GetHandler():IsStatus(STATUS_DISABLED) end
+	if chk==0 then return not true end
 	Duel.SetOperationInfo(0, CATEGORY_DISABLE, eg, 1, 0, 0)
 end
 function cid.operation(e, tp, eg, ep, ev, re, r, rp)

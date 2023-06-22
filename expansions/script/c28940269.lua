@@ -60,11 +60,12 @@ function ref.sstg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetMatchingGroup(ref.ssfilter,tp,LOCATION_DECK+LOCATION_REMOVED,0,nil,e,tp):CheckSubGroup(ref.ssgfilter,1,2,tp,Duel.GetLocationCount(tp,LOCATION_MZONE)) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK+LOCATION_REMOVED)
 end
+function ref.descfilter(c,p) return c:IsPreviousLocation(LOCATION_MZONE) and c:GetPreviousControler()==p end
 function ref.ssop(e,tp)
 	local sg=Duel.GetMatchingGroup(ref.ssfilter,tp,LOCATION_DECK+LOCATION_REMOVED,0,nil,e,tp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	Debug.Message(#sg)
-	Debug.Message(sg:CheckSubGroup(ref.ssgfilter,1,2,tp,Duel.GetLocationCount(tp,LOCATION_MZONE)))
+	--Debug.Message(#sg)
+	--Debug.Message(sg:CheckSubGroup(ref.ssgfilter,1,2,tp,Duel.GetLocationCount(tp,LOCATION_MZONE)))
 	local g=sg:SelectSubGroup(tp,ref.ssgfilter,false,1,2,tp,Duel.GetLocationCount(tp,LOCATION_MZONE))
 	if #g>0 and Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP) then
 		local cg=Duel.GetMatchingGroup(ref.sscfilter,tp,LOCATION_HAND+LOCATION_ONFIELD,LOCATION_ONFIELD,nil,g)
@@ -72,6 +73,7 @@ function ref.ssop(e,tp)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 		local scg=cg:SelectSubGroup(tp,ref.sscgfilter,false,#g,#g)
 		Duel.SendtoGrave(scg,REASON_EFFECT)
+		if scg:IsExists(ref.descfilter,1,nil,1-tp) then Duel.Destroy(e:GetHandler(),REASON_EFFECT) end
 	end
 end
 

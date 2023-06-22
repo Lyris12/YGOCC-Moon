@@ -27,13 +27,19 @@ function ref.initial_effect(c)
 	c:RegisterEffect(e2)
 	--Floodgate
 	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetCode(EVENT_CHAIN_SOLVING)
+	e3:SetOperation(ref.handes)
+	c:RegisterEffect(e3)
+	--[[local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD)
 	e3:SetCode(EFFECT_CANNOT_ACTIVATE)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e3:SetTargetRange(1,1)
 	e3:SetValue(ref.actlimit)
-	c:RegisterEffect(e3)
+	c:RegisterEffect(e3)]]
 	--Drain
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_FIELD)
@@ -82,6 +88,17 @@ function ref.ngop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 --Floodgate
+ref[0]=0
+function ref.handes(e,tp,eg,ep,ev,re,r,rp)
+	local loc,id=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION,CHAININFO_CHAIN_ID)
+	if (Duel.CheckEvent(EVENT_SUMMON_SUCCESS) or Duel.CheckEvent(EVENT_SPSUMMON_SUCCESS) or Duel.CheckEvent(EVENT_FLIP_SUMMON_SUCCESS)) or id==ref[0] or not re:IsActiveType(TYPE_MONSTER) then return end
+	ref[0]=id
+	local p=re:GetHandlerPlayer()
+	if Duel.GetFieldGroupCount(p,LOCATION_HAND,0)>0 and Duel.SelectYesNo(p,aux.Stringid(id,1)) then
+		Duel.DiscardHand(p,aux.TRUE,1,1,REASON_EFFECT+REASON_DISCARD,nil)
+		Duel.BreakEffect()
+	else Duel.NegateEffect(ev) end
+end
 function ref.actlimit(e,re,rp)
 	return re:IsActiveType(TYPE_MONSTER)
 		and not (Duel.CheckEvent(EVENT_SUMMON_SUCCESS) or Duel.CheckEvent(EVENT_SPSUMMON_SUCCESS) or Duel.CheckEvent(EVENT_FLIP_SUMMON_SUCCESS))

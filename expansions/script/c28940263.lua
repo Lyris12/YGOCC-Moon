@@ -66,7 +66,7 @@ function ref.ssop(e,tp)
 	if #g>0 and Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)~=0 then
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_ADD_RACE)
+		e1:SetCode(EFFECT_CHANGE_RACE)
 		e1:SetValue(e:GetLabel())
 		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 		g:GetFirst():RegisterEffect(e1)
