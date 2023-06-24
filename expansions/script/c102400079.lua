@@ -1,5 +1,5 @@
 --created & coded by Lyris, art from Shadowverse's "Lapis, Glorious Seraph"
---剣主のアドバンテージ
+--天剣主のアドバンテージ
 local s,id,o=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)

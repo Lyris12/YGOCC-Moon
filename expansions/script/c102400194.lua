@@ -1,5 +1,5 @@
 --created & coded by Lyris, art by Ray-V-Xyz of DeviantArt
---Cyber Dragon Weiss
+--サイバー・ドラゴン・ヴァイス
 local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()

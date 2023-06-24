@@ -1,5 +1,5 @@
 --created & coded by Lyris, art from Yu-Gi-Oh! Arc-V Episode 125
---Parasite Integration
+--パラサイト・インテグレーション
 local s,id,o=GetID()
 function s.initial_effect(c)
 	if not s.global_check then

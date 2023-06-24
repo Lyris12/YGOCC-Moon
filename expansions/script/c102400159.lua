@@ -1,5 +1,5 @@
 --created & coded by Lyris, art on Reddit at https://www.reddit.com/r/yugioh/comments/88lik5/fan_art_cyber_dragon/
---Cyber Dragon Ein
+--サイバー・ドラゴン・アイン
 local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()

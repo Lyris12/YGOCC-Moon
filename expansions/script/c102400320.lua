@@ -1,5 +1,5 @@
 --created & coded by Discord \ Ace/Verloren, art from "Absorouter Dragon"
---Dominus Dragon
+--ドーミーナス・ドラゴン
 local s,id,o=GetID()
 function s.initial_effect(c)
 	aux.EnablePendulumAttribute(c,false)

@@ -1,5 +1,5 @@
 --created & coded by Lyris
---Cyber Dragon Mach
+--サイバー・ドラゴン・レッシュ
 local s,id,o=GetID()
 function s.initial_effect(c)
 	aux.EnableChangeCode(c,CARD_CYBER_DRAGON,LOCATION_MZONE+LOCATION_GRAVE)

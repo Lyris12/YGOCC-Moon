@@ -1,5 +1,5 @@
 --created & coded by Lyris, art from Cardfight!! Vanguard's "Starlight Melody Tamer, Farah"
---エニグマフォーマスター・ファラス
+--エントラフォーマスター・ファラス
 local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()

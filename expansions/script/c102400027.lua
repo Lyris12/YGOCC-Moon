@@ -1,5 +1,5 @@
 --created & coded by Lyris, art from Shadowverse's Evolved "Shion, Immortal Aegis"
---Undying Hadoken (Altered)
+--永久の波動拳
 local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit(c)

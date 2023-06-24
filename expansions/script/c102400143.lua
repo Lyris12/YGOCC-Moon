@@ -1,6 +1,7 @@
 --created by NovaTsukimori, coded by Lyris
 --RUM－ライリス・フォース
 local s,id,o=GetID()
+Card.IsLyrisForce=Card.IsLyrisForce or function(c) return c:IsCode(102400132,102400143,102400144) end
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)

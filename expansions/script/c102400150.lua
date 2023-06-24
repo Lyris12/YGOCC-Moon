@@ -1,5 +1,5 @@
 --created & coded by Lyris, art by Ray-V-Xyz of DeviantArt
---Chimeratech Cyber Dragon
+--キメラテック・サイバー・ドラゴン
 local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()

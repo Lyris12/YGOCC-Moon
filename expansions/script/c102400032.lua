@@ -1,5 +1,5 @@
 --created & coded by Lyris, art from Shadowverse's "Craftsman's Pride"
---Hadokenstruction
+--波動拳設
 local s,id,o=GetID()
 Card.IsHadoken=Card.IsHadoken or function(c) return c:GetCode()>102400019 and c:GetCode()<102400034 end
 function s.initial_effect(c)

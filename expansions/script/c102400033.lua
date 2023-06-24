@@ -1,5 +1,5 @@
 --created & coded by Lyris, art from Shadowverse's "Merciless Voiding"
---Hadokenihilism
+--波動拳無情
 local s,id,o=GetID()
 Card.IsHadoken=Card.IsHadoken or function(c) return c:GetCode()>102400019 and c:GetCode()<102400034 end
 function s.initial_effect(c)

@@ -1,5 +1,5 @@
 --created & coded by Lyris, art from Cardfight!! Vanguard's "Turquoise Beast Tamer"
---エニグマフォーマー・ターコイズテイマー
+--エントラフォーマー・ターコイズテイマー
 local s,id,o=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)

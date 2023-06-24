@@ -1,5 +1,5 @@
 --created & coded by Lyris, art from Cardfight!! Vanguard's "Mistress Hurricane"
---エニグマフォーマスター・ハリケン
+--エントラフォーマスター・ハリケン
 local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()

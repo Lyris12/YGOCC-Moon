@@ -1,5 +1,5 @@
 --created & coded by Lyris, art from Shadowverse's Evolved "Norn, Arbiter of Worlds"
---Seeker Hadoken
+--審判の波動拳
 local s,id,o=GetID()
 Card.IsHadoken=Card.IsHadoken or function(c) return c:GetCode()>102400019 and c:GetCode()<102400034 end
 function s.initial_effect(c)

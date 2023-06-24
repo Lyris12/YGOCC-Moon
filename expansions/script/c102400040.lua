@@ -1,5 +1,5 @@
 --created & coded by Lyris, art from Cardfight!! Vanguard's "Hades Ringmaster"
---エニグマフォーマー・リンマス
+--エントラフォーマー・リンマス
 local s,id,o=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)

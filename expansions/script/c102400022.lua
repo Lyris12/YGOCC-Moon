@@ -1,5 +1,5 @@
 --created & coded by Lyris, art from Shadowverse's "Rosa, Unfettered Maiden"
---Happy Hadoken
+--解放の波動拳
 local s,id,o=GetID()
 Card.IsHadoken=Card.IsHadoken or function(c) return c:GetCode()>102400019 and c:GetCode()<102400034 end
 function s.initial_effect(c)

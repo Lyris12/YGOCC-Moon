@@ -1,5 +1,5 @@
 --created & coded by Lyris, art from Shadowverse's "Shion, Immortal Aegis"
---Undying Hadoken
+--永久の波動拳
 local s,id,o=GetID()
 Card.IsHadoken=Card.IsHadoken or function(c) return c:GetCode()>102400019 and c:GetCode()<102400034 end
 function s.initial_effect(c)
