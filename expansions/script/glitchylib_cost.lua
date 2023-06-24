@@ -25,6 +25,9 @@ function Auxiliary.RevealFilter(f)
 end
 
 -----------------------------------------------------------------------
+function Auxiliary.DummyCost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+end
 function Auxiliary.ConfirmRuleCost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.ConfirmCards(1-tp,Group.FromCards(e:GetHandler()))

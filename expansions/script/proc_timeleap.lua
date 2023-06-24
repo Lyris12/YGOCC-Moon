@@ -214,21 +214,23 @@ function Auxiliary.AddTimeleapProc(c,futureval,sumcon,filter,customop,...)
 	else
 		table.insert(list,{999,min,max})
 	end
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_SPSUMMON_PROC)
-	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE)
-	e1:SetRange(LOCATION_EXTRA)
-	e1:SetCondition(Auxiliary.TimeleapCondition(sumcon,filter,table.unpack(list)))
-	e1:SetTarget(Auxiliary.TimeleapTarget(filter,table.unpack(list)))
-	e1:SetOperation(Auxiliary.TimeleapOperation(customop))
-	e1:SetValue(SUMMON_TYPE_TIMELEAP)
-	c:RegisterEffect(e1)
+	if sumcon then
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_FIELD)
+		e1:SetCode(EFFECT_SPSUMMON_PROC)
+		e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE)
+		e1:SetRange(LOCATION_EXTRA)
+		e1:SetCondition(Auxiliary.TimeleapCondition(sumcon,filter,table.unpack(list)))
+		e1:SetTarget(Auxiliary.TimeleapTarget(filter,table.unpack(list)))
+		e1:SetOperation(Auxiliary.TimeleapOperation(customop))
+		e1:SetValue(SUMMON_TYPE_TIMELEAP)
+		c:RegisterEffect(e1)
+	end
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e2:SetCode(EFFECT_FUTURE)
-	e2:SetValue(Auxiliary.FutureVal(futureval))
+	e2:SetValue(futureval)
 	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
@@ -236,6 +238,13 @@ function Auxiliary.AddTimeleapProc(c,futureval,sumcon,filter,customop,...)
 	e3:SetCode(EFFECT_CANNOT_BE_XYZ_MATERIAL)
 	e3:SetValue(1)
 	c:RegisterEffect(e3)
+	--remember previous Future on field
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_SINGLE|EFFECT_TYPE_CONTINUOUS)
+	e4:SetCode(EVENT_LEAVE_FIELD_P)
+	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_IGNORE_IMMUNE|EFFECT_FLAG_UNCOPYABLE)
+	e4:SetOperation(aux.UpdateLastFutureOnField)
+	c:RegisterEffect(e4)
 end
 function Auxiliary.TimeleapCondition(sumcon,filter,...)
 	local funs={...}
@@ -464,10 +473,21 @@ function Card.IsFutureBelow(c,future)
 	local ft=c:GetFuture()
 	return ft>0 and ft<=future
 end
-function Auxiliary.FutureVal(future)
-	return  function(e,c)
-				local future=future
-				--insert modifications here
-				return future
-			end
+
+function Auxiliary.UpdateLastFutureOnField(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local s=getmetatable(c)
+	s.PreviousFutureOnField=c:GetFuture()
 end
+function Card.GetPreviousFutureOnField(c)
+	local val=c.PreviousFutureOnField
+	if not val then return false end
+	return val
+end
+-- function Auxiliary.FutureVal(future)
+	-- return  function(e,c)
+				-- local future=future
+				-- --insert modifications here
+				-- return future
+			-- end
+-- end

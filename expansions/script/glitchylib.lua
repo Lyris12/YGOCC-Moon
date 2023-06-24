@@ -558,6 +558,34 @@ function Auxiliary.GlitchyCannotDisable(f)
 			end
 end
 
+function Auxiliary.nbcon2(tp,ev,re)
+	local rc=re:GetHandler()
+	return Duel.IsPlayerCanRemove(tp) and (not rc:IsRelateToChain(ev) or rc:IsAbleToRemove())
+end
+function Auxiliary.nbtg2(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return aux.nbcon2(tp,ev,re) end
+	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
+	if re:GetHandler():IsRelateToChain(ev) then
+		Duel.SetOperationInfo(0,CATEGORY_REMOVE,eg,1,0,0)
+	end
+	if re:GetActivateLocation()==LOCATION_GRAVE then
+		e:SetCategory(e:GetCategory()|CATEGORY_GRAVE_ACTION)
+	else
+		e:SetCategory(e:GetCategory()&~CATEGORY_GRAVE_ACTION)
+	end
+end
+function Auxiliary.dbtg2(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return aux.nbcon2(tp,ev,re) end
+	Duel.SetOperationInfo(0,CATEGORY_DISABLE,eg,1,0,0)
+	if re:GetHandler():IsRelateToChain(ev) then
+		Duel.SetOperationInfo(0,CATEGORY_REMOVE,eg,1,0,0)
+	end
+	if re:GetActivateLocation()==LOCATION_GRAVE then
+		e:SetCategory(e:GetCategory()|CATEGORY_GRAVE_ACTION)
+	else
+		e:SetCategory(e:GetCategory()&~CATEGORY_GRAVE_ACTION)
+	end
+end
 
 
 -----------------------------------------------------------------------
@@ -586,6 +614,11 @@ GECC_OVERRIDE_ACTIVE_TYPE	 	= 0x1
 GECC_OVERRIDE_REASON_EFFECT 	= 0x2
 GECC_OVERRIDE_REASON_CARD 		= 0x4
 
+CHEATCODE_OVERRIDE_ACTIVE_TYPE	 	= 0x1
+CHEATCODE_OVERRIDE_REASON_EFFECT 	= 0x2
+CHEATCODE_OVERRIDE_REASON_CARD 		= 0x4
+CHEATCODE_SET_CHAIN_ID				= 0x8
+
 function Card.SetCheatCode(c,code,temp)
 	if not temp then
 		if not c.cheat_code_table then
@@ -607,8 +640,11 @@ function Card.SetCheatCode(c,code,temp)
 		end
 	end
 end
-function Effect.SetCheatCode(e,code,temp)
+function Effect.SetCheatCode(e,code,temp,val)
 	local c=e:GetHandler()
+	if not c then
+		c=e:GetOwner()
+	end
 	if not c then return end
 	if not temp then
 		if not c.cheat_code_effect_table then
@@ -630,19 +666,25 @@ function Effect.SetCheatCode(e,code,temp)
 			c.cheat_code_effect_table_temp[id]=ogcode|code
 		end
 	end
+	if val then
+		e:SetCheatCodeValue(code,val)
+	end
 end
 function Card.GetCheatCode(c)
 	if not c then return 0 end
 	local code = (not c.cheat_code_table) and 0 or c.cheat_code_table
 	local temp = (not c.cheat_code_table_temp or not c.cheat_code_table_temp[c:GetFieldID()]) and 0 or c.cheat_code_table_temp[c:GetFieldID()]
-	return (code&~temp)|temp
+	return code|temp
 end
 function Effect.GetCheatCode(e)
 	local c=e:GetHandler()
+	if not c then
+		c=e:GetOwner()
+	end
 	if not c then return 0 end
 	local code = (not c.cheat_code_effect_table or not c.cheat_code_effect_table[e]) and 0 or c.cheat_code_effect_table[e]
 	local temp = (not c.cheat_code_effect_table_temp or not c.cheat_code_effect_table_temp[e:GetFieldID()]) and 0 or c.cheat_code_effect_table_temp[e:GetFieldID()]
-	return (code&~temp)|temp
+	return code|temp
 end
 function Card.IsHasCheatCode(c,code)
 	local getcode=c:GetCheatCode()
@@ -665,6 +707,9 @@ function Card.SetCheatCodeValue(c,code,val)
 end
 function Effect.SetCheatCodeValue(e,code,val)
 	local c=e:GetHandler()
+	if not c then
+		c=e:GetOwner()
+	end
 	if not c or not e:IsHasCheatCode(code) then return end
 	if not c.cheat_code_effect_table_values then
 		local mt=getmetatable(c)
@@ -679,12 +724,15 @@ function Effect.SetCheatCodeValue(e,code,val)
 	end
 end
 function Card.GetCheatCodeValue(c,code)
-	if not c or not c:IsHasCheatCode(code) or not c.cheat_code_table_values or not c.cheat_code_table_values[code] then return end
+	if not c or not c:IsHasCheatCode(code) or not c.cheat_code_table_values or not c.cheat_code_table_values[code] then return false end
 	return c.cheat_code_table_values[code]
 end
 function Effect.GetCheatCodeValue(e,code)
 	local c=e:GetHandler()
-	if not c or not e:IsHasCheatCode(code) or not c.cheat_code_effect_table_values or not c.cheat_code_effect_table_values[e] or not c.cheat_code_effect_table_values[e][code] then return end
+	if not c then
+		c=e:GetOwner()
+	end
+	if not c or not e:IsHasCheatCode(code) or not c.cheat_code_effect_table_values or not c.cheat_code_effect_table_values[e] or not c.cheat_code_effect_table_values[e][code] then return false end
 	return c.cheat_code_effect_table_values[e][code]
 end
 
@@ -718,7 +766,6 @@ Card.GetReasonCard = function(c)
 		return _GetReasonCard(c)
 	end
 end
-
 
 --Modified Functions: Names
 local _IsCode, _IsFusionCode, _IsLinkCode, _IsOriginalCodeRule =

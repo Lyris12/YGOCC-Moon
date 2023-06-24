@@ -226,12 +226,27 @@ function Card.GetEngagedID(c)
 	for _,e in ipairs({c:IsHasEffect(EFFECT_PUBLIC)}) do
 		if e and e.GetLabel then
 			local label1,label2=e:GetLabel()
-			if label==FLAG_ENGAGE then
+			if label1==FLAG_ENGAGE then
 				return label2
 			end
 		end
 	end
 	return 0
+end
+function Auxiliary.RememberEngagedID(c,e)
+	if c:IsRelateToChain() and c:IsEngaged() then
+		e:SetLabel(c:GetEngagedID())
+	else
+		e:SetLabel(0)
+	end
+end
+function Auxiliary.ExceptThisEngaged(c,previous_eid)
+	if aux.GetValueType(c)=="Effect" then c=c:GetHandler() end
+	if c:IsRelateToChain() and c:IsEngaged() and c:GetEngagedID()==previous_eid then
+		return c
+	else
+		return nil
+	end
 end
 
 function Auxiliary.EngageCondition(e,tp)
@@ -367,7 +382,6 @@ function Auxiliary.OverDriveEffectCost(cost,setlabel)
 				end
 				local available_effects = {}
 				local g=Group.CreateGroup()
-				Debug.Message(#egroup)
 				for _,ce in ipairs(egroup) do
 					if aux.GetValueType(ce)=="Effect" and ce:CheckCountLimit(tp) then
 						g:AddCard(ce:GetOwner())
@@ -418,7 +432,7 @@ function Card.DriveEffect(c,energycost,desc,category,typ,property,event,conditio
 	local typ = typ or EFFECT_TYPE_IGNITION
 	local property = type(property)~="boolean" and property or property==true and EFFECT_FLAG_CARD_TARGET
 	local event = event
-	local hint1,hint2
+	local hint1,hint2 = 0,0
 	
 	if typ~=EFFECT_TYPE_IGNITION and not event then
 		event=EVENT_FREE_CHAIN
@@ -452,7 +466,7 @@ function Card.DriveEffect(c,energycost,desc,category,typ,property,event,conditio
 	if event then
 		e:SetCode(event)
 	end
-	if hint then
+	if hint1~=0 or hint2~=0 then
 		e:SetHintTiming(hint1,hint2)
 	end
 	e:SetRange(LOCATION_HAND)
@@ -496,9 +510,22 @@ function Card.OverDriveEffect(c,desc,category,typ,property,event,condition,cost,
 	local typ = typ or EFFECT_TYPE_IGNITION
 	local property = type(property)~="boolean" and property or property==true and EFFECT_FLAG_CARD_TARGET
 	local event = event
+	local hint1,hint2 = 0,0
+	
 	if typ~=EFFECT_TYPE_IGNITION and not event then
 		event=EVENT_FREE_CHAIN
+	elseif type(event)=="table" then
+		local ct=#event
+		hint2 = event[ct]
+		event = event[1]
+		if ct==3 then
+			hint1 = event[2]
+		end
+	elseif typ==EFFECT_TYPE_QUICK_O then
+		hint2 = RELEVANT_TIMINGS
 	end
+	
+	
 	local e=Effect.CreateEffect(c)
 	if desc then
 		e:Desc(desc)
@@ -517,6 +544,9 @@ function Card.OverDriveEffect(c,desc,category,typ,property,event,condition,cost,
 	end
 	if event then
 		e:SetCode(event)
+	end
+	if hint1~=0 or hint2~=0 then
+		e:SetHintTiming(hint1,hint2)
 	end
 	e:SetRange(LOCATION_HAND)
 	if not shopt then
@@ -697,18 +727,18 @@ function Card.UpdateEnergy(c,val,p,r,reset,rc,e,val2)
 	end
 	
 	local en=c:GetEnergy()
-	local e=Effect.CreateEffect(rc)
-	e:SetType(EFFECT_TYPE_SINGLE)
-	e:SetCode(EFFECT_UPDATE_ENERGY)
-	e:SetCondition(aux.ResetIfNotEngaged(c:GetEngagedID()))
-	e:SetValue(val)
+	local e1=Effect.CreateEffect(rc)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_UPDATE_ENERGY)
+	e1:SetCondition(aux.ResetIfNotEngaged(c:GetEngagedID()))
+	e1:SetValue(val)
 	if reset then
 		if r&REASON_EFFECT>0 then
 			reset = rc==c and reset|RESET_DISABLE or reset
 		end
-		e:SetReset(RESET_EVENT|RESETS_STANDARD|reset)
+		e1:SetReset(RESET_EVENT|RESETS_STANDARD|reset)
 	end
-	c:RegisterEffect(e)
+	c:RegisterEffect(e1)
 	local diff=c:GetEnergy()-en
 	if r&REASON_TEMPORARY==0 then
 		aux.CheckEnergyOperation(c,p)
@@ -795,12 +825,13 @@ function Duel.AnnounceEnergyUpdate(p,c,min,max,up,r,e)
 end
 
 --conditions
-function Auxiliary.IsExistingEngagedCond(p)
+function Auxiliary.IsExistingEngagedCond(p,f)
 	if p then
 		return	function(e,tp)
 					local tp = type(tp)~=nil and tp or e:GetHandlerPlayer()
 					local p = (p==0) and tp or 1-tp
-					return Duel.GetEngagedCard(p)~=nil
+					local ec=Duel.GetEngagedCard(p)
+					return ec~=nil and (not f or f(ec,e,tp))
 				end
 	else
 		return	function(e)
@@ -867,13 +898,14 @@ function Auxiliary.UpdateEnergyCost(min,max,f)
 end
 
 --operations
-function Duel.SearchAndEngage(tc,e,tp)
+function Duel.SearchAndEngage(tc,e,tp,forced)
 	if Duel.SendtoHand(tc,nil,REASON_EFFECT)>0 and aux.PLChk(tc,tp,LOCATION_HAND) then
 		Duel.ConfirmCards(1-tp,Group.FromCards(tc))
-		if tc:IsMonster(TYPE_DRIVE) and tc:IsCanEngage(tp) and Duel.SelectYesNo(tp,STRING_ASK_ENGAGE) then
+		if tc:IsMonster(TYPE_DRIVE) and tc:IsCanEngage(tp) and (forced or (not forced and Duel.SelectYesNo(tp,STRING_ASK_ENGAGE))) then
 			tc:Engage(e,tp)
 			return tc:IsEngaged()
 		end
+		return false
 	end
 	return false
 end

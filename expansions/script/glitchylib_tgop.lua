@@ -3111,6 +3111,15 @@ function Duel.SpecialSummonRedirect(e,g,styp,sump,tp,ign1,ign2,pos,zone,loc,desc
 	if not zone then zone=0xff end
 	if not loc then loc=LOCATION_REMOVED end
 	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
+	
+	if not desc then
+		if loc==LOCATION_REMOVED then
+			desc=STRING_BANISH_REDIRECT
+		elseif loc==LOCATION_DECKSHF then
+			desc=STRING_SHUFFLE_INTO_DECK_REDIRECT
+		end
+	end
+	
 	for dg in aux.Next(g) do
 		local finalzone=zone
 		if type(zone)=="table" then
@@ -3137,6 +3146,7 @@ function Duel.SpecialSummonRedirect(e,g,styp,sump,tp,ign1,ign2,pos,zone,loc,desc
 	end
 	return Duel.SpecialSummonComplete()
 end
+
 function Duel.SpecialSummonATKDEF(e,g,styp,sump,tp,ign1,ign2,pos,zone,atk,def,reset,rc)
 	if not zone then zone=0xff end
 	if not reset then reset=0 end

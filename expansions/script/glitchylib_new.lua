@@ -14,23 +14,51 @@ CATEGORY_LVCHANGE					= 0x800
 CATEGORY_PAYLP						= 0x1000
 CATEGORY_ACTIVATES_ON_NORMAL_SET	= 0x2000
 
-CATEGORIES_SEARCH = CATEGORY_SEARCH|CATEGORY_TOHAND
-CATEGORIES_FUSION_SUMMON = CATEGORY_SPECIAL_SUMMON|CATEGORY_FUSION_SUMMON
-CATEGORIES_TOKEN = CATEGORY_SPECIAL_SUMMON|CATEGORY_TOKEN
+CATEGORIES_ATKDEF			=	CATEGORY_ATKCHANGE|CATEGORY_DEFCHANGE
+CATEGORIES_SEARCH 			= 	CATEGORY_SEARCH|CATEGORY_TOHAND
+CATEGORIES_FUSION_SUMMON 	= 	CATEGORY_SPECIAL_SUMMON|CATEGORY_FUSION_SUMMON
+CATEGORIES_TOKEN 			= 	CATEGORY_SPECIAL_SUMMON|CATEGORY_TOKEN
 
 CATEGORY_FLAG_SELF					= 0x1
+CATEGORY_FLAG_DELAYED_RESOLUTION	= 0x2
 
 --Custom Archetypes
 CUSTOM_ARCHE_ZERO_HERO				= 0x1
 
 --Custom Cards
-CARD_ZERO_HERO_MAGMA_MAN				= 30409
-CARD_STARFORCE_KNIGHT					= 39301
-CARD_ZEROST_BEAST_ZEROTL 				= 100000025
-CARD_IN_THE_FOREST_BLACK_AS_MY_MEMORY	= 1
+ARCHE_FUSION		= 0x46
+ARCHE_PANDEMONIUM	= 0xf80
+ARCHE_BIGBANG		= 0xbba
+ARCHE_HYPERDRIVE	= 0x660
+
+ARCHE_DOOMSDAY_ARTIFICE	= 0x3a6
+ARCHE_DREAMY_FOREST		= 0xd43
+ARCHE_DREARY_FOREST		= 0xd44
+ARCHE_GOLDEN_SKIES		= 0x528
+ARCHE_IDOLESCENT		= 0x5a3
+ARCHE_LEYLAH			= 0xd45
+ARCHE_LIFEWEAVER		= 0x5a5
+ARCHE_METALURGOS		= 0x5a4
+ARCHE_OSCURION			= 0x5a6
+ARCHE_TRAPPIT			= 0x54a
+ARCHE_VAISSEAU			= 0x4a8
+ARCHE_ZEROST			= 0x1e4
+
+CARD_METALURGOS_CONDUCTION				= 11110608
 CARD_CHEVALIER_DU_VAISSEAU				= 100000032
-CARD_ROI_DU_VAISSEAU					= 100000035
+CARD_GOLDEN_SKIES_TREASURE				= 11111040
+CARD_GOLDEN_SKIES_TREASURE_OF_WELFARE	= 11111029
+CARD_IN_THE_FOREST_BLACK_AS_MY_MEMORY	= 1
+CARD_OSCURION_TYPE0						= 11110633
+CARD_OSCURION_TYPE2						= 11110634
 CARD_REVERIE_DU_VAISSEAU				= 100000039
+CARD_ROI_DU_VAISSEAU					= 100000035
+CARD_ROTA								= 32807846
+CARD_STARFORCE_KNIGHT					= 39301
+CARD_ZERO_HERO_MAGMA_MAN				= 30409
+CARD_ZEROST_BEAST_ZEROTL 				= 100000025
+
+TOKEN_RIVAL								= 11110646
 
 --Custom Counters
 COUNTER_ICE_PRISON					= 0x1301
@@ -39,20 +67,23 @@ COUNTER_SORROW						= 0xd44
 COUNTER_JOY							= 0xd43
 
 --Desc
-STRING_CANNOT_CHANGE_POSITION 			= 	700
-STRING_CANNOT_TRIGGER					=	701
-STRING_BANISH_REDIRECT					=	702
-STRING_CANNOT_BE_DESTROYED_BY_BATTLE	=	703
-STRING_CANNOT_BE_DESTROYED_BY_EFFECT	=	704
-STRING_CANNOT_ATTACK					=	705
-STRING_TREATED_AS_TUNER					=	706
-STRING_UNAFFECTED_BY_OPPONENT_EFFECT	=	707
-STRING_TEMPORARILY_BANISHED				=   708
-STRING_INCREASE_DICE_RESULT				=   709
-STRING_DECREASE_DICE_RESULT				=   710
-STRING_IGNORE_BATTLE_TARGET				=	711
-STRING_FAST_ACTIVATION					=	712
-STRING_GAINED_ADDITIONAL_ATTACK			=	713
+STRING_CANNOT_CHANGE_POSITION 					= 	700
+STRING_CANNOT_TRIGGER							=	701
+STRING_BANISH_REDIRECT							=	702
+STRING_CANNOT_BE_DESTROYED_BY_BATTLE			=	703
+STRING_CANNOT_BE_DESTROYED_BY_EFFECT			=	704
+STRING_CANNOT_ATTACK							=	705
+STRING_TREATED_AS_TUNER							=	706
+STRING_UNAFFECTED_BY_OPPONENT_EFFECT			=	707
+STRING_TEMPORARILY_BANISHED						=   708
+STRING_INCREASE_DICE_RESULT						=   709
+STRING_DECREASE_DICE_RESULT						=   710
+STRING_IGNORE_BATTLE_TARGET						=	711
+STRING_FAST_ACTIVATION							=	712
+STRING_GAINED_ADDITIONAL_ATTACK					=	713
+STRING_SHUFFLE_INTO_DECK_REDIRECT				=	714
+STRING_CANNOT_BE_TARGETED_BY_OPPONENT_EFFECT	=	715
+STRING_CANNOT_BE_DESTROYED_BY_OPPONENT_EFFECT	=	716
 
 STRING_ASK_REPLACE_UPDATE_ENERGY_COST	= 	900
 STRING_ASK_ENGAGE						=	901
@@ -116,20 +147,9 @@ WIN_REASON_CUSTOM = 0xff
 
 --constants aliases
 TYPE_ST			= TYPE_SPELL|TYPE_TRAP
+TYPE_GEMINI		= TYPE_DUAL
 
 RACES_BEASTS = RACE_BEAST|RACE_BEASTWARRIOR|RACE_WINDBEAST
-
-ARCHE_FUSION		= 0x46
-ARCHE_PANDEMONIUM	= 0xf80
-ARCHE_BIGBANG		= 0xbba
-ARCHE_HYPERDRIVE	= 0x660
-
-ARCHE_DREAMY_FOREST	= 0xd43
-ARCHE_DREARY_FOREST	= 0xd44
-ARCHE_LEYLAH		= 0xd45
-ARCHE_TRAPPIT		= 0x54a
-ARCHE_VAISSEAU		= 0x4a8
-ARCHE_ZEROST		= 0x1e4
 
 LOCATION_ALL = LOCATION_DECK|LOCATION_HAND|LOCATION_MZONE|LOCATION_SZONE|LOCATION_GRAVE|LOCATION_REMOVED|LOCATION_EXTRA
 LOCATION_GB  = LOCATION_GRAVE|LOCATION_REMOVED
@@ -143,7 +163,7 @@ RESET_TURN_OPPO = RESET_OPPO_TURN
 
 --Shortcuts
 function Duel.IsExists(target,f,tp,loc1,loc2,min,exc,...)
-	if aux.GetValueType(target)~="boolean" then return false end
+	if aux.GetValueType(target)~="boolean" then Debug.Message("Duel.IsExists: First argument should be boolean") return false end
 	local func = (target==true) and Duel.IsExistingTarget or Duel.IsExistingMatchingCard
 	
 	return func(f,tp,loc1,loc2,min,exc,...)
@@ -438,14 +458,15 @@ function Duel.Bounce(g)
 	return ct,#cg,cg
 end
 
-function Duel.ShuffleIntoDeck(g,p)
+function Duel.ShuffleIntoDeck(g,p,loc)
+	if not loc then loc=LOCATION_DECK|LOCATION_EXTRA end
 	local ct=Duel.SendtoDeck(g,p,SEQ_DECKSHUFFLE,REASON_EFFECT)
 	if ct>0 then
 		aux.AfterShuffle(g)
-		if aux.GetValueType(g)=="Card" and aux.PLChk(g,p,LOCATION_DECK+LOCATION_EXTRA) then
+		if aux.GetValueType(g)=="Card" and aux.PLChk(g,p,loc) then
 			return 1
 		elseif aux.GetValueType(g)=="Group" then
-			return g:FilterCount(aux.PLChk,nil,p,LOCATION_DECK+LOCATION_EXTRA)
+			return g:FilterCount(aux.PLChk,nil,p,loc)
 		end
 	end
 	return 0
@@ -505,11 +526,18 @@ end
 function Card.IsNormalTrap(c)
 	return c:GetType()&(TYPE_TRAP|TYPE_CONTINUOUS|TYPE_COUNTER)==TYPE_TRAP
 end
+function Card.IsNormalST(c)
+	return c:IsNormalSpell() or c:IsNormalTrap()
+end
 function Card.IsST(c,typ)
 	return c:IsType(TYPE_ST) and (aux.GetValueType(typ)~="number" or c:IsType(typ))
 end
 function Card.MonsterOrFacedown(c)
 	return c:IsMonster() or c:IsFacedown()
+end
+
+function Card.IsAttributeRace(c,attr,race)
+	return c:IsAttribute(attr) and c:IsRace(race)
 end
 
 function Card.IsAppropriateEquipSpell(c,ec,tp)
@@ -697,6 +725,11 @@ function Effect.UpdateDefenseClone(e,c,notreg)
 	return ex
 end
 
+--codes
+function Card.IsOriginalCode(c,code)
+	return c:GetOriginalCode()==code
+end
+
 --Columns
 function Card.GlitchyGetColumnGroup(c,left,right,without_center)
 	local left = (left and aux.GetValueType(left)=="number" and left>=0) and left or 0
@@ -803,6 +836,7 @@ function Auxiliary.Option(id,tp,desc,...)
 			off=off+1
 		end
 	end
+	if #ops==0 then return end
 	local op=Duel.SelectOption(tp,table.unpack(ops))+1
 	local sel=opval[op]
 	Duel.Hint(HINT_OPSELECTED,1-tp,ops[op])
@@ -813,6 +847,16 @@ function Duel.RegisterHint(p,flag,reset,rct,id,desc)
 	if not reset then reset=PHASE_END end
 	if not rct then rct=1 end
 	return Duel.RegisterFlagEffect(p,flag,RESET_PHASE+reset,EFFECT_FLAG_CLIENT_HINT,rct,0,aux.Stringid(id,desc))
+end
+
+--EDOPro Imported
+function Group.CheckSameProperty(g,f,...)
+	local chk=nil
+	for tc in aux.Next(g) do
+		chk = chk and (chk&f(tc,...)) or f(tc,...)
+		if chk==0 then return false,0 end
+	end
+	return true, chk
 end
 
 --Excavate
@@ -963,9 +1007,6 @@ function Duel.PlayerHasFlagEffectLabel(tp,id,val)
 	return false
 end
 
---Flip Summon
-
-
 --Gain Effect
 function Auxiliary.GainEffectType(c,oc,reset)
 	if not oc then oc=c end
@@ -980,17 +1021,11 @@ function Auxiliary.GainEffectType(c,oc,reset)
 	end
 end
 
---Group Check
-
---EDOPro Imported
-function Group.CheckSameProperty(g,f,...)
-	local chk=nil
-	for tc in aux.Next(g) do
-		chk = chk and (chk&f(tc,...)) or f(tc,...)
-		if chk==0 then return false,0 end
-	end
-	return true, chk
+--Hint timing
+function Effect.SetRelevantTimings(e)
+	return e:SetHintTiming(0,RELEVANT_TIMINGS)
 end
+
 
 --Labels
 function Effect.SetLabelPair(e,l1,l2)
@@ -1095,11 +1130,18 @@ function Card.IsSelfSummoned(c)
 	return c:IsSummonType(SUMMON_TYPE_SPECIAL+1)
 end
 
+--Zones
 function Card.GetZone(c,tp)
-	local rzone = c:IsControler(tp) and (1 <<c:GetSequence()) or (1 << (16+c:GetSequence()))
-	if c:IsSequence(5,6) then
-		rzone = rzone | (c:IsControler(tp) and (1 << (16 + 11 - c:GetSequence())) or (1 << (11 - c:GetSequence())))
+	local rzone
+	if c:IsLocation(LOCATION_MZONE) then
+		rzone = c:IsControler(tp) and (1 <<c:GetSequence()) or (1 << (16+c:GetSequence()))
+		if c:IsSequence(5,6) then
+			rzone = rzone | (c:IsControler(tp) and (1 << (16 + 11 - c:GetSequence())) or (1 << (11 - c:GetSequence())))
+		end
+	elseif c:IsLocation(LOCATION_SZONE) then
+		rzone = c:IsControler(tp) and (1 << (8+c:GetSequence())) or (1 << (24+c:GetSequence()))
 	end
+	
 	return rzone
 end
 function Card.GetPreviousZone(c,tp)
@@ -1109,6 +1151,89 @@ function Card.GetPreviousZone(c,tp)
 	end
 	return rzone
 end
+
+function Duel.GetColumnZoneFromSequence(seq,seqloc,loc)
+	local zones=0
+	if not seqloc then
+		seqloc=LOCATION_ONFIELD
+	else
+		if seqloc&LOCATION_ONFIELD==0 or (seqloc==LOCATION_SZONE and seq>=5) then
+			return 0
+		end 
+	end
+	if not loc then
+		loc=LOCATION_ONFIELD
+	else
+		if loc&LOCATION_ONFIELD==0 then
+			return 0
+		end
+	end
+	
+	if seq<=4 then
+		if loc&LOCATION_MZONE~=0 then
+			if seqloc&LOCATION_MZONE==0 then
+				zones = zones|(1<<seq)
+			end
+			zones = zones|(1<<(16+(4-seq)))
+			if seq==1 then
+				zones = zones|((1<<5)|(1<<(16+6)))
+			end
+			if seq==3 then
+				zones = zones|((1<<6)|(1<<(16+5)))
+			end
+		end
+		if loc&LOCATION_SZONE~=0 then
+			if seqloc&LOCATION_SZONE==0 then
+				zones = zones|(1<<seq+8)
+			end
+			zones = zones|(1<<(16+8+(4-seq)))
+		end
+	
+	elseif seq==5 then
+		if loc&LOCATION_MZONE~=0 then
+			zones = zones|((1 << 1) | (1 << (16 + 3)))
+		end
+		if loc&LOCATION_SZONE~=0 then
+			zones = zones|((1 << (8 + 1)) | (1 << (16 + 8 + 3)))
+		end
+	
+	elseif seq==6 then
+		if loc&LOCATION_MZONE~=0 then
+			zones = zones|((1 << 3) | (1 << (16 + 1)))
+		end
+		if loc&LOCATION_SZONE~=0 then
+			zones = zones|((1 << (8 + 3)) | (1 << (16 + 8 + 1)))
+		end
+	end
+	
+	--Debug.Message(zones)
+	return zones
+end
+function Duel.GetColumnGroupFromSequence(tp,seq,seqloc)
+	if seqloc&LOCATION_ONFIELD==0 then return end
+	local column_mzone,column_szone = Duel.GetColumnZoneFromSequence(seq,seqloc,LOCATION_MZONE),Duel.GetColumnZoneFromSequence(seq,seqloc,LOCATION_SZONE)
+	local g1=Duel.GetCardsInZone(column_mzone,tp,LOCATION_MZONE)
+	local g2=Duel.GetCardsInZone(column_mzone>>16,1-tp,LOCATION_MZONE)
+	local g3=Duel.GetCardsInZone(column_szone>>8,tp,LOCATION_SZONE)
+	local g4=Duel.GetCardsInZone(column_szone>>24,1-tp,LOCATION_SZONE)
+	g1:Merge(g2)
+	g1:Merge(g3)
+	g1:Merge(g4)
+	return g1
+end
+function Duel.GetCardsInZone(zone,tp,loc)
+	if loc&LOCATION_ONFIELD==0 then return end
+	local g=Group.CreateGroup()
+	local v = loc==LOCATION_MZONE and Duel.GetFieldGroup(tp,LOCATION_MZONE,0) or Duel.GetFieldGroup(tp,LOCATION_SZONE,0):Filter(Card.IsSequenceBelow,nil,4)
+	for tc in aux.Next(v) do
+		local icheck=1<<tc:GetSequence()
+		if zone&icheck~=0 then
+			g:AddCard(tc)
+		end
+	end
+	return g
+end
+
 function Duel.CheckPendulumZones(tp)
 	return Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,1)
 end
@@ -1212,8 +1337,9 @@ end
 if not Auxiliary.HOPTTracker then
 	Auxiliary.HOPTTracker={}
 end
-function Effect.HOPT(e,oath)
+function Effect.HOPT(e,oath,ct)
 	if not e:GetOwner() then return end
+	if not ct then ct=1 end
 	local c=e:GetOwner()
 	local cid=c:GetOriginalCode()
 	if not aux.HOPTTracker[c] then
@@ -1227,8 +1353,7 @@ function Effect.HOPT(e,oath)
 	if oath then
 		flag=flag|EFFECT_COUNT_CODE_OATH
 	end
-	
-	return e:SetCountLimit(1,cid+flag)
+	return e:SetCountLimit(ct,cid+flag)
 end
 function Effect.SHOPT(e,oath)
 	if not e:GetOwner() then return end
@@ -1721,6 +1846,30 @@ function Auxiliary.DreamyDrearyTransformationCondition(status)
 						and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,ARCHE_DREAMY_FOREST,ARCHE_DREARY_FOREST),tp,LOCATION_ONFIELD,0,1,e:GetHandler())
 				end
 	end
+end
+
+----OSCURION
+function Auxiliary.RegisterOscurionDiscardCostEffectFlag(c,e)
+	local prop=EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_IGNORE_IMMUNE|EFFECT_FLAG_SET_AVAILABLE
+	if e:IsHasProperty(EFFECT_FLAG_UNCOPYABLE) then prop=prop|EFFECT_FLAG_UNCOPYABLE end
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_TRIGGER_O)
+	e3:SetProperty(prop)
+	e3:SetCode(CARD_OSCURION_TYPE0)
+	e3:SetLabelObject(e)
+	e3:SetLabel(c:GetOriginalCode())
+	c:RegisterEffect(e3)
+end
+function Auxiliary.RegisterOscurionDriveSummonEffectFlag(c,e)
+	local prop=EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_IGNORE_IMMUNE|EFFECT_FLAG_SET_AVAILABLE
+	if e:IsHasProperty(EFFECT_FLAG_UNCOPYABLE) then prop=prop|EFFECT_FLAG_UNCOPYABLE end
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_TRIGGER_O)
+	e3:SetProperty(prop)
+	e3:SetCode(CARD_OSCURION_TYPE2)
+	e3:SetLabelObject(e)
+	e3:SetLabel(c:GetOriginalCode())
+	c:RegisterEffect(e3)
 end
 
 ----VAISSEAU
