@@ -2,71 +2,17 @@
 --Voidictator Energy - Ritual Essence
 local s,id,o=GetID()
 function s.initial_effect(c)
-	local e1=aux.AddRitualProcUltimate(c,aux.FilterBoolFunction(Card.IsSetCard,0xc97),Card.GetLevel,"Greater",LOCATION_HAND+LOCATION_GRAVE,aux.FilterBoolFunction(aux.AND(Card.IsFaceup,Card.IsSetCard),0xc97),s.mfilter)
-	e1:SetOperation(s.RitualUltimateOperation(aux.FilterBoolFunction(Card.IsSetCard,0xc97),Card.GetLevel,"Greater",LOCATION_HAND+LOCATION_GRAVE,aux.FilterBoolFunction(aux.AND(Card.IsFaceup,Card.IsSetCard),0xc97),s.mfilter))
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e2:SetCode(EVENT_REMOVE)
-	e2:SetCountLimit(2,id)
-	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
-	e2:SetCategory(CATEGORY_TOHAND)
-	e2:SetCondition(function(e,tp,eg,ep,ev,re) return re and re:GetHandler():IsSetCard(0xc97) and e:GetHandler():IsReason(REASON_EFFECT) end)
-	e2:SetCost(s.cost)
-	e2:SetTarget(s.tg)
-	e2:SetOperation(s.op)
-	c:RegisterEffect(e2)
-end
-function s.mfilter(c)
-	return c:IsAttribute(ATTRIBUTE_DARK) and c:IsRace(RACE_FIEND)
-end
-function s.RitualUltimateOperation(filter,level_function,greater_or_equal,summon_location,grave_filter,mat_filter)
-	return  function(e,tp,eg,ep,ev,re,r,rp)
-				local mg=Duel.GetRitualMaterial(tp):Filter(Card.IsOnField,nil)
-				if mat_filter then mg=mg:Filter(mat_filter,nil,e,tp) end
-				local exg=nil
-				if grave_filter then
-					exg=Duel.GetMatchingGroup(aux.RitualExtraFilter,tp,LOCATION_REMOVED,0,nil,grave_filter)
-				end
-				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-				local tg=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(aux.RitualUltimateFilter),tp,summon_location,0,1,1,nil,filter,e,tp,mg,exg,level_function,greater_or_equal)
-				local tc=tg:GetFirst()
-				if tc then
-					mg=mg:Filter(Card.IsCanBeRitualMaterial,tc,tc)
-					if exg then
-						mg:Merge(exg)
-					end
-					if tc.mat_filter then
-						mg=mg:Filter(tc.mat_filter,tc,tp)
-					else
-						mg:RemoveCard(tc)
-					end
-					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-					local lv=level_function(tc)
-					aux.GCheckAdditional=aux.RitualCheckAdditional(tc,lv,greater_or_equal)
-					local mat=mg:SelectSubGroup(tp,aux.RitualCheck,false,1,lv,tp,tc,lv,greater_or_equal)
-					aux.GCheckAdditional=nil
-					tc:SetMaterial(mat)
-					Duel.SendtoGrave(mat:Filter(Card.IsLocation,nil,LOCATION_REMOVED),REASON_RETURN+REASON_MATERIAL+REASON_RITUAL+REASON_EFFECT)
-					Duel.ReleaseRitualMaterial(mat:Filter(Card.IsOnField,nil))
-					Duel.BreakEffect()
-					Duel.SpecialSummon(tc,SUMMON_TYPE_RITUAL,tp,tp,false,true,POS_FACEUP)
-					tc:CompleteProcedure()
-				end
-			end
-end
-function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.Damage(tp,500,REASON_COST)
-end
-function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	if chk==0 then return c:IsAbleToHand() end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,c,1,0,0)
-end
-function s.op(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) then
-		Duel.SendtoHand(c,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,c)
-	end
+	--This card can be used to Ritual Summon any "Voidictator" Ritual Monster. You must also Tribute DARK Fiend monsters from your hand or field, or return your banished Level 4 or lower DARK Fiend monsters to the GY, whose total Levels equal or exceed the Level of the Ritual Monster you are Ritual Summoning. If this card is banished because of a "Voidictator" card you own: You can banish 1 "Voidictator Servant" monster from your hand or GY; add this card to your hand. You can use this effect of "Voidictator Energy - Ritual Essence" up to twice per turn.
+	local tp=c:GetControler()
+	local ef=Effect.CreateEffect(c)
+	ef:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	ef:SetCode(EVENT_PHASE_START+PHASE_DRAW)
+	ef:SetCountLimit(1,5001+EFFECT_COUNT_CODE_DUEL)
+	ef:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+	ef:SetOperation(function()
+		local tk=Duel.CreateToken(tp,5000)
+		Duel.SendtoDeck(tk,nil,SEQ_DECKBOTTOM,REASON_RULE)
+		c5000.ops(ef,tp)
+	end)
+	Duel.RegisterEffect(ef,tp)
 end

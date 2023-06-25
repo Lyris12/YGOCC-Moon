@@ -2,67 +2,17 @@
 --Voidictator Servant - Shield of Corvus
 local s,id,o=GetID()
 function s.initial_effect(c)
-	aux.CannotBeEDMaterial(c,nil,LOCATION_MZONE)
-	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e1:SetCode(EVENT_ATTACK_ANNOUNCE)
-	e1:SetRange(LOCATION_HAND)
-	e1:SetCondition(s.condition)
-	e1:SetTarget(s.target)
-	e1:SetOperation(s.operation)
-	c:RegisterEffect(e1)
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e1:SetCode(EFFECT_UPDATE_DEFENSE)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetValue(function(e,c) return Duel.GetMatchingGroupCount(aux.AND(Card.IsFaceup,Card.IsSetCard),e:GetHandlerPlayer(),LOCATION_MZONE,LOCATION_MZONE,c,0xc97)*500 end)
-	c:RegisterEffect(e1)
-	local e2=Effect.CreateEffect(c)
-	e2:SetCountLimit(1,id)
-	e2:SetCategory(CATEGORY_TOHAND)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e2:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
-	e2:SetCode(EVENT_REMOVE)
-	e2:SetCondition(function(e,tp,eg,ep,ev,re,r,rp) return re and re:GetHandler():IsSetCard(0xc97) and e:GetHandler():IsReason(REASON_EFFECT) end)
-	e2:SetCost(s.cost)
-	e2:SetTarget(s.thtg)
-	e2:SetOperation(s.thop)
-	c:RegisterEffect(e2)
-end
-function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	local at=Duel.GetAttacker()
-	return at:GetControler()~=tp and Duel.GetAttackTarget()==nil
-end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	if chk==0 then return Duel.GetFlagEffect(tp,id)==0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
-end
-function s.operation(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP_DEFENSE)>0 then
-		Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
-		Duel.BreakEffect()
-		Duel.SkipPhase(1-tp,PHASE_BATTLE,RESET_PHASE+PHASE_BATTLE_STEP,1)
-	end
-end
-function s.filter(c)
-	return c:IsSetCard(0xc97) and c:IsAbleToRemoveAsCost()
-end
-function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_GRAVE+LOCATION_HAND,0,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	Duel.Remove(Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_GRAVE+LOCATION_HAND,0,1,1,nil),POS_FACEUP,REASON_COST)
-end
-function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	if chk==0 then return c:IsAbleToHand() end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,c,1,0,0)
-end
-function s.thop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) then Duel.SendtoHand(c,nil,REASON_EFFECT) end
+	--This card cannot be used as a material for the Summon of a monster from the Extra Deck while it is on the field. This effect cannot be negated. You can only use each effect of "Voidictator Servant - Shield of Corvus" once per turn. 1 If your opponent declares a direct attack while this card is in your hand (Quick Effect): You can Special Summon this card, and if you do, end the Battle Phase. 2 If this card is banished because of a "Voidictator" card you own: You can shuffle this card into the Deck; Special Summon 1 Level 4 "Voidictator Servant" monster from your hand or GY.
+	local tp=c:GetControler()
+	local ef=Effect.CreateEffect(c)
+	ef:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	ef:SetCode(EVENT_PHASE_START+PHASE_DRAW)
+	ef:SetCountLimit(1,5001+EFFECT_COUNT_CODE_DUEL)
+	ef:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+	ef:SetOperation(function()
+		local tk=Duel.CreateToken(tp,5000)
+		Duel.SendtoDeck(tk,nil,SEQ_DECKBOTTOM,REASON_RULE)
+		c5000.ops(ef,tp)
+	end)
+	Duel.RegisterEffect(ef,tp)
 end

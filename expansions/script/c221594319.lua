@@ -2,57 +2,17 @@
 --Voidictator Servant - Gate Attendant
 local s,id,o=GetID()
 function s.initial_effect(c)
-	aux.CannotBeEDMaterial(c,nil,LOCATION_MZONE)
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetCode(EVENT_SUMMON_SUCCESS)
-	e1:SetProperty(EFFECT_FLAG_DELAY)
-	e1:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
-	e1:SetCountLimit(1,id)
-	e1:SetTarget(s.tg)
-	e1:SetOperation(s.op)
-	c:RegisterEffect(e1)
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e4:SetCode(EVENT_REMOVE)
-	e4:SetCountLimit(1,id+100)
-	e4:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
-	e4:SetCondition(function(e,tp,eg,ep,ev,re,r,rp) return re and re:GetHandler():IsSetCard(0xc97) and e:GetHandler():IsReason(REASON_EFFECT) end)
-	e4:SetCost(s.cost)
-	e4:SetTarget(s.thtg)
-	e4:SetOperation(s.thop)
-	c:RegisterEffect(e4)
-end
-function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,2,tp,LOCATION_DECK+LOCATION_EXTRA)
-end
-function s.filter(c)
-	return (c:IsFaceup() or c:IsLocation(LOCATION_DECK)) and c:IsSetCard(0x3c97) and c:IsType(TYPE_PANDEMONIUM+TYPE_PENDULUM) and c:IsAbleToHand()
-end
-function s.op(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_DECK+LOCATION_EXTRA,0,nil):SelectSubGroup(tp,aux.dncheck,false,2,2)
-	if #g==2 then
-		Duel.SendtoHand(g,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,g)
-	end
-end
-function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.Damage(tp,1000,REASON_COST)
-end
-function s.sfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0xc97) and c:IsType(TYPE_PENDULUM) and not c:IsForbidden()
-end
-function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_PZONE)>1
-		and Duel.GetMatchingGroup(s.filter,tp,LOCATION_EXTRA,0,nil):GetClassCount(Card.GetCode)>1 end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_EXTRA)
-end
-function s.thop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_PZONE)<2 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_EXTRA,0,nil):SelectSubGroup(tp,aux.dncheck,false,2,2)
-	if #g==2 then for tc in aux.Next(g) do Duel.MoveToField(tc,tp,tp,LOCATION_PZONE,POS_FACEUP,true) end end
+	--This card cannot be used as a material for the Summon of a monster from the Extra Deck while it is on the field. This effect cannot be negated. You can only use each effect of "Voidictator Servant - Gate Attendant" once per turn. You can discard this card; add 1 "Voidictator Servant" Pendulum or Pandemonium Monster from your Deck or face-up from your Extra Deck to your hand. If this card is banished because of a "Voidictator" card you own: You can shuffle this card into the Deck; add 1 "Voidictator Servant" Pendulum or Pandemonium Monster from your GY or from among your banished cards to your hand.
+	local tp=c:GetControler()
+	local ef=Effect.CreateEffect(c)
+	ef:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	ef:SetCode(EVENT_PHASE_START+PHASE_DRAW)
+	ef:SetCountLimit(1,5001+EFFECT_COUNT_CODE_DUEL)
+	ef:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+	ef:SetOperation(function()
+		local tk=Duel.CreateToken(tp,5000)
+		Duel.SendtoDeck(tk,nil,SEQ_DECKBOTTOM,REASON_RULE)
+		c5000.ops(ef,tp)
+	end)
+	Duel.RegisterEffect(ef,tp)
 end

@@ -2,57 +2,17 @@
 --Voidictator Rune - Execution of the Divine
 local s,id,o=GetID()
 function s.initial_effect(c)
-	local e1=Effect.CreateEffect(c)
-	e1:SetCountLimit(1,id)
-	e1:SetCategory(CATEGORY_TOHAND)
-	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_END_PHASE)
-	e1:SetTarget(s.target)
-	e1:SetOperation(s.activate)
-	c:RegisterEffect(e1)
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e2:SetCode(EVENT_REMOVE)
-	e2:SetCountLimit(1,id+1000)
-	e2:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
-	e2:SetCategory(CATEGORY_TOHAND)
-	e2:SetCondition(function(e,tp,eg,ep,ev,re,r,rp) return re and re:GetHandler():IsSetCard(0xc97) and e:GetHandler():IsReason(REASON_EFFECT) end)
-	e2:SetCost(s.cost)
-	e2:SetTarget(s.thtg)
-	e2:SetOperation(s.thop)
-	c:RegisterEffect(e2)
-end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and chkc:IsSetCard(0x3c97) and chkc:IsAbleToHand() and chkc:IsFaceup() end
-	if chk==0 then return Duel.IsExistingTarget(aux.AND(Card.IsAbleToHand,Card.IsFaceup,Card.IsSetCard),tp,LOCATION_MZONE,0,1,nil,0x3c97) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
-	local g=Duel.SelectTarget(tp,aux.AND(Card.IsAbleToHand,Card.IsFaceup,Card.IsSetCard),tp,LOCATION_MZONE,0,1,1,nil,0x3c97)
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
-end
-function s.activate(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) then
-		Duel.SendtoHand(tc,nil,REASON_EFFECT)
-	end
-end
-function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.Damage(tp,1000,REASON_COST)
-end
-function s.cfilter(c)
-	return c:IsSetCard(0xcc97) and c:IsAbleToHand() and (not c:IsLocation(LOCATION_REMOVED) or c:IsFaceup())
-end
-function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED)
-end
-function s.thop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED,0,1,1,nil)
-	if #g>0 then
-		Duel.SendtoHand(g,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,g)
-	end
+	--You can only use 1 effect of "Voidictator Rune - Execution of the Divine" per turn, and only once that turn. If you control a face-up "Voidictator Demon - Guardian of Corvus": Banish as many random face-down cards from your opponent's Extra Deck, face-down, up to the number of "Voidictator" cards with different names among your banished cards (or their entire Extra Deck, if less than that number), and if you do, 1 "Voidictator Demon - Guardian of Corvus" you control gains 800 ATK/DEF for each card banished by this effect. If you banished 10 or more cards by this effect, halve your opponent's LP. You cannot conduct your Battle Phase during the turn you activate this effect. If this card is banished by a "Voidictator" card you own: You can target 1 face-up "Voidictator Demon - Guardian of Corvus" you control; its ATK/DEF becomes 0, and if it does so by this effect, gain LP equal to that lost DEF, then inflict damage to your opponent equal to half of that lost ATK.
+	local tp=c:GetControler()
+	local ef=Effect.CreateEffect(c)
+	ef:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	ef:SetCode(EVENT_PHASE_START+PHASE_DRAW)
+	ef:SetCountLimit(1,5001+EFFECT_COUNT_CODE_DUEL)
+	ef:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+	ef:SetOperation(function()
+		local tk=Duel.CreateToken(tp,5000)
+		Duel.SendtoDeck(tk,nil,SEQ_DECKBOTTOM,REASON_RULE)
+		c5000.ops(ef,tp)
+	end)
+	Duel.RegisterEffect(ef,tp)
 end

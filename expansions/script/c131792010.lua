@@ -1,6 +1,7 @@
 --created by LeonDuvall, coded by Lyris
 --Metallic Concentrated Magitate
 local s,id,o=GetID()
+Card.IsConcentratedMagitate=Card.IsConcentratedMagitate or function(c) return c:GetCode()>131792009 and c:GetCode()<131792017 end
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddLinkProcedure(c,s.mfilter,1,1)
@@ -17,10 +18,10 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function s.mfilter(c)
-	return c:IsLevelBelow(4) and not c:IsAttribute(ATTRIBUTE_FIRE) and c:IsSetCard(0xd16)
+	return c:IsLevelBelow(4) and c:IsNonAttribute(ATTRIBUTE_FIRE) and c:IsSetCard(0xd16)
 end
 function s.cfilter(c)
-	return c:IsLevel(5) and c:IsSetCard(0xd16)
+	return c:IsPreviousPosition(POS_FACEUP) and c:GetPreviousLevelOnField()==5 and c:IsPreviousSetCard(0xd16)
 end
 function s.con(e,tp,eg)
 	return eg:IsExists(s.cfilter,1,nil)

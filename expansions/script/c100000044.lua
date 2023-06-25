@@ -3,6 +3,7 @@
 --Scripted by: XGlitchy30
 
 local s,id,o=GetID()
+Card.IsLeylah=Card.IsLeylah or function(c) return c:GetCode()>100000040 and c:GetCode()<100000046 end
 function s.initial_effect(c)
 	aux.AddOrigDoubleSidedType(c)
 	aux.AddDoubleSidedProc(c,SIDE_REVERSE,id-1,id)
