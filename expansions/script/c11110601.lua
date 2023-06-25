@@ -125,7 +125,7 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	if #g>0 and Duel.Destroy(g:GetFirst(),REASON_EFFECT)>0 then
 		local c=e:GetHandler()
 		local ec=Duel.GetEngagedCard(tp)
-		if ec:IsMonster(TYPE_DRIVE) and ec:IsSetCard(ARCHE_METALURGOS) and ec:IsCanChangeEnergy(1,tp,REASON_EFFECT) and c:AskPlayer(tp,5) then
+		if ec and ec:IsMonster(TYPE_DRIVE) and ec:IsSetCard(ARCHE_METALURGOS) and ec:IsCanChangeEnergy(1,tp,REASON_EFFECT) and c:AskPlayer(tp,5) then
 			Duel.BreakEffect()
 			ec:ChangeEnergy(1,tp,REASON_EFFECT,true,c)
 		end

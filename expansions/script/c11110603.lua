@@ -58,7 +58,7 @@ end
 --DE1
 function s.pctg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
-		return Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and Duel.IsExistingMatchingCard(s.pcfilter,tp,LOCATION_GRAVE,0,1,nil,tp)
+		return Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and Duel.IsExistingMatchingCard(s.pcfilter,tp,LOCATION_DECK,0,1,nil,tp)
 	end
 end
 function s.pcop(e,tp,eg,ep,ev,re,r,rp)
