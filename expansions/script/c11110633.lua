@@ -40,13 +40,12 @@ function s.initial_effect(c)
 		ge1:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
 		ge1:SetCode(EVENT_PHASE|PHASE_END)
 		ge1:SetCountLimit(1)
-		ge1:SetCondition(s.resetop)
+		ge1:SetOperation(s.resetop)
 		Duel.RegisterEffect(ge1,0)
 	end
 end
 function s.resetop(e,tp,eg,ep,ev,re,r,rp)
 	s.code_list={{},{}}
-	return false
 end
 function s.splimit(e,se,sp,st)
 	if not (se:IsOverDriveEffect() and se:IsHasType(EFFECT_TYPE_ACTIONS)) then return false end

@@ -46,7 +46,7 @@ function s.initial_effect(c)
 		ge2:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
 		ge2:SetCode(EVENT_PHASE|PHASE_END)
 		ge2:SetCountLimit(1)
-		ge2:SetCondition(s.resetop)
+		ge2:SetOperation(s.resetop)
 		Duel.RegisterEffect(ge2,0)
 	end
 end
@@ -59,7 +59,6 @@ function s.regop(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.resetop(e,tp,eg,ep,ev,re,r,rp)
 	s.code_list={{},{}}
-	return false
 end
 
 function s.statval(e,c)

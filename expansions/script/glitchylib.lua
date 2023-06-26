@@ -46,6 +46,50 @@ function Auxiliary.FindInTable(tab,a,...)
 	return false
 end
 
+-----------------------------------------------------------------------------------------------------------
+-------------------------------PREVENT COUNT LIMIT OVERLAP-------------------------------------------------
+aux.EffectCountLimitFlagTable = {}
+
+local _SetCountLimit = Effect.SetCountLimit
+
+Effect.SetCountLimit = function(e,ct,...)
+	local x={...}
+	local flag = #x>0 and x[1] or 0
+	if flag~=0 then
+		local code=e:GetOwner():GetOriginalCodeRule()
+		local pureflag=flag
+		local extraflags=0
+		local flagtable={EFFECT_COUNT_CODE_OATH,EFFECT_COUNT_CODE_DUEL,EFFECT_COUNT_CODE_CHAIN}
+		for _,f in ipairs(flagtable) do
+			if flag&f>0 then
+				pureflag = pureflag&(~f)
+				extraflags = extraflags|f
+			end
+		end
+		
+		if not aux.EffectCountLimitFlagTable[pureflag] then
+			aux.EffectCountLimitFlagTable[pureflag]=code
+		elseif aux.EffectCountLimitFlagTable[pureflag]~=code then
+			while aux.EffectCountLimitFlagTable[pureflag]~=code do
+				pureflag=pureflag+1
+				if pureflag>MAX_ID then
+					pureflag=MIN_ID
+				end
+				if not aux.EffectCountLimitFlagTable[pureflag] then
+					break
+				end
+			end
+			aux.EffectCountLimitFlagTable[pureflag]=code
+		end
+		
+		--Debug.Message(tostring(code)..": "..tostring(pureflag|extraflags))
+		return _SetCountLimit(e,ct,pureflag|extraflags)
+	
+	else
+		return _SetCountLimit(e,ct,...)
+	end
+end
+
 -------------------------------------------------------------------------------------
 -------------------------------CUSTOM ARCHETYPES-------------------------------------
 function Auxiliary.IsCustomSetCardTemplate(effect_code,c,hex,...)
