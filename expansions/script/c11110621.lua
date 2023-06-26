@@ -112,7 +112,7 @@ function s.rmcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_CARD,0,id)
-	local g=Duel.Select(HINTMSG_REMOVE,false,tp,s.rmilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
+	local g=Duel.Select(HINTMSG_REMOVE,false,tp,s.rmfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
 	if #g>0 then
 		Duel.HintSelection(g)
 		Duel.Banish(g)

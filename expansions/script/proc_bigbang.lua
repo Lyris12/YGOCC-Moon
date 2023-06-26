@@ -181,7 +181,7 @@ function Card.HasNoVibe(c)
 	return not c:GetVibe()
 end
 
-function Card.GetBigbangAttack(c)
+function Card.GetBigbangAttack(c,bc,mg)
 	local vibe=c:GetVibe()
 	if c:HasFlagEffect(FLAG_BIGBANG_VIBE) then
 		local val=c:GetFlagEffectLabel(FLAG_BIGBANG_VIBE)
@@ -193,19 +193,26 @@ function Card.GetBigbangAttack(c)
 	end
 	
 	local val=c:GetAttack()
+	local extraval_base=0
 	local te=c:IsHasEffect(EFFECT_BASE_BIGBANG_ATTACK)
 	if te then
 		local tg=te:GetTarget()
-		if not tg or tg(c,bc,mg) then 
+		if not tg or tg(te,c,bc,mg) then 
 			local nval=te:GetValue()
 			if type(nval)=='number' then
 				val=nval
 			else
-				val=nval(c,bc,mg)
+				local tempval,count_neutral=nval(te,c,bc,mg)
+				if vibe==0 and count_neutral then
+					extraval_base=tempval
+				else
+					val=tempval
+				end
 			end
 		end
 	end
 	
+	local extraval_update=0
 	if c:IsHasEffect(EFFECT_UPDATE_BIGBANG_ATTACK) then
 		local tef={c:IsHasEffect(EFFECT_UPDATE_BIGBANG_ATTACK)}
 		for _,upe in ipairs(tef) do
@@ -213,13 +220,18 @@ function Card.GetBigbangAttack(c)
 			if type(nval)=='number' then
 				val=val+nval
 			else
-				val=nval(c,bc,mg)+val
+				local tempval,count_neutral=nval(upe,c,bc,mg)
+				if vibe==0 and count_neutral then
+					extraval_update=extraval_update+ tempval
+				else
+					val=val+tempval
+				end
 			end
 		end
 	end
-	return val*math.abs(vibe)
+	return val*math.abs(vibe) + extraval_base + extraval_update
 end
-function Card.GetBigbangDefense(c,forcedvibe)
+function Card.GetBigbangDefense(c,bc,mg)
 	local vibe=c:GetVibe()
 	if c:HasFlagEffect(FLAG_BIGBANG_VIBE) then
 		local val=c:GetFlagEffectLabel(FLAG_BIGBANG_VIBE)
@@ -231,28 +243,45 @@ function Card.GetBigbangDefense(c,forcedvibe)
 	end
 	
 	local val=c:GetDefense()
+	local extraval_base=0
 	local te=c:IsHasEffect(EFFECT_BASE_BIGBANG_DEFENSE)
 	if te then
 		local tg=te:GetTarget()
-		if not tg or tg(c,bc,mg) then 
+		if not tg or tg(te,c,bc,mg) then 
 			local nval=te:GetValue()
 			if type(nval)=='number' then
 				val=nval
 			else
-				val=nval(c,bc,mg)
+				local tempval,count_neutral=nval(te,c,bc,mg)
+				if vibe==0 and count_neutral then
+					extraval_base=tempval
+					
+				else
+					val=tempval
+				end
 			end
 		end
 	end
 	
+	local extraval_update=0
 	if c:IsHasEffect(EFFECT_UPDATE_BIGBANG_DEFENSE) then
 		local tef={c:IsHasEffect(EFFECT_UPDATE_BIGBANG_DEFENSE)}
 		for _,upe in ipairs(tef) do
 			local nval = upe:GetValue()
-			if type(nval)=='number' then val=val+nval else val=nval(c,bc,mg)+val end
+			if type(nval)=='number'
+				then val=val+nval
+			else
+				local tempval,count_neutral=nval(upe,c,bc,mg)
+				if vibe==0 and count_neutral then
+					extraval_update=extraval_update+ tempval
+				else
+					val=val+tempval
+				end
+			end
 		end
 	end
 	
-	return val*math.abs(vibe)
+	return val*math.abs(vibe) + extraval_base + extraval_update
 end
 function Auxiliary.AddOrigBigbangType(c,issynchro)
 	table.insert(Auxiliary.Bigbangs,c)
@@ -436,22 +465,23 @@ function Auxiliary.BigbangCheckGoal(tp,sg,fg,bc,gf,ct,...)
 	if bc:IsHasEffect(EFFECT_IGNORE_BIGBANG_SUMREQ) then
 		bigbang_stats_res = true
 	else
-		bigbang_stats_res = not sg:IsExists(Card.HasNoVibe,1,nil) and sg:CheckWithSumGreater(Card.GetBigbangAttack,bc:GetAttack()) and sg:CheckWithSumGreater(Card.GetBigbangDefense,bc:GetDefense())
+		bigbang_stats_res = not sg:IsExists(Card.HasNoVibe,1,nil)
+		and sg:CheckWithSumGreater(Card.GetBigbangAttack,bc:GetAttack(),bc,sg) and sg:CheckWithSumGreater(Card.GetBigbangDefense,bc:GetDefense(),bc,sg)
 	end
 	
 	--LEAVE THIS FOR DEBUGGING PURPOSES IN CASE A BIGBANG MONSTER IS NOT BEING ABLE TO BE SUMMONED
-	-- if bc:IsCode(CODE_OF_THE_BIGBANG_TO_DEBUG) then
+	-- if bc:IsCode(CODE_OF_THE_BUGGED_BIGBANG) then
 		-- Debug.Message(ct>=min)
 		-- Debug.Message(Duel.GetLocationCountFromEx(tp,tp,sg,bc)>0)
 		-- Debug.Message(not gf or gf(sg,bc,tp))
-		-- Debug.Message(tostring(sg:CheckWithSumGreater(Card.GetBigbangAttack,bc:GetAttack()))..": "..tostring(bc:GetAttack()))
-		-- Debug.Message(tostring(sg:CheckWithSumGreater(Card.GetBigbangAttack,bc:GetDefense()))..": "..tostring(bc:GetDefense()))
+		-- Debug.Message(tostring(sg:CheckWithSumGreater(Card.GetBigbangAttack,bc:GetAttack(),bc,sg))..": "..tostring(bc:GetAttack()))
+		-- Debug.Message(tostring(sg:CheckWithSumGreater(Card.GetBigbangAttack,bc:GetDefense(),bc,sg))..": "..tostring(bc:GetDefense()))
 		-- Debug.Message(not sg:IsExists(Auxiliary.BigbangUncompatibilityFilter,1,nil,sg,bc,tp))
 		-- local atk,def=0,0
 		-- for tc in aux.Next(sg) do
 			-- Debug.Message(tc:GetCode())
-			-- atk=atk+tc:GetBigbangAttack()
-			-- def=def+tc:GetBigbangDefense()
+			-- atk=atk+tc:GetBigbangAttack(bc,sg)
+			-- def=def+tc:GetBigbangDefense(bc,sg)
 		-- end
 		-- Debug.Message("ATK: "..tostring(atk))
 		-- Debug.Message("DEF: "..tostring(def))
