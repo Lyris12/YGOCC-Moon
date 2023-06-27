@@ -43,7 +43,7 @@ function s.atkval(e,c)
 	return c:GetOverlayCount()*500
 end
 function s.filter(c,tp)
-	return c:IsAbleToChangeControler() and c:IsControler(tp) and c:IsPreviousLocation(LOCATION_DECK) and not c:IsReason(REASON_DRAW)
+	return c:IsAbleToChangeControler() and c:IsControler(tp) and c:IsPreviousLocation(LOCATION_DECK)
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()~=tp and Duel.GetCurrentPhase()~=PHASE_DRAW and eg:IsExists(s.filter,1,nil,1-tp)

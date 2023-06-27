@@ -50,8 +50,9 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(xyz,SUMMON_TYPE_XYZ,tp,tp,false,false,POS_FACEUP)
 		xyz:CompleteProcedure()
 	end
-	if Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
-		tc=Duel.SelectMatchingCard(tp,s.attachfilter,tp,LOCATION_MZONE,0,1,1,nil,e):GetFirst()
+	Duel.BreakEffect()
+	if Duel.IsExistingMatchingCard(s.attachfilter,tp,LOCATION_MZONE,0,1,nil,e) and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
+		local tc=Duel.SelectMatchingCard(tp,s.attachfilter,tp,LOCATION_MZONE,0,1,1,nil,e):GetFirst()
 		e:GetHandler():CancelToGrave()
 		Duel.Overlay(tc,e:GetHandler())
 	end
