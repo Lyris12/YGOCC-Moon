@@ -131,7 +131,7 @@ function s.spcon(e)
 	return not e:GetHandler():IsStatus(STATUS_CHAINING)
 end
 function s.costfilter(c,e,tp)
-	return c:IsDestructable(e,REASON_COST,tp) and c:IsSetCard(0x2c2) and (c:IsFaceup() or not c:IsOnField())
+	return c:IsDestructable(e,REASON_COST,tp) and c:IsSetCard(0x2c2) and c:IsFaceupEx()
 		and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_EXTRA,0,1,c,e,tp,c)
 end
 function s.spfilter(c,e,tp,mc)
@@ -140,7 +140,6 @@ function s.spfilter(c,e,tp,mc)
 		and Duel.IsExistingMatchingCard(s.bbfilter,tp,LOCATION_EXTRA,0,1,mg,e,tp,mg)
 end
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	e:SetLabel(1)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.costfilter,tp,LOCATION_HAND+LOCATION_ONFIELD,0,1,e:GetHandler(),e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectMatchingCard(tp,s.costfilter,tp,LOCATION_HAND+LOCATION_ONFIELD,0,1,1,e:GetHandler(),e,tp)
@@ -149,11 +148,8 @@ function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then
-		local res=e:GetLabel()==1 or Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,nil)
-		e:SetLabel(0)
-		return Duel.IsPlayerCanSpecialSummonCount(tp,2) and res
-	end
+	if chk==0 then return Duel.IsPlayerCanSpecialSummonCount(tp,2) and (e:IsCostChecked()
+		or Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,nil)) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)

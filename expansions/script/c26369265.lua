@@ -97,7 +97,7 @@ function s.BigbangCondition(e,c,matg,mustg)
 		local mg,mg2
 		if matg and aux.GetValueType(matg)=="Group" then
 			mg=matg:Filter(Card.IsCanBeBigbangMaterial,nil,c)
-			mg2=matg:Filter(Auxiliary.BigbangExtraFilter,nil,c,tp,table.unpack(plist))			
+			mg2=matg:Filter(Auxiliary.BigbangExtraFilter,nil,c,tp,table.unpack(plist))		  
 		else
 			mg=Duel.GetMatchingGroup(Card.IsCanBeBigbangMaterial,tp,LOCATION_MZONE,0,nil,c)
 			mg2=Duel.GetMatchingGroup(Auxiliary.BigbangExtraFilter,tp,0xff,0xff,nil,c,tp,table.unpack(plist))
@@ -109,7 +109,7 @@ function s.BigbangCondition(e,c,matg,mustg)
 		end
 		if fg:IsExists(aux.MustMaterialCounterFilter,1,nil,mg) then return false end
 		Duel.SetSelectedCard(fg)
-		local res=mg:IsExists(Auxiliary.BigbangRecursiveFilter,1,nil,tp,Group.CreateGroup(),mg,c,0,max,table.unpack(plist))
+		local res=mg:IsExists(Auxiliary.BigbangRecursiveFilter,1,nil,tp,Group.CreateGroup(),mg,nil,c,nil,0,table.unpack(plist))
 		if i==2 then
 			e1:Reset()
 			e1=nil
@@ -140,13 +140,13 @@ function s.BigbangTarget(e,tp,eg,ep,ev,re,r,rp,chk,c)
 	local e1
 	local list={{{s.proton,1,1},{s.electron,1,99}},{{s.mat1,1,1},{s.mat2,1,1}}}
 	local ops=0
-	local res1=aux.BigbangCondition(table.unpack(list[1]))(e,c)
+	local res1=aux.BigbangCondition(nil,table.unpack(list[1]))(e,c)
 	e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetCode(EFFECT_IGNORE_BIGBANG_SUMREQ)
 	c:RegisterEffect(e1)
-	local res2=aux.BigbangCondition(table.unpack(list[2]))(e,c)
+	local res2=aux.BigbangCondition(nil,table.unpack(list[2]))(e,c)
 	e1:Reset()
 	e1=nil
 	if res1 and res2 then
@@ -187,8 +187,8 @@ function s.BigbangTarget(e,tp,eg,ep,ev,re,r,rp,chk,c)
 	sg:Merge(bg)
 	local finish=false
 	while not (#sg>=max) do
-		finish=Auxiliary.BigbangCheckGoal(tp,sg,c,#sg,table.unpack(funs))
-		local cg=mg:Filter(Auxiliary.BigbangRecursiveFilter,sg,tp,sg,mg,c,#sg,max,table.unpack(funs))
+		finish=Auxiliary.BigbangCheckGoal(tp,sg,nil,c,nil,#sg,table.unpack(funs))
+		local cg=mg:Filter(Auxiliary.BigbangRecursiveFilter,sg,tp,sg,mg,nil,c,nil,#sg,table.unpack(funs))
 		if #cg==0 then break end
 		local cancel=not finish
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
