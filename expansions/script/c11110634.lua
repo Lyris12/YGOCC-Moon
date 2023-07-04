@@ -74,7 +74,7 @@ function s.dcfilter(c,e,tp)
 	return c:IsSetCard(ARCHE_IDOLESCENT,ARCHE_OSCURION) and c:IsDiscardable() and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND|LOCATION_GRAVE,0,1,Group.FromCards(c,e:GetHandler()),e,tp)
 end
 function s.spfilter(c,e,tp)
-	return c:IsSetCard(ARCHE_IDOLESCENT,ARCHE_OSCURION,true) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(ARCHE_IDOLESCENT,ARCHE_OSCURION) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.checkeffect(c,tp,e)
 	local egroup=c:GetEffects()
@@ -82,9 +82,14 @@ function s.checkeffect(c,tp,e)
 		if aux.GetValueType(teh)=="Effect" and not teh:WasReset() then
 			if teh:GetCode()==CARD_OSCURION_TYPE2 then
 				local te=teh:GetLabelObject()
-				local tg=te:GetTarget()
-				if (not tg or tg(e,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,0)) then
-					return true
+				if aux.GetValueType(te)=="Effect" then
+					local tg=te:GetTarget()
+					Duel.SetProxyEffect(e,te)
+					if (not tg or tg(e,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,0)) then
+						Duel.ResetProxyEffect()
+						return true
+					end
+					Duel.ResetProxyEffect()
 				end
 			end
 		else
@@ -133,10 +138,14 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 			for _,teh in ipairs(egroup) do
 				if aux.GetValueType(teh)=="Effect" and teh:GetCode()==CARD_OSCURION_TYPE2 then
 					local temp=teh:GetLabelObject()
-					local tg=temp:GetTarget()
-					if (not tg or tg(e,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,0)) then
-						table.insert(ac,teh)
-						table.insert(acd,temp:GetDescription())
+					if aux.GetValueType(temp)=="Effect" then
+						local tg=temp:GetTarget()
+						Duel.SetProxyEffect(e,temp)
+						if (not tg or tg(e,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,0)) then
+							table.insert(ac,teh)
+							table.insert(acd,temp:GetDescription())
+						end
+						Duel.ResetProxyEffect()
 					end
 				end
 			end
@@ -155,7 +164,9 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 			te=teh:GetLabelObject()
 			local tg=te:GetTarget()
 			if tg then
+				Duel.SetProxyEffect(e,te)
 				tg(e,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,1)
+				Duel.ResetProxyEffect()
 			end
 			if tc:IsRelateToEffect(e) then
 				tc:CreateEffectRelation(e)
@@ -168,7 +179,9 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 				end
 				local op=te:GetOperation()
 				if op then
+					Duel.SetProxyEffect(e,te)
 					op(e,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,1)
+					Duel.ResetProxyEffect()
 				end
 				tc:ReleaseEffectRelation(e)
 				if g then

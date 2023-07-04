@@ -89,9 +89,14 @@ function s.filter(c,tp,tab,e)
 	for _,teh in ipairs(egroup) do
 		if aux.GetValueType(teh)=="Effect" and teh:GetCode()==CARD_OSCURION_TYPE0 then
 			local te=teh:GetLabelObject()
-			local tg=te:GetTarget()
-			if (not tg or tg(e,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,0)) then
-				return true
+			if aux.GetValueType(te)=="Effect" then
+				local tg=te:GetTarget()
+				Duel.SetProxyEffect(e,te)
+				if (not tg or tg(e,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,0)) then
+					Duel.ResetProxyEffect()
+					return true
+				end
+				Duel.ResetProxyEffect()
 			end
 		end
 	end
@@ -117,10 +122,14 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		for _,teh in ipairs(egroup) do
 			if aux.GetValueType(teh)=="Effect" and teh:GetCode()==CARD_OSCURION_TYPE0 then
 				local temp=teh:GetLabelObject()
-				local tg=temp:GetTarget()
-				if (not tg or tg(e,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,0)) then
-					table.insert(ac,teh)
-					table.insert(acd,temp:GetDescription())
+				if aux.GetValueType(temp)=="Effect" then
+					local tg=temp:GetTarget()
+					Duel.SetProxyEffect(e,temp)
+					if (not tg or tg(e,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,0)) then
+						table.insert(ac,teh)
+						table.insert(acd,temp:GetDescription())
+					end
+					Duel.ResetProxyEffect()
 				end
 			end
 		end
@@ -140,7 +149,9 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		te=teh:GetLabelObject()
 		local tg=te:GetTarget()
 		if tg then
+			Duel.SetProxyEffect(e,te)
 			tg(e,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,1)
+			Duel.ResetProxyEffect()
 		end
 		e:SetOperation(s.operation(te,teh))
 	end
@@ -165,7 +176,9 @@ function s.operation(te,teh)
 					end
 					local op=te:GetOperation()
 					if op then
+						Duel.SetProxyEffect(e,te)
 						op(e,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,1)
+						Duel.ResetProxyEffect()
 					end
 					tc:ReleaseEffectRelation(e)
 					for etc in aux.Next(g) do

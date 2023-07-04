@@ -6,16 +6,8 @@ function s.initial_effect(c)
 	--bigbang
 	aux.AddOrigBigbangType(c)
 	c:EnableReviveLimit()
-	local ge2=Effect.CreateEffect(c)
-	ge2:SetType(EFFECT_TYPE_FIELD)
-	ge2:SetCode(EFFECT_SPSUMMON_PROC)
-	ge2:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE)
-	ge2:SetRange(LOCATION_EXTRA)
-	ge2:SetCondition(s.BigbangCondition)
-	ge2:SetTarget(s.BigbangTarget)
-	ge2:SetOperation(aux.BigbangOperation)
-	ge2:SetValue(340)
-	c:RegisterEffect(ge2)
+	aux.AddBigbangProc(c,s.proton,1,1,s.electron,1)
+	aux.AddBigbangProc(c,s.mat1,1,1,s.mat2,1,1,nil,true)
 	--material check
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
@@ -63,10 +55,10 @@ function s.initial_effect(c)
 	c:RegisterEffect(e5)
 end
 function s.proton(c)
-	return c:IsRace(RACE_PSYCHO) and c:GetVibe()==1
+	return c:IsRace(RACE_PSYCHO) and c:IsPositive()
 end
 function s.electron(c)
-	return c:IsSetCard(0x2c2) and c:GetVibe()==-1
+	return c:IsSetCard(0x2c2) and c:IsNegative()
 end
 function s.mat1(c)
 	return c:IsSetCard(0x2c2) and c:IsType(TYPE_BIGBANG)
@@ -75,176 +67,176 @@ function s.mat2(c)
 	return c:IsRace(RACE_PSYCHO) and c:IsType(TYPE_PANDEMONIUM)
 end
 
-function s.BigbangCondition(e,c,matg,mustg)
-	if c==nil then return true end
-	if (c:IsType(TYPE_PENDULUM) or c:IsType(TYPE_PANDEMONIUM)) and c:IsFaceup() then return false end
-	local tp=c:GetControler()
-	local list={{{s.proton,1,1},{s.electron,1,99}},{{s.mat1,1,1},{s.mat2,1,1}}}
+-- function s.BigbangCondition(e,c,matg,mustg)
+	-- if c==nil then return true end
+	-- if (c:IsType(TYPE_PENDULUM) or c:IsType(TYPE_PANDEMONIUM)) and c:IsFaceup() then return false end
+	-- local tp=c:GetControler()
+	-- local list={{{s.proton,1,1},{s.electron,1,99}},{{s.mat1,1,1},{s.mat2,1,1}}}
 	
-	for i,plist in ipairs(list) do
-		local max=0
-		for i=1,#plist do
-			max=max+plist[i][3]
-		end
-		local e1
-		if i==2 then
-			e1=Effect.CreateEffect(c)
-			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-			e1:SetCode(EFFECT_IGNORE_BIGBANG_SUMREQ)
-			c:RegisterEffect(e1)
-		end
-		local mg,mg2
-		if matg and aux.GetValueType(matg)=="Group" then
-			mg=matg:Filter(Card.IsCanBeBigbangMaterial,nil,c)
-			mg2=matg:Filter(Auxiliary.BigbangExtraFilter,nil,c,tp,table.unpack(plist))		  
-		else
-			mg=Duel.GetMatchingGroup(Card.IsCanBeBigbangMaterial,tp,LOCATION_MZONE,0,nil,c)
-			mg2=Duel.GetMatchingGroup(Auxiliary.BigbangExtraFilter,tp,0xff,0xff,nil,c,tp,table.unpack(plist))
-		end
-		if #mg2>0 then mg:Merge(mg2) end
-		local fg=Duel.GetMustMaterial(tp,EFFECT_MUST_BE_BIGBANG_MATERIAL)
-		if mustg and aux.GetValueType(mustg)=="Group" then
-			fg:Merge(mustg)
-		end
-		if fg:IsExists(aux.MustMaterialCounterFilter,1,nil,mg) then return false end
-		Duel.SetSelectedCard(fg)
-		local res=mg:IsExists(Auxiliary.BigbangRecursiveFilter,1,nil,tp,Group.CreateGroup(),mg,nil,c,nil,0,table.unpack(plist))
-		if i==2 then
-			e1:Reset()
-			e1=nil
-		end
-		if res then
-			return true
-		end
-	end
-	return false
-end
-function s.BigbangTarget(e,tp,eg,ep,ev,re,r,rp,chk,c)
-	if bigbang_limit_mats_operation and bigbang_limit_mats_operation.SetLabelObject then
-		Duel.RegisterEffect(bigbang_limit_mats_operation,tp)
-	end
-	if bigbang_force_mats_operation and bigbang_force_mats_operation.SetLabelObject then
-		local forcedmat=bigbang_force_mats_operation:GetLabelObject()
-		if forcedmat then
-			if aux.GetValueType(forcedmat)=="Card" then
-				forcedmat:RegisterEffect(bigbang_force_mats_operation)
-			elseif aux.GetValueType(forcedmat)=="Group" then
-				for tc in aux.Next(forcedmat) do
-					tc:RegisterEffect(bigbang_force_mats_operation)
-				end
-			end
-		end
-	end
+	-- for i,plist in ipairs(list) do
+		-- local max=0
+		-- for i=1,#plist do
+			-- max=max+plist[i][3]
+		-- end
+		-- local e1
+		-- if i==2 then
+			-- e1=Effect.CreateEffect(c)
+			-- e1:SetType(EFFECT_TYPE_SINGLE)
+			-- e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+			-- e1:SetCode(EFFECT_IGNORE_BIGBANG_SUMREQ)
+			-- c:RegisterEffect(e1)
+		-- end
+		-- local mg,mg2
+		-- if matg and aux.GetValueType(matg)=="Group" then
+			-- mg=matg:Filter(Card.IsCanBeBigbangMaterial,nil,c)
+			-- mg2=matg:Filter(Auxiliary.BigbangExtraFilter,nil,c,tp,table.unpack(plist))			
+		-- else
+			-- mg=Duel.GetMatchingGroup(Card.IsCanBeBigbangMaterial,tp,LOCATION_MZONE,0,nil,c)
+			-- mg2=Duel.GetMatchingGroup(Auxiliary.BigbangExtraFilter,tp,0xff,0xff,nil,c,tp,table.unpack(plist))
+		-- end
+		-- if #mg2>0 then mg:Merge(mg2) end
+		-- local fg=Duel.GetMustMaterial(tp,EFFECT_MUST_BE_BIGBANG_MATERIAL)
+		-- if mustg and aux.GetValueType(mustg)=="Group" then
+			-- fg:Merge(mustg)
+		-- end
+		-- if fg:IsExists(aux.MustMaterialCounterFilter,1,nil,mg) then return false end
+		-- Duel.SetSelectedCard(fg)
+		-- local res=mg:IsExists(Auxiliary.BigbangRecursiveFilter,1,nil,tp,Group.CreateGroup(),mg,c,0,max,table.unpack(plist))
+		-- if i==2 then
+			-- e1:Reset()
+			-- e1=nil
+		-- end
+		-- if res then
+			-- return true
+		-- end
+	-- end
+	-- return false
+-- end
+-- function s.BigbangTarget(e,tp,eg,ep,ev,re,r,rp,chk,c)
+	-- if bigbang_limit_mats_operation and bigbang_limit_mats_operation.SetLabelObject then
+		-- Duel.RegisterEffect(bigbang_limit_mats_operation,tp)
+	-- end
+	-- if bigbang_force_mats_operation and bigbang_force_mats_operation.SetLabelObject then
+		-- local forcedmat=bigbang_force_mats_operation:GetLabelObject()
+		-- if forcedmat then
+			-- if aux.GetValueType(forcedmat)=="Card" then
+				-- forcedmat:RegisterEffect(bigbang_force_mats_operation)
+			-- elseif aux.GetValueType(forcedmat)=="Group" then
+				-- for tc in aux.Next(forcedmat) do
+					-- tc:RegisterEffect(bigbang_force_mats_operation)
+				-- end
+			-- end
+		-- end
+	-- end
 	
-	local e1
-	local list={{{s.proton,1,1},{s.electron,1,99}},{{s.mat1,1,1},{s.mat2,1,1}}}
-	local ops=0
-	local res1=aux.BigbangCondition(nil,table.unpack(list[1]))(e,c)
-	e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e1:SetCode(EFFECT_IGNORE_BIGBANG_SUMREQ)
-	c:RegisterEffect(e1)
-	local res2=aux.BigbangCondition(nil,table.unpack(list[2]))(e,c)
-	e1:Reset()
-	e1=nil
-	if res1 and res2 then
-		ops=Duel.SelectOption(tp,aux.Stringid(id,0),aux.Stringid(id,1))+1
-	elseif res1 then
-		ops=1
-	else
-		ops=2
-	end
-	if ops==2 then
-		e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-		e1:SetCode(EFFECT_IGNORE_BIGBANG_SUMREQ)
-		c:RegisterEffect(e1)
-	end
+	-- local e1
+	-- local list={{{s.proton,1,1},{s.electron,1,99}},{{s.mat1,1,1},{s.mat2,1,1}}}
+	-- local ops=0
+	-- local res1=aux.BigbangCondition(table.unpack(list[1]))(e,c)
+	-- e1=Effect.CreateEffect(c)
+	-- e1:SetType(EFFECT_TYPE_SINGLE)
+	-- e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	-- e1:SetCode(EFFECT_IGNORE_BIGBANG_SUMREQ)
+	-- c:RegisterEffect(e1)
+	-- local res2=aux.BigbangCondition(table.unpack(list[2]))(e,c)
+	-- e1:Reset()
+	-- e1=nil
+	-- if res1 and res2 then
+		-- ops=Duel.SelectOption(tp,aux.Stringid(id,0),aux.Stringid(id,1))+1
+	-- elseif res1 then
+		-- ops=1
+	-- else
+		-- ops=2
+	-- end
+	-- if ops==2 then
+		-- e1=Effect.CreateEffect(c)
+		-- e1:SetType(EFFECT_TYPE_SINGLE)
+		-- e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+		-- e1:SetCode(EFFECT_IGNORE_BIGBANG_SUMREQ)
+		-- c:RegisterEffect(e1)
+	-- end
 	
-	local funs=list[ops]
-	local min,max=0,0
-	for i=1,#funs do
-		min=min+funs[i][2] max=max+funs[i][3]
-	end
-	if max>99 then max=99 end
-	local mg=Duel.GetMatchingGroup(Card.IsCanBeBigbangMaterial,tp,LOCATION_MZONE,0,nil,c)
-	local mg2=Duel.GetMatchingGroup(Auxiliary.BigbangExtraFilter,tp,0xff,0xff,nil,c,tp,table.unpack(funs))
-	if #mg2>0 then mg:Merge(mg2) end
-	local bg=Group.CreateGroup()
-	local ce={Duel.IsPlayerAffectedByEffect(tp,EFFECT_MUST_BE_BIGBANG_MATERIAL)}
-	for _,te in ipairs(ce) do
-		local tc=te:GetHandler()
-		if tc then bg:AddCard(tc) end
-	end
-	if #bg>0 then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_LMATERIAL)
-		bg:Select(tp,#bg,#bg,nil)
-	end
-	local sg=Group.CreateGroup()
-	sg:Merge(bg)
-	local finish=false
-	while not (#sg>=max) do
-		finish=Auxiliary.BigbangCheckGoal(tp,sg,nil,c,nil,#sg,table.unpack(funs))
-		local cg=mg:Filter(Auxiliary.BigbangRecursiveFilter,sg,tp,sg,mg,nil,c,nil,#sg,table.unpack(funs))
-		if #cg==0 then break end
-		local cancel=not finish
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-		local tc=cg:SelectUnselect(sg,tp,finish,cancel,min,max)
-		if not tc then break end
-		if not bg:IsContains(tc) then
-			if not sg:IsContains(tc) then
-				sg:AddCard(tc)
-				if (#sg>=max) then finish=true end
-			else
-				sg:RemoveCard(tc)
-			end
-		elseif #bg>0 and #sg<=#bg then
-			if bigbang_limit_mats_operation and bigbang_limit_mats_operation.SetLabelObject then
-				bigbang_limit_mats_operation:Reset()
-				bigbang_limit_mats_operation=nil
-			end
-			if bigbang_force_mats_operation and bigbang_force_mats_operation.SetLabelObject then
-				bigbang_force_mats_operation:Reset()
-				bigbang_force_mats_operation=nil
-			end
-			return false
-		end
-	end
-	if finish then
-		sg:KeepAlive()
-		e:SetLabelObject(sg)
-		if bigbang_limit_mats_operation and bigbang_limit_mats_operation.SetLabelObject then
-			bigbang_limit_mats_operation:Reset()
-			bigbang_limit_mats_operation=nil
-		end
-		if bigbang_force_mats_operation and bigbang_force_mats_operation.SetLabelObject then
-			bigbang_force_mats_operation:Reset()
-			bigbang_force_mats_operation=nil
-		end
-		if e1 then
-			e1:Reset()
-			e1=nil
-		end
-		return true
-	else
-		if bigbang_limit_mats_operation and bigbang_limit_mats_operation.SetLabelObject then
-			bigbang_limit_mats_operation:Reset()
-			bigbang_limit_mats_operation=nil
-		end
-		if bigbang_force_mats_operation and bigbang_force_mats_operation.SetLabelObject then
-			bigbang_force_mats_operation:Reset()
-			bigbang_force_mats_operation=nil
-		end
-		if e1 then
-			e1:Reset()
-			e1=nil
-		end
-		return false
-	end
-end
+	-- local funs=list[ops]
+	-- local min,max=0,0
+	-- for i=1,#funs do
+		-- min=min+funs[i][2] max=max+funs[i][3]
+	-- end
+	-- if max>99 then max=99 end
+	-- local mg=Duel.GetMatchingGroup(Card.IsCanBeBigbangMaterial,tp,LOCATION_MZONE,0,nil,c)
+	-- local mg2=Duel.GetMatchingGroup(Auxiliary.BigbangExtraFilter,tp,0xff,0xff,nil,c,tp,table.unpack(funs))
+	-- if #mg2>0 then mg:Merge(mg2) end
+	-- local bg=Group.CreateGroup()
+	-- local ce={Duel.IsPlayerAffectedByEffect(tp,EFFECT_MUST_BE_BIGBANG_MATERIAL)}
+	-- for _,te in ipairs(ce) do
+		-- local tc=te:GetHandler()
+		-- if tc then bg:AddCard(tc) end
+	-- end
+	-- if #bg>0 then
+		-- Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_LMATERIAL)
+		-- bg:Select(tp,#bg,#bg,nil)
+	-- end
+	-- local sg=Group.CreateGroup()
+	-- sg:Merge(bg)
+	-- local finish=false
+	-- while not (#sg>=max) do
+		-- finish=Auxiliary.BigbangCheckGoal(tp,sg,c,#sg,table.unpack(funs))
+		-- local cg=mg:Filter(Auxiliary.BigbangRecursiveFilter,sg,tp,sg,mg,c,#sg,max,table.unpack(funs))
+		-- if #cg==0 then break end
+		-- local cancel=not finish
+		-- Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+		-- local tc=cg:SelectUnselect(sg,tp,finish,cancel,min,max)
+		-- if not tc then break end
+		-- if not bg:IsContains(tc) then
+			-- if not sg:IsContains(tc) then
+				-- sg:AddCard(tc)
+				-- if (#sg>=max) then finish=true end
+			-- else
+				-- sg:RemoveCard(tc)
+			-- end
+		-- elseif #bg>0 and #sg<=#bg then
+			-- if bigbang_limit_mats_operation and bigbang_limit_mats_operation.SetLabelObject then
+				-- bigbang_limit_mats_operation:Reset()
+				-- bigbang_limit_mats_operation=nil
+			-- end
+			-- if bigbang_force_mats_operation and bigbang_force_mats_operation.SetLabelObject then
+				-- bigbang_force_mats_operation:Reset()
+				-- bigbang_force_mats_operation=nil
+			-- end
+			-- return false
+		-- end
+	-- end
+	-- if finish then
+		-- sg:KeepAlive()
+		-- e:SetLabelObject(sg)
+		-- if bigbang_limit_mats_operation and bigbang_limit_mats_operation.SetLabelObject then
+			-- bigbang_limit_mats_operation:Reset()
+			-- bigbang_limit_mats_operation=nil
+		-- end
+		-- if bigbang_force_mats_operation and bigbang_force_mats_operation.SetLabelObject then
+			-- bigbang_force_mats_operation:Reset()
+			-- bigbang_force_mats_operation=nil
+		-- end
+		-- if e1 then
+			-- e1:Reset()
+			-- e1=nil
+		-- end
+		-- return true
+	-- else
+		-- if bigbang_limit_mats_operation and bigbang_limit_mats_operation.SetLabelObject then
+			-- bigbang_limit_mats_operation:Reset()
+			-- bigbang_limit_mats_operation=nil
+		-- end
+		-- if bigbang_force_mats_operation and bigbang_force_mats_operation.SetLabelObject then
+			-- bigbang_force_mats_operation:Reset()
+			-- bigbang_force_mats_operation=nil
+		-- end
+		-- if e1 then
+			-- e1:Reset()
+			-- e1=nil
+		-- end
+		-- return false
+	-- end
+-- end
 
 function s.matcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_BIGBANG) and e:GetLabel()==1

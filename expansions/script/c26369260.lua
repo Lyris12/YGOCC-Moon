@@ -335,7 +335,9 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetTarget(s.limitmat)
 		e1:SetLabel(eid)
 		e1:SetValue(1)
-		bigbang_limit_mats_operation = e1
+		local e2=e1:Clone()
+		bigbang_limit_mats_condition = e1
+		bigbang_limit_mats_operation = e2
 		Duel.SpecialSummonRule(tp,sc)
 		if Duel.SetSummonCancelable then Duel.SetSummonCancelable(false) end
 	end

@@ -46,6 +46,51 @@ function Auxiliary.FindInTable(tab,a,...)
 	return false
 end
 
+-------------------------------------------------------------------------------------
+-------------------------------PROXY EFFECTS FIX-------------------------------------
+Auxiliary.EffectBeingApplied = nil
+Auxiliary.ProxyEffect = nil
+
+function Duel.SetProxyEffect(e,te)
+	Auxiliary.ProxyEffect = e
+	Auxiliary.EffectBeingApplied = te
+end
+function Duel.ResetProxyEffect()
+	Auxiliary.ProxyEffect = nil
+	Auxiliary.EffectBeingApplied = nil
+end
+
+local _SetLabel, _SetLabelObject, _GetLabel, _GetLabelObject = Effect.SetLabel, Effect.SetLabelObject, Effect.GetLabel, Effect.GetLabelObject
+
+Effect.SetLabel = function(e,l1,...)
+	if aux.GetValueType(aux.EffectBeingApplied)=="Effect" and aux.GetValueType(aux.ProxyEffect)=="Effect" and aux.ProxyEffect==e then
+		return _SetLabel(aux.EffectBeingApplied,l1,...)
+	else
+		return _SetLabel(e,l1,...)
+	end
+end
+Effect.SetLabelObject = function(e,obj)
+	if aux.GetValueType(aux.EffectBeingApplied)=="Effect" and aux.GetValueType(aux.ProxyEffect)=="Effect" and aux.ProxyEffect==e then
+		return _SetLabelObject(aux.EffectBeingApplied,obj)
+	else
+		return _SetLabelObject(e,obj)
+	end
+end
+Effect.GetLabel = function(e)
+	if aux.GetValueType(aux.EffectBeingApplied)=="Effect" and aux.GetValueType(aux.ProxyEffect)=="Effect" and aux.ProxyEffect==e then
+		return _GetLabel(aux.EffectBeingApplied)
+	else
+		return _GetLabel(e)
+	end
+end
+Effect.GetLabelObject = function(e)
+	if aux.GetValueType(aux.EffectBeingApplied)=="Effect" and aux.GetValueType(aux.ProxyEffect)=="Effect" and aux.ProxyEffect==e then
+		return _GetLabelObject(aux.EffectBeingApplied)
+	else
+		return _GetLabelObject(e)
+	end
+end
+
 -----------------------------------------------------------------------------------------------------------
 -------------------------------PREVENT COUNT LIMIT OVERLAP-------------------------------------------------
 aux.EffectCountLimitFlagTable = {}
@@ -55,7 +100,7 @@ local _SetCountLimit = Effect.SetCountLimit
 Effect.SetCountLimit = function(e,ct,...)
 	local x={...}
 	local flag = #x>0 and x[1] or 0
-	if flag~=0 then
+	if flag>EFFECT_COUNT_CODE_SINGLE then
 		local code=e:GetOwner():GetOriginalCodeRule()
 		local pureflag=flag
 		local extraflags=0
@@ -69,6 +114,7 @@ Effect.SetCountLimit = function(e,ct,...)
 		
 		if not aux.EffectCountLimitFlagTable[pureflag] then
 			aux.EffectCountLimitFlagTable[pureflag]=code
+			
 		elseif aux.EffectCountLimitFlagTable[pureflag]~=code then
 			while aux.EffectCountLimitFlagTable[pureflag]~=code do
 				pureflag=pureflag+1
@@ -1908,15 +1954,15 @@ function Auxiliary.FCheckSelectMixRepMEx(c,xct,tp,...)
 		and Auxiliary.FCheckMixRepTemplateEx(c,Auxiliary.FCheckSelectMixRepEx,xct,tp,...)
 end
 
-Duel.SendtoGrave = function(tg,reason)
+Duel.SendtoGrave = function(tg,reason,...)
 	if reason~=REASON_EFFECT+REASON_MATERIAL+REASON_FUSION or aux.GetValueType(tg)~="Group" then
-		return _SendtoGrave(tg,reason)
+		return _SendtoGrave(tg,reason,...)
 	end
 	local rg=tg:Filter(Card.IsHasEffect,nil,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)
 	tg:Sub(rg)
 	local opt=0
 	
-	local ct1=_SendtoGrave(tg,reason)
+	local ct1=_SendtoGrave(tg,reason,...)
 	local ct2=0
 	
 	while #rg>0 do
@@ -1941,14 +1987,14 @@ Duel.SendtoGrave = function(tg,reason)
 	end
 	return ct1+ct2
 end
-Duel.Remove = function(tg,pos,reason)
+Duel.Remove = function(tg,pos,reason,...)
 	if reason~=REASON_EFFECT+REASON_MATERIAL+REASON_FUSION or aux.GetValueType(tg)~="Group" then
-		return _Remove(tg,pos,reason)
+		return _Remove(tg,pos,reason,...)
 	end
 	local rg=tg:Filter(Card.IsHasEffect,nil,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)
 	tg:Sub(rg)
 	local opt=0
-	local ct1=_Remove(tg,pos,reason)
+	local ct1=_Remove(tg,pos,reason,...)
 	local ct2=0
 	while #rg>0 do
 		local extra_g=Group.CreateGroup()
@@ -1970,14 +2016,14 @@ Duel.Remove = function(tg,pos,reason)
 	end
 	return ct1+ct2
 end
-Duel.SendtoDeck = function(tg,p,seq,reason)
+Duel.SendtoDeck = function(tg,p,seq,reason,...)
 	if reason~=REASON_EFFECT+REASON_MATERIAL+REASON_FUSION or aux.GetValueType(tg)~="Group" then
-		return _SendtoDeck(tg,p,seq,reason)
+		return _SendtoDeck(tg,p,seq,reason,...)
 	end
 	local rg=tg:Filter(Card.IsHasEffect,nil,EFFECT_GLITCHY_EXTRA_FUSION_MATERIAL)
 	tg:Sub(rg)
 	local opt=0
-	local ct1=_SendtoDeck(tg,p,seq,reason)
+	local ct1=_SendtoDeck(tg,p,seq,reason,...)
 	local ct2=0
 
 	while #rg>0 do

@@ -142,7 +142,12 @@ function Card.IsCanBeBigbangMaterial(c,ec)
 	if c:IsOnField() and not c:IsFaceup() then return false end
 	local tef={c:IsHasEffect(EFFECT_CANNOT_BE_BIGBANG_MATERIAL)}
 	for _,te in ipairs(tef) do
-		if (type(te:GetValue())=="function" and te:GetValue()(te,ec)) or te:GetValue()==1 then return false end
+		local val=te:GetValue()
+		if type(val)=="nil" or type(val)=="number" then
+			return false
+		elseif type(val)=="function" and val(te,c) then
+			return false
+		end 
 	end
 	return true
 end
@@ -295,8 +300,17 @@ function Auxiliary.AddBigbangProc(c,...)
 	local list={}
 	local min,max
 	local gf
-	if type(t[#t])=="function" then
-		gf=t[#t]
+	local ignore_sumreq=false
+	
+	local ignore_sumreq_chk,gf_chk=false,false
+	while type(t[#t])~="number" do 
+		if not ignore_sumreq_chk and type(t[#t])=="boolean" then
+			ignore_sumreq=t[#t]
+			ignore_sumreq_chk=true
+		elseif not gf_chk and type(t[#t])=="function" then
+			gf=t[#t]
+			gf_chk=true
+		end
 		table.remove(t)
 	end
 	for i=1,#t do
@@ -320,18 +334,53 @@ function Auxiliary.AddBigbangProc(c,...)
 	ge2:SetCode(EFFECT_SPSUMMON_PROC)
 	ge2:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE)
 	ge2:SetRange(LOCATION_EXTRA)
-	ge2:SetCondition(Auxiliary.BigbangCondition(gf,table.unpack(list)))
-	ge2:SetTarget(Auxiliary.BigbangTarget(gf,table.unpack(list)))
+	ge2:SetCondition(Auxiliary.BigbangCondition(gf,ignore_sumreq,table.unpack(list)))
+	ge2:SetTarget(Auxiliary.BigbangTarget(gf,ignore_sumreq,table.unpack(list)))
 	ge2:SetOperation(Auxiliary.BigbangOperation)
 	ge2:SetValue(340)
 	c:RegisterEffect(ge2)
 end
-function Auxiliary.BigbangCondition(gf,...)
+function Auxiliary.BigbangCondition(gf,ignore_sumreq,...)
 	local funs={...}
 	return  function(e,c,matg,mustg)
 				if c==nil then return true end
 				if (c:IsType(TYPE_PENDULUM) or c:IsType(TYPE_PANDEMONIUM)) and c:IsFaceup() then return false end
 				local tp=c:GetControler()
+				
+				local ignore_sumreq_effect
+				if ignore_sumreq then
+					ignore_sumreq_effect=Effect.CreateEffect(c)
+					ignore_sumreq_effect:SetType(EFFECT_TYPE_SINGLE)
+					ignore_sumreq_effect:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+					ignore_sumreq_effect:SetCode(EFFECT_IGNORE_BIGBANG_SUMREQ)
+					c:RegisterEffect(ignore_sumreq_effect)
+				end
+				
+				if bigbang_limit_mats_condition and bigbang_limit_mats_condition.SetLabelObject then
+					Duel.RegisterEffect(bigbang_limit_mats_condition,tp)
+				end
+				local bigbang_forced_mats_table={}
+				if bigbang_force_mats_condition and bigbang_force_mats_condition.SetLabelObject then
+					local forcedmat=bigbang_force_mats_condition:GetLabelObject()
+					if forcedmat then
+						if aux.GetValueType(forcedmat)=="Card" then
+							forcedmat:RegisterEffect(bigbang_force_mats_condition)
+						elseif aux.GetValueType(forcedmat)=="Group" then
+							local already_registered_original=false
+							for tc in aux.Next(forcedmat) do
+								if already_registered_original then
+									local clone=bigbang_force_mats_condition:Clone()
+									tc:RegisterEffect(clone)
+									table.insert(bigbang_forced_mats_table,clone)
+								else
+									tc:RegisterEffect(bigbang_force_mats_condition)
+									already_registered_original=true
+								end
+							end
+						end
+					end
+				end
+				
 				local mg,mg2
 				if matg and aux.GetValueType(matg)=="Group" then
 					mg=matg:Filter(Card.IsCanBeBigbangMaterial,nil,c)  ---matg:Filter(aux.NOT(Card.IsDestructable),nil,e) THIS Card.IsDestructable CHECK MUST NOT BE PERFORMED SINCE BIGBANG MATERIALS ARE NOT DESTROYED BY AN EFFECT
@@ -345,9 +394,46 @@ function Auxiliary.BigbangCondition(gf,...)
 				if mustg and aux.GetValueType(mustg)=="Group" then
 					fg:Merge(mustg)
 				end
-				if fg:IsExists(aux.MustMaterialCounterFilter,1,nil,mg) then return false end
+				if fg:IsExists(aux.MustMaterialCounterFilter,1,nil,mg) then
+					Debug.Message(c:GetCode().." error")
+					for tc in aux.Next(fg) do
+						Debug.Message(tc:GetCode())
+					end
+					if ignore_sumreq_effect then
+						ignore_sumreq_effect:Reset()
+						ignore_sumreq_effect=nil
+					end
+					if bigbang_limit_mats_condition and bigbang_limit_mats_condition.SetLabelObject then
+						bigbang_limit_mats_condition:Reset()
+						bigbang_limit_mats_condition=nil
+					end
+					if bigbang_force_mats_condition and bigbang_force_mats_condition.SetLabelObject then
+						bigbang_force_mats_condition:Reset()
+						bigbang_force_mats_condition=nil
+						for _,clone in ipairs(bigbang_forced_mats_table) do
+							if aux.GetValueType(clone)=="Effect" then clone:Reset() end
+						end
+					end
+					return false
+				end
 				--Duel.SetSelectedCard(fg)
-				return mg:IsExists(Auxiliary.BigbangRecursiveFilter,1,nil,tp,Group.CreateGroup(),mg,fg,c,gf,0,table.unpack(funs))
+				local res=mg:IsExists(Auxiliary.BigbangRecursiveFilter,1,nil,tp,Group.CreateGroup(),mg,fg,c,gf,0,table.unpack(funs))
+				if ignore_sumreq_effect then
+					ignore_sumreq_effect:Reset()
+					ignore_sumreq_effect=nil
+				end
+				if bigbang_limit_mats_condition and bigbang_limit_mats_condition.SetLabelObject then
+					bigbang_limit_mats_condition:Reset()
+					bigbang_limit_mats_condition=nil
+				end
+				if bigbang_force_mats_condition and bigbang_force_mats_condition.SetLabelObject then
+					bigbang_force_mats_condition:Reset()
+					bigbang_force_mats_condition=nil
+					for _,clone in ipairs(bigbang_forced_mats_table) do
+						if aux.GetValueType(clone)=="Effect" then clone:Reset() end
+					end
+				end
+				return res
 			end
 end
 function Auxiliary.BigbangExtraFilter(c,lc,tp,...)
@@ -457,7 +543,7 @@ function Auxiliary.BigbangCheckGoal(tp,sg,fg,bc,gf,ct,...)
 	
 	local funs,min={...},0
 	for i=1,#funs do
-		if not sg:IsExists(funs[i][1],funs[i][2],nil,sg) then return false end
+		if not sg:IsExists(funs[i][1],funs[i][2],nil,sg) or sg:IsExists(funs[i][1],funs[i][3]+1,nil,sg) then return false end
 		min=min+funs[i][2]
 	end
 	
@@ -506,7 +592,7 @@ function Auxiliary.BigbangCheckOtherMaterial(c,mg,lc,tp)
 end
 
 Auxiliary.BigbangMaterialSelectionStep = false
-function Auxiliary.BigbangTarget(gf,...)
+function Auxiliary.BigbangTarget(gf,ignore_sumreq,...)
 	local funs,min,max={...},0,0
 	for i=1,#funs do min=min+funs[i][2] max=max+funs[i][3] end
 	if max>99 then max=99 end
@@ -514,18 +600,37 @@ function Auxiliary.BigbangTarget(gf,...)
 				if bigbang_limit_mats_operation and bigbang_limit_mats_operation.SetLabelObject then
 					Duel.RegisterEffect(bigbang_limit_mats_operation,tp)
 				end
+				local bigbang_forced_mats_table={}
 				if bigbang_force_mats_operation and bigbang_force_mats_operation.SetLabelObject then
 					local forcedmat=bigbang_force_mats_operation:GetLabelObject()
 					if forcedmat then
 						if aux.GetValueType(forcedmat)=="Card" then
 							forcedmat:RegisterEffect(bigbang_force_mats_operation)
 						elseif aux.GetValueType(forcedmat)=="Group" then
+							local already_registered_original=false
 							for tc in aux.Next(forcedmat) do
-								tc:RegisterEffect(bigbang_force_mats_operation)
+								if already_registered_original then
+									local clone=bigbang_force_mats_operation:Clone()
+									tc:RegisterEffect(clone)
+									table.insert(bigbang_forced_mats_table,clone)
+								else
+									tc:RegisterEffect(bigbang_force_mats_operation)
+									already_registered_original=true
+								end
 							end
 						end
 					end
 				end
+				
+				local ignore_sumreq_effect
+				if ignore_sumreq then
+					ignore_sumreq_effect=Effect.CreateEffect(c)
+					ignore_sumreq_effect:SetType(EFFECT_TYPE_SINGLE)
+					ignore_sumreq_effect:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+					ignore_sumreq_effect:SetCode(EFFECT_IGNORE_BIGBANG_SUMREQ)
+					c:RegisterEffect(ignore_sumreq_effect)
+				end
+				
 				local mg=Duel.GetMatchingGroup(Card.IsCanBeBigbangMaterial,tp,LOCATION_MZONE,0,nil,c)
 				local mg2=Duel.GetMatchingGroup(Auxiliary.BigbangExtraFilter,tp,0xff,0xff,nil,c,tp,table.unpack(funs))
 				if #mg2>0 then mg:Merge(mg2) end
@@ -605,7 +710,10 @@ function Auxiliary.BigbangTarget(gf,...)
 					tc:ResetFlagEffect(FLAG_BIGBANG_VIBE)
 				end
 				if finish then
-					
+					if ignore_sumreq_effect then
+						ignore_sumreq_effect:Reset()
+						ignore_sumreq_effect=nil
+					end
 					sg:KeepAlive()
 					e:SetLabelObject(sg)
 					if bigbang_limit_mats_operation and bigbang_limit_mats_operation.SetLabelObject then
@@ -615,9 +723,16 @@ function Auxiliary.BigbangTarget(gf,...)
 					if bigbang_force_mats_operation and bigbang_force_mats_operation.SetLabelObject then
 						bigbang_force_mats_operation:Reset()
 						bigbang_force_mats_operation=nil
+						for _,clone in ipairs(bigbang_forced_mats_table) do
+							if aux.GetValueType(clone)=="Effect" then clone:Reset() end
+						end
 					end
 					return true
 				else
+					if ignore_sumreq_effect then
+						ignore_sumreq_effect:Reset()
+						ignore_sumreq_effect=nil
+					end
 					if bigbang_limit_mats_operation and bigbang_limit_mats_operation.SetLabelObject then
 						bigbang_limit_mats_operation:Reset()
 						bigbang_limit_mats_operation=nil
@@ -625,6 +740,9 @@ function Auxiliary.BigbangTarget(gf,...)
 					if bigbang_force_mats_operation and bigbang_force_mats_operation.SetLabelObject then
 						bigbang_force_mats_operation:Reset()
 						bigbang_force_mats_operation=nil
+						for _,clone in ipairs(bigbang_forced_mats_table) do
+							if aux.GetValueType(clone)=="Effect" then clone:Reset() end
+						end
 					end
 					return false
 				end

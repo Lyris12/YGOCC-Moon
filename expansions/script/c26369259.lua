@@ -116,7 +116,9 @@ function s.scop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetTarget(s.limitmat)
 		e1:SetLabel(eid)
 		e1:SetValue(1)
-		bigbang_limit_mats_operation = e1
+		local e1x=e1:Clone()
+		bigbang_limit_mats_condition = e1
+		bigbang_limit_mats_operation = e1x
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local sg=g:Select(tp,1,1,nil)
 		Duel.SpecialSummonRule(tp,sg:GetFirst())

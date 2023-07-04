@@ -103,11 +103,11 @@ end
 function s.bbfilter(c,e,tp,mg)
 	if not c:IsType(TYPE_BIGBANG) or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_BIGBANG,tp,false,false) or Duel.GetLocationCountFromEx(tp,tp,mg,c)<=0 then return false end
 	local et=global_card_effect_table[c]
-	for _,e in ipairs(et) do
-		if e:GetCode()==EFFECT_SPSUMMON_PROC then
-			local ev=e:GetValue()
-			local ec=e:GetCondition()
-			if ev and (aux.GetValueType(ev)=="function" and ev(ef,c)&340==340 or ev&340==340) and (not ec or ec(e,c,mg,Group.FromCards(e:GetHandler()))) then return true end
+	for _,ce in ipairs(et) do
+		if ce:GetCode()==EFFECT_SPSUMMON_PROC then
+			local ev=ce:GetValue()
+			local ec=ce:GetCondition()
+			if ev and (aux.GetValueType(ev)=="function" and ev(ef,c)&340==340 or ev&340==340) and (not ec or ec(ce,c,mg,Group.FromCards(e:GetHandler()))) then return true end
 		end
 	end
 	return false
@@ -139,6 +139,7 @@ function s.bbop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetTarget(s.limitmat)
 		e1:SetLabel(eid)
 		e1:SetValue(1)
+		local e1x=e1:Clone()
 		--
 		local e2=Effect.CreateEffect(e:GetHandler())
 		e2:SetType(EFFECT_TYPE_FIELD)
@@ -148,11 +149,14 @@ function s.bbop(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetTargetRange(1,1)
 		e2:SetLabelObject(e:GetHandler())
 		e2:SetValue(1)
-		bigbang_limit_mats_operation = e1
-		bigbang_force_mats_operation = e2
+		local e2x=e2:Clone()
+		bigbang_limit_mats_condition = e1
+		bigbang_limit_mats_operation = e1x
+		bigbang_force_mats_condition = e2
+		bigbang_force_mats_operation = e2x
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local sg=g:Select(tp,1,1,nil)
-		Duel.SpecialSummonRule(tp,sg:GetFirst())
+		Duel.SpecialSummonRule(tp,sg:GetFirst(),340)
 		if Duel.SetSummonCancelable then Duel.SetSummonCancelable(false) end
 	end
 end
