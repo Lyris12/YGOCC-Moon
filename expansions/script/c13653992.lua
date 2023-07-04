@@ -6,7 +6,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddOrigTimeleapType(c)
-	aux.AddTimeleapProc(c,11,s.TLcon,aux.FilterBoolFunction(Card.IsSetCard,0xae6),s.TLop)
+	aux.AddTimeleapProc(c,11,s.TLcon,s.TLmaterial,s.TLop)
 	--base stats
 	local e01=Effect.CreateEffect(c)
 	e01:SetType(EFFECT_TYPE_SINGLE)
@@ -55,6 +55,9 @@ end
 --timeleap summon
 function s.excfilter(c)
 	return c:IsFacedown() or not c:IsSetCard(0xae6)
+end
+function s.TLmaterial(c,e)
+	return c:IsSetCard(0xae6) and c:IsAbleToRemove(e:GetHandlerPlayer(),POS_FACEDOWN)
 end
 function s.TLcon(e,c)
 	local g=Duel.GetFieldGroup(e:GetHandlerPlayer(),LOCATION_ONFIELD+LOCATION_GRAVE,0)

@@ -34,8 +34,8 @@ function s.initial_effect(c)
 	c:SummonedTrigger(false,false,true,false,0,CATEGORY_ATKCHANGE+CATEGORY_REMOVE,true,nil,aux.TimeleapSummonedCond,aux.LabelCost,s.tg,s.op)
 end
 --timeleap summon
-function s.TLfil(c)
-	return c:IsMonster(TYPE_TIMELEAP) and c:IsFuture(11) and c:IsSetCard(0xae6)
+function s.TLfil(c,e)
+	return c:IsMonster(TYPE_TIMELEAP) and c:IsFuture(11) and c:IsSetCard(0xae6) and c:IsAbleToRemove(e:GetHandlerPlayer(),POS_FACEDOWN)
 end
 function s.TLcon(e,c)
 	local tp=e:GetHandlerPlayer()

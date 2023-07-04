@@ -6,7 +6,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddOrigTimeleapType(c)
-	aux.AddTimeleapProc(c,11,s.TLcon,aux.FilterBoolFunction(Card.IsSetCard,0xae6),s.TLop)
+	aux.AddTimeleapProc(c,11,s.TLcon,s.TLmaterial,s.TLop)
 	--ss
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
@@ -34,6 +34,9 @@ end
 --timeleap summon
 function s.TLcon(e,c)
 	return Duel.GetMatchingGroupCount(Card.IsFacedown,e:GetHandlerPlayer(),LOCATION_REMOVED,0,nil)>=7
+end
+function s.TLmaterial(c,e)
+	return c:IsSetCard(0xae6) and c:IsAbleToRemove(e:GetHandlerPlayer(),POS_FACEDOWN)
 end
 function s.TLop(e,tp,eg,ep,ev,re,r,rp,c,g)
 	Duel.Remove(g,POS_FACEDOWN,REASON_MATERIAL+REASON_TIMELEAP)

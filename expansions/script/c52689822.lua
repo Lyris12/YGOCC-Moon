@@ -61,7 +61,8 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		for p = turnp, 1-turnp, 1-2*turnp do
 			if ct[p+1]>=0 then
 				excav=Duel.GetFirstMatchingCard(Card.IsSequence,p,LOCATION_DECK,0,nil,ct[p+1])
-				Duel.ConfirmCards(1-tp,excav)
+				Duel.ConfirmCards(p,Group.FromCards(excav))
+				Duel.ConfirmCards(1-p,Group.FromCards(excav))
 				if excav:IsMonster() and excav:HasLevel() then
 					ok=false
 					break

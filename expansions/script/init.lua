@@ -2255,6 +2255,7 @@ end
 --Global Card Effect Table
 function Card.GetEffects(c)
 	local eset=global_card_effect_table[c]
+	if not eset then return {} end
 	local ct=#eset
 	for i = 1,ct do
 		local e=eset[i]

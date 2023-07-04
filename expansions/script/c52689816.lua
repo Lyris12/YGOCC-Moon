@@ -79,7 +79,7 @@ function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 		end
 		if pos==0 then return end
 		pos=Duel.SelectPosition(tp,tc,pos)
-		Duel.BanishUntil(tc,pos,PHASE_END,id)
+		Duel.BanishUntil(tc,e,tp,pos,PHASE_END,id)
 	end
 end
 

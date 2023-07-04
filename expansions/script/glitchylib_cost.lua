@@ -352,6 +352,20 @@ function Auxiliary.TributeForSummonSelfCost(f,loc1,loc2,sumtype,sump,ign1,ign2,p
 end
 
 -----------------------------------------------------------------------
+--Counter Costs
+function Auxiliary.RemoveCounterCost(ctype,ct,self,oppo)
+	if not ct then ct=1 end
+	if not self then self=1 end
+	if not oppo then oppo=0 end
+	return	function(e,tp,eg,ep,ev,re,r,rp,chk)
+				if chk==0 then
+					return Duel.IsCanRemoveCounter(tp,self,oppo,ctype,ct,REASON_COST)
+				end
+				Duel.RemoveCounter(tp,self,oppo,ctype,ct,REASON_COST)
+			end
+end
+
+-----------------------------------------------------------------------
 --LP Payment Costs
 function Auxiliary.PayLPCost(lp)
 	if not lp then lp=1000 end

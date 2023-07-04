@@ -93,22 +93,6 @@ function Duel.FlipSummon(tp,c)
 	end
 end
 -- ---------------------------------------
-
---[[Effect.Evaluate
-Get the value of an effect. If the effect has a function as value, it calculates the value of the function
-]]
-function Effect.Evaluate(e,...)
-	local extraargs={...}
-	local val=e:GetValue()
-	if not val then return false end
-	if type(val)=="function" then
-		local results={val(e,table.unpack(extraargs))}
-		return table.unpack(results)
-	else
-		return val
-	end
-end
-
 CODE_CUSTOM,CODE_COUNTER,CODE_PHASE,CODE_VALUE = 1,2,3,4
 function Effect.GetCodeType(code)
 	if code&EVENT_CUSTOM>0 then
