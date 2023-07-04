@@ -339,6 +339,7 @@ function Auxiliary.AddBigbangProc(c,...)
 	ge2:SetOperation(Auxiliary.BigbangOperation)
 	ge2:SetValue(340)
 	c:RegisterEffect(ge2)
+	return ge2
 end
 function Auxiliary.BigbangCondition(gf,ignore_sumreq,...)
 	local funs={...}

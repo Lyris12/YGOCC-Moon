@@ -6,8 +6,10 @@ function s.initial_effect(c)
 	--bigbang
 	aux.AddOrigBigbangType(c)
 	c:EnableReviveLimit()
-	aux.AddBigbangProc(c,s.proton,1,1,s.electron,1)
-	aux.AddBigbangProc(c,s.mat1,1,1,s.mat2,1,1,nil,true)
+	local b1=aux.AddBigbangProc(c,s.proton,1,1,s.electron,1)
+	local b2=aux.AddBigbangProc(c,s.mat1,1,1,s.mat2,1,1,nil,true)
+	b1:Desc(0)
+	b2:Desc(1)
 	--material check
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
