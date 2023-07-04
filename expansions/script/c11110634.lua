@@ -74,16 +74,16 @@ function s.dcfilter(c,e,tp)
 	return c:IsSetCard(ARCHE_IDOLESCENT,ARCHE_OSCURION) and c:IsDiscardable() and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND|LOCATION_GRAVE,0,1,Group.FromCards(c,e:GetHandler()),e,tp)
 end
 function s.spfilter(c,e,tp)
-	return c:IsSetCard(ARCHE_IDOLESCENT,ARCHE_OSCURION) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(ARCHE_IDOLESCENT,ARCHE_OSCURION,true) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function s.checkeffect(c,tp)
+function s.checkeffect(c,tp,e)
 	local egroup=c:GetEffects()
 	for i,teh in ipairs(egroup) do
 		if aux.GetValueType(teh)=="Effect" and not teh:WasReset() then
 			if teh:GetCode()==CARD_OSCURION_TYPE2 then
 				local te=teh:GetLabelObject()
 				local tg=te:GetTarget()
-				if (not tg or tg(te,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,0)) then
+				if (not tg or tg(e,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,0)) then
 					return true
 				end
 			end
@@ -106,7 +106,9 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then
 		if Duel.GetMZoneCount(tp)<=0 then return false end
-		return e:IsCostChecked() or Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND|LOCATION_GRAVE,0,1,c,e,tp)
+		if e:IsCostChecked() then return true end
+		e:SetCostCheck(false)
+		return Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND|LOCATION_GRAVE,0,1,c,e,tp)
 	end
 	if c:IsRelateToChain() and c:IsEngaged() then
 		e:SetLabel(c:GetEngagedID())
@@ -117,11 +119,12 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetMZoneCount(tp)<=0 then return end
+	e:SetCostCheck(false)
 	local c=e:GetHandler()
 	local sg=Duel.Select(HINTMSG_SPSUMMON,false,tp,aux.Necro(s.spfilter),tp,LOCATION_HAND|LOCATION_GRAVE,0,1,1,aux.ExceptThisEngaged(c,e:GetLabel()),e,tp)
 	if #sg>0 and Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)>0 then
 		local tc=sg:GetFirst()
-		if not Duel.PlayerHasFlagEffect(tp,id) and tc:IsFaceup() and tc:IsSetCard(ARCHE_OSCURION) and s.checkeffect(tc,tp) and c:AskPlayer(tp,2) then
+		if not Duel.PlayerHasFlagEffect(tp,id) and tc:IsFaceup() and tc:IsSetCard(ARCHE_OSCURION) and s.checkeffect(tc,tp,e) and c:AskPlayer(tp,2) then
 			Duel.RegisterFlagEffect(tp,id,RESET_CHAIN,0,1,nil)
 			local egroup=tc:GetEffects()
 			local te=nil
@@ -131,7 +134,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 				if aux.GetValueType(teh)=="Effect" and teh:GetCode()==CARD_OSCURION_TYPE2 then
 					local temp=teh:GetLabelObject()
 					local tg=temp:GetTarget()
-					if (not tg or tg(temp,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,0)) then
+					if (not tg or tg(e,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,0)) then
 						table.insert(ac,teh)
 						table.insert(acd,temp:GetDescription())
 					end
@@ -152,25 +155,25 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 			te=teh:GetLabelObject()
 			local tg=te:GetTarget()
 			if tg then
-				tg(te,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,1)
+				tg(e,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,1)
 			end
 			if tc:IsRelateToEffect(e) then
-				tc:CreateEffectRelation(te)
+				tc:CreateEffectRelation(e)
 				Duel.BreakEffect()
 				local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 				if g then
 					for etc in aux.Next(g) do
-						etc:CreateEffectRelation(te)
+						etc:CreateEffectRelation(e)
 					end
 				end
 				local op=te:GetOperation()
 				if op then
-					op(te,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,1)
+					op(e,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,1)
 				end
-				tc:ReleaseEffectRelation(te)
+				tc:ReleaseEffectRelation(e)
 				if g then
 					for etc in aux.Next(g) do
-						etc:ReleaseEffectRelation(te)
+						etc:ReleaseEffectRelation(e)
 					end
 				end
 			end

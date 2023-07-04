@@ -38,7 +38,7 @@ function s.initial_effect(c)
 		s.code_list={{},{}}
 		local ge1=Effect.CreateEffect(c)
 		ge1:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_PHASE|PHASE_END)
+		ge1:SetCode(EVENT_TURN_END)
 		ge1:SetCountLimit(1)
 		ge1:SetOperation(s.resetop)
 		Duel.RegisterEffect(ge1,0)
@@ -77,7 +77,7 @@ function s.TLmaterial(c)
 end
 
 --FILTERS E2
-function s.filter(c,tp,tab)
+function s.filter(c,tp,tab,e)
 	if #tab>0 then
 		local codes={c:GetOriginalCodeRule()}
 		if aux.FindInTable(tab,table.unpack(codes)) then
@@ -90,7 +90,7 @@ function s.filter(c,tp,tab)
 		if aux.GetValueType(teh)=="Effect" and teh:GetCode()==CARD_OSCURION_TYPE0 then
 			local te=teh:GetLabelObject()
 			local tg=te:GetTarget()
-			if (not tg or tg(te,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,0)) then
+			if (not tg or tg(e,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,0)) then
 				return true
 			end
 		end
@@ -100,11 +100,12 @@ end
 --E2
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local tab=s.code_list[tp+1]
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.filter(chkc,tp,tab) end
+	e:SetCostCheck(false)
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.filter(chkc,tp,tab,e) end
 	if chk==0 then
-		return Duel.IsExistingTarget(s.filter,tp,LOCATION_GRAVE,0,1,nil,tp,tab) and not e:GetHandler():IsStatus(STATUS_CHAINING) and not Duel.PlayerHasFlagEffect(tp,id)
+		return Duel.IsExistingTarget(s.filter,tp,LOCATION_GRAVE,0,1,nil,tp,tab,e) and not e:GetHandler():IsStatus(STATUS_CHAINING) and not Duel.PlayerHasFlagEffect(tp,id)
 	end
-	local g=Duel.Select(HINTMSG_TARGET,true,tp,s.filter,tp,LOCATION_GRAVE,0,1,1,nil,tp,tab)
+	local g=Duel.Select(HINTMSG_TARGET,true,tp,s.filter,tp,LOCATION_GRAVE,0,1,1,nil,tp,tab,e)
 	local tc=g:GetFirst()
 	if tc then
 		local codes={tc:GetOriginalCodeRule()}
@@ -117,7 +118,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 			if aux.GetValueType(teh)=="Effect" and teh:GetCode()==CARD_OSCURION_TYPE0 then
 				local temp=teh:GetLabelObject()
 				local tg=temp:GetTarget()
-				if (not tg or tg(temp,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,0)) then
+				if (not tg or tg(e,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,0)) then
 					table.insert(ac,teh)
 					table.insert(acd,temp:GetDescription())
 				end
@@ -139,7 +140,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		te=teh:GetLabelObject()
 		local tg=te:GetTarget()
 		if tg then
-			tg(te,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,1)
+			tg(e,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,1)
 		end
 		e:SetOperation(s.operation(te,teh))
 	end
@@ -148,6 +149,7 @@ function s.operation(te,teh)
 	return	function(e,tp,eg,ep,ev,re,r,rp)
 				if aux.GetValueType(te)~="Effect" then return end
 				e,tp,eg,ep,ev,re,r,rp = aux.OperationRegistrationProcedure(e,tp,eg,ep,ev,re,r,rp)
+				e:SetCostCheck(false)
 				local codes={e:GetLabel()}
 				for _,code in ipairs(codes) do
 					table.insert(s.code_list[tp+1],code)
@@ -155,19 +157,19 @@ function s.operation(te,teh)
 				local tc=e:GetLabelObject()
 				if tc:IsRelateToEffect(e) and tc:IsMonster(TYPE_DRIVE) and tc:IsSetCard(ARCHE_OSCURION) and tc:IsControler(tp) then
 					Duel.RegisterFlagEffect(tp,id,RESET_CHAIN,0,1,nil)
-					tc:CreateEffectRelation(te)
+					tc:CreateEffectRelation(e)
 					Duel.BreakEffect()
 					local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 					for etc in aux.Next(g) do
-						etc:CreateEffectRelation(te)
+						etc:CreateEffectRelation(e)
 					end
 					local op=te:GetOperation()
 					if op then
-						op(te,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,1)
+						op(e,tp,Group.CreateGroup(),PLAYER_NONE,0,teh,REASON_EFFECT,PLAYER_NONE,1)
 					end
-					tc:ReleaseEffectRelation(te)
+					tc:ReleaseEffectRelation(e)
 					for etc in aux.Next(g) do
-						etc:ReleaseEffectRelation(te)
+						etc:ReleaseEffectRelation(e)
 					end
 				end
 			end
