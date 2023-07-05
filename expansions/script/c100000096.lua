@@ -79,7 +79,7 @@ function s.matfilter(c)
 	if c:IsInBackrow() then
 		return c:IsFacedown() and c:IsLinkSetCard(ARCHE_TRAPPIT) and c:IsLinkType(TYPE_TRAP)
 	else
-		return c:IsLinkRace(RACE_BEAST)
+		return c:IsLinkRace(RACE_BEAST|RACE_MACHINE)
 	end
 	return false
 end

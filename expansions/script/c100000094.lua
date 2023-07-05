@@ -112,20 +112,24 @@ function s.activate(mode)
 							if g:GetFirst():HasLevel() then
 								local lv=g:GetFirst():GetLevel()
 								local hg=Duel.GetHand(1-tp)
+								local phase=Duel.GetCurrentPhase()
+								if phase==PHASE_BATTLE_START or phase==PHASE_BATTLE_STEP then
+									phase=PHASE_BATTLE
+								end
 								for tc in aux.Next(hg) do
 									local e1=Effect.CreateEffect(c)
 									e1:SetType(EFFECT_TYPE_SINGLE)
 									e1:SetCode(EFFECT_UPDATE_LEVEL)
 									e1:SetValue(lv)
-									e1:SetReset(RESET_EVENT|(RESETS_STANDARD&(~RESET_TOFIELD))|RESET_PHASE|PHASE_END)
+									e1:SetReset(RESET_EVENT|(RESETS_STANDARD&(~RESET_TOFIELD))|RESET_PHASE|phase)
 									tc:RegisterEffect(e1)
 								end
 								local e2=Effect.CreateEffect(c)
 								e2:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
 								e2:SetCode(EVENT_TO_HAND)
-								e2:SetLabel(lv)
+								e2:SetLabel(lv,phase)
 								e2:SetOperation(s.hlvop)
-								e2:SetReset(RESET_PHASE|PHASE_END)
+								e2:SetReset(RESET_PHASE|phase)
 								Duel.RegisterEffect(e2,tp)
 							end
 						end
@@ -156,13 +160,14 @@ function s.hlvfilter(c,tp)
 	return c:IsLocation(LOCATION_HAND) and c:IsControler(tp)
 end
 function s.hlvop(e,tp,eg,ep,ev,re,r,rp)
+	local lv,phase=e:GetLabel()
 	local hg=eg:Filter(s.hlvfilter,nil,1-tp)
 	for tc in aux.Next(hg) do
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_LEVEL)
-		e1:SetValue(e:GetLabel())
-		e1:SetReset(RESET_EVENT|(RESETS_STANDARD&(~RESET_TOFIELD))|RESET_PHASE|PHASE_END)
+		e1:SetValue(lv)
+		e1:SetReset(RESET_EVENT|(RESETS_STANDARD&(~RESET_TOFIELD))|RESET_PHASE|phase)
 		tc:RegisterEffect(e1)
 	end
 end

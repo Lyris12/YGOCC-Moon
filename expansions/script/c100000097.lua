@@ -24,7 +24,7 @@ function s.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e1:SetCode(EFFECT_IMMUNE_EFFECT)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetValue(s.econ)
+	e1:SetValue(s.efilter)
 	c:RegisterEffect(e1)
 	--[[If this card is Link Summoned: You can target cards on the field, up to the number of Normal or Flip Summoned monsters used as material for its Link Summon; destroy them.]]
 	local e2=Effect.CreateEffect(c)
