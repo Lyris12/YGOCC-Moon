@@ -67,12 +67,11 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 		Duel.SetTargetCard(tc)
 		if tc:IsLocation(LOCATION_HAND) then
 			Duel.SetCardOperationInfo(g,CATEGORY_SUMMON)
-			Duel.SetCustomOperationInfo(0,CATEGORY_ATKCHANGE,g,1,tp,LOCATION_MZONE,2000)
-			Duel.SetCustomOperationInfo(0,CATEGORY_DEFCHANGE,g,1,tp,LOCATION_MZONE,2000)
-		else
-			aux.RemainOnFieldCost(e,tp,eg,ep,ev,re,r,rp,chk)
-			Duel.SetOperationInfo(0,CATEGORY_EQUIP,e:GetHandler(),1,0,0)
 		end
+		aux.RemainOnFieldCost(e,tp,eg,ep,ev,re,r,rp,chk)
+		Duel.SetOperationInfo(0,CATEGORY_EQUIP,e:GetHandler(),1,0,0)
+		Duel.SetCustomOperationInfo(0,CATEGORY_ATKCHANGE,g,1,tp,LOCATION_MZONE,2000)
+		Duel.SetCustomOperationInfo(0,CATEGORY_DEFCHANGE,g,1,tp,LOCATION_MZONE,2000)
 	end
 end
 function s.activate(mode)
@@ -84,7 +83,7 @@ function s.activate(mode)
 						local nscheck=(tc:IsLocation(LOCATION_HAND) or tc:IsFaceup()) and tc:IsSummonable(true,nil)
 						local fscheck=tc:IsCanBeFlipSummoned(tp,true)
 						if nscheck then
-							local e1=Effect.CreateEffect(e:GetHandler())
+							local e1=Effect.CreateEffect(c)
 							e1:SetType(EFFECT_TYPE_SINGLE|EFFECT_TYPE_CONTINUOUS)
 							e1:SetCode(EVENT_SUMMON_SUCCESS)
 							e1:SetLabelObject(tc)
@@ -100,6 +99,7 @@ function s.activate(mode)
 						elseif fscheck then
 							if Duel.FlipSummon(tp,tc) and c:IsRelateToChain() and not c:IsStatus(STATUS_LEAVE_CONFIRMED) then
 								if tc:IsRelateToChain() and tc:IsFaceup() then
+									tc:UpdateATKDEF(2000,2000,true,c)
 									if Duel.EquipAndRegisterLimit(tp,c,tc) then
 										local e1=Effect.CreateEffect(c)
 										e1:SetType(EFFECT_TYPE_EQUIP)
@@ -131,9 +131,33 @@ function s.activate(mode)
 	
 	elseif mode==1 then
 		return	function(e,tp,eg,ep,ev,re,r,rp,ce)
+					local c=e:GetHandler()
 					local tc=ce:GetLabelObject()
 					if tc and tc:IsFaceup() and tc:IsLocation(LOCATION_MZONE) then
-						tc:UpdateATKDEF(2000,2000,true,ce:GetOwner())
+						tc:UpdateATKDEF(2000,2000,true,c)
+						if Duel.EquipAndRegisterLimit(tp,c,tc) then
+							local e1=Effect.CreateEffect(c)
+							e1:SetType(EFFECT_TYPE_EQUIP)
+							e1:SetCode(EFFECT_IMMUNE_EFFECT)
+							e1:SetValue(s.immval)
+							e1:SetReset(RESET_EVENT|RESETS_STANDARD)
+							c:RegisterEffect(e1)
+							local e2=Effect.CreateEffect(c)
+							e2:SetCategory(CATEGORY_DISABLE)
+							e2:SetType(EFFECT_TYPE_QUICK_O)
+							e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
+							e2:SetCode(EVENT_FREE_CHAIN)
+							e2:SetRange(LOCATION_SZONE)
+							e2:SetHintTiming(0,RELEVANT_TIMINGS)
+							e2:OPT()
+							e2:SetCondition(aux.IsEquippedCond)
+							e2:SetCost(aux.ToGraveCost(s.negcfilter),LOCATION_HAND|LOCATION_ONFIELD,0,1,1,true)
+							e2:SetTarget(s.negtg)
+							e2:SetOperation(s.negop)
+							c:RegisterEffect(e2)
+						end
+					else
+						c:CancelToGrave(false)
 					end
 				end
 	end

@@ -66,10 +66,10 @@ function s.cfilter(c,tp)
 end
 --E1
 function s.limcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(Card.IsSummonPlayer,1,nil,tp)
+	return Duel.IsExistingMatchingCard(Card.IsSummonType,tp,0,LOCATION_MZONE,1,nil,SUMMON_TYPE_SPECIAL) and eg:IsExists(Card.IsSummonPlayer,1,nil,tp)
 end
 function s.limcon_set(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(s.cfilter,1,nil,tp)
+	return Duel.IsExistingMatchingCard(Card.IsSummonType,tp,0,LOCATION_MZONE,1,nil,SUMMON_TYPE_SPECIAL) and eg:IsExists(s.cfilter,1,nil,tp)
 end
 function s.limop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetCurrentChain()==0 then

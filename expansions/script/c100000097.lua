@@ -57,6 +57,26 @@ function s.initial_effect(c)
 	e2:SetTarget(s.target)
 	e2:SetOperation(s.operation)
 	c:RegisterEffect(e2)
+	if not aux.AddFlipSummonTypeCheck then
+		aux.AddFlipSummonTypeCheck=true
+		local ge1=Effect.CreateEffect(c)
+		ge1:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
+		ge1:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
+		ge1:SetOperation(s.regcon)
+		Duel.RegisterEffect(ge1,0)
+	end
+end
+function s.regcon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	for tc in aux.Next(eg) do
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_IGNORE_IMMUNE|EFFECT_FLAG_SET_AVAILABLE|EFFECT_FLAG_UNCOPYABLE)
+		e1:SetCode(EFFECT_ADD_SUMMON_TYPE_KOISHI)
+		e1:SetValue(SUMMON_TYPE_FLIP)
+		e1:SetReset(RESET_EVENT|RESETS_STANDARD&~(RESET_TEMP_REMOVE|RESET_TURN_SET|RESET_LEAVE))
+		tc:RegisterEffect(e1,true)
+	end
 end
 --EX
 function s.matfilter(c)
@@ -80,9 +100,12 @@ function s.efilter(e,te)
 	return te:IsActiveType(TYPE_MONSTER|TYPE_SPELL) and te:GetOwnerPlayer()~=e:GetHandlerPlayer()
 end
 --E1X
+function s.schkfilter(c)
+	return c:IsSummonType(SUMMON_TYPE_NORMAL) or c:IsSummonType(SUMMON_TYPE_FLIP)
+end
 function s.matcheck(e,c)
 	local mat=c:GetMaterial()
-	local ct = type(mat)~="nil" and mat:FilterCount(Card.IsSummonType,nil,SUMMON_TYPE_NORMAL) or 0
+	local ct = type(mat)~="nil" and mat:FilterCount(s.schkfilter,nil) or 0
 	e:GetLabelObject():SetLabel(ct)
 end
 

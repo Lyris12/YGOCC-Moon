@@ -39,7 +39,7 @@ function s.initial_effect(c)
 	e3:Desc(2)
 	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetCode(EFFECT_TRAP_ACT_IN_HAND)
-	e3:SetCondition(aux.TurnPlayerCond(0))
+	e3:SetCondition(s.acthandcon)
 	c:RegisterEffect(e3)
 end
 function s.egfilter(c,_,_,eg,_,_,_,_,_,_,event)
@@ -147,4 +147,9 @@ function s.setop(e,tp,eg,ep,ev,re,r,rp)
 	if tc:HasFlagEffectLabel(id+100,e:GetLabel()) and tc:IsCanBeSet(e,tp) then
 		Duel.Set(tp,tc)
 	end
+end
+
+function s.acthandcon(e)
+	local tp=e:GetHandlerPlayer()
+	return Duel.GetTurnPlayer()==tp and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,ARCHE_TRAPPIT),tp,LOCATION_ONFIELD,0,1,nil)
 end

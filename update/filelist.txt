@@ -1,4 +1,4 @@
-﻿expansions/cards-new.cdb	c784ffdd9d0f9ba9383f6c679a23c3ca
+﻿expansions/cards-new.cdb	c0868898f5d1cdce30f451aa1537adbb
 expansions/lflist.conf	2693c6a36f15eb781e07c2b55ff94fc2
 expansions/strings.conf	17c7de25c8d375ba117accd1766b4482
 expansions/pics/100000000.png	b67e8ff2c7f674f012be790c136b43e5
@@ -5920,13 +5920,13 @@ expansions/script/c100000089.lua	95fb1dea69d9e329f6ca1e2cc5f86c72
 expansions/script/c100000090.lua	66f8d99b1dff702c855a1bcc9e92c08f
 expansions/script/c100000091.lua	776ce99fb00611dd6165a71a3ed978f0
 expansions/script/c100000092.lua	832ba3940b6c8977cd9b43b41d56739c
-expansions/script/c100000093.lua	caaeca1e97088e6755e1c532f08d9ec1
+expansions/script/c100000093.lua	250c0aaa2b34a57a65c475bef94b9f62
 expansions/script/c100000094.lua	7c504d6552e5cf460590013b1db05fe0
-expansions/script/c100000095.lua	ee2998e960aa5569b4ce42bf3dd92e2a
-expansions/script/c100000096.lua	8861ad4a2b64f7215c05ce485ba86444
-expansions/script/c100000097.lua	9705fcd441d9fbcf7fc7e1435fba0542
+expansions/script/c100000095.lua	ccf2283ed7bde8c27e12f1eef5d02305
+expansions/script/c100000096.lua	ea354907127b24086b3492e87072bb05
+expansions/script/c100000097.lua	c1a1b5377b4e58905b32b0ac9cb7a11e
 expansions/script/c100000098.lua	84c7e0724e858a0dcc1d1041b93c6887
-expansions/script/c100000099.lua	d14493757edf32a6f3b0c0290eab77ba
+expansions/script/c100000099.lua	2614775ecdd0ee9f32a7217948799a7e
 expansions/script/c100000714.lua	d76fba87c5edb765a2be2d5bd214a793
 expansions/script/c100000736.lua	4b60d073e942c60222e137d3f350e025
 expansions/script/c100000737.lua	21f0e03236994964f5cb4a517edb0523
@@ -11530,6 +11530,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	3334ad83074854ff9713777ff00e2fda
+update/filelist.txt	5c57d17d1a4350ddd61e48489546712b
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	823cbb4cf83603b96cfe16ee4fed5b4f
+update/version.txt	eda89f2c37273c86a203ccf21b09ffbf
