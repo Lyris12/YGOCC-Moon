@@ -71,7 +71,16 @@ end
 
 --FILTERS D2
 function s.dcfilter(c,e,tp)
-	return c:IsSetCard(ARCHE_IDOLESCENT,ARCHE_OSCURION) and c:IsDiscardable() and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND|LOCATION_GRAVE,0,1,Group.FromCards(c,e:GetHandler()),e,tp)
+	if not (c:IsSetCard(ARCHE_IDOLESCENT,ARCHE_OSCURION) and c:IsDiscardable()) then return false end
+	if c:IsAbleToGraveAsCost() then
+		c:SetLocationAfterCost(LOCATION_GRAVE)
+		local res=c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+		c:SetLocationAfterCost(0)
+		if res then
+			return true
+		end
+	end
+	return Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND|LOCATION_GRAVE,0,1,Group.FromCards(c,e:GetHandler()),e,tp)
 end
 function s.spfilter(c,e,tp)
 	return c:IsSetCard(ARCHE_IDOLESCENT,ARCHE_OSCURION) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

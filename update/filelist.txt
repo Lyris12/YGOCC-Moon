@@ -6609,7 +6609,7 @@ expansions/script/c11110630.lua	f813b60ad504205eeac7735a7976cd22
 expansions/script/c11110631.lua	cd41ad34244c381116aeff3e30373775
 expansions/script/c11110632.lua	359d29be57d000f24fa950e100530a88
 expansions/script/c11110633.lua	fcdd7fea4d1083cb5f4c3b6848eaf265
-expansions/script/c11110634.lua	0f0492b7f80ffadaf7f9ab759860ebc4
+expansions/script/c11110634.lua	4099da2e261d30ac9cc5cb36baab68cb
 expansions/script/c11110635.lua	b2c6a3988e92c5c1e172b813133552d9
 expansions/script/c11110636.lua	5a735dd5d14f36cd826074d7b78191cc
 expansions/script/c11110637.lua	1aff8fe04ebe4a1cb6102a11e869d71d
@@ -11444,7 +11444,7 @@ expansions/script/c99998880.lua	3aef26642d50e23356a371a14d7b09ad
 expansions/script/Deptheaven.lua	451894d4b7a9a2b13929be6cc70876c1
 expansions/script/Elemerge.lua	4475491ee094a20d129be9c6638155d1
 expansions/script/GardrenialCommons.lua	df2b3e36ef0489fd6749fea0b4ed75f8
-expansions/script/glitchylib.lua	a2ffe153534c8ff61c7a767c72be4519
+expansions/script/glitchylib.lua	bb87cfb9fc4109187505da5accaeb555
 expansions/script/glitchylib_adjust_events.lua	620dcaecb767f65089869854803c5e8b
 expansions/script/glitchylib_aeonstride.lua	b6af07df91ed86f143cde05b9aaca11f
 expansions/script/glitchylib_cond.lua	9c3b76eb77a5908daed3650e8e0def29
@@ -11460,7 +11460,7 @@ expansions/script/glitchylib_tgop.lua	c866f74e4040bb820aac818386bb8144
 expansions/script/glitchylib_trigger.lua	99fade1f52aa59cb9e27589b81e2c57f
 expansions/script/GLShortcuts.lua	6743700bf509cc48d8f596ff4a8fe5c0
 expansions/script/Hollohom.lua	1068c36899a36de7eb374af8fc28a892
-expansions/script/init.lua	47fb6c054ea82e7fbf7c5bb884a4ab9f
+expansions/script/init.lua	8e6ea98e738e08bee403727e6f3aedda
 expansions/script/json.lua	d41a01cf67c76915b49c57d21ac471ee
 expansions/script/lap.lua	1325997ac4231550048dae57e7eb75b0
 expansions/script/Marionightte.lua	5a85f8763d461732b045784033bd63ac
@@ -11564,6 +11564,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	3ec100cac404f49aa9e2d4011c94b77e
+update/filelist.txt	757e7cab713b19c8ec9f37268e68c35f
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	aea5caccac265a6a663906e094458dcf
+update/version.txt	7e1ff9c74bfab60901394b415b4583ab

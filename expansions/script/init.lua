@@ -2331,9 +2331,8 @@ if not global_card_effect_table_global_check then
 					ce:SetTarget(function(eff,c) return (not tg or tg(eff,c)) and c:IsHasEffect(EFFECT_ORIGINAL_LEVEL_RANK_DUALITY) end)
 				end
 				self.register_global_card_effect_table(self,ce,forced)
-			end
 			
-			if e:GetCode()==EFFECT_DISABLE or e:GetCode()==EFFECT_DISABLE_EFFECT or e:GetCode()==EFFECT_DISABLE_CHAIN or e:GetCode()==EFFECT_DISABLE_TRAPMONSTER then
+			elseif e:GetCode()==EFFECT_DISABLE or e:GetCode()==EFFECT_DISABLE_EFFECT or e:GetCode()==EFFECT_DISABLE_CHAIN or e:GetCode()==EFFECT_DISABLE_TRAPMONSTER then
 				if e:GetType()==EFFECT_TYPE_SINGLE then
 					local cond=e:GetCondition()
 					if not cond then
@@ -2458,7 +2457,14 @@ if not global_card_effect_table_global_check then
 			e:SetCost(newcost)
 		end
 		if tg then
-			if e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()==EFFECT_TYPE_XMATERIAL or e:GetType()==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or e:GetType()&EFFECT_TYPE_GRANT~=0) then
+			if e:GetCode()==EFFECT_CANNOT_SPECIAL_SUMMON then
+				local newtg =	function(...)
+									local x={...}
+									self_reference_effect=x[1]
+									return tg(table.unpack(x))
+								end
+				e:SetTarget(newtg)
+			elseif e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()==EFFECT_TYPE_XMATERIAL or e:GetType()==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or e:GetType()&EFFECT_TYPE_GRANT~=0) then
 				local newtg =	function(...)
 									local x={...}
 									self_reference_effect=x[1]
@@ -2666,7 +2672,14 @@ if not global_duel_effect_table_global_check then
 								e:SetCost(newcost)
 							end
 							if tg then
-								if e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()&EFFECT_TYPE_GRANT~=0) then
+								if e:GetCode()==EFFECT_CANNOT_SPECIAL_SUMMON then
+									local newtg =	function(...)
+														local x={...}
+														self_reference_effect=x[1]
+														return tg(table.unpack(x))
+													end
+									e:SetTarget(newtg)
+								elseif e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()&EFFECT_TYPE_GRANT~=0) then
 									local newtg =	function(...)
 														local x={...}
 														self_reference_effect=x[1]

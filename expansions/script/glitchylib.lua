@@ -46,6 +46,41 @@ function Auxiliary.FindInTable(tab,a,...)
 	return false
 end
 
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------EFFECTS THAT CAN BE ACTIVATED BY AFFECTING THE CARD USED AS COST, EVEN WHEN THERE ARE NO OTHER VALID TARGETS-------------------------------------
+function Card.SetLocationAfterCost(c,loc)
+	local s=getmetatable(c)
+	s.LocationAfterCost=loc
+end
+function Card.IsLocationAfterCost(c,loc)
+	if not c.LocationAfterCost then return false end
+	local s=getmetatable(c)
+	return s.LocationAfterCost&loc~=0
+end
+function Card.GetLocationAfterCost(c)
+	local s=getmetatable(c)
+	if not s.LocationAfterCost then return 0 end
+	return s.LocationAfterCost
+end
+
+local _IsLocation, _GetLocation = Card.IsLocation, Card.GetLocation
+
+Card.IsLocation = function(c,loc)
+	if self_reference_effect and self_reference_effect:GetCode()==EFFECT_CANNOT_SPECIAL_SUMMON then
+		if c:IsLocationAfterCost(loc) then
+			return true
+		end
+	end
+	return _IsLocation(c,loc)
+end
+Card.GetLocation = function(c)
+	local locs=_GetLocation(c)
+	if self_reference_effect and self_reference_effect:GetCode()==EFFECT_CANNOT_SPECIAL_SUMMON then
+		locs=locs|c:GetLocationAfterCost()
+	end
+	return locs
+end
+
 -------------------------------------------------------------------------------------
 -------------------------------PROXY EFFECTS FIX-------------------------------------
 Auxiliary.EffectBeingApplied = nil
