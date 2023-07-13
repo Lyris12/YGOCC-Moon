@@ -137,7 +137,8 @@ function Auxiliary.SpawnGlitchyHelper(flags)
 			
 			aux.GlitchyHelperFlags=0
 			for p=0,1 do
-				if Duel.SelectYesNo(p,STRING_EXCLUDE_AI) then
+				local res=Duel.SelectYesNo(p,STRING_EXCLUDE_AI)
+				if not res then
 					aux.GlitchyHelperIgnorePlayerTable[p+1]=true
 				end
 			end
