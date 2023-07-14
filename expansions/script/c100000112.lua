@@ -109,6 +109,9 @@ function s.operation(mode)
 								Duel.SpecialSummonRule(tp,sc,SUMMON_TYPE_TIMELEAP)
 								if Duel.SetSummonCancelable then Duel.SetSummonCancelable(false) end
 							end
+						else
+							ign:Reset()
+							mat:Reset()
 						end
 					end
 				end
