@@ -163,7 +163,7 @@ function s.synfilter(c,e,tp,exc)
 	local lv=c:GetLevel()
 	local g=Duel.Group(s.rmfilter,tp,LOCATION_MZONE|LOCATION_EXTRA,0,exc,lv)
 	aux.GCheckAdditional=s.lvchk(lv)
-	local res=g:CheckSubGroup(s.fgoal,2,#g,c,tp,lv,exc)
+	local res=g:CheckSubGroup(s.fgoal,2,2,c,tp,lv,exc)
 	aux.GCheckAdditional=nil
 	return res
 end
@@ -173,7 +173,7 @@ end
 function s.fgoal(g,c,tp,lv,exc)
 	local exg=g:Clone()
 	if exc then exg:AddCard(exc) end
-	return Duel.GetLocationCountFromEx(tp,tp,exg,c)>0 and g:GetSum(Card.GetLevel)==lv
+	return g:GetClassCount(Card.GetCode)==#g and Duel.GetLocationCountFromEx(tp,tp,exg,c)>0 and g:GetSum(Card.GetLevel)==lv
 end
 --E2
 function s.syncost(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -199,9 +199,10 @@ function s.synop(e,tp,eg,ep,ev,re,r,rp)
 	if tc then
 		local lv=tc:GetLevel()
 		local mg=Duel.Group(s.rmfilter,tp,LOCATION_MZONE|LOCATION_EXTRA,0,nil,lv)
+		if #mg<2 then return end
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 		aux.GCheckAdditional=s.lvchk(lv)
-		local g2=mg:SelectSubGroup(tp,s.fgoal,false,2,#mg,tc,tp,lv,nil)
+		local g2=mg:SelectSubGroup(tp,s.fgoal,false,2,2,tc,tp,lv,nil)
 		aux.GCheckAdditional=nil
 		if #g2>0 and Duel.Remove(g2,POS_FACEUP,REASON_EFFECT)>0 then
 			tc:SetMaterial(nil)
