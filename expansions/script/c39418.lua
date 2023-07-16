@@ -1,90 +1,84 @@
---ダイガスタ・エメラル
-function c39418.initial_effect(c)
+--Dracosis Kelathym
+--Dracosi Kelathym
+--Scripted by: XGlitchy30
+
+local s,id,o=GetID()
+function s.initial_effect(c)
 	--xyz summon
 	c:EnableReviveLimit()
-	aux.AddXyzProcedureLevelFree(c,c39418.mfilter,c39418.xyzcheck,2,2,c39418.alt,aux.Stringid(39415,0))
-	--ret&draw
+	aux.AddXyzProcedureLevelFree(c,s.mfilter,s.xyzcheck,2,2,s.alt,aux.Stringid(id,0))
+	--[[When this card is Xyz Summoned: You can shuffle up to 5 "Dracosis" cards from your GY into your Deck (min. 2); draw 1 card and reveal it,
+	then this monster gains 1 of these effects depending on the type of that card (Monster, Spell, Trap)
+	● Monster: This card gains 500 ATK/DEF.
+	● Spell: This card is unaffected by your opponent's Spell/Trap effects.
+	● Trap: Once per turn, this card cannot be destroyed by battle or card effects.]]
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(581014,1))
-	e1:SetCategory(CATEGORY_TODECK+CATEGORY_DRAW)
-	e1:SetType(EFFECT_TYPE_IGNITION)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCountLimit(1)
-	e1:SetCost(c39418.cost)
-	e1:SetTarget(c39418.target1)
-	e1:SetOperation(c39418.operation1)
+	e1:Desc(0)
+	e1:SetCategory(CATEGORY_DRAW)
+	e1:SetType(EFFECT_TYPE_SINGLE|EFFECT_TYPE_TRIGGER_O)
+	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e1:SetCondition(aux.XyzSummonedCond)
+	e1:SetCost(aux.ToDeckCost(aux.ArchetypeFilter(0x300),LOCATION_GRAVE,0,2,5))
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
 end
-function c39418.mfilter(c,xyzc)
-	return c:GetLevel()==4 and c:IsSetCard(0x300)
+function s.mfilter(c,xyzc)
+	return c:IsXyzType(TYPE_MONSTER) and c:IsXyzLevel(xyzc,4) and c:IsSetCard(0x300)
 end
-function c39418.xyzcheck(g)
-	local sg=g:Filter(function(c) return c:GetLevel()==4 end,nil)
-	return sg:GetClassCount(Card.GetRace)>=2 or sg:GetClassCount(Card.GetAttribute)>=2
+function s.xyzcheck(g)
+	return g:GetClassCount(Card.GetRace)==#g or g:GetClassCount(Card.GetAttribute)==#g
 end
-function c39418.alt(c)
-	return c:IsSetCard(0x300) and c:GetLevel()==6
+function s.alt(c,xyzc)
+	return c:IsXyzType(TYPE_MONSTER) and c:IsXyzLevel(xyzc,6) and c:IsSetCard(0x300)
 end
-function c39418.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c39418.filter1,tp,LOCATION_GRAVE,0,2,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g=Duel.SelectMatchingCard(tp,c39418.filter1,tp,LOCATION_GRAVE,0,2,5,nil)
-	g:KeepAlive()
-	Duel.SendtoDeck(g,nil,2,REASON_COST)
-	e:SetLabelObject(g)
-end
-function c39418.filter1(c)
+
+function s.filter1(c)
 	return c:IsSetCard(0x300) and c:IsAbleToDeckAsCost()
 end
-function c39418.target1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return false end
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end
-function c39418.operation1(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Draw(tp,1,REASON_EFFECT)
-	Duel.BreakEffect()
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.Draw(tp,1,REASON_EFFECT)<=0 then return end
 	local g=Duel.GetOperatedGroup()
 	local tc=g:GetFirst()
+	if not tc:IsControler(tp) or not tc:IsLocation(LOCATION_HAND) then return end
 	Duel.ConfirmCards(1-tp,tc)
 	local typ=tc:GetType()
+	local opt=aux.Option(tp,id,1,typ&TYPE_MONSTER>0,typ&TYPE_SPELL>0,typ&TYPE_TRAP>0)
+	if not opt or opt<0 or opt>2 then return end
 	local c=e:GetHandler()
-	if typ&TYPE_MONSTER~=0 then
-		--atkup
+	Duel.BreakEffect()
+	if opt==0 then
+		c:UpdateATKDEF(500,500,true,c)
+	elseif opt==1 then
 		local e1=Effect.CreateEffect(c)
+		e1:Desc(2)
 		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-		e1:SetRange(LOCATION_MZONE)
-		e1:SetCode(EFFECT_UPDATE_ATTACK)
-		e1:SetValue(500)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD_DISABLE)
-		c:RegisterEffect(e1)
-		local e2=e1:Clone()
-		e2:SetCode(EFFECT_UPDATE_DEFENSE)
-		c:RegisterEffect(e2)
-	end
-	if typ&TYPE_SPELL~=0 then
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+		e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE|EFFECT_FLAG_CLIENT_HINT|EFFECT_FLAG_SET_AVAILABLE)
 		e1:SetRange(LOCATION_MZONE)
 		e1:SetCode(EFFECT_IMMUNE_EFFECT)
-		e1:SetValue(c39418.imfilter)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD_DISABLE)
+		e1:SetReset(RESET_EVENT|RESETS_STANDARD)
+		e1:SetValue(s.efilter)
+		e1:SetOwnerPlayer(tp)
 		c:RegisterEffect(e1)
-	end
-	if typ&TYPE_TRAP~=0 then
+	elseif opt==2 then
 		local e1=Effect.CreateEffect(c)
+		e1:Desc(3)
 		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-		e1:SetRange(LOCATION_MZONE)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_CLIENT_HINT|EFFECT_FLAG_SET_AVAILABLE)
 		e1:SetCode(EFFECT_INDESTRUCTABLE_COUNT)
 		e1:SetCountLimit(1)
-		e1:SetValue(function(e,re,r) return bit.band(r,REASON_EFFECT+REASON_BATTLE)~=0 end)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD_DISABLE)
+		e1:SetValue(s.valcon)
+		e1:SetReset(RESET_EVENT|RESETS_STANDARD)
 		c:RegisterEffect(e1)
 	end
 end
-function c39418.imfilter(e,re)
-	return re:IsActiveType(TYPE_SPELL+TYPE_TRAP)
-end	
+function s.efilter(e,te)
+	return te:IsActiveType(TYPE_SPELL|TYPE_TRAP) and te:GetOwnerPlayer()~=e:GetOwnerPlayer()
+end
+function s.valcon(e,re,r,rp)
+	return r&(REASON_BATTLE|REASON_EFFECT)~=0
+end

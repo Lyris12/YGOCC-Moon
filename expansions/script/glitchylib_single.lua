@@ -978,6 +978,8 @@ PROTECTION_FROM_MONSTER_EFFECTS		= 0x2
 PROTECTION_FROM_SPELL_EFFECTS		= 0x4
 PROTECTION_FROM_TRAP_EFFECTS		= 0x8
 PROTECTION_FROM_EFFECTS				= 0xe
+PROTECTION_FROM_SPELLS_TRAPS		= 0xc
+PROTECTION_MAX_VALUE				= 0x8
 
 PROTECTION_FUNCTIONS={
 [PROTECTION_FROM_OPPONENT]=function(eff,re,rp) return rp~=eff:GetHandlerPlayer() end;
@@ -1158,6 +1160,7 @@ end
 --Protections
 function Card.BattleProtection(c,reset,rc,cond,prop,desc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
+	local prop = prop and prop or 0
 	local rc = rc and rc or c
     local rct=1
     if type(reset)=="table" then
@@ -1165,9 +1168,13 @@ function Card.BattleProtection(c,reset,rc,cond,prop,desc)
         reset=reset[1]
     end
 	local e=Effect.CreateEffect(c)
+	if desc then
+		e:Desc(desc)
+		prop=prop|EFFECT_FLAG_CLIENT_HINT
+	end
 	e:SetType(typ)
 	if not SCRIPT_AS_EQUIP then
-		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE|prop)
 		e:SetRange(LOCATION_MZONE)
 	end
 	e:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
@@ -1184,6 +1191,7 @@ function Card.BattleProtection(c,reset,rc,cond,prop,desc)
 end
 function Card.EffectProtection(c,protection,reset,rc,range,cond,prop,desc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
+	local prop = prop and prop or 0
 	local rc = rc and rc or c
     local rct=1
     if type(reset)=="table" then
@@ -1192,9 +1200,13 @@ function Card.EffectProtection(c,protection,reset,rc,range,cond,prop,desc)
     end
 	local range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
 	local e=Effect.CreateEffect(c)
+	if desc then
+		e:Desc(desc)
+		prop=prop|EFFECT_FLAG_CLIENT_HINT
+	end
 	e:SetType(typ)
 	if not SCRIPT_AS_EQUIP then
-		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE|prop)
 		e:SetRange(range)
 	end
 	e:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
@@ -1204,11 +1216,11 @@ function Card.EffectProtection(c,protection,reset,rc,range,cond,prop,desc)
 		if type(protection)=="number" then
 			local list={}
 			local i=1
-			while i<=8 do
+			while i<=PROTECTION_MAX_VALUE do
 				if protection&i==i then
 					table.insert(list,PROTECTION_FUNCTIONS[i])
 				end
-				i=i*2
+				i=i<<1
 			end
 			local func =	function(eff,re,rp)
 								for _,f in ipairs(list) do
@@ -1238,6 +1250,7 @@ function Card.EffectProtection(c,protection,reset,rc,range,cond,prop,desc)
 end
 function Card.TargetProtection(c,protection,reset,rc,range,cond,prop,desc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
+	local prop = prop and prop or 0
 	local rc = rc and rc or c
     local rct=1
     if type(reset)=="table" then
@@ -1246,9 +1259,13 @@ function Card.TargetProtection(c,protection,reset,rc,range,cond,prop,desc)
     end
 	local range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
 	local e=Effect.CreateEffect(c)
+	if desc then
+		e:Desc(desc)
+		prop=prop|EFFECT_FLAG_CLIENT_HINT
+	end
 	e:SetType(typ)
 	if not SCRIPT_AS_EQUIP then
-		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE|prop)
 		e:SetRange(range)
 	end
 	e:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
@@ -1258,11 +1275,11 @@ function Card.TargetProtection(c,protection,reset,rc,range,cond,prop,desc)
 		if type(protection)=="number" then
 			local list={}
 			local i=1
-			while i<=8 do
+			while i<=PROTECTION_MAX_VALUE do
 				if protection&i==i then
 					table.insert(list,PROTECTION_FUNCTIONS[i])
 				end
-				i=i*2
+				i=i<<1
 			end
 			local func =	function(eff,re,rp)
 								for _,f in ipairs(list) do
@@ -1285,13 +1302,14 @@ function Card.TargetProtection(c,protection,reset,rc,range,cond,prop,desc)
 	if reset then
 		if type(reset)~="number" then reset=0 end
 		
-		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
+		e:SetReset(RESET_EVENT|RESETS_STANDARD|reset,rct)
 	end
 	c:RegisterEffect(e)
 	return e
 end
 function Card.UnaffectedProtection(c,protection,reset,rc,range,cond,prop,desc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
+	local prop = prop and prop or 0
 	local rc = rc and rc or c
     local rct=1
     if type(reset)=="table" then
@@ -1299,10 +1317,14 @@ function Card.UnaffectedProtection(c,protection,reset,rc,range,cond,prop,desc)
         reset=reset[1]
     end
 	local range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
-	local e=Effect.CreateEffect(c)
+	local e=Effect.CreateEffect(rc)
+	if desc then
+		e:Desc(desc)
+		prop=prop|EFFECT_FLAG_CLIENT_HINT
+	end
 	e:SetType(typ)
 	if not SCRIPT_AS_EQUIP then
-		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE|prop)
 		e:SetRange(range)
 	end
 	e:SetCode(EFFECT_IMMUNE_EFFECT)
@@ -1312,11 +1334,12 @@ function Card.UnaffectedProtection(c,protection,reset,rc,range,cond,prop,desc)
 		if type(protection)=="number" then
 			local list={}
 			local i=1
-			while i<=8 do
+			while i<=PROTECTION_MAX_VALUE do
 				if protection&i==i then
+					Debug.Message(i)
 					table.insert(list,UNAFFECTED_PROTECTION_FUNCTIONS[i])
 				end
-				i=i*2
+				i=i<<1
 			end
 			local func =	function(eff,re)
 								for _,f in ipairs(list) do
@@ -1330,7 +1353,7 @@ function Card.UnaffectedProtection(c,protection,reset,rc,range,cond,prop,desc)
 		elseif type(protection)=="function" then
 			e:SetValue(protection)
 		else
-			e:SetValue(function(eff,re,rp) return rp~=eff:GetHandlerPlayer() end)
+			e:SetValue(function(eff,re,rp) return rp~=eff:GetOwnerPlayer() end)
 		end
 	end
 	if cond then
@@ -1347,6 +1370,7 @@ end
 
 function Card.FirstTimeProtection(c,each_turn,battle,effect,protection,reset,rc,range,cond,prop,desc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
+	local prop = prop and prop or 0
 	local rc = rc and rc or c
     local rct=1
     if type(reset)=="table" then
@@ -1355,17 +1379,20 @@ function Card.FirstTimeProtection(c,each_turn,battle,effect,protection,reset,rc,
     end
 	local range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
 	local e=Effect.CreateEffect(c)
+	if desc then
+		e:Desc(desc)
+		prop=prop|EFFECT_FLAG_CLIENT_HINT
+	end
 	e:SetType(typ)
 	if not SCRIPT_AS_EQUIP then
-		if each_turn then
-			e:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-		else
-			e:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_NO_TURN_RESET)
+		if not each_turn then
+			prop=prop|EFFECT_FLAG_NO_TURN_RESET
 		end
+		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE|prop)
 		e:SetRange(range)
 	else
 		if not each_turn then
-			e:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
+			e:SetProperty(EFFECT_FLAG_NO_TURN_RESET|prop)
 		end
 	end
 	e:SetCode(EFFECT_INDESTRUCTABLE_COUNT)
@@ -1378,11 +1405,11 @@ function Card.FirstTimeProtection(c,each_turn,battle,effect,protection,reset,rc,
 		if type(protection)=="number" then
 			local list={}
 			local i=1
-			while i<=8 do
+			while i<=PROTECTION_MAX_VALUE do
 				if protection&i==i then
 					table.insert(list,PROTECTION_FUNCTIONS[i])
 				end
-				i=i*2
+				i=i<<1
 			end
 			local func =	function(eff,re,rp)
 								if not ((battle and r&REASON_BATTLE>0) or (effect and r&REASON_EFFECT>0)) then return false end
@@ -1409,7 +1436,7 @@ function Card.FirstTimeProtection(c,each_turn,battle,effect,protection,reset,rc,
 	end
 	if reset then
 		if type(reset)~="number" then reset=0 end
-		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
+		e:SetReset(RESET_EVENT|RESETS_STANDARD|reset,rct)
 	end
 	c:RegisterEffect(e)
 	return e

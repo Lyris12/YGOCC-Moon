@@ -2253,6 +2253,8 @@ function Auxiliary.DeleteResettedEffects(c)
 end
 
 --Global Card Effect Table
+EVENT_CHAIN_CREATED = 39419
+
 function Card.GetEffects(c)
 	local eset=global_card_effect_table[c]
 	if not eset then return {} end
@@ -2452,6 +2454,9 @@ if not global_card_effect_table_global_check then
 										current_reason_effect=x[6]
 									end
 								end
+								if #x>=9 and x[9]~=0 then
+									Duel.RaiseEvent(x[1]:GetHandler(),EVENT_CHAIN_CREATED,x[1],0,x[2],x[2],Duel.GetCurrentChain())
+								end
 								return cost(table.unpack(x))
 							end
 			e:SetCost(newcost)
@@ -2475,6 +2480,9 @@ if not global_card_effect_table_global_check then
 											x[6]=current_reason_effect:GetCheatCodeValue(GECC_OVERRIDE_REASON_EFFECT)
 											current_reason_effect=x[6]
 										end
+									end
+									if #x>=9 and x[9]~=0 and (#x<10 or not x[10]) and (not x[1]:GetCost() or not x[1]:IsCostChecked()) then
+										Duel.RaiseEvent(x[1]:GetHandler(),EVENT_CHAIN_CREATED,x[1],0,x[2],x[2],Duel.GetCurrentChain())
 									end
 									return tg(table.unpack(x))
 								end

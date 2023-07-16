@@ -1,89 +1,81 @@
 --Dracosis Homecoming
-function c39410.initial_effect(c)
+
+local s,id=GetID()
+function s.initial_effect(c)
 	--effect
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(39410,0))
+	e1:Desc(0)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetTarget(c39410.tg)
-	e1:SetOperation(c39410.op)
+	e1:HOPT(true)
+	e1:SetCost(aux.DummyCost)
+	e1:SetTarget(s.tg)
+	e1:SetOperation(s.op)
 	c:RegisterEffect(e1)
 end
-function c39410.cfilter(c,race)
-	if race then
-		return c:IsSetCard(0x300) and c:GetRace()&race~=0 and c:IsAbleToDeckOrExtraAsCost()
-	else
-		return c:IsSetCard(0x300) and c:IsType(TYPE_MONSTER) and c:IsAbleToDeckOrExtraAsCost()
-	end
+function s.cfilter(c)
+	return c:IsSetCard(0x300) and c:IsType(TYPE_MONSTER) and c:IsAbleToDeckOrExtraAsCost()
 end
-function c39410.spfilter(c,e,tp)
+function s.gcheck(g,races)
+	return g:GetClassCount(Card.GetLocation)==2 and g:IsExists(Card.IsRace,1,nil,races)
+end
+function s.spfilter(c,e,tp)
 	return c:IsSetCard(0x300) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function c39410.thfilter(c)
+function s.thfilter(c)
 	return c:IsSetCard(0x300) and c:IsSSetable()
 end
-function c39410.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chkc then return false end
+	local races=0
+	local b1=(Duel.GetMZoneCount(tp)>0 and Duel.IsExists(false,s.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp))
+	local b2=Duel.IsExists(false,s.thfilter,tp,LOCATION_DECK,0,1,nil)
+	if b1 then races=RACE_DRAGON end
+	if b2 then races=races|RACE_WYRM end
+	local g=Duel.Group(s.cfilter,tp,LOCATION_HAND|LOCATION_GRAVE,0,nil)
 	if chk==0 then
-		local sel=0
-		if Duel.IsExistingMatchingCard(c39410.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(aux.NecroValleyFilter(c39410.cfilter),tp,LOCATION_GRAVE,0,1,nil,RACE_DRAGON) then
-			sel=sel+1
+		return races~=0 and e:IsCostChecked() and g:CheckSubGroup(s.gcheck,2,2,races)
+	end
+	local rchk=0
+	Duel.HintMessage(tp,HINTMSG_TODECK)
+	local tg=g:SelectSubGroup(tp,s.gcheck,false,2,2,races)
+	if #tg>0 then
+		if tg:IsExists(Card.IsRace,1,nil,RACE_DRAGON) then rchk=RACE_DRAGON end
+		if tg:IsExists(Card.IsRace,1,nil,RACE_WYRM) then rchk=rchk|RACE_WYRM end
+		local hg,gg=tg:Filter(Card.IsLocation,nil,LOCATION_HAND),tg:Filter(aux.NOT(Card.IsLocation),nil,LOCATION_HAND)
+		if #hg>0 then
+			Duel.ConfirmCards(1-tp,hg)
 		end
-		if Duel.IsExistingMatchingCard(c39410.thfilter,tp,LOCATION_DECK,0,1,nil)
-		and Duel.IsExistingMatchingCard(aux.NecroValleyFilter(c39410.cfilter),tp,LOCATION_GRAVE,0,1,nil,RACE_WYRM) then
-			if c:IsLocation(LOCATION_SZONE) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 then
-				sel=sel+2
-			elseif c:IsLocation(LOCATION_HAND) and Duel.GetLocationCount(tp,LOCATION_SZONE)>1 then
-				sel=sel+2
-			end
+		if #gg>0 then
+			Duel.HintSelection(gg)
 		end
-		e:SetLabel(sel)
-		return sel~=0 and Duel.IsExistingMatchingCard(c39410.cfilter,tp,LOCATION_HAND,0,1,nil)
+		Duel.SendtoDeck(tg,nil,SEQ_DECKSHUFFLE,REASON_COST)
 	end
-	local sel=e:GetLabel()
-	if sel==3 then
-		Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(40044918,0))
-		sel=Duel.SelectOption(tp,1152,1159)+1
-	end
-	if sel==1 then
-		Duel.SelectOption(tp,1152)
-	elseif sel==2 then
-		Duel.SelectOption(tp,1159)
-	end
+	local sel=aux.Option(tp,false,false,{b1 and rchk&RACE_DRAGON>0,STRING_SPECIAL_SUMMON},{b2 and rchk&RACE_WYRM>0,STRING_SET})
+	if not sel then return end
 	e:SetLabel(sel)
-	if sel==1 then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-		g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(c39410.cfilter),tp,LOCATION_GRAVE,0,1,1,nil,RACE_DRAGON)
-		local gb=Duel.SelectMatchingCard(tp,c39410.cfilter,tp,LOCATION_HAND,0,1,1,nil)
-		g:AddCard(gb:GetFirst())
+	if sel==0 then
 		e:SetCategory(CATEGORY_SPECIAL_SUMMON)
 		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,LOCATION_DECK)
+	elseif sel==1 then
+		e:SetCategory(0)
 	end
-	if sel==2 then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-		g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(c39410.cfilter),tp,LOCATION_GRAVE,0,1,1,nil,RACE_WYRM)
-		local gb=Duel.SelectMatchingCard(tp,c39410.cfilter,tp,LOCATION_HAND,0,1,1,nil)
-		g:AddCard(gb:GetFirst())
-	end
-	Duel.SendtoDeck(g,nil,2,REASON_COST)
 end
-function c39410.op(e,tp,eg,ep,ev,re,r,rp)
+function s.op(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local sel=e:GetLabel()
-	if sel==1 then
+	if sel==0 then
+		if Duel.GetMZoneCount(tp)<=0 then return end
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local g=Duel.SelectMatchingCard(tp,c39410.spfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
-		if g:GetCount()>0 then
+		local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
+		if #g>0 then
 			Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 		end
-	elseif sel==2 then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-		local g=Duel.SelectMatchingCard(tp,c39410.thfilter,tp,LOCATION_DECK,0,1,1,nil)
-		if g:GetCount()>0 then
+	elseif sel==1 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
+		local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil)
+		if #g>0 then
 			Duel.SSet(tp,g)
-			Duel.ConfirmCards(1-tp,g)
 		end
 	end
 end

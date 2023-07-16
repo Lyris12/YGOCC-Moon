@@ -1,46 +1,51 @@
---Dracosis Electrosyde
-function c39416.initial_effect(c)
+--Dracosis Syowar
+
+local s,id,o=GetID()
+function s.initial_effect(c)
 	--xyz summon
 	c:EnableReviveLimit()
-	aux.AddXyzProcedureLevelFree(c,c39416.mfilter,c39416.xyzcheck,2,2,c39416.alt,aux.Stringid(39415,0))
-	--negate activate
+	aux.AddXyzProcedureLevelFree(c,s.mfilter,s.xyzcheck,2,2,s.alt,aux.Stringid(id,0))
+	--negate
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(92661479,0))
-	e1:SetCategory(CATEGORY_DISABLE+CATEGORY_DAMAGE)
+	e1:Desc(1)
+	e1:SetCategory(CATEGORY_DISABLE|CATEGORY_DESTROY)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCode(EVENT_CHAINING)
-	e1:SetCondition(c39416.condition)
-	e1:SetCost(c39416.cost)
-	e1:SetTarget(c39416.target)
-	e1:SetOperation(c39416.operation)
+	e1:SetCondition(s.condition)
+	e1:SetCost(aux.DetachSelfCost())
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
 end
-function c39416.mfilter(c,xyzc)
-	return c:GetLevel()==4 and c:IsSetCard(0x300)
+function s.mfilter(c,xyzc)
+	return c:IsXyzType(TYPE_MONSTER) and c:IsXyzLevel(xyzc,4) and c:IsSetCard(0x300)
 end
-function c39416.xyzcheck(g)
-	local sg=g:Filter(function(c) return c:GetLevel()==4 end,nil)
-	return sg:GetClassCount(Card.GetRace)>=2 or sg:GetClassCount(Card.GetAttribute)>=2
+function s.xyzcheck(g)
+	return g:GetClassCount(Card.GetRace)==#g or g:GetClassCount(Card.GetAttribute)==#g
 end
-function c39416.alt(c)
-	return c:IsSetCard(0x300) and c:GetLevel()==6
+function s.alt(c,xyzc)
+	return c:IsXyzType(TYPE_MONSTER) and c:IsXyzLevel(xyzc,6) and c:IsSetCard(0x300)
 end
-function c39416.filter(c,tp)
-	return c:IsFaceup() and c:IsControler(tp) and c:IsSetCard(0x300) and c:IsType(TYPE_MONSTER)
+
+function s.tfilter(c,tp)
+	return c:IsFaceup() and c:IsControler(tp) and c:IsLocation(LOCATION_MZONE) and c:IsSetCard(0x300)
 end
-function c39416.condition(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.condition(e,tp,eg,ep,ev,re,r,rp,chk)
+	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return false end
 	local tg=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
-	return tg:IsExists(c39416.filter,1,nil,tp) and not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED)
+	return tg and tg:IsExists(s.tfilter,1,nil,tp) and Duel.IsChainDisablable(ev)
 end
-function c39416.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
-	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
-end
-function c39416.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_DISABLE,eg,1,0,0)
+	local rc=re:GetHandler()
+	if rc:IsDestructable() and rc:IsRelateToChain(ev) then
+		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
+	end
 end
-function c39416.operation(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.NegateEffect(ev) then Duel.Destroy(eg,REASON_EFFECT) end
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.NegateEffect(ev) and re:GetHandler():IsRelateToChain(ev) then
+		Duel.Destroy(eg,REASON_EFFECT)
+	end
 end

@@ -163,6 +163,18 @@ function Auxiliary.IsEquippedToCond(f)
 end
 
 --Reason and Reason Player
+function Auxiliary.ByBattleOrCardEffect(p,typ)
+	if not p and not typ then
+		return	function(e,tp,eg,ep,ev,re,r,rp)
+					return r&(REASON_BATTLE|REASON_EFFECT)~=0
+				end
+	else
+		return	function(e,tp,eg,ep,ev,re,r,rp)
+					return r&REASON_BATTLE~=0 or aux.ByCardEffectCond(p,typ)
+				end
+	end 
+end
+
 function Auxiliary.ByCardEffectCond(p,typ)
 	return	function(e,tp,eg,ep,ev,re,r,rp)
 				local c=e:GetHandler()

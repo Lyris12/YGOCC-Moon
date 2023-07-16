@@ -44,7 +44,7 @@ function s.initial_effect(c)
 		s.code_list={{},{}}
 		local ge2=Effect.CreateEffect(c)
 		ge2:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
-		ge2:SetCode(EVENT_PHASE|PHASE_END)
+		ge2:SetCode(EVENT_TURN_END)
 		ge2:SetCountLimit(1)
 		ge2:SetOperation(s.resetop)
 		Duel.RegisterEffect(ge2,0)

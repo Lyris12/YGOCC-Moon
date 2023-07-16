@@ -2187,10 +2187,15 @@ function Auxiliary.IsTunerCond(e)
 end
 
 -------------------------------XYZ-----------------------------------
-local _XyzLevelFreeGoal = Auxiliary.XyzLevelFreeGoal
+local _XyzLevelFreeGoal, _XyzAlterFilter = Auxiliary.XyzLevelFreeGoal, Auxiliary.XyzAlterFilter
 
 Auxiliary.XyzLevelFreeGoal = function(g,tp,xyzc,gf)
 	return (not gf or gf(g,tp,xyzc)) and Duel.GetLocationCountFromEx(tp,tp,g,xyzc)>0
+end
+
+Auxiliary.XyzAlterFilter = function (c,alterf,xyzc,e,tp,alterop)
+	return alterf(c,xyzc) and c:IsCanBeXyzMaterial(xyzc) and Duel.GetLocationCountFromEx(tp,tp,c,xyzc)>0
+		and Auxiliary.MustMaterialCheck(c,tp,EFFECT_MUST_BE_XMATERIAL) and (not alterop or alterop(e,tp,0,c))
 end
 
 -------------------------------LINKS-----------------------------------
@@ -2210,7 +2215,7 @@ Auxiliary.LExtraFilter=function(c,f,lc,tp)
 	return false
 end
 Auxiliary.LCheckGoal=function(sg,tp,lc,gf,lmat)
-	if lc:IsHasEffect(EFFECT_AVAILABLE_LMULTIPLE) then
+	if lc:IsHasEffect(EFFECT_MULTIPLE_LMATERIAL) then
 		return sg:CheckWithSumEqual(Auxiliary.GetLinkCount,lc:GetLink(),#sg,#sg,lc)
 			and Duel.GetLocationCountFromEx(tp,tp,sg,lc)>0 and (not gf or gf(sg,lc,tp))
 			and not sg:IsExists(Auxiliary.LUncompatibilityFilter,1,nil,sg,lc,tp)
@@ -2221,32 +2226,16 @@ Auxiliary.LCheckGoal=function(sg,tp,lc,gf,lmat)
 end
 function Auxiliary.GetLinkCount(c,lc)
 	if lc then
-		local egroup={lc:IsHasEffect(EFFECT_AVAILABLE_LMULTIPLE)}
-		for k,w in ipairs(egroup) do
-			local lab=w:GetLabel()
-			if c:IsHasEffect(EFFECT_MULTIPLE_LMATERIAL) then
-				local av_val={}
-				local lmat={c:IsHasEffect(EFFECT_MULTIPLE_LMATERIAL)}
-				for _,ec in ipairs(lmat) do
-					if ec:GetLabel()==lab then
-						table.insert(av_val,ec:GetValue())
-					end
+		for _,e in ipairs({lc:IsHasEffect(EFFECT_MULTIPLE_LMATERIAL)}) do
+			local tg=e:GetTarget()
+			if not tg or tg(e,c) then
+				local val=e:Evaluate(c)
+				if val then
+					return 1+0x10000*val
 				end
-				for maxval=1,10 do
-					local val=av_val[maxval]
-					av_val[maxval]=nil
-					if c:IsType(TYPE_LINK) and c:GetLink()>1 then
-						return 1+0x10000*val and 1+0x10000*c:GetLink()
-					else
-						return 1+0x10000*val
-					end
-				end
-			elseif c:IsType(TYPE_LINK) and c:GetLink()>1 then
-				return 1+0x10000*c:GetLink()
-			else 
-				return 1
 			end
 		end
+		return _GetLinkCount(c)
 	else
 		return _GetLinkCount(c)
 	end
