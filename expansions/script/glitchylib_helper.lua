@@ -111,7 +111,7 @@ end
 Duel.GetFieldGroupCount = function(pov,l1,l2)
 	local ct0=_GetFieldGroupCount(pov,l1,l2)
 	local ct=_GetMatchingGroupCount(Card.IsNonPlayableCard,0,LOCATION_REMOVED,LOCATION_REMOVED,nil)
-	return ct0-ct
+	return math.max(ct0-ct,0)
 end
 
 Auxiliary.GlitchyHelperIgnorePlayerTable={false,false}
