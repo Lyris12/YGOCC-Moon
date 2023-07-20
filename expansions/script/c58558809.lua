@@ -65,7 +65,7 @@ function cid.repop(e,tp,eg,ep,ev,re,r,rp)
     Duel.ResetFlagEffect(e:GetOwner():GetControler(),id)
 end
 function cid.cfilter(c)
-    return c:IsFaceup() and c:IsSetCard(0x5855)
+    return c:IsFaceup() and c:IsSetCard(ARCHE_FLIBBERTY)
 end
 function cid.condition(e,tp,eg,ep,ev,re,r,rp)
     return Duel.GetTurnPlayer()~=tp and Duel.IsExistingMatchingCard(cid.cfilter,tp,LOCATION_MZONE,0,2,nil)
@@ -94,7 +94,7 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
     end
 end
 function cid.checkop(e,tp,eg,ep,ev,re,r,rp)
-	if not re or not re:GetHandler():IsSetCard(0x5855) then return end
+	if not re or not re:GetHandler():IsSetCard(ARCHE_FLIBBERTY) then return end
 	local tc=eg:GetFirst()
 	while tc do
 		tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)

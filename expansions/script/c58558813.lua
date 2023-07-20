@@ -53,17 +53,17 @@ function cid.disop(e,tp,eg,ep,ev,re,r,rp)
 	local pos=Duel.SelectPosition(tp,tc,POS_FACEUP)
 	if tc then
 		Duel.ChangePosition(tc,pos)
-		if tc:IsSetCard(0x5855) and Duel.NegateActivation(ev)
+		if tc:IsSetCard(ARCHE_FLIBBERTY) and Duel.NegateActivation(ev)
 			and re:GetHandler():IsRelateToEffect(re) then
 			Duel.Destroy(eg,REASON_EFFECT)
 		end
 	end
 end
 function cid.filter(c)
-	return c:IsSetCard(0x5855) and c:IsFaceup()
+	return c:IsSetCard(ARCHE_FLIBBERTY) and c:IsFaceup()
 end
 function cid.filter2(c)
-	return c:IsSetCard(0x5855) and c:IsFaceup() and c:IsCanTurnSet()
+	return c:IsSetCard(ARCHE_FLIBBERTY) and c:IsFaceup() and c:IsCanTurnSet()
 end
 function cid.setcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_MZONE,0,2,nil)
@@ -86,7 +86,7 @@ function cid.actcon(e)
 	return e:GetHandler():GetFlagEffect(id)>0
 end
 function cid.checkop(e,tp,eg,ep,ev,re,r,rp)
-	if not re or not re:GetHandler():IsSetCard(0x5855) or re:GetHandler():IsCode(id) then return end
+	if not re or not re:GetHandler():IsSetCard(ARCHE_FLIBBERTY) or re:GetHandler():IsCode(id) then return end
 	local tc=eg:GetFirst()
 	while tc do
 		tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)

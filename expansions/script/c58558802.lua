@@ -31,7 +31,7 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function cid.thfilter(c)
-	return c:IsSetCard(0x5855) and c:IsAbleToHand()
+	return c:IsSetCard(ARCHE_FLIBBERTY) and c:IsAbleToHand()
 end
 function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
@@ -44,10 +44,10 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function cid.extg(e,c)
-	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x5855)
+	return c:IsType(TYPE_MONSTER) and c:IsSetCard(ARCHE_FLIBBERTY)
 end
 function cid.filter(c)
-	return c:IsSetCard(0x5855) and c:IsFaceup()
+	return c:IsSetCard(ARCHE_FLIBBERTY) and c:IsFaceup()
 end
 function cid.postg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingTarget(cid.filter,tp,LOCATION_MZONE,0,1,nil) end

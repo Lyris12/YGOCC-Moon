@@ -38,7 +38,7 @@ function cid.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Draw(p,d,REASON_EFFECT)
 end
 function cid.cfilter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x5855)
+	return c:IsType(TYPE_MONSTER) and c:IsSetCard(ARCHE_FLIBBERTY)
 end
 function cid.acop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

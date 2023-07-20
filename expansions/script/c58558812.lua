@@ -30,7 +30,7 @@ function cid.actcon(e)
 	return e:GetHandler():GetFlagEffect(id)>0
 end
 function cid.checkop(e,tp,eg,ep,ev,re,r,rp)
-	if not re or not re:GetHandler():IsSetCard(0x5855) or re:GetHandler():IsCode(id) then return end
+	if not re or not re:GetHandler():IsSetCard(ARCHE_FLIBBERTY) or re:GetHandler():IsCode(id) then return end
 	local tc=eg:GetFirst()
 	while tc do
 		tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
@@ -118,5 +118,5 @@ end
 function cid.effectfilter(e,ct)
 	local te=Duel.GetChainInfo(ct,CHAININFO_TRIGGERING_EFFECT)
 	local tc=te:GetHandler()
-	return tc:IsSetCard(0x5855)
+	return tc:IsSetCard(ARCHE_FLIBBERTY)
 end

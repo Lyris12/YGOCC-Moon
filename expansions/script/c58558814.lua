@@ -22,7 +22,7 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function cid.filter(c,e,tp)
-	return c:IsSetCard(0x5855) and ((c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsSSetable())
+	return c:IsSetCard(ARCHE_FLIBBERTY) and ((c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsSSetable())
 		or (c:IsType(TYPE_MONSTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)))
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
@@ -36,7 +36,7 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) and tc:IsFacedown() then
 		Duel.ChangePosition(tc,POS_FACEUP_DEFENSE)
-		if tc:IsSetCard(0x5855) then
+		if tc:IsSetCard(ARCHE_FLIBBERTY) then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
 			local g=Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil,e,tp)
 			local tg=g:GetFirst()
@@ -54,7 +54,7 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function cid.repfilter(c,tp)
-	return c:IsFaceup() and c:IsSetCard(0x5855) and c:IsLocation(LOCATION_ONFIELD)
+	return c:IsFaceup() and c:IsSetCard(ARCHE_FLIBBERTY) and c:IsLocation(LOCATION_ONFIELD)
 		and c:IsControler(tp) and c:IsReason(REASON_EFFECT+REASON_BATTLE) and not c:IsReason(REASON_REPLACE)
 end
 function cid.reptg(e,tp,eg,ep,ev,re,r,rp,chk)

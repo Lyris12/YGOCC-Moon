@@ -332,7 +332,10 @@ function Auxiliary.RegisterPreviousCustomSetCard(e,tp,eg,ep,ev,re,r,rp)
 end
 ---------------------------------------------------------------------------------
 -------------------------------DELAYED EVENT-------------------------------------
-function Auxiliary.RegisterMergedDelayedEventGlitchy(c,code,event,f,flag,range,evgcheck,check_if_already_in_location,operation)
+EVENT_ID = 0
+aux.MustUpdateEventID = {}
+
+function Auxiliary.RegisterMergedDelayedEventGlitchy(c,code,event,f,flag,range,evgcheck,check_if_already_in_location,operation,simult_check)
 	if type(event)~="table" then event={event} end
 	if not f then f=aux.TRUE end
 	if not flag then flag=c:GetOriginalCode() end
@@ -361,13 +364,27 @@ function Auxiliary.RegisterMergedDelayedEventGlitchy(c,code,event,f,flag,range,e
 			else
 				ge1:SetLabelObject(se)
 			end
-			ge1:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy1(ev,flag,f,range,evgcheck,se,operation))
+			ge1:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy1(ev,flag,f,range,evgcheck,se,operation,simult_check))
 			Duel.RegisterEffect(ge1,0)
 		end
 		local ge2=ge1:Clone()
 		ge2:SetCode(EVENT_CHAIN_END)
 		ge2:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy2(flag,range,evgcheck,se,operation))
 		Duel.RegisterEffect(ge2,0)
+		if simult_check then
+			aux.MustUpdateEventID[c]=false
+			local ge3=Effect.CreateEffect(c)
+			ge3:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
+			ge3:SetCode(EVENT_BREAK_EFFECT)
+			ge3:SetOperation(aux.SignalEventIDUpdate)
+			Duel.RegisterEffect(ge3,0)
+			local ge4=ge3:Clone()
+			ge4:SetCode(EVENT_CHAIN_SOLVED)
+			Duel.RegisterEffect(ge4,0)
+			local ge5=ge3:Clone()
+			ge5:SetCode(EVENT_CHAINING)
+			Duel.RegisterEffect(ge5,0)
+		end
 	else
 		local mt=getmetatable(c)
 		local ge1
@@ -383,7 +400,7 @@ function Auxiliary.RegisterMergedDelayedEventGlitchy(c,code,event,f,flag,range,e
 				else
 					ge1:SetLabelObject(se)
 				end
-				ge1:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy1(ev,flag,f,nil,evgcheck,se,operation))
+				ge1:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy1(ev,flag,f,nil,evgcheck,se,operation,simult_check))
 				Duel.RegisterEffect(ge1,0)
 			end
 		end
@@ -395,10 +412,14 @@ function Auxiliary.RegisterMergedDelayedEventGlitchy(c,code,event,f,flag,range,e
 		end
 	end
 end
-function Auxiliary.MergedDelayEventCheckGlitchy1(event,id,f,range,evgcheck,se,operation)
+function Auxiliary.SignalEventIDUpdate(e,tp,eg,ep,ev,re,r,rp)
+	aux.MustUpdateEventID[e:GetOwner()] = true
+end
+function Auxiliary.MergedDelayEventCheckGlitchy1(event,id,f,range,evgcheck,se,operation,simult_check)
 	return	function(e,tp,eg,ep,ev,re,r,rp)
 				local c=e:GetOwner()
 				local tp=c:GetControler()
+				
 				if range then
 					if range==LOCATION_ENGAGED then
 						if not c:IsLocation(LOCATION_HAND) or not c:IsEngaged() then
@@ -425,17 +446,26 @@ function Auxiliary.MergedDelayEventCheckGlitchy1(event,id,f,range,evgcheck,se,op
 				if type(id)=="function" then
 					flagID=id(event)
 				end
+				
 				for tc in aux.Next(evg) do
 					tc:RegisterFlagEffect(flagID,RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET,EFFECT_FLAG_SET_AVAILABLE,1,label)
+					if simult_check then
+						tc:RegisterFlagEffect(simult_check,RESET_PHASE+PHASE_END,EFFECT_FLAG_SET_AVAILABLE,1,EVENT_ID)
+					end
 					if engage_label~=0 then
 						tc:RegisterFlagEffect(flagID,RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET,EFFECT_FLAG_SET_AVAILABLE,1,engage_label)
 					end
 				end
+				if aux.MustUpdateEventID[c]==true then
+					EVENT_ID = EVENT_ID + 1
+					aux.MustUpdateEventID[c]=false
+				end
+				
 				g:Merge(evg)
 				--Debug.Message('gsize '..tostring(#g))
 				if Duel.GetCurrentChain()==0 and not Duel.CheckEvent(EVENT_CHAIN_END) then
 					--Debug.Message('nochain')
-					local flags
+					local flags	
 					if type(id)=="function" then
 						flags={id()}
 					else
@@ -534,7 +564,15 @@ function Auxiliary.MergedDelayEventCheckGlitchy2(id,range,evgcheck,se,operation)
 				end
 			end
 end
-
+function Auxiliary.SimultaneousEventGroupCheck(g,simult_check,og)
+	local sg=g:Filter(Card.HasFlagEffect,nil,simult_check)
+	if #sg~=#g or sg:GetClassCount(Card.GetFlagEffectLabel,simult_check)>1 then return false end
+	local val=sg:GetFirst():GetFlagEffectLabel(simult_check)
+	if g:FilterCount(Card.HasFlagEffectLabel,nil,simult_check,val)~=og:FilterCount(Card.HasFlagEffectLabel,nil,simult_check,val) then
+		return false
+	end
+	return true
+end
 
 ---------------------------------------------------------------------------------
 -------------------------------CONTACT FUSION---------------------------------

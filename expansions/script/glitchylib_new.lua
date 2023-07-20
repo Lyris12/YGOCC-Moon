@@ -35,6 +35,7 @@ ARCHE_AEONSTRIDE		= 0xae0
 ARCHE_DOOMSDAY_ARTIFICE	= 0x3a6
 ARCHE_DREAMY_FOREST		= 0xd43
 ARCHE_DREARY_FOREST		= 0xd44
+ARCHE_FLIBBERTY			= 0x855
 ARCHE_GOLDEN_SKIES		= 0x528
 ARCHE_IDOLESCENT		= 0x5a3
 ARCHE_LEYLAH			= 0xd45
@@ -110,6 +111,7 @@ STRING_ASK_PLACE_IN_PZONE				=	907
 STRING_ASK_PLACE_COUNTER				=	908
 STRING_ASK_BANISH						=	909
 STRING_EXCLUDE_AI						=	910
+STRING_ASK_DISCARD						=	911
 
 STRING_SEND_TO_EXTRA					=	1006
 STRING_BANISH							=	1102
@@ -1699,7 +1701,29 @@ function Duel.IsEndPhase(tp)
 	return (not tp or Duel.GetTurnPlayer()==tp) and Duel.GetCurrentPhase()==PHASE_END
 end
 
+function Duel.GetNextPhaseCount(ph,p)
+	if Duel.GetCurrentPhase()==ph and (not p or Duel.GetTurnPlayer()==tp) then
+		return 2
+	else
+		return 1
+	end
+end
+
 --PositionChange
+function Duel.Flip(c,pos)
+	if not c or (pos&POS_FACEUP==0 and pos&POS_FACEDOWN==0) then return 0 end
+	if aux.GetValueType(c)=="Card" then
+		if (pos&POS_FACEUP>0 and c:IsFaceup()) or (pos&POS_FACEDOWN>0 and c:IsFacedown()) then return 0 end
+		local position = pos&POS_FACEUP>0 and c:GetPosition()>>1 or c:GetPosition()<<1
+		return Duel.ChangePosition(c,position)
+	else
+		local ct=0
+		for tc in aux.Next(c) do
+			ct=ct+Duel.Flip(tc,pos)
+		end
+		return ct
+	end
+end
 function Card.IsCanTurnSetGlitchy(c)
 	if c:IsPosition(POS_FACEDOWN_DEFENSE) then return false end
 	if not c:IsPosition(POS_FACEDOWN_ATTACK) then

@@ -43,7 +43,7 @@ function cid.actcon(e)
 	return e:GetHandler():GetFlagEffect(id)>0
 end
 function cid.checkop(e,tp,eg,ep,ev,re,r,rp)
-	if not re or not re:GetHandler():IsSetCard(0x5855) or re:GetHandler():IsCode(id) then return end
+	if not re or not re:GetHandler():IsSetCard(ARCHE_FLIBBERTY) or re:GetHandler():IsCode(id) then return end
 	local tc=eg:GetFirst()
 	while tc do
 		tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
@@ -92,7 +92,7 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 end
 function cid.setfilter(c,tp)
 	return bit.band(c:GetPreviousTypeOnField(),TYPE_MONSTER)~=0
-		and c:IsPreviousSetCard(0x5855) and c:IsPreviousControler(tp)
+		and c:IsPreviousSetCard(ARCHE_FLIBBERTY) and c:IsPreviousControler(tp)
 		and c:IsPreviousLocation(LOCATION_ONFIELD)
 		and c:IsReason(REASON_EFFECT) and c:GetReasonPlayer()==1-tp
 end

@@ -24,7 +24,7 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function cid.filter(c)
-	return ((c:IsSetCard(0x5855) or c:IsSetCard(0x12)) and c:IsType(TYPE_MONSTER)) and not c:IsCode(id) and c:IsFaceup()
+	return ((c:IsSetCard(ARCHE_FLIBBERTY) or c:IsSetCard(0x12)) and c:IsType(TYPE_MONSTER)) and not c:IsCode(id) and c:IsFaceup()
 end
 function cid.filter2(c)
 	return c:IsFacedown() and c:IsDefensePos()
@@ -52,7 +52,7 @@ function cid.posop(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 end
 function cid.filter4(c,tp)
-	return c:IsSetCard(0x5855) and c:IsType(TYPE_MONSTER) and c:IsFaceup()
+	return c:IsSetCard(ARCHE_FLIBBERTY) and c:IsType(TYPE_MONSTER) and c:IsFaceup()
 		and c:IsControler(tp)
 end
 function cid.condition(e,tp,eg,ep,ev,re,r,rp)
