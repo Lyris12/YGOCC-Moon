@@ -125,13 +125,17 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 			tc:CreateEffectRelation(te)
 			Duel.BreakEffect()
 			local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-			for etc in aux.Next(g) do
-				etc:CreateEffectRelation(te)
+			if g then
+				for etc in aux.Next(g) do
+					etc:CreateEffectRelation(te)
+				end
 			end
 			if op then op(e,tp,ceg,cep,cev,cre,cr,crp) end
 			tc:ReleaseEffectRelation(te)
-			for etc in aux.Next(g) do
-				etc:ReleaseEffectRelation(te)
+			if g then
+				for etc in aux.Next(g) do
+					etc:ReleaseEffectRelation(te)
+				end
 			end
 		end
 	end

@@ -94,6 +94,7 @@ function s.activate(mode)
 							local ct,ht=Duel.Search(g,tp)
 							if ct>0 and ht>0 then
 								local codes={g:GetFirst():GetCode()}
+								Debug.Message(g:GetFirst():GetCode())
 								local rg=Duel.Group(s.rvfilter,tp,LOCATION_HAND,0,nil,codes)
 								if #rg>0 and Duel.IsPlayerCanDraw(tp,1) and c:AskPlayer(tp,3) then
 									local sg=rg:Select(tp,1,1,nil)

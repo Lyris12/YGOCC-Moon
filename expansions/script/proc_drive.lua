@@ -762,7 +762,7 @@ function Card.IncreaseOrDecreaseEnergy(c,val,p,r,reset,rc,e,val2)
 		end
 	end
 	if #n==0 then return end
-	local val=Duel.AnnounceNumber(tp,table.unpack(n))
+	local val=Duel.AnnounceNumber(p,table.unpack(n))
 	return c:UpdateEnergy(val,p,r,reset,rc,e,val2)
 end
 	
@@ -819,8 +819,8 @@ function Duel.AnnounceEnergyUpdate(p,c,min,max,up,r,e)
 			table.insert(n,i)
 		end
 	end
-	Duel.HintMessage(tp,STRING_INPUT_ENERGY)
-	local ct=Duel.AnnounceNumber(tp,table.unpack(n))
+	Duel.HintMessage(p,STRING_INPUT_ENERGY)
+	local ct=Duel.AnnounceNumber(p,table.unpack(n))
 	return ct
 end
 
