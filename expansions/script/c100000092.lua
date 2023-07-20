@@ -120,7 +120,9 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 			if not te then return end
 			local tg=te:GetTarget()
 			local op=te:GetOperation()
+			Duel.SetProxyEffect(e,te)
 			if tg then tg(e,tp,ceg,cep,cev,cre,cr,crp,1) end
+			Duel.ResetProxyEffect()
 			Duel.BreakEffect()
 			tc:CreateEffectRelation(te)
 			Duel.BreakEffect()
@@ -130,7 +132,9 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 					etc:CreateEffectRelation(te)
 				end
 			end
+			Duel.SetProxyEffect(e,te)
 			if op then op(e,tp,ceg,cep,cev,cre,cr,crp) end
+			Duel.ResetProxyEffect()
 			tc:ReleaseEffectRelation(te)
 			if g then
 				for etc in aux.Next(g) do

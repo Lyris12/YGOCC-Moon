@@ -1002,6 +1002,9 @@ function Effect.Desc(e,id,...)
 	return e:SetDescription(aux.Stringid(code,id))
 end
 function Card.AskPlayer(c,tp,desc)
+	if aux.GetValueType(aux.EffectBeingApplied)=="Effect" and aux.GetValueType(aux.ProxyEffect)=="Effect" and aux.ProxyEffect:GetHandler()==c then
+		c=aux.EffectBeingApplied:GetHandler()
+	end
 	local string = desc<=15 and aux.Stringid(c:GetOriginalCode(),desc) or desc
 	return Duel.SelectYesNo(tp,string)
 end
