@@ -1851,14 +1851,14 @@ expansions/pics/19906926.jpg	1f16eec998472a4c00faba63291c304a
 expansions/pics/19906940.jpg	0cf0827fc1725339e9af019813382ee4
 expansions/pics/19906942.jpg	522c3359e9aadb9e63c3bef4bd5604a8
 expansions/pics/19910053.jpg	21c87fdc87944e6ed665c0257ac3949e
-expansions/pics/19936275.jpeg	5147932d90fa39ae8d98275697e3574c
-expansions/pics/19936276.jpeg	ea6e7780b0fbc6cea1cbb33e0f9ea959
-expansions/pics/19936277.jpeg	951cb78a67a29bc1266b566c5dd68e46
+expansions/pics/19936275.jpg	5147932d90fa39ae8d98275697e3574c
+expansions/pics/19936276.jpg	ea6e7780b0fbc6cea1cbb33e0f9ea959
+expansions/pics/19936277.jpg	951cb78a67a29bc1266b566c5dd68e46
 expansions/pics/19936278.jpg	e9da93a01cb768b8f33bb20320217905
 expansions/pics/19936279.jpg	dff9fb3c97b472510958ee0d40070280
 expansions/pics/19936280.jpg	99b11af8b4e7985d04469ff7a2c94596
 expansions/pics/19936281.jpg	d1818b70f2356882fec381898fa5b27d
-expansions/pics/19936282.jpeg	b23abdd722f27da38adea10b5d3a3085
+expansions/pics/19936282.jpg	b23abdd722f27da38adea10b5d3a3085
 expansions/pics/19960000.png	30688100a145c863d81bbdd4419919ee
 expansions/pics/19960001.png	a8c8c1ad5ed29088efdd1d5a62594ae4
 expansions/pics/19960002.png	3c3f9b73a03545e4c1cb8ec9d5e1b491
@@ -6689,7 +6689,7 @@ expansions/script/c11111304.lua	00f120bdcb460e9f260556d5e03d65df
 expansions/script/c11111305.lua	45f59d98a6cf26658f7302c63547f76d
 expansions/script/c11111306.lua	c1557b1e81d51550fcac2e0ad4b43cfd
 expansions/script/c11111307.lua	5b9c3adb4f30b4b3b7465990fe2e74c7
-expansions/script/c11111308.lua	e556fac32bbd698d1cd348330de21e77
+expansions/script/c11111308.lua	bd6626954d6b7a4e881a78bec0c2ca06
 expansions/script/c11111309.lua	7150bf6286a11f7fa21de681aa84fe5e
 expansions/script/c11111310.lua	bfb0eb7775c4a8c0ac970cc6806a3c57
 expansions/script/c11111311.lua	3c2cbbaa20d4d025fc7dbe4d8a603273
@@ -11536,6 +11536,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	da50bf3bc754eeb5cdd281ce95b41b24
+update/filelist.txt	516b9c104203b2337bfbc1c4fac201e2
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	28167a82adc8fe4a027e31807ff10bc3
+update/version.txt	f7f14248df83110ed425a9e33e6a32e1

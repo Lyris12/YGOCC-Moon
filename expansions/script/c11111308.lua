@@ -58,7 +58,7 @@ function c11111308.bcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c11111308.btg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local rg=Duel.GetDecktopGroup(1-tp,3)
-	if chk==0 then return rg:FilterCount(Card.IsAbleToRemove,nil,tp,POS_FACEDOWN,REASON_EFFECT)==3
+	if chk==0 then return rg:FilterCount(Card.IsAbleToRemove,nil,tp,POS_FACEDOWN,REASON_EFFECT)==3 end
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,rg,3,1-tp,LOCATION_DECK)
 end
 function c11111308.bop(e,tp,eg,ep,ev,re,r,rp)
