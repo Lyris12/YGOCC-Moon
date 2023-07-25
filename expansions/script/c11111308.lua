@@ -6,7 +6,7 @@ c:EnableReviveLimit()
 aux.AddFusionProcCode2(c,11111301,11111306,true,true)
 aux.AddContactFusionProcedure(c,Card.IsReleasable,LOCATION_MZONE,0,Duel.Release,REASON_COST+REASON_MATERIAL)
 local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_DISABLE+CATEGORY_DESTROY)
+	e1:SetCategory(CATEGORY_NEGATE+CATEGORY_DESTROY)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetCode(EVENT_CHAINING)
 	e1:SetRange(LOCATION_MZONE)
@@ -20,18 +20,19 @@ local e1=Effect.CreateEffect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetCategory(CATEGORY_REMOVE)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e2:SetCode(EVENT_DAMAGE)
+	e2:SetCode(EVENT_PHASE|PHASE_STANDBY)
 	e2:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1,11111308+100)
 	e2:SetCondition(c11111308.bcon)
 	e2:SetTarget(c11111308.btg)
 	e2:SetOperation(c11111308.bop)
 	c:RegisterEffect(e2)
 end
 function c11111308.cfilter(c)
-	return c:IsSetCard(0x5a3) and c:IsFaceup() and c:IsAbleToDeckOrExtraAsCost()
+	return c:IsSetCard(0x5a3) and c:IsFaceup()
 end
 function c11111308.ngcon(e,tp,eg,ep,ev,re,r,rp)
-	return rp==1-tp and not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and (re:IsActiveType(TYPE_SPELL) or re:IsActiveType(TYPE_TRAP)) and Duel.IsChainNegatable(ev)
+	return rp==1-tp and not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and re:IsActiveType(TYPE_ST) and Duel.IsChainNegatable(ev)
 end
 function c11111308.ngcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c11111307.cfilter,tp,LOCATION_PZONE,0,1,nil) end
@@ -41,26 +42,28 @@ function c11111308.ngcost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c11111308.ngtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_DISABLE,eg,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
 	if re:GetHandler():IsRelateToEffect(re) and re:GetHandler():IsDestructable() then
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
 	end
 end
 function c11111308.ngop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.NegateEffect(ev) and re:GetHandler():IsRelateToEffect(re) then
+	if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then
 		Duel.Destroy(eg,REASON_EFFECT)
 	end
 end
+
 function c11111308.bcon(e,tp,eg,ep,ev,re,r,rp)
-	return ep~=tp and r&REASON_EFFECT==REASON_EFFECT
+	return Duel.GetTurnPlayer()==1-tp
 end
 function c11111308.btg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,3,1-tp,LOCATION_DECK)
+	local rg=Duel.GetDecktopGroup(1-tp,3)
+	if chk==0 then return rg:FilterCount(Card.IsAbleToRemove,nil,tp,POS_FACEDOWN,REASON_EFFECT)==3
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,rg,3,1-tp,LOCATION_DECK)
 end
 function c11111308.bop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetFieldGroupCount(tp,0,LOCATION_DECK)==0 then return end
 	local g=Duel.GetDecktopGroup(1-tp,3)
+	if #g==0 then return end
 	Duel.DisableShuffleCheck()
-	Duel.Remove(g,POS_FACEDOWN,REASON_EFFECT)
+	Duel.Remove(g,POS_FACEDOWN,REASON_EFFECT) 
 end

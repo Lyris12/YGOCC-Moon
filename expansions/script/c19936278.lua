@@ -12,11 +12,21 @@ function s.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetCountLimit(1,id)
+	e1:HOPT()
 	e1:SetCost(s.cost)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
+	--draw
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(id,1))
+	e2:SetCategory(CATEGORY_DESTROY|CATEGORY_DRAW)
+	e2:SetType(EFFECT_TYPE_IGNITION)
+	e2:SetRange(LOCATION_HAND)
+	e2:HOPT()
+	e2:SetTarget(s.dstg)
+	e2:SetOperation(s.dsop)
+	c:RegisterEffect(e2)
 	--cannot target
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE)
@@ -71,5 +81,22 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 			e2:SetCode(EFFECT_UPDATE_DEFENSE)
 			c:RegisterEffect(e2)
 		end
+	end
+end
+
+function s.dcfilter(c)
+	return c:IsMonster() and c:IsSetCard(0xa11)
+end
+function s.dstg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then
+		return Duel.IsExists(false,s.dcfilter,tp,LOCATION_HAND,0,1,nil) and Duel.IsPlayerCanDraw(tp,1)
+	end
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,1,tp,LOCATION_HAND)
+	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
+end
+function s.dsop(e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.Select(HINTMSG_DESTROY,false,tp,s.dcfilter,tp,LOCATION_HAND,0,1,1,nil)
+	if #g>0 and Duel.Destroy(g,REASON_EFFECT)>0 then
+		Duel.Draw(tp,1,REASON_EFFECT)
 	end
 end

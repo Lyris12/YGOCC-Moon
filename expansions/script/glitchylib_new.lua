@@ -22,6 +22,9 @@ CATEGORIES_TOKEN 			= 	CATEGORY_SPECIAL_SUMMON|CATEGORY_TOKEN
 CATEGORY_FLAG_SELF					= 0x1
 CATEGORY_FLAG_DELAYED_RESOLUTION	= 0x2
 
+--Custom Effects
+EFFECT_SET_SPSUMMON_LIMIT			= 39503
+
 --Custom Archetypes
 CUSTOM_ARCHE_ZERO_HERO				= 0x1
 
@@ -56,6 +59,7 @@ CARD_OSCURION_TYPE2						= 11110634
 CARD_REVERIE_DU_VAISSEAU				= 100000039
 CARD_ROI_DU_VAISSEAU					= 100000035
 CARD_ROTA								= 32807846
+CARD_RUM_DREAM_DISTILL_FORCE			= 39518
 CARD_STARFORCE_KNIGHT					= 39301
 CARD_ZERO_HERO_MAGMA_MAN				= 30409
 CARD_ZEROST_BEAST_ZEROTL 				= 100000025
@@ -99,6 +103,13 @@ STRING_LINK_MARKER_RIGHT						=	729
 STRING_LINK_MARKER_TOP_LEFT						=	730
 STRING_LINK_MARKER_TOP							=	731
 STRING_LINK_MARKER_TOP_RIGHT					=	732
+STRING_CANNOT_BE_FUSION_MATERIAL				=	733
+STRING_CANNOT_BE_RITUAL_MATERIAL				=	734
+STRING_CANNOT_BE_SYNCHRO_MATERIAL				=	735
+STRING_CANNOT_BE_XYZ_MATERIAL					=	736
+STRING_CANNOT_BE_LINK_MATERIAL					=	737
+STRING_CANNOT_BE_BIGBANG_MATERIAL				=	738
+STRING_CANNOT_BE_TIMELEAP_MATERIAL				=	739
 
 STRING_ASK_REPLACE_UPDATE_ENERGY_COST	= 	900
 STRING_ASK_ENGAGE						=	901
@@ -112,6 +123,7 @@ STRING_ASK_PLACE_COUNTER				=	908
 STRING_ASK_BANISH						=	909
 STRING_EXCLUDE_AI						=	910
 STRING_ASK_DISCARD						=	911
+STRING_ASK_REVEAL						=	912
 
 STRING_SEND_TO_EXTRA					=	1006
 STRING_BANISH							=	1102
@@ -998,8 +1010,16 @@ end
 --Descriptions
 function Effect.Desc(e,id,...)
 	local x = {...}
-	local code = #x>0 and x[1] or e:GetOwner():GetOriginalCode()
-	return e:SetDescription(aux.Stringid(code,id))
+	local c=e:GetOwner()
+	if aux.GetValueType(aux.EffectBeingApplied)=="Effect" and aux.GetValueType(aux.ProxyEffect)=="Effect" and aux.ProxyEffect:GetOwner()==c then
+		c=aux.EffectBeingApplied:GetOwner()
+	end
+	local code = #x>0 and x[1] or c:GetOriginalCode()
+	if id<16 then
+		return e:SetDescription(aux.Stringid(code,id))
+	else
+		return e:SetDescription(id)
+	end
 end
 function Card.AskPlayer(c,tp,desc)
 	if aux.GetValueType(aux.EffectBeingApplied)=="Effect" and aux.GetValueType(aux.ProxyEffect)=="Effect" and aux.ProxyEffect:GetHandler()==c then

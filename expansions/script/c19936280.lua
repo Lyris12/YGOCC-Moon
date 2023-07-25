@@ -7,10 +7,11 @@ function s.initial_effect(c)
 	--activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND+CATEGORY_DESTROY)
+	e1:SetCategory(CATEGORIES_SEARCH)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCountLimit(1,id+EFFECT_COUNT_CODE_OATH)
+	e1:SetCost(s.cost)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
@@ -24,33 +25,79 @@ function s.initial_effect(c)
 	e2:SetOperation(s.repop)
 	c:RegisterEffect(e2)
 end
-function s.thfilter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xa11) and c:IsAbleToHand()
+function s.thfilter(c,e,tp)
+	if not (c:IsType(TYPE_MONSTER) and c:IsSetCard(0xa11) and c:IsAbleToHand()) then return false end
+	if not e then return true end
+	c:SetLocationAfterCost(LOCATION_HAND)
+	local res=c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	c:SetLocationAfterCost(0)
+	return res
 end
 function s.disfilter(c,e)
 	return c:IsType(TYPE_MONSTER) and c:IsDestructable(e)
 end
+function s.rvfilter(c,e,tp)
+	if not (c:IsMonster() and c:IsRace(RACE_ZOMBIE) and not c:IsPublic()) then return false end
+	if c:IsCode(CARD_LIMIERRE) then
+		return Duel.IsExists(false,s.disfilter,tp,LOCATION_HAND,0,1,nil)
+	elseif c:IsSetCard(0xa11) then
+		return Duel.GetMZoneCount(tp)>0 and Duel.IsExists(false,s.thfilter,tp,LOCATION_DECK,0,1,nil,e,tp)
+	end
+	return false
+end
+function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	local a=Duel.IsExists(false,s.thfilter,tp,LOCATION_DECK,0,1,nil)
+	local b=Duel.IsExists(false,s.rvfilter,tp,LOCATION_HAND,0,1,nil,e,tp)
+	if chk==0 then return a or b end
+	if b and e:GetHandler():AskPlayer(tp,STRING_ASK_REVEAL) then
+		local g=Duel.Select(HINTMSG_CONFIRM,false,tp,s.rvfilter,tp,LOCATION_HAND,0,1,1,nil,e,tp)
+		Duel.ConfirmCards(1-tp,g)
+		e:SetLabel(g:GetFirst():GetCode())
+	else
+		e:SetLabel(0)
+	end
+end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) and Duel.IsExistingMatchingCard(s.disfilter,tp,LOCATION_HAND,0,1,nil,e) end
+	if chk==0 then
+		return e:IsCostChecked() or Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil)
+	end
+	if not e:IsCostChecked() then
+		e:SetLabel(0)
+	end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,1,tp,LOCATION_HAND)
+	local lab=e:GetLabel()
+	if lab>0 then
+		if lab==CARD_LIMIERRE then
+			e:SetCategory(CATEGORIES_SEARCH|CATEGORY_DESTROY)
+			Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,1,tp,LOCATION_HAND)
+		else
+			e:SetCategory(CATEGORIES_SEARCH|CATEGORY_SPECIAL_SUMMON)
+			Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
+		end
+	else
+		e:SetCategory(CATEGORIES_SEARCH)
+	end
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
+	local lab=e:GetLabel()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil)
-	if #g>0 and Duel.SendtoHand(g,nil,REASON_EFFECT)>0 then
-		Duel.ConfirmCards(1-tp,g)
+	if #g>0 and Duel.SearchAndCheck(g,tp) and lab>0 then
 		Duel.ShuffleHand(tp)
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-		local dg=Duel.SelectMatchingCard(tp,s.disfilter,tp,LOCATION_HAND,0,1,1,nil,e)
-		if #dg>0 then
-			for rc in aux.Next(dg) do
+		if lab==CARD_LIMIERRE then
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+			local dg=Duel.SelectMatchingCard(tp,s.disfilter,tp,LOCATION_HAND,0,1,1,nil,e)
+			if #dg>0 then
+				local rc=dg:GetFirst()
 				rc:RegisterFlagEffect(CARD_LIMIERRE,RESET_CHAIN,0,1)
-			end
-			Duel.Destroy(dg,REASON_EFFECT)
-			for rc in aux.Next(dg) do
+				Duel.BreakEffect()
+				Duel.Destroy(dg,REASON_EFFECT)
 				rc:ResetFlagEffect(CARD_LIMIERRE)
 			end
+		else
+			if Duel.GetMZoneCount(tp)<=0 or not g:GetFirst():IsCanBeSpecialSummoned(e,0,tp,false,false) then return end
+			Duel.BreakEffect()
+			Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 		end
 	end
 end

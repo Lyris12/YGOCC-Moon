@@ -42,19 +42,10 @@ function s.initial_effect(c)
 	e1:SetOperation(aux.SearchOperation(s.scfilter))
 	c:RegisterEffect(e1)
 	aux.RegisterOscurionDriveSummonEffectFlag(c,e1)
-	--[[While this card is in the GY, face-up "Oscurion Type-0 ‹Cradle of the Universe(s)›" in your Monster Zones are also treated as "Idolescent" monsters.]]
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetCode(EFFECT_ADD_SETCODE)
-	e2:SetRange(LOCATION_GRAVE)
-	e2:SetTargetRange(LOCATION_MZONE,0)
-	e2:SetTarget(aux.TargetBoolFunction(Card.IsCode,CARD_OSCURION_TYPE0))
-	e2:SetValue(ARCHE_IDOLESCENT)
-	c:RegisterEffect(e2)
 end
 --FILTERS D1
 function s.pzfilter(c,tp)
-	return c:IsMonster(TYPE_PENDULUM) and not c:IsForbidden() and c:CheckUniqueOnField(tp,LOCATION_SZONE)
+	return c:IsMonster(TYPE_PENDULUM) and c:IsSetCard(ARCHE_IDOLESCENT) and not c:IsForbidden() and c:CheckUniqueOnField(tp,LOCATION_SZONE)
 end
 --D1
 function s.pztg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -217,8 +208,16 @@ function s.tltg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.tlop(e,tp,eg,ep,ev,re,r,rp)
 	local sg=Duel.Select(HINTMSG_SPSUMMON,false,tp,s.tlfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp)
-	if #sg>0 then
-		Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
+	if #sg>0 and Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)>0 then
+		local e2=Effect.CreateEffect(e:GetHandler())
+		e2:Desc(5)
+		e2:SetType(EFFECT_TYPE_SINGLE)
+		e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE|EFFECT_FLAG_CLIENT_HINT)
+		e2:SetCode(EFFECT_ADD_SETCODE)
+		e2:SetRange(LOCATION_MZONE)
+		e2:SetValue(ARCHE_IDOLESCENT)
+		e2:SetReset(RESET_EVENT|RESETS_STANDARD)
+		sg:GetFirst():RegisterEffect(e2)
 	end
 end
 

@@ -72,15 +72,6 @@ function s.initial_effect(c)
 	e3:SetTarget(s.dstg)
 	e3:SetOperation(s.dsop)
 	c:RegisterEffect(e3)
-	--[[While this card is in the GY, the names of face-up "Oscurion Type-0 ‹Cradle of the Universe(s)›" in your Monster Zones are also treated as "Limiérre, the All-Consuming".]]
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_FIELD)
-	e4:SetCode(EFFECT_ADD_CODE)
-	e4:SetRange(LOCATION_GRAVE)
-	e4:SetTargetRange(LOCATION_MZONE,0)
-	e4:SetTarget(s.addcode)
-	e4:SetValue(CARD_LIMIERRE)
-	c:RegisterEffect(e4)
 	if not s.TriggeringSetcodeCheck then
 		s.TriggeringSetcodeCheck=true
 		s.TriggeringSetcode={}
@@ -177,8 +168,16 @@ function s.tltg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.tlop(e,tp,eg,ep,ev,re,r,rp)
 	local sg=Duel.Select(HINTMSG_SPSUMMON,false,tp,s.tlfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp)
-	if #sg>0 then
-		Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
+	if #sg>0 and Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)>0 then
+		local e2=Effect.CreateEffect(e:GetHandler())
+		e2:Desc(7)
+		e2:SetType(EFFECT_TYPE_SINGLE)
+		e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE|EFFECT_FLAG_CLIENT_HINT)
+		e2:SetCode(EFFECT_ADD_CODE)
+		e2:SetRange(LOCATION_MZONE)
+		e2:SetValue(CARD_LIMIERRE)
+		e2:SetReset(RESET_EVENT|RESETS_STANDARD)
+		sg:GetFirst():RegisterEffect(e2)
 	end
 end
 
@@ -257,9 +256,4 @@ function s.dsop(e,tp,eg,ep,ev,re,r,rp)
 	if c:IsRelateToChain() then
 		Duel.SearchAndEngage(c,e,tp)
 	end
-end
-
---E4
-function s.addcode(e,c)
-	return c:IsOriginalCode(CARD_OSCURION_TYPE0)
 end
