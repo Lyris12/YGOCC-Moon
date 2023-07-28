@@ -2,6 +2,7 @@
 --Approaching the Event Horizon
 local s,id,o=GetID()
 function s.initial_effect(c)
+	aux.AddCodeList(c,30241314,54493213)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
@@ -17,9 +18,9 @@ function s.filter(c,code)
 end
 function s.con(e,tp)
 	for _,i in ipairs{30241314,54493213} do
-		if Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_ONFIELD,0,1,nil,i) then return true end
+		if not Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_ONFIELD,0,1,nil,i) then return false end
 	end
-	return false
+	return true
 end
 function s.tg(e,tp,eg,ep,ev,r,er,r,rp,chk)
 	local g=Duel.GetMatchingGroup(Card.IsType,tp,0,LOCATION_ONFIELD,nil,TYPE_SPELL+TYPE_TRAP)
