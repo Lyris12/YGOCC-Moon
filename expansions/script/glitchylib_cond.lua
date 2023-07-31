@@ -163,7 +163,7 @@ function Auxiliary.IsEquippedToCond(f)
 end
 
 --Reason and Reason Player
-function Auxiliary.ByBattleOrCardEffect(p,typ)
+function Auxiliary.ByBattleOrCardEffectCond(p,typ)
 	if not p and not typ then
 		return	function(e,tp,eg,ep,ev,re,r,rp)
 					return r&(REASON_BATTLE|REASON_EFFECT)~=0
@@ -173,6 +173,9 @@ function Auxiliary.ByBattleOrCardEffect(p,typ)
 					return r&REASON_BATTLE~=0 or aux.ByCardEffectCond(p,typ)
 				end
 	end 
+end
+function Auxiliary.ByBattleOrCardEffect(p,typ)
+	return aux.ByBattleOrCardEffectCond(p,typ)
 end
 
 function Auxiliary.ByCardEffectCond(p,typ)

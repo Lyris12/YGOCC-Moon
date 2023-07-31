@@ -1125,6 +1125,7 @@ function Auxiliary.XyzMaterialComplete(c,sc,lv,tp)
 end
 Duel.CheckXyzMaterial=function(sc,f,lv,min,max,mg)
 	local res=duel_check_xyz_mat(sc,f,lv,min,max,mg)
+	if mg~=nil then return res end
 	if res then
 		return true
 	else
@@ -1133,8 +1134,12 @@ Duel.CheckXyzMaterial=function(sc,f,lv,min,max,mg)
 	end
 end
 Duel.SelectXyzMaterial=function(p,sc,f,lv,min,max,mg)
-	local extramats=Duel.GetMatchingGroup(Auxiliary.XyzMaterialComplete,0,0xff,0xff,nil,sc,lv,p)
-	return duel_select_xyz_mat(p,sc,f,lv,min,max,extramats)
+	if mg~=nil then
+		return duel_select_xyz_mat(p,sc,f,lv,min,max,extramats)
+	else
+		local extramats=Duel.GetMatchingGroup(Auxiliary.XyzMaterialComplete,0,0xff,0xff,nil,sc,lv,p)
+		return duel_select_xyz_mat(p,sc,f,lv,min,max,extramats)
+	end
 end
 
 Duel.Recover = function(p,v,r,...)
@@ -1356,7 +1361,12 @@ function Auxiliary.CannotBeEDMaterial(c,f,range,isrule,reset,owner,prop,allow_cu
 				restrict:SetValue(Auxiliary.FilterToCannotValue(f))
 			end
 			if reset~=nil then
-				restrict:SetReset(reset)
+				local rct=1
+				if type(reset)=="table" then
+					rct=reset[2]
+					reset=reset[1]
+				end
+				restrict:SetReset(reset,rct)
 			end
 			c:RegisterEffect(restrict)
 		end

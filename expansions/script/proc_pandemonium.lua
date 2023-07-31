@@ -646,7 +646,7 @@ function Auxiliary.PandSSetCon(tc,player,...)
 							check=false
 						elseif tc and type(tc)=="function" then
 							local ct=0
-							local sg=Duel.GetMatchingGroup(tc,ttp,loc1,loc2,nil,e,ttp)
+							local sg=Duel.GetMatchingGroup(tc,ttp,loc1,loc2,nil,te,ttp)
 							local tsg=sg:GetFirst()
 							while tsg do
 								if tg(te,tsg) then
@@ -664,14 +664,10 @@ function Auxiliary.PandSSetCon(tc,player,...)
 					return (neglect_zone or Duel.GetLocationCount(ttp,LOCATION_SZONE)>0) and check
 				end
 	else
-		return	function(c,e,tp,eg,ep,ev,re,r,rp)
+		return	function()
 					local ttp=player
 					if not ttp or ttp<0 then
-						if aux.GetValueType(e)=="Effect" then
-							ttp=e:GetHandlerPlayer()
-						elseif tc then
-							ttp=tc:GetControler()
-						end
+						ttp=tc:GetControler()
 					end
 					local check=true
 					local egroup={Duel.IsPlayerAffectedByEffect(ttp,EFFECT_CANNOT_SSET)}
@@ -683,7 +679,7 @@ function Auxiliary.PandSSetCon(tc,player,...)
 							check=false
 						elseif tc and type(tc)=="function" then
 							local ct=0
-							local sg=Duel.GetMatchingGroup(tc,ttp,loc1,loc2,nil,e,tp,eg,ep,ev,re,r,rp)
+							local sg=Duel.GetMatchingGroup(tc,ttp,loc1,loc2,nil,te,ttp,e)
 							local tsg=sg:GetFirst()
 							while tsg do
 								if tg(te,tsg) then
@@ -704,12 +700,15 @@ function Auxiliary.PandSSetCon(tc,player,...)
 end	
 function Auxiliary.PandSSetFilter(f,...)
 	local params={...}
-	return	function(c,e,tp,eg,ep,ev,re,r,rp)
-				return (not f or f(c,e,tp,eg,ep,ev,re,r,rp)) and not c:IsForbidden() and Auxiliary.PandSSetCon(c,table.unpack(params))(nil,e,tp,eg,ep,ev,re,r,rp)
+	return	function(c,...)
+				return c:IsMonster(TYPE_PANDEMONIUM) and not c:IsForbidden() and (not f or f(c,...)) and Auxiliary.PandSSetCon(c,table.unpack(params))()
 			end
 end
 function Auxiliary.GetOriginalPandemoniumType(c)
 	return c:GetFlagEffectLabel(1074)
+end
+function Duel.PandSSet(tc,e,tp,reason,tpe)
+	return aux.PandSSet(tc,reason,tpe)(e,tp)
 end
 function Auxiliary.PandSSet(tc,reason,tpe)
 	return  function(e,tp,eg,ep,ev,re,r,rp,c)

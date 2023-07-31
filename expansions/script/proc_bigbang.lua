@@ -396,10 +396,10 @@ function Auxiliary.BigbangCondition(gf,ignore_sumreq,...)
 					fg:Merge(mustg)
 				end
 				if fg:IsExists(aux.MustMaterialCounterFilter,1,nil,mg) then
-					Debug.Message(c:GetCode().." error")
-					for tc in aux.Next(fg) do
-						Debug.Message(tc:GetCode())
-					end
+					--Debug.Message(c:GetCode().." error")
+					-- for tc in aux.Next(fg) do
+						-- Debug.Message(tc:GetCode())
+					-- end
 					if ignore_sumreq_effect then
 						ignore_sumreq_effect:Reset()
 						ignore_sumreq_effect=nil

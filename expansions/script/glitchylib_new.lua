@@ -110,6 +110,9 @@ STRING_CANNOT_BE_XYZ_MATERIAL					=	736
 STRING_CANNOT_BE_LINK_MATERIAL					=	737
 STRING_CANNOT_BE_BIGBANG_MATERIAL				=	738
 STRING_CANNOT_BE_TIMELEAP_MATERIAL				=	739
+STRING_CANNOT_BE_TRIBUTED						=	740
+STRING_CANNOT_BE_MATERIAL						=	741
+STRING_CAN_BE_TREATED_AS_TUNER					=	742
 
 STRING_ASK_REPLACE_UPDATE_ENERGY_COST	= 	900
 STRING_ASK_ENGAGE						=	901
@@ -316,6 +319,7 @@ if not global_effect_category_table_global_check then
 	global_effect_category_table_global_check=true
 	global_effect_category_table={}
 	global_effect_info_table={}
+	global_additional_info_table={}
 	global_possible_info_table={}
 end
 function Effect.SetCustomCategory(e,cat,flags)
@@ -337,17 +341,27 @@ end
 --New Operation Infos
 function Duel.SetCustomOperationInfo(ch,cat,g,ct,p,val,...)
 	local extra={...}
-	if not global_effect_info_table[ch+1] or #global_effect_info_table[ch+1]>0 then
-		global_effect_info_table[ch+1]={}
+	local chain = ch==0 and Duel.GetCurrentChain() or ch
+	if not global_effect_info_table[chain] or #global_effect_info_table[chain]>0 then
+		global_effect_info_table[chain]={}
 	end
-	table.insert(global_effect_info_table[ch+1],{cat,g,ct,p,val,table.unpack(extra)})
+	table.insert(global_effect_info_table[chain],{cat,g,ct,p,val,table.unpack(extra)})
 end
 function Duel.SetPossibleOperationInfo(ch,cat,g,ct,p,val,...)
 	local extra={...}
-	if not global_possible_info_table[ch+1] or #global_possible_info_table[ch+1]>0 then
-		global_possible_info_table[ch+1]={}
+	local chain = ch==0 and Duel.GetCurrentChain() or ch
+	if not global_possible_info_table[chain] or #global_possible_info_table[chain]>0 then
+		global_possible_info_table[chain]={}
 	end
-	table.insert(global_possible_info_table[ch+1],{cat,g,ct,p,val,table.unpack(extra)})
+	table.insert(global_possible_info_table[chain],{cat,g,ct,p,val,table.unpack(extra)})
+end
+function Duel.SetAdditionalOperationInfo(ch,cat,g,ct,p,val,...)
+	local extra={...}
+	local chain = ch==0 and Duel.GetCurrentChain() or ch
+	if not global_additional_info_table[chain] or #global_additional_info_table[chain]>0 then
+		global_additional_info_table[chain]={}
+	end
+	table.insert(global_additional_info_table[chain],{cat,g,ct,p,val,table.unpack(extra)})
 end
 
 --Card Actions
@@ -869,6 +883,9 @@ function Card.IsRatingBelow(c,rtyp,...)
 	end
 end
 
+function Card.IsStats(c,atk,def)
+	return (not atk or (c:HasAttack() and c:IsAttack(atk))) and (not def or (c:HasDefense() and c:IsDefense(def)))
+end
 function Card.IsStat(c,rtyp,...)
 	local x={...}
 	local atk=rtyp&STAT_ATTACK>0
