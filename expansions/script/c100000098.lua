@@ -129,9 +129,16 @@ end
 --E2
 function s.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return c:IsAbleToRemove() and eg:IsExists(s.repfilter,1,nil,tp) end
+	if chk==0 then return c:IsAbleToRemove() and eg:IsExists(s.repfilter,1,c,tp) end
 	if Duel.SelectEffectYesNo(tp,c,96) then
-		local g=eg:Filter(aux.AND(Card.IsOnField,Card.IsFacedown),nil)
+		local sg=eg:Filter(s.repfilter,c,tp)
+		if #sg>1 then
+			Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(53167658,0))
+			sg=sg:Select(tp,1,1,nil)
+		end
+		sg:KeepAlive()
+		e:SetLabelObject(sg)
+		local g=sg:Filter(aux.AND(Card.IsOnField,Card.IsFacedown),nil)
 		if #g>0 then
 			Duel.ConfirmCards(1-tp,g)
 		end
@@ -142,9 +149,17 @@ function s.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.reptg_banish(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return c:IsAbleToRemove() and eg:IsExists(s.repfilter,1,nil,tp,true) end
+	if chk==0 then return c:IsAbleToRemove() and eg:IsExists(s.repfilter,1,c,tp,true) end
 	if c:AskPlayer(tp,1) then
-		local g=eg:Filter(aux.AND(Card.IsOnField,Card.IsFacedown),nil)
+		local sg=eg:Filter(s.repfilter,c,tp,true)
+		if #sg>1 then
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SELECT)
+			sg=sg:Select(tp,1,1,nil)
+			Duel.HintSelection(sg)
+		end
+		sg:KeepAlive()
+		e:SetLabelObject(sg)
+		local g=sg:Filter(aux.AND(Card.IsOnField,Card.IsFacedown),nil)
 		if #g>0 then
 			Duel.ConfirmCards(1-tp,g)
 		end
@@ -154,8 +169,11 @@ function s.reptg_banish(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 end
 function s.repval(e,c)
-	return s.repfilter(c,e:GetHandlerPlayer())
+	local g=e:GetLabelObject()
+	return g:IsContains(c)
 end
 function s.repop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_EFFECT|REASON_REPLACE)
+	local g=e:GetLabelObject()
+	g:DeleteGroup()
 end
