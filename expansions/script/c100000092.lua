@@ -22,28 +22,17 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
-	--[[If this card is in your GY, except the turn it was sent there: You can banish this card, then target 1 "Trappit" monster you control, even if Set;
-	return it to the hand, and if you do, immediately after this effect resolves, Normal Summon/Set 1 monster (if you can).]]
-	local e2=Effect.CreateEffect(c)
-	e2:Desc(1)
-	e2:SetCategory(CATEGORY_TOHAND|CATEGORY_SUMMON)
-	e2:SetType(EFFECT_TYPE_QUICK_O)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e2:SetCode(EVENT_FREE_CHAIN)
-	e2:SetRange(LOCATION_GRAVE)
-	e2:HOPT()
-	e2:SetCondition(aux.exccon)
-	e2:SetCost(aux.bfgcost)
-	e2:SetTarget(s.thtg)
-	e2:SetOperation(s.thop)
-	c:RegisterEffect(e2)
 	-- During your turn only, you can also activate this card from your hand.
 	local e3=Effect.CreateEffect(c)
 	e3:Desc(6)
 	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetCode(EFFECT_TRAP_ACT_IN_HAND)
-	e3:SetCondition(aux.TurnPlayerCond(0))
+	e3:SetCondition(s.acthandcon)
 	c:RegisterEffect(e3)
+end
+function s.acthandcon(e)
+	local tp=e:GetHandlerPlayer()
+	return Duel.GetTurnPlayer()==tp and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,ARCHE_TRAPPIT),tp,LOCATION_ONFIELD,0,1,nil)
 end
 
 --Filters E1
@@ -113,6 +102,17 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		end
 		
 	elseif opt==2 then
+		if e:IsHasType(EFFECT_TYPE_ACTIVATE) then
+			local e1=Effect.CreateEffect(e:GetHandler())
+			e1:SetType(EFFECT_TYPE_FIELD)
+			e1:SetCode(EFFECT_CHANGE_DAMAGE)
+			e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+			e1:SetTargetRange(0,1)
+			e1:SetValue(s.damval)
+			e1:SetReset(RESET_PHASE|PHASE_END)
+			Duel.RegisterEffect(e1,tp)
+		end
+		Duel.RegisterHint(tp,id,PHASE_END,1,id,7)
 		local g=Duel.Select(HINTMSG_TOGRAVE,false,tp,s.actfilter,tp,LOCATION_DECK,0,1,1,nil)
 		local tc=g:GetFirst()
 		if tc and Duel.SendtoGrave(tc,REASON_EFFECT)>0 and tc:IsLocation(LOCATION_GRAVE) then
@@ -144,33 +144,6 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-
---Filters E2
-function s.bfilter(c)
-	return c:IsSetCard(ARCHE_TRAPPIT) and c:IsAbleToHand()
-end
---Text sections E2
-function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.bfilter(chkc) end
-	if chk==0 then
-		return Duel.IsExistingTarget(s.bfilter,tp,LOCATION_MZONE,0,1,nil)
-	end
-	local g=Duel.Select(HINTMSG_RTOHAND,true,tp,s.bfilter,tp,LOCATION_MZONE,0,1,1,nil)
-	if g:GetFirst():IsFacedown() then
-		Duel.ConfirmCards(1-tp,g)
-	end
-	Duel.SetCardOperationInfo(g,CATEGORY_TOHAND)
-	if Duel.IsPlayerCanSummon(tp) then
-		Duel.SetOperationInfo(0,CATEGORY_SUMMON,nil,1,tp,LOCATION_HAND|LOCATION_MZONE)
-	end
-end
-function s.thop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToChain() and Duel.SendtoHand(tc,nil,REASON_EFFECT) and tc:IsLocation(LOCATION_HAND) then
-		Duel.ShuffleHand(tp)
-		local g=Duel.Select(HINTMSG_SUMMON,false,tp,Card.IsSummonableOrSettable,tp,LOCATION_HAND|LOCATION_MZONE,0,1,1,nil)
-		if #g>0 then
-			Duel.SummonOrSet(tp,g:GetFirst())
-		end
-	end
+function s.damval(e,re,val,r,rp,rc)
+	return math.floor(val/2)
 end

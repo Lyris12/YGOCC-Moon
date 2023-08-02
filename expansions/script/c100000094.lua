@@ -22,13 +22,18 @@ function s.initial_effect(c)
 	e1:SetOperation(s.activate(0))
 	c:RegisterEffect(e1)
 	--During your turn only, you can also activate this card from your hand.
-	local e2=Effect.CreateEffect(c)
-	e2:Desc(4)
-	e2:SetType(EFFECT_TYPE_SINGLE)
-	e2:SetCode(EFFECT_TRAP_ACT_IN_HAND)
-	e2:SetCondition(aux.TurnPlayerCond(0))
-	c:RegisterEffect(e2)
+	local e3=Effect.CreateEffect(c)
+	e3:Desc(4)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetCode(EFFECT_TRAP_ACT_IN_HAND)
+	e3:SetCondition(s.acthandcon)
+	c:RegisterEffect(e3)
 end
+function s.acthandcon(e)
+	local tp=e:GetHandlerPlayer()
+	return Duel.GetTurnPlayer()==tp and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,ARCHE_TRAPPIT),tp,LOCATION_ONFIELD,0,1,nil)
+end
+
 function s.egfilter(c,_,tp,eg,_,_,_,_,_,_,event)
 	if event==EVENT_SPSUMMON_SUCCESS then
 		return c:IsControler(1-tp)

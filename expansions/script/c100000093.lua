@@ -39,8 +39,12 @@ function s.initial_effect(c)
 	e3:Desc(2)
 	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetCode(EFFECT_TRAP_ACT_IN_HAND)
-	e3:SetCondition(aux.TurnPlayerCond(0))
+	e3:SetCondition(s.acthandcon)
 	c:RegisterEffect(e3)
+end
+function s.acthandcon(e)
+	local tp=e:GetHandlerPlayer()
+	return Duel.GetTurnPlayer()==tp and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,ARCHE_TRAPPIT),tp,LOCATION_ONFIELD,0,1,nil)
 end
 
 --Filters E1
@@ -101,12 +105,6 @@ function s.activate(mode)
 								if tc:IsRelateToChain() and tc:IsFaceup() then
 									tc:UpdateATKDEF(2000,2000,true,c)
 									if Duel.EquipAndRegisterLimit(tp,c,tc) then
-										local e1=Effect.CreateEffect(c)
-										e1:SetType(EFFECT_TYPE_EQUIP)
-										e1:SetCode(EFFECT_IMMUNE_EFFECT)
-										e1:SetValue(s.immval)
-										e1:SetReset(RESET_EVENT|RESETS_STANDARD)
-										c:RegisterEffect(e1)
 										local e2=Effect.CreateEffect(c)
 										e2:SetCategory(CATEGORY_DISABLE)
 										e2:SetType(EFFECT_TYPE_QUICK_O)
@@ -136,12 +134,6 @@ function s.activate(mode)
 					if tc and tc:IsFaceup() and tc:IsLocation(LOCATION_MZONE) then
 						tc:UpdateATKDEF(2000,2000,true,c)
 						if Duel.EquipAndRegisterLimit(tp,c,tc) then
-							local e1=Effect.CreateEffect(c)
-							e1:SetType(EFFECT_TYPE_EQUIP)
-							e1:SetCode(EFFECT_IMMUNE_EFFECT)
-							e1:SetValue(s.immval)
-							e1:SetReset(RESET_EVENT|RESETS_STANDARD)
-							c:RegisterEffect(e1)
 							local e2=Effect.CreateEffect(c)
 							e2:SetCategory(CATEGORY_DISABLE)
 							e2:SetType(EFFECT_TYPE_QUICK_O)
@@ -161,14 +153,6 @@ function s.activate(mode)
 					end
 				end
 	end
-end
-
---Immunity
-function s.immval(e,re)
-	if e:GetOwnerPlayer()==re:GetOwnerPlayer() then return false end
-	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return true end
-	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	return not g or not g:IsContains(e:GetHandler():GetEquipTarget())
 end
 
 --Negate

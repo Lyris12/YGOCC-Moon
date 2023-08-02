@@ -19,12 +19,6 @@ function s.initial_effect(c)
 	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
 	local e1x=e1:FlipSummonEventClone(c)
-	local e1y=e1:Clone()
-	e1y:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_TRIGGER_O)
-	e1y:SetRange(LOCATION_MZONE)
-	e1y:SetCondition(s.condition)
-	c:RegisterEffect(e1y)
-	local e1z=e1y:FlipSummonEventClone(c)
 	--[[You can reveal 1 "Trappit" monster, or 1 Normal Trap, in your hand; immediately after this effect resolves, apply 1 of these effects.
 	● Normal Summon 1 monster, and if you do, change 1 Normal Summoned/Set monster you control to face-down Defense Position.
 	● Your opponent Normal Summons 1 monster, and if they do, you can change 1 Special Summoned monster they control to face-down Defense Position.]]
@@ -63,9 +57,6 @@ function s.spfilter(c,e,tp)
 	return c:IsMonster() and c:IsLevel(1,4) and c:IsRace(RACE_BEAST) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEDOWN_DEFENSE)
 end
 --Text sections E1
-function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return not eg:IsContains(e:GetHandler())
-end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		return Duel.GetMZoneCount(tp)>0 and Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp)

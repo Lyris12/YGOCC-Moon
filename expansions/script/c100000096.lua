@@ -116,7 +116,7 @@ end
 function s.value(e,c)
 	local ct=e:GetLabel()
 	if not ct or ct<0 then ct=0 end
-	return ct*1000
+	return ct*1200
 end
 --E1X
 function s.schkfilter(c)

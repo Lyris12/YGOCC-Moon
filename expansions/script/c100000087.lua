@@ -19,11 +19,10 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
-	--[[If this card, or another monster(s) (except during the Damage Step), is Normal or Flip Summoned, you can:
-	Immediately after this effect resolves, Normal Set 1 monster from your hand, and if you do, if you control another "Trappit" card, you can shuffle 1 Normal Trap from your GY into the Deck.]]
+	--[[If this card or another monster(s) is Normal or Flip Summoned (except during the Damage Step): You can add 1 "Trappit" monster from your Deck to your hand, then, immediately after this effect resolves, Normal Summon/Set 1 monster from your hand (if you can).]]
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(1)
-	e2:SetCategory(CATEGORY_TODECK|CATEGORY_GRAVE_ACTION)
+	e2:SetCategory(CATEGORIES_SEARCH|CATEGORY_SUMMON)
 	e2:SetType(EFFECT_TYPE_SINGLE|EFFECT_TYPE_TRIGGER_O)
 	e2:SetProperty(EFFECT_FLAG_DELAY)
 	e2:SetCode(EVENT_SUMMON_SUCCESS)
@@ -123,42 +122,27 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 
+function s.thfilter(c)
+	return c:IsMonster() and c:IsSetCard(ARCHE_TRAPPIT) and c:IsAbleToHand()
+end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return not eg:IsContains(e:GetHandler())
 end
 function s.nstg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsMSetable,tp,LOCATION_HAND,0,1,nil,true,nil) end
+	if chk==0 then
+		return Duel.IsExists(false,s.thfilter,tp,LOCATION_DECK,0,1,nil)
+	end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
 function s.nsop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
-	local g=Duel.SelectMatchingCard(tp,Card.IsMSetable,tp,LOCATION_HAND,0,1,1,nil,true,nil)
-	local tc=g:GetFirst()
-	if tc then
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
-		e1:SetCode(EVENT_MSET)
-		e1:SetLabelObject(tc)
-		e1:SetOperation(function(_e,_tp,_eg,_ep,_ev,_re,_r,_rp)
-			s.tdop(e,tp,eg,ep,ev,re,r,rp,_e,_eg)
-			_e:Reset()
-		end
-		)
-		e1:SetReset(RESET_PHASE|PHASE_END)
-		Duel.RegisterEffect(e1,0)
-		Duel.MSet(tp,tc,true,nil)
-	end
-end
-function s.tdfilter(c)
-	return c:IsNormalTrap() and c:IsAbleToDeck()
-end
-function s.tdop(e,tp,eg,ep,ev,re,r,rp,oe,oeg)
-	local c=e:GetHandler()
-	if oeg:IsContains(oe:GetLabelObject()) and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,ARCHE_TRAPPIT),tp,LOCATION_ONFIELD,0,1,c)
-	and Duel.IsExistingMatchingCard(aux.Necro(s.tdfilter),tp,LOCATION_GRAVE,0,1,nil) and c:AskPlayer(tp,2) then
-		local g=Duel.Select(HINTMSG_TODECK,false,tp,aux.Necro(s.tdfilter),tp,LOCATION_GRAVE,0,1,1,nil)
-		if #g>0 then
-			Duel.HintSelection(g)
-			Duel.ShuffleIntoDeck(g)
+	local g=Duel.Select(HINTMSG_ATOHAND,false,tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil)
+	if #g>0 and Duel.SearchAndCheck(g,tp) then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
+		local sg=Duel.SelectMatchingCard(tp,Card.IsSummonableOrSettable,tp,LOCATION_HAND|LOCATION_MZONE,0,1,1,nil)
+		if #sg>0 then
+			Duel.ShuffleHand(tp)
+			Duel.BreakEffect()
+			Duel.SummonOrSet(tp,sg:GetFirst())
 		end
 	end
 end

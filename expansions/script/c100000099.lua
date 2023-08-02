@@ -9,21 +9,20 @@ function s.initial_effect(c)
 	aux.RegisterMergedDelayedEventGlitchy(c,id,{EVENT_SUMMON_SUCCESS,EVENT_FLIP_SUMMON_SUCCESS,EVENT_MSET},s.egfilter,id)
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(0)
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON|CATEGORY_DECKDES)
+	e1:SetCategory(CATEGORY_TODECK|CATEGORY_SPECIAL_SUMMON|CATEGORY_DECKDES)
 	e1:SetCustomCategory(CATEGORY_ACTIVATES_ON_NORMAL_SET)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetCode(EVENT_CUSTOM+id)
 	e1:HOPT(true)
-	e1:SetCost(aux.ToDeckCost(aux.TRUE,LOCATION_HAND,0,1,1,true))
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
-	--[[If this card is in your GY, except the turn it was sent there: You can banish this card, then target 1 other "Trappit" card you control, even if Set;
-	banish it, and if you do, Set that banished card to your field at the end of this turn.]]
+	--[[If this card is in your GY, except the turn it was sent there: You can banish this card, then target 1 "Trappit" monster you control, even if Set;
+	return it to the hand, and if you do, immediately after this effect resolves, Normal Summon/Set 1 monster (if you can).]]
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(1)
-	e2:SetCategory(CATEGORY_REMOVE)
+	e2:SetCategory(CATEGORY_TOHAND|CATEGORY_SUMMON)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetCode(EVENT_FREE_CHAIN)
@@ -31,8 +30,8 @@ function s.initial_effect(c)
 	e2:HOPT()
 	e2:SetCondition(aux.exccon)
 	e2:SetCost(aux.bfgcost)
-	e2:SetTarget(s.rmtg)
-	e2:SetOperation(s.rmop)
+	e2:SetTarget(s.thtg)
+	e2:SetOperation(s.thop)
 	c:RegisterEffect(e2)
 	--During your turn only, you can also activate this card from your hand.
 	local e3=Effect.CreateEffect(c)
@@ -61,6 +60,12 @@ end
 --Text sections E1
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
+		local c=e:GetHandler()
+		local exc
+		if e:IsHasType(EFFECT_TYPE_ACTIVATE) and c:IsLocation(LOCATION_HAND) then
+			exc=c
+		end
+		if not Duel.IsExists(false,Card.IsAbleToDeck,tp,LOCATION_HAND,0,1,exc) then return false end
 		local mmz,stz=Duel.GetMZoneCount(tp),Duel.GetLocationCount(tp,LOCATION_SZONE)
 		if e:IsHasType(EFFECT_TYPE_ACTIVATE) and not e:GetHandler():IsInBackrow() then
 			stz=stz-1
@@ -71,81 +76,68 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 		aux.GCheckAdditional=nil
 		return res
 	end
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,1,tp,LOCATION_HAND)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local mmz,stz=Duel.GetMZoneCount(tp),Duel.GetLocationCount(tp,LOCATION_SZONE)
-	local g=Duel.Group(s.setfilter,tp,LOCATION_DECK,0,nil,e,tp)
-	aux.GCheckAdditional=s.gcheck
-	local res=g:SelectSubGroup(tp,aux.TRUE,false,2,2,mmz,stz)
-	aux.GCheckAdditional=nil
-	if #res>0 and Duel.Set(tp,res)>0 then
-		local og=res:Filter(Card.IsOnField,nil)
-		for tc in aux.Next(og) do
-			local e1=Effect.CreateEffect(c)
-			e1:SetDescription(STRING_BANISH_REDIRECT)
-			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_CLIENT_HINT|EFFECT_FLAG_SET_AVAILABLE)
-			e1:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
-			e1:SetReset(RESET_EVENT|RESETS_REDIRECT_FIELD)
-			e1:SetValue(LOCATION_REMOVED)
-			tc:RegisterEffect(e1,true)
+	local g=Duel.Select(HINTMSG_TODECK,false,tp,Card.IsAbleToDeck,tp,LOCATION_HAND,0,1,1,nil)
+	if #g>0 and Duel.ShuffleIntoDeck(g)>0 then
+		local c=e:GetHandler()
+		local mmz,stz=Duel.GetMZoneCount(tp),Duel.GetLocationCount(tp,LOCATION_SZONE)
+		local g=Duel.Group(s.setfilter,tp,LOCATION_DECK,0,nil,e,tp)
+		aux.GCheckAdditional=s.gcheck
+		local res=g:SelectSubGroup(tp,aux.TRUE,false,2,2,mmz,stz)
+		aux.GCheckAdditional=nil
+		if #res>0 and Duel.Set(tp,res)>0 then
+			local og=res:Filter(Card.IsOnField,nil)
+			for tc in aux.Next(og) do
+				local e1=Effect.CreateEffect(c)
+				e1:SetDescription(STRING_BANISH_REDIRECT)
+				e1:SetType(EFFECT_TYPE_SINGLE)
+				e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_CLIENT_HINT|EFFECT_FLAG_SET_AVAILABLE)
+				e1:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
+				e1:SetReset(RESET_EVENT|RESETS_REDIRECT_FIELD)
+				e1:SetValue(LOCATION_REMOVED)
+				tc:RegisterEffect(e1,true)
+			end
 		end
+		local e2=Effect.CreateEffect(c)
+		e2:Desc(3)
+		e2:SetType(EFFECT_TYPE_FIELD)
+		e2:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+		e2:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
+		e2:SetTargetRange(LOCATION_SZONE,0)
+		e2:SetCountLimit(1,id)
+		Duel.RegisterEffect(e2,tp)
 	end
-	local e2=Effect.CreateEffect(c)
-	e2:Desc(3)
-	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
-	e2:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)
-	e2:SetTargetRange(LOCATION_SZONE,0)
-	e2:SetCountLimit(1,id)
-	Duel.RegisterEffect(e2,tp)
 end
 
 --Filters E2
-function s.rmfilter(c)
-	return c:IsSetCard(ARCHE_TRAPPIT) and c:IsAbleToRemove()
+function s.bfilter(c)
+	return c:IsSetCard(ARCHE_TRAPPIT) and c:IsAbleToHand()
 end
 --Text sections E2
-function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsOnField() and chkc:IsControler(tp) and s.rmfilter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(s.rmfilter,tp,LOCATION_ONFIELD,0,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=Duel.SelectTarget(tp,s.rmfilter,tp,LOCATION_ONFIELD,0,1,1,nil)
-	Duel.SetCardOperationInfo(g,CATEGORY_REMOVE)
+function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.bfilter(chkc) end
+	if chk==0 then
+		return Duel.IsExistingTarget(s.bfilter,tp,LOCATION_MZONE,0,1,nil)
+	end
+	local g=Duel.Select(HINTMSG_RTOHAND,true,tp,s.bfilter,tp,LOCATION_MZONE,0,1,1,nil)
+	if g:GetFirst():IsFacedown() then
+		Duel.ConfirmCards(1-tp,g)
+	end
+	Duel.SetCardOperationInfo(g,CATEGORY_TOHAND)
+	if Duel.IsPlayerCanSummon(tp) then
+		Duel.SetOperationInfo(0,CATEGORY_SUMMON,nil,1,tp,LOCATION_HAND|LOCATION_MZONE)
+	end
 end
-function s.rmop(e,tp,eg,ep,ev,re,r,rp)
+function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToChain() and Duel.Banish(tc)>0 and tc:IsBanished() then
-		local fid=e:GetFieldID()
-		tc:RegisterFlagEffect(id+100,RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_END,EFFECT_FLAG_CLIENT_HINT|EFFECT_FLAG_SET_AVAILABLE,1,fid,aux.Stringid(id,4))
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:Desc(5)
-		e1:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
-		e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
-		e1:SetCode(EVENT_PHASE|PHASE_END)
-		e1:SetCountLimit(1)
-		e1:SetLabel(fid)
-		e1:SetLabelObject(tc)
-		e1:SetCondition(s.setcon)
-		e1:SetOperation(s.setop)
-		e1:SetReset(RESET_PHASE|PHASE_END)
-		Duel.RegisterEffect(e1,tp)
-	end
-end
-function s.setcon(e,tp,eg,ep,ev,re,r,rp)
-	local tc=e:GetLabelObject()
-	if not tc:HasFlagEffectLabel(id+100,e:GetLabel()) then
-		e:Reset()
-		return false
-	else
-		return true
-	end
-end
-function s.setop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=e:GetLabelObject()
-	if tc:HasFlagEffectLabel(id+100,e:GetLabel()) and tc:IsCanBeSet(e,tp) then
-		Duel.Set(tp,tc)
+	if tc and tc:IsRelateToChain() and Duel.SendtoHand(tc,nil,REASON_EFFECT) and tc:IsLocation(LOCATION_HAND) then
+		Duel.ShuffleHand(tp)
+		local g=Duel.Select(HINTMSG_SUMMON,false,tp,Card.IsSummonableOrSettable,tp,LOCATION_HAND|LOCATION_MZONE,0,1,1,nil)
+		if #g>0 then
+			Duel.SummonOrSet(tp,g:GetFirst())
+		end
 	end
 end
 

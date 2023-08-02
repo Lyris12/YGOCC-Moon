@@ -4,7 +4,7 @@
 
 local s,id=GetID()
 function s.initial_effect(c)
-	--[[If this card, or another monster(s) (except during the Damage Step), is Normal or Flip Summoned:
+	--[[If this card is Normal or Flip Summoned:
 	You can take 1 "Trappit" Spell/Trap from your Deck, and either add it to your hand, or Set it to your field. If you Set it, and it is a Trap, it can be activated this turn.]]
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(0)
@@ -17,12 +17,6 @@ function s.initial_effect(c)
 	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
 	local e1x=e1:FlipSummonEventClone(c)
-	local e1y=e1:Clone()
-	e1y:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_TRIGGER_O)
-	e1y:SetRange(LOCATION_MZONE)
-	e1y:SetCondition(s.condition)
-	c:RegisterEffect(e1y)
-	local e1z=e1y:FlipSummonEventClone(c)
 	--[[You can reveal 1 "Trappit" monster, or 1 Normal Trap, in your hand; immediately after this effect resolves, apply 1 of these effects.
 	● Normal Summon 1 monster, and if you do, it loses 1000 ATK/DEF.
 	● Your opponent Normal Summons 1 monster, and if they do, it gains 1000 ATK/DEF.]]
@@ -56,9 +50,6 @@ function s.regop(e,tp,eg,ep,ev,re,r,rp)
 	aux.TrappitNormalSummonCheck[tp] = Duel.IsExistingMatchingCard(Card.IsSummonable,tp,LOCATION_HAND|LOCATION_MZONE,0,1,nil,true,nil)	
 end
 
-function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return not eg:IsContains(e:GetHandler())
-end
 function s.filter(c)
 	return c:IsST() and c:IsSetCard(ARCHE_TRAPPIT) and (c:IsAbleToHand() or c:IsSSetable())
 end
