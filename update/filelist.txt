@@ -1,4 +1,4 @@
-﻿expansions/cards-new.cdb	bdecf01dae104dd7f1e2d021e5a924a4
+﻿expansions/cards-new.cdb	40f614131b54370ada7f2f5b4f26f7c4
 expansions/lflist.conf	2693c6a36f15eb781e07c2b55ff94fc2
 expansions/strings.conf	b84b7567d5222ee4655c58eb5431510c
 expansions/pics/100000000.png	b67e8ff2c7f674f012be790c136b43e5
@@ -1137,6 +1137,7 @@ expansions/pics/14060018.jpg	75e44d4416a5eda862febd0857e6df44
 expansions/pics/14060019.jpg	4559a369eb4f094309eff62eb116552b
 expansions/pics/14060020.jpg	930bbaea1b0616afdd457edad22416f2
 expansions/pics/14142136.jpg	5a36f5bd524005754570b94e6b7e4ca6
+expansions/pics/14558139.png	1c7783a79838eef46c5cd2c714fb16d6
 expansions/pics/1497.png	51fb3bcca82bf197ecd9f1e7cb2a37de
 expansions/pics/151991819.jpg	82b1c902cdf0e345d965ea6938f5a5bb
 expansions/pics/1552222.jpg	5ab13a6ad12df3b8feff8a12c04422fb
@@ -6986,6 +6987,7 @@ expansions/script/c14060018.lua	7369f0ac43f2fbb9894f5fde331e18be
 expansions/script/c14060019.lua	5b87ec7da0cc0a02b4894cdcb2bc1e8c
 expansions/script/c14060020.lua	7d16e4f0bc41bff0571a43bfaa1b97d8
 expansions/script/c14142136.lua	ad64bba07012f0f475bd20188660df96
+expansions/script/c14558139.lua	993a6ebe8eb264aa6002195484865f60
 expansions/script/c1497.lua	b6aac2af7125bc5f152481c915502d75
 expansions/script/c151991819.lua	342c87c92cb8709b5cd665b9dece7c86
 expansions/script/c1552222.lua	fc35244abaf273812fd82738a3a6f656
@@ -11537,6 +11539,14 @@ sound/custom/kyushu_eff021.wav	e0ef67c1c8eb72f68e8d50de135e1111
 sound/custom/kyushu_eff022.wav	21a424a99ddc10ed105914ae0e648783
 sound/custom/kyushu_effe02.wav	092b0a0e7cdcb6a013a8c3506643dd99
 sound/custom/lefty_summon.wav	054f0d0f443f1a45f8706e7a7b38b1d0
+sound/custom/neco-arc-dori.wav	62c628155c350bea7ab82ac2e016d176
+sound/custom/neco-arc-sound-effect.wav	5f1110ece8772fdbfc8601e7e54ba833
+sound/custom/necoarc-bibibi.wav	89741fb982a5e125745a36cc9a94b3ff
+sound/custom/necoarc-gahwoo.wav	ab3cf2dd92c944d2c3c542a8aa50e2c2
+sound/custom/necoarc-mudamuda.wav	f1ec22dbbf4a15f03381382c4f95216b
+sound/custom/necoarc-nyanyanya.wav	ad95e18e92468a153fea47e65c9c0f53
+sound/custom/necoarc-nyanyanya2.wav	b4e91b1cbe1950b81e88fd62edf83923
+sound/custom/necoarc-shaa.wav	d00529c5c0ce7513bb82fa23e2b037ea
 sound/custom/oinari_battle.wav	2ab95a1f478d035b9133fa44f757e37f
 sound/custom/oinari_summon.wav	1bc6417dffd82eabbf2b632311ab4e4d
 sound/custom/right_summon.wav	9a961eae8ac72085dee6197313fa12e0
@@ -11556,6 +11566,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	fc54ef7c72ee98c3a135069b557bb9ad
+update/filelist.txt	8efa6597ba821613b76c3f4257bcc603
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	a9c39a39c88312940640ba0234c2e2cc
+update/version.txt	df4b644f2a81f614f56c17d8581b9b76
