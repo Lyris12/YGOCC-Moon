@@ -80,6 +80,32 @@ Card.GetLocation = function(c)
 	end
 	return locs
 end
+-------------------------------------------------------------------------------------
+-------------------------------DISCARD EFFECTS FIX-------------------------------------
+local _DiscardHand, _SendtoGrave = Duel.DiscardHand, Duel.SendtoGrave
+
+function Auxiliary.CanBeDiscarded(f,r)
+	local reason=r&(~REASON_DISCARD)
+	return	function(c,...)
+				return c:IsDiscardable(reason) and (not f or f(c,...))
+			end
+end
+
+Duel.DiscardHand = function(p,f,min,max,r,exc,...)
+	return _DiscardHand(p,aux.CanBeDiscarded(f,r),min,max,r,exc,...)
+end
+Duel.SendtoGrave = function(tg,reason,...)
+	if reason&REASON_DISCARD>0 then
+		if aux.GetValueType(tg)=="Card" then
+			tg=Group.FromCards(tg)
+		end
+		local g=tg:Clone()
+		g:Remove(aux.NOT(aux.CanBeDiscarded(nil,reason)),nil)
+		return _SendtoGrave(g,reason,...)
+	else
+		return _SendtoGrave(tg,reason,...)
+	end
+end
 
 -------------------------------------------------------------------------------------
 -------------------------------PROXY EFFECTS FIX-------------------------------------
@@ -609,31 +635,41 @@ function Auxiliary.ContactFusionMaterialFilterGlitchy(c,fc,filter,sumtype)
 	return c:IsCanBeFusionMaterial(fc,sumtype) and (not filter or filter(c,fc))
 end
 function Auxiliary.ContactFusionConditionGlitchy(filter,self_location,opponent_location,sumtype,condition)
+	local chkfnf = sumtype==SUMMON_TYPE_FUSION and 0 or 0x200
 	return	function(e,c)
 				if c==nil then return true end
 				if c:IsType(TYPE_PENDULUM) and c:IsFaceup() then return false end
 				local tp=c:GetControler()
 				local mg=Duel.GetMatchingGroup(Auxiliary.ContactFusionMaterialFilterGlitchy,tp,self_location,opponent_location,c,c,filter,sumtype)
-				return (sumtype==0 or c:IsCanBeSpecialSummoned(e,sumtype,tp,false,false)) and c:CheckFusionMaterial(mg,nil,tp|0x200)
+				return (sumtype==0 or c:IsCanBeSpecialSummoned(e,sumtype,tp,false,false)) and c:CheckFusionMaterial(mg,nil,tp|chkfnf)
 					and (not condition or condition(e,c,tp,mg))
 			end
 end
 function Auxiliary.ContactFusionOperationGlitchy(filter,self_location,opponent_location,sumtype,mat_operation,operation_params)
+	local chkfnf = sumtype==SUMMON_TYPE_FUSION and 0 or 0x200
 	if type(mat_operation)=="function" then
 		return	function(e,tp,eg,ep,ev,re,r,rp,c)
 					local mg=Duel.GetMatchingGroup(Auxiliary.ContactFusionMaterialFilterGlitchy,tp,self_location,opponent_location,c,c,filter,sumtype)
-					local g=Duel.SelectFusionMaterial(tp,c,mg,nil,tp|0x200)
+					local g=Duel.SelectFusionMaterial(tp,c,mg,nil,tp|chkfnf)
 					c:SetMaterial(g)
 					mat_operation(g,table.unpack(operation_params))
 				end
 	else
 		return	function(e,tp,eg,ep,ev,re,r,rp,c)
 					local mg=Duel.GetMatchingGroup(Auxiliary.ContactFusionMaterialFilterGlitchy,tp,self_location,opponent_location,c,c,filter,sumtype)
-					local g=Duel.SelectFusionMaterial(tp,c,mg,nil,tp|0x200)
+					local g=Duel.SelectFusionMaterial(tp,c,mg,nil,tp|chkfnf)
 					c:SetMaterial(g)
 					operation_params[1](g,e,tp,eg,ep,ev,re,r,rp,c)
 				end
 	end
+end
+
+function Auxiliary.ContactFusionMaterialsToDeck(g,_,tp)
+	local cg=g:Filter(Card.IsFacedown,nil)
+	if cg:GetCount()>0 then
+		Duel.ConfirmCards(1-tp,cg)
+	end
+	Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_COST)
 end
 
 ---------------------------------------------------------------------------------

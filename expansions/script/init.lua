@@ -1456,25 +1456,6 @@ function Auxiliary.RandomTargetFilter(c)
 	return c:GetFlagEffect(39759371)>0 and c:GetFlagEffectLabel(39759371)==999
 end
 
---Hardcode AZW Phalanx Unicorn (39510) allow equipped monster to activate its effect without detaching
-local ocheck,oremove=Card.CheckRemoveOverlayCard,Card.RemoveOverlayCard
-function Card.CheckRemoveOverlayCard(c,p,ct,r)
-	local tc=c:GetEquipGroup()
-	if tc and tc:FilterCount(Card.IsHasEffect,nil,39510)>0 and r and (r&REASON_COST>0) then
-		return true
-	else
-		return ocheck(c,p,ct,r)
-	end
-end
-function Card.RemoveOverlayCard(c,p,minct,maxct,r)
-	local tc=c:GetEquipGroup()
-	if tc and tc:FilterCount(Card.IsHasEffect,nil,39510)>0 and r and (r&REASON_COST>0) and (not ocheck(c,p,minct,r) or Duel.SelectYesNo(p,aux.Stringid(39510,0))) then
-		return 0
-	else
-		return oremove(c,p,minct,maxct,r)
-	end
-end
-
 --Glitchy's custom auxs and functions
 if not glitchy_effect_table then glitchy_effect_table={} end
 if not glitchy_archetype_table then glitchy_archetype_table={} end

@@ -25,6 +25,17 @@ CATEGORY_FLAG_DELAYED_RESOLUTION	= 0x2
 --Custom Effects
 EFFECT_SET_SPSUMMON_LIMIT			= 39503
 
+--Archetypes
+ARCHE_GALAXY						= 0x7b
+ARCHE_GALAXY_EYES					= 0x107b
+ARCHE_NUMBER						= 0x48
+ARCHE_NUMBER_C						= 0x1048
+ARCHE_NUMBER_C39					= 0x5048
+ARCHE_PHOTON						= 0x55
+ARCHE_RUM							= 0x95
+ARCHE_UTOPIA						= 0x107f
+ARCHE_ZW							= 0x107e
+
 --Custom Archetypes
 CUSTOM_ARCHE_ZERO_HERO				= 0x1
 
@@ -44,21 +55,29 @@ ARCHE_IDOLESCENT		= 0x5a3
 ARCHE_LEYLAH			= 0xd45
 ARCHE_LIFEWEAVER		= 0x5a5
 ARCHE_METALURGOS		= 0x5a4
+ARCHE_MMS				= 0xd71
+ARCHE_NUMBER_I			= 0x2048
+ARCHE_NUMBER_I39		= 0x6048
+ARCHE_NUMBER_IC39		= 0xa048
 ARCHE_OSCURION			= 0x5a6
 ARCHE_TRAPPIT			= 0x54a
 ARCHE_VAISSEAU			= 0x4a8
 ARCHE_ZEROST			= 0x1e4
 
-CARD_METALURGOS_CONDUCTION				= 11110608
+CARD_NUMBER_39_UTOPIA					= 84013237
+CARD_ROTA								= 32807846
+
 CARD_CHEVALIER_DU_VAISSEAU				= 100000032
 CARD_GOLDEN_SKIES_TREASURE				= 11111040
 CARD_GOLDEN_SKIES_TREASURE_OF_WELFARE	= 11111029
 CARD_IN_THE_FOREST_BLACK_AS_MY_MEMORY	= 1
+CARD_METALURGOS_CONDUCTION				= 11110608
+CARD_MMS_JACKLYN_ALLTRADES				= 19905907
+CARD_MMS_SHERLOCK_HOLMES				= 19905908
 CARD_OSCURION_TYPE0						= 11110633
 CARD_OSCURION_TYPE2						= 11110634
 CARD_REVERIE_DU_VAISSEAU				= 100000039
 CARD_ROI_DU_VAISSEAU					= 100000035
-CARD_ROTA								= 32807846
 CARD_RUM_DREAM_DISTILL_FORCE			= 39518
 CARD_STARFORCE_KNIGHT					= 39301
 CARD_ZERO_HERO_MAGMA_MAN				= 30409
@@ -127,6 +146,8 @@ STRING_ASK_BANISH						=	909
 STRING_EXCLUDE_AI						=	910
 STRING_ASK_DISCARD						=	911
 STRING_ASK_REVEAL						=	912
+STRING_ASK_SEND_TO_GY					=	913
+STRING_ASK_SPSUMMON						=	914
 
 STRING_SEND_TO_EXTRA					=	1006
 STRING_BANISH							=	1102
@@ -190,6 +211,8 @@ WIN_REASON_CUSTOM = 0xff
 --constants aliases
 TYPE_ST			= TYPE_SPELL|TYPE_TRAP
 TYPE_GEMINI		= TYPE_DUAL
+
+ATTRIBUTES_CHAOS = ATTRIBUTE_LIGHT|ATTRIBUTE_DARK
 
 RACES_BEASTS = RACE_BEAST|RACE_BEASTWARRIOR|RACE_WINDBEAST
 
@@ -390,6 +413,11 @@ function Duel.Banish(g,pos,r)
 	if not pos then pos=POS_FACEUP end
 	if not r then r=REASON_EFFECT end
 	return Duel.Remove(g,pos,r)
+end
+function Card.IsAbleToRemoveTemp(c,tp,r)
+	if not r then r=REASON_EFFECT end
+	local pos = c:GetPosition()&POS_FACEDOWN>0 and POS_FACEDOWN or POS_FACEUP
+	return c:IsAbleToRemove(tp,pos,r|REASON_TEMPORARY)
 end
 function Duel.BanishUntil(g,e,tp,pos,phase,id,phasect,phasenext,rc,r,disregard_turncount,counts_turns,op,loc)
 	if not e then
@@ -607,7 +635,7 @@ function Duel.Negate(tc,e,reset,notfield,forced)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e1:SetCode(EFFECT_DISABLE)
-	e1:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
+	e1:SetReset(RESET_EVENT|RESETS_STANDARD|reset,rct)
 	tc:RegisterEffect(e1,forced)
 	local e2=Effect.CreateEffect(e:GetHandler())
 	e2:SetType(EFFECT_TYPE_SINGLE)
@@ -616,7 +644,7 @@ function Duel.Negate(tc,e,reset,notfield,forced)
 	if not notfield then
 		e2:SetValue(RESET_TURN_SET)
 	end
-	e2:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
+	e2:SetReset(RESET_EVENT|RESETS_STANDARD|reset,rct)
 	tc:RegisterEffect(e2,forced)
 	if not notfield and tc:IsType(TYPE_TRAPMONSTER) then
 		local e3=Effect.CreateEffect(e:GetHandler())
@@ -1043,6 +1071,11 @@ function Card.AskPlayer(c,tp,desc)
 		c=aux.EffectBeingApplied:GetHandler()
 	end
 	local string = desc<=15 and aux.Stringid(c:GetOriginalCode(),desc) or desc
+	return Duel.SelectYesNo(tp,string)
+end
+function Duel.Ask(tp,id,desc)
+	if desc and (desc<0 or desc>15) then desc=0 end
+	local string = desc and aux.Stringid(id,desc) or id
 	return Duel.SelectYesNo(tp,string)
 end
 
