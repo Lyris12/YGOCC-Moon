@@ -132,6 +132,7 @@ STRING_CANNOT_BE_TIMELEAP_MATERIAL				=	739
 STRING_CANNOT_BE_TRIBUTED						=	740
 STRING_CANNOT_BE_MATERIAL						=	741
 STRING_CAN_BE_TREATED_AS_TUNER					=	742
+STRING_UNAFFECTED_BY_OTHER_EFFECT				=	743
 
 STRING_ASK_REPLACE_UPDATE_ENERGY_COST	= 	900
 STRING_ASK_ENGAGE						=	901
@@ -803,6 +804,9 @@ end
 function Card.HasDefense(c)
 	return not c:IsOriginalType(TYPE_LINK)
 end
+function Card.HasRank(c)
+	return c:IsOriginalType(TYPE_XYZ)
+end
 function Auxiliary.GetCappedDefense(c)
 	local x=c:GetDefense()
 	if x>MAX_PARAMETER then
@@ -988,7 +992,14 @@ function Effect.UpdateDefenseClone(e,c,notreg)
 	end
 	return ex
 end
-
+function Effect.SetDefenseFinalClone(e,c,notreg)
+	local ex=e:Clone()
+	ex:SetCode(EFFECT_SET_DEFENSE_FINAL)
+	if not notreg then
+		c:RegisterEffect(ex)
+	end
+	return ex
+end
 --codes
 function Card.IsOriginalCode(c,code)
 	return c:GetOriginalCode()==code
