@@ -456,9 +456,9 @@ function Duel.BanishUntil(g,e,tp,pos,phase,id,phasect,phasenext,rc,r,disregard_t
 			local player = phase&(RESET_SELF_TURN|RESET_OPPO_TURN)
 			local p = player==RESET_SELF_TURN and tp or player==RESET_OPPO_TURN and 1-tp or nil
 			
-			-- Debug.Message(phasenext)
-			-- Debug.Message(Duel.GetCurrentPhase().." "..ph)
-			-- Debug.Message(Duel.GetTurnPlayer().." "..p)
+			--Debug.Message(phasenext)
+			--Debug.Message(Duel.GetCurrentPhase().." "..ph)
+			--Debug.Message(Duel.GetTurnPlayer().." "..tostring(p))
 			if Duel.GetCurrentPhase()>ph or (p and Duel.GetTurnPlayer()~=p) or (phasenext and Duel.GetCurrentPhase()==ph and (not p or Duel.GetTurnPlayer()==p)) then
 				turnct=turnct+1
 				if phasenext and Duel.GetCurrentPhase()==ph and (not p or Duel.GetTurnPlayer()==p) then
@@ -497,8 +497,10 @@ end
 
 function Auxiliary.TimingCondition(phase,p,disregard_turncount)
 	return	function(e,tp,eg,ep,ev,re,r,rp)
+				--Debug.Message(Duel.GetTurnCount().." "..e:GetLabel())
 				--Debug.Message(Duel.GetTurnCount(p).." "..e:GetLabel())
-				return Duel.GetCurrentPhase()==phase and (not p or Duel.GetTurnPlayer()==p) and (disregard_turncount or Duel.GetTurnCount(p)==e:GetLabel())
+				local turnct = not p and Duel.GetTurnCount() or Duel.GetTurnCount(p)
+				return Duel.GetCurrentPhase()==phase and (not p or Duel.GetTurnPlayer()==p) and (disregard_turncount or turnct==e:GetLabel())
 			end
 end
 function Auxiliary.TimingConditionButCountsTurns(counts_turns)
