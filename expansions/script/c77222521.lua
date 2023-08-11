@@ -66,15 +66,18 @@ function s.spregtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
 end
 function s.spregop(e,tp,eg,ep,ev,re,r,rp)
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetDescription(aux.Stringid(id,2))
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e1:SetCode(EVENT_PHASE+PHASE_END)
-	e1:SetCountLimit(1)
-	e1:SetLabel(Duel.GetTurnCount())
-	e1:SetOperation(s.spop)
-	e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
-	Duel.RegisterEffect(e1,tp)
+	local e2=Effect.CreateEffect(e:GetHandler())
+	e2:SetDescription(aux.Stringid(id,2))
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e2:SetCode(EVENT_PHASE+PHASE_END)
+	e2:SetCountLimit(1)
+	e2:SetLabel(Duel.GetTurnCount())
+	e2:SetCondition(s.spcon)
+	e2:SetOperation(s.spop)
+	Duel.RegisterEffect(e2,tp)
+end
+function s.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnCount()==e:GetLabel()
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -82,32 +85,14 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 and Duel.IsExistingMatchingCard(Card.IsAbleToRemove,tp,0,LOCATION_ONFIELD,1,nil) and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 		local g=Duel.SelectMatchingCard(tp,Card.IsAbleToRemove,tp,0,LOCATION_ONFIELD,1,1,nil)
-			if #g>0 then 
-				tc=g:GetFirst()
-				if Duel.Remove(tc,0,REASON_EFFECT+REASON_TEMPORARY)~=0 then
-				tc:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,2)
-				local e1=Effect.CreateEffect(e:GetHandler())
-				e1:SetDescription(aux.Stringid(id,1))
-				e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-				e1:SetCode(EVENT_PHASE+PHASE_END)
-				e1:SetReset(RESET_PHASE+PHASE_END,2)
-				e1:SetLabelObject(tc)
-				e1:SetCountLimit(1)
-				e1:SetCondition(s.retcon)
-				e1:SetOperation(s.retop)
-				e1:SetLabel(Duel.GetTurnCount())
-				Duel.RegisterEffect(e1,tp)
-			end
+		if #g>0 then 
+			local tc=g:GetFirst()
+			Duel.BanishUntil(tc,e,tp,nil,PHASE_END,id,1,true,c,REASON_EFFECT)
 		end
 	end
+	e:Reset()
 end
-function s.retcon(e,tp,eg,ep,ev,re,r,rp)
-	local tc=e:GetLabelObject()
-	return Duel.GetTurnCount()~=e:GetLabel() and tc:GetFlagEffect(id)~=0
-end
-function s.retop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.ReturnToField(e:GetLabelObject())
-end
+
 function s.regcon(e,tp,eg,ep,ev,re,r,rp)
 	local i=0
 	if global_duel_effect_table[tp] then

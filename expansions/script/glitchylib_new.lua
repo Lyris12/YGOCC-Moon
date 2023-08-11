@@ -467,14 +467,15 @@ function Duel.BanishUntil(g,e,tp,pos,phase,id,phasect,phasenext,rc,r,disregard_t
 			end
 			for tc in aux.Next(og) do
 				tc:RegisterFlagEffect(id,RESET_EVENT|RESETS_STANDARD|RESET_PHASE|phase,EFFECT_FLAG_SET_AVAILABLE|EFFECT_FLAG_CLIENT_HINT,turnct2,0,STRING_TEMPORARILY_BANISHED)
-			end	
+			end
+			local turnct0 = not p and Duel.GetTurnCount() or Duel.GetTurnCount(p)
 			local e1=Effect.CreateEffect(rc)
 			e1:SetDescription(STRING_RETURN_TO_FIELD)
 			e1:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
 			e1:SetCode(EVENT_PHASE|ph)
 			e1:SetReset(RESET_PHASE|phase,turnct2)
 			e1:SetCountLimit(1)
-			e1:SetLabel(Duel.GetTurnCount(p)+turnct)
+			e1:SetLabel(turnct0+turnct)
 			e1:SetLabelObject(og)
 			if not counts_turns then
 				e1:SetCondition(aux.TimingCondition(ph,p,disregard_turncount))
@@ -498,6 +499,7 @@ end
 function Auxiliary.TimingCondition(phase,p,disregard_turncount)
 	return	function(e,tp,eg,ep,ev,re,r,rp)
 				--Debug.Message(Duel.GetTurnCount().." "..e:GetLabel())
+				--Debug.Message(e:GetLabelObject():GetFirst():GetReasonEffect())
 				--Debug.Message(Duel.GetTurnCount(p).." "..e:GetLabel())
 				local turnct = not p and Duel.GetTurnCount() or Duel.GetTurnCount(p)
 				return Duel.GetCurrentPhase()==phase and (not p or Duel.GetTurnPlayer()==p) and (disregard_turncount or turnct==e:GetLabel())
@@ -572,7 +574,9 @@ function Auxiliary.ReturnLabelObjectToFieldOp(id,counts_turns)
 								e1:SetReset(RESET_EVENT|RESETS_STANDARD)
 								tc:RegisterEffect(e1,true)
 							end
-							Duel.ReturnToField(tc,tc:GetPreviousPosition(),(~EXTRA_MONSTER_ZONE)&0xffff)
+							--Debug.Message(tc:GetReasonEffect())
+							--Debug.Message(e:GetOwner())
+							Duel.ReturnToField(tc,tc:GetPreviousPosition(),0xff&(~EXTRA_MONSTER_ZONE))
 							if e1 then e1:Reset() end
 						end
 					end
