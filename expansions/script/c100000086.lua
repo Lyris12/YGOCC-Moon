@@ -22,7 +22,7 @@ function s.initial_effect(c)
 	● Your opponent Normal Summons 1 monster, and if they do, it gains 1000 ATK/DEF.]]
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(1)
-	e2:SetCategory(CATEGORY_SUMMON|CATEGORY_ATKCHANGE|CATEGORY_DEFCHANGE)
+	e2:SetCategory(CATEGORY_DRAW|CATEGORY_SUMMON|CATEGORY_ATKCHANGE|CATEGORY_DEFCHANGE)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
 	e2:HOPT()
@@ -30,24 +30,6 @@ function s.initial_effect(c)
 	e2:SetTarget(s.nstg)
 	e2:SetOperation(s.nsop(0))
 	c:RegisterEffect(e2)
-	if not aux.TrappitNormalSummonCheck then
-		aux.TrappitNormalSummonCheck={false,false}
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_ADJUST)
-		ge1:SetOperation(s.regop)
-		ge1:SetOwnerPlayer(0)
-		Duel.RegisterEffect(ge1,0)
-		local ge2=Effect.CreateEffect(c)
-		ge2:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
-		ge2:SetCode(EVENT_ADJUST)
-		ge2:SetOperation(s.regop)
-		ge2:SetOwnerPlayer(1)
-		Duel.RegisterEffect(ge2,1)
-	end
-end
-function s.regop(e,tp,eg,ep,ev,re,r,rp)
-	aux.TrappitNormalSummonCheck[tp] = Duel.IsExistingMatchingCard(Card.IsSummonable,tp,LOCATION_HAND|LOCATION_MZONE,0,1,nil,true,nil)	
 end
 
 function s.filter(c)
@@ -94,10 +76,9 @@ function s.nscost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.nstg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
-		if Duel.IsExistingMatchingCard(Card.IsSummonable,tp,LOCATION_HAND|LOCATION_MZONE,0,1,nil,true,nil) then return true end
-		local hg=Duel.GetHand(1-tp)
-		return (#hg>0 and hg:IsExists(aux.NOT(Card.IsPublic),1,nil) and Duel.IsPlayerCanSummon(1-tp)) or aux.TrappitNormalSummonCheck[1-tp]==true
+		return Duel.IsPlayerCanDraw(1-tp)
 	end
+	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,1-tp,1)
 	Duel.SetOperationInfo(0,CATEGORY_SUMMON,nil,1,PLAYER_ALL,LOCATION_HAND|LOCATION_MZONE)
 end
 function s.nsop(mode)
@@ -105,7 +86,7 @@ function s.nsop(mode)
 		return	function(e,tp,eg,ep,ev,re,r,rp)
 					local hg=Duel.GetHand(1-tp)
 					local b1 = Duel.IsExistingMatchingCard(Card.IsSummonable,tp,LOCATION_HAND|LOCATION_MZONE,0,1,nil,true,nil)
-					local b2 = (#hg>0 and hg:IsExists(aux.NOT(Card.IsPublic),1,nil) and Duel.IsPlayerCanSummon(1-tp)) or aux.TrappitNormalSummonCheck[1-tp]==true
+					local b2 = Duel.IsPlayerCanDraw(1-tp)
 					local opt = aux.Option(tp,id,2,b1,b2)
 					if opt==0 then
 						Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SUMMON)
@@ -127,6 +108,7 @@ function s.nsop(mode)
 						end
 					
 					elseif opt==1 then
+						Duel.Draw(1-tp,1,REASON_EFFECT)
 						local e1=Effect.CreateEffect(e:GetHandler())
 						e1:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
 						e1:SetCode(EVENT_CHAIN_SOLVED)
