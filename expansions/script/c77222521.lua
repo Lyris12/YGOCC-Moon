@@ -87,10 +87,9 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		local g=Duel.SelectMatchingCard(tp,Card.IsAbleToRemove,tp,0,LOCATION_ONFIELD,1,1,nil)
 		if #g>0 then 
 			local tc=g:GetFirst()
-			Duel.BanishUntil(tc,e,tp,nil,PHASE_END,id,1,true,c,REASON_EFFECT)
+			Duel.BanishUntil(tc,e,tp,nil,PHASE_END,id,1,true,c,REASON_EFFECT,false,false,nil,nil,e)
 		end
 	end
-	e:Reset()
 end
 
 function s.regcon(e,tp,eg,ep,ev,re,r,rp)

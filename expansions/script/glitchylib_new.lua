@@ -420,7 +420,7 @@ function Card.IsAbleToRemoveTemp(c,tp,r)
 	local pos = c:GetPosition()&POS_FACEDOWN>0 and POS_FACEDOWN or POS_FACEUP
 	return c:IsAbleToRemove(tp,pos,r|REASON_TEMPORARY)
 end
-function Duel.BanishUntil(g,e,tp,pos,phase,id,phasect,phasenext,rc,r,disregard_turncount,counts_turns,op,loc)
+function Duel.BanishUntil(g,e,tp,pos,phase,id,phasect,phasenext,rc,r,disregard_turncount,counts_turns,op,loc,lingering_effect_to_reset)
 	if not e then
 		e=self_reference_effect
 	end
@@ -482,7 +482,7 @@ function Duel.BanishUntil(g,e,tp,pos,phase,id,phasect,phasenext,rc,r,disregard_t
 			else
 				e1:SetCondition(aux.TimingConditionButCountsTurns(counts_turns))
 			end
-			e1:SetOperation(aux.ReturnLabelObjectToFieldOp(id,counts_turns))
+			e1:SetOperation(aux.ReturnLabelObjectToFieldOp(id,lingering_effect_to_reset))
 			Duel.RegisterEffect(e1,tp)
 			return ct,e1
 		end
@@ -519,7 +519,7 @@ function Auxiliary.TimingConditionButCountsTurns(counts_turns)
 				return false
 			end
 end
-function Auxiliary.ReturnLabelObjectToFieldOp(id,counts_turns)
+function Auxiliary.ReturnLabelObjectToFieldOp(id,lingering_effect_to_reset)
 	return	function(e,tp,eg,ep,ev,re,r,rp)
 				local g=e:GetLabelObject()
 				--Debug.Message("OBJSIZE: "..#g)
@@ -580,6 +580,9 @@ function Auxiliary.ReturnLabelObjectToFieldOp(id,counts_turns)
 							if e1 then e1:Reset() end
 						end
 					end
+				end
+				if aux.GetValueType(lingering_effect_to_reset)=="Effect" then
+					lingering_effect_to_reset:Reset()
 				end
 				g:DeleteGroup()
 			end
