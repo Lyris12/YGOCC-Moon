@@ -40,8 +40,10 @@ function s.initial_effect(c)
 	)
 end
 function s.cfilter(c,e,tp,eg,ep,ev,re)
-	return c:IsFaceup() and c:IsMonster(TYPE_FUSION) and c:IsSetCard(0xd71) and c:GetSummonType()&SUMMON_TYPE_FUSION==SUMMON_TYPE_FUSION
-		and (not c:IsReason(REASON_EFFECT) or not re or not re:GetHandler() or not re:GetHandler():IsCode(id))
+	if not (c:IsFaceup() and c:IsMonster(TYPE_FUSION) and c:IsSetCard(0xd71) and c:GetSummonType()&SUMMON_TYPE_FUSION==SUMMON_TYPE_FUSION) then return false end
+	if not re then return true end
+	local code,code2=Duel.GetChainInfo(Duel.GetCurrentChain(),CHAININFO_TRIGGERING_CODE,CHAININFO_TRIGGERING_CODE2)
+	return code~=id and (not code2 or code2~=id)
 end
 
 function s.desreptg(e,tp,eg,ep,ev,re,r,rp,chk)
