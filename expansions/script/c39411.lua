@@ -21,7 +21,9 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function s.cfilter(c,tp)
-	return c:IsControler(tp) and c:IsSetCard(0x300) and c:IsType(TYPE_MONSTER)
+	if not c:IsControler(tp) then return false end
+	return (c:IsSetCard(0x300) and c:IsType(TYPE_MONSTER))
+		or (c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousPosition(POS_FACEUP) and c:IsPreviousTypeOnField(TYPE_MONSTER) and c:IsPreviousSetCard(0x300))
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.cfilter,1,nil,tp)
