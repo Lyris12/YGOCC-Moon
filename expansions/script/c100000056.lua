@@ -1,13 +1,10 @@
---Dreamy Forest, Dreaming Heart
---Foresta Sognante, Cuore Sognante
---Scripted by: XGlitchy30
-
+--created by Swag, coded by XGlitchy30
+--Dreary Forest, Dreaming Heart
 local s,id=GetID()
 function s.initial_effect(c)
 	c:SetUniqueOnField(1,0,id)
 	c:EnableCounterPermit(COUNTER_SORROW)
 	c:Activate()
-	--[[Each time a "Dreamy Forest" or "Dreary Forest" card(s) you control Transforms with its own effect, place 1 Sorrow Counter on this card.]]
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(0)
 	e1:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
@@ -17,7 +14,6 @@ function s.initial_effect(c)
 	e1:SetOperation(s.ctop)
 	c:RegisterEffect(e1)
 	aux.AddPreTransformationCheck(c,e1,s.tfcon)
-	--[[While you control a "Dreary Forest" monster, monsters your opponent controls lose 100 ATK/DEF for each Sorrow Counter on this card, during your opponent's turn.]]
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_UPDATE_ATTACK)
@@ -27,9 +23,6 @@ function s.initial_effect(c)
 	e2:SetValue(s.statval)
 	c:RegisterEffect(e2)
 	local e2x=e2:UpdateDefenseClone(c)
-	--[[Once per opponent's turn: You can activate 1 of these effects;
-	● Banish 1 "Dreary Forest" card from your GY, then target 1 Level 3 or higher "Dreamy Forest" monster you control; Transform it into its [Reverse] Side.
-	● Banish 1 "Dreary Forest" card from your GY, then target 1 Level 3 or higher "Dreary Forest" monster you control; Transform it into its [Obverse] Side.]]
 	local e3=Effect.CreateEffect(c)
 	e3:Desc(1)
 	e3:SetType(EFFECT_TYPE_QUICK_O)
@@ -51,7 +44,6 @@ function s.ctop(e,tp,eg,ep,ev,re,r,rp)
 		c:AddCounter(COUNTER_SORROW,1)
 	end
 end
-
 function s.cfilter(c)
 	return c:IsFaceup() and c:IsSetCard(ARCHE_DREARY_FOREST)
 end
@@ -60,7 +52,6 @@ function s.statval(e,c)
 	if ct<0 then ct=0 end
 	return -ct*100
 end
-
 function s.filter(c,arche,e,tp)
 	if not (c:IsFaceup() and c:IsSetCard(arche) and c:IsLevelAbove(3)) then return false end
 	if arche&ARCHE_DREAMY_FOREST==ARCHE_DREAMY_FOREST then
@@ -98,7 +89,6 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Transform(tc,side,e,tp)
 	end
 end
-
 function s.tffilter(c,tp,re)
 	return c:IsFaceup() and c:IsOnField() and c:IsControler(tp) and c:IsSetCard(ARCHE_DREAMY_FOREST,ARCHE_DREARY_FOREST) and re:GetHandler()==c
 end

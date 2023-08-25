@@ -1,18 +1,75 @@
---created by Seth
+--created by Seth, coded by Lyris
 --Mextro Darxstorm
 local s,id,o=GetID()
 function s.initial_effect(c)
-	--2 co-linked "Mextro" monsters If this card is Link Summoned: You can Special Summon 1 level 4 or lower "Mextro" monster from your hand or Deck to your zone this card points to. During the Main Phase (Quick Effect): You can Tribute 1 "Mextro" Link Monster this card points to; destroy face-up Spells/Traps on the field, up to that monsters Link Rating (max. 3). You can only use each effect of "Mextro Darxstorm" once per turn.
-	local tp=c:GetControler()
-	local ef=Effect.CreateEffect(c)
-	ef:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	ef:SetCode(EVENT_PHASE_START+PHASE_DRAW)
-	ef:SetCountLimit(1,5001+EFFECT_COUNT_CODE_DUEL)
-	ef:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
-	ef:SetOperation(function()
-		local tk=Duel.CreateToken(tp,5000)
-		Duel.SendtoDeck(tk,nil,SEQ_DECKBOTTOM,REASON_RULE)
-		c5000.ops(ef,tp)
-	end)
-	Duel.RegisterEffect(ef,tp)
+	c:EnableReviveLimit()
+	aux.AddLinkProcedure(c,s.mfilter,2,2)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e1:HOPT()
+	e1:SetProperty(EFFECT_FLAG_DELAY)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetCondition(s.spcon)
+	e1:SetTarget(s.sptg)
+	e1:SetOperation(s.spop)
+	c:RegisterEffect(e1)
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetCode(EVENT_FREE_CHAIN)
+	e2:SetRange(LOCATION_MZONE)
+	e2:HOPT()
+	e2:SetCategory(CATEGORY_DESTROY)
+	e2:SetCondition(s.descon)
+	e2:SetCost(s.descost)
+	e2:SetTarget(s.destg)
+	e2:SetOperation(s.desop)
+	c:RegisterEffect(e2)
+end
+function s.mfilter(c)
+	return c:IsSetCard(0xee5) and c:GetMutualLinkedGroupCount()>0
+end
+function s.spcon(e)
+	return e:GetHandler():IsSummonType(SUMMON_TYPE_LINK)
+end
+function s.filter(c,e,tp,z)
+	return z>0 and c:IsLevelBelow(4) and c:IsSetCard(0xee5)
+		and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,tp,z)
+end
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local z=e:GetHandler():GetLinkedZone(tp)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK+LOCATION_HAND,0,1,nil,e,tp,z) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK+LOCATION_HAND)
+end
+function s.spop(e,tp)
+	local z=e:GetHandler():GetLinkedZone(tp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	Duel.SpecialSummon(Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK+LOCATION_HAND,0,1,1,nil,e,tp,z),0,tp,tp,false,false,POS_FACEUP,z)
+end
+function s.descon()
+	local ph=Duel.GetCurrentPhase()
+	return ph==PHASE_MAIN1 or ph==PHASE_MAIN2
+end
+function s.cfilter(c,g)
+	return c:IsSetCard(0xee5) and c:IsLinkAbove(1) and g:IsContains(c)
+end
+function s.descost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.CheckReleaseGroup(tp,s.cfilter,1,nil,e:GetHandler():GetLinkedGroup()) end
+	local tc=Duel.SelectReleaseGroup(tp,s.cfilter,1,1,nil,e:GetHandler():GetLinkedGroup()):GetFirst()
+	Duel.Release(tc,REASON_COST)
+	e:SetLabel(tc:GetLink())
+end
+function s.dfilter(c)
+	return c:IsFaceup() and c:IsType(TYPE_SPELL+TYPE_TRAP)
+end
+function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local g=Duel.GetMatchingGroup(s.dfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
+	if chk==0 then return e:IsCostChecked() and #g>0 end
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
+end
+function s.desop(e,tp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+	local g=Duel.SelectMatchingCard(tp,s.dfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,math.min(3,e:GetLabel()),nil)
+	Duel.HintSelection(g)
+	Duel.Destroy(g,REASON_EFFECT)
 end

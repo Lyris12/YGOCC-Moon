@@ -1,12 +1,9 @@
+--created by Swag, coded by XGlitchy30
 --The Dreary Forest's Lightless Glade
---La Radure Senzaluce della Foresta Tetra
---Scripted by: XGlitchy30
-
 local s,id,o=GetID()
 function s.initial_effect(c)
 	aux.AddDoubleSidedProc(c,SIDE_REVERSE,id-1)
 	c:Activate()
-	--[[During your opponent's End Phase, they cannot activate cards or effects in response to the activation of your "Dreamy Forest" and "Dreary Forest" cards and effects.]]
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_CHAINING)
@@ -14,7 +11,6 @@ function s.initial_effect(c)
 	e1:SetCondition(aux.EndPhaseCond(1))
 	e1:SetOperation(s.chainop)
 	c:RegisterEffect(e1)
-	--[[If a card(s) in your opponent's possession is banished by the effect of a "Dreary Forest" monster you control: You can activate this effect;
 	for the rest of this turn, you take no battle damage from direct attacks, also your opponent takes any effect damage you would take.]]
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(0)
@@ -26,7 +22,6 @@ function s.initial_effect(c)
 	e2:SetCondition(s.effcon)
 	e2:SetOperation(s.effop)
 	c:RegisterEffect(e2)
-	--[[If a "Dreary Forest" monster(s) you control Transforms (except during the Damage Step): You can Transform this card into its [Obverse] side.]]
 	local e3=Effect.CreateEffect(c)
 	e3:Desc(1)
 	e3:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_TRIGGER_O)
@@ -60,7 +55,6 @@ function s.regop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-
 function s.chainop(e,tp,eg,ep,ev,re,r,rp)
 	if ep==tp and re:GetHandler():IsSetCard(ARCHE_DREAMY_FOREST,ARCHE_DREARY_FOREST) and re:GetOwnerPlayer()==tp then
 		Duel.SetChainLimit(s.chainlm)
@@ -69,7 +63,6 @@ end
 function s.chainlm(e,rp,tp)
 	return tp==rp
 end
-
 function s.effcon(e,tp,eg,ep,ev,re,r,rp)
 	if not re then return false end
 	local check=s.triggering_setcode_check[re:GetFieldID()]
@@ -109,7 +102,6 @@ end
 function s.refval(e,re,ev,r,rp,rc)
 	return r&REASON_EFFECT~=0
 end
-
 function s.tffilter(c,tp)
 	return c:IsFaceup() and c:IsControler(tp) and c:IsLocation(LOCATION_MZONE) and c:IsSetCard(ARCHE_DREARY_FOREST)
 end

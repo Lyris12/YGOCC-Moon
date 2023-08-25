@@ -1,12 +1,9 @@
+--created by Swag, coded by XGlitchy30
 --Leylah, Shine of the Dreamy Forest
---Leylah, Luccichio della Foresta Sognante
---Scripted by: XGlitchy30
-
 local s,id,o=GetID()
 function s.initial_effect(c)
 	aux.AddOrigDoubleSidedType(c)
 	aux.AddDoubleSidedProc(c,SIDE_OBVERSE,id+1,id)
-	--[[During your Main or Battle Phase, if you control another "Dreamy Forest" or "Dreary Forest" card (Quick Effect):
 	You can target 1 monster your opponent controls; negate its effects, and if you do, it loses 1000 ATK.]]
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(0)
@@ -21,7 +18,6 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
-	--If this card is Transformed from "Leylah, Shade of the Dreary Forest": You can Tribute this card; Special Summon 1 "Leylah, Light of the Dreamy Forest" from your hand or Deck.
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(1)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -34,7 +30,6 @@ function s.initial_effect(c)
 	e2:SetTarget(s.sptg)
 	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
-	--During your End Phase: You can Transform this card into its [Reverse] side.
 	aux.AddDreamyDrearyTransformation(c,ARCHE_DREARY_FOREST)
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
@@ -58,7 +53,6 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-
 function s.spfilter(c)
 	return c:IsCode(id+2)
 end

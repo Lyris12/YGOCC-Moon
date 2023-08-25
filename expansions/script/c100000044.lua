@@ -1,12 +1,9 @@
+--created by Swag, coded by XGlitchy30
 --Leylah, Shadow of the Dreary Forest
---Leylah, Ombra della Foresta Tetra
---Scripted by: XGlitchy30
-
 local s,id,o=GetID()
 function s.initial_effect(c)
 	aux.AddOrigDoubleSidedType(c)
 	aux.AddDoubleSidedProc(c,SIDE_REVERSE,id-1,id)
-	--[[If this card is Transformed from "Leylah, Light of the Dreamy Forest": You can activate this effect;
 	until the end of your opponent's next turn, this card is unaffected by your opponent's monster effects that do not target it, also it cannot be targeted for attacks, but it does not prevent your opponent from attacking you directly.]]
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(0)
@@ -18,7 +15,6 @@ function s.initial_effect(c)
 	e1:SetOperation(s.effop)
 	c:RegisterEffect(e1)
 	aux.AddPreTransformationCheck(c,e1,id-1)
-	--[[During your opponent's turn, when your opponent activates a card or effect (Quick Effect): You can banish that card]]
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(1)
 	e2:SetCategory(CATEGORY_REMOVE)
@@ -30,7 +26,6 @@ function s.initial_effect(c)
 	e2:SetTarget(s.target)
 	e2:SetOperation(s.operation)
 	c:RegisterEffect(e2)
-	--During your End Phase: You can Transform this card into its [Reverse] side.
 	aux.AddDreamyDrearyTransformation(c,ARCHE_DREAMY_FOREST)
 end
 function s.effop(e,tp,eg,ep,ev,re,r,rp)
@@ -59,7 +54,6 @@ function s.immval(e,te)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	return not g or not g:IsContains(e:GetHandler())
 end
-
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==1-tp and rp==1-tp
 end

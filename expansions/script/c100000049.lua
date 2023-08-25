@@ -1,11 +1,8 @@
+--created by Swag, coded by XGlitchy30
 --Dreamy Forest, Dreary Forest
---Foresta Sognante, Foresta Tetra
---Scripted by: XGlitchy30
-
 local s,id=GetID()
 function s.initial_effect(c)
 	c:Activate()
-	--[["Dreamy Forest" monsters you control gain 500 ATK, and cannot be destroyed by card effects.]]
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_UPDATE_ATTACK)
@@ -18,7 +15,6 @@ function s.initial_effect(c)
 	e1x:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
 	e1x:SetValue(1)
 	c:RegisterEffect(e1x)
-	--[["Dreary Forest" monsters you control gain 500 DEF, and cannot be targeted by your opponent's card effects.]]
 	local e2=e1:Clone()
 	e2:SetCode(EFFECT_UPDATE_DEFENSE)
 	e2:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,ARCHE_DREARY_FOREST))
@@ -28,7 +24,6 @@ function s.initial_effect(c)
 	e2x:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
 	e2x:SetValue(aux.tgoval)
 	c:RegisterEffect(e2x)
-	--[[If a "Dreamy Forest" monster(s) you control Transforms (except during the Damage Step): You can discard 1 random card from your opponent's hand.]]
 	local e3=Effect.CreateEffect(c)
 	e3:Desc(0)
 	e3:SetCategory(CATEGORY_HANDES)
@@ -41,7 +36,6 @@ function s.initial_effect(c)
 	e3:SetTarget(s.dctg)
 	e3:SetOperation(s.dcop)
 	c:RegisterEffect(e3)
-	--[[If a "Dreary Forest" monster(s) you control Transforms (except during the Damage Step): You can draw 1 card.]]
 	local e4=Effect.CreateEffect(c)
 	e4:Desc(1)
 	e4:SetCategory(CATEGORY_DRAW)
@@ -67,7 +61,6 @@ function s.dcop(e,tp,eg,ep,ev,re,r,rp)
 	local sg=g:RandomSelect(1-tp,1)
 	Duel.SendtoGrave(sg,REASON_EFFECT|REASON_DISCARD)
 end
-
 function s.drawtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
 	Duel.SetTargetPlayer(tp)
@@ -78,7 +71,6 @@ function s.drawop(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	Duel.Draw(p,d,REASON_EFFECT)
 end
-
 function s.tffilter(c,tp,arche)
 	return c:IsFaceup() and c:IsControler(tp) and c:IsLocation(LOCATION_MZONE) and c:IsSetCard(arche)
 end

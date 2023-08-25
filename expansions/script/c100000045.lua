@@ -1,12 +1,9 @@
+--created by Swag, coded by XGlitchy30
 --Leylah, Radiance of the Dreamy Forest
---Leylah, Radianza della Foresta Sognante
---Scripted by: XGlitchy30
-
 local s,id,o=GetID()
 function s.initial_effect(c)
 	aux.AddOrigDoubleSidedType(c)
 	aux.AddDoubleSidedProc(c,SIDE_OBVERSE,id+1,id)
-	--[[During your Main or Battle Phase (Quick Effect): You can target 1 card your opponent controls; destroy it, and if you do,
 	you can negate the effects of 1 face-up card your opponent controls, then you can make the ATK of 1 monster your opponent controls become 0.]]
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(0)
@@ -21,7 +18,6 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
-	--If this card is Transformed from "Fay'lah, Cradle of the Dreary Forest": You can return 1 card your opponent controls to the hand.
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(1)
 	e2:SetCategory(CATEGORY_TOHAND)
@@ -34,7 +30,6 @@ function s.initial_effect(c)
 	e2:SetOperation(s.retop)
 	c:RegisterEffect(e2)
 	aux.AddPreTransformationCheck(c,e2,id+1)
-	--During your End Phase: You can Transform this card into its [Reverse] side.
 	aux.AddDreamyDrearyTransformation(c,ARCHE_DREARY_FOREST)
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
@@ -76,7 +71,6 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-
 function s.rettg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToHand,tp,0,LOCATION_ONFIELD,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,0,LOCATION_ONFIELD)

@@ -1,12 +1,9 @@
+--created by Swag, coded by XGlitchy30
 --The Dreamy Forest's Happy Space
---Lo Spazio Felice della Foresta Sognante
---Scripted by: XGlitchy30
-
 local s,id,o=GetID()
 function s.initial_effect(c)
 	aux.AddDoubleSidedProc(c,SIDE_OBVERSE,id+1)
 	c:Activate()
-	--[[During your End Phase, your opponent cannot activate cards or effects in response to the activation of your "Dreamy Forest" and "Dreary Forest" cards and effects.]]
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_CHAINING)
@@ -14,7 +11,6 @@ function s.initial_effect(c)
 	e1:SetCondition(aux.EndPhaseCond(0))
 	e1:SetOperation(s.chainop)
 	c:RegisterEffect(e1)
-	--[[During the Main Phase: You can reveal 1 "Dreamy Forest" monster in your hand; shuffle it into the Deck, and if you do,
 	Set 1 "Dreamy Forest" or "Dreary Forest" Spell/Trap, OR 1 "In the Forest, Black As My Memory", directly from your Deck.]]
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(0)
@@ -27,7 +23,6 @@ function s.initial_effect(c)
 	e2:SetTarget(s.settg)
 	e2:SetOperation(s.setop)
 	c:RegisterEffect(e2)
-	--[[If a "Dreamy Forest" monster(s) you control Transforms (except during the Damage Step): You can Transform this card into its [Reverse] side.]]
 	local e3=Effect.CreateEffect(c)
 	e3:Desc(1)
 	e3:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_TRIGGER_O)
@@ -49,7 +44,6 @@ end
 function s.chainlm(e,rp,tp)
 	return tp==rp
 end
-
 function s.tdfilter(c,tp)
 	return c:IsMonster() and c:IsSetCard(ARCHE_DREAMY_FOREST) and not c:IsPublic() and c:IsAbleToDeck()
 		and Duel.IsExistingMatchingCard(s.setfilter,tp,LOCATION_DECK,0,1,c)
@@ -83,7 +77,6 @@ function s.setop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-
 function s.tffilter(c,tp)
 	return c:IsFaceup() and c:IsControler(tp) and c:IsLocation(LOCATION_MZONE) and c:IsSetCard(ARCHE_DREAMY_FOREST)
 end
