@@ -3,7 +3,8 @@ local s,id,o=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddOrigBigbangType(c)
-	aux.AddBigbangProc(c,aux.FilterBoolFunction(Card.IsCode,111455790),1,1,aux.NOT(aux.FilterEqualFunction(Card.GetVibe,0)),1)
+	--aux.AddBigbangProc(c,aux.FilterBoolFunction(Card.IsCode,111455790),1,1,aux.NOT(aux.FilterEqualFunction(Card.GetVibe,0)),1)
+	aux.AddBigbangProc(c,s.matfilter,2,s.matgroup)
 	aux.AddCodeList(c,111455790)
 	aux.AddMaterialCodeList(c,111455790)
 	--The first time this card would be destroyed by your opponent's card effects each turn, it is not destroyed
@@ -51,6 +52,15 @@ function s.initial_effect(c)
 	c:RegisterEffect(e6)
 end
 s.material_setcode=0xcf11
+function s.matfilter(c)
+	return c:IsCode(111455790) or c:IsPositive() or c:IsNegative()
+end
+function s.matfilter2(c)
+	return c:IsCode(111455790) and c:IsNeutral()
+end
+function s.matgroup(g,c,tp)
+	return not g:IsExists(s.matfilter2,2,nil) and g:IsExists(Card.IsCode,1,nil,111455790)
+end
 function s.atkval(e,c)
 	local tp=c:GetControler()
 	return Duel.GetMatchingGroupCount(aux.FaceupFilter(Card.IsType,TYPE_EQUIP),tp,LOCATION_SZONE,0,nil)*300

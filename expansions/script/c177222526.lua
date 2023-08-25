@@ -54,7 +54,7 @@ function s.sumcon(e)
 	return Duel.GetFlagEffect(e:GetHandlerPlayer(),id)>0 and Duel.IsExistingMatchingCard(s.tlfilter,tp,LOCATION_MZONE,0,1,nil,tp) and Duel.GetFlagEffect(tp,EFFECT_EXTRA_TIMELEAP_MATERIAL)<=0
 end
 function s.tlfilter(c)
-	return c:IsFaceup() and c:IsRace(RACE_PSYCHO) and (c:IsLevel(6) or (c:IsLevel(2) and c:IsDefense(0)))
+	return c:IsFaceup() and c:IsRace(RACE_PSYCHO) and (c:IsLevel(6) or (c:IsLevelBelow(2) and c:IsDefense(0)))
 		and c:IsAbleToRemove(tp,POS_FACEUP,REASON_MATERIAL+REASON_TIMELEAP) and c:IsCanBeTimeleapMaterial() --and (Duel.GetLocationCountFromEx(tp,tp,c,TYPE_TIMELEAP)>0
 end
 function s.sumtg(e,tp,eg,ep,ev,re,r,rp,chk,c)

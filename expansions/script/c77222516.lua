@@ -8,7 +8,7 @@ function s.initial_effect(c)
 	aux.AddBigbangProc(c,s.matfilter1,2)
 	--If this card is Bigbang Summoned: You can add 1 Level 6 or lower Pendulum monster with 0 ATK or DEF from your Deck to your hand.
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_DESTROY+CATEGORY_TOHAND+CATEGORY_SEARCH)
+	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)

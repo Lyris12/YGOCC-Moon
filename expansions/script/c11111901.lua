@@ -3,7 +3,7 @@
 --bigbang summon
 function c11111901.initial_effect(c)
 	aux.AddOrigBigbangType(c)
-	aux.AddBigbangProc(c,aux.FilterEqualFunction(Card.GetVibe,0),2)
+	aux.AddBigbangProc(c,aux.FilterEqualFunction(Card.GetVibe,0),2,2)
 	c:EnableReviveLimit()
 	local e2=Effect.CreateEffect(c)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)

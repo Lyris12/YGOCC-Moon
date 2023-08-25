@@ -86,7 +86,9 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		if #g2>0 then
 			Duel.BreakEffect() 
 			Duel.SpecialSummon(g2,0,tp,tp,false,false,POS_DEFENSE)
+			if g2:GetFirst():IsFacedown() then g:Merge(g2) end
 		end
+		Duel.ConfirmCards(1-tp,g)
 	end
 end
 

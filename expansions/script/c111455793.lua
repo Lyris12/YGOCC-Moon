@@ -68,18 +68,30 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 			end
 		end
 	end
+	--also you cannot Special Summon monsters from the Extra Deck for the rest of this turn, except Bigbang Monsters.
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e1:SetTargetRange(1,0)
+	e1:SetReset(RESET_PHASE+PHASE_END)
+	e1:SetTarget(s.splimit)
+	Duel.RegisterEffect(e1,tp)
+end
+function s.splimit(e,c)
+	return not c:IsType(TYPE_BIGBANG) and c:IsLocation(LOCATION_EXTRA)
 end
 function s.filter2(c,tp)
 	return (c:IsSetCard(0xcf11) or (c:IsRace(RACE_PSYCHO) and c:IsType(TYPE_BIGBANG))) and c:IsControler(tp)
 end
-function s.eqfilter(c)
-	return c:IsType(TYPE_MONSTER)
+function s.eqfilter(c,tp)
+	return c:IsType(TYPE_MONSTER) and not c:IsForbidden() and c:CheckUniqueOnField(tp)
 end
 function s.eqcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.filter2,1,e:GetHandler(),tp)
 end
 function s.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.eqfilter,tp,0,LOCATION_GRAVE,1,nil) and 
+	if chk==0 then return Duel.IsExistingMatchingCard(s.eqfilter,tp,0,LOCATION_GRAVE,1,nil,tp) and 
 		Duel.IsExistingMatchingCard(Card.IsType,tp,LOCATION_MZONE,0,1,nil,TYPE_BIGBANG) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 end
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,g,1,0,0)
 end
@@ -88,7 +100,7 @@ function s.eqlimit(e,c)
 end
 function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
-	local g=Duel.SelectMatchingCard(tp,s.eqfilter,tp,0,LOCATION_GRAVE,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,s.eqfilter,tp,0,LOCATION_GRAVE,1,1,nil,tp)
 	if #g>0 then
 		local g2=Duel.SelectMatchingCard(tp,Card.IsType,tp,LOCATION_MZONE,0,1,1,nil,TYPE_BIGBANG)
 		if #g2>0 and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 then

@@ -57,7 +57,7 @@ function s.val(e,c)
 	return Duel.GetMatchingGroupCount(s.filter,c:GetControler(),LOCATION_MZONE,0,nil)*200
 end
 function s.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0x84)
+	return c:IsFaceup() and c:IsSetCard(0x1084)
 end
 function s.discon(e,tp,eg,ep,ev,re,r,rp)
 	return rp~=tp and Duel.IsBattlePhase() and Duel.IsChainNegatable(ev)
@@ -82,7 +82,7 @@ function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD) and (r&REASON_EFFECT+REASON_BATTLE)~=0
 end
 function s.spfilter(c,e,tp)
-	return c:IsMonster() and c:IsSetCard(0x84) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsMonster() and c:IsSetCard(0x1084) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.spfilter(chkc,e,tp) end

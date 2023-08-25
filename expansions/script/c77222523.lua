@@ -89,8 +89,13 @@ function s.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local rc=re:GetHandler()
 end
 function s.disop(e,tp,eg,ep,ev,re,r,rp)
-	local rc=re:GetHandler()
-	if Duel.NegateActivation(ev) and rc:IsRelateToEffect(re) and rc:IsAbleToChangeControler() then
-		Duel.Overlay(e:GetHandler(),rc)
+	local tc=re:GetHandler()
+	if Duel.NegateActivation(ev) and tc:IsRelateToEffect(re) and tc:IsAbleToChangeControler() then
+		c=e:GetHandler()
+		local og=tc:GetOverlayGroup()
+		if og:GetCount()>0 then
+			Duel.SendtoGrave(og,REASON_RULE)
+		end
+		Duel.Overlay(c,Group.FromCards(tc))
 	end
 end
