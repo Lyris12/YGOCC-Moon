@@ -13,6 +13,7 @@ env:
 - DATABASE_FILE=expansions/Cards-non-QCD.cdb
 - DATABASE_FILE=expansions/official.cdb
 - DATABASE_FILE=expansions/pre-release.cdb
+- DATABASE_FILE=expansions/cards-new.cdb
 
 before_install:
 - git clone --depth=1 --branch=server --recursive https://github.com/purerosefallen/ygopro
