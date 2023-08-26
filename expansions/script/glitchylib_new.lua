@@ -45,12 +45,15 @@ ARCHE_PANDEMONIUM	= 0xf80
 ARCHE_BIGBANG		= 0xbba
 ARCHE_HYPERDRIVE	= 0x660
 
+ARCHE_ABYSSLYM			= 0x49c
 ARCHE_AEONSTRIDE		= 0xae0
+ARCHE_BOMBER_GOBLIN		= 0x30ac
 ARCHE_DOOMSDAY_ARTIFICE	= 0x3a6
 ARCHE_DREAMY_FOREST		= 0xd43
 ARCHE_DREARY_FOREST		= 0xd44
 ARCHE_FLIBBERTY			= 0x855
 ARCHE_GOLDEN_SKIES		= 0x528
+ARCHE_GRENADE_TYPE		= 0x302
 ARCHE_IDOLESCENT		= 0x5a3
 ARCHE_LEYLAH			= 0xd45
 ARCHE_LIFEWEAVER		= 0x5a5
@@ -632,7 +635,7 @@ end
 function Card.CheckNegateConjunction(c,e1,e2,e3)
 	return not c:IsImmuneToEffect(e1) and not c:IsImmuneToEffect(e2) and (not e3 or not c:IsImmuneToEffect(e3))
 end
-function Duel.Negate(tc,e,reset,notfield,forced)
+function Duel.Negate(tc,e,reset,notfield,forced,typ)
 	local rct=1
 	if not reset then
 		reset=0
@@ -640,6 +643,7 @@ function Duel.Negate(tc,e,reset,notfield,forced)
 		rct=reset[2]
 		reset=reset[1]
 	end
+	if not typ then typ=0 end
 	Duel.NegateRelatedChain(tc,RESET_TURN_SET)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -656,7 +660,7 @@ function Duel.Negate(tc,e,reset,notfield,forced)
 	end
 	e2:SetReset(RESET_EVENT|RESETS_STANDARD|reset,rct)
 	tc:RegisterEffect(e2,forced)
-	if not notfield and tc:IsType(TYPE_TRAPMONSTER) then
+	if not notfield and typ&TYPE_TRAP>0 and tc:IsType(TYPE_TRAPMONSTER) then
 		local e3=Effect.CreateEffect(e:GetHandler())
 		e3:SetType(EFFECT_TYPE_SINGLE)
 		e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
@@ -1057,6 +1061,48 @@ function Card.GlitchyGetColumnGroup(c,left,right,without_center)
 		return cg
 	end
 end
+function Card.GlitchyGetPreviousColumnGroup(c,left,right,without_center)
+	local left = (left and aux.GetValueType(left)=="number" and left>=0) and left or 0
+	local right = (right and aux.GetValueType(right)=="number" and right>=0) and right or 0
+	if left==0 and right==0 then
+		return c:GetColumnGroup()
+	else
+		local f = 	function(card,refc,val)
+						local refseq
+						if refc:GetPreviousSequence()<5 then
+							refseq=refc:GetPreviousSequence()
+						else
+							if refc:GetPreviousSequence()==5 then
+								refseq = 1
+							elseif refc:GetPreviousSequence()==6 then
+								refseq = 3
+							end
+						end
+						
+						if card:GetSequence()<5 then
+							if card:IsControler(refc:GetPreviousControler()) then
+								return math.abs(refseq-card:GetSequence())==val
+							else
+								return math.abs(refseq+card:GetSequence()-4)==val
+							end
+						
+						elseif card:GetSequence()==5 then
+							local seq = card:IsControler(refc:GetPreviousControler()) and 1 or 3
+							return math.abs(refseq-seq)==val
+						elseif card:GetSequence()==6 then
+							local seq = card:IsControler(refc:GetPreviousControler()) and 3 or 1
+							return math.abs(refseq-seq)==val
+						end
+					end
+					
+		local lg=Duel.Group(f,c:GetPreviousControler(),LOCATION_MZONE+LOCATION_SZONE,LOCATION_MZONE+LOCATION_SZONE,nil,c,left)
+		local cg = without_center and Group.CreateGroup() or c:GetColumnGroup()
+		local rg=Duel.Group(f,c:GetPreviousControler(),LOCATION_MZONE+LOCATION_SZONE,LOCATION_MZONE+LOCATION_SZONE,nil,c,right)
+		cg:Merge(lg)
+		cg:Merge(rg)
+		return cg
+	end
+end
 
 --Exception
 function Auxiliary.ActivateException(e,chk)
@@ -1143,10 +1189,11 @@ function Auxiliary.Option(id,tp,desc,...)
 	return sel
 end
 
-function Duel.RegisterHint(p,flag,reset,rct,id,desc)
+function Duel.RegisterHint(p,flag,reset,rct,id,desc,prop)
 	if not reset then reset=PHASE_END end
 	if not rct then rct=1 end
-	return Duel.RegisterFlagEffect(p,flag,RESET_PHASE+reset,EFFECT_FLAG_CLIENT_HINT,rct,0,aux.Stringid(id,desc))
+	if not prop then prop=0 end
+	return Duel.RegisterFlagEffect(p,flag,RESET_PHASE+reset,EFFECT_FLAG_CLIENT_HINT|prop,rct,0,aux.Stringid(id,desc))
 end
 
 --EDOPro Imported
@@ -1752,7 +1799,8 @@ function Effect.HOPT(e,oath,ct)
 	end
 	local flag=0
 	if oath then
-		flag=flag|EFFECT_COUNT_CODE_OATH
+		if type(oath)~="number" then oath=EFFECT_COUNT_CODE_OATH end
+		flag=flag|oath
 	end
 	return e:SetCountLimit(ct,cid+flag)
 end
@@ -1769,7 +1817,8 @@ function Effect.SHOPT(e,oath)
 	
 	local flag=0
 	if oath then
-		flag=flag|EFFECT_COUNT_CODE_OATH
+		if type(oath)~="number" then oath=EFFECT_COUNT_CODE_OATH end
+		flag=flag|oath
 	end
 	
 	return e:SetCountLimit(1,cid+flag)
@@ -1860,6 +1909,48 @@ function Card.IsPreviousAttackOnField(c,atk)
 end
 function Card.IsPreviousDefenseOnField(c,def)
 	return c:GetPreviousDefenseOnField()==def
+end
+
+--Check archetype at Activation
+function Auxiliary.RegisterTriggeringArchetypeCheck(c,setc)
+	local s=getmetatable(c)
+	if not s.TriggeringSetcodeCheck then
+		s.TriggeringSetcodeCheck=true
+		s.TriggeringSetcode={}
+		local ge1=Effect.CreateEffect(c)
+		ge1:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
+		ge1:SetCode(EVENT_CHAIN_CREATED)
+		ge1:SetOperation(aux.UpdateTriggeringArchetypeCheck(s,setc))
+		Duel.RegisterEffect(ge1,0)
+		return ge1
+	end
+	return
+end
+function Auxiliary.UpdateTriggeringArchetypeCheck(s,setc)
+	return	function(e,tp,eg,ep,ev,re,r,rp)
+				local cid=Duel.GetChainInfo(ev,CHAININFO_CHAIN_ID)
+				local rc=re:GetHandler()
+				if rc:IsSetCard(setc) then
+					s.TriggeringSetcode[cid]=true
+					return
+				end
+				s.TriggeringSetcode[cid]=false
+			end
+end
+
+function Auxiliary.CheckArchetypeReasonEffect(s,re,setc)
+	local rc=re:GetHandler()
+	local ch=Duel.GetCurrentChain()
+	local cid=Duel.GetChainInfo(ch,CHAININFO_CHAIN_ID)
+	if re:IsActivated() then
+		if rc:IsRelateToChain(ch) then
+			return rc:IsSetCard(setc)
+		else
+			return s.TriggeringSetcode[cid]
+		end
+	else
+		return rc:IsSetCard(setc)
+	end
 end
 
 --Pendulum-related
