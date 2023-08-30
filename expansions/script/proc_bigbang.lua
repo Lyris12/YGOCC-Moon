@@ -140,6 +140,7 @@ end
 function Card.IsCanBeBigbangMaterial(c,ec)
 	--if c:IsType(TYPE_LINK) and not c:IsHasEffect(EFFECT_EXTRA_BIGBANG_VIBE) then return false end
 	if c:IsOnField() and not c:IsFaceup() then return false end
+	if c:IsHasEffect(EFFECT_INDESTRUCTABLE) then return false end
 	local tef={c:IsHasEffect(EFFECT_CANNOT_BE_BIGBANG_MATERIAL)}
 	for _,te in ipairs(tef) do
 		local val=te:GetValue()
@@ -384,7 +385,8 @@ function Auxiliary.BigbangCondition(gf,ignore_sumreq,...)
 				
 				local mg,mg2
 				if matg and aux.GetValueType(matg)=="Group" then
-					mg=matg:Filter(Card.IsCanBeBigbangMaterial,nil,c)  ---matg:Filter(aux.NOT(Card.IsDestructable),nil,e) THIS Card.IsDestructable CHECK MUST NOT BE PERFORMED SINCE BIGBANG MATERIALS ARE NOT DESTROYED BY AN EFFECT
+					mg=matg:Filter(Card.IsCanBeBigbangMaterial,nil,c)
+					---matg:Filter(aux.NOT(Card.IsDestructable),nil,e) THIS Card.IsDestructable CHECK MUST NOT BE PERFORMED SINCE BIGBANG MATERIALS ARE NOT DESTROYED BY AN EFFECT
 					mg2=matg:Filter(Auxiliary.BigbangExtraFilter,nil,c,tp,table.unpack(funs))			
 				else
 					mg=Duel.GetMatchingGroup(Card.IsCanBeBigbangMaterial,tp,LOCATION_MZONE,0,nil,c)
