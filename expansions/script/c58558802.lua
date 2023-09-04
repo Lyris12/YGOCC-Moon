@@ -47,7 +47,7 @@ function cid.extg(e,c)
 	return c:IsType(TYPE_MONSTER) and c:IsSetCard(ARCHE_FLIBBERTY)
 end
 function cid.filter(c)
-	return c:IsSetCard(ARCHE_FLIBBERTY) and c:IsFaceup()
+	return c:IsSetCard(ARCHE_FLIBBERTY) and c:IsFaceup() and c:IsCanTurnSet()
 end
 function cid.postg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingTarget(cid.filter,tp,LOCATION_MZONE,0,1,nil) end

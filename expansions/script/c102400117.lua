@@ -73,7 +73,7 @@ function s.reset(c)
 	return c:GetFlagEffect(id)>0
 end
 function s.rfilter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x7c4) and c:GetDestination()&LOCATION_DECK==0 and (c:IsOnField() or c:GetFlagEffect(id)>0)
+	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x7c4) and (c:IsOnField() or c:GetFlagEffect(id)>0)
 end
 function s.rchk(c)
 	return not c:IsReason(REASON_DESTROY)
