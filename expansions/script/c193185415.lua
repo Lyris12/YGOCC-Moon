@@ -65,6 +65,6 @@ function cm.milop(e,tp,eg,ep,ev,re,r,rp)
 	if g:IsExists(cm.filter,1,nil) then
 		local sg=g:FilterSelect(tp,cm.filter,1,1,nil)
 		Duel.DisableShuffleCheck()
-		Duel.SendtoGrave(sg,nil,REASON_EFFECT)
+		Duel.SendtoGrave(sg,REASON_EFFECT)
 	else Duel.ShuffleDeck(tp) end
 end
