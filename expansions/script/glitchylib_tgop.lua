@@ -1652,8 +1652,8 @@ function Auxiliary.SSFilter(f,sumtype,sump,ign1,ign2,pos,recp,zone)
 	if not pos then pos=POS_FACEUP end
 	if not zone then zone=0xff end
 	return	function(c,e,tp,...)
-				local sump = sump and sump==1 and 1-tp or tp
-				local recp = recp and recp==1 and 1-tp or tp
+				if not sump then sump=tp end
+				if not recp then recp=tp end
 				local zone = type(zone)=="number" and zone or zone(e,tp)
 				return (not f or f(c,e,tp,...)) and c:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos,recp,zone)
 			end
@@ -1665,8 +1665,8 @@ function Auxiliary.SSFromExtraDeckFilter(f,sumtype,sump,ign1,ign2,pos,recp,zone)
 	if not pos then pos=POS_FACEUP end
 	if not zone then zone=0xff end
 	return	function(c,e,tp,...)
-				local sump = sump and sump==1 and 1-tp or tp
-				local recp = recp and recp==1 and 1-tp or tp
+				if not sump then sump=tp end
+				if not recp then recp=tp end
 				local zone = type(zone)=="number" and zone or zone(e,tp)
 				return (not f or f(c,e,tp,...)) and c:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos,recp,zone)
 					and Duel.GetLocationCountFromEx(recp,sump,nil,c,zone)>0
@@ -1679,7 +1679,7 @@ function Auxiliary.SSToEitherFieldFilter(f,sumtype,sump,ign1,ign2,pos,zone1,zone
 	if not pos then pos=POS_FACEUP end
 	if not zone then zone=0xff end
 	return	function(c,e,tp,...)
-				local sump = sump and sump==1 and 1-tp or tp
+				if not sump then sump=tp end
 				local zone = type(zone)=="number" and zone or zone(e,tp)
 				return (not f or f(c,e,tp,...))
 					and (c:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos,tp,zone1) or c:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos,1-tp,zone2))
@@ -1702,10 +1702,11 @@ function Auxiliary.SSTarget(f,loc1,loc2,min,exc,sumtype,sump,ign1,ign2,pos,recp,
 	if type(f)=="function" or type(f)=="nil" then
 		if min==1 then
 			return	function (e,tp,eg,ep,ev,re,r,rp,chk)
-						local sump = sump and sump==1 and 1-tp or tp
-						local recp = recp and recp==1 and 1-tp or tp
+						local sump = (sump and sump==1) and 1-tp or tp
+						local recp = (recp and recp==1) and 1-tp or tp
 						local zone = type(zone)=="number" and zone or zone(e,tp)
 						if exc then exc=e:GetHandler() end
+						
 						if chk==0 then
 							local check = (e:GetLabel()==1) or (Duel.GetLocationCount(recp,LOCATION_MZONE,sump,LOCATION_REASON_TOFIELD,zone)>=min and Duel.IsExistingMatchingCard(aux.SSFilter(f,sumtype,sump,ign1,ign2,pos,recp,zone),tp,loc1,loc2,min,exc,e,tp,eg,ep,ev,re,r,rp))
 							e:SetLabel(0)
