@@ -185,7 +185,7 @@ dofile("expansions/script/proc_relay.lua") --Relays					0 x 200 0000 0000
 dofile("expansions/script/proc_harmony.lua") --Harmonies			0 x 800 0000 0000
 dofile("expansions/script/proc_accent.lua") --Accents				0 x 1000 0000 0000
 dofile("expansions/script/proc_magick.lua") --Magick				0 x 8 0000 0000 0000
-dofile("expansions/script/proc_xros.lua") --Xroses					0 x 10 0000 0000 0000
+--dofile("expansions/script/proc_xros.lua") --Xroses					0 x 10 0000 0000 0000	(BREAKS TIMELEAP FUNCTIONS)
 dofile("expansions/script/proc_evolve.lua") --Evolves				0 x 20 0000 0000 0000
 dofile("expansions/script/proc_drive.lua") --Drive 					0 x 40 0000 0000 0000
 dofile("expansions/script/muse_proc.lua") --"Muse"
@@ -2302,8 +2302,9 @@ if not global_card_effect_table_global_check then
 		
 		if e:GetType()&(EFFECT_TYPE_ACTIONS)==0 then
 			local e = e:IsHasType(EFFECT_TYPE_GRANT) and e:GetLabelObject() or e
+			local code=e:GetCode()
 			
-			if e:GetCode()==EFFECT_UPDATE_LEVEL or e:GetCode()==EFFECT_CHANGE_LEVEL then
+			if code==EFFECT_UPDATE_LEVEL or code==EFFECT_CHANGE_LEVEL then
 				local ce=e:Clone()
 				if e:GetCode()==EFFECT_UPDATE_LEVEL then
 					ce:SetCode(EFFECT_UPDATE_RANK)
@@ -2322,7 +2323,7 @@ if not global_card_effect_table_global_check then
 				end
 				self.register_global_card_effect_table(self,ce,forced)
 			
-			elseif e:GetCode()==EFFECT_DISABLE or e:GetCode()==EFFECT_DISABLE_EFFECT or e:GetCode()==EFFECT_DISABLE_CHAIN or e:GetCode()==EFFECT_DISABLE_TRAPMONSTER then
+			elseif code==EFFECT_DISABLE or code==EFFECT_DISABLE_EFFECT or code==EFFECT_DISABLE_CHAIN or code==EFFECT_DISABLE_TRAPMONSTER then
 				if e:GetType()==EFFECT_TYPE_SINGLE then
 					local cond=e:GetCondition()
 					if not cond then
@@ -2339,7 +2340,7 @@ if not global_card_effect_table_global_check then
 					end
 				end
 				
-			elseif e:GetCode()==EFFECT_EXTRA_SUMMON_COUNT or e:GetCode()==EFFECT_EXTRA_SET_COUNT then
+			elseif code==EFFECT_EXTRA_SUMMON_COUNT or code==EFFECT_EXTRA_SET_COUNT then
 				local s,o=e:GLGetTargetRange()
 				if s~=0 and s&LOCATION_GRAVE==0 then
 					s=s|LOCATION_GRAVE
@@ -2349,7 +2350,7 @@ if not global_card_effect_table_global_check then
 				end
 				e:SetTargetRange(s,o)
 				
-			elseif e:GetCode()==EFFECT_UPDATE_ATTACK or e:GetCode()==EFFECT_SET_ATTACK or e:GetCode()==EFFECT_SET_ATTACK_FINAL or e:GetCode()==EFFECT_SWAP_AD then
+			elseif code==EFFECT_UPDATE_ATTACK or code==EFFECT_SET_ATTACK or code==EFFECT_SET_ATTACK_FINAL or code==EFFECT_SWAP_AD then
 				if e:IsHasType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_XMATERIAL) then
 					if e:IsHasType(EFFECT_TYPE_SINGLE) and self:IsHasEffect(EFFECT_GLITCHY_CANNOT_CHANGE_ATK) then
 						for _,ce in ipairs({self:IsHasEffect(EFFECT_GLITCHY_CANNOT_CHANGE_ATK)}) do

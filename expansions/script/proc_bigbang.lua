@@ -386,7 +386,6 @@ function Auxiliary.BigbangCondition(gf,ignore_sumreq,...)
 				local mg,mg2
 				if matg and aux.GetValueType(matg)=="Group" then
 					mg=matg:Filter(Card.IsCanBeBigbangMaterial,nil,c)
-					---matg:Filter(aux.NOT(Card.IsDestructable),nil,e) THIS Card.IsDestructable CHECK MUST NOT BE PERFORMED SINCE BIGBANG MATERIALS ARE NOT DESTROYED BY AN EFFECT
 					mg2=matg:Filter(Auxiliary.BigbangExtraFilter,nil,c,tp,table.unpack(funs))			
 				else
 					mg=Duel.GetMatchingGroup(Card.IsCanBeBigbangMaterial,tp,LOCATION_MZONE,0,nil,c)

@@ -7,7 +7,7 @@ xpcall(function() require("expansions/script/glitchylib_helper") end,function() 
 xpcall(function() require("expansions/script/glitchylib_aeonstride") end,function() require("script/glitchylib_aeonstride") end)
 function s.initial_effect(c)
 	aux.AddOrigTimeleapType(c)
-	aux.AddTimeleapProc(c,5,s.TLcon,{s.TLmaterial,true},s.TLop)
+	aux.AddTimeleapProc(c,5,s.TLcon,{s.TLmaterial,true},{s.TLop,s.TLval})
 	aux.SpawnGlitchyHelper(GLITCHY_HELPER_TURN_COUNT_FLAG)
 	aux.RaiseAeonstrideEndOfTurnEvent(c)
 	c:EnableReviveLimit()
@@ -57,7 +57,6 @@ function s.TLcon(e,c)
 	return Duel.PlayerHasFlagEffect(c:GetControler(),id)
 end
 function s.TLmaterial(c,e)
-	if not c:IsMonster(TYPE_PENDULUM) or not c:IsAbleToExtra() then return false end
 	return c:CheckTimeleapMaterialLevel(e:GetHandler()) or (c:IsSetCard(ARCHE_AEONSTRIDE) and c:IsLevelBelow(4))
 end
 function s.TLop(e,tp,eg,ep,ev,re,r,rp,c,g)
@@ -69,7 +68,10 @@ function s.TLop(e,tp,eg,ep,ev,re,r,rp,c,g)
 	if #g>0 then
 		Duel.Remove(g,POS_FACEUP,REASON_MATERIAL+REASON_TIMELEAP)
 	end
-	aux.TimeleapHOPT(tp)
+end
+function s.TLval(c,e,tp)
+	if not c:IsMonster(TYPE_PENDULUM) or not c:IsAbleToExtra() then return false end
+	return true
 end
 
 --FILTERS E1

@@ -6,7 +6,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddOrigTimeleapType(c)
-	aux.AddTimeleapProc(c,11,s.TLcon,aux.FilterBoolFunction(Card.IsSetCard,0xae6),s.TLop)
+	aux.AddTimeleapProc(c,11,s.TLcon,aux.FilterBoolFunction(Card.IsSetCard,0xae6),{s.TLop,s.TLval})
 	--deck search
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
@@ -32,7 +32,9 @@ function s.TLcon(e,c)
 end
 function s.TLop(e,tp,eg,ep,ev,re,r,rp,c,g)
 	Duel.Remove(g,POS_FACEDOWN,REASON_MATERIAL+REASON_TIMELEAP)
-	aux.TimeleapHOPT(tp)
+end
+function s.TLval(c,e,tp)
+	return c:IsAbleToRemove(tp,POS_FACEDOWN)
 end
 --deck search
 function s.condition(e)

@@ -11,6 +11,7 @@ REASON_DRIVE	= 0x80000000000
 
 FLAG_ENGAGE = 348
 FLAG_ZERO_ENERGY = 349
+FLAG_ENERGY_CHANGE = 350
 
 EFFECT_DRIVE_ORIGINAL_ENERGY 		= 34843
 EFFECT_DRIVE_ENERGY 				= 34844
@@ -183,7 +184,7 @@ function Auxiliary.DriveCondition(e,c)
 end
 
 --ENGAGING PROCEDURE
-function Card.IsCanEngage(c,tp,ignore_ruling)
+function Card.IsCanEngage(c,tp,ignore_ruling,e)
 	return (not c:IsLocation(LOCATION_HAND) or not c:IsEngaged()) and (ignore_ruling or not Duel.IsExistingMatchingCard(Card.IsEngaged,tp,LOCATION_HAND,0,1,c))
 end
 function Card.IsEngaged(c)
@@ -306,7 +307,7 @@ function Auxiliary.CheckEnergyOperation(e,tp)
 	Duel.Hint(HINT_SOUND,0,aux.Stringid(DRIVE_STRINGS,4))
 	if en<=20 and en>0 then
 		c:SetTurnCounter(en)
-	else
+	elseif en>=0 then
 		Duel.AnnounceNumber(tp,en)
 	end
 end
@@ -611,7 +612,7 @@ function Card.GetEnergy(c)
 			end
 		end
 	end
-	return energy
+	return math.max(0,energy)
 end
 function Card.GetOriginalEnergy(c)
 	if not Auxiliary.Drives[c] then return false end
@@ -622,7 +623,7 @@ function Card.GetOriginalEnergy(c)
 	else
 		energy=te:GetValue()
 	end
-	return energy
+	return math.max(0,energy)
 end
 
 function Card.CheckZeroEnergySelfDestroy(c,ct)
@@ -683,76 +684,107 @@ function Card.IsCanResetEnergy(c,p,r)
 	return ct and c:IsHasEnergy() and not c:IsEnergy(ct)
 end
 
-function Card.UpdateEnergy(c,val,p,r,reset,rc,e,val2)
+aux.EnergyChangeEventParams = {}
+aux.EnergyChangeEventGroup = nil
+function Card.UpdateEnergy(c,val,p,r,reset,rc,e,val2,step)
 	local reset = (type(reset)=="number" or not reset) and reset or 0
-	local rc = rc and rc or c
 	if not val2 then val2=val end
 	
-	local enchk = val>=0 or c:IsEnergyAbove(math.abs(val2))
-	if r&REASON_COST==REASON_COST and r&REASON_REPLACE==0 then
-		local available_effects = {}
-		local g=Group.CreateGroup()
-		local egroup={Duel.IsPlayerAffectedByEffect(p,EFFECT_REPLACE_UPDATE_ENERGY_COST)}
-		for _,ce in ipairs(egroup) do
-			if ce and ce.SetLabel then
-				local cond=ce:GetCondition()
-				if ce:CheckCountLimit(p) and (not cond or cond(ce,c,e,p,ct)) then
-					g:AddCard(ce:GetOwner())
-					table.insert(available_effects,ce)
+	local type=aux.GetValueType(c)
+	if type=="Card" then
+		local rc = rc and rc or c
+		local enchk = val>=0 or c:IsEnergyAbove(math.abs(val2))
+		if r&REASON_COST==REASON_COST and r&REASON_REPLACE==0 then
+			local available_effects = {}
+			local g=Group.CreateGroup()
+			local egroup={Duel.IsPlayerAffectedByEffect(p,EFFECT_REPLACE_UPDATE_ENERGY_COST)}
+			for _,ce in ipairs(egroup) do
+				if ce and ce.SetLabel then
+					local cond=ce:GetCondition()
+					if ce:CheckCountLimit(p) and (not cond or cond(ce,c,e,p,ct)) then
+						g:AddCard(ce:GetOwner())
+						table.insert(available_effects,ce)
+					end
 				end
+			end
+			if #available_effects>0 and (not enchk or Duel.SelectYesNo(p,STRING_ASK_REPLACE_UPDATE_ENERGY_COST)) then
+				local tc=g:Select(p,1,1,nil):GetFirst()
+				local specific_available_effects, options = {}, {}
+				local ce
+				for _,aveff in ipairs(available_effects) do
+					if aveff:GetOwner()==tc then
+						table.insert(specific_available_effects,aveff)
+						table.insert(options,aveff:GetDescription())
+					end
+				end
+				if #specific_available_effects>1 then
+					ce=specific_available_effects[Duel.SelectOption(p,table.unpack(options))+1]
+				else
+					ce=specific_available_effects[1]
+				end
+				local op=ce:GetOperation()
+				local res=op(ce,c,e,p,ct)
+				if res then
+					ce:UseCountLimit(p)
+				end
+				return res
 			end
 		end
-		if #available_effects>0 and (not enchk or Duel.SelectYesNo(p,STRING_ASK_REPLACE_UPDATE_ENERGY_COST)) then
-			local tc=g:Select(p,1,1,nil):GetFirst()
-			local specific_available_effects, options = {}, {}
-			local ce
-			for _,aveff in ipairs(available_effects) do
-				if aveff:GetOwner()==tc then
-					table.insert(specific_available_effects,aveff)
-					table.insert(options,aveff:GetDescription())
-				end
+		
+		local en=c:GetEnergy()
+		local e1=Effect.CreateEffect(rc)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_UPDATE_ENERGY)
+		e1:SetCondition(aux.ResetIfNotEngaged(c:GetEngagedID()))
+		e1:SetValue(val)
+		if reset then
+			if r&REASON_EFFECT>0 then
+				reset = rc==c and reset|RESET_DISABLE or reset
 			end
-			if #specific_available_effects>1 then
-				ce=specific_available_effects[Duel.SelectOption(p,table.unpack(options))+1]
+			e1:SetReset(RESET_EVENT|RESETS_STANDARD|reset)
+		end
+		c:RegisterEffect(e1)
+		local diff=c:GetEnergy()-en
+		if r&REASON_TEMPORARY==0 then
+			aux.CheckEnergyOperation(c,p)
+			Duel.RaiseSingleEvent(c,EVENT_ENERGY_CHANGE,e,r,p,c:GetControler(),diff)
+			if c:HasFlagEffect(FLAG_ENERGY_CHANGE) then c:ResetFlagEffect(FLAG_ENERGY_CHANGE) end
+			if not step then
+				Duel.RaiseEvent(c,EVENT_ENERGY_CHANGE,e,r,p,c:GetControler(),diff)
 			else
-				ce=specific_available_effects[1]
+				if #aux.EnergyChangeEventParams==0 then
+					aux.EnergyChangeEventParams={e,r,p,0,0}
+				end
+				if not aux.EnergyChangeEventGroup then
+					aux.EnergyChangeEventGroup=Group.CreateGroup()
+					aux.EnergyChangeEventGroup:KeepAlive()
+				end
+				c:RegisterFlagEffect(FLAG_ENERGY_CHANGE,0,0,1,diff)
+				aux.EnergyChangeEventGroup:AddCard(c)
 			end
-			local op=ce:GetOperation()
-			local res=op(ce,c,e,p,ct)
-			if res then
-				ce:UseCountLimit(p)
+			if c:GetEnergy()==0 then
+				Auxiliary.DriveSelfToGraveOp(c)
 			end
-			return res
+		end
+		if reset then
+			return e1,diff
+		else
+			return e1
 		end
 	end
-	
-	local en=c:GetEnergy()
-	local e1=Effect.CreateEffect(rc)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_UPDATE_ENERGY)
-	e1:SetCondition(aux.ResetIfNotEngaged(c:GetEngagedID()))
-	e1:SetValue(val)
-	if reset then
-		if r&REASON_EFFECT>0 then
-			reset = rc==c and reset|RESET_DISABLE or reset
-		end
-		e1:SetReset(RESET_EVENT|RESETS_STANDARD|reset)
-	end
-	c:RegisterEffect(e1)
-	local diff=c:GetEnergy()-en
-	if r&REASON_TEMPORARY==0 then
-		aux.CheckEnergyOperation(c,p)
-		Duel.RaiseEvent(c,EVENT_ENERGY_CHANGE,e,r,p,c:GetControler(),diff)
+end
+function Duel.UpdateEnergyComplete()
+	local g=aux.EnergyChangeEventGroup:Clone()
+	Duel.RaiseEvent(g,EVENT_ENERGY_CHANGE,table.unpack(aux.EnergyChangeEventParams))
+	for c in aux.Next(g) do
 		if c:GetEnergy()==0 then
 			Auxiliary.DriveSelfToGraveOp(c)
 		end
 	end
-	if reset then
-		return e,diff
-	else
-		return e
-	end
+	aux.EnergyChangeEventParams={}
+	aux.EnergyChangeEventGroup:DeleteGroup()
 end
+
 function Card.IncreaseOrDecreaseEnergy(c,val,p,r,reset,rc,e,val2)
 	local n={}
 	for i=-1,1,2 do

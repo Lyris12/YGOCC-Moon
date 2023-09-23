@@ -7,7 +7,7 @@ function s.initial_effect(c)
 	c:EnableReviveLimit()
 	c:SetUniqueOnField(LOCATION_MZONE,0,id)
 	aux.AddOrigTimeleapType(c)
-	aux.AddTimeleapProc(c,12,s.TLcon,{s.TLfil,true},s.TLop)
+	aux.AddTimeleapProc(c,12,s.TLcon,{s.TLfil,true},{s.TLop,s.TLval})
 	--sslimit
 	local e0=Effect.CreateEffect(c)
 	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
@@ -35,7 +35,7 @@ function s.initial_effect(c)
 end
 --timeleap summon
 function s.TLfil(c,e)
-	return c:IsMonster(TYPE_TIMELEAP) and c:IsFuture(11) and c:IsSetCard(0xae6) and c:IsAbleToRemove(e:GetHandlerPlayer(),POS_FACEDOWN)
+	return c:IsMonster(TYPE_TIMELEAP) and c:IsFuture(11) and c:IsSetCard(0xae6)
 end
 function s.TLcon(e,c)
 	local tp=e:GetHandlerPlayer()
@@ -45,7 +45,9 @@ function s.TLcon(e,c)
 end
 function s.TLop(e,tp,eg,ep,ev,re,r,rp,c,g)
 	Duel.Remove(g,POS_FACEDOWN,REASON_MATERIAL+REASON_TIMELEAP)
-	aux.TimeleapHOPT(tp)
+end
+function s.TLval(c,e,tp)
+	return c:IsAbleToRemove(tp,POS_FACEDOWN)
 end
 --
 function s.tlimit(e,se,sp,st)

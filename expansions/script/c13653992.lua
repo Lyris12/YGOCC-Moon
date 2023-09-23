@@ -6,7 +6,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddOrigTimeleapType(c)
-	aux.AddTimeleapProc(c,11,s.TLcon,s.TLmaterial,s.TLop)
+	aux.AddTimeleapProc(c,11,s.TLcon,s.TLmaterial,{s.TLop,s.TLval})
 	--base stats
 	local e01=Effect.CreateEffect(c)
 	e01:SetType(EFFECT_TYPE_SINGLE)
@@ -57,7 +57,10 @@ function s.excfilter(c)
 	return c:IsFacedown() or not c:IsSetCard(0xae6)
 end
 function s.TLmaterial(c,e)
-	return c:IsSetCard(0xae6) and c:IsAbleToRemove(e:GetHandlerPlayer(),POS_FACEDOWN)
+	return c:IsSetCard(0xae6)
+end
+function s.TLval(c,e,tp)
+	return c:IsAbleToRemove(tp,POS_FACEDOWN)
 end
 function s.TLcon(e,c)
 	local g=Duel.GetFieldGroup(e:GetHandlerPlayer(),LOCATION_ONFIELD+LOCATION_GRAVE,0)
@@ -66,7 +69,6 @@ function s.TLcon(e,c)
 end
 function s.TLop(e,tp,eg,ep,ev,re,r,rp,c,g)
 	Duel.Remove(g,POS_FACEDOWN,REASON_MATERIAL+REASON_TIMELEAP)
-	aux.TimeleapHOPT(tp)
 end
 --base stats
 function s.atkval(e,c)

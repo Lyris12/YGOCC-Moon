@@ -4,7 +4,7 @@ local cid,id=GetID()
 function cid.initial_effect(c)
 	--time leap procedure
 	aux.AddOrigTimeleapType(c,false)
-	aux.AddTimeleapProc(c,8,cid.sumcon,cid.tlfilter,cid.tlcustomop)
+	aux.AddTimeleapProc(c,8,cid.sumcon,cid.tlfilter,{cid.tlcustomop,s.TLval})
 	c:EnableReviveLimit()
 	--Toadally Gaiaemperor.
 	local e1=Effect.CreateEffect(c)
@@ -39,9 +39,10 @@ function cid.initial_effect(c)
 end
 function cid.tlcustomop(e,tp,eg,ep,ev,re,r,rp,c,g)
 	Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_MATERIAL+REASON_TIMELEAP)
-	aux.TimeleapHOPT(tp)
 end
-
+function s.TLval(c)
+	return c:IsAbleToDeck()
+end
 function cid.confilter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x9b5)
 end
@@ -49,7 +50,7 @@ function cid.sumcon(e,c)
 	return Duel.GetMatchingGroupCount(cid.confilter,c:GetControler(),LOCATION_GRAVE,0,nil)>=5
 end
 function cid.tlfilter(c,e,mg)
-	return c:IsCode(20181407) and c:GetLevel()==e:GetHandler():GetFuture()-1 and c:IsAbleToDeck()
+	return c:IsCode(20181407) and c:GetLevel()==e:GetHandler():GetFuture()-1
 end
 function cid.actfilter(c,tp,eg,ep,ev,re,r,rp)
 	return c:GetType()&TYPE_PANDEMONIUM==TYPE_PANDEMONIUM and c:IsSetCard(0x9b5)

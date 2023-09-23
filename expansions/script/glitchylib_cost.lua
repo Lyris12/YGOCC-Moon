@@ -398,8 +398,10 @@ end
 function Auxiliary.SSRestrictionCost(f,oath,reset,id,cf,desc,cost)
 	if id then
 		if not cf then
+			--aux.AddSSCounter(id,f)
 			Duel.AddCustomActivityCounter(id,ACTIVITY_SPSUMMON,f)
 		else
+			--aux.AddSSCounter(id,cf)
 			Duel.AddCustomActivityCounter(id,ACTIVITY_SPSUMMON,cf)
 		end
 	end

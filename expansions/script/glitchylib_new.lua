@@ -26,6 +26,7 @@ CATEGORY_FLAG_DELAYED_RESOLUTION	= 0x2
 EFFECT_SET_SPSUMMON_LIMIT			= 39503
 
 --Archetypes
+ARCHE_CRYSTRON						= 0xea
 ARCHE_GALAXY						= 0x7b
 ARCHE_GALAXY_EYES					= 0x107b
 ARCHE_NUMBER						= 0x48
@@ -91,6 +92,7 @@ CARD_THE_ORIGIN_OF_DRAGONS				= 20157309
 CARD_ZERO_HERO_MAGMA_MAN				= 30409
 CARD_ZEROST_BEAST_ZEROTL 				= 100000025
 
+TOKEN_CRYSTRON							= 55326323
 TOKEN_DRAGON_EGG						= 20157305
 TOKEN_NEBULA							= 218201917
 TOKEN_RIVAL								= 11110646
@@ -143,6 +145,10 @@ STRING_CANNOT_BE_TRIBUTED						=	740
 STRING_CANNOT_BE_MATERIAL						=	741
 STRING_CAN_BE_TREATED_AS_TUNER					=	742
 STRING_UNAFFECTED_BY_OTHER_EFFECT				=	743
+STRING_REGULAR_TIMELEAP_SUMMON					=	744
+STRING_CANNOT_DIRECT_ATTACK						=	745
+STRING_ATK										=	746
+STRING_DEF										=	747
 
 STRING_ASK_REPLACE_UPDATE_ENERGY_COST	= 	900
 STRING_ASK_ENGAGE						=	901
@@ -161,6 +167,8 @@ STRING_ASK_SEND_TO_GY					=	913
 STRING_ASK_SPSUMMON						=	914
 STRING_ASK_DRAW							=	915
 STRING_ASK_SUMMON						=	916
+STRING_ASK_EXCAVATE						=	917
+STRING_ASK_TO_EXTRA						=	918
 
 STRING_SEND_TO_EXTRA					=	1006
 STRING_BANISH							=	1102
@@ -180,6 +188,8 @@ HINTMSG_ENERGY							=	2100
 HINTMSG_TRANSFORM						=	2101
 HINTMSG_TOEXTRA							=	2102
 HINTMSG_FLIPSUMMON						=	2103
+HINTMSG_ATTACH							=	2104
+HINTMSG_ATTACHTO						=	2105
 
 --Locations
 LOCATION_ENGAGED	=	0x1000
@@ -534,6 +544,7 @@ end
 function Auxiliary.ReturnLabelObjectToFieldOp(id,lingering_effect_to_reset)
 	return	function(e,tp,eg,ep,ev,re,r,rp)
 				local g=e:GetLabelObject()
+				local ltype=aux.GetValueType(lingering_effect_to_reset)
 				--Debug.Message("OBJSIZE: "..#g)
 				local sg=g:Filter(Card.HasFlagEffect,nil,id)
 				local rg=Group.CreateGroup()
@@ -568,6 +579,8 @@ function Auxiliary.ReturnLabelObjectToFieldOp(id,lingering_effect_to_reset)
 								rg:Merge(sgs)
 							end
 						end
+						local sgf=sg1:Filter(Card.IsPreviousLocation,nil,LOCATION_FZONE)
+						rg:Merge(sgf)
 					end
 				end
 				--Debug.Message(#rg)
@@ -591,19 +604,23 @@ function Auxiliary.ReturnLabelObjectToFieldOp(id,lingering_effect_to_reset)
 							Duel.ReturnToField(tc,tc:GetPreviousPosition(),0xff&(~EXTRA_MONSTER_ZONE))
 							if e1 then e1:Reset() end
 						end
+						if ltype=="number" then
+							tc:ResetFlagEffect(lingering_effect_to_reset)
+						end
 					end
 				end
-				if aux.GetValueType(lingering_effect_to_reset)=="Effect" then
+				if ltype=="Effect" then
 					lingering_effect_to_reset:Reset()
 				end
 				g:DeleteGroup()
 			end
 end
 
-function Duel.EquipAndRegisterLimit(p,be_equip,equip_to,...)
+--For cards that equip other cards to themselves ONLY
+function Duel.EquipAndRegisterLimit(e,p,be_equip,equip_to,...)
 	local res=Duel.Equip(p,be_equip,equip_to,...)
 	if res and equip_to:GetEquipGroup():IsContains(be_equip) then
-		local e1=Effect.CreateEffect(equip_to)
+		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetProperty(EFFECT_FLAG_OWNER_RELATE)
 		e1:SetCode(EFFECT_EQUIP_LIMIT)
@@ -613,8 +630,28 @@ function Duel.EquipAndRegisterLimit(p,be_equip,equip_to,...)
 					end
 				   )
 		be_equip:RegisterEffect(e1)
+		return true
 	end
-	return res and equip_to:GetEquipGroup():IsContains(be_equip)
+	return false
+end
+--For effects that equip a card to another card
+function Duel.EquipToOtherCardAndRegisterLimit(e,p,be_equip,equip_to,...)
+	local res=Duel.Equip(p,be_equip,equip_to,...)
+	if res and equip_to:GetEquipGroup():IsContains(be_equip) then
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e1:SetCode(EFFECT_EQUIP_LIMIT)
+		e1:SetLabelObject(equip_to)
+		e1:SetReset(RESET_EVENT|RESETS_STANDARD)
+		e1:SetValue(function(e,c)
+						return e:GetLabelObject()==c
+					end
+				   )
+		be_equip:RegisterEffect(e1)
+		return true
+	end
+	return false
 end
 function Duel.EquipAndRegisterCustomLimit(f,p,be_equip,equip_to,...)
 	local res=Duel.Equip(p,be_equip,equip_to,...)
@@ -717,11 +754,14 @@ function Duel.Search(g,tp,p)
 	end
 	return ct,#cg,cg
 end
-function Duel.SearchAndCheck(g,tp,p)
+function Duel.SearchAndCheck(g,tp,p,brk)
 	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
 	local ct=Duel.SendtoHand(g,p,REASON_EFFECT)
 	local cg=g:Filter(aux.PLChk,nil,tp,LOCATION_HAND)
 	if #cg>0 then
+		if brk then
+			Duel.BreakEffect()
+		end
 		Duel.ConfirmCards(1-tp,cg)
 	end
 	return ct>0 and #cg>0
@@ -985,6 +1025,9 @@ function Card.IsContained(c,g,exc)
 end
 
 --Chain Info
+function Duel.GetTargetPlayer()
+	return Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
+end
 function Duel.GetTargetParam()
 	return Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)
 end
@@ -1205,7 +1248,40 @@ function Duel.RegisterHint(p,flag,reset,rct,id,desc,prop)
 	return Duel.RegisterFlagEffect(p,flag,RESET_PHASE+reset,EFFECT_FLAG_CLIENT_HINT|prop,rct,0,aux.Stringid(id,desc))
 end
 
---EDOPro Imported
+--EDOPro Imports
+function Auxiliary.BitSplit(v)
+	local res={}
+	local i=0
+	while 2^i<=v do
+		local p=2^i
+		if v & p~=0 then
+			table.insert(res,p)
+		end
+		i=i+1
+	end
+	return pairs(res)
+end
+function Auxiliary.GetAttributeStrings(v)
+	local t = {
+		[ATTRIBUTE_EARTH] = 1010,
+		[ATTRIBUTE_WATER] = 1011,
+		[ATTRIBUTE_FIRE] = 1012,
+		[ATTRIBUTE_WIND] = 1013,
+		[ATTRIBUTE_LIGHT] = 1014,
+		[ATTRIBUTE_DARK] = 1015,
+		[ATTRIBUTE_DIVINE] = 1016
+	}
+	local res={}
+	local ct=0
+	for _,att in Auxiliary.BitSplit(v) do
+		if t[att] then
+			table.insert(res,t[att])
+			ct=ct+1
+		end
+	end
+	return pairs(res)
+end
+
 function Group.CheckSameProperty(g,f,...)
 	local chk=nil
 	for tc in aux.Next(g) do
@@ -1363,6 +1439,14 @@ function Duel.PlayerHasFlagEffectLabel(tp,id,val)
 	return false
 end
 
+function Auxiliary.FixNegativeLabel(n)
+	if n<2147483648 then
+		return n
+	else
+		return n-4294967296
+	end
+end
+
 --Gain Effect
 function Auxiliary.GainEffectType(c,oc,reset)
 	if not oc then oc=c end
@@ -1375,6 +1459,22 @@ function Auxiliary.GainEffectType(c,oc,reset)
 		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
 		c:RegisterEffect(e,true)
 	end
+end
+
+--Groups
+function Group.GetControlers(g)
+	local p=PLAYER_NONE
+	if #g==0 then return p end
+	for i=0,1 do
+		if g:IsExists(Card.IsControler,1,nil,i) then
+			if p==PLAYER_NONE then
+				p=i
+			else
+				p=PLAYER_ALL
+			end
+		end
+	end
+	return p
 end
 
 --Hint timing
@@ -1590,9 +1690,15 @@ function Card.GetZone(c,tp)
 	return rzone
 end
 function Card.GetPreviousZone(c,tp)
-	local rzone = c:IsControler(tp) and (1 <<c:GetPreviousSequence()) or (1 << (16+c:GetPreviousSequence()))
-	if c:GetPreviousSequence()==5 or c:GetPreviousSequence()==6 then
-		rzone = rzone | (c:IsControler(tp) and (1 << (16 + 11 - c:GetPreviousSequence())) or (1 << (11 - c:GetPreviousSequence())))
+	local rzone
+	if c:IsPreviousLocation(LOCATION_MZONE) then
+		rzone = c:IsControler(tp) and (1 <<c:GetPreviousSequence()) or (1 << (16+c:GetPreviousSequence()))
+		if c:GetPreviousSequence()==5 or c:GetPreviousSequence()==6 then
+			rzone = rzone | (c:IsControler(tp) and (1 << (16 + 11 - c:GetPreviousSequence())) or (1 << (11 - c:GetPreviousSequence())))
+		end
+	
+	elseif c:IsPreviousLocation(LOCATION_SZONE) then
+		rzone = c:IsControler(tp) and (1 << (8+c:GetPreviousSequence())) or (1 << (24+c:GetPreviousSequence()))
 	end
 	return rzone
 end
@@ -2562,6 +2668,171 @@ end
 
 --ARCHETYPAL FUNCTIONS
 
+----ILLUSION MONSTERS
+function Auxiliary.AddIllusionBattleEffect(c)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
+	e1:SetTarget(aux.IllusionBattleEffectTarget)
+	e1:SetValue(1)
+	c:RegisterEffect(e1)
+	return e1
+end
+function Auxiliary.IllusionBattleEffectTarget(e,c)
+	local h=e:GetHandler()
+	return c==h or c==h:GetBattleTarget()
+end
+
+----AIRCASTER
+function Auxiliary.AddAircasterExcavateEffect(c,ct,typ,desc,id,e,cat,altf)
+	if typ==EFFECT_TYPE_TRIGGER_O then
+		local e1=Effect.CreateEffect(c)
+		e1:Desc(desc)
+		e1:SetCategory(CATEGORY_TOGRAVE|CATEGORY_DECKDES)
+		e1:SetType(EFFECT_TYPE_SINGLE|EFFECT_TYPE_TRIGGER_O)
+		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+		e1:SetCode(EVENT_SUMMON_SUCCESS)
+		e1:SetTarget(aux.AircasterExcavateTarget(ct))
+		e1:SetOperation(aux.AircasterExcavateOperation(ct))
+		c:RegisterEffect(e1)
+		local e2=e1:SpecialSummonEventClone(c)
+		local e3=e1:FlipSummonEventClone(c)
+		return e1,e2,e3
+	
+	elseif typ==EFFECT_TYPE_QUICK_O then
+		if not cat then cat=0 end
+		local e1=Effect.CreateEffect(c)
+		e1:Desc(desc)
+		e1:SetCategory(CATEGORY_TOGRAVE|CATEGORY_DECKDES|cat)
+		e1:SetType(EFFECT_TYPE_QUICK_O)
+		e1:SetCode(EVENT_FREE_CHAIN)
+		e1:SetRange(LOCATION_HAND)
+		e1:SetRelevantTimings()
+		e1:SetTarget(aux.AircasterExcavateTarget(ct,typ,id,e))
+		e1:SetOperation(aux.AircasterExcavateOperation(ct,typ,id,e,altf))
+		c:RegisterEffect(e1)
+		return e1
+	
+	elseif typ==EFFECT_TYPE_IGNITION then
+		local e1=Effect.CreateEffect(c)
+		e1:Desc(desc)
+		e1:SetCategory(CATEGORY_TOGRAVE|CATEGORY_DECKDES)
+		e1:SetType(EFFECT_TYPE_IGNITION)
+		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+		e1:SetRange(LOCATION_MZONE)
+		if id then
+			e1:SetCost(aux.DetachSelfCost())
+		else
+			e1:OPT()
+		end
+		e1:SetTarget(aux.AircasterExcavateTarget(ct))
+		e1:SetOperation(aux.AircasterExcavateOperation(ct))
+		c:RegisterEffect(e1)
+		return e1
+	end
+end
+function Auxiliary.AircasterExcavateFilter(c,altf)
+	return c:IsMonster() and ((not altf and c:IsRace(RACE_PSYCHIC)) or (altf and c:IsSetCard(ARCHE_AIRCASTER))) and c:IsAbleToGrave()
+end
+function Auxiliary.AircasterExcavateTarget(ct,typ,id)
+	if not typ then
+		return	function(e,tp,eg,ep,ev,re,r,rp,chk)
+					if chk==0 then return Duel.IsPlayerCanDiscardDeck(tp,ct) end
+					Duel.SetTargetPlayer(tp)
+					Duel.SetPossibleOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
+				end
+	
+	elseif typ==EFFECT_TYPE_QUICK_O then
+		return	function(e,tp,eg,ep,ev,re,r,rp,chk)
+					local c=e:GetHandler()
+					if chk==0 then return not c:HasFlagEffect(id) and c:IsAbleToGrave() end
+					c:RegisterFlagEffect(id,RESET_EVENT|RESETS_STANDARD|RESET_CHAIN,0,1)
+					Duel.SetCardOperationInfo(c,CATEGORY_TOGRAVE)
+					Duel.SetPossibleOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
+				end
+	end
+end
+function Auxiliary.AircasterExcavateOperation(ct,typ,id,ge,altf)
+	if not typ then
+		return	function(e,tp,eg,ep,ev,re,r,rp,chk)
+					local p=Duel.GetTargetPlayer()
+					if not Duel.IsPlayerCanDiscardDeck(p,ct) then return end
+					Duel.ConfirmDecktop(p,ct)
+					local g=Duel.GetDecktopGroup(p,ct)
+					local sg=g:Filter(aux.AircasterExcavateFilter,nil,altf)
+					if #sg>0 then
+						Duel.DisableShuffleCheck()
+						Duel.SendtoGrave(sg,REASON_EFFECT|REASON_EXCAVATE)
+					end
+					Duel.ShuffleDeck(p)
+				end
+	
+	elseif typ==EFFECT_TYPE_QUICK_O then
+		return	function(e,tp,eg,ep,ev,re,r,rp,chk)
+					local c=e:GetHandler()
+					if c:IsRelateToChain() and Duel.SendtoGrave(c,REASON_EFFECT)>0 and c:IsInGY() and Duel.IsPlayerCanDiscardDeck(tp,ct) and c:AskPlayer(tp,STRING_ASK_EXCAVATE) then
+						if ge then
+							local eff=ge:Clone()
+							eff:SetLabel(e:GetFieldID())
+							Duel.RegisterEffect(eff,tp)
+						end
+						Duel.BreakEffect()
+						Duel.ConfirmDecktop(p,ct)
+						local g=Duel.GetDecktopGroup(p,ct)
+						local sg=g:Filter(aux.AircasterExcavateFilter,nil)
+						if #sg>0 then
+							Duel.DisableShuffleCheck()
+							Duel.SendtoGrave(sg,REASON_EFFECT|REASON_EXCAVATE)
+						end
+						Duel.ShuffleDeck(p)
+					end
+				end
+	end
+end
+
+function Auxiliary.AddAircasterEquipEffect(c,desc)
+	local e1=Effect.CreateEffect(c)
+	e1:Desc(desc)
+	e1:SetCategory(CATEGORY_EQUIP)
+	e1:SetType(EFFECT_TYPE_SINGLE|EFFECT_TYPE_TRIGGER_F)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetCode(EVENT_TO_GRAVE)
+	e1:SetCondition(aux.AircasterEquipCond)
+	e1:SetTarget(aux.AircasterEquipTarget)
+	e1:SetOperation(aux.AircasterEquipOperation)
+	c:RegisterEffect(e1)
+	return e1
+end
+function Auxiliary.AircasterEquipCond(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return c:IsPreviousLocation(LOCATION_DECK) and c:GetReason()&(REASON_EFFECT|REASON_EXCAVATE)==REASON_EFFECT|REASON_EXCAVATE
+end
+function Auxiliary.AircasterEquipTarget(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() end
+	if chk==0 then return true end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
+	Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
+	local c=e:GetHandler()
+	Duel.SetOperationInfo(0,CATEGORY_EQUIP,c,1,c:GetControler(),c:GetLocation())
+	if c:IsInGY() then
+		Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,c,1,c:GetControler(),0)
+	end
+end
+function Auxiliary.AircasterEquipOperation(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 or not c:IsRelateToChain() then return end
+	local tc=Duel.GetFirstTarget()
+	if not tc then return end
+	if tc:IsFacedown() or not tc:IsRelateToChain() then
+		if not c:IsLocation(LOCATION_GB) then
+			Duel.SendtoGrave(c,REASON_RULE)
+		end
+		return
+	end
+	Duel.EquipToOtherCardAndRegisterLimit(e,tp,c,tc)
+end
 
 ----DREAMY/DREARY FOREST
 function Auxiliary.AddDreamyDrearyTransformation(c,status)

@@ -7,7 +7,7 @@ xpcall(function() require("expansions/script/glitchylib_helper") end,function() 
 xpcall(function() require("expansions/script/glitchylib_aeonstride") end,function() require("script/glitchylib_aeonstride") end)
 function s.initial_effect(c)
 	aux.AddOrigTimeleapType(c)
-	aux.AddTimeleapProc(c,7,s.TLcon,s.TLmaterial,s.TLop)
+	aux.AddTimeleapProc(c,7,s.TLcon,s.TLmaterial,{s.TLop,s.TLval})
 	aux.SpawnGlitchyHelper(GLITCHY_HELPER_TURN_COUNT_FLAG)
 	aux.RaiseAeonstrideEndOfTurnEvent(c)
 	c:EnableReviveLimit()
@@ -67,12 +67,14 @@ function s.TLcon(e,c)
 	return Duel.GetTurnCount(nil,true)>=3
 end
 function s.TLmaterial(c,e)
-	if not c:IsSetCard(ARCHE_AEONSTRIDE) then return false end
+	return c:IsSetCard(ARCHE_AEONSTRIDE)
+end
+function s.TLval(c,e,tp)
 	if c:IsMonster(TYPE_PENDULUM) then
 		return c:IsAbleToExtra()
 	else
 		return c:IsAbleToRemove()
-	end 
+	end
 end
 function s.TLop(e,tp,eg,ep,ev,re,r,rp,c,g)
 	local pg=g:Filter(Card.IsType,nil,TYPE_PENDULUM)
