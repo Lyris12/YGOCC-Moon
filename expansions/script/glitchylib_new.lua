@@ -48,6 +48,12 @@ ARCHE_HYPERDRIVE	= 0x660
 
 ARCHE_ABYSSLYM			= 0x49c
 ARCHE_AEONSTRIDE		= 0xae0
+
+ARCHE_AIRCASTER			= 0xa88
+ARCHE_FLAIRCASTER		= 0x1a88
+ARCHE_DESPAIRCASTER		= 0x2a88
+ARCHE_FAIRCASTER		= 0x4a88
+
 ARCHE_BOMBER_GOBLIN		= 0x30ac
 ARCHE_DOOMSDAY_ARTIFICE	= 0x3a6
 ARCHE_DREAMY_FOREST		= 0xd43
@@ -61,9 +67,11 @@ ARCHE_LEYLAH			= 0xd45
 ARCHE_LIFEWEAVER		= 0x5a5
 ARCHE_METALURGOS		= 0x5a4
 ARCHE_MMS				= 0xd71
+
 ARCHE_NUMBER_I			= 0x2048
 ARCHE_NUMBER_I39		= 0x6048
 ARCHE_NUMBER_IC39		= 0xa048
+
 ARCHE_ORIGIN_DRAGON		= 0xfc1
 ARCHE_OSCURION			= 0x5a6
 ARCHE_TRAPPIT			= 0x54a
@@ -303,6 +311,18 @@ function Duel.Select(hint,target,tp,f,pov,loc1,loc2,min,max,exc,...)
 	
 	Duel.Hint(HINT_SELECTMSG,tp,hint)
 	local g=func(tp,f,pov,loc1,loc2,min,max,exc,...)
+	return g
+end
+function Duel.ForcedSelect(hint,target,tp,f,pov,loc1,loc2,min,max,exc,...)
+	if aux.GetValueType(target)~="boolean" then return false end
+	local func = (target==true) and Duel.SelectTarget or Duel.SelectMatchingCard
+	local hint = hint or HINTMSG_TARGET
+	
+	Duel.Hint(HINT_SELECTMSG,tp,hint)
+	local g=func(tp,f,pov,loc1,loc2,min,max,exc,...)
+	if not g or #g==0 then
+		g=func(tp,f,pov,loc1,loc2,min,max,exc)
+	end
 	return g
 end
 function Duel.Group(f,tp,loc1,loc2,exc,...)
@@ -847,6 +867,12 @@ function Card.IsNormalST(c)
 end
 function Card.IsST(c,typ)
 	return c:IsType(TYPE_ST) and (aux.GetValueType(typ)~="number" or c:IsType(typ))
+end
+function Card.IsMonsterCard(c)
+	return c:IsOriginalType(TYPE_MONSTER)
+end
+function Card.IsPendulumMonsterCard(c)
+	return c:IsOriginalType(TYPE_PENDULUM) and c:IsOriginalType(TYPE_MONSTER)
 end
 function Card.MonsterOrFacedown(c)
 	return c:IsMonster() or c:IsFacedown()
@@ -1628,8 +1654,8 @@ function Card.IsInMainSequence(c)
 	return c:IsSequenceBelow(4)
 end
 
-function Card.IsSpellTrapOnField(c)
-	return not c:IsLocation(LOCATION_MZONE) or (c:IsFaceup() and c:IsST())
+function Card.IsSpellTrapOnField(c,typ)
+	return not c:IsLocation(LOCATION_MZONE) or (c:IsFaceup() and c:IsST(typ))
 end
 function Card.NotOnFieldOrFaceup(c)
 	return not c:IsOnField() or c:IsFaceup()
@@ -1808,7 +1834,8 @@ end
 
 --Location Groups
 function Duel.GetHand(p)
-	return Duel.GetFieldGroup(p,LOCATION_HAND,0)
+	local g=Duel.GetFieldGroup(p,LOCATION_HAND,0)
+	return g,#g
 end
 function Duel.GetHandCount(p)
 	return Duel.GetFieldGroupCount(p,LOCATION_HAND,0)
@@ -2703,6 +2730,7 @@ function Auxiliary.AddAircasterExcavateEffect(c,ct,typ,desc,id,e,cat,altf)
 	
 	elseif typ==EFFECT_TYPE_QUICK_O then
 		if not cat then cat=0 end
+		if id==ARCHE_DESPAIRCASTER then cat=cat|CATEGORY_HANDES end
 		local e1=Effect.CreateEffect(c)
 		e1:Desc(desc)
 		e1:SetCategory(CATEGORY_TOGRAVE|CATEGORY_DECKDES|cat)
@@ -2710,6 +2738,11 @@ function Auxiliary.AddAircasterExcavateEffect(c,ct,typ,desc,id,e,cat,altf)
 		e1:SetCode(EVENT_FREE_CHAIN)
 		e1:SetRange(LOCATION_HAND)
 		e1:SetRelevantTimings()
+		if id==ARCHE_FLAIRCASTER then
+			e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+			e1:HOPT(true)
+			e1:SetCost(aux.RevealSelfCost())
+		end
 		e1:SetTarget(aux.AircasterExcavateTarget(ct,typ,id,e))
 		e1:SetOperation(aux.AircasterExcavateOperation(ct,typ,id,e,altf))
 		c:RegisterEffect(e1)
@@ -2737,10 +2770,20 @@ function Auxiliary.AircasterExcavateFilter(c,altf)
 	return c:IsMonster() and ((not altf and c:IsRace(RACE_PSYCHIC)) or (altf and c:IsSetCard(ARCHE_AIRCASTER))) and c:IsAbleToGrave()
 end
 function Auxiliary.AircasterExcavateTarget(ct,typ,id)
-	if not typ then
+	if not typ or (id and id==ARCHE_FLAIRCASTER) then
 		return	function(e,tp,eg,ep,ev,re,r,rp,chk)
-					if chk==0 then return Duel.IsPlayerCanDiscardDeck(tp,ct) end
+					if chk==0 then return Duel.IsPlayerCanDiscardDeck(tp,ct) and Duel.IsPlayerCanSendtoGrave(tp) end
 					Duel.SetTargetPlayer(tp)
+					Duel.SetPossibleOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
+				end
+	
+	elseif (id and id==ARCHE_DESPAIRCASTER) then
+		return	function(e,tp,eg,ep,ev,re,r,rp,chk)
+					local c=e:GetHandler()
+					if chk==0 then return not c:HasFlagEffect(id) and c:IsDiscardable(REASON_EFFECT) and Duel.IsPlayerCanDiscardDeck(tp,ct) and Duel.IsPlayerCanSendtoGrave(tp) end
+					c:RegisterFlagEffect(id,RESET_EVENT|RESETS_STANDARD|RESET_CHAIN,0,1)
+					Duel.SetCardOperationInfo(c,CATEGORY_TOGRAVE)
+					Duel.SetCardOperationInfo(c,CATEGORY_HANDES)
 					Duel.SetPossibleOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
 				end
 	
@@ -2755,10 +2798,34 @@ function Auxiliary.AircasterExcavateTarget(ct,typ,id)
 	end
 end
 function Auxiliary.AircasterExcavateOperation(ct,typ,id,ge,altf)
-	if not typ then
+	if (id and id==ARCHE_FLAIRCASTER) then
 		return	function(e,tp,eg,ep,ev,re,r,rp,chk)
 					local p=Duel.GetTargetPlayer()
 					if not Duel.IsPlayerCanDiscardDeck(p,ct) then return end
+					if ge then
+						local eff=ge:Clone()
+						eff:SetLabel(e:GetFieldID())
+						e:GetHandler():RegisterEffect(eff)
+					end
+					Duel.ConfirmDecktop(p,ct)
+					local g=Duel.GetDecktopGroup(p,ct)
+					local sg=g:Filter(aux.AircasterExcavateFilter,nil,altf)
+					if #sg>0 then
+						Duel.DisableShuffleCheck()
+						Duel.SendtoGrave(sg,REASON_EFFECT|REASON_EXCAVATE)
+					end
+					Duel.ShuffleDeck(p)
+				end
+				
+	elseif not typ then
+		return	function(e,tp,eg,ep,ev,re,r,rp,chk)
+					local p=Duel.GetTargetPlayer()
+					if not Duel.IsPlayerCanDiscardDeck(p,ct) then return end
+					if ge then
+						local eff=ge:Clone()
+						eff:SetLabel(e:GetFieldID())
+						Duel.RegisterEffect(eff,tp)
+					end
 					Duel.ConfirmDecktop(p,ct)
 					local g=Duel.GetDecktopGroup(p,ct)
 					local sg=g:Filter(aux.AircasterExcavateFilter,nil,altf)
@@ -2769,24 +2836,46 @@ function Auxiliary.AircasterExcavateOperation(ct,typ,id,ge,altf)
 					Duel.ShuffleDeck(p)
 				end
 	
-	elseif typ==EFFECT_TYPE_QUICK_O then
+	elseif (id and id==ARCHE_DESPAIRCASTER) then
 		return	function(e,tp,eg,ep,ev,re,r,rp,chk)
 					local c=e:GetHandler()
-					if c:IsRelateToChain() and Duel.SendtoGrave(c,REASON_EFFECT)>0 and c:IsInGY() and Duel.IsPlayerCanDiscardDeck(tp,ct) and c:AskPlayer(tp,STRING_ASK_EXCAVATE) then
+					if c:IsRelateToChain() and c:IsDiscardable(REASON_EFFECT) and Duel.SendtoGrave(c,REASON_EFFECT|REASON_DISCARD)>0 and Duel.IsPlayerCanDiscardDeck(tp,ct) then
 						if ge then
 							local eff=ge:Clone()
 							eff:SetLabel(e:GetFieldID())
 							Duel.RegisterEffect(eff,tp)
 						end
 						Duel.BreakEffect()
-						Duel.ConfirmDecktop(p,ct)
-						local g=Duel.GetDecktopGroup(p,ct)
+						Duel.ConfirmDecktop(tp,ct)
+						local g=Duel.GetDecktopGroup(tp,ct)
 						local sg=g:Filter(aux.AircasterExcavateFilter,nil)
 						if #sg>0 then
 							Duel.DisableShuffleCheck()
 							Duel.SendtoGrave(sg,REASON_EFFECT|REASON_EXCAVATE)
 						end
-						Duel.ShuffleDeck(p)
+						Duel.ShuffleDeck(tp)
+					end
+				end
+	
+	elseif typ==EFFECT_TYPE_QUICK_O then
+		return	function(e,tp,eg,ep,ev,re,r,rp,chk)
+					local c=e:GetHandler()
+					if c:IsRelateToChain() and Duel.SendtoGrave(c,REASON_EFFECT)>0 and c:IsInGY() and Duel.IsPlayerCanDiscardDeck(tp,ct) and Duel.IsPlayerCanSendtoGrave(tp)
+					and c:AskPlayer(tp,STRING_ASK_EXCAVATE) then
+						if ge then
+							local eff=ge:Clone()
+							eff:SetLabel(e:GetFieldID())
+							Duel.RegisterEffect(eff,tp)
+						end
+						Duel.BreakEffect()
+						Duel.ConfirmDecktop(tp,ct)
+						local g=Duel.GetDecktopGroup(tp,ct)
+						local sg=g:Filter(aux.AircasterExcavateFilter,nil)
+						if #sg>0 then
+							Duel.DisableShuffleCheck()
+							Duel.SendtoGrave(sg,REASON_EFFECT|REASON_EXCAVATE)
+						end
+						Duel.ShuffleDeck(tp)
 					end
 				end
 	end

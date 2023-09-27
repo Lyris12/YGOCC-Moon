@@ -1,97 +1,74 @@
+--Flaircaster Unison
 --created by Alastar Rainford, coded by Lyris
+--New auxiliaries by: XGlitchy30
+
 local s,id=GetID()
 function s.initial_effect(c)
 	aux.EnablePendulumAttribute(c)
+	--atk
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_UPDATE_ATTACK)
 	e1:SetRange(LOCATION_PZONE)
-	e1:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-	e1:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0xa88))
+	e1:SetTargetRange(LOCATION_MZONE,0)
+	e1:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,ARCHE_AIRCASTER))
 	e1:SetValue(s.evalue)
 	c:RegisterEffect(e1)
+	--spsummon
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_QUICK_O)
-	e2:SetCode(EVENT_FREE_CHAIN)
+	e2:Desc(1)
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_TRIGGER_F)
+	e2:SetCode(EVENT_TO_GRAVE)
 	e2:SetRange(LOCATION_HAND)
-	e2:SetCategory(CATEGORY_DECKDES)
-	e2:SetCountLimit(1,id)
-	e2:SetTarget(s.target)
-	e2:SetOperation(s.operation)
-	c:RegisterEffect(e2)
+	e2:SetFunctions(s.spcon,nil,s.sptg,s.spop)
+	e2:SetReset(RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_END)
+	--excavate
+	local ex=aux.AddAircasterExcavateEffect(c,3,EFFECT_TYPE_QUICK_O,0,ARCHE_FLAIRCASTER,e2,CATEGORY_SPECIAL_SUMMON)
+	e2:SetLabelObject(ex)
+	--equip
+	aux.AddAircasterEquipEffect(c,2)
+	--damage
 	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_TRIGGER_F+EFFECT_TYPE_SINGLE)
-	e3:SetCode(EVENT_CUSTOM+id)
-	e3:SetRange(LOCATION_HAND)
-	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e3:SetLabelObject(e2)
-	e3:SetCondition(function(e) return e:GetLabelObject():GetLabel()>0 end)
-	e3:SetTarget(s.atarget)
-	e3:SetOperation(s.aoperation)
+	e3:Desc(3)
+	e3:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
+	e3:SetCode(EVENT_BATTLE_CONFIRM)
+	e3:SetRange(LOCATION_SZONE)
+	e3:SetCondition(s.econ)
+	e3:SetOperation(s.damop)
 	c:RegisterEffect(e3)
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e4:SetCode(EVENT_TO_GRAVE)
-	e4:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
-	e4:SetCondition(s.con)
-	e4:SetCategory(CATEGORY_EQUIP)
-	e4:SetTarget(s.eqtg)
-	e4:SetOperation(s.eqop)
-	c:RegisterEffect(e4)
-	local e6=Effect.CreateEffect(c)
-	e6:SetType(EFFECT_TYPE_SINGLE)
-	e6:SetCode(EFFECT_EQUIP_LIMIT)
-	e6:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e6:SetValue(aux.TRUE)
-	c:RegisterEffect(e6)
-	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e5:SetCode(EVENT_BATTLE_CONFIRM)
-	e5:SetRange(LOCATION_SZONE)
-	e5:SetCondition(function(e) return Duel.GetAttacker()==e:GetHandler():GetEquipTarget() end)
-	e5:SetOperation(function(e,tp) Duel.Damage(1-tp,500,REASON_EFFECT) end)
-	c:RegisterEffect(e5)
 end
 function s.evalue(e,c)
-	return Duel.GetMatchingGroupCount(aux.AND(Card.IsFaceup,Card.IsSetCard),tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil,0xa88)*300
+	return Duel.GetMatchingGroupCount(aux.FaceupFilter(Card.IsSetCard,ARCHE_AIRCASTER),tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)*300
 end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsPlayerCanDiscardDeck(tp,3) and not e:GetHandler():IsPublic() end
+
+function s.cfilter(c,eid,e)
+	local re=c:GetReasonEffect()
+	return c:IsMonster() and c:IsRace(RACE_PSYCHIC) and c:IsReason(REASON_EFFECT) and re and re==e and re:GetFieldID()==eid
 end
-function s.operation(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) or not Duel.IsPlayerCanDiscardDeck(tp,3)
-		or not Duel.SelectYesNo(tp,aux.Stringid(id,0)) then return end
-	Duel.ConfirmDecktop(tp,3)
-	local g=Duel.GetDecktopGroup(tp,3)
-	local tg=g:Filter(Card.IsRace,nil,RACE_PSYCHO)
-	if Duel.SendtoGrave(tg,REASON_EFFECT+REASON_REVEAL)==0 then Duel.ShuffleDeck(tp) end
-	e:SetLabel(#tg)
-	Duel.RaiseSingleEvent(c,EVENT_CUSTOM+id,re,r,rp,tp,0)
+function s.spcon(e,tp,eg,ep,ev,re,r,rp)
+	if not re then return false end
+	local eid=e:GetLabel()
+	if not eid then return false end
+	return eg:IsExists(s.cfilter,1,nil,eid,e:GetLabelObject())
 end
-function s.atarget(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
+	Duel.SetCardOperationInfo(e:GetHandler(),CATEGORY_SPECIAL_SUMMON)
 end
-function s.aoperation(e,tp,eg,ep,ev,re,r,rp)
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) then Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP) end
+	if c:IsRelateToChain() then
+		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+	end
 end
-function s.con(e,tp,eg,ep,ev,re,r,rp)
+
+function s.econ(e)
 	local c=e:GetHandler()
-	return c:IsPreviousLocation(LOCATION_DECK) and c:IsReason(REASON_REVEAL)
+	local eqc=c:GetEquipTarget()
+	return eqc and c:IsSpell(TYPE_EQUIP) and Duel.GetAttacker()==eqc
 end
-function s.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() end
-	if chk==0 then return true end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
-	Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
-	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,e:GetHandler(),1,0,0)
-end
-function s.eqop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) then return end
-	local tc=Duel.GetFirstTarget()
-	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 or not tc or tc:IsFacedown() or not tc:IsRelateToEffect(e) then return end
-	Duel.Equip(tp,c,tc,true)
+function s.damop(e,tp)
+	Duel.Hint(HINT_CARD,tp,id)
+	Duel.Damage(1-tp,500,REASON_EFFECT)
 end

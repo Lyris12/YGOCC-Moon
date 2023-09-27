@@ -1,8 +1,12 @@
---created by Alastar Rainford, coded by Lyris
+--Aircaster's Zero Tolerance
+--created by Alastar Rainford, originally coded by Lyris
+--Rescripted by: XGlitchy30
+
 local s,id=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_TOGRAVE+CATEGORY_SPECIAL_SUMMON+CATEGORY_EQUIP)
+	e1:Desc(0)
+	e1:SetCategory(CATEGORY_TOGRAVE|CATEGORY_SPECIAL_SUMMON|CATEGORY_EQUIP)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCost(s.cost)
@@ -10,63 +14,65 @@ function s.initial_effect(c)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 end
-function s.cfilter(c,f,...)
-	return c:GetEquipTarget()~=nil and f(...) and c:IsAbleToGraveAsCost()
+s.hnchecks=aux.CreateChecks(Card.IsSetCard,{ARCHE_AIRCASTER,ARCHE_FLAIRCASTER,ARCHE_DESPAIRCASTER,ARCHE_FAIRCASTER})
+
+function s.cfilter(c)
+	return c:IsFaceup() and c:IsSpell(TYPE_EQUIP) and c:IsSetCard(ARCHE_AIRCASTER) and c:IsReleasable()
+end
+function s.hngoal(g,e,tp)
+	local sg=Duel.Group(Card.IsAbleToGrave,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
+	sg:Merge(g)
+	return g:IsExists(s.hnfilter,1,nil,e,tp,sg,true) and Duel.IsExistingMatchingCard(s.hnfilter,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,nil,e,tp,sg,false)
+end
+function s.hnfilter(c,e,tp,g,check)
+	return c:IsSetCard(ARCHE_AIRCASTER) and Duel.GetMZoneCount(tp,g)>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and (not check or c:IsMonsterCard())
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	e:SetLabel(1)
-	local g0=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_SZONE,0,nil,Card.IsSetCard,0xa88)
-	local g1=g0:Filter(Card.IsSetCard,nil,0x1a88)
-	local g2=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_SZONE,0,nil,Card.IsCode,id-3,id-1)
-	if chk==0 then return #g0>0 and #g1>0 and (#g0-#g1>0 or #g0>1 and #g1>1)
-		and g2:GetClassCount(Card.GetCode)>1 end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=g0:Select(tp,1,1,nil)
-	g:Merge(g1:Select(tp,1,1,g))
-	aux.GCheckAdditional=aux.dncheck
-	g:Merge(g2:SelectSubGroup(tp,aux.TRUE,false,2,2))
-	aux.GCheckAdditional=nil
-	Duel.SendtoGrave(g,REASON_COST)
+	local g0=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_SZONE,0,nil)
+	if chk==0 then return #g0>0 and g0:CheckSubGroupEach(s.hnchecks,s.hngoal,e,tp) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
+	local sg=g0:SelectSubGroupEach(tp,s.hnchecks,false,s.hngoal,e,tp)
+	Duel.Release(sg,REASON_COST)
 end
-function s.filter(c,e,tp,loc)
-	return c:IsSetCard(0xa88) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-		and Duel.IsExistingMatchingCard(aux.AND(Card.IsSetCard,aux.NOT(Card.IsForbidden)),tp,loc,0,1,c,0xa88)
+function s.filter(c,e,tp)
+	return c:IsSetCard(ARCHE_AIRCASTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+		and Duel.IsExistingMatchingCard(s.eqfilter,tp,LOCATION_GRAVE,0,1,c,tp)
+end
+function s.eqfilter(c,tp)
+	return c:IsMonster() and c:IsSetCard(ARCHE_AIRCASTER) and not c:IsForbidden() and c:CheckUniqueOnField(tp,LOCATION_SZONE)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
-		if e:GetLabel()~=1 then
-			return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,nil,e,tp,LOCATION_GRAVE)
-		else
-			e:SetLabel(0)
-			return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,nil,e,tp,LOCATION_SZONE+LOCATION_GRAVE)
-		end
+		local sg=Duel.Group(aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
+		return not sg:IsExists(aux.NOT(Card.IsAbleToGrave),1,nil) and (e:IsCostChecked() or Duel.IsExistingMatchingCard(s.hnfilter,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,nil,e,tp,sg,false))
 	end
-	e:SetLabel(0)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,LOCATION_GRAVE)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,PLAYER_ALL,LOCATION_GRAVE)
 	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,nil,1,tp,0)
 end
-function s.ctfilter(c,tp)
-	return c:GetPreviousControler()==tp and c:IsLocation(LOCATION_GRAVE)
+function s.ctfilter(c,e,p)
+	local re=c:GetReasonEffect()
+	return c:GetPreviousControler()==p and c:IsLocation(LOCATION_GRAVE) and c:IsReason(REASON_EFFECT) and re and re==e and not c:IsReason(REASON_REDIRECT)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetFieldGroup(tp,LOCATION_ONFIELD,LOCATION_ONFIELD)
-	local gt=#g
-	Duel.SendtoGrave(g,REASON_EFFECT)
-	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	local g=Duel.Group(Card.IsAbleToGrave,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
+	local ct=Duel.SendtoGrave(g,REASON_EFFECT)
 	g=Duel.GetOperatedGroup()
-	if ft<=0 or #g~=gt then return end
+	if ct==0 or Duel.GetMZoneCount(tp)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local sg=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,1,nil,e,tp,LOCATION_GRAVE)
+	local sg=Duel.SelectMatchingCard(tp,aux.Necro(s.filter),tp,LOCATION_GRAVE,LOCATION_GRAVE,1,1,nil,e,tp)
 	if #sg>0 then
 		Duel.BreakEffect()
 		if Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)==0 then return end
 		local tc=sg:GetFirst()
-		ft=ft-1
-		local ct=g:FilterCount(s.ctfilter,nil,1-tp)
-		if ft>ct then ft=ct end
+		if not tc:IsFaceup() then return end
+		local ft=Duel.GetLocationCount(tp,LOCATION_SZONE)
+		local ct=math.min(ft,g:FilterCount(s.ctfilter,nil,e,1-tp))
+		if ft<=0 or ct==0 then return end
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
-		g=Duel.SelectMatchingCard(tp,aux.AND(Card.IsSetCard,aux.NOT(Card.IsForbidden)),tp,LOCATION_GRAVE,0,ft,ft,nil,0xa88)
-		for ec in aux.Next(g) do Duel.Equip(tp,ec,tc,true,true) end
+		local eqg=Duel.SelectMatchingCard(tp,aux.Necro(s.eqfilter),tp,LOCATION_GRAVE,0,ct,ct,nil,tp)
+		for ec in aux.Next(eqg) do
+			Duel.EquipToOtherCardAndRegisterLimit(e,tp,ec,tc,true,true)
+		end
 		Duel.EquipComplete()
 	end
 end
