@@ -11,7 +11,6 @@ function s.initial_effect(c)
 	e1:SetCondition(aux.EndPhaseCond(1))
 	e1:SetOperation(s.chainop)
 	c:RegisterEffect(e1)
-	for the rest of this turn, you take no battle damage from direct attacks, also your opponent takes any effect damage you would take.]]
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(0)
 	e2:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_TRIGGER_O)

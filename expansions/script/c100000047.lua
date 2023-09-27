@@ -11,7 +11,6 @@ function s.initial_effect(c)
 	e1:SetCondition(aux.EndPhaseCond(0))
 	e1:SetOperation(s.chainop)
 	c:RegisterEffect(e1)
-	Set 1 "Dreamy Forest" or "Dreary Forest" Spell/Trap, OR 1 "In the Forest, Black As My Memory", directly from your Deck.]]
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(0)
 	e2:SetCategory(CATEGORY_TODECK)

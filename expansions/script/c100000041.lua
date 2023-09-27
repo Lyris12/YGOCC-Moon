@@ -4,7 +4,7 @@ local s,id,o=GetID()
 function s.initial_effect(c)
 	aux.AddOrigDoubleSidedType(c)
 	aux.AddDoubleSidedProc(c,SIDE_OBVERSE,id+1,id)
-	You can target 1 monster your opponent controls; negate its effects, and if you do, it loses 1000 ATK.]]
+	--You can target 1 monster your opponent controls; negate its effects, and if you do, it loses 1000 ATK.]]
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(0)
 	e1:SetCategory(CATEGORY_DISABLE|CATEGORY_ATKCHANGE)

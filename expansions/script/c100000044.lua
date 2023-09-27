@@ -4,7 +4,6 @@ local s,id,o=GetID()
 function s.initial_effect(c)
 	aux.AddOrigDoubleSidedType(c)
 	aux.AddDoubleSidedProc(c,SIDE_REVERSE,id-1,id)
-	until the end of your opponent's next turn, this card is unaffected by your opponent's monster effects that do not target it, also it cannot be targeted for attacks, but it does not prevent your opponent from attacking you directly.]]
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(0)
 	e1:SetType(EFFECT_TYPE_SINGLE|EFFECT_TYPE_TRIGGER_O)

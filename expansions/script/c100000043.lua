@@ -4,7 +4,6 @@ local s,id,o=GetID()
 function s.initial_effect(c)
 	aux.AddOrigDoubleSidedType(c)
 	aux.AddDoubleSidedProc(c,SIDE_OBVERSE,id+1,id)
-	negate its effects, and if you do, you can make the ATK of 1 monster your opponent controls become 0, until the end of this turn.]]
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(0)
 	e1:SetCategory(CATEGORY_DISABLE|CATEGORY_ATKCHANGE)
