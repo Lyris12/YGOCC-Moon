@@ -1,8 +1,8 @@
 banned_list_table=banned_list_table or {}
 local string=require'string'
 local ls=[[
-#[2023.6 YGOCC+2023.6 TCG]
-!2023.6 YGOCC
+#[2023.9 YGOCC+2023.9 TCG]
+!2023.9 YGOCC
 #Forbidden YGOCC
 20181405 0 --Terradication Geryonarsenal
 33700082 0 --Anifriends Seiryu of the East
@@ -15,20 +15,17 @@ local ls=[[
 33700747 0 --Anifriends Black-Backed Jackal
 33700750 0 --Anifriends Reindeer
 33700079 0 --Anifriends Small-clawed Otter
-33700751 0 --Anifriends Tanuki
 37564909 0 --Sayuri - Scarlet Moon
 63553466 0 --Universal Marshall
 79854546 0 --Numbing Winter Jewel
 79854547 0 --Verdant Illusion
 102400004 0 --Accel Burst Dragon
 56642464 0 --Holy Noble Knight Crusader, Artorgius
-202114501 0 --Sireknight
 56642463 0 --Noble Knight Mordred
 #Limited YGOCC
 77585595 1 --Forgalgia Emperor Jinzo
 15747847 1 --Mythos Valor
 32904936 1 --Arisa, the Aeonbreaker's Defender
-32904931 1 --Aeonbreaker Fusion
 33700058 1 --Miracle of the Sandstar
 33700065 1 --Anifriends PPP Gentoo
 33700744 1 --Anifriends "Ikkaku"
@@ -37,15 +34,15 @@ local ls=[[
 #Semi-limited YGOCC
 --							New 2/11/2022
 97569832 0 --Flight of Star Regalia
-33700183 1 --Anifriends Sisha Lefty
-33700184 1 --Anifriends Sisha Right
+#33700183 1 --Anifriends Sisha Lefty
+#33700184 1 --Anifriends Sisha Righty
 --							New 3/24/2022
 63553469 1 --Atom Marshall
 31157205 1 --Mezka Melodia
 23251031 1 --Pharaohnic Papyrus of Patience
 28915253 1 --Shadowflame Calvary
 63287035 1 --Horrible Reborn
-195208417 1 --False Reality Knight Thrax
+#195208417 1 --False Reality Knight Thrax
 195208422 2 --False Reality Spirit Monk Dalos
 --							New 7/6/2022
 53313934 1 --Disstonant Luster Dragon
@@ -64,6 +61,16 @@ local ls=[[
 #37564903 3 --Sayuri - ALICE
 #17029608 3 --Psychether Priestess, Joan
 #195208400 3 --Spectre Magician & Dark Light
+--							New 9/25/2023
+62242678 0 --Hot Red Dragon Archfiend King Calamity
+54974237 0 --Eradicator Epidemic Virus
+32904931 2 --Aeonbreaker Fusion
+195208417 2 --False Reality Knight Thrax
+#33700751 3 --Anifriends Tanuki
+#202114501 3 --Sireknight
+#33700183 3 --Anifriends Sisha Lefty
+#33700184 3 --Anifriends Sisha Righty
+
 
 #RULE CARDS
 5000 1 --Manual Mode
@@ -167,7 +174,6 @@ local ls=[[
 99177923 1 --Infernity Archfiend
 33508719 1 --Morphing Jar
 12958919 1 --Phantom Skyblaster
-26889158 1 --Salamangreat Gazelle
 92559258 1 --Servant of Endymion
 81275020 1 --Speedroid Terrortop
 4474060 1 --SPYRAL GEAR - Drone
@@ -278,7 +284,7 @@ local ls=[[
 --							New 12/1/2022
 98095162 0 --Curious, the Lightsworn Dominion
 76375976 0 --Mystic Mine
-17266660 1 --Herald of Orange Light
+#17266660 1 --Herald of Orange Light
 --							New 2/1/2022
 20292186 0 --Artifact Scythe
 27381364 0 --Spright Elf
@@ -311,22 +317,21 @@ local ls=[[
 36521307 1 --Mathmech Circular
 38814750 1 --PSY-Framegear Gamma
 65536818 1 --Denglong, First of the Yang Zing
-48626373 1 --Kashtira Arise-Heart
 55584558 1 --Purrely Delicious Memory
+#48626373 1 --Kashtira Arise-Heart
 3734202 1 --Naturia Sacred Tree
-17266660 2 --Herald of Orange Light
+#17266660 2 --Herald of Orange Light
 68304193 2 --Kashtira Unicorn
 14532163 2 --Lightning Storm
 92107604 2 --Runick Fountain
 63166095 2 --Sky Striker Mobilize - Engage!
 15443125 2 --Spright Starter
-#9047460 3 --Blackwing - Steam the Cloak
-#64034255 3 --Genex Ally Birdman
-#5592689 3 --Samsara Lotus
-#8491961 3 --Lyrilusc - Recital Starling
-#78080961 3 --SPYRAL Quik-Fix
-#14733538 3 --Draco Face-Off
-#24010609 3 --Sky Striker Mecha Modules - Multirole
+--							New 2/1/2022
+48626373 0 --Kashtira Arise-Heart
+33854624 1 --Bystial Magnamhut
+99266988 1 --Chaos Space
+#26889158 3 --Salamangreat Gazelle
+#17266660 3 --Herald of Orange Light
 ]]
 for id in ls:sub(ls:find("!"),ls:find("!",ls:find("!")+1) and ls:find("!",ls:find("!")+1)-1 or -1):gmatch("([0-9]+) 0") do
 	banned_list_table[tonumber(id)]=true
