@@ -592,7 +592,7 @@ function Card.GetFuture(c)
 	end
 end
 function Card.IsFuture(c,...)
-	for future in pairs({...}) do
+	for _,future in ipairs({...}) do
 		if c:GetFuture()==future then return true end
 	end
 	return false
