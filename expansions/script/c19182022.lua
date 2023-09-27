@@ -64,7 +64,6 @@ function s.spfilter(c,e,tp)
 			break
 		end
 	end
-	Debug.Message(lv)
 	return lv and lv>0 and Duel.IsPlayerCanDiscardDeck(tp,lv)
 end
 function s.ptg(e,tp,eg,ep,ev,re,r,rp,chk)
