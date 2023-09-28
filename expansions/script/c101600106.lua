@@ -68,7 +68,7 @@ function cid.syntg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g2=Duel.SelectMatchingCard(tp,cid.cfilter2,tp,LOCATION_GRAVE,0,1,1,c,e,tp,c)
 	if not g2:GetFirst() then return end
-	lv=c:GetLevel()+g2:GetFirst():GetLevel()
+	local lv=c:GetLevel()+g2:GetFirst():GetLevel()
 	g2:AddCard(c)
 	if #g2==2 then
 		Duel.Remove(g2,POS_FACEUP,REASON_COST)

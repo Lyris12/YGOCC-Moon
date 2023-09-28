@@ -69,7 +69,7 @@ function cid.syntg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g2=Duel.SelectMatchingCard(tp,cid.cfilter2,tp,LOCATION_REMOVED,0,1,1,c,e,tp,c)
 	if not g2:GetFirst() then return end
-	lv=c:GetLevel()+g2:GetFirst():GetLevel()
+	local lv=c:GetLevel()+g2:GetFirst():GetLevel()
 	if #g2>0 then
 		Duel.Remove(c,POS_FACEUP,REASON_COST)
 		Duel.SendtoGrave(g2,REASON_COST+REASON_RETURN)
