@@ -199,6 +199,8 @@ dofile("expansions/script/tables.lua") --Special Tables
 -- dofile("expansions/script/proc_perdition.lua") --Perditions
 -- dofile("expansions/script/proc_impure.lua") --Impures
 
+dofile("expansions/script/mods_pendulum.lua") --Generic Pendulum Procedure modifications
+
 --overwrite functions
 local is_type, card_remcounter, duel_remcounter, effect_set_target_range, effect_set_reset, add_xyz_proc, add_xyz_proc_nlv, duel_overlay, duel_set_lp, duel_select_target, duel_banish, card_check_remove_overlay_card, is_reason, duel_check_tribute, select_tribute,card_sethighlander,
 	card_is_facedown, card_is_able_to_remove, card_is_able_to_remove_as_cost, card_is_able_to_hand, card_is_can_be_ssed, card_get_level, card_get_original_level, card_get_previous_level, card_is_level, card_is_level_below, card_is_level_above, card_is_destructable, card_get_syn_level, card_get_rit_level, card_is_xyz_level,
