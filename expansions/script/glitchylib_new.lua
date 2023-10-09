@@ -1190,7 +1190,7 @@ function Auxiliary.ActivateException(e,chk)
 	if c and e:IsHasType(EFFECT_TYPE_ACTIVATE) and not c:IsType(TYPE_CONTINUOUS+TYPE_FIELD+TYPE_EQUIP) and not c:IsHasEffect(EFFECT_REMAIN_FIELD) and (chk or c:IsRelateToChain(0)) then
 		return c
 	else
-		return nil
+		return
 	end
 end
 function Auxiliary.ExceptThis(c)

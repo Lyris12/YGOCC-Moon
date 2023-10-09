@@ -70,12 +70,6 @@ function cid.initial_effect(c)
 		e8:SetCode(EVENT_SSET)
 		e8:SetOperation(cid.ckop)
 		Duel.RegisterEffect(e8,0)
-		--chainlimit
-		local e9=Effect.CreateEffect(c)
-		e9:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e9:SetCode(EVENT_CHAINING)
-		e9:SetOperation(cid.actop)
-		Duel.RegisterEffect(e9,0)
 	end
 	Duel.AddCustomActivityCounter(id,ACTIVITY_SPSUMMON,cid.counterfilter)
 end
@@ -196,6 +190,7 @@ end
 --POP AND SS
 function cid.sscon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp and (Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2)
+		and (Duel.GetCurrentChain()==0 or Duel.GetChainInfo(Duel.GetCurrentChain(),CHAININFO_TRIGGERING_PLAYER)~=1-tp)
 end
 function cid.sscost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetCustomActivityCount(id,tp,ACTIVITY_SPSUMMON)==0 end
@@ -256,16 +251,4 @@ function cid.ckop(e,tp,eg,ep,ev,re,r,rp)
 	for tc in aux.Next(eg) do
 		tc:RegisterFlagEffect(id,RESET_PHASE+PHASE_END,EFFECT_FLAG_SET_AVAILABLE,1)
 	end
-end
---chainlimit
-function cid.actop(e,tp,eg,ep,ev,re,r,rp)
-	local rc=re:GetHandler()
-	if ep~=tp then
-		Duel.SetChainLimit(cid.limit(e:GetHandler()))
-	end
-end
-function cid.limit(c)
-	return	function (e,lp,tp)
-				return not (tp==lp and e:GetHandler()==c and e:GetLabel()==101)
-			end
 end

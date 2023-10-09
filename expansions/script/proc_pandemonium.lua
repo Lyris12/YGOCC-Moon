@@ -560,6 +560,9 @@ end
 function Auxiliary.PaCheckFilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_PANDEMONIUM) and c:GetFlagEffect(726)>0
 end
+function Card.IsInPandemoniumZone(c)
+	return Auxiliary.PaCheckFilter(c)
+end
 function Auxiliary.PandActCon(actcon,card)
 	return	function(e,tp,eg,ep,ev,re,r,rp)
 				local c=e:GetHandler()

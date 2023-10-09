@@ -38,15 +38,6 @@ function cid.initial_effect(c)
 	e3:SetTarget(cid.sstg)
 	e3:SetOperation(cid.ssop)
 	c:RegisterEffect(e3)
-	if not cid.global_check then
-		cid.global_check=true
-		--chainlimit
-		local e9=Effect.CreateEffect(c)
-		e9:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e9:SetCode(EVENT_CHAINING)
-		e9:SetOperation(cid.actop)
-		Duel.RegisterEffect(e9,0)
-	end
 end
 function cid.counterfilter(c)
 	return c:IsSetCard(0x7a4) or c:IsType(TYPE_PENDULUM+TYPE_PANDEMONIUM)
@@ -104,6 +95,7 @@ end
 --POP AND PLACE
 function cid.sscon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp and (Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2)
+		and (Duel.GetCurrentChain()==0 or Duel.GetChainInfo(Duel.GetCurrentChain(),CHAININFO_TRIGGERING_PLAYER)~=1-tp)
 end
 function cid.dryfilter(c,e,tp,eg,ep,ev,re,r,rp)
 	return (not c:IsLocation(LOCATION_MZONE) or c:IsFaceup()) and c:IsType(TYPE_MONSTER) and c:IsType(TYPE_PENDULUM+TYPE_PANDEMONIUM) and c:IsSetCard(0x7a4)
@@ -136,16 +128,4 @@ function cid.ssop(e,tp,eg,ep,ev,re,r,rp)
 			end		
 		end
 	end
-end
---chainlimit
-function cid.actop(e,tp,eg,ep,ev,re,r,rp)
-	local rc=re:GetHandler()
-	if ep~=tp then
-		Duel.SetChainLimit(cid.limit(e:GetHandler()))
-	end
-end
-function cid.limit(c)
-	return	function (e,lp,tp)
-				return not (tp==lp and e:GetHandler()==c and e:GetLabel()==101)
-			end
 end
