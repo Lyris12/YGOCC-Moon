@@ -4,9 +4,9 @@ function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddOrigBigbangType(c)
 	aux.AddBigbangProc(c,s.matfilter1,1,1,s.matfilter2,1)
-	--If this card is Bigbang Summoned: You can send 1 Level 4 or lower FIRE monster from your Deck to the GY, and if you do, this card gains ATK equal to half the original ATK of the sent monster.
+	--If this card is Bigbang Summoned: You can send 1 FIRE monster from your Deck to the GY, and if you do, this card gains ATK equal to half the original ATK of the sent monster.
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_TOGRAVE+CATEGORY_DAMAGE)
+	e1:SetCategory(CATEGORY_TOGRAVE+CATEGORY_ATKCHANGE)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e1:SetProperty(EFFECT_FLAG_DELAY)
@@ -41,7 +41,7 @@ function s.tgcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_BIGBANG)
 end
 function s.tgfilter(c)
-	return c:IsAttribute(ATTRIBUTE_FIRE) and c:IsAbleToGrave() and c:IsLevelBelow(4)
+	return c:IsAttribute(ATTRIBUTE_FIRE) and c:IsAbleToGrave()
 end
 function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.tgfilter,tp,LOCATION_DECK,0,1,nil) end

@@ -3,7 +3,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddOrigBigbangType(c)
-	aux.AddBigbangProc(c,Card.IsNeutral,1,1,s.matfilter1,1)
+	aux.AddBigbangProc(c,Card.IsNeutral,1,1,Card.IsNegative,1)
 	--The first time this card would be destroyed by card effect each turn, it is not destroyed.
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_SINGLE)
@@ -41,9 +41,6 @@ function s.initial_effect(c)
 	e3:SetCondition(s.poscon)
 	e3:SetOperation(s.posop)
 	c:RegisterEffect(e3)
-end
-function s.matfilter1(c)
-	return c:IsLevelAbove(5) and c:IsNegative()
 end
 function s.valcon(e,re,r,rp)
 	return bit.band(r,REASON_EFFECT)~=0

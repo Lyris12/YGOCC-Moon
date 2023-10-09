@@ -3,7 +3,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddOrigBigbangType(c)
-	aux.AddBigbangProc(c,Card.IsNeutral,1,1,Card.IsPositive,1,Card.IsNegative,1)
+	aux.AddBigbangProc(c,aux.NOT(Card.IsNeutral),2)
 	--Cannot be targeted or destroyed by card effects, nor used as material for a Bigbang Summon.
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -26,11 +26,11 @@ function s.initial_effect(c)
 	e3:SetValue(1)
 	c:RegisterEffect(e3)
 	--If this card is Bigbang Summoned: You can banish cards on the field up to the number of non-Neutral monsters used for this card's Bigbang Summon, also, this card cannot attack directly for the rest of this turn.
-	local e0=Effect.CreateEffect(c)
-	e0:SetType(EFFECT_TYPE_SINGLE)
-	e0:SetCode(EFFECT_MATERIAL_CHECK)
-	e0:SetValue(s.matcheck)
-	c:RegisterEffect(e0)
+	--local e0=Effect.CreateEffect(c)
+	--e0:SetType(EFFECT_TYPE_SINGLE)
+	--e0:SetCode(EFFECT_MATERIAL_CHECK)
+	--e0:SetValue(s.matcheck)
+	--c:RegisterEffect(e0)
 	local e4=Effect.CreateEffect(c)
 	e4:SetCategory(CATEGORY_REMOVE)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
@@ -43,9 +43,9 @@ function s.initial_effect(c)
 	e4:SetOperation(s.rmop)
 	c:RegisterEffect(e4)
 end
-function s.matcheck(e,c)
-	e:SetLabel(c:GetMaterial():FilterCount(aux.FilterEqualFunction(Card.GetVibe,0),nil))
-end
+--function s.matcheck(e,c)
+	--e:SetLabel(c:GetMaterial():FilterCount(aux.FilterEqualFunction(Card.GetVibe,0),nil))
+--end
 function s.rmcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_BIGBANG)
 end
@@ -56,7 +56,7 @@ function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local ct=e:GetHandler():GetMaterialCount()-e:GetLabelObject():GetLabel()
+	local ct=e:GetHandler():GetMaterialCount()-1
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToRemove,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,ct,nil)
 	if g:GetCount()>0 then

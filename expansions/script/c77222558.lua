@@ -3,7 +3,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddOrigBigbangType(c)
-	aux.AddBigbangProc(c,Card.IsNeutral,1,1,aux.NOT(Card.IsNeutral),1)
+	aux.AddBigbangProc(c,aux.NOT(Card.IsPositive),2)
 	--If this card is Bigbang Summoned: You can target 1 monster on the field or in the GYs; banish it, and if you do, its owner can Special Summon 1 of their banished monster with a different Type and Attribute from the monster banished by this effect.
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_REMOVE+CATEGORY_SPECIAL_SUMMON)

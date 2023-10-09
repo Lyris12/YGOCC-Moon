@@ -3,7 +3,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddOrigBigbangType(c)
-	aux.AddBigbangProc(c,s.matfilter1,1,1,aux.NOT(Card.IsNeutral),1)
+	aux.AddBigbangProc(c,s.matfilter1,1,1,s.matfilter2,1)
 	--If this card is Bigbang Summoned: You can equip 1 monster from your Extra Deck to this card, except "Kurara, Protector of the Skies".
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_EQUIP)
@@ -27,7 +27,7 @@ function s.initial_effect(c)
 	e2:SetTarget(s.distg)
 	e2:SetOperation(s.disop)
 	c:RegisterEffect(e2)
-	--Your opponent cannot attack with monster that have the same card type (Fusion, Synchro, Xyz, Link, Bigbang or Time Leap) as a monster equipped to this card.
+	--Your opponent cannot attack nor activate the effects of monsters that have the same card type (Fusion, Synchro, Xyz, Link, Bigbang or Time Leap) as a monster equipped to this card.
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD)
 	e3:SetCode(EFFECT_CANNOT_ATTACK_ANNOUNCE)
@@ -35,9 +35,20 @@ function s.initial_effect(c)
 	e3:SetTargetRange(0,LOCATION_MZONE)
 	e3:SetTarget(s.attg)
 	c:RegisterEffect(e3)
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_FIELD)
+	e4:SetCode(EFFECT_CANNOT_ACTIVATE)
+	e4:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e4:SetRange(LOCATION_MZONE)
+	e4:SetTargetRange(0,1)
+	e4:SetValue(s.actlimit)
+	c:RegisterEffect(e4)
 end
 function s.matfilter1(c)
 	return c:IsSummonLocation(LOCATION_EXTRA) and c:IsNeutral()
+end
+function s.matfilter2(c)
+	return c:IsType(TYPE_EFFECT) and not c:IsNeutral()
 end
 function s.eqcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_BIGBANG)
@@ -103,4 +114,11 @@ function s.attg(e,c)
 	local g=e:GetHandler():GetEquipGroup()
 	local tg=g:Filter(s.atfilter,nil,rtype)
 	return c:GetControler(1-tp) and #tg>0
+end
+function s.actlimit(e,re,rp)
+	local tp=e:GetHandlerPlayer()
+	local rtype=bit.band(re:GetHandler():GetType(),TYPE_FUSION|TYPE_SYNCHRO|TYPE_XYZ|TYPE_LINK|TYPE_BIGBANG|TYPE_TIMELEAP)
+	local g=e:GetHandler():GetEquipGroup()
+	local tg=g:Filter(s.atfilter,nil,rtype)
+	return re:IsActiveType(TYPE_MONSTER) and #tg>0
 end

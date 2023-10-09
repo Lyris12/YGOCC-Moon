@@ -3,7 +3,7 @@ local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddOrigBigbangType(c)
-	aux.AddBigbangProc(c,Card.IsNeutral,1,1,aux.NOT(Card.IsNeutral),1)
+	aux.AddBigbangProc(c,aux.NOT(Card.IsNeutral),2)
 	--If this card is Bigbang Summoned: You can target 1 card on the field; place it to the bottom of the Deck.
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_TODECK)
@@ -44,7 +44,7 @@ function s.tdtg1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsAbleToDeck() end
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g=Duel.SelectTarget(tp,Card.IsAbleToDeck,tp,0,LOCATION_ONFIELD,1,1,nil)
+	local g=Duel.SelectTarget(tp,Card.IsAbleToDeck,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,g:GetCount(),0,0)
 end
 function s.tdop1(e,tp,eg,ep,ev,re,r,rp)

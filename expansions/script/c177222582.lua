@@ -4,7 +4,7 @@ function s.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddOrigBigbangType(c)
 	aux.AddBigbangProc(c,Card.IsPositive,1,1,Card.IsNegative,1,1)
-	--If this card is Bigbang Summoned: You can equip 1 "Muskabb's Lava Blade" from your Deck to this card.
+	--If this card is Bigbang Summoned: You can equip 1 "Muskabb's Lava Blade" from your Deck or GY to this card.
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_EQUIP)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
@@ -44,14 +44,14 @@ function s.eqfilter(c,ec)
 end
 function s.eqtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsRelateToEffect(e) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0
-		and Duel.IsExistingMatchingCard(s.eqfilter,tp,LOCATION_DECK+LOCATION_HAND,0,1,nil,e:GetHandler()) end
-	Duel.SetOperationInfo(0,CATEGORY_EQUIP,nil,1,tp,LOCATION_DECK+LOCATION_HAND)
+		and Duel.IsExistingMatchingCard(s.eqfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil,e:GetHandler()) end
+	Duel.SetOperationInfo(0,CATEGORY_EQUIP,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE)
 end
 function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 or c:IsFacedown() or not c:IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
-	local g=Duel.SelectMatchingCard(tp,s.eqfilter,tp,LOCATION_DECK+LOCATION_HAND,0,1,1,nil,c)
+	local g=Duel.SelectMatchingCard(tp,s.eqfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil,c)
 	local tc=g:GetFirst()
 	if tc then
 		if not Duel.Equip(tp,tc,c) then return end
