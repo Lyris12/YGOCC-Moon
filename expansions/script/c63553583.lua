@@ -40,7 +40,7 @@ function cid.initial_effect(c)
 	--accumulate
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD)
-	e3:SetCode(0x10000000+id)
+	e3:SetCode(EFFECT_FLAG_EFFECT+id)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e3:SetTargetRange(0,1)
@@ -99,11 +99,10 @@ function cid.costcon(e)
 end
 function cid.costchk(e,te_or_c,tp)
 	local ct=Duel.GetFlagEffect(tp,id)
-	return Duel.CheckLPCost(tp,ct*2000) 
+	return ct==0 or Duel.CheckLPCost(tp,ct*2000)
 end
 function cid.costtg(e,te,tp)
-	if not te:IsActiveType(TYPE_TRAP) then return false end
-	return true
+	return te:IsActiveType(TYPE_TRAP)
 end
 function cid.costop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.PayLPCost(tp,2000)
