@@ -56,17 +56,15 @@ function c63553467.setcost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c63553467.settg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
-		and aux.PandSSetCon(c63553467.setfilter,nil,LOCATION_DECK)(nil,e,tp,eg,ep,ev,re,r,rp)
-		and Duel.IsExistingMatchingCard(c63553467.setfilter,tp,LOCATION_DECK,0,1,nil)
+		and Duel.IsExistingMatchingCard(aux.PandSSetFilter(c63553467.setfilter,tp),tp,LOCATION_DECK,0,1,nil)
 	end
 end
 function c63553467.setop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 or not aux.PandSSetCon(c63553467.setfilter,nil,LOCATION_DECK)(nil,e,tp,eg,ep,ev,re,r,rp) then return end
+	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
-	local g=Duel.SelectMatchingCard(tp,aux.PandSSetFilter(c63553467.setfilter),tp,LOCATION_DECK,0,1,1,nil,e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.SelectMatchingCard(tp,aux.PandSSetFilter(c63553467.setfilter,tp),tp,LOCATION_DECK,0,1,1,nil)
 	if #g>0 then
-		aux.PandSSet(g,REASON_EFFECT,aux.GetOriginalPandemoniumType(g:GetFirst()))(e,tp,eg,ep,ev,re,r,rp)
-		Duel.ConfirmCards(1-tp,g)
+		Duel.PandSSet(g:GetFirst(),e,tp,REASON_EFFECT)
 	end
 end
 --special summon

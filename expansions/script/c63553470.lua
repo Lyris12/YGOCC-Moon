@@ -80,9 +80,6 @@ function c63553470.drcfilter2(c,e,tp,eg,ep,ev,re,r,rp)
 	return c:GetType()&TYPE_PANDEMONIUM==TYPE_PANDEMONIUM and c:IsPreviousLocation(LOCATION_SZONE) and c:GetPreviousControler()==tp and c:IsPreviousPosition(POS_FACEUP_ATTACK)
 		and aux.PandSSetCon(c,nil,c:GetLocation(),c:GetLocation())(nil,e,tp,eg,ep,ev,re,r,rp)
 end
-function c63553470.checksetfilter(c,e,tp,eg,ep,ev,re,r,rp)
-	return aux.PandSSetCon(c,nil,c:GetLocation(),c:GetLocation())(nil,e,tp,eg,ep,ev,re,r,rp)
-end
 function c63553470.excfilter(c)
 	return c:GetType()&TYPE_PANDEMONIUM==TYPE_PANDEMONIUM and c:IsFaceup()
 end
@@ -187,17 +184,16 @@ function c63553470.settg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c63553470.setop(e,tp,eg,ep,ev,re,r,rp)
 	local sg=eg:Filter(c63553470.drcfilter2,nil,e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 or not sg:IsExists(c63553470.checksetfilter,1,nil,e,tp,eg,ep,ev,re,r,rp) then return end
+	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 or not sg:IsExists(aux.PandSSetFilter(nil,tp),1,nil) then return end
 	local tc=nil
 	if eg:GetCount()>1 then
-		local fg=sg:Filter(c63553470.checksetfilter,nil,e,tp,eg,ep,ev,re,r,rp)
+		local fg=sg:Filter(aux.PandSSetFilter(nil,tp),nil)
 		tc=fg:Select(tp,1,1,nil):GetFirst()
 	else
-		local fg=sg:Filter(c63553470.checksetfilter,nil,e,tp,eg,ep,ev,re,r,rp)
+		local fg=sg:Filter(aux.PandSSetFilter(nil,tp),nil)
 		tc=fg:GetFirst()
 	end
 	if tc then
-		aux.PandSSet(tc,REASON_EFFECT,aux.GetOriginalPandemoniumType(tc))(e,tp,eg,ep,ev,re,r,rp)
-		Duel.ConfirmCards(1-tp,tc)
+		Duel.PandSSet(g:GetFirst(),e,tp,REASON_EFFECT)
 	end
 end

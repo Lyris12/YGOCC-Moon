@@ -750,7 +750,7 @@ function Auxiliary.PandSSet(tc,reason,tpe)
 					if #sg>0 then
 						res=Duel.SSet(tp,sg,tp,false)
 						for cc in aux.Next(sg) do
-							local tpe=tpe or aux.GetOriginalPandemoniumType(cc)
+							local tpe = tpe~=nil and tpe or aux.GetOriginalPandemoniumType(cc)
 							if cc:IsType(TYPE_PANDEMONIUM) then
 								cc:RegisterFlagEffect(706,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SET_AVAILABLE,1)
 								if cc:IsPreviousLocation(LOCATION_HAND) then
@@ -765,7 +765,9 @@ function Auxiliary.PandSSet(tc,reason,tpe)
 						end
 					end
 				else
-					local tpe=tpe or aux.GetOriginalPandemoniumType(tc)
+					if not tpe then
+						tpe=aux.GetOriginalPandemoniumType(tc)
+					end
 					local hand_chk=true
 					if not tc:IsLocation(LOCATION_HAND) then
 						hand_chk=false

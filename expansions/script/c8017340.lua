@@ -59,8 +59,7 @@ function cid.setcost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function cid.settg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
-		and aux.PandSSetCon(cid.setfilter,nil,LOCATION_EXTRA+LOCATION_GRAVE)(nil,e,tp,eg,ep,ev,re,r,rp)
-		and Duel.IsExistingMatchingCard(cid.setfilter,tp,LOCATION_EXTRA+LOCATION_GRAVE,0,1,nil) 
+		and Duel.IsExistingMatchingCard(aux.PandSSetFilter(cid.setfilter,tp),tp,LOCATION_EXTRA+LOCATION_GRAVE,0,1,nil) 
 	end
 	local lg=Duel.GetMatchingGroup(cid.setfilter,tp,LOCATION_GRAVE,0,nil)
 	if #lg>0 then
@@ -71,15 +70,13 @@ function cid.settg(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 end
 function cid.setop(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 
-	or not aux.PandSSetCon(cid.setfilter,nil,LOCATION_EXTRA+LOCATION_GRAVE)(nil,e,tp,eg,ep,ev,re,r,rp) then 
+	if not e:GetHandler():IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then 
 		return 
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
-	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(aux.PandSSetFilter(cid.setfilter,LOCATION_EXTRA+LOCATION_GRAVE)),tp,LOCATION_EXTRA+LOCATION_GRAVE,0,1,1,nil,e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(aux.PandSSetFilter(cid.setfilter,tp)),tp,LOCATION_EXTRA+LOCATION_GRAVE,0,1,1,nil)
 	if g:GetCount()>0 then
-		aux.PandSSet(g,REASON_EFFECT,aux.GetOriginalPandemoniumType(g:GetFirst()))(e,tp,eg,ep,ev,re,r,rp)
-		Duel.ConfirmCards(1-tp,g)
+		Duel.PandSSet(g:GetFirst(),e,tp,REASON_EFFECT)
 		Duel.BreakEffect()
 		Duel.Destroy(e:GetHandler(),REASON_EFFECT)
 	end
