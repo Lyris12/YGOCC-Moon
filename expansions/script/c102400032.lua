@@ -21,17 +21,22 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0 and Duel.IsPlayerCanDraw(tp) end
+	local ct=3
+	if Duel.IsPlayerAffectedByEffect(tp,102400030) then ct=ct*2 end
+	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>=ct and Duel.IsPlayerCanDraw(tp) end
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)<3 then return end
-	local ct=0
-	for i=0,2 do
+	local ct=3
+	if Duel.IsPlayerAffectedByEffect(tp,102400030) then ct=ct*2 end
+	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)<ct then return end
+	local g=Group.CreateGroup()
+	for i=0,ct-1 do
 		local tc=Duel.GetFieldCard(tp,LOCATION_DECK,i)
-		for p=0,1 do Duel.ConfirmCards(p,tc,true) end
-		if tc:IsHadoken() then ct=ct+1 end
+		if ct<6 then for p=0,1 do Duel.ConfirmCards(p,tc,true) end end
+		g:AddCard(tc)
 	end
-	Duel.Draw(tp,ct,REASON_EFFECT)
+	if ct>5 then for p=0,1 do Duel.ConfirmCards(p,g,true) end end
+	Duel.Draw(tp,g:FilterCount(Card.IsHadoken,nil),REASON_EFFECT)
 	for i=1,3 do Duel.MoveSequence(Duel.GetFieldCard(tp,LOCATION_DECK,0),SEQ_DECKTOP) end
 	Duel.SortDecktop(tp,tp,3)
 end

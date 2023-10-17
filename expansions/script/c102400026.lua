@@ -19,7 +19,7 @@ function s.initial_effect(c)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e2:SetCategory(CATEGORY_REMOVE)
+	e2:SetCategory(CATEGORY_TOGRAVE)
 	e2:SetCost(s.cost)
 	e2:SetTarget(s.target)
 	e2:SetOperation(s.operation)
@@ -37,20 +37,20 @@ function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SendtoDeck(g,nil,SEQ_DECKBOTTOM,REASON_COST)
 end
 function s.filter(c)
-	return Duel.IsExistingMatchingCard(Card.IsAbleToRemove,c:GetOwner(),LOCATION_ONFIELD,0,1,nil)
+	return Duel.IsExistingMatchingCard(Card.IsAbleToGrave,c:GetOwner(),LOCATION_ONFIELD,0,1,nil)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) and s.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(s.filter,tp,0,LOCATION_ONFIELD,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	local tc=Duel.SelectTarget(tp,s.filter,tp,0,LOCATION_ONFIELD,1,1,nil):GetFirst()
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,tc:GetOwner(),LOCATION_ONFIELD)
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tc:GetOwner(),LOCATION_ONFIELD)
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if not tc:IsRelateToEffect(e) then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToRemove,tc:GetOwner(),LOCATION_ONFIELD,0,1,1,nil)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToGrave,tc:GetOwner(),LOCATION_ONFIELD,0,1,1,nil)
 	Duel.HintSelection(g)
-	Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
+	Duel.SendtoGrave(g,REASON_EFFECT)
 end

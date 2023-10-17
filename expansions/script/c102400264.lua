@@ -84,5 +84,6 @@ function s.actfilter(c,tp)
 	return c and c:IsFaceup() and c:IsSetCard(0xa6c) and c:IsType(TYPE_MONSTER) and c:IsControler(tp)
 end
 function s.actcon(e)
-	return s.actfilter(Duel.GetAttacker(),e:GetHandlerPlayer())
+	local tp=e:GetHandlerPlayer()
+	return s.actfilter(Duel.GetAttacker(),tp) or s.actfilter(Duel.GetAttackTarget(),tp)
 end

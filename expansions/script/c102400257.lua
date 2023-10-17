@@ -5,7 +5,7 @@ function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetRange(LOCATION_MZONE)
+	e1:SetRange(LOCATION_HAND+LOCATION_MZONE)
 	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
 	e1:SetCondition(s.con)
 	e1:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND+CATEGORY_DESTROY)
@@ -30,7 +30,7 @@ function s.con(e,tp)
 		and Duel.GetCurrentPhase()==PHASE_DAMAGE and not Duel.IsDamageCalculated()
 end
 function s.filter(c)
-	return c:IsSetCard(0xa6c) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
+	return c:IsSetCard(0xa6c) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand() and not c:IsCode(id)
 end
 function s.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil) end
@@ -41,8 +41,11 @@ function s.op(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil)
 	if Duel.SendtoHand(g,nil,REASON_EFFECT)==0 then return end
 	Duel.ConfirmCards(1-tp,g)
-	Duel.BreakEffect()
-	Duel.Destroy(e:GetHandler(),REASON_EFFECT)
+	local c=e:GetHandler()
+	if c:IsRelateToEffect(e) then
+		Duel.BreakEffect()
+		Duel.Destroy(c,REASON_EFFECT)
+	end
 end
 function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

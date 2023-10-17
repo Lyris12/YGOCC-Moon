@@ -49,22 +49,14 @@ function s.initial_effect(c)
 	e2:SetTarget(aux.TargetBoolFunction(Card.IsHadoken))
 	e2:SetValue(s.val)
 	c:RegisterEffect(e2)
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_IGNITION)
-	e3:SetRange(LOCATION_FZONE)
-	e3:SetCountLimit(1)
-	e3:SetCategory(CATEGORY_TOGRAVE)
-	e3:SetTarget(s.tgtg)
-	e3:SetOperation(s.tgop)
-	c:RegisterEffect(e3)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>5 end
+	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>11 end
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)<6 then return end
+	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)<12 then return end
 	local g=Group.CreateGroup()
-	for i=0,5 do g:AddCard(Duel.GetFieldCard(tp,LOCATION_DECK,i)) end
+	for i=0,11 do g:AddCard(Duel.GetFieldCard(tp,LOCATION_DECK,i)) end
 	Duel.ConfirmCards(tp,g)
 	while #g>0 do
 		Duel.Hint(HINT_SELECTMSG,tp,205)
@@ -74,25 +66,5 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.val(e,c)
-	return Duel.GetFlagEffect(e:GetHandlerPlayer(),id)//2*100
-end
-function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>2 end
-end
-function s.tgop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)<3 then return end
-	local ct=0
-	for i=0,2 do
-		local tc=Duel.GetFieldCard(tp,LOCATION_DECK,i)
-		for p=0,1 do Duel.ConfirmCards(p,tc,true) end
-		if tc:IsHadoken() then ct=ct+1 end
-	end
-	local tg=Duel.GetMatchingGroup(Card.IsAbleToGrave,tp,0,LOCATION_ONFIELD,0,nil)
-	if ct>0 and #tg>0 and Duel.SelectEffectYesNo(tp,e:GetHandler()) then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-		local sg=tg:Select(tp,1,ct,nil)
-		Duel.HintSelection(sg)
-		Duel.SendtoGrave(sg,REASON_EFFECT)
-	end
-	for i=1,3 do Duel.MoveSequence(Duel.GetFieldCard(tp,LOCATION_DECK,0),SEQ_DECKTOP) end
+	return Duel.GetFlagEffect(e:GetHandlerPlayer(),id)//2*500
 end

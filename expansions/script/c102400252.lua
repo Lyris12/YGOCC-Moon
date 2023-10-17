@@ -5,7 +5,7 @@ function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetRange(LOCATION_MZONE)
+	e1:SetRange(LOCATION_HAND+LOCATION_MZONE)
 	e1:SetCountLimit(1)
 	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
 	e1:SetCondition(s.con)
@@ -46,8 +46,10 @@ function s.op(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetValue(500)
 	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 	a:RegisterEffect(e1)
-	Duel.BreakEffect()
-	Duel.Destroy(c,REASON_EFFECT)
+	if c:IsRelateToEffect(e) then
+		Duel.BreakEffect()
+		Duel.Destroy(c,REASON_EFFECT)
+	end
 end
 function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	for tc in aux.Next(Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,0,nil)) do

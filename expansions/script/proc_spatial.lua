@@ -131,7 +131,7 @@ function Card.SwitchSpace(c)
 	return true
 end
 function Card.IsCanBeSpaceMaterial(c,sptc)
-	if not c:IsAbleToRemove() or c:IsOnField() and c:IsFacedown() then return false end
+	if not (c:IsOnField() or c:IsFaceupEx()) then return false end
 	local tef={c:IsHasEffect(EFFECT_CANNOT_BE_SPACE_MATERIAL)}
 	for _,te in ipairs(tef) do
 		if (type(te:GetValue())=="function" and te:GetValue()(te,sptc)) or te:GetValue()==1 then return false end
@@ -185,7 +185,7 @@ function Auxiliary.SpaceMatFilter(c,sptc,tp,...)
 	end
 	return false
 end
-function Auxiliary.SptCheckRecursive(c,tp,sg,mg,sptc,ct,djn,sptcheck,...)
+function Auxiliary.SptCheckRecursive(c,tp,sg,mg,fg,sptc,ct,djn,sptcheck,...)
 	if not c:IsLevelAbove(1) and not c:IsRankAbove(1)
 		or c:IsLevelAbove(djn+1) or c:IsRankAbove(djn+1) then return false end
 	sg:AddCard(c)
@@ -198,13 +198,14 @@ function Auxiliary.SptCheckRecursive(c,tp,sg,mg,sptc,ct,djn,sptcheck,...)
 			chk=true
 		end
 	end
-	local res=chk and (Auxiliary.SptCheckGoal(tp,sg,sptc,ct,sptcheck,...)
-		or (ct<max and mg:IsExists(Auxiliary.SptCheckRecursive,1,sg,tp,sg,mg,sptc,ct,djn,sptcheck,...)))
+	local res=chk and (Auxiliary.SptCheckGoal(tp,sg,fg,sptc,ct,sptcheck,...)
+		or (ct<max and mg:IsExists(Auxiliary.SptCheckRecursive,1,sg,tp,sg,mg,fg,sptc,ct,djn,sptcheck,...)))
 	sg:RemoveCard(c)
 	ct=ct-1
 	return res
 end
-function Auxiliary.SptCheckGoal(tp,sg,sptc,ct,sptcheck,...)
+function Auxiliary.SptCheckGoal(tp,sg,fg,sptc,ct,sptcheck,...)
+	if fg and fg:IsExists(aux.NOT(Card.IsContained),1,nil,sg) then return false end
 	local funs,min={...},0
 	for i=1,#funs do
 		if not sg:IsExists(funs[i][1],funs[i][2],nil) then return false end
@@ -271,9 +272,8 @@ function Auxiliary.SpatialCondition(sptcheck,...)
 				if #mg2>0 then mg:Merge(mg2) end
 				local fg=aux.GetMustMaterialGroup(tp,EFFECT_MUST_BE_SPACE_MATERIAL)
 				if fg:IsExists(aux.MustMaterialCounterFilter,1,nil,mg) then return false end
-				Duel.SetSelectedCard(fg)
 				local sg=Group.CreateGroup()
-				return mg:IsExists(Auxiliary.SptCheckRecursive,1,nil,tp,sg,mg,c,0,djn,sptcheck,table.unpack(funs))
+				return mg:IsExists(Auxiliary.SptCheckRecursive,1,nil,tp,sg,mg,fg,c,0,djn,sptcheck,table.unpack(funs))
 			end
 end
 function Auxiliary.SpatialTarget(sptcheck,...)
@@ -295,15 +295,16 @@ function Auxiliary.SpatialTarget(sptcheck,...)
 					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_LMATERIAL)
 					bg:Select(tp,#bg,#bg,nil)
 				end
+				local fg=Duel.GetMustMaterial(tp,EFFECT_MUST_BE_BIGBANG_MATERIAL)
 				local sg=Group.CreateGroup()
 				sg:Merge(bg)
 				local finish=false
 				local djn=c:GetLevel()
 				while #sg<max do
-					finish=Auxiliary.SptCheckGoal(tp,sg,c,#sg,sptcheck,table.unpack(funs))
-					local cg=mg:Filter(Auxiliary.SptCheckRecursive,sg,tp,sg,mg,c,#sg,djn,sptcheck,table.unpack(funs))
+					finish=Auxiliary.SptCheckGoal(tp,sg,fg,c,#sg,sptcheck,table.unpack(funs))
+					local cg=mg:Filter(Auxiliary.SptCheckRecursive,sg,tp,sg,mg,fg,c,#sg,djn,sptcheck,table.unpack(funs))
 					if #cg==0 then break end
-					local cancel=not finish
+					local cancel=Duel.IsSummonCancelable() and not finish
 					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 					local tc=cg:SelectUnselect(sg,tp,finish,cancel,min,max)
 					if not tc then break end
@@ -344,6 +345,12 @@ function Auxiliary.SpatialOperation(e,tp,eg,ep,ev,re,r,rp,c,smat,mg)
 	g:DeleteGroup()
 	local ospc=Duel.CreateToken(tp,c.spt_other_space)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local spch=Group.CreateGroup(c,ospc):SelectSubGroup(tp,aux.TRUE,true,1,1)
-	if spch and spch:GetFirst()==ospc then c:SwitchSpace() end
+	Duel.ConfirmCards(tp,ospc)
+	if Duel.SelectYesNo(tp,aux.Stringid(c:GetOriginalCode(),15)) then
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e1:SetCode(EVENT_SPSUMMON)
+		e1:SetOperation(function() c:SwitchSpace() e1:Reset() end)
+		Duel.RegisterEffect(e1,tp)
+	end
 end

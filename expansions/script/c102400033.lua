@@ -22,10 +22,10 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function s.discon(e,tp,eg,ep,ev,re,r,rp)
-	return rp==1-tp and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)%2==0 and Duel.IsChainDisablable(ev)
+	return rp==1-tp and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)%2<1 and Duel.IsChainDisablable(ev)
 end
 function s.filter(c)
-	return c:IsFaceupEx() and c:IsHadoken() and c:IsAbleToDeck()
+	return c:IsFaceupEx() and c:IsHadoken() and c:IsAbleToDeck() and not c:IsCode(id)
 end
 function s.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_GRAVE+LOCATION_ONFIELD,0,nil)
@@ -47,23 +47,28 @@ function s.disop(e,tp,eg,ep,ev,re,r,rp)
 	if g:FilterCount(Card.IsAbleToDeck,nil)==2 then Duel.SendtoDeck(g,tp,SEQ_DECKBOTTOM,REASON_EFFECT) end
 end
 function s.settg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local ct=3
+	if Duel.IsPlayerAffectedByEffect(tp,102400030) then ct=ct*2 end
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsHadoken,tp,LOCATION_DECK,0,1,nil)
-		and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>2 end
+		and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>=ct end
 end
 function s.sfilter(c,e,tp)
-	if not c:IsHadoken() then return end
+	if not c:IsHadoken() or c:IsCode(id) then return end
 	if c:IsType(TYPE_MONSTER) then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEDOWN_DEFENSE)
 	else return c:IsSSetable() end
 end
 function s.setop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)<3 then return end
+	local ct=3
+	if Duel.IsPlayerAffectedByEffect(tp,102400030) then ct=ct*2 end
+	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)<ct then return end
 	local g=Group.CreateGroup()
-	for i=0,2 do
+	for i=0,ct-1 do
 		local tc=Duel.GetFieldCard(tp,LOCATION_DECK,i)
-		for p=0,1 do Duel.ConfirmCards(p,tc,true) end
+		if ct<6 then for p=0,1 do Duel.ConfirmCards(p,tc,true) end end
 		g:AddCard(tc)
 	end
+	if ct>5 then for p=0,1 do Duel.ConfirmCards(p,g,true) end end
 	local mg=g:Filter(s.sfilter,nil,e,tp)
 	if #mg>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
