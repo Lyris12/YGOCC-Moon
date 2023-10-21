@@ -1,113 +1,156 @@
---created by Alastar Rainford, coded by Lyris
+--Savior of the Daylilly
+--created by Alastar Rainford, originally coded by Lyris
+--Rescripted by: XGlitchy30
+
 local s,id=GetID()
 function s.initial_effect(c)
+	if not s.progressive_id then
+		s.progressive_id=id
+	else
+		s.progressive_id=s.progressive_id+1
+	end
+	
 	c:EnableReviveLimit()
 	aux.EnablePendulumAttribute(c,false)
-	local e8=Effect.CreateEffect(c)
-	e8:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e8:SetRange(LOCATION_PZONE)
-	e8:SetCode(EVENT_SUMMON_SUCCESS)
-	e8:SetCategory(CATEGORY_DEFCHANGE)
-	e8:SetCondition(s.pcon)
-	e8:SetTarget(s.ptg)
-	e8:SetOperation(s.pop)
-	c:RegisterEffect(e8)
-	local e9=e8:Clone()
-	e9:SetCode(EVENT_SPSUMMON_SUCCESS)
-	c:RegisterEffect(e9)
-	local e7=e8:Clone()
-	e7:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
-	c:RegisterEffect(e7)
 	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_PLANT),aux.NonTuner(s.mfilter),1)
+	--double original def
+	aux.RegisterMergedDelayedEventGlitchy(c,s.progressive_id,{EVENT_SUMMON_SUCCESS,EVENT_SPSUMMON_SUCCESS,EVENT_FLIP_SUMMON_SUCCESS},s.filter,id,LOCATION_PZONE,nil,LOCATION_PZONE,nil,id+100,true)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_TRIGGER_F)
+	e1:SetCode(EVENT_CUSTOM+s.progressive_id)
+	e1:SetRange(LOCATION_PZONE)
+	e1:SetTarget(s.ptg)
+	e1:SetOperation(s.pop)
+	c:RegisterEffect(e1)
+	--spsummon
 	local e3=Effect.CreateEffect(c)
+	e3:Desc(0)
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_MZONE)
-	e3:SetCountLimit(1,id)
-	e3:SetCondition(function(e,tp) return Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsCode),tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil,CARD_BLACK_GARDEN) end)
-	e3:SetCost(s.spcost3)
+	e3:HOPT(true)
+	e3:SetLabel(0)
+	e3:SetCondition(s.spcon)
+	e3:SetCost(aux.DummyCost)
 	e3:SetTarget(s.sptg3)
 	e3:SetOperation(s.spop3)
 	c:RegisterEffect(e3)
-	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e5:SetCode(EVENT_DESTROYED)
-	e5:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
-	e5:SetCountLimit(1,id+100)
-	e5:SetCondition(s.pencon)
-	e5:SetTarget(s.pentg)
-	e5:SetOperation(s.penop)
-	c:RegisterEffect(e5)
+	--place in pzone
+	aux.AddDaylillyPlacingEffect(c,s.pencon,true)
 end
 function s.mfilter(c)
-	return c:IsRace(RACE_PLANT) and not c:IsType(TYPE_EFFECT)
+	return c:IsRace(RACE_PLANT) and not c:IsSynchroType(TYPE_EFFECT)
 end
-function s.filter(c,e,tp)
-	return c:GetSummonPlayer()==tp and c:IsRace(RACE_PLANT) and c:GetSummonLocation()==LOCATION_HAND and c:IsFaceup() and (not e or c:IsRelateToEffect(e))
-end
-function s.pcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(s.filter,1,nil,nil,tp) and Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsCode),tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil,CARD_BLACK_GARDEN)
+
+function s.filter(c,_,tp)
+	return c:IsSummonPlayer(tp) and c:IsSummonLocation(LOCATION_HAND|LOCATION_GRAVE) and c:IsFaceup() --and c:IsRace(RACE_PLANT)
 end
 function s.ptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.SetTargetCard(eg)
+	if chk==0 then return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,CARD_BLACK_GARDEN),tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
+	if eg then
+		local c=e:GetHandler()
+		local g
+		local sg=eg:Filter(aux.NOT(Card.HasFlagEffectLabel),nil,id+200,c:GetFieldID())
+		if #sg>1 then
+			g=sg:SelectSubGroup(tp,aux.SimultaneousEventGroupCheck,false,1,#sg,id+100,sg)
+		else
+			g=sg:Clone()
+		end
+		Duel.HintSelection(g)
+		for tc in aux.Next(g) do
+			tc:RegisterFlagEffect(id+200,RESET_EVENT|RESETS_STANDARD|RESET_CHAIN,0,1,c:GetFieldID())
+		end
+		Duel.SetTargetCard(g)
+	end
 end
 function s.pop(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
-	local g=eg:Filter(s.filter,1,nil,e,tp)
+	local g=Duel.GetTargetCards()
+	if not g then return end
+	local c=e:GetHandler()
 	for tc in aux.Next(g) do
-		local e1=Effect.CreateEffect(e:GetHandler())
+		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_SET_BASE_DEFENSE)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+		e1:SetCode(EFFECT_SET_BASE_DEFENSE_FINAL)
+		e1:SetReset(RESET_EVENT|RESETS_STANDARD)
 		e1:SetValue(tc:GetBaseDefense()*2)
 		tc:RegisterEffect(e1)
 	end
 end
-function s.costfilter(c)
-	return c:IsLevelAbove(1) and c:IsRace(RACE_PLANT) and not c:IsType(TYPE_EFFECT)
+
+function s.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,CARD_BLACK_GARDEN),tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
 end
-function s.fgoal(sg,e,tp)
-	local lv=sg:GetSum(Card.GetLevel)
-	Duel.SetSelectedCard(sg)
-	return Duel.CheckReleaseGroup(tp,nil,0,nil)
-		and Duel.IsExistingMatchingCard(s.spfilter3,tp,LOCATION_EXTRA+LOCATION_GRAVE,0,1,nil,e,tp,lv,sg)
+function s.fgoal(g,e,tp)
+	return Duel.IsExistingMatchingCard(s.spfilter3,tp,LOCATION_EXTRA|LOCATION_GRAVE,0,1,nil,e,tp,g)
 end
-function s.spfilter3(c,e,tp,lv,sg)
-	return c:IsRace(RACE_PLANT) and c:IsType(TYPE_FUSION) and c:IsLevel(lv)
-		and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE,tp,0x1f) and c:CheckFusionMaterial()
-		and (Duel.GetLocationCountFromEx(tp,tp,sg,c,0x1f)>0 or c:IsLocation(LOCATION_GRAVE))
+function s.spfilter3(c,e,tp,g,lv)
+	if not (c:IsFaceupEx() and c:IsMonster(TYPE_FUSION) and c:IsRace(RACE_PLANT) and c:GetLevel()>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE)) then return false end
+
+	if g then
+		if not g:CheckWithSumEqual(Card.GetLevel,c:GetLevel(),#g,#g) then
+			return false
+		end
+	elseif lv then
+		if not c:IsLevel(lv) then
+			return false
+		end
+	end
+	
+	if c:IsInGY() then
+		return Duel.GetMZoneCount(tp,g,tp,LOCATION_REASON_TOFIELD,0x1f)>0
+	else
+		return Duel.GetLocationCountFromEx(tp,tp,g,c,0x1f)>0
+	end
 end
-function s.spcost3(e,tp,eg,ep,ev,re,r,rp,chk)
-	local rg=(Duel.GetReleaseGroup(tp)+Duel.GetReleaseGroup(1-tp)):Filter(s.costfilter,nil)
-	if chk==0 then return rg:CheckSubGroup(s.fgoal,2,#rg,e,tp) end
-	local g=rg:SelectSubGroup(tp,s.fgoal,false,2,#rg,e,tp)
-	local lv=g:GetSum(Card.GetLevel)
-	e:SetLabel(lv)
-	Duel.Release(g,REASON_COST)
+function s.cfilter1(c,tp)
+	return not c:IsType(TYPE_EFFECT) and c:IsRace(RACE_PLANT) and (c:IsFaceup() or c:IsControler(tp)) and c:GetLevel()>0
+end
+function s.lairfilter_forced(c,tp,g)
+	return c:IsHasEffect(EFFECT_EXTRA_RELEASE_NONSUM,tp) and not g:IsContains(c)
+end
+function s.lairfilter_optional(c,tp,g)
+	return c:IsHasEffect(EFFECT_EXTRA_RELEASE_NONSUM,tp) and g:IsContains(c)
 end
 function s.sptg3(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return aux.MustMaterialCheck(nil,tp,EFFECT_MUST_BE_FMATERIAL) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA+LOCATION_GRAVE)
+	local g1=Duel.GetReleaseGroup(tp)
+	local g2=Duel.Group(Card.IsReleasable,tp,0,LOCATION_MZONE,nil)
+	g1:Merge(g2)
+	g1=g1:Filter(s.cfilter1,nil,tp)
+	if chk==0 then
+		return e:IsCostChecked() and #g1>0 and g1:CheckSubGroup(s.fgoal,1,#g1,e,tp)
+	end
+	Duel.HintMessage(tp,HINTMSG_RELEASE)
+	local rg=g1:SelectSubGroup(tp,s.fgoal,false,1,#g1,e,tp)
+	e:SetLabel(rg:GetSum(Card.GetLevel))
+	
+	local exg=rg:Filter(Auxiliary.ExtraReleaseFilter,nil,tp)
+	local exg1=exg:Filter(s.lairfilter_forced,nil,tp,g2)
+	local exg2=exg:Filter(s.lairfilter_optional,nil,tp,g2)
+	local te
+	if #exg1>0 then
+		local tc=exg1:Select(tp,1,1,nil):GetFirst()
+		te=tc:IsHasEffect(EFFECT_EXTRA_RELEASE_NONSUM,tp)
+	elseif #exg2>0 and Duel.SelectYesNo(tp,STRING_ASK_EXTRA_RELEASE_NONSUM) then
+		local tc=exg2:Select(tp,1,1,nil):GetFirst()
+		te=tc:IsHasEffect(EFFECT_EXTRA_RELEASE_NONSUM,tp)
+	end
+	if te then
+		Duel.Hint(HINT_CARD,tp,te:GetHandler():GetOriginalCode())
+		te:UseCountLimit(tp)
+	end
+	Duel.Release(rg,REASON_COST)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA|LOCATION_GRAVE)
 end
 function s.spop3(e,tp,eg,ep,ev,re,r,rp)
 	local lv=e:GetLabel()
+	if not lv then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local tc=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.spfilter3),tp,LOCATION_EXTRA+LOCATION_GRAVE,0,1,1,nil,e,tp,lv,nil):GetFirst()
+	local tc=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.spfilter3),tp,LOCATION_EXTRA|LOCATION_GRAVE,0,1,1,nil,e,tp,nil,lv):GetFirst()
 	if tc then
-		tc:SetMaterial(nil)
-		if Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)~=0 then tc:CompleteProcedure() end
+		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP_DEFENSE,0x1f)
 	end
 end
+
 function s.pencon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return r&REASON_EFFECT+REASON_BATTLE~=0 and c:IsPreviousLocation(LOCATION_MZONE) and c:IsFaceup()
-end
-function s.pentg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,1) end
-end
-function s.penop(e,tp,eg,ep,ev,re,r,rp)
-	if not Duel.CheckLocation(tp,LOCATION_PZONE,0) and not Duel.CheckLocation(tp,LOCATION_PZONE,1) then return false end
-	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) then Duel.MoveToField(c,tp,tp,LOCATION_SZONE,POS_FACEUP,true) end
+	return r&(REASON_EFFECT|REASON_BATTLE)>0
 end

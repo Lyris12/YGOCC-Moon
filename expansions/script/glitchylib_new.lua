@@ -102,6 +102,7 @@ CARD_ZERO_HERO_MAGMA_MAN				= 30409
 CARD_ZEROST_BEAST_ZEROTL 				= 100000025
 
 TOKEN_CRYSTRON							= 55326323
+TOKEN_DAYLILLY							= 41251200
 TOKEN_DRAGON_EGG						= 20157305
 TOKEN_NEBULA							= 218201917
 TOKEN_RIVAL								= 11110646
@@ -179,6 +180,7 @@ STRING_ASK_DRAW							=	915
 STRING_ASK_SUMMON						=	916
 STRING_ASK_EXCAVATE						=	917
 STRING_ASK_TO_EXTRA						=	918
+STRING_ASK_EXTRA_RELEASE_NONSUM			=	919
 
 STRING_SEND_TO_EXTRA					=	1006
 STRING_BANISH							=	1102
@@ -940,6 +942,9 @@ end
 function Card.IsOriginalType(c,typ)
 	return c:GetOriginalType()&typ>0
 end
+function Card.IsOriginalAttribute(c,att)
+	return c:GetOriginalAttribute()&att>0
+end
 function Card.IsOriginalRace(c,rc)
 	return c:GetOriginalRace()&rc>0
 end
@@ -947,6 +952,20 @@ end
 function Card.HasRank(c)
 	return c:IsType(TYPE_XYZ) or c:IsOriginalType(TYPE_XYZ) or c:IsHasEffect(EFFECT_ORIGINAL_LEVEL_RANK_DUALITY)
 end
+
+function Card.GetOriginalLink(c)
+	local link=0
+	local markers=c:GetOriginalLinkMarker()
+	local i=1
+	while i<=LINK_MARKER_TOP_RIGHT do
+		if markers&i==i then
+			link=link+1
+		end
+		i=i<<1
+	end
+	return link
+end
+
 function Card.GetRating(c)
 	local list={false,false,false,false}
 	if c:HasLevel() then
@@ -962,6 +981,31 @@ function Card.GetRating(c)
 		list[4]=c:GetFuture()
 	end
 	return list
+end
+function Card.GetOriginalRating(c)
+	local list={false,false,false}
+	if c:HasLevel(true) then
+		list[1]=c:GetOriginalLevel()
+	end
+	if c:IsOriginalType(TYPE_XYZ) then
+		list[2]=c:GetOriginalRank()
+	end
+	if c:IsOriginalType(TYPE_LINK) then
+		list[3]=c:GetOriginalLink()
+	end
+	return list
+end
+function Card.GetOriginalRatingAuto(c)
+	if c:HasLevel(true) then
+		return c:GetOriginalLevel()
+	end
+	if c:IsOriginalType(TYPE_XYZ) then
+		return c:GetOriginalRank()
+	end
+	if c:IsOriginalType(TYPE_LINK) then
+		return c:GetOriginalLink()
+	end
+	return 0
 end
 	
 function Card.IsRating(c,rtyp,...)
@@ -2923,6 +2967,108 @@ function Auxiliary.AircasterEquipOperation(e,tp,eg,ep,ev,re,r,rp)
 		return
 	end
 	Duel.EquipToOtherCardAndRegisterLimit(e,tp,c,tc)
+end
+
+----DAYLILLY
+function Auxiliary.AddDaylillyFusionProcedures(c)
+	aux.AddFusionProcFunRep(c,aux.DaylillyFusionMatFilter,2,true)
+	local contact_fusion=aux.AddContactFusionProcedure(c,Card.IsReleasable,LOCATION_MZONE,0,aux.DaylillyContactFusionOp(c))
+	local cond=contact_fusion:GetCondition()
+	contact_fusion:SetCondition(aux.DaylillyContactFusionCond(cond))
+end
+function Auxiliary.DaylillyFusionMatFilter(c)
+	return not c:IsFusionType(TYPE_EFFECT) and c:IsRace(RACE_PLANT)
+end
+function Auxiliary.DaylillyContactFusionCond(cond)
+	return	function(e,c)
+				return (not cond or cond(e,c)) and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,CARD_BLACK_GARDEN),tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
+			end 
+end
+function Auxiliary.DaylillyContactFusionOp(c)
+	return  function(g)
+				Duel.Release(g,REASON_COST|REASON_MATERIAL)
+				local e1=Effect.CreateEffect(c)
+				e1:SetDescription(aux.Stringid(TOKEN_DAYLILLY,0))
+				e1:SetType(EFFECT_TYPE_SINGLE)
+				e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE|EFFECT_FLAG_CLIENT_HINT)
+				e1:SetCode(EFFECT_IMMUNE_EFFECT)
+				e1:SetRange(LOCATION_MZONE)
+				e1:SetReset(RESET_EVENT|RESETS_STANDARD_TOFIELD)
+				e1:SetValue(function(e,te) return te:GetHandler():IsCode(CARD_BLACK_GARDEN) end)
+				c:RegisterEffect(e1)
+			end
+end
+
+function Auxiliary.AddDaylillySpSummonEffect(c)
+	local e1=Effect.CreateEffect(c)
+	e1:Desc(1)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetRange(LOCATION_PZONE)
+	e1:HOPT(true)
+	e1:SetCost(aux.DaylillySpSummonEffectCost)
+	e1:SetTarget(aux.DaylillySpSummonEffectTarget)
+	e1:SetOperation(aux.DaylillySpSummonEffectOp)
+	c:RegisterEffect(e1)
+	return e1
+end
+function Auxiliary.DaylillyReleaseFilter(c)
+	return not c:IsType(TYPE_EFFECT) and c:IsRace(RACE_PLANT)
+end
+function Auxiliary.DaylillySpSummonEffectCost(e,tp,eg,ep,ev,re,r,rp,chk)
+	local g=Duel.GetReleaseGroup(tp):Filter(aux.DaylillyReleaseFilter,nil)
+	if chk==0 then return g:CheckSubGroup(aux.mzctcheckrel,2,2,tp) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
+	local rg=g:SelectSubGroup(tp,aux.mzctcheckrel,false,2,2,tp)
+	aux.UseExtraReleaseCount(rg,tp)
+	Duel.Release(rg,REASON_COST)
+end
+function Auxiliary.DaylillySpSummonEffectTarget(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then return (e:IsCostChecked() or Duel.GetMZoneCount(tp)>0) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	Duel.SetCardOperationInfo(c,CATEGORY_SPECIAL_SUMMON)
+end
+function Auxiliary.DaylillySpSummonEffectOp(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if c:IsRelateToChain() and c:IsControler(tp) and c:IsLocation(LOCATION_PZONE) then
+		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+	end
+end
+
+function Auxiliary.AddDaylillyPlacingEffect(c,cond,hopt)
+	local e5=Effect.CreateEffect(c)
+	e5:Desc(3)
+	e5:SetType(EFFECT_TYPE_SINGLE|EFFECT_TYPE_TRIGGER_O)
+	e5:SetProperty(EFFECT_FLAG_DELAY)
+	e5:SetCode(EVENT_DESTROYED)
+	if hopt then
+		e5:HOPT(true)
+	end
+	e5:SetCondition(function(e,tp,eg,ep,ev,re,r,rp)
+						local c=e:GetHandler()
+						return c:IsPreviousLocation(LOCATION_MZONE) and (not cond or cond(e,tp,eg,ep,ev,re,r,rp))
+					end)
+	e5:SetTarget(aux.DaylillyPlaceInPZoneTarget)
+	e5:SetOperation(aux.DaylillyPlaceInPZoneOp)
+	c:RegisterEffect(e5)
+	local e6=e5:Clone()
+	e6:SetCode(EVENT_RELEASE)
+	c:RegisterEffect(e6)
+	return e1
+end
+function Auxiliary.DaylillyPlaceInPZoneTarget(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.CheckPendulumZones(tp) end
+	local c=e:GetHandler()
+	if c:IsInGY() then
+		Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,c,1,c:GetControler(),0)
+	end
+end
+function Auxiliary.DaylillyPlaceInPZoneOp(e,tp,eg,ep,ev,re,r,rp)
+	if not Duel.CheckPendulumZones(tp) then return end
+	local c=e:GetHandler()
+	if c:IsRelateToChain() then
+		Duel.MoveToField(c,tp,tp,LOCATION_PZONE,POS_FACEUP,true)
+	end
 end
 
 ----DREAMY/DREARY FOREST
