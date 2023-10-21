@@ -1,9 +1,7 @@
---Lamaccino dell'Alba - Flagello & Cielo
---Scripted by: XGlitchy30
-
+--created by Jake, coded by XGlitchy30
+--Dawn Blader - Bane & Sky
 local s,id=GetID()
 function s.initial_effect(c)
-	--special summon from hand
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -14,7 +12,6 @@ function s.initial_effect(c)
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
-	--search
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_TOHAND)
@@ -25,7 +22,6 @@ function s.initial_effect(c)
 	e2:SetTarget(s.thtg)
 	e2:SetOperation(s.thop)
 	c:RegisterEffect(e2)
-	--discard event
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,2))
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -56,7 +52,6 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-
 function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,nil) end
 	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD)
@@ -75,7 +70,6 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Search(g,tp)
 	end
 end
-
 function s.dsccond(e,tp,eg,ep,ev,re,r,rp)
 	return re and re:IsActiveType(TYPE_MONSTER) and re:GetHandler():IsSetCard(0x613) and e:GetHandler():IsReason(REASON_EFFECT+REASON_COST)
 end
@@ -128,7 +122,6 @@ function s.dscop(e,tp,eg,ep,ev,re,r,rp)
 	c:RegisterEffect(e1y,true)
 	if c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE) and Duel.SpecialSummonStep(c,0,tp,tp,false,false,POS_FACEUP_DEFENSE) then
 		spchk=true
-		--stats
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_SINGLE)
 		e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
@@ -140,7 +133,6 @@ function s.dscop(e,tp,eg,ep,ev,re,r,rp)
 		e2x:SetCode(EFFECT_SET_DEFENSE_FINAL)
 		e2x:SetValue(c:GetDefense()/2)
 		c:RegisterEffect(e2x,true)
-		--negate
 		local e3=Effect.CreateEffect(c)
 		e3:SetType(EFFECT_TYPE_SINGLE)
 		e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE)

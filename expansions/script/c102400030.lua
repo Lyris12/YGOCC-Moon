@@ -66,5 +66,5 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.val(e,c)
-	return Duel.GetFlagEffect(e:GetHandlerPlayer(),id)//2*500
+	return Duel.GetFlagEffect(e:GetHandlerPlayer(),id)//2*200
 end

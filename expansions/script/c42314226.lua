@@ -1,10 +1,8 @@
---Legame nell'Alba
---Scripted by: XGlitchy30
-
+--created by Jake, coded by XGlitchy30
+--Bond Between Dawn
 if not global_override_reason_effect_check then
 	global_override_reason_effect_check = true
 end
-
 local s,id=GetID()
 s.original_category={}
 function s.initial_effect(c)
@@ -22,7 +20,6 @@ function s.initial_effect(c)
 end
 s.dawn_blader_monster_in_text = true
 s.scapetoken = nil
-
 function s.filter0(c)
 	return c:IsType(TYPE_MONSTER) and c:IsFusionSetCard(0x613) and c:IsCanBeFusionMaterial() and c:IsAbleToGrave()
 end

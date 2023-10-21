@@ -1,9 +1,7 @@
---Lamaccino dell'Alba - Leone
---Scripted by: XGlitchy30
-
+--created by Jake, coded by XGlitchy30
+--Dawn Blader - Lion
 local s,id=GetID()
 function s.initial_effect(c)
-	--discard event
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -15,13 +13,11 @@ function s.initial_effect(c)
 	e1:SetTarget(aux.SSSelfTarget())
 	e1:SetOperation(aux.SSSelfOperation())
 	c:RegisterEffect(e1)
-	--lv up
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_SYNCHRO_LEVEL)
 	e2:SetValue(s.lvval)
 	c:RegisterEffect(e2)
-	--material
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e3:SetProperty(EFFECT_FLAG_EVENT_PLAYER)
@@ -30,12 +26,10 @@ function s.initial_effect(c)
 	e3:SetOperation(s.efop)
 	c:RegisterEffect(e3)
 end
-
 function s.dsccond(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return re and re:IsActiveType(TYPE_MONSTER) and re:GetHandler():IsSetCard(0x613) and (c:IsReason(REASON_EFFECT) or (c:IsReason(REASON_COST) and re:IsActivated()))
 end
-
 function s.lvval(e,c)
 	local lv=e:GetHandler():GetLevel()
 	if c:IsRace(RACE_WARRIOR+RACE_DRAGON) then
@@ -44,7 +38,6 @@ function s.lvval(e,c)
 		return lv
 	end
 end
-
 function s.efcon(e,tp,eg,ep,ev,re,r,rp)
 	local rc=e:GetHandler():GetReasonCard()
 	return rc:IsRace(RACE_WARRIOR) and e:GetHandler():IsReason(REASON_SYNCHRO)

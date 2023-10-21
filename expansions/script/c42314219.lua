@@ -1,12 +1,10 @@
---Lamaccino dell'Alba - Tigre
---Scripted by: XGlitchy30
-
+--created by Jake, coded by XGlitchy30
+--Dawn Blader - Tiger
 local s,id = GetID()
 function s.initial_effect(c)
 	aux.AddSetNameMonsterList(c,0x613)
 	c:EnableReviveLimit()
 	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_WARRIOR),aux.NonTuner(nil),1)
-	--salvage
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -24,7 +22,6 @@ function s.initial_effect(c)
 	e0:SetValue(s.valcheck)
 	e0:SetLabelObject(e1)
 	c:RegisterEffect(e0)
-	--battle target protection
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetRange(LOCATION_MZONE)
@@ -32,7 +29,6 @@ function s.initial_effect(c)
 	e2:SetCode(EFFECT_CANNOT_SELECT_BATTLE_TARGET)
 	e2:SetValue(s.atlimit)
 	c:RegisterEffect(e2)
-	--discard
 	c:SentToGYTrigger(false,1,CATEGORY_HANDES,EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_DDD,true,nil,nil,aux.DiscardTarget(nil,1,2),aux.DiscardOperation(nil,1,2))
 end
 function s.mfilter(c)
@@ -66,7 +62,6 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-
 function s.atlimit(e,c)
 	return c:IsRace(RACE_WARRIOR) and not c:IsCode(id)
 end

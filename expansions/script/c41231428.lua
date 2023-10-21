@@ -1,9 +1,7 @@
---Lamaccino dell'Alba - Re degli Eroi
---Scripted by: XGlitchy30
-
+--created by Jake, coded by XGlitchy30
+--Dawn Blader - King of Heroes
 local s,id=GetID()
 function s.initial_effect(c)
-	--special summon from hand
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -14,7 +12,6 @@ function s.initial_effect(c)
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
-	--search
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(1)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -40,7 +37,6 @@ function s.initial_effect(c)
 	e2y:SetTarget(aux.DiscardTarget())
 	e2y:SetOperation(aux.DiscardOperation())
 	c:RegisterEffect(e2y)
-	--discard event
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,4))
 	e3:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
@@ -68,7 +64,6 @@ function s.checkop(e,tp,eg,ep,ev,re,r,rp)
 		s[0]=Duel.GetChainInfo(cid,CHAININFO_CHAIN_ID)
 	end
 end
-
 function s.cfilter(c)
 	return c:IsMonster() and c:IsSetCard(0x613) and c:IsDiscardable()
 end
@@ -87,7 +82,6 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-
 function s.filter(c,chain)
 	return c:IsMonster() and c:IsSetCard(0x613) and (not chain or c:IsReason(REASON_COST))
 end
@@ -115,7 +109,6 @@ function s.op1(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummonNegate(e,g,0,tp,tp,false,false,POS_FACEUP_DEFENSE)
 	end
 end
-
 function s.hdcon(e,tp,eg,ep,ev,re,r,rp)
 	return not eg:IsContains(e:GetHandler()) and eg:IsExists(aux.Faceup(s.filter),1,nil)
 end

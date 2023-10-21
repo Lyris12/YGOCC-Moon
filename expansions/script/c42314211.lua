@@ -1,9 +1,7 @@
---Lamaccino dell'Alba - Orso
---Scripted by: XGlitchy30
-
+--created by Jake, coded by XGlitchy30
+--Dawn Blader - Bear
 local s,id=GetID()
 function s.initial_effect(c)
-	--discard event
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,0))
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -15,7 +13,6 @@ function s.initial_effect(c)
 	e3:SetTarget(aux.SSSelfTarget())
 	e3:SetOperation(aux.SSSelfOperation())
 	c:RegisterEffect(e3)
-	--material
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e2:SetProperty(EFFECT_FLAG_EVENT_PLAYER)
@@ -24,12 +21,10 @@ function s.initial_effect(c)
 	e2:SetOperation(s.efop)
 	c:RegisterEffect(e2)
 end
-
 function s.dsccond(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return re and re:IsActiveType(TYPE_MONSTER) and re:GetHandler():IsSetCard(0x613) and (c:IsReason(REASON_EFFECT) or (c:IsReason(REASON_COST) and re:IsActivated()))
 end
-
 function s.efcon(e,tp,eg,ep,ev,re,r,rp)
 	local rc=e:GetHandler():GetReasonCard()
 	return rc:IsRace(RACE_WARRIOR) and e:GetHandler():IsReason(REASON_FUSION)

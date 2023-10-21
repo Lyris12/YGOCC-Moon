@@ -1,17 +1,14 @@
---Drago Violetto Occhi d'Alba
---Scripted by: XGlitchy30
-
+--created by Jake, coded by XGlitchy30
+--Dawn-Eyes Violet Dragon
 local s,id=GetID()
 function s.initial_effect(c)
 	aux.AddSetNameMonsterList(c,0x614)
-	--type rule
 	local r1=Effect.CreateEffect(c)
 	r1:SetType(EFFECT_TYPE_SINGLE)
 	r1:SetCode(EFFECT_ADD_RACE)
 	r1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SET_AVAILABLE)
 	r1:SetValue(RACE_WARRIOR)
 	c:RegisterEffect(r1)
-	--special summon from hand
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -22,7 +19,6 @@ function s.initial_effect(c)
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
-	--draw
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,1))
 	e2:SetCategory(CATEGORY_DRAW)
@@ -35,7 +31,6 @@ function s.initial_effect(c)
 	e2:SetTarget(aux.DrawTarget())
 	e2:SetOperation(aux.DrawOperation())
 	c:RegisterEffect(e2)
-	--material
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e3:SetProperty(EFFECT_FLAG_EVENT_PLAYER)
@@ -63,14 +58,12 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-
 function s.drawcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return c:IsAbleToRemoveAsCost() and Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,nil) end
 	Duel.Remove(c,POS_FACEUP,REASON_COST)
 	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD)
 end
-
 function s.efcon(e,tp,eg,ep,ev,re,r,rp)
 	local rc=e:GetHandler():GetReasonCard()
 	return rc:IsSetCard(0x614) and e:GetHandler():IsReason(REASON_FUSION+REASON_SYNCHRO+REASON_XYZ+REASON_LINK)

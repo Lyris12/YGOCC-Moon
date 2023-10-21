@@ -1,9 +1,7 @@
---Lamaccino dell'Alba - Eroko
---Scripted by: XGlitchy30
-
+--created by Jake, coded by XGlitchy30
+--Dawn Blader - Eroko
 local s,id=GetID()
 function s.initial_effect(c)
-	--normal summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_SUMMON)
@@ -14,7 +12,6 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
-	--draw
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(1)
 	e2:SetCategory(CATEGORY_DRAW)
@@ -25,7 +22,6 @@ function s.initial_effect(c)
 	e2:SetTarget(s.drawtg)
 	e2:SetOperation(s.drawop)
 	c:RegisterEffect(e2)
-	--discard event
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,2))
 	e3:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
@@ -79,7 +75,6 @@ function s.ntcon(e,c,minc)
 	if c==nil then return true end
 	return minc==0 and Duel.CheckTribute(c,0)
 end
-
 function s.drfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x613)
 end
@@ -98,7 +93,6 @@ function s.drawop(e,tp,eg,ep,ev,re,r,rp)
 	if d>3 then d=3 end
 	Duel.Draw(p,d,REASON_EFFECT)
 end
-
 function s.dsccond(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return re and re:IsActiveType(TYPE_MONSTER) and re:GetHandler():IsSetCard(0x613) and (c:IsReason(REASON_EFFECT) or (c:IsReason(REASON_COST) and re:IsActivated()))

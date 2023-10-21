@@ -1,12 +1,10 @@
+--created by Jake, coded by XGlitchy30
 --Steinitz's Tactics
---Script by XGlitchy30
 function c25386875.initial_effect(c)
-	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e1)
-	--equip
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(25386875,0))
 	e1:SetCategory(CATEGORY_EQUIP)
@@ -17,7 +15,6 @@ function c25386875.initial_effect(c)
 	e1:SetTarget(c25386875.eqtg)
 	e1:SetOperation(c25386875.eqop)
 	c:RegisterEffect(e1)
-	--special summon
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(25386875,1))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -28,7 +25,6 @@ function c25386875.initial_effect(c)
 	e2:SetTarget(c25386875.sptg)
 	e2:SetOperation(c25386875.spop)
 	c:RegisterEffect(e2)
-	--zone movement
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(25386875,2))
 	e3:SetType(EFFECT_TYPE_QUICK_O)
@@ -41,7 +37,6 @@ function c25386875.initial_effect(c)
 	e3:SetOperation(c25386875.zoneop)
 	c:RegisterEffect(e3)
 end
---filters
 function c25386875.eqtarget(c)
 	return c:IsFaceup() and c:IsSetCard(0x63d0)
 end
@@ -60,11 +55,9 @@ function c25386875.sptarg_final(c,e,tp)
 	local ec=c:GetEquipTarget()
 	return c:IsSetCard(0x63d0) and ec and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
---values
 function c25386875.eqlimit(e,c)
 	return c==e:GetLabelObject()
 end
---equip
 function c25386875.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and c25386875.eqtarget(chkc) end
@@ -95,7 +88,6 @@ function c25386875.eqop(e,tp,eg,ep,ev,re,r,rp)
 		ec:RegisterEffect(e1)
 	end
 end
---special summon
 function c25386875.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
 	if chkc then return chkc:IsLocation(LOCATION_SZONE) and c25386875.sptarg_final(chkc,e,tp) end
@@ -124,7 +116,6 @@ function c25386875.spop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
---zone movement
 function c25386875.zonecon(e,tp,eg,ep,ev,re,r,rp)
 	return (Duel.GetCurrentPhase()>=PHASE_BATTLE_START and Duel.GetCurrentPhase()<=PHASE_BATTLE) and not e:GetHandler():IsStatus(STATUS_CHAINING)
 end

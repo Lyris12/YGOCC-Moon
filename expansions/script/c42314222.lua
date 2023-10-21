@@ -1,12 +1,10 @@
---Lamaccino dell'Alba - Sciabola
---Scripted by: XGlitchy30
-
+--created by Jake, coded by XGlitchy30
+--Dawn Blader - Saber
 local s,id = GetID()
 function s.initial_effect(c)
 	aux.AddSetNameMonsterList(c,0x613)
 	c:EnableReviveLimit()
 	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_WARRIOR),4,2)
-	--salvage
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetCategory(CATEGORY_TOHAND)
@@ -24,7 +22,6 @@ function s.initial_effect(c)
 	e0:SetValue(s.valcheck)
 	e0:SetLabelObject(e1)
 	c:RegisterEffect(e0)
-	--effect target protection
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
@@ -34,9 +31,7 @@ function s.initial_effect(c)
 	e2:SetTarget(s.tglimit)
 	e2:SetValue(aux.tgoval)
 	c:RegisterEffect(e2)
-	--to hand
 	c:Ignition(1,CATEGORY_TOHAND,nil,nil,true,nil,aux.DetachSelfCost(),s.thtg2,s.thop2)
-	--discard
 	c:SentToGYTrigger(false,2,CATEGORY_DRAW,EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_DDD,true,nil,nil,aux.DrawTarget(),aux.DrawOperation())
 end
 function s.mfilter(c)
@@ -69,11 +64,9 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Search(tc,tp)
 	end
 end
-
 function s.tglimit(e,c)
 	return c:IsRace(RACE_WARRIOR) and not c:IsCode(id)
 end
-
 function s.thfil(c)
 	return c:IsMonster() and c:IsRace(RACE_WARRIOR) and c:IsAbleToHand()
 end

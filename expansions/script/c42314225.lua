@@ -1,12 +1,9 @@
---Il Luogo di Riposo di un Lamaccino
---Scripted by: XGlitchy30
-
+--created by Jake, coded by XGlitchy30
+--A Blader's Resting Place
 local s,id=GetID()
 s.original_category={}
 function s.initial_effect(c)
-	--activate
 	c:Activate()
-	--avoid damage
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_AVOID_BATTLE_DAMAGE)
@@ -19,7 +16,6 @@ function s.initial_effect(c)
 	e1x:SetCode(EFFECT_NO_BATTLE_DAMAGE)
 	e1x:SetTargetRange(0,LOCATION_MZONE)
 	c:RegisterEffect(e1x)
-	--ignition effect
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(0)
 	e2:SetType(EFFECT_TYPE_IGNITION)
@@ -31,11 +27,9 @@ function s.initial_effect(c)
 	e2:SetOperation(s.operation)
 	c:RegisterEffect(e2)
 	s.original_category[e2]=e2:GetCategory()
-	--draw
 	c:DestroyedTrigger(false,4,CATEGORY_DRAW,EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL,nil,aux.ByCardEffect(1),nil,aux.DrawTarget(),aux.DrawOperation())
 end
 s.dawn_blader_monster_in_text = true
-
 function s.cfilter(c,f,exc)
 	if not f(c) or (exc and c:IsCode(id)) then return false end
 	if c:IsMonster() then

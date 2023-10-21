@@ -1,13 +1,10 @@
---Sopravvivenza all'Alba
---Scripted by: XGlitchy30
-
+--created by Jake, coded by XGlitchy30
+--Survival at Dawn
 if not global_override_reason_effect_check then
 	global_override_reason_effect_check = true
 end
-
 local s,id=GetID()
 function s.initial_effect(c)
-	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,0))
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
@@ -30,7 +27,6 @@ function s.initial_effect(c)
 end
 s.dawn_blader_monster_in_text = true
 s.scapetoken = nil
-
 function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetAttacker()
 	local bc=Duel.GetAttackTarget()

@@ -1,10 +1,8 @@
---Ira all'Alba
---Scripted by: XGlitchy30
-
+--created by Jake, coded by XGlitchy30
+--Wrath at Dawn
 if not global_override_reason_effect_check then
 	global_override_reason_effect_check = true
 end
-
 local s,id=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
@@ -21,7 +19,6 @@ function s.initial_effect(c)
 end
 s.dawn_blader_monster_in_text = true
 s.scapetoken = nil
-
 function s.cfilter(c,e,tp)
 	local rat=c:GetRating()
 	local lv,rk=rat[1],rat[2]

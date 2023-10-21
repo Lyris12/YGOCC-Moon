@@ -1,7 +1,6 @@
+--created by Jake, coded by XGlitchy30
 --Steinitz's Check Call
---Script by XGlitchy30
 function c25386876.initial_effect(c)
-	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_DESTROY)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
@@ -12,7 +11,6 @@ function c25386876.initial_effect(c)
 	e1:SetOperation(c25386876.activate)
 	c:RegisterEffect(e1)
 end
---filters
 function c25386876.costfilter(c,tp)
 	return c:IsFaceup() and c:IsSetCard(0x63d0)
 		and Duel.IsExistingMatchingCard(c25386876.clfilter,tp,0,LOCATION_MZONE,1,nil,c,tp)
@@ -21,7 +19,6 @@ function c25386876.clfilter(c,tg,tp)
 	local g=tg:GetColumnGroup()
 	return g:IsContains(c) and c:GetControler()~=tp 
 end
---Activate
 function c25386876.cost(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and c25386876.costfilter(chkc,tp) end
 	if chk==0 then return Duel.IsExistingTarget(c25386876.costfilter,tp,LOCATION_MZONE,0,1,nil,tp)

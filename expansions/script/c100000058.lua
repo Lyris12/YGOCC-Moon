@@ -1,12 +1,8 @@
---Eptamagi's Memory, Matertetra
---Memoria degli Eptamagi, Matertetra
---Scripted by: XGlitchy30
-
+--created by Swag, coded by XGlitchy30
+--Safety, Deep in the Dreary Forest's Lies
 local s,id=GetID()
 function s.initial_effect(c)
 	aux.EnablePendulumAttribute(c)
-	--[[You can perform a Pendulum Summon even if there is not a Pendulum Monster Card in your other Pendulum Zone, treating the missing Pendulum Scale as 0.
-	If you do this, you can only Pendulum Summon "Eptamagi" monsters and/or EARTH Warrior monsters.]]
 	local e0=Effect.CreateEffect(c)
 	e0:Desc(0)
 	e0:SetType(EFFECT_TYPE_SINGLE)
@@ -14,8 +10,6 @@ function s.initial_effect(c)
 	e0:SetTarget(s.pendtg)
 	e0:SetValue(0)
 	c:RegisterEffect(e0)
-	--[[If there is an "Eptamagi" Monster Card in your other Pendulum Zone, except "Eptamagi's Memory, Matertetra":
-	You can Special Summon 1 "Eptamagi" Monster Card from your Pendulum Zone, and if you do, you can add 1 Level 7 EARTH Warrior monster from your Deck to your hand.]]
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(1)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON|CATEGORIES_SEARCH)
@@ -25,12 +19,9 @@ function s.initial_effect(c)
 	e1:SetFunctions(s.spcon,nil,s.sptg,s.spop)
 	c:RegisterEffect(e1)
 end
-
-
 function s.pendtg(e,c)
 	return c:IsSetCard(ARCHE_EPTAMAGI) or c:IsAttributeRace(ATTRIBUTE_EARTH,RACE_WARRIOR)
 end
-
 function s.cfilter(c)
 	return c:IsFaceup() and c:IsMonsterCard() and c:IsSetCard(ARCHE_EPTAMAGI) and not c:IsCode(id)
 end
