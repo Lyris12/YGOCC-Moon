@@ -527,7 +527,7 @@ function Auxiliary.MergedDelayEventCheckGlitchy1(event,id,f,range,evgcheck,se,op
 							if operation then
 								customev=operation(e,tp,G,ep,ev,re,r,rp,obj,event)
 							end
-							local counter=(aux.EventCounter[eid]>0) and aux.EventCounter[eid] or 1
+							local counter=(type(aux.EventCounter[eid])=="number" and aux.EventCounter[eid]>0) and aux.EventCounter[eid] or 1
 							for i=1,counter do
 								Duel.RaiseEvent(G,EVENT_CUSTOM+e:GetLabel(),re,r,rp,ep,customev)
 							end
@@ -538,7 +538,9 @@ function Auxiliary.MergedDelayEventCheckGlitchy1(event,id,f,range,evgcheck,se,op
 							end
 						end
 					end
-					aux.EventCounter[eid]=0
+					if type(aux.EventCounter[eid])=="number" then
+						aux.EventCounter[eid]=0
+					end
 					g:Clear()
 				end
 			end
@@ -590,7 +592,7 @@ function Auxiliary.MergedDelayEventCheckGlitchy2(id,range,evgcheck,se,operation,
 								local obj = aux.GetValueType(se)=="Effect" and se:GetLabelObject() or nil
 								customev=operation(e,tp,G,ep,ev,re,r,rp,obj)
 							end
-							local counter=(aux.EventCounter[eid]>0) and aux.EventCounter[eid] or 1
+							local counter=(type(aux.EventCounter[eid])=="number" and aux.EventCounter[eid]>0) and aux.EventCounter[eid] or 1
 							for i=1,counter do
 								Debug.Message(i)
 								Duel.RaiseEvent(G,EVENT_CUSTOM+e:GetLabel(),re,r,rp,ep,customev)
@@ -603,7 +605,9 @@ function Auxiliary.MergedDelayEventCheckGlitchy2(id,range,evgcheck,se,operation,
 							end
 						end
 					end
-					aux.EventCounter[eid]=0
+					if type(aux.EventCounter[eid])=="number" then
+						aux.EventCounter[eid]=0
+					end
 					g:Clear()
 				end
 			end
