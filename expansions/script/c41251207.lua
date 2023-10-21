@@ -43,7 +43,7 @@ function s.mfilter(c)
 end
 
 function s.filter(c,_,tp)
-	return c:IsSummonPlayer(tp) and c:IsSummonLocation(LOCATION_HAND|LOCATION_GRAVE) and c:IsFaceup() --and c:IsRace(RACE_PLANT)
+	return c:IsSummonPlayer(tp) and c:IsSummonLocation(LOCATION_HAND|LOCATION_GRAVE) and c:IsFaceup() and c:IsRace(RACE_PLANT)
 end
 function s.ptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsCode,CARD_BLACK_GARDEN),tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
