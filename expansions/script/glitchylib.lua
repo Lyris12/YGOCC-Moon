@@ -494,7 +494,7 @@ function Auxiliary.MergedDelayEventCheckGlitchy1(event,id,f,range,evgcheck,se,op
 					end
 				end
 				if aux.MustUpdateEventID[c]==true then
-					if forced and type(aux.EventCounter[eid])=="number" then
+					if forced and type(aux.EventCounter[eid])=="number" and #evg>0 then
 						aux.EventCounter[eid] = aux.EventCounter[eid] + 1
 					end
 					EVENT_ID = EVENT_ID + 1

@@ -11641,7 +11641,7 @@ expansions/script/c99998880.lua	3aef26642d50e23356a371a14d7b09ad
 expansions/script/Deptheaven.lua	451894d4b7a9a2b13929be6cc70876c1
 expansions/script/Elemerge.lua	4475491ee094a20d129be9c6638155d1
 expansions/script/GardrenialCommons.lua	df2b3e36ef0489fd6749fea0b4ed75f8
-expansions/script/glitchylib.lua	52cc68f04d471699275d430eeb03c7a1
+expansions/script/glitchylib.lua	345e7f36d7065122052369ee734abb0e
 expansions/script/glitchylib_adjust_events.lua	620dcaecb767f65089869854803c5e8b
 expansions/script/glitchylib_aeonstride.lua	b6af07df91ed86f143cde05b9aaca11f
 expansions/script/glitchylib_cond.lua	f8b5d033e01d43764ca8eaee9d326c29
@@ -11772,6 +11772,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	ba02d085a0a6da59efe52e786b37ee3e
+update/filelist.txt	09feab8f1ab20b18b4a43448580b7b3d
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	c66716539f57873ba94f088d63a33936
+update/version.txt	f3467fd6f35f32831dd395758e55f391
