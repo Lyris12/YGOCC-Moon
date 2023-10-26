@@ -1,4 +1,4 @@
-EFFECT_PENDULUM_SUMMON_WITH_ONE_SCALE	= 100000058
+EFFECT_PENDULUM_SUMMON_WITH_ONE_SCALE	= 100000060
 
 function Auxiliary.PandePendScale(c,seq)
 	return Auxiliary.PaCheckFilter(c) and c:IsHasEffect(EFFECT_PANDEPEND_SCALE) and c:GetSequence()==math.abs(4-seq)
