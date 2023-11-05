@@ -2,8 +2,8 @@
 --Elysia, Magitate Megacyma
 local s,id,o=GetID()
 function s.initial_effect(c)
-	aux.AddOrigDoubleSidedType(c)
 	aux.AddDoubleSidedProc(c,SIDE_REVERSE,131792002)
+	aux.AddReverseSideProc(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
@@ -30,7 +30,7 @@ function s.indval(e,re,rp)
 	return aux.indoval(e,re,rp) and re:IsActiveType(TYPE_MONSTER)
 end
 function s.filter(c)
-	return Card.IsConcentratedMagitate and c:IsConcentratedMagitate() and c:IsAbleToRemoveAsCost()
+	return c:IsSetCard({0xd16, "Concentrated"}) and c:IsAbleToRemoveAsCost()
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) and chkc:IsType(TYPE_SPELL+TYPE_TRAP) end

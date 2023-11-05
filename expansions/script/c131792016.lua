@@ -26,7 +26,7 @@ function s.drcon(e)
 	return e:GetHandler():IsPreviousControler(tp) and e:GetHandler():IsPreviousLocation(LOCATION_GRAVE)
 end
 function s.filter(c)
-	return Card.IsConcentratedMagitate and c:IsConcentratedMagitate() and c:IsAbleToRemove()
+	return c:IsSetCard({0xd16, "Concentrated"}) and c:IsAbleToRemove()
 end
 function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_EXTRA,0,1,nil)

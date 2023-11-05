@@ -1,8 +1,8 @@
 --created by LeonDuvall, coded by Lyris
 --Metallic Concentrated Magitate
 local s,id,o=GetID()
-Card.IsConcentratedMagitate=Card.IsConcentratedMagitate or function(c) return c:GetCode()>131792009 and c:GetCode()<131792017 end
 function s.initial_effect(c)
+	c:RegisterSetCardString({0xd16, "Concentrated"})
 	c:EnableReviveLimit()
 	aux.AddLinkProcedure(c,s.mfilter,1,1)
 	local e1=Effect.CreateEffect(c)

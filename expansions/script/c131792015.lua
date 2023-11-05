@@ -26,7 +26,7 @@ function s.filter(c,e,tp)
 	return c:IsSetCard(0xd16) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,nil,c:GetAttribute())
 end
 function s.cfilter(c,at)
-	return c:IsFaceup() and Card.IsConcentratedMagitate and c:IsConcentratedMagitate() and c:GetAttribute()==at
+	return c:IsFaceup() and c:IsSetCard({0xd16, "Concentrated"}) and c:GetAttribute()==at
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

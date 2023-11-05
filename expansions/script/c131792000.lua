@@ -2,8 +2,7 @@
 --Aster, Magitate Ember
 local s,id,o=GetID()
 function s.initial_effect(c)
-	aux.AddOrigDoubleSidedType(c)
-	aux.AddDoubleSidedProc(c.SIDE_OBVERSE,131792001)
+	aux.AddDoubleSidedProc(c,SIDE_OBVERSE,131792001)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
@@ -43,7 +42,7 @@ function s.thop(e,tp)
 	Duel.ConfirmCards(1-tp,g)
 end
 function s.cfilter(c)
-	return Card.IsConcentratedMagitate and c:IsConcentratedMagitate() and c:IsAttribute(ATTRIBUTE_EARTH) and Duel.GetMZoneCount(tp,c)>0
+	return c:IsSetCard({0xd16, "Concentrated"}) and c:IsAttribute(ATTRIBUTE_EARTH) and Duel.GetMZoneCount(tp,c)>0
 end
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckReleaseGroup(tp,s.cfilter,1,nil,tp) end

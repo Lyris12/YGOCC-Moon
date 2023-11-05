@@ -1,4 +1,4 @@
---created by Jake, coded by XGlitchy30
+--created by Jake, coded by XGlitchy30; edited by _
 --A Blader's Resting Place
 local s,id=GetID()
 s.original_category={}

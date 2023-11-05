@@ -2,6 +2,8 @@
 --Cindy, Magitate Infernum
 local s,id,o=GetID()
 function s.initial_effect(c)
+	aux.AddDoubleSidedProc(c,SIDE_REVERSE,131792006)
+	aux.AddReverseSideProc(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_PIERCE)
@@ -25,7 +27,7 @@ function s.pierce(e,c)
 	return c:IsLevel(5) and c:IsSetCard(0xd16)
 end
 function s.cfilter(c)
-	return Card.IsConcentratedMagitate and c:IsConcentratedMagitate() and c:IsAbleToRemoveAsCost()
+	return c:IsSetCard({0xd16, "Concentrated"}) and c:IsAbleToRemoveAsCost()
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_GRAVE,0,1,nil) end

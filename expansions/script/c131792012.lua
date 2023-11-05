@@ -2,6 +2,7 @@
 --Verdant Concentrated Magitate
 local s,id,o=GetID()
 function s.initial_effect(c)
+	c:RegisterSetCardString({0xd16, "Concentrated"})
 	c:EnableReviveLimit()
 	aux.AddLinkProcedure(c,s.mfilter,1,1)
 	local e1=Effect.CreateEffect(c)
@@ -17,7 +18,6 @@ function s.initial_effect(c)
 	e1:SetOperation(s.tdop)
 	c:RegisterEffect(e1)
 end
-Card.IsConcentratedMagitate=Card.IsConcentratedMagitate or function(c) return c:GetCode()>131792009 and c:GetCode()<131792017 and c:IsSetCard(0xd16) end
 function s.mfilter(c)
 	return c:IsLevelBelow(4) and not c:IsLinkAttribute(ATTRIBUTE_EARTH) and c:IsSetCard(0xd16)
 end
@@ -34,7 +34,7 @@ function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SendtoDeck(c,nil,SEQ_DECKTOP,REASON_COST)
 end
 function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then Duel.IsExistingMatchingCard(Card.IsAbleToDeck,tp,0,LOCATION_HAND,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToDeck,tp,0,LOCATION_HAND,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,1,1-tp,LOCATION_HAND)
 end
 function s.tdop(e,tp)

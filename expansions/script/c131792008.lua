@@ -2,7 +2,6 @@
 --Aerin, Magitate Shade
 local s,id,o=GetID()
 function s.initial_effect(c)
-	aux.AddOrigDoubleSidedType(c)
 	aux.AddDoubleSidedProc(c,SIDE_OBVERSE,131792009)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
@@ -44,7 +43,7 @@ function s.drop(e,tp)
 	Duel.ShuffleHand(tp)
 end
 function s.cfilter(c)
-	return Card.IsConcentratedMagitate and c:IsConcentratedMagitate() and c:IsAttribute(ATTRIBUTE_LIGHT) and Duel.GetMZoneCount(tp,c)>0
+	return c:IsSetCard({0xd16, "Concentrated"}) and c:IsAttribute(ATTRIBUTE_LIGHT) and Duel.GetMZoneCount(tp,c)>0
 end
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckReleaseGroup(tp,s.cfilter,1,nil,tp) end

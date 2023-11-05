@@ -200,6 +200,7 @@ dofile("expansions/script/tables.lua") --Special Tables
 -- dofile("expansions/script/proc_impure.lua") --Impures
 
 dofile("expansions/script/mods_pendulum.lua") --Generic Pendulum Procedure modifications
+dofile("expansions/script/mods_archetype.lua") --SetCard modifcations for Custom Archetypes
 
 --overwrite functions
 local is_type, card_remcounter, duel_remcounter, effect_set_target_range, effect_set_reset, add_xyz_proc, add_xyz_proc_nlv, duel_overlay, duel_set_lp, duel_select_target, duel_banish, card_check_remove_overlay_card, is_reason, duel_check_tribute, select_tribute,card_sethighlander,

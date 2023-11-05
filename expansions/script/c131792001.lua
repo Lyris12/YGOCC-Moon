@@ -2,7 +2,6 @@
 --Aster, Magitate Terraemotus
 local s,id,o=GetID()
 function s.initial_effect(c)
-	aux.AddOrigDoubleSidedType(c)
 	aux.AddDoubleSidedProc(c,SIDE_REVERSE,131792000)
 	aux.AddReverseSideProc(c)
 	local e1=Effect.CreateEffect(c)
@@ -35,7 +34,7 @@ function s.value(e,c)
 	return aux.GetAttributeCount(g)*200
 end
 function s.cfilter(c)
-	return Card.IsConcentratedMagitate and c:IsConcentratedMagitate() and c:IsAbleToRemoveAsCost()
+	return c:IsSetCard({0xd16, "Concentrated"}) and c:IsAbleToRemoveAsCost()
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_GRAVE,0,1,nil) end
@@ -45,7 +44,7 @@ end
 function s.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0xd16)
 end
-function s.target(e,tp,eg,ep,re,r,rp,chk,chkc)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(s.filter,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)

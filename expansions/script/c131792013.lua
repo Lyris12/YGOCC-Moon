@@ -2,6 +2,7 @@
 --Radiant Concentrated Magitate
 local s,id,o=GetID()
 function s.initial_effect(c)
+	c:RegisterSetCardString({0xd16, "Concentrated"})
 	c:EnableReviveLimit()
 	aux.AddLinkProcedure(c,s.mfilter,1,1)
 	local e1=Effect.CreateEffect(c)
@@ -18,7 +19,6 @@ function s.initial_effect(c)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
 end
-Card.IsConcentratedMagitate=Card.IsConcentratedMagitate or function(c) return c:GetCode()>131792009 and c:GetCode()<131792017 and c:IsSetCard(0xd16) end
 function s.mfilter(c)
 	return c:IsLevelBelow(4) and not c:IsLinkAttribute(ATTRIBUTE_WIND) and c:IsSetCard(0xd16)
 end
@@ -46,7 +46,7 @@ end
 function s.spop(e,tp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local tc=Duel.SelectMatchingCard(tp,1,nil,e,tp):GetFirst()
+	local tc=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp):GetFirst()
 	if tc and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)>0 then
 		Duel.BreakEffect()
 		Duel.Transform(tc,SIDE_REVERSE,e,tp)

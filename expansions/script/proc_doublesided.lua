@@ -258,7 +258,7 @@ function Auxiliary.AddReverseSideProc(c)
 		return c:HasObverseSide()
 	end)
 	e2:SetOperation(Auxiliary.RevertToObverseSideOperation)
-	c:RegisterEffect(e2)	
+	c:RegisterEffect(e2)
 	local e3=e2:Clone()
 	e3:SetType(EFFECT_TYPE_SINGLE|EFFECT_TYPE_CONTINUOUS)
 	e3:SetCode(EVENT_LEAVE_FIELD)
@@ -267,6 +267,8 @@ function Auxiliary.AddReverseSideProc(c)
 end
 function Auxiliary.RevertToObverseSideOperation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
+	local g=Duel.GetMatchingGroup(Card.HasObverseSide,tp,LOCATION_DECK|LOCATION_GRAVE|LOCATION_REMOVED|LOCATION_HAND|LOCATION_EXTRA,LOCATION_DECK|LOCATION_GRAVE|LOCATION_REMOVED|LOCATION_HAND|LOCATION_EXTRA,nil)
+	if #g>1 and not g:GetMaxGroup(Card.GetSequence):IsContains(c) then return end
 	local tcode=c.obverse_side
 	if not tcode then return end
 	c:SetEntityCode(tcode)

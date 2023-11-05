@@ -2,6 +2,8 @@
 --Corentin, Magitate Tempestas
 local s,id,o=GetID()
 function s.initial_effect(c)
+	aux.AddDoubleSidedProc(c,SIDE_REVERSE,131792004)
+	aux.AddReverseSideProc(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_TURN_SET)
@@ -34,7 +36,7 @@ function s.discon(e,tp,eg,ep,ev,re,r,rp)
 	return rp==1-tp and g and g:IsExists(s.filter,1,nil,tp) and Duel.IsChainDisablable(ev)
 end
 function s.cfilter(c)
-	return Card.IsConcentratedMagitate and c:IsConcentratedMagitate() and c:IsAbleToRemoveAsCost()
+	return c:IsSetCard({0xd16, "Concentrated"}) and c:IsAbleToRemoveAsCost()
 end
 function s.discost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_GRAVE,0,1,nil) end

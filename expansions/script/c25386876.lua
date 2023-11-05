@@ -1,4 +1,4 @@
---created by Jake, coded by XGlitchy30
+--created by Jake, coded by XGlitchy30; updated by _
 --Steinitz's Check Call
 function c25386876.initial_effect(c)
 	local e1=Effect.CreateEffect(c)

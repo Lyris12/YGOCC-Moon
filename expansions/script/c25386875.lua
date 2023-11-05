@@ -1,4 +1,4 @@
---created by Jake, coded by XGlitchy30
+--created by Jake, coded by XGlitchy30; updated by _
 --Steinitz's Tactics
 function c25386875.initial_effect(c)
 	local e1=Effect.CreateEffect(c)

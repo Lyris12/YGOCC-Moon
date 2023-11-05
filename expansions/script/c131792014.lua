@@ -2,6 +2,7 @@
 --Shimmering Concentrated Magitate
 local s,id,o=GetID()
 function s.initial_effect(c)
+	c:RegisterSetCardString({0xd16, "Concentrated"})
 	c:EnableReviveLimit()
 	aux.AddLinkProcedure(c,s.mfilter,1,1)
 	local e1=Effect.CreateEffect(c)
@@ -17,7 +18,6 @@ function s.initial_effect(c)
 	e1:SetOperation(s.drop)
 	c:RegisterEffect(e1)
 end
-Card.IsConcentratedMagitate=Card.IsConcentratedMagitate or function(c) return c:GetCode()>131792009 and c:GetCode()<131792017 and c:IsSetCard(0xd16) end
 function s.mfilter(c)
 	return c:IsLevelBelow(4) and not c:IsLinkAttribute(ATTRIBUTE_DARK) and c:IsSetCard(0xd16)
 end

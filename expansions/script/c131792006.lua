@@ -2,7 +2,6 @@
 --Cindy, Magitate Whisper
 local s,id,o=GetID()
 function s.initial_effect(c)
-	aux.AddOrigDoubleSidedType(c)
 	aux.AddDoubleSidedProc(c,SIDE_OBVERSE,131792007)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
@@ -41,7 +40,7 @@ function s.thop(e,tp)
 	Duel.ConfirmCards(1-tp,g)
 end
 function s.cfilter(c,tp)
-	return c:IsAttribute(ATTRIBUTE_FIRE) and Card.IsConcentratedMagitate and c:IsConcentratedMagitate()
+	return c:IsAttribute(ATTRIBUTE_FIRE) and c:IsSetCard({0xd16, "Concentrated"})
 		and Duel.GetMZoneCount(tp,c)>0
 end
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)

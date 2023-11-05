@@ -1,4 +1,4 @@
---created by Jake, coded by Keddy
+--created by Jake, coded by Keddy; updated by _
 --Steinitz's Castling
 local function ID()
 	local str=string.match(debug.getinfo(2,'S')['source'],"c%d+%.lua")
