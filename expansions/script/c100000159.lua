@@ -54,7 +54,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetPossibleOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
 end
 function s.tgfilter(c)
-	return c:IsMonster() and c:IsSetCard(0x35) and c:IsAbleToGrave()
+	return c:IsMonster(TYPE_RITUAL) and c:IsSetCard(ARCHE_CRYSTARION) and c:IsAbleToGrave()
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(s.tgfilter,tp,LOCATION_DECK,0,nil)

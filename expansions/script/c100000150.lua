@@ -40,29 +40,32 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and aux.NegateMonsterFilter(chkc) end
 	local en=Duel.GetEngagedCard(tp)
 	if chk==0 then
-		return e:IsCostChecked() and en and en:IsMonster() and en:IsLevelAbove(3) and Duel.IsExists(true,aux.NegateMonsterFilter,tp,0,LOCATION_MZONE,2,nil)
+		if not (e:IsCostChecked() and en and en:IsMonster() and en:GetEnergy()>=2) then return false end
+		local enchk=false
+		for i=2,en:GetEnergy(),2 do
+			if en:IsCanUpdateEnergy(-i,tp,REASON_COST,e) then
+				enchk=true
+				break
+			end
+		end
+		return enchk and Duel.IsExists(true,aux.NegateMonsterFilter,tp,0,LOCATION_MZONE,2,nil)
 	end
 	local AvailableNums={}
-	for i=2,en:GetLevel(),2 do
-		if Duel.IsExists(true,aux.NegateMonsterFilter,tp,0,LOCATION_MZONE,i,nil) then
-			table.insert(AvailableNums,i)
-		else
-			break
+	for i=2,en:GetEnergy(),2 do
+		if en:IsCanUpdateEnergy(-i,tp,REASON_COST,e) then
+			if Duel.IsExists(true,aux.NegateMonsterFilter,tp,0,LOCATION_MZONE,i,nil) then
+				table.insert(AvailableNums,i)
+			else
+				break
+			end
 		end
 	end
 	if #AvailableNums==0 then return end
 	Duel.HintMessage(tp,STRING_INPUT_LEVEL)
 	local lv=Duel.AnnounceNumber(tp,table.unpack(AvailableNums))
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE|EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_UNCOPYABLE)
-	e1:SetCode(EFFECT_UPDATE_LEVEL)
-	e1:SetCondition(aux.ResetIfNotEngaged(en:GetEngagedID()))
-	e1:SetReset(RESET_EVENT|RESETS_STANDARD)
-	e1:SetValue(-lv)
-	en:RegisterEffect(e1,true)
-	Duel.AdjustInstantly(en)
-	local tg=Duel.Select(HINTMSG_DISABLE,true,tp,aux.NegateMonsterFilter,tp,0,LOCATION_MZONE,lv,lv,nil)
+	local _,ct=en:UpdateEnergy(-lv,tp,REASON_COST,true,e:GetHandler(),e)
+	ct=math.abs(ct)
+	local tg=Duel.Select(HINTMSG_DISABLE,true,tp,aux.NegateMonsterFilter,tp,0,LOCATION_MZONE,ct,ct,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DISABLE,tg,#tg,1-tp,LOCATION_MZONE)
 	Duel.SetPossibleOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
 end
