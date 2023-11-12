@@ -7,6 +7,7 @@ function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(0)
 	e1:SetCategory(CATEGORY_DESTROY)
+	e1:SetCustomCategory(CATEGORY_UPDATE_ENERGY)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetTarget(s.target)
@@ -14,8 +15,8 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	local en=Duel.GetEngagedCard(tp)
 	if chk==0 then
-		local en=Duel.GetEngagedCard(tp)
 		if not en then return false end
 		for i=1,3 do
 			if en:IsCanUpdateEnergy(-i,tp,REASON_EFFECT) then
@@ -24,6 +25,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 		end
 		return false
 	end
+	Duel.SetCustomOperationInfo(0,CATEGORY_UPDATE_ENERGY,en,1,INFOFLAG_DECREASE,-1)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local en=Duel.GetEngagedCard(tp)

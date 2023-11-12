@@ -12,6 +12,7 @@ REASON_DRIVE	= 0x80000000000
 FLAG_ENGAGE = 348
 FLAG_ZERO_ENERGY = 349
 FLAG_ENERGY_CHANGE = 350
+FLAG_OVERDRIVE_ENERGY = 351
 
 EFFECT_DRIVE_ORIGINAL_ENERGY 		= 34843
 EFFECT_DRIVE_ENERGY 				= 34844
@@ -22,6 +23,9 @@ EFFECT_IGNORE_OVERDRIVE_COST		= 34848
 
 EVENT_ENGAGE					= EVENT_CUSTOM+34843
 EVENT_ENERGY_CHANGE				= EVENT_CUSTOM+29935986
+
+INFOFLAG_DECREASE	= 0x1
+INFOFLAG_INCREASE	= 0x2
 
 Auxiliary.Drives={}
 
@@ -344,17 +348,21 @@ function Auxiliary.OverDriveEffectCondition(cond)
 			end
 end
 DRIVE_SIMPLE_COST = false
-function Auxiliary.DriveEffectCost(ct,cost,setlabel,ct2)
+function Auxiliary.DriveEffectCost(ct,cost,setlabel,ct2,enchk)
 	return	function(e,tp,eg,ep,ev,re,r,rp,chk)
 				DRIVE_SIMPLE_COST=true
 				if setlabel then e:SetLabel(1) end
 				local c=e:GetHandler()
+				local res
+				if enchk then
+					res=enchk(c,ct,e,tp,eg,ep,ev,re,r,rp)
+				end
 				if chk==0 then
-					local check = c:IsCanUpdateEnergy(ct,tp,REASON_COST,e,ct2) and (not cost or cost(e,tp,eg,ep,ev,re,r,rp,chk))
+					local check = c:IsCanUpdateEnergy(ct,tp,REASON_COST,e,ct2,res) and (not cost or cost(e,tp,eg,ep,ev,re,r,rp,chk))
 					DRIVE_SIMPLE_COST=false
 					return check
 				end
-				c:UpdateEnergy(ct,tp,REASON_COST,true,c,e,ct2)
+				c:UpdateEnergy(ct,tp,REASON_COST,true,c,e,ct2,false,res)
 				if cost then
 					cost(e,tp,eg,ep,ev,re,r,rp,chk)
 				end
@@ -381,6 +389,9 @@ function Auxiliary.OverDriveEffectCost(cost,setlabel)
 					DRIVE_SIMPLE_COST=false
 					return check
 				end
+				
+				c:RegisterFlagEffect(FLAG_OVERDRIVE_ENERGY,RESET_CHAIN,0,1,c:GetEnergy())
+				
 				local available_effects = {}
 				local g=Group.CreateGroup()
 				for _,ce in ipairs(egroup) do
@@ -421,7 +432,7 @@ end
 if not OVERDRIVE_EFFECTS_TABLE then
 	OVERDRIVE_EFFECTS_TABLE = {}
 end
-function Card.DriveEffect(c,energycost,desc,category,typ,property,event,condition,cost,target,operation,hold_registration,setlabelcost,shopt)
+function Card.DriveEffect(c,energycost,desc,category,typ,property,event,condition,cost,target,operation,hold_registration,setlabelcost,shopt,enchk)
 	local energy_for_legal_activation
 	if type(energycost)=="table" then
 		energy_for_legal_activation = energycost[2]
@@ -479,8 +490,8 @@ function Card.DriveEffect(c,energycost,desc,category,typ,property,event,conditio
 		end
 	end
 	e:SetCondition(aux.DriveEffectCondition(condition))
-	if energycost~=0 then
-		e:SetCost(aux.DriveEffectCost(energycost,cost,setlabelcost,energy_for_legal_activation))
+	if energycost and energycost~=0 then
+		e:SetCost(aux.DriveEffectCost(energycost,cost,setlabelcost,energy_for_legal_activation,enchk))
 	elseif cost then
 		e:SetCost(cost)
 	end
@@ -625,6 +636,10 @@ function Card.GetOriginalEnergy(c)
 	end
 	return math.max(0,energy)
 end
+function Card.GetOverdriveEnergy(c)
+	if not c:HasFlagEffect(FLAG_OVERDRIVE_ENERGY) then return 0 end
+	return c:GetFlagEffectLabel(FLAG_OVERDRIVE_ENERGY)
+end
 
 function Card.CheckZeroEnergySelfDestroy(c,ct)
 	return ct<0 and c:IsEnergyBelow(math.abs(ct)) --futureproofing
@@ -656,10 +671,10 @@ function Duel.GetTotalEnergy()
 	return ct
 end
 
-function Card.IsCanUpdateEnergy(c,ct,p,r,e,ct2)
+function Card.IsCanUpdateEnergy(c,ct,p,r,e,ct2,chk)
 	if not c:IsHasEnergy() then return false end
 	if not ct2 then ct2=ct end
-	local enchk = ct>=0 or c:IsEnergyAbove(math.abs(ct2))
+	local enchk = (ct>=0 or c:IsEnergyAbove(math.abs(ct2))) and (chk==nil or chk)
 	if DRIVE_SIMPLE_COST and not enchk and r&REASON_COST==REASON_COST and r&REASON_REPLACE==0 then
 		local egroup={Duel.IsPlayerAffectedByEffect(p,EFFECT_REPLACE_UPDATE_ENERGY_COST)}
 		for _,ce in ipairs(egroup) do
@@ -686,15 +701,15 @@ end
 
 aux.EnergyChangeEventParams = {}
 aux.EnergyChangeEventGroup = nil
-function Card.UpdateEnergy(c,val,p,r,reset,rc,e,val2,step)
+function Card.UpdateEnergy(c,val,p,r,reset,rc,e,val2,step,chk,ignore_modifiers)
 	local reset = (type(reset)=="number" or not reset) and reset or 0
 	if not val2 then val2=val end
 	
 	local type=aux.GetValueType(c)
 	if type=="Card" then
 		local rc = rc and rc or c
-		local enchk = val>=0 or c:IsEnergyAbove(math.abs(val2))
-		if r&REASON_COST==REASON_COST and r&REASON_REPLACE==0 then
+		local enchk = (val>=0 or c:IsEnergyAbove(math.abs(val2))) and (chk==nil or chk)
+		if not ignore_modifiers and r&REASON_COST==REASON_COST and r&REASON_REPLACE==0 then
 			local available_effects = {}
 			local g=Group.CreateGroup()
 			local egroup={Duel.IsPlayerAffectedByEffect(p,EFFECT_REPLACE_UPDATE_ENERGY_COST)}

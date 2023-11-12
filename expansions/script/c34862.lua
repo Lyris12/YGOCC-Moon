@@ -18,10 +18,10 @@ function s.initial_effect(c)
 		aux.SSTarget(s.spfilter,LOCATION_HAND,0,1),
 		aux.SSOperation(s.spfilter,LOCATION_HAND,0,1)
 	)
-	local d3=c:OverDriveEffect(2,CATEGORY_SEARCH+CATEGORY_TOHAND,EFFECT_TYPE_IGNITION,nil,nil,
+	local d3=c:OverDriveEffect(3,{CATEGORY_SEARCH+CATEGORY_TOHAND,CATEGORY_CHANGE_ENERGY},EFFECT_TYPE_IGNITION,nil,nil,
 		nil,
 		nil,
-		aux.SearchTarget(s.thfilter),
+		s.thtg,
 		s.thop
 	)
 	--Monster Effects
@@ -48,6 +48,7 @@ function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(id,6))
 	e2:SetCategory(CATEGORY_TOGRAVE)
+	e2:SetCustomCategory(CATEGORY_RESET_ENERGY)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
 	e2:HOPT()
@@ -77,15 +78,20 @@ function s.spfilter(c)
 end
 
 function s.thfilter(c)
-	return c:IsMonster(TYPE_DRIVE) and not c:IsAttribute(ATTRIBUTE_EARTH)
+	return c:IsMonster(TYPE_DRIVE) and c:IsAttribute(ATTRIBUTE_ALL&(~ATTRIBUTE_EARTH)) and c:IsAbleToHand()
 end
+function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+	Duel.SetPossibleCustomOperationInfo(0,CATEGORY_CHANGE_ENERGY,nil,1,0,1)
+end 
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,s.thfilter,tp,LOCATION_DECK,0,1,1,nil)
 	if #g>0 and Duel.SendtoHand(g,nil,REASON_EFFECT)>0 and g:GetFirst():IsLocation(LOCATION_HAND) then
 		local tc=g:GetFirst()
 		Duel.ConfirmCards(1-tp,g)
-		if tc:IsCanEngage(tp) and Duel.SelectYesNo(tp,aux.Stringid(id,3)) then
+		if tc:IsCanEngage(tp) and Duel.SelectYesNo(tp,aux.Stringid(id,2)) then
 			tc:Engage(e,tp)
 			if tc:IsEngaged() and tc:IsCanChangeEnergy(1,tp,REASON_EFFECT) then
 				tc:ChangeEnergy(1,tp,REASON_EFFECT,nil,e:GetHandler())
@@ -121,6 +127,7 @@ function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local dc=Duel.GetEngagedCard(tp)
 	if chk==0 then return dc and dc:IsCanResetEnergy(tp,REASON_EFFECT) and Duel.IsExistingMatchingCard(s.tgfilter,tp,LOCATION_DECK,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
+	Duel.SetCustomOperationInfo(0,CATEGORY_RESET_ENERGY,dc,1,0,0)
 end
 function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 	local dc=Duel.GetEngagedCard(tp)

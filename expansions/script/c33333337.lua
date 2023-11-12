@@ -12,6 +12,7 @@ function s.initial_effect(c)
 	)
 	--energy
 	local e2=Effect.CreateEffect(c)
+	e2:SetCustomCategory(CATEGORY_UPDATE_ENERGY)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetProperty(EFFECT_FLAG_DELAY)
 	e2:SetCode(EVENT_ENGAGE)
@@ -65,6 +66,7 @@ function s.entg(e,tp,eg,ep,ev,re,r,rp,chk)
 		end
 		return false
 	end
+	Duel.SetCustomOperationInfo(0,CATEGORY_UPDATE_ENERGY,en,1,INFOFLAG_DECREASE|INFOFLAG_INCREASE,1)
 end
 function s.enop(e,tp,eg,ep,ev,re,r,rp)
 	local en=Duel.GetEngagedCard(tp)

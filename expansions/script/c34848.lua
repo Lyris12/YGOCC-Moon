@@ -33,12 +33,13 @@ function s.initial_effect(c)
 	--decrease energy
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(id,3))
+	e3:SetCustomCategory(CATEGORY_UPDATE_ENERGY)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e3:SetCode(EVENT_PHASE+PHASE_END)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1)
 	e3:SetCondition(aux.TurnPlayerCond())
-	e3:SetTarget(aux.Check())
+	e3:SetTarget(s.entg)
 	e3:SetOperation(s.enop)
 	c:RegisterEffect(e3)
 end
@@ -139,6 +140,11 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 
+function s.entg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	local en=Duel.GetEngagedCard(tp)
+	Duel.SetCustomOperationInfo(0,CATEGORY_UPDATE_ENERGY,en,1,INFOFLAG_DECREASE,2)
+end
 function s.enop(e,tp,eg,ep,ev,re,r,rp)
 	local en=Duel.GetEngagedCard(tp)
 	if en and en:IsCanUpdateEnergy(-2,tp,REASON_EFFECT) then

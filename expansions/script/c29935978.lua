@@ -31,7 +31,8 @@ function s.initial_effect(c)
 	--search
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(1)
-	e1:SetCategory(CATEGORY_DISABLE+CATEGORY_DESTROY)
+	e1:SetCategory(CATEGORY_DISABLE|CATEGORY_DESTROY)
+	e1:SetCustomCategory(CATEGORY_UPDATE_ENERGY)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetCode(EVENT_CHAINING)
 	e1:SetRange(LOCATION_HAND)
@@ -92,11 +93,11 @@ function s.actop(e,tp,eg,ep,ev,re,r,rp)
 		or not Duel.IsPlayerCanSpecialSummonMonster(tp,id,0x209,TYPE_MONSTER+TYPE_EFFECT+TYPE_PANDEMONIUM,700,3100,7,RACE_AQUA,ATTRIBUTE_WATER) then
 		return
 	end
-	c:AddMonsterAttribute(TYPE_EFFECT+TYPE_PANDEMONIUM)
+	c:AddMonsterAttribute(c:GetOriginalPandemoniumType())
 	if Duel.SpecialSummon(c,0,tp,tp,true,false,POS_FACEUP)>0 and c:IsFaceup() and c:IsLocation(LOCATION_MZONE) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 then
 		local tc=Duel.GetFirstTarget()
 		if tc and tc:IsRelateToChain() and tc:IsControler(1-tp) and s.eqfilter(tc,tp) then
-			Duel.EquipAndRegisterLimit(tp,tc,c,false)
+			Duel.EquipAndRegisterLimit(e,tp,tc,c,false)
 		end
 	end
 end
@@ -128,6 +129,7 @@ function s.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
 		if dc:IsDestructable(e) then
 			Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,dc:GetControler(),dc:GetLocation())
 			Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,nil,1,1-tp,0)
+			Duel.SetPossibleCustomOperationInfo(0,CATEGORY_UPDATE_ENERGY,nil,1,INFOFLAG_INCREASE,0)
 		end
 	else
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,0,0,rc:GetPreviousLocation())

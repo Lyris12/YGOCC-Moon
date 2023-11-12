@@ -386,6 +386,8 @@ function Auxiliary.RegisterMergedDelayedEventGlitchy(c,code,event,f,flag,range,e
 	if check_if_already_in_location then
 		if check_if_already_in_location&LOCATION_GRAVE>0 then
 			se=aux.AddThisCardInGraveAlreadyCheck(c)
+		elseif check_if_already_in_location&LOCATION_FZONE>0 then
+			se=aux.AddThisCardInFZoneAlreadyCheck(c)
 		elseif check_if_already_in_location&LOCATION_MZONE>0 then
 			se=aux.AddThisCardInMZoneAlreadyCheck(c)
 		end
@@ -580,7 +582,7 @@ function Auxiliary.MergedDelayEventCheckGlitchy2(id,range,evgcheck,se,operation,
 						--Debug.Message("FILTERED GROUP COUNT: "..tostring(#_eg))
 						if engage_label~=0 then
 							_eg=_eg:Filter(Card.HasFlagEffectLabel,nil,cid,engage_label)
-							Debug.Message(#_eg)
+							--Debug.Message(#_eg)
 						end
 						G:Merge(_eg)
 					end
@@ -594,7 +596,7 @@ function Auxiliary.MergedDelayEventCheckGlitchy2(id,range,evgcheck,se,operation,
 							end
 							local counter=(type(aux.EventCounter[eid])=="number" and aux.EventCounter[eid]>0) and aux.EventCounter[eid] or 1
 							for i=1,counter do
-								Debug.Message(i)
+								--Debug.Message(i)
 								Duel.RaiseEvent(G,EVENT_CUSTOM+e:GetLabel(),re,r,rp,ep,customev)
 							end
 						end

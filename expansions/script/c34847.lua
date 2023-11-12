@@ -7,7 +7,7 @@ function s.initial_effect(c)
 	--Drive Effects
 	aux.AddDriveProc(c,6)
 	local d1=c:DriveEffect(0,nil,nil,EFFECT_TYPE_FIELD,EFFECT_FLAG_IGNORE_IMMUNE,EFFECT_CANNOT_BE_EFFECT_TARGET,nil,nil,{LOCATION_MZONE,0,aux.TargetBoolFunction(Card.IsType,TYPE_DRIVE)},1)
-	local d2=c:DriveEffect(0,0,nil,EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F,nil,EVENT_PHASE+PHASE_END,aux.TurnPlayerCond(),nil,aux.Check(),s.enop)
+	local d2=c:DriveEffect(0,0,{0,CATEGORY_UPDATE_ENERGY},EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F,nil,EVENT_PHASE+PHASE_END,aux.TurnPlayerCond(),nil,s.entg,s.enop)
 	local d3=c:OverDriveEffect(1,CATEGORY_SEARCH+CATEGORY_TOHAND,EFFECT_TYPE_IGNITION,nil,nil,nil,nil,s.thtg,s.thop)
 	--SS
 	local e1=Effect.CreateEffect(c)
@@ -31,6 +31,10 @@ function s.initial_effect(c)
 	e2:SetTarget(s.pttg)
 	e2:SetOperation(s.ptop)
 	c:RegisterEffect(e2)
+end
+function s.entg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.SetCustomOperationInfo(0,CATEGORY_UPDATE_ENERGY,e:GetHandler(),1,INFOFLAG_DECREASE,-2)
 end
 function s.enop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

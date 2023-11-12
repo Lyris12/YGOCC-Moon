@@ -6,7 +6,8 @@ function s.initial_effect(c)
 	aux.AddCodeList(c,34843)
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(0)
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_GRAVE_SPSUMMON)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON|CATEGORY_GRAVE_SPSUMMON)
+	e1:SetCustomCategory(CATEGORY_UPDATE_ENERGY)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:HOPT(true)
@@ -15,8 +16,8 @@ function s.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	local en=Duel.GetEngagedCard(tp)
 	if chk==0 then
-		local en=Duel.GetEngagedCard(tp)
 		if not en then return false end
 		for i=1,3 do
 			if en:IsCanUpdateEnergy(i,tp,REASON_EFFECT) then
@@ -25,6 +26,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 		end
 		return false
 	end
+	Duel.SetCustomOperationInfo(0,CATEGORY_UPDATE_ENERGY,en,1,INFOFLAG_INCREASE,1)
 end
 function s.spfilter(c,e,tp)
 	return c:IsMonster(TYPE_DRIVE) and c:NotBanishedOrFaceup() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

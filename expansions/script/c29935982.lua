@@ -15,7 +15,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.acttg)
 	c:RegisterEffect(e1)
 	--increase energy
-	c:Ignition(1,nil,EFFECT_FLAG_CARD_TARGET,nil,true,
+	c:Ignition(1,{0,CATEGORY_UPDATE_ENERGY},EFFECT_FLAG_CARD_TARGET,nil,true,
 		nil,
 		nil,
 		s.entg,
@@ -51,7 +51,8 @@ function s.entg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		return en and en:IsMonster() and en:IsSetCard(0x209) and Duel.IsExistingTarget(s.enfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,tp,en)
 	end
 	Duel.HintMessage(tp,HINTMSG_TARGET)
-	Duel.SelectTarget(tp,s.enfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil,tp,en)
+	local g=Duel.SelectTarget(tp,s.enfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil,tp,en)
+	Duel.SetCustomOperationInfo(0,CATEGORY_UPDATE_ENERGY,en,1,INFOFLAG_INCREASE,g:GetFirst():GetLevel())
 end
 function s.enop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()

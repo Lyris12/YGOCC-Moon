@@ -11,7 +11,7 @@ function s.initial_effect(c)
 		aux.SearchOperation(aux.Filter(Card.IsSetCard,0x7ea),LOCATION_DECK+LOCATION_GRAVE,0,1)
 	)
 	--add to hand
-	c:FieldTrigger(nil,false,1,CATEGORY_ATKCHANGE,true,EVENT_ENGAGE,LOCATION_MZONE,nil,
+	c:FieldTrigger(nil,false,1,{CATEGORY_ATKCHANGE,CATEGORY_UPDATE_ENERGY},true,EVENT_ENGAGE,LOCATION_MZONE,nil,
 		nil,
 		nil,
 		s.entg,
@@ -25,9 +25,11 @@ end
 function s.entg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local en=eg:Filter(s.filter,nil,tp)
 	if chk==0 then return #en==1 and rp==tp end
-	Duel.SetTargetCard(en:GetFirst())
+	local ec=en:GetFirst()
+	Duel.SetTargetCard(ec)
 	local c=e:GetHandler()
 	Duel.SetCustomOperationInfo(0,CATEGORY_ATKCHANGE,c,1,c:GetControler(),c:GetLocation())
+	Duel.SetCustomOperationInfo(0,CATEGORY_UPDATE_ENERGY,ec,1,INFOFLAG_DECREASE|INFOFLAG_INCREASE,1)
 end
 function s.enop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()

@@ -6,10 +6,10 @@ function s.initial_effect(c)
 	aux.AddOrigDriveType(c)
 	--Drive Effects
 	aux.AddDriveProc(c,15)
-	local d1=c:DriveEffect(0,0,nil,EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F,nil,EVENT_ENGAGE,
+	local d1=c:DriveEffect(0,0,{0,CATEGORY_UPDATE_ENERGY},EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F,nil,EVENT_ENGAGE,
 		nil,
 		nil,
-		nil,
+		s.target,
 		s.operation
 	)
 	local d2=c:DriveEffect(-4,1,CATEGORY_DRAW,EFFECT_TYPE_IGNITION,EFFECT_FLAG_PLAYER_TARGET,nil,
@@ -48,6 +48,10 @@ function s.initial_effect(c)
 	e3:SetTarget(s.sptg)
 	e3:SetOperation(s.spop)
 	c:RegisterEffect(e3)
+end
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.SetCustomOperationInfo(0,CATEGORY_UPDATE_ENERGY,e:GetHandler(),1,INFOFLAG_DECREASE,Duel.GetFieldGroupCount(0,LOCATION_ONFIELD,LOCATION_ONFIELD))
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

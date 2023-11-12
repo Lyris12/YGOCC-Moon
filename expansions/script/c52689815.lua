@@ -39,6 +39,7 @@ function s.initial_effect(c)
 	local e2=e1:Clone()
 	e2:Desc(3)
 	e2:SetCategory(0)
+	e2:SetCustomCategory(CATEGORY_UPDATE_ENERGY)
 	e2:HOPT(true)
 	e2:SetTarget(s.target(1))
 	e2:SetOperation(s.operation(1))
@@ -46,6 +47,7 @@ function s.initial_effect(c)
 	local e3=e1:Clone()
 	e3:Desc(4)
 	e3:SetCategory(CATEGORY_REMOVE|CATEGORY_SPECIAL_SUMMON|CATEGORY_GRAVE_SPSUMMON)
+	e3:SetCustomCategory(CATEGORY_UPDATE_ENERGY)
 	e3:HOPT(true)
 	e3:SetTarget(s.target(2))
 	e3:SetOperation(s.operation(2))
@@ -143,13 +145,15 @@ function s.opinfo(opt)
 					else
 						e:SetCategory(0)
 					end
+					Duel.SetCustomOperationInfo(0,CATEGORY_UPDATE_ENERGY,c,1,INFOFLAG_INCREASE,1)
 				end
 	
 	elseif opt==2 then
-		return	function(c,_,tp,eg)
+		return	function(c,_,tp,eg,en)
 					local g=eg:Filter(aux.PLChk,nil,tp,LOCATION_GRAVE)
 					Duel.SetTargetCard(g)
 					Duel.SetCardOperationInfo(c,CATEGORY_REMOVE)
+					Duel.SetCustomOperationInfo(0,CATEGORY_UPDATE_ENERGY,en,1,INFOFLAG_DECREASE,1)
 				end
 	end
 end
@@ -163,7 +167,7 @@ function s.target(opt)
 					return not c:HasFlagEffect(id+200) and check_function(c,e,tp,eg,en)
 				end
 				c:RegisterFlagEffect(id+200,RESET_CHAIN,0,1)
-				infos_function(c,e,tp,eg)
+				infos_function(c,e,tp,eg,en)
 			end
 end
 function s.operation(opt)

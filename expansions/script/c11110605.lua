@@ -16,7 +16,7 @@ function s.initial_effect(c)
 	e0:SetValue(s.adval)
 	c:RegisterEffect(e0)
 	e0:UpdateDefenseClone(c)
-	--[[During the Main Phase (Quick Effect): You can increase or reduce your Engaged Drive Monster's Energy by its Level.]]
+	--[[While you have an Engaged "Metalurgos" Drive Monster, "Metalurgos" Continuous Spells you control cannot be destroyed by your opponent's card effects.]]
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
@@ -27,10 +27,11 @@ function s.initial_effect(c)
 	e1:SetValue(aux.indoval)
 	c:RegisterEffect(e1)
 	--[[During the Main Phase (Quick Effect): You can add 1 "Metalurgos" Drive Monster from your Deck or GY to your hand,
-	and if you do, you can Engage it, and if you do that, reduce it's Energy to 1.]]
+	and if you do, you can Engage it, and if you do that, reduce its Energy to 1.]]
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(0)
 	e2:SetCategory(CATEGORIES_SEARCH)
+	e2:SetCustomCategory(CATEGORY_CHANGE_ENERGY)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_MZONE)
@@ -72,6 +73,7 @@ function s.sctg(e,tp,eg,ep,ev,re,r,rp,chk)
 		return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK|LOCATION_GRAVE,0,1,nil)
 	end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK|LOCATION_GRAVE)
+	Duel.SetPossibleCustomOperationInfo(0,CATEGORY_CHANGE_ENERGY,nil,1,0,1)
 end
 function s.scop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.Select(HINTMSG_ATOHAND,false,tp,aux.Necro(s.thfilter),tp,LOCATION_DECK|LOCATION_GRAVE,0,1,1,nil)

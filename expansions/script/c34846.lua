@@ -23,6 +23,7 @@ function s.initial_effect(c)
 	--decrease energy
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(3)
+	e2:SetCustomCategory(CATEGORY_UPDATE_ENERGY)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_HAND)
@@ -99,8 +100,8 @@ function s.encon(e,tp)
 	return not e:GetHandler():IsEngaged() and Duel.GetTurnPlayer()==1-tp
 end
 function s.entg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local en=Duel.GetEngagedCard(tp)
 	if chk==0 then
-		local en=Duel.GetEngagedCard()
 		if en==nil then return false end
 		for i=1,5 do
 			if en:IsCanUpdateEnergy(-i,tp,REASON_EFFECT) then
@@ -109,9 +110,10 @@ function s.entg(e,tp,eg,ep,ev,re,r,rp,chk)
 		end
 		return false
 	end
+	Duel.SetCustomOperationInfo(0,CATEGORY_UPDATE_ENERGY,en,1,INFOFLAG_DECREASE,1)
 end
 function s.enop(e,tp,eg,ep,ev,re,r,rp)
-	local en=Duel.GetEngagedCard()
+	local en=Duel.GetEngagedCard(tp)
 	if en==nil then return end
 	local nums={}
 	for i=1,5 do

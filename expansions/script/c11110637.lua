@@ -19,6 +19,7 @@ function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(1)
 	e2:SetCategory(CATEGORY_TODECK)
+	e2:SetCustomCategory(CATEGORY_CHANGE_ENERGY)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_GRAVE)
 	e2:HOPT()
@@ -72,11 +73,12 @@ function s.tdcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
+	local ec=Duel.GetEngagedCard(tp)
 	if chk==0 then
-		local ec=Duel.GetEngagedCard(tp)
 		return ec and ec:IsMonster(TYPE_DRIVE) and ec:IsSetCard(ARCHE_OSCURION) and ec:IsCanChangeEnergy(1,tp,REASON_EFFECT,e) and c:IsAbleToDeck()
 	end
 	Duel.SetCardOperationInfo(c,CATEGORY_TODECK)
+	Duel.SetCustomOperationInfo(0,CATEGORY_CHANGE_ENERGY,ec,1,0,1)
 end
 function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
