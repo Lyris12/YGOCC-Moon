@@ -41,13 +41,14 @@ end
 function s.sumcon(e)
 	local c=e:GetHandler()
 	local tp=c:GetControler()
-	return Duel.GetFlagEffect(0,id)>0 and Duel.IsExistingMatchingCard(s.tlfilter,tp,LOCATION_MZONE,0,1,nil,tp)
+	return Duel.GetFlagEffect(0,id)>0 and Duel.IsExistingMatchingCard(s.tlfilter,tp,LOCATION_MZONE,0,1,nil,e,tp) and s.checkatls(c,e,tp)
 end
-function s.tlfilter(c,tp)
-	return c:IsAttribute(ATTRIBUTE_WIND) and c:IsLevel(7) and c:IsAbleToHand() and c:IsFaceup() and Duel.GetFlagEffect(tp,EFFECT_EXTRA_TIMELEAP_MATERIAL)<=0
+function s.tlfilter(c,e,tp)
+	return c:IsAttribute(ATTRIBUTE_WIND) and c:IsLevel(7) and c:IsAbleToHand() and c:IsFaceup()
 end
 function s.sumtg(e,tp,eg,ep,ev,re,r,rp,chk,c)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+	s.performatls(tp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 	local g=Duel.SelectMatchingCard(tp,s.tlfilter,tp,LOCATION_MZONE,0,0,1,true,nil,tp)
 	if #g==0 then return false end
 	if #g>0 then
@@ -57,11 +58,12 @@ function s.sumtg(e,tp,eg,ep,ev,re,r,rp,chk,c)
 	end
 end
 function s.sumop(e,tp,eg,ep,ev,re,r,rp,c)
+	local c=e:GetHandler()
 	local g=e:GetLabelObject()
 	if not g then return end
 	c:SetMaterial(g)
 	--The monster used as material for this card's Time Leap Summon is returned to the hand instead of being banished.
-	Duel.SendtoHand(g,REASON_MATERIAL+REASON_TIMELEAP)
+	Duel.SendtoHand(g,nil,REASON_MATERIAL+REASON_TIMELEAP)
 	aux.TimeleapHOPT(tp)
 end
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
@@ -94,4 +96,66 @@ end
 function s.regop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
 	Duel.RegisterFlagEffect(1-tp,id,RESET_PHASE+PHASE_END,0,1)
+end
+
+
+--STUFF TO MAKE IT WORK WITH EFFECT_EXTRA_TIMELEAP_SUMMON
+function s.checkatls(c,e,tp)
+	if c==nil then return true end
+	if (c:IsType(TYPE_PENDULUM) or c:IsType(TYPE_PANDEMONIUM)) and c:IsFaceup() then return false end
+	local eset={Duel.IsPlayerAffectedByEffect(tp,EFFECT_EXTRA_TIMELEAP_SUMMON)}
+	local exsumcheck=false
+	for _,te in ipairs(eset) do
+		if not te:GetValue() or type(te:GetValue())=="number" or te:GetValue()(e,c) then
+			exsumcheck=true
+		end
+	end
+	eset={Duel.IsPlayerAffectedByEffect(tp,EFFECT_IGNORE_TIMELEAP_HOPT)}
+	local ignsumcheck=false
+	for _,te in ipairs(eset) do
+		if te:CheckCountLimit(tp) then
+			ignsumcheck=true
+			break
+		end
+	end
+	return (Duel.GetFlagEffect(tp,828)<=0 or (exsumcheck and Duel.GetFlagEffect(tp,830)<=0) or c:IsHasEffect(EFFECT_IGNORE_TIMELEAP_HOPT) or ignsumcheck)
+end
+function s.performatls(tp)
+	local eset={Duel.IsPlayerAffectedByEffect(tp,EFFECT_EXTRA_TIMELEAP_SUMMON)}
+	local igneset={Duel.IsPlayerAffectedByEffect(tp,EFFECT_IGNORE_TIMELEAP_HOPT)}
+	local exsumeff,ignsumeff
+	local options={}
+	if (#eset>0 and Duel.GetFlagEffect(tp,830)<=0) or #igneset>0 then
+		local cond=1
+		if Duel.GetFlagEffect(tp,828)<=0 then
+			table.insert(options,aux.Stringid(433005,15))
+			cond=0
+		end
+					
+		for _,te in ipairs(eset) do
+			table.insert(options,te:GetDescription())
+		end
+		for _,te in ipairs(igneset) do
+			if te:CheckCountLimit(tp) then
+				table.insert(options,te:GetDescription())
+			end
+		end
+					
+		local op=Duel.SelectOption(tp,table.unpack(options))+cond
+		if op>0 then
+			if op<=#eset then
+				exsumeff=eset[op]
+			else
+				ignsumeff=igneset[op-#eset]
+			end
+		end
+	end
+	
+	if exsumeff~=nil then
+		Duel.RegisterFlagEffect(tp,829,RESET_PHASE+PHASE_END,0,1)
+		Duel.Hint(HINT_CARD,0,exsumeff:GetHandler():GetOriginalCode())
+	elseif ignsumeff~=nil then
+		Duel.Hint(HINT_CARD,0,ignsumeff:GetHandler():GetOriginalCode())
+		ignsumeff:UseCountLimit(tp)
+	end
 end
