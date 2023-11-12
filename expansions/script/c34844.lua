@@ -7,7 +7,7 @@ function s.initial_effect(c)
 	--Drive Effects
 	aux.AddDriveProc(c,1)
 	local d1=c:DriveEffect(4,0,CATEGORY_DRAW,EFFECT_TYPE_QUICK_O,EFFECT_FLAG_PLAYER_TARGET,nil,nil,s.drawcost,s.drawtg,s.drawop)
-	local d2=c:DriveEffect(-13,1,CATEGORY_REMOVE,EFFECT_TYPE_QUICK_O,true,nil,nil,nil,s.rmtg,s.rmop)
+	local d2=c:DriveEffect(-13,1,{CATEGORY_REMOVE,CATEGORY_CHANGE_ENERGY},EFFECT_TYPE_QUICK_O,true,nil,nil,nil,s.rmtg,s.rmop)
 	--SS
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,2))
@@ -61,6 +61,7 @@ function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectTarget(tp,Card.IsAbleToRemove,tp,0,LOCATION_ONFIELD,1,3,nil)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,#g,0,0)
+	Duel.SetCustomOperationInfo(0,CATEGORY_CHANGE_ENERGY,e:GetHandler(),1,0,0)
 end
 function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

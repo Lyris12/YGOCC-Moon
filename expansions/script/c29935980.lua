@@ -6,7 +6,7 @@ function s.initial_effect(c)
 	aux.AddOrigDriveType(c)
 	--Drive Effects
 	aux.AddDriveProc(c,3)
-	local d1=c:DriveEffect(0,0,CATEGORY_DISABLE,EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O,EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DDD,EVENT_ENGAGE,
+	local d1=c:DriveEffect(0,0,{CATEGORY_DISABLE,CATEGORY_UPDATE_ENERGY},EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O,EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DDD,EVENT_ENGAGE,
 		nil,
 		nil,
 		s.target,
@@ -56,13 +56,14 @@ function s.initial_effect(c)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and aux.NegateAnyFilter(chkc) end
+	local c=e:GetHandler()
 	if chk==0 then
-		local c=e:GetHandler()
 		return Duel.IsExistingTarget(aux.NegateAnyFilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) and c:IsCanUpdateEnergy(tp,5,REASON_EFFECT)
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DISABLE)
 	local g=Duel.SelectTarget(tp,aux.NegateAnyFilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
 	Duel.SetCardOperationInfo(g,CATEGORY_DISABLE)
+	Duel.SetCustomOperationInfo(0,CATEGORY_UPDATE_ENERGY,c,1,INFOFLAG_INCREASE,5)
 end
 function s.setfilter(c,e,tp,eg,ep,ev,re,r,rp)
 	if c:IsForbidden() then return false end
@@ -145,7 +146,7 @@ function s.actop(e,tp,eg,ep,ev,re,r,rp)
 			local g=Duel.SelectMatchingCard(tp,s.eqfilter,tp,LOCATION_MZONE,0,1,1,tc)
 			if #g>0 then
 				Duel.HintSelection(g)
-				Duel.EquipAndRegisterLimit(tp,tc,g:GetFirst())
+				Duel.EquipToOtherCardAndRegisterLimit(e,tp,tc,g:GetFirst())
 			end
 		end
 	end

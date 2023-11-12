@@ -25,6 +25,7 @@ function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(4)
 	e1:SetCategory(CATEGORY_DESTROY)
+	e1:SetCustomCategory(CATEGORY_CHANGE_ENERGY)
 	e1:SetType(EFFECT_TYPE_SINGLE|EFFECT_TYPE_TRIGGER_O)
 	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
@@ -118,6 +119,7 @@ end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.desfilter,tp,LOCATION_DECK,0,1,nil,e) end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,1,tp,LOCATION_DECK)
+	Duel.SetPossibleCustomOperationInfo(0,CATEGORY_CHANGE_ENERGY,nil,1,0,1)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)

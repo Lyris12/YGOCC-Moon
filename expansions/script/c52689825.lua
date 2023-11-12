@@ -17,6 +17,7 @@ function s.initial_effect(c)
 	--Once per turn: You can remove any number of counters from this card; increase the Energy of 1 Engaged monster by the numbers of counters you removed.
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(2)
+	e2:SetCustomCategory(CATEGORY_UPDATE_ENERGY)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_SZONE)
 	e2:OPT()
@@ -106,6 +107,7 @@ function s.entg(e,tp,eg,ep,ev,re,r,rp,chk)
 		c:RemoveCounter(tp,COUNTER_ENGAGED_MASS,ann,REASON_COST)
 		local rem=ct-c:GetCounter(COUNTER_ENGAGED_MASS)
 		Duel.SetTargetParam(rem)
+		Duel.SetCustomOperationInfo(0,CATEGORY_UPDATE_ENERGY,g,1,INFOFLAG_INCREASE,rem)
 	end
 end
 function s.enop(e,tp,eg,ep,ev,re,r,rp)

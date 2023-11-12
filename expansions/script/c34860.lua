@@ -23,6 +23,7 @@ function s.initial_effect(c)
 	--increase energy
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(4)
+	e1:SetCustomCategory(CATEGORY_UPDATE_ENERGY)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetProperty(EFFECT_FLAG_DDD)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
@@ -98,6 +99,7 @@ end
 function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local dc=Duel.GetEngagedCard(tp)
 	if chk==0 then return dc and dc:HasLevel() and dc:IsCanUpdateEnergy(dc:GetLevel()) end
+	Duel.SetCustomOperationInfo(0,CATEGORY_UPDATE_ENERGY,dc,1,INFOFLAG_INCREASE,dc:GetLevel())
 end
 function s.op(e,tp,eg,ep,ev,re,r,rp)
 	local dc=Duel.GetEngagedCard(tp)

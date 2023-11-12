@@ -13,6 +13,9 @@ CATEGORY_UPDATE_SETCODE				= 0x400
 CATEGORY_LVCHANGE					= 0x800
 CATEGORY_PAYLP						= 0x1000
 CATEGORY_ACTIVATES_ON_NORMAL_SET	= 0x2000
+CATEGORY_UPDATE_ENERGY				= 0x4000
+CATEGORY_CHANGE_ENERGY				= 0x8000
+CATEGORY_RESET_ENERGY				= 0x10000
 
 CATEGORIES_ATKDEF			=	CATEGORY_ATKCHANGE|CATEGORY_DEFCHANGE
 CATEGORIES_SEARCH 			= 	CATEGORY_SEARCH|CATEGORY_TOHAND
@@ -37,6 +40,9 @@ ARCHE_RUM							= 0x95
 ARCHE_UTOPIA						= 0x107f
 ARCHE_ZW							= 0x107e
 
+--Counters
+COUNTER_ICE							= 0x1015
+
 --Custom Archetypes
 CUSTOM_ARCHE_ZERO_HERO				= 0x1
 
@@ -48,13 +54,14 @@ ARCHE_HYPERDRIVE	= 0x660
 
 ARCHE_ABYSSLYM			= 0x49c
 ARCHE_AEONSTRIDE		= 0xae0
-
+--
 ARCHE_AIRCASTER			= 0xa88
 ARCHE_FLAIRCASTER		= 0x1a88
 ARCHE_DESPAIRCASTER		= 0x2a88
 ARCHE_FAIRCASTER		= 0x4a88
-
+--
 ARCHE_BOMBER_GOBLIN		= 0x30ac
+ARCHE_CRYSTARION		= 0xc46
 ARCHE_DOOMSDAY_ARTIFICE	= 0x3a6
 ARCHE_DREAMY_FOREST		= 0xd43
 ARCHE_DREARY_FOREST		= 0xd44
@@ -68,38 +75,47 @@ ARCHE_LEYLAH			= 0xd45
 ARCHE_LIFEWEAVER		= 0x5a5
 ARCHE_METALURGOS		= 0x5a4
 ARCHE_MMS				= 0xd71
-
+--
 ARCHE_NUMBER_I			= 0x2048
 ARCHE_NUMBER_I39		= 0x6048
 ARCHE_NUMBER_IC39		= 0xa048
-
+--
 ARCHE_ORIGIN_DRAGON		= 0xfc1
 ARCHE_OSCURION			= 0x5a6
 ARCHE_TRAPPIT			= 0x54a
 ARCHE_VAISSEAU			= 0x4a8
+ARCHE_WINTER_SPIRIT		= 0xa8d
 ARCHE_ZEROST			= 0x1e4
 
 CARD_DESPAIR_FROM_THE_DARK				= 71200730
 CARD_NUMBER_39_UTOPIA					= 84013237
 CARD_ROTA								= 32807846
 
-CARD_CHEVALIER_DU_VAISSEAU				= 100000032
-CARD_GOLDEN_SKIES_TREASURE				= 11111040
-CARD_GOLDEN_SKIES_TREASURE_OF_WELFARE	= 11111029
-CARD_IN_THE_FOREST_BLACK_AS_MY_MEMORY	= 1
-CARD_LIMIERRE							= 19936278
-CARD_METALURGOS_CONDUCTION				= 11110608
-CARD_MMS_JACKLYN_ALLTRADES				= 19905907
-CARD_MMS_SHERLOCK_HOLMES				= 19905908
-CARD_OSCURION_TYPE0						= 11110633
-CARD_OSCURION_TYPE2						= 11110634
-CARD_REVERIE_DU_VAISSEAU				= 100000039
-CARD_ROI_DU_VAISSEAU					= 100000035
-CARD_RUM_DREAM_DISTILL_FORCE			= 39518
-CARD_STARFORCE_KNIGHT					= 39301
-CARD_THE_ORIGIN_OF_DRAGONS				= 20157309
-CARD_ZERO_HERO_MAGMA_MAN				= 30409
-CARD_ZEROST_BEAST_ZEROTL 				= 100000025
+CARD_CHEVALIER_DU_VAISSEAU					= 100000032
+CARD_CRYSTARION_ASCENDANT_PILLAR_OF_COBALT	= 100000152
+CARD_EMISSARY_OF_ARMONY						= 11110642
+CARD_GOLDEN_SKIES_TREASURE					= 11111040
+CARD_GOLDEN_SKIES_TREASURE_OF_WELFARE		= 11111029
+CARD_IN_THE_FOREST_BLACK_AS_MY_MEMORY		= 1
+CARD_KEEPER_OF_ARMONY						= 100000145
+CARD_LIMIERRE								= 19936278
+CARD_METALURGOS_CONDUCTION					= 11110608
+CARD_MISTRESS_OF_THE_SKY					= 34847
+CARD_MMS_JACKLYN_ALLTRADES					= 19905907
+CARD_MMS_SHERLOCK_HOLMES					= 19905908
+CARD_OSCURION_TYPE0							= 11110633
+CARD_OSCURION_TYPE2							= 11110634
+CARD_REVERIE_DU_VAISSEAU					= 100000039
+CARD_ROI_DU_VAISSEAU						= 100000035
+CARD_RUM_DREAM_DISTILL_FORCE				= 39518
+CARD_SACRED_EFFIGY_OF_WATER					= 34848
+CARD_SISTERS_OF_HARMONY						= 100000144
+CARD_SPACE_VALKYR							= 11210118
+CARD_STARFORCE_KNIGHT						= 39301
+CARD_THE_EMBODIMENTS_OF_MOVEMENTS			= 34853
+CARD_THE_ORIGIN_OF_DRAGONS					= 20157309
+CARD_ZERO_HERO_MAGMA_MAN					= 30409
+CARD_ZEROST_BEAST_ZEROTL 					= 100000025
 
 TOKEN_CRYSTRON							= 55326323
 TOKEN_DAYLILLY							= 41251200
@@ -160,6 +176,7 @@ STRING_CANNOT_DIRECT_ATTACK						=	745
 STRING_ATK										=	746
 STRING_DEF										=	747
 STRING_PANDEPEND_SCALE							=	748
+STRING_SPECIAL_SUMMONED							=	749
 
 STRING_ASK_REPLACE_UPDATE_ENERGY_COST	= 	900
 STRING_ASK_ENGAGE						=	901
@@ -389,6 +406,7 @@ if not global_effect_category_table_global_check then
 	global_effect_category_table_global_check=true
 	global_effect_category_table={}
 	global_effect_info_table={}
+	global_possible_custom_effect_info_table={}
 	global_additional_info_table={}
 	global_possible_info_table={}
 end
@@ -409,28 +427,131 @@ function Effect.IsHasCustomCategory(e,cat1,cat2)
 end
 
 --New Operation Infos
+function Auxiliary.ClearCustomOperationInfo(e,tp,eg,ep,ev,re,r,rp)
+	for _,chtab in pairs(global_effect_info_table) do
+		for _,tab in ipairs(chtab) do
+			local dg=tab[2]
+			if dg then
+				dg:DeleteGroup()
+			end
+		end
+	end
+	global_effect_info_table={}
+	e:Reset()
+end
 function Duel.SetCustomOperationInfo(ch,cat,g,ct,p,val,...)
 	local extra={...}
 	local chain = ch==0 and Duel.GetCurrentChain() or ch
-	if not global_effect_info_table[chain] or #global_effect_info_table[chain]>0 then
+	if g then
+		if aux.GetValueType(g)=="Card" then
+			g=Group.FromCards(g)
+		end
+		g:KeepAlive()
+	end
+	if not global_effect_info_table[chain] then
 		global_effect_info_table[chain]={}
 	end
+	local e1=Effect.GlobalEffect()
+	e1:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
+	e1:SetCode(EVENT_CHAIN_END)
+	e1:SetOperation(aux.ClearCustomOperationInfo)
+	Duel.RegisterEffect(e1,0)
 	table.insert(global_effect_info_table[chain],{cat,g,ct,p,val,table.unpack(extra)})
+end
+function Duel.GetCustomOperationInfo(chain,cat)
+	if not global_effect_info_table[chain] then return end
+	if not cat then
+		return global_effect_info_table[chain]
+	else
+		local res={}
+		local global=global_effect_info_table[chain]
+		for _,tab in ipairs(global) do
+			if tab[1]&cat==cat then
+				table.insert(res,tab)
+			end
+		end
+		return res
+	end
+end
+function Auxiliary.ClearPossibleCustomOperationInfo(e,tp,eg,ep,ev,re,r,rp)
+	for _,chtab in pairs(global_possible_custom_effect_info_table) do
+		for _,tab in ipairs(chtab) do
+			local dg=tab[2]
+			if dg then
+				dg:DeleteGroup()
+			end
+		end
+	end
+	global_possible_custom_effect_info_table={}
+	e:Reset()
+end
+function Duel.SetPossibleCustomOperationInfo(ch,cat,g,ct,p,val,...)
+	local extra={...}
+	local chain = ch==0 and Duel.GetCurrentChain() or ch
+	if g then
+		if aux.GetValueType(g)=="Card" then
+			g=Group.FromCards(g)
+		end
+		g:KeepAlive()
+	end
+	if not global_possible_custom_effect_info_table[chain] then
+		global_possible_custom_effect_info_table[chain]={}
+	end
+	local e1=Effect.GlobalEffect()
+	e1:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
+	e1:SetCode(EVENT_CHAIN_END)
+	e1:SetOperation(aux.ClearPossibleCustomOperationInfo)
+	Duel.RegisterEffect(e1,0)
+	table.insert(global_possible_custom_effect_info_table[chain],{cat,g,ct,p,val,table.unpack(extra)})
+end
+function Auxiliary.ClearPossibleOperationInfo(e,tp,eg,ep,ev,re,r,rp)
+	for _,chtab in pairs(global_possible_info_table) do
+		for _,tab in ipairs(chtab) do
+			local dg=tab[2]
+			if dg then
+				dg:DeleteGroup()
+			end
+		end
+	end
+	global_possible_info_table={}
+	e:Reset()
 end
 function Duel.SetPossibleOperationInfo(ch,cat,g,ct,p,val,...)
 	local extra={...}
 	local chain = ch==0 and Duel.GetCurrentChain() or ch
-	if not global_possible_info_table[chain] or #global_possible_info_table[chain]>0 then
+	if not global_possible_info_table[chain] then
 		global_possible_info_table[chain]={}
 	end
+	local e1=Effect.GlobalEffect()
+	e1:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
+	e1:SetCode(EVENT_CHAIN_END)
+	e1:SetOperation(aux.ClearPossibleOperationInfo)
+	Duel.RegisterEffect(e1,0)
 	table.insert(global_possible_info_table[chain],{cat,g,ct,p,val,table.unpack(extra)})
+end
+function Auxiliary.ClearAdditionalOperationInfo(e,tp,eg,ep,ev,re,r,rp)
+	for _,chtab in pairs(global_additional_info_table) do
+		for _,tab in ipairs(chtab) do
+			local dg=tab[2]
+			if dg then
+				dg:DeleteGroup()
+			end
+		end
+	end
+	global_additional_info_table={}
+	e:Reset()
 end
 function Duel.SetAdditionalOperationInfo(ch,cat,g,ct,p,val,...)
 	local extra={...}
 	local chain = ch==0 and Duel.GetCurrentChain() or ch
-	if not global_additional_info_table[chain] or #global_additional_info_table[chain]>0 then
+	if not global_additional_info_table[chain] then
 		global_additional_info_table[chain]={}
 	end
+	local e1=Effect.GlobalEffect()
+	e1:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
+	e1:SetCode(EVENT_CHAIN_END)
+	e1:SetOperation(aux.ClearAdditionalOperationInfo)
+	Duel.RegisterEffect(e1,0)
 	table.insert(global_additional_info_table[chain],{cat,g,ct,p,val,table.unpack(extra)})
 end
 
@@ -882,6 +1003,10 @@ function Card.MonsterOrFacedown(c)
 	return c:IsMonster() or c:IsFacedown()
 end
 
+function Card.IsSpecialSummoned(c,loc,p)
+	return c:IsSummonType(SUMMON_TYPE_SPECIAL) and (not loc or c:IsSummonLocation(loc)) and (not p or c:IsSummonPlayer(p))
+end
+
 function Card.IsAttributeRace(c,attr,race)
 	return c:IsAttribute(attr) and c:IsRace(race)
 end
@@ -981,6 +1106,18 @@ function Card.GetRating(c)
 		list[4]=c:GetFuture()
 	end
 	return list
+end
+function Card.GetRatingAuto(c)
+	if c:HasLevel() then
+		return c:GetLevel()
+	end
+	if c:IsOriginalType(TYPE_XYZ) then
+		return c:GetRank()
+	end
+	if c:IsOriginalType(TYPE_LINK) then
+		return c:GetLink()
+	end
+	return 0
 end
 function Card.GetOriginalRating(c)
 	local list={false,false,false}
@@ -1226,6 +1363,11 @@ function Card.GlitchyGetPreviousColumnGroup(c,left,right,without_center)
 		cg:Merge(rg)
 		return cg
 	end
+end
+
+--Counters
+function Card.HasCounter(c,ctype)
+	return c:GetCounter(ctype)>0
 end
 
 --Exception
@@ -2167,6 +2309,27 @@ function Card.IsAbleToExtraFaceupAsCost(c,p,tp)
 end
 
 --redirect
+function Card.GetDestinationReset(c)
+	if c:IsOriginalType(TYPE_TOKEN) then return 0 end
+	local dest=c:GetDestination()
+	local options={
+		[LOCATION_HAND]=RESET_TOHAND;
+		[LOCATION_DECK]=RESET_TODECK;
+		[LOCATION_EXTRA]=RESET_TODECK;
+		[LOCATION_GRAVE]=RESET_TOGRAVE;
+		[LOCATION_REMOVED]=RESET_REMOVE|RESET_TEMP_REMOVE;
+		[LOCATION_ONFIELD]=RESET_TOFIELD;
+		[LOCATION_OVERLAY]=RESET_OVERLAY;
+	}
+	
+	for loc,eloc in pairs(options) do
+		if dest&loc>0 then
+			return eloc
+		end
+	end
+	
+	return 0
+end
 function Card.DestinationRedirect(c,dest,r)
 	local eset
 	if c:IsOriginalType(TYPE_TOKEN) then return 0 end
@@ -2280,6 +2443,28 @@ function Auxiliary.RemainOnFieldCostFunction(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 
+--Set Backrow
+function Auxiliary.SetSuccessfullyFilter(c)
+	return c:IsFacedown() and c:IsLocation(LOCATION_SZONE)
+end
+function Duel.SSetAndFastActivation(p,g,e)
+	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
+	if Duel.SSet(p,g)>0 then
+		local c=e:GetHandler()
+		local og=g:Filter(aux.SetSuccessfullyFilter,nil)
+		for tc in aux.Next(og) do
+			local code = tc:IsTrap() and EFFECT_TRAP_ACT_IN_SET_TURN or EFFECT_QP_ACT_IN_SET_TURN
+			local e1=Effect.CreateEffect(c)
+			e1:SetDescription(STRING_FAST_ACTIVATION)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetCode(code)
+			e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE|EFFECT_FLAG_CLIENT_HINT)
+			e1:SetReset(RESET_EVENT|RESETS_STANDARD)
+			tc:RegisterEffect(e1)
+		end
+	end
+end
+
 --Location Check
 function Auxiliary.AddThisCardBanishedAlreadyCheck(c,setf,getf)
 	local e1=Effect.CreateEffect(c)
@@ -2309,6 +2494,16 @@ function Auxiliary.AddThisCardInExtraAlreadyCheck(c,pos,setf,getf)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e1:SetCondition(function(e) return e:GetHandler():IsInExtra(pos) end)
 	e1:SetOperation(Auxiliary.ThisCardInLocationAlreadyCheckReg(setf,getf))
+	c:RegisterEffect(e1)
+	return e1
+end
+function Auxiliary.AddThisCardInFZoneAlreadyCheck(c,setf,getf)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE|EFFECT_TYPE_CONTINUOUS)
+	e1:SetCode(EVENT_MOVE)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e1:SetCondition(function(e) return not e:GetHandler():IsPreviousLocation(LOCATION_FZONE) and e:GetHandler():IsLocation(LOCATION_FZONE) end)
+	e1:SetOperation(Auxiliary.ThisCardInLocationAlreadyCheckReg(setf,getf,true))
 	c:RegisterEffect(e1)
 	return e1
 end
@@ -3138,6 +3333,34 @@ end
 function Auxiliary.VaisseauQECondition(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return Duel.GetTurnPlayer()==1-tp or c:IsSummonType(SUMMON_TYPE_RITUAL)
+end
+
+----WINTER SPIRIT
+function Auxiliary.AddWinterSpiritBattleEffect(c,range)
+	if not range then range=LOCATION_MZONE end
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetCode(EFFECT_UPDATE_ATTACK)
+	e2:SetRange(range)
+	e2:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
+	e2:SetCondition(aux.WinterSpiritBattleEffectCondition)
+	e2:SetTarget(aux.WinterSpiritBattleEffectTarget)
+	e2:SetValue(aux.WinterSpiritBattleEffectValue)
+	c:RegisterEffect(e2)
+	local e3=e2:Clone()
+	e3:SetCode(EFFECT_UPDATE_DEFENSE)
+	c:RegisterEffect(e3)
+	return e2,e3
+end
+function Auxiliary.WinterSpiritBattleEffectCondition(e)
+	return Duel.GetCurrentPhase()==PHASE_DAMAGE_CAL and Duel.GetAttackTarget()
+end
+function Auxiliary.WinterSpiritBattleEffectTarget(e,c)
+	local bc=c:GetBattleTarget()
+	return bc and c:HasCounter(COUNTER_ICE) and bc:IsSetCard(ARCHE_WINTER_SPIRIT)
+end
+function Auxiliary.WinterSpiritBattleEffectValue(e,c)
+	return c:GetCounter(COUNTER_ICE)*-200
 end
 
 ----ZEROST

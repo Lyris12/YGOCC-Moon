@@ -9,8 +9,10 @@ function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(0)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON|CATEGORY_DECKDES)
+	e1:SetCustomCategory(CATEGORY_CHANGE_ENERGY)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetTarget(s.tg)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
 	--[[You can target 1 other face-up card you control; destroy it, and if you do, Set 1 "Hyperdrive" Spell/Trap from your GY.
@@ -25,6 +27,10 @@ function s.initial_effect(c)
 	e2:SetTarget(s.target)
 	e2:SetOperation(s.operation)
 	c:RegisterEffect(e2)
+end
+function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.SetPossibleCustomOperationInfo(0,CATEGORY_CHANGE_ENERGY,Duel.GetEngagedCard(tp),1,0,0)
 end
 function s.spfilter(c,e,tp)
 	return c:IsMonster(TYPE_DRIVE) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

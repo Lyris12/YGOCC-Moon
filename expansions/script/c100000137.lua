@@ -12,6 +12,7 @@ function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(0)
 	e1:SetCategory(CATEGORIES_SEARCH)
+	e1:SetCustomCategory(CATEGORY_UPDATE_ENERGY)
 	e1:SetType(EFFECT_TYPE_SINGLE|EFFECT_TYPE_TRIGGER_O)
 	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
@@ -82,6 +83,10 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.ConfirmCards(1-tp,g)
 	Duel.SetTargetCard(g)
 	Duel.SetCardOperationInfo(g,CATEGORY_TOHAND)
+	local ng=Duel.GetEngagedCards():Filter(Card.IsMonster,nil,TYPE_DRIVE)
+	if #ng>0 then
+		Duel.SetCustomOperationInfo(0,CATEGORY_UPDATE_ENERGY,ng,#ng,INFOFLAG_DECREASE,g:GetFirst():GetEnergy())
+	end
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()

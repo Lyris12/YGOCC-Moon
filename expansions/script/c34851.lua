@@ -16,6 +16,7 @@ function s.initial_effect(c)
 	--increase energy
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(1)
+	e2:SetCustomCategory(CATEGORY_UPDATE_ENERGY)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetHintTiming(TIMING_MAIN_END+TIMING_BATTLE_START+TIMING_BATTLE_END,TIMING_MAIN_END+TIMING_BATTLE_START+TIMING_BATTLE_END)
 	e2:SetCode(EVENT_FREE_CHAIN)
@@ -65,6 +66,7 @@ function s.entg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		return en~=nil and en:IsCanUpdateEnergy(2,tp,REASON_EFFECT)
 	end
+	Duel.SetCustomOperationInfo(0,CATEGORY_UPDATE_ENERGY,en,1,INFOFLAG_INCREASE,2)
 end
 function s.enop(e,tp,eg,ep,ev,re,r,rp)
 	local en=Duel.GetEngagedCard(tp)

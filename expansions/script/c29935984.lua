@@ -18,6 +18,7 @@ function s.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(1)
 	e2:SetCategory(CATEGORY_TODECK)
+	e2:SetCustomCategory(CATEGORY_UPDATE_ENERGY)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_GRAVE)
 	e2:HOPT()
@@ -26,7 +27,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function s.filter(c,tp)
-	return c:IsFaceup() and not c:IsForbidden() and c:CheckUniqueOnField(tp) and c:IsAbleToChangeControler() and Duel.IsExistingMatchingCard(s.eqfilter,tp,LOCATION_MZONE,0,1,c)
+	return c:IsFaceup() and not c:IsForbidden() and c:CheckUniqueOnField(tp,LOCATION_SZONE) and c:IsAbleToChangeControler() and Duel.IsExistingMatchingCard(s.eqfilter,tp,LOCATION_MZONE,0,1,c)
 end
 function s.eqfilter(c)
 	return c:IsFaceup() and c:IsMonster(TYPE_PANDEMONIUM) and c:IsSetCard(0x209)
@@ -50,7 +51,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		local g=Duel.Select(HINTMSG_EQUIP,false,tp,s.eqfilter,tp,LOCATION_MZONE,0,1,1,tc)
 		if #g>0 then
 			Duel.HintSelection(g)
-			Duel.EquipAndRegisterLimit(tp,tc,g:GetFirst())
+			Duel.EquipToOtherCardAndRegisterLimit(e,tp,tc,g:GetFirst())
 		end
 	end
 end
@@ -68,6 +69,7 @@ function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk)
 		return false
 	end
 	Duel.SetCardOperationInfo(c,CATEGORY_TODECK)
+	Duel.SetCustomOperationInfo(0,CATEGORY_UPDATE_ENERGY,en,1,INFOFLAG_INCREASE,1)
 end
 function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

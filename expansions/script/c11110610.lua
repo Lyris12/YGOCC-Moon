@@ -32,6 +32,7 @@ function s.initial_effect(c)
 	--[[During the Main Phase: You can target 1 face-up monster you control; increase or reduce your Engaged "Metalurgos" Drive Monster's Energy by the target's Level.]]
 	local e3=Effect.CreateEffect(c)
 	e3:Desc(1)
+	e3:SetCustomCategory(CATEGORY_UPDATE_ENERGY)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e3:SetRange(LOCATION_SZONE)
@@ -101,7 +102,8 @@ function s.entg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		return ec and ec:IsMonster(TYPE_DRIVE) and ec:IsSetCard(ARCHE_METALURGOS) and Duel.IsExistingTarget(s.cfilter,tp,LOCATION_MZONE,0,1,nil,ec,tp)
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	Duel.SelectTarget(tp,s.cfilter,tp,LOCATION_MZONE,0,1,1,nil,ec,tp)
+	local g=Duel.SelectTarget(tp,s.cfilter,tp,LOCATION_MZONE,0,1,1,nil,ec,tp)
+	Duel.SetCustomOperationInfo(0,CATEGORY_UPDATE_ENERGY,ec,1,INFOFLAG_DECREASE|INFOFLAG_INCREASE,g:GetFirst():GetLevel())
 end
 function s.enop(e,tp,eg,ep,ev,re,r,rp)
 	local ec=Duel.GetEngagedCard(tp)

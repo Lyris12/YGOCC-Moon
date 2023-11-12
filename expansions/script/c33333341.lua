@@ -11,7 +11,7 @@ function s.initial_effect(c)
 		aux.SSOperationMod(SPSUM_MOD_REDIRECT,SUBJECT_THIS_CARD,nil,nil,nil,nil,nil,{LOCATION_HAND,aux.Stringid(id,1)})
 	)
 	--add to hand
-	c:Ignition(2,CATEGORIES_SEARCH+CATEGORY_HANDES,nil,LOCATION_MZONE,true,
+	c:Ignition(2,{CATEGORIES_SEARCH+CATEGORY_HANDES,CATEGORY_UPDATE_ENERGY},nil,LOCATION_MZONE,true,
 		nil,
 		aux.TributeSelfCost,
 		s.thtg,
@@ -31,7 +31,12 @@ end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.thfilter,tp,LOCATION_DECK,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
-	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,tp,1)
+	local en=Duel.GetEngagedCard(tp)
+	if en and en:IsMonster() and en:IsSetCard(0x7eb) then
+		Duel.SetCustomOperationInfo(0,CATEGORY_UPDATE_ENERGY,en,1,INFOFLAG_DECREASE|INFOFLAG_INCREASE,2)
+	else
+		Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,tp,1)
+	end
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)

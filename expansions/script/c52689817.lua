@@ -8,10 +8,10 @@ function s.initial_effect(c)
 	aux.AddDriveProc(c,12)
 	aux.EnableUnionAttribute(c,1)
 	--[[ If this card becomes Engaged: Decrease this card's Energy by the number of Spells/Traps on the field.]]
-	c:DriveEffect(0,0,nil,EFFECT_TYPE_SINGLE|EFFECT_TYPE_TRIGGER_F,nil,EVENT_ENGAGE,
+	c:DriveEffect(0,0,{0,CATEGORY_UPDATE_ENERGY},EFFECT_TYPE_SINGLE|EFFECT_TYPE_TRIGGER_F,nil,EVENT_ENGAGE,
 		nil,
 		nil,
-		nil,
+		s.tg,
 		s.operation
 	)
 	--[[-5]: Equip to 1 Drive Monster you control, this Engaged card and 1 appopriate Equip Spell from your Deck,
@@ -70,6 +70,7 @@ function s.initial_effect(c)
 	local e3=Effect.CreateEffect(c)
 	e3:Desc(6)
 	e3:SetCategory(CATEGORIES_SEARCH)
+	e3:SetCustomCategory(CATEGORY_UPDATE_ENERGY)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_SZONE)
 	e3:HOPT()
@@ -77,6 +78,12 @@ function s.initial_effect(c)
 	e3:SetTarget(s.thtg)
 	e3:SetOperation(s.thop)
 	c:RegisterEffect(e3)
+end
+function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then
+		return true
+	end
+	Duel.SetCustomOperationInfo(0,CATEGORY_UPDATE_ENERGY,e:GetHandler(),1,INFOFLAG_DECREASE,Duel.GetMatchingGroupCount(Card.IsSpellTrapOnField,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil))
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -114,7 +121,7 @@ function s.eqop(e,tp,eg,ep,ev,re,r,rp)
 			for tc in aux.Next(eqg) do
 				local res=false
 				if tc==c then
-					res=Duel.EquipAndRegisterLimit(tp,tc,eqtc,true,true) 
+					res=Duel.EquipToOtherCardAndRegisterLimit(e,tp,tc,eqtc,true,true) 
 				else
 					if Duel.Equip(tp,tc,eqtc,true,true) and eqtc:GetEquipGroup():IsContains(tc) then
 						res=true
@@ -184,7 +191,7 @@ function s.eqop2(e,tp,eg,ep,ev,re,r,rp)
 		local eqm=Duel.Select(HINTMSG_FACEUP,false,tp,aux.FaceupFilter(Card.IsType,TYPE_DRIVE),tp,LOCATION_MZONE,0,1,1,tc)
 		if #eqm>0 then
 			Duel.HintSelection(eqm)
-			if Duel.EquipAndRegisterLimit(tp,tc,eqm:GetFirst()) then
+			if Duel.EquipToOtherCardAndRegisterLimit(e,tp,tc,eqm:GetFirst()) then
 				local e2=Effect.CreateEffect(e:GetHandler())
 				e2:SetType(EFFECT_TYPE_EQUIP)
 				e2:SetCode(EFFECT_UPDATE_ATTACK)
@@ -238,6 +245,9 @@ end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.scfilter,tp,LOCATION_DECK,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+	local ec=c:GetEquipTarget()
+	local en=ec:GetOriginalEnergy()
+	Duel.SetPossibleCustomOperationInfo(0,CATEGORY_UPDATE_ENERGY,nil,1,INFOFLAG_DECREASE|INFOFLAG_INCREASE,en)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

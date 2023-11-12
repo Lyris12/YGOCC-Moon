@@ -19,6 +19,7 @@ function s.initial_effect(c)
 	--You can banish this card from your GY; increase the Energy of your Engaged monster by the number of cards in your opponent's Extra Deck.
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(1)
+	e2:SetCustomCategory(CATEGORY_UPDATE_ENERGY)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_GRAVE)
 	e2:SHOPT(true)
@@ -46,11 +47,12 @@ function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 function s.entg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local ec=Duel.GetEngagedCard(tp)
+	local ct=Duel.GetExtraDeckCount(1-tp)
 	if chk==0 then
-		local ec=Duel.GetEngagedCard(tp)
-		local ct=Duel.GetExtraDeckCount(1-tp)
 		return ec and ct>0 and ec:IsCanUpdateEnergy(ct,tp,REASON_EFFECT)
 	end
+	Duel.SetCustomOperationInfo(0,CATEGORY_UPDATE_ENERGY,ec,1,INFOFLAG_INCREASE,ct)
 end
 function s.enop(e,tp,eg,ep,ev,re,r,rp)
 	local ec=Duel.GetEngagedCard(tp)

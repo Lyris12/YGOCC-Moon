@@ -21,6 +21,9 @@ SUMMON_TYPE_TIMELEAP				=SUMMON_TYPE_SPECIAL+825
 
 REASON_TIMELEAP	=0x10000000000
 
+--flag for Cerulean Sea Siren
+FLAG_CERULEAN_SEA_SIREN = 100000148
+
 --Custom Type Table
 Auxiliary.Timeleaps={} --number as index = card, card as index = function() is_synchro
 table.insert(aux.CannotBeEDMatCodes,EFFECT_CANNOT_BE_TIMELEAP_MATERIAL)
@@ -373,7 +376,7 @@ function Auxiliary.TimeleapMaterialFilter(c,filter,e,tp,sg,mg,fg,tl,ct,sumcon,..
 		override_future_check=filter[2]
 		filter=filter[1]
 	end
-	if (not filter or filter(c,e,mg) or aux.IgnoreTimeleapMatReqFilter(c,tl,e,tp,sg))
+	if (not filter or filter(c,e,mg,tl) or aux.IgnoreTimeleapMatReqFilter(c,tl,e,tp,sg))
 	and (override_future_check or (c:HasLevel() and c:GetLevel()==tl:GetFuture()-1) or aux.IgnoreTimeleapFutReqFilter(c,tl,e,tp,sg)) then
 		chk=true
 	end
@@ -408,10 +411,13 @@ function Auxiliary.TimeleapCheckGoal(filter,e,tp,sg,fg,tl,ct,sumcon,...)
 			end
 		end
 	end
-	return ct>=min and (not fg or not fg:IsExists(aux.MustMaterialCounterFilter,1,nil,sg))
+	tl:RegisterFlagEffect(FLAG_CERULEAN_SEA_SIREN,0,0,1)
+	local res = ct>=min and (not fg or not fg:IsExists(aux.MustMaterialCounterFilter,1,nil,sg))
 		and (not sumcon or sumcon(e,tl,tp) or sg:IsExists(aux.IgnoreTimeleapCondFilter,1,nil,c,e,tp,sg))
 		and Duel.GetLocationCountFromEx(tp,tp,sg,tl)>0
 		and not sg:IsExists(Auxiliary.TimeleapUncompatibilityFilter,1,nil,sg,tl,tp)
+	tl:ResetFlagEffect(FLAG_CERULEAN_SEA_SIREN)
+	return res
 end
 function Auxiliary.TimeleapUncompatibilityFilter(c,sg,lc,tp)
 	local mg=sg:Filter(aux.TRUE,c)
@@ -539,6 +545,7 @@ function Auxiliary.TimeleapOperation(customop)
 				if Duel.SetSummonCancelable then Duel.SetSummonCancelable(true) end
 				local g=e:GetLabelObject()
 				c:SetMaterial(g)
+				c:RegisterFlagEffect(FLAG_CERULEAN_SEA_SIREN,RESET_EVENT|RESETS_STANDARD,0,1)
 				
 				local custom_matop=c:IsHasEffect(EFFECT_TIMELEAP_CUSTOM_MATERIAL_OPERATION)
 				if custom_matop then

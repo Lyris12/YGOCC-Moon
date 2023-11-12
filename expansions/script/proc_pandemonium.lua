@@ -296,6 +296,8 @@ function Auxiliary.EnablePandemoniumAttribute(c,...)
 		c:RegisterEffect(set)
 	end
 	Duel.AddCustomActivityCounter(10000000,ACTIVITY_SPSUMMON,Auxiliary.PaCheck)
+	
+	return e1
 end
 function Auxiliary.PaCheck(c)
 	return not c:IsSummonType(SUMMON_TYPE_PENDULUM)
@@ -708,6 +710,9 @@ function Auxiliary.PandSSetFilter(f,...)
 			end
 end
 function Auxiliary.GetOriginalPandemoniumType(c)
+	return c:GetFlagEffectLabel(1074)
+end
+function Card.GetOriginalPandemoniumType(c)
 	return c:GetFlagEffectLabel(1074)
 end
 function Duel.PandSSet(tc,e,tp,reason,tpe)

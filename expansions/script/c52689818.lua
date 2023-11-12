@@ -51,6 +51,12 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local b2=g:IsExists(Card.HasLevel,1,nil)
 	local opt=aux.Option(tp,id,1,b1,b2)
 	e:SetLabel(opt)
+	if opt==0 then
+		e:SetCustomCategory(CATEGORY_UPDATE_ENERGY)
+		Duel.SetCustomOperationInfo(0,CATEGORY_UPDATE_ENERGY,g,1,INFOFLAG_DECREASE|INFOFLAG_INCREASE,1)
+	else
+		e:SetCustomCategory(0)
+	end
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetEngagedCards()

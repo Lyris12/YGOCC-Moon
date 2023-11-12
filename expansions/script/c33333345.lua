@@ -11,7 +11,7 @@ function s.initial_effect(c)
 		s.spop
 	)
 	--normal summon
-	c:Ignition(1,nil,nil,LOCATION_HAND+LOCATION_MZONE,true,
+	c:Ignition(1,{0,CATEGORY_UPDATE_ENERGY},nil,LOCATION_HAND+LOCATION_MZONE,true,
 		s.encon,
 		aux.ToGraveSelfCost,
 		s.entg,
@@ -73,6 +73,7 @@ function s.entg(e,tp,eg,ep,ev,re,r,rp,chk)
 		return (already_checked or (en and en:IsMonster())) and en:IsCanUpdateEnergy(3,tp,REASON_EFFECT)
 	end
 	e:SetLabel(0)
+	Duel.SetCustomOperationInfo(0,CATEGORY_UPDATE_ENERGY,en,1,INFOFLAG_DECREASE,3)
 end
 function s.enop(e,tp,eg,ep,ev,re,r,rp)
 	local en=Duel.GetEngagedCard(tp)

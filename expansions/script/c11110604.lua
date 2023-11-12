@@ -10,6 +10,7 @@ function s.initial_effect(c)
 	--[[During the Main Phase (Quick Effect): You can increase or reduce your Engaged Drive Monster's Energy by its Level.]]
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(0)
+	e1:SetCustomCategory(CATEGORY_UPDATE_ENERGY)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetRange(LOCATION_MZONE)
@@ -39,10 +40,11 @@ function s.initial_effect(c)
 end
 --E1
 function s.entg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local ec=Duel.GetEngagedCard(tp)
 	if chk==0 then
-		local ec=Duel.GetEngagedCard(tp)
 		return ec and ec:IsMonster(TYPE_DRIVE) and ec:HasLevel() and ec:IsCanIncreaseOrDecreaseEnergy(ec:GetLevel(),tp,REASON_EFFECT)
 	end
+	Duel.SetCustomOperationInfo(0,CATEGORY_UPDATE_ENERGY,ec,1,INFOFLAG_DECREASE|INFOFLAG_INCREASE,ec:GetLevel())
 end
 function s.enop(e,tp,eg,ep,ev,re,r,rp)
 	local ec=Duel.GetEngagedCard(tp)

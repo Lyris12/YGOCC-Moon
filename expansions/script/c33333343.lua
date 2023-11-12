@@ -4,7 +4,7 @@
 local s,id,o=GetID()
 function s.initial_effect(c)
 	--ss
-	c:SummonedTrigger(false,true,true,false,0,CATEGORIES_SEARCH,true,true,
+	c:SummonedTrigger(false,true,true,false,0,{CATEGORIES_SEARCH,CATEGORY_UPDATE_ENERGY},true,true,
 		nil,
 		aux.LabelCost,
 		s.thtg,
@@ -33,8 +33,10 @@ function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(0)
 	local e1=en:GetEnergy()
 	local _,e2=en:ChangeEnergy(0,tp,REASON_COST,true,e:GetHandler())
-	Duel.SetTargetParam(math.abs(e2-e1))
+	local val=math.abs(e2-e1)
+	Duel.SetTargetParam(val)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+	Duel.SetCustomOperationInfo(0,CATEGORY_UPDATE_ENERGY,nil,1,INFOFLAG_DECREASE|INFOFLAG_INCREASE,val)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local val=Duel.GetTargetParam()
