@@ -52,7 +52,7 @@ end
 --E2
 function s.rtfilter(c,e,tp,en)
 	return c:IsMonster(TYPE_RITUAL) and c:IsSetCard(ARCHE_CRYSTARION) and c:HasLevel()
-		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,true,false) and en:IsCanUpdateEnergy(-c:GetLevel(),tp,REASON_EFFECT,e)
+		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,false,true) and en:IsCanUpdateEnergy(-c:GetLevel(),tp,REASON_EFFECT,e)
 end
 function s.rttg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -76,7 +76,7 @@ function s.rtop(e,tp,eg,ep,ev,re,r,rp)
 		local c=e:GetHandler()
 		en:UpdateEnergy(-tc:GetLevel(),tp,REASON_EFFECT,true,c,e)
 		tc:SetMaterial(nil)
-		if Duel.SpecialSummon(tc,SUMMON_TYPE_RITUAL,tp,tp,true,false,POS_FACEUP)>0 then
+		if Duel.SpecialSummon(tc,SUMMON_TYPE_RITUAL,tp,tp,false,true,POS_FACEUP)>0 then
 			tc:CompleteProcedure()
 			if c:IsRelateToChain() then
 				Duel.SendtoDeck(c,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
