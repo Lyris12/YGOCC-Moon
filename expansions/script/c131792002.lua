@@ -38,7 +38,7 @@ function s.tgop(e,tp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local tc=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil,Card.IsAbleToGrave):GetFirst()
 	if not (tc and Duel.SendtoGrave(tc,REASON_EFFECT)>0 and tc:IsLocation(LOCATION_GRAVE)) then return end
-	local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_GRAVE,0,1,nil,Card.IsAbleToRemove)
+	local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_GRAVE,0,nil,Card.IsAbleToRemove)
 	if #g>0 and Duel.SelectEffectYesNo(tp,e:GetHandler()) then
 		Duel.BreakEffect()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)

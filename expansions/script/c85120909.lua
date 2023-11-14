@@ -1,4 +1,4 @@
---created by LeonDuvall
+--created by LeonDuvall, coded by Lyris
 --Approaching the Event Horizon
 local s,id,o=GetID()
 function s.initial_effect(c)

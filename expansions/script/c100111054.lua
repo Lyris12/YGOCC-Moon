@@ -40,7 +40,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local lc=e:GetLabelObject()
 	local g=Duel.GetMatchingGroup(Card.IsLinkAbove,tp,0,LOCATION_MZONE,nil,lc:GetLink()+1)
 	if Duel.Destroy(g,REASON_EFFECT)~=#g then return end
-	local tg=Duel.GetMatchingGroup(s.xfilter,tp,0,LOCATION_EXTRA,1,nil,lc:GetAttack())
+	local tg=Duel.GetMatchingGroup(s.xfilter,tp,0,LOCATION_EXTRA,nil,lc:GetAttack())
 	if #tg>=#g then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 		Duel.SendtoGrave(tg:Select(1-tp,#g,#g,nil),REASON_EFFECT)

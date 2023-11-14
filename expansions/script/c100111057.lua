@@ -42,7 +42,8 @@ function s.operation(e,tp)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
 	e1:SetValue(TYPE_TUNER)
-	if tc:RegisterEffect(e1)<=0 or not tc:IsLevelAbove(1) then return end
+	tc:RegisterEffect(e1)
+	if not (tc:IsType(TYPE_TUNER) and tc:IsLevelAbove(1)) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_GRAVE,0,1,1,nil,tc:GetLevel())
 	Duel.SendtoHand(g,nil,REASON_EFFECT)

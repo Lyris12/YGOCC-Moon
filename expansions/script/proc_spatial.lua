@@ -258,7 +258,7 @@ function Auxiliary.SpaceExtraFilter(c,lc,tp,...)
 	end
 	if not ValidSubstitute then return false end
 	if c:IsLocation(LOCATION_ONFIELD) and not c:IsFaceup() then return false end
-	return c:IsCanBeSpaceMaterial(lc) and (not flist or #flist<=0 or check)
+	return c:IsCanBeSpaceMaterial(lc) and (not flist or #flist<1 or check)
 end
 function Auxiliary.SpatialCondition(sptcheck,...)
 	local funs={...}

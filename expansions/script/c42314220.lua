@@ -30,7 +30,7 @@ function s.initial_effect(c)
 	c:SentToGYTrigger(false,2,CATEGORY_HANDES,EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_DDD,true,nil,nil,aux.DiscardTarget(nil,1,2),aux.DiscardOperation(nil,1,2))
 end
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsSummonType(SUMMON_TYPE_FUSION) and Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)<=113
+	return e:GetHandler():IsSummonType(SUMMON_TYPE_FUSION) and Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)<=3
 end
 function s.thfil(c)
 	return c:IsMonster() and c:IsRace(RACE_WARRIOR)

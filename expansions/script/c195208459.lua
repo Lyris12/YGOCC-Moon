@@ -2,7 +2,7 @@
 --Great London Clue - Bloody Footprints
 local s,id,o=GetID()
 function s.initial_effect(c)
-	c:RegisterSetCardString("Great London")
+	c:RegisterSetCardString({"Great London", "Clue"})
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
