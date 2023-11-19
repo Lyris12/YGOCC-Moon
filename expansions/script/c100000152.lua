@@ -58,7 +58,7 @@ function s.rttg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	local en=Duel.GetEngagedCard(tp)
 	if chk==0 then
-		return en and c:IsAbleToDeck() and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		return en and en:IsMonster(TYPE_DRIVE) and en:IsSetCard(ARCHE_CRYSTARION) and c:IsAbleToDeck() and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 			and Duel.IsExistingMatchingCard(s.rtfilter,tp,LOCATION_HAND|LOCATION_GRAVE,0,1,nil,e,tp,en)
 	end
 	Duel.SetCustomOperationInfo(0,CATEGORY_UPDATE_ENERGY,en,1,INFOFLAG_DECREASE,0)
@@ -68,7 +68,7 @@ end
 function s.rtop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local en=Duel.GetEngagedCard(tp)
-	if not en then return end
+	if not (en and en:IsMonster(TYPE_DRIVE) and en:IsSetCard(ARCHE_CRYSTARION)) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local tg=Duel.SelectMatchingCard(tp,aux.Necro(s.rtfilter),tp,LOCATION_HAND|LOCATION_GRAVE,0,1,1,nil,e,tp,en)
 	local tc=tg:GetFirst()
