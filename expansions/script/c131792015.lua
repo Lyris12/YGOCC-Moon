@@ -2,6 +2,7 @@
 --On The Practical Applications of Concentrated Magitate
 local s,id,o=GetID()
 function s.initial_effect(c)
+	c:RegisterSetCardString({0xd16, "Concentrated"})
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
@@ -21,7 +22,6 @@ function s.initial_effect(c)
 	e2:SetOperation(s.thop)
 	c:RegisterEffect(e2)
 end
-Card.IsConcentratedMagitate=Card.IsConcentratedMagitate or function(c) return c:GetCode()>131792009 and c:GetCode()<131792017 and c:IsSetCard(0xd16) end
 function s.filter(c,e,tp)
 	return c:IsSetCard(0xd16) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_MZONE,0,1,nil,c:GetAttribute())
 end

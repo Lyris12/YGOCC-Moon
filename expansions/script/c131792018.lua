@@ -61,6 +61,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if not (tc:IsRelateToEffect(e) and Duel.Destroy(tc,REASON_EFFECT)>0
 		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	if Duel.SpecialSummonStep(Duel.SelectMatchingCard(tp,s.sfilter,tp,LOCATION_DECK+LOCATION_HAND,0,1,1,nil,e,tp,tc:GetOriginalAttribute()),0,tp,tp,false,false,POS_FACEUP)>0 then Duel.Transform(c,SIDE_REVERSE,e,tp) end
+	local sc=Duel.SelectMatchingCard(tp,s.sfilter,tp,LOCATION_DECK+LOCATION_HAND,0,1,1,nil,e,tp,tc:GetOriginalAttribute()):GetFirst()
+	if sc and Duel.SpecialSummonStep(sc,0,tp,tp,false,false,POS_FACEUP)>0 then Duel.Transform(sc,SIDE_REVERSE,e,tp) end
 	Duel.SpecialSummonComplete()
 end

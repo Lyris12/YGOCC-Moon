@@ -45,10 +45,9 @@ function s.pscost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.filter(c,tp)
 	local e=c:GetActivateEffect()
-	local evt=e:GetCode()
 	return c:IsSetCard(0xd18) and c:IsType(TYPE_SPELL+TYPE_TRAP) and (c:IsType(TYPE_FIELD)
-		or Duel.GetLocationCount(tp,LOCATION_SZONE)>0) and c:CheckActivateEffect(false,false)
-		and evt==EVENT_FREE_CHAIN and e:IsActivatable(tp)
+		or Duel.GetLocationCount(tp,LOCATION_SZONE)>0) and c:CheckActivateEffect(true,false)
+		and e:GetCode()==EVENT_FREE_CHAIN and e:IsActivatable(tp)
 end
 function s.pstg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK,0,1,nil,tp) end
@@ -66,33 +65,30 @@ function s.psop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.MoveToField(tc,tp,tp,LOCATION_FZONE,POS_FACEUP,true)
 		Duel.RaiseEvent(tc,4179255,te,0,tp,tp,Duel.GetCurrentChain())
 	else Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true) end
-	local c=e:GetHandler()
 	local te=tc:GetActivateEffect()
 	te:UseCountLimit(tp,1,true)
 	local tep=tc:GetControler()
-	c:SetEntityCode(tc:GetOriginalCode(),true)
 	Duel.ClearTargetCard()
 	local cost=te:GetCost()
 	if cost then cost(te,tep,eg,ep,ev,re,r,rp,1) end
-	local trg=te:GetTarget()
-	if trg then trg(te,tep,eg,ep,ev,re,r,rp,1)
-	local op=te:GetOperation()
-	if op then
-		tc:CreateEffectRelation(te)
-		local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-		local tg=g:GetFirst()
-		while tg do
-			tg:CreateEffectRelation(te)
-			tg=g:GetNext()
+	if not sc:IsType(TYPE_CONTINUOUS+TYPE_FIELD) then
+		local c=e:GetHandler()
+		c:SetEntityCode(tc:GetOriginalCode(),true)
+		local trg=te:GetTarget()
+		if trg then trg(te,tep,eg,ep,ev,re,r,rp,1)
+		local op=te:GetOperation()
+		if op then
+			tc:CreateEffectRelation(te)
+			local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
+			for tg in aux.Next(g) do tg:CreateEffectRelation(te) end
+			op(te,tep,eg,ep,ev,re,r,rp)
+			tc:ReleaseEffectRelation(te)
+			for tg in aux.Next(g) do tg:ReleaseEffectRelation(te) end
 		end
-		op(te,tep,eg,ep,ev,re,r,rp)
-		tc:ReleaseEffectRelation(te)
-		tg=g:GetFirst()
-		while tg do
-			tg:ReleaseEffectRelation(te)
-			tg=g:GetNext()
-		end
+		c:SetEntityCode(id)
 	end
-	c:SetEntityCode(id)
-	tc:CancelToGrave(false)
+	if not (tc:GetEquipTarget() or tc:IsType(TYPE_CONTINUOUS+TYPE_FIELD)) then
+		tc:CancelToGrave(false)
+	end
+	if tc:IsType(TYPE_SPELL) then Duel.RaiseEvent(tc,73734821,te,0,tp,tp,Duel.GetCurrentChain()) end
 end
