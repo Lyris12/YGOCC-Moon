@@ -19,7 +19,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
-	return re:IsActiveType(TYPE_MONSTER) and Duel.IsChainNegatable(ev)
+	return re:IsActiveType(TYPE_MONSTER) and Duel.IsChainNegatable(ev) and rp==1-tp
 end
 function s.cfilter(c)
 	return c:IsFacedown() and c:IsRank(8) and c:IsRace(RACE_DRAGON) and c:IsType(TYPE_XYZ)
@@ -37,21 +37,21 @@ function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.ConfirmCards(1-tp,tc)
 	e:SetLabelObject(tc)
 end
-function s.target(e,tp,eg,ep,ev,re,r,rp)
-	if chk==0 then return true end
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+    if chk==0 then return true end
 	Duel.SetTargetCard(e:GetLabelObject())
 	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
 end
 function s.sfilter(c,e,tp,mc)
-	return mc:IsCanBeXyzMaterial(c) and 
+	return mc:IsCanBeXyzMaterial(c)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local mc=re:GetHandler()
-	if not (Duel.NegateActivation(ev) and mc:IsRelateToEffect(re) and e:IsCostChecked()
+	if not (Duel.NegateActivation(ev) and mc:IsRelateToEffect(re)
 		and aux.MustMaterialCheck(mc,tp,EFFECT_MUST_BE_XMATERIAL)) or mc:IsImmuneToEffect(e) then return end
 	local sc=Duel.GetFirstTarget()
-	if sc and sc:IsRelateToEffect(e) and mc:IsCanBeXyzMaterial(sc) and sc:IsCanBeSpecialSummoned(e,0,tp,false,false)
-		and Duel.GetLocationCountFromEx(tp,tp,mg,sc)>0 and Duel.SelectEffectYesNo(tp,e:GetHandler())
+	if sc and sc:IsRelateToEffect(e) and mc:IsCanBeXyzMaterial(nil,tp,REASON_EFFECT) and sc:IsCanBeSpecialSummoned(e,0,tp,false,false)
+		and Duel.GetLocationCountFromEx(tp,tp,mg,sc)>0 and Duel.SelectEffectYesNo(tp,e:GetHandler()) then
 		local mg=mc:GetOverlayGroup()
 		if mg:GetCount()~=0 then
 			Duel.Overlay(sc,mg)
@@ -63,8 +63,8 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.xfilter(c)
-	return c:IsFacedown() or c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsRace(RACE_DRAGON)
+	return c:IsFacedown() or not (c:IsAttribute(ATTRIBUTE_LIGHT) or c:IsRace(RACE_DRAGON))
 end
 function s.hcon(e,tp,eg,ep,ev,re,r,rp)
-	return not Duel.IsExistingMatchingCard(s.xfilter,tp,LOCATION_MZONE,0,1,nil)
+	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0 or not Duel.IsExistingMatchingCard(s.xfilter,tp,LOCATION_MZONE,0,1,nil)
 end
