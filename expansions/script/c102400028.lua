@@ -1,7 +1,8 @@
 --created & coded by Lyris, art from Shadowverse's Evolved "Cutthroat, Discord Convict"
---Psychic Hadoken (Altered)
+--Psychic Hadouken (Altered)
 local s,id,o=GetID()
 function s.initial_effect(c)
+	c:RegisterSetCardString("Hadouken")
 	c:EnableReviveLimit()
 	aux.AddOrigSpatialType(c)
 	local e0=Effect.CreateEffect(c)
@@ -40,7 +41,7 @@ function s.initial_effect(c)
 end
 s.spt_other_space=102400026
 function s.cfilter(c)
-	return c:IsFaceupEx() and c:IsHadoken() and c:IsAbleToDeckAsCost()
+	return c:IsFaceupEx() and c:IsSetCard("Hadouken") and c:IsAbleToDeckAsCost()
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil) end

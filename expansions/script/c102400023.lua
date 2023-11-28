@@ -1,8 +1,8 @@
 --created & coded by Lyris, art from Shadowverse's "Gun Collector"
 --弾丸の波動拳
 local s,id,o=GetID()
-Card.IsHadoken=Card.IsHadoken or function(c) return c:GetCode()>102400019 and c:GetCode()<102400034 end
 function s.initial_effect(c)
+	c:RegisterSetCardString("Hadouken")
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_HAND)
@@ -22,7 +22,7 @@ function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local ct=3
 	if Duel.IsPlayerAffectedByEffect(tp,102400030) then ct=ct*2 end
 	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>=ct
-		and Duel.IsExistingMatchingCard(Card.IsHadoken,tp,LOCATION_DECK,0,1,nil) end
+		and Duel.IsExistingMatchingCard(Card.IsSetCard,tp,LOCATION_DECK,0,1,nil,"Hadouken") end
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local ct=3
@@ -35,7 +35,7 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 		g:AddCard(tc)
 	end
 	if ct>5 then for p=0,1 do Duel.ConfirmCards(p,g,true) end end
-	local d=g:FilterCount(Card.IsHadoken,nil)
+	local d=g:FilterCount(Card.IsSetCard,nil,"Hadouken")
 	for i=1,ct do Duel.MoveSequence(Duel.GetFieldCard(tp,LOCATION_DECK,0),SEQ_DECKTOP) end
 	local dg=Duel.GetFieldGroup(tp,0,LOCATION_ONFIELD)
 	if d>0 and #dg>0 and Duel.SelectEffectYesNo(tp,e:GetHandler()) then

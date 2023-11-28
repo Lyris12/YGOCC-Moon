@@ -1,4 +1,4 @@
---created & coded by Lyris, art from Cardfight!! Vanguard's "Kelpie Rider, Nikki"
+--created by Lyris, art from Cardfight!! Vanguard's "Kelpie Rider, Nikki"
 --アーマリン・シーホース・ライダー
 local s,id,o=GetID()
 function s.initial_effect(c)

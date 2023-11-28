@@ -2,6 +2,7 @@
 --永久の波動拳
 local s,id,o=GetID()
 function s.initial_effect(c)
+	c:RegisterSetCardString("Hadouken")
 	c:EnableReviveLimit(c)
 	aux.AddOrigSpatialType(c)
 	local e0=Effect.CreateEffect(c)
@@ -33,7 +34,7 @@ function s.initial_effect(c)
 end
 s.spt_other_space=102400025
 function s.filter(c,e,tp)
-	return c:IsHadoken() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard("Hadouken") and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToDeckAsCost,tp,LOCATION_HAND+LOCATION_ONFIELD,0,1,nil) end
@@ -51,7 +52,7 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SpecialSummon(Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil,e,tp),0,tp,tp,false,false,POS_FACEUP)
 end
 function s.sfilter(c,e,tp)
-	return c:IsHadoken() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard("Hadouken") and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.xptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ct=6

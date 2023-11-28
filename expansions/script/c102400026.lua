@@ -1,8 +1,8 @@
 --created & coded by Lyris, art from Shadowverse's "Cutthroat, Discord Convict"
 --サイコ波動拳
 local s,id,o=GetID()
-Card.IsHadoken=Card.IsHadoken or function(c) return c:GetCode()>102400019 and c:GetCode()<102400034 end
 function s.initial_effect(c)
+	c:RegisterSetCardString("Hadouken")
 	c:EnableReviveLimit()
 	aux.AddOrigSpatialType(c)
 	aux.AddSpatialProc(c,aux.drccheck,aux.TRUE,2,99)
@@ -27,7 +27,7 @@ function s.initial_effect(c)
 end
 s.spt_other_space=102400028
 function s.cfilter(c)
-	return c:IsFaceupEx() and c:IsHadoken() and c:IsAbleToDeckAsCost()
+	return c:IsFaceupEx() and c:IsSetCard("Hadouken") and c:IsAbleToDeckAsCost()
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,nil) end

@@ -1,8 +1,8 @@
 --created & coded by Lyris, art from Shadowverse's "Cassim, the Courageous"
 --勇気の波動拳
 local s,id,o=GetID()
-Card.IsHadoken=Card.IsHadoken or function(c) return c:GetCode()>102400019 and c:GetCode()<102400034 end
 function s.initial_effect(c)
+	c:RegisterSetCardString("Hadouken")
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_GRAVE+LOCATION_HAND)
@@ -19,7 +19,7 @@ function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SendtoDeck(c,nil,SEQ_DECKTOP,REASON_COST)
 end
 function s.filter(c)
-	return c:IsHadoken() and c:IsAbleToHand() and not c:IsCode(id)
+	return c:IsSetCard("Hadouken") and c:IsAbleToHand() and not c:IsCode(id)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ct=3
@@ -39,7 +39,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 	if ct>5 then for p=0,1 do Duel.ConfirmCards(p,g,true) end end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local tc=g:FilterSelect(tp,Card.IsHadoken,1,1,nil):GetFirst()
+	local tc=g:FilterSelect(tp,Card.IsSetCard,1,1,nil,"Hadouken"):GetFirst()
 	if tc then
 		Duel.DisableShuffleCheck()
 		if tc:IsAbleToHand() then

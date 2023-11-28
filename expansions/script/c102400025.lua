@@ -1,8 +1,8 @@
 --created & coded by Lyris, art from Shadowverse's "Shion, Immortal Aegis"
 --永久の波動拳
 local s,id,o=GetID()
-Card.IsHadoken=Card.IsHadoken or function(c) return c:GetCode()>102400019 and c:GetCode()<102400034 end
 function s.initial_effect(c)
+	c:RegisterSetCardString("Hadouken")
 	c:EnableReviveLimit()
 	aux.AddOrigSpatialType(c)
 	aux.AddSpatialProc(c,nil,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_LIGHT),2,2)
@@ -28,7 +28,7 @@ function s.initial_effect(c)
 end
 s.spt_other_space=102400027
 function s.filter(c,e,tp)
-	return c:IsHadoken() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard("Hadouken") and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToDeckAsCost,tp,LOCATION_HAND+LOCATION_ONFIELD,0,1,nil) end
@@ -59,7 +59,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	for i=0,ct-1 do g:AddCard(Duel.GetFieldCard(tp,LOCATION_DECK,i)) end
 	for p=0,1 do Duel.ConfirmCards(p,g,true) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local tc=g:FilterSelect(tp,Card.IsHadoken,1,1,nil):GetFirst()
+	local tc=g:FilterSelect(tp,Card.IsSetCard,1,1,nil,"Hadouken"):GetFirst()
 	if tc then
 		Duel.DisableShuffleCheck()
 		if tc:IsAbleToHand() then

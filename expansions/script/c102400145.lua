@@ -1,4 +1,4 @@
---created & coded by Lyris, art at https://gizmodo.com/720850?_escaped_fragment_=
+--created & coded by Lyris, art at https://gizmodo.com/5970670/
 --襲雷のアーティレリ
 local s,id,o=GetID()
 function s.initial_effect(c)

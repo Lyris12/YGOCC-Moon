@@ -1,8 +1,8 @@
 --created & coded by Lyris, art from Shadowverse's "Merciless Voiding"
 --波動拳無情
 local s,id,o=GetID()
-Card.IsHadoken=Card.IsHadoken or function(c) return c:GetCode()>102400019 and c:GetCode()<102400034 end
 function s.initial_effect(c)
+	c:RegisterSetCardString("Hadouken")
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_CHAINING)
@@ -25,7 +25,7 @@ function s.discon(e,tp,eg,ep,ev,re,r,rp)
 	return rp==1-tp and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)%2<1 and Duel.IsChainDisablable(ev)
 end
 function s.filter(c)
-	return c:IsFaceupEx() and c:IsHadoken() and c:IsAbleToDeck() and not c:IsCode(id)
+	return c:IsFaceupEx() and c:IsSetCard("Hadouken") and c:IsAbleToDeck() and not c:IsCode(id)
 end
 function s.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_GRAVE+LOCATION_ONFIELD,0,nil)
@@ -49,11 +49,11 @@ end
 function s.settg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ct=3
 	if Duel.IsPlayerAffectedByEffect(tp,102400030) then ct=ct*2 end
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsHadoken,tp,LOCATION_DECK,0,1,nil)
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsSetCard,tp,LOCATION_DECK,0,1,nil,"Hadouken")
 		and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>=ct end
 end
 function s.sfilter(c,e,tp)
-	if not c:IsHadoken() or c:IsCode(id) then return end
+	if not c:IsSetCard("Hadouken") or c:IsCode(id) then return end
 	if c:IsType(TYPE_MONSTER) then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEDOWN_DEFENSE)
 	else return c:IsSSetable() end

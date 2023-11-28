@@ -1,8 +1,8 @@
 --created & coded by Lyris, art from Shadowverse's "Craftsman's Pride"
 --波動拳設
 local s,id,o=GetID()
-Card.IsHadoken=Card.IsHadoken or function(c) return c:GetCode()>102400019 and c:GetCode()<102400034 end
 function s.initial_effect(c)
+	c:RegisterSetCardString("Hadouken")
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
@@ -36,12 +36,12 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		g:AddCard(tc)
 	end
 	if ct>5 then for p=0,1 do Duel.ConfirmCards(p,g,true) end end
-	Duel.Draw(tp,g:FilterCount(Card.IsHadoken,nil),REASON_EFFECT)
+	Duel.Draw(tp,g:FilterCount(Card.IsSetCard,nil,"Hadouken"),REASON_EFFECT)
 	for i=1,3 do Duel.MoveSequence(Duel.GetFieldCard(tp,LOCATION_DECK,0),SEQ_DECKTOP) end
 	Duel.SortDecktop(tp,tp,3)
 end
 function s.filter(c)
-	return c:IsFaceupEx() and c:IsHadoken() and c:IsAbleToDeck()
+	return c:IsFaceupEx() and c:IsSetCard("Hadouken") and c:IsAbleToDeck()
 end
 function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,e:GetHandler()) end

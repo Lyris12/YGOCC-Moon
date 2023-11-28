@@ -1,8 +1,8 @@
 --created & coded by Lyris, art from Shadowverse's Evolved "Norn, Arbiter of Worlds"
 --審判の波動拳
 local s,id,o=GetID()
-Card.IsHadoken=Card.IsHadoken or function(c) return c:GetCode()>102400019 and c:GetCode()<102400034 end
 function s.initial_effect(c)
+	c:RegisterSetCardString("Hadouken")
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetCode(EVENT_FREE_CHAIN)
@@ -24,10 +24,10 @@ function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SendtoDeck(c,nil,SEQ_DECKTOP,REASON_COST)
 end
 function s.filter(c)
-	return c:IsFaceup() and c:IsHadoken()
+	return c:IsFaceup() and c:IsSetCard("Hadouken")
 end
 function s.sfilter(c,e,tp)
-	return c:IsHadoken() and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsCode(id)
+	return c:IsSetCard("Hadouken") and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsCode(id)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ct=3

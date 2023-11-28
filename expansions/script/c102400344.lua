@@ -1,4 +1,4 @@
---created & coded by Lyris, art at https://www.reddit.com/r/yugioh/comments/d8rrf9/crusadia_maximus/
+--created & coded by Lyris, art at https://www.reddit.com/r/yugioh/comments/d8rrf9/crusadia%5Fmaximus/
 --機氷竜マクシー
 local s,id,o=GetID()
 function s.initial_effect(c)

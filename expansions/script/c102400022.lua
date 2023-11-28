@@ -1,8 +1,8 @@
 --created & coded by Lyris, art from Shadowverse's "Rosa, Unfettered Maiden"
 --解放の波動拳
 local s,id,o=GetID()
-Card.IsHadoken=Card.IsHadoken or function(c) return c:GetCode()>102400019 and c:GetCode()<102400034 end
 function s.initial_effect(c)
+	c:RegisterSetCardString("Hadouken")
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_HAND+LOCATION_MZONE)
@@ -19,7 +19,7 @@ function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SendtoDeck(c,nil,SEQ_DECKTOP,REASON_COST)
 end
 function s.filter(c)
-	return c:IsHadoken() and c:IsType(TYPE_SPELL+TYPE_TRAP)
+	return c:IsSetCard("Hadouken") and c:IsType(TYPE_SPELL+TYPE_TRAP)
 end
 function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>2

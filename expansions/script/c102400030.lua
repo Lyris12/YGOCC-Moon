@@ -1,8 +1,8 @@
 --created & coded by Lyris, art from Shadowverse's "Cultivate Life"
 --波動拳の培養
 local s,id,o=GetID()
-Card.IsHadoken=Card.IsHadoken or function(c) return c:GetCode()>102400019 and c:GetCode()<102400034 end
 function s.initial_effect(c)
+	c:RegisterSetCardString("Hadouken")
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
@@ -15,13 +15,13 @@ function s.initial_effect(c)
 		cf(tp,g)
 		if not xc then return end
 		if aux.GetValueType(g)=="Group" then
-			for tc in aux.Next(g:Filter(Card.IsHadoken,nil)) do
+			for tc in aux.Next(g:Filter(Card.IsSetCard,nil,"Hadouken")) do
 				local p=tc:GetControler()
 				if Duel.IsPlayerAffectedByEffect(p,id) then Duel.RegisterFlagEffect(p,id,RESET_PHASE+PHASE_END,0,1) end
 			end
 		else
 			local p=g:GetControler()
-			if aux.GetValueType(g)=="Card" and g:IsHadoken() and Duel.IsPlayerAffectedByEffect(p,id) then
+			if aux.GetValueType(g)=="Card" and g:IsSetCard("Hadouken") and Duel.IsPlayerAffectedByEffect(p,id) then
 				Duel.RegisterFlagEffect(p,id,RESET_PHASE+PHASE_END,0,1)
 			end
 		end
@@ -29,7 +29,7 @@ function s.initial_effect(c)
 	function Duel.ConfirmDecktop(tp,ct)
 		cd(tp,ct)
 		if Duel.IsPlayerAffectedByEffect(tp,id) then
-			for i=1,Duel.GetDecktopGroup(tp,ct):FilterCount(Card.IsHadoken,nil)*2 do
+			for i=1,Duel.GetDecktopGroup(tp,ct):FilterCount(Card.IsSetCard,nil,"Hadouken")*2 do
 				Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
 			end
 		end
@@ -46,7 +46,7 @@ function s.initial_effect(c)
 	e2:SetCode(EFFECT_UPDATE_ATTACK)
 	e2:SetRange(LOCATION_FZONE)
 	e2:SetTargetRange(LOCATION_MZONE,0)
-	e2:SetTarget(aux.TargetBoolFunction(Card.IsHadoken))
+	e2:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,"Hadouken"))
 	e2:SetValue(s.val)
 	c:RegisterEffect(e2)
 end
@@ -66,5 +66,5 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.val(e,c)
-	return Duel.GetFlagEffect(e:GetHandlerPlayer(),id)//2*200
+	return Duel.GetFlagEffect(e:GetHandlerPlayer(),id)//2*500
 end

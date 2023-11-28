@@ -1,4 +1,4 @@
---created & coded by Lyris, art on Reddit at https://www.reddit.com/r/yugioh/comments/88lik5/fan_art_cyber_dragon/
+--created & coded by Lyris, art on Reddit at https://www.reddit.com/r/yugioh/comments/88lik5/fan%5Fart%5Fcyber%5Fdragon/
 --サイバー・ドラゴン・アイン
 local s,id,o=GetID()
 function s.initial_effect(c)
