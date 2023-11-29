@@ -348,7 +348,7 @@ function Auxiliary.SpatialOperation(e,tp,eg,ep,ev,re,r,rp,c,smat,mg)
 	local ospc=Duel.CreateToken(tp,c.spt_other_space)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	Duel.ConfirmCards(tp,ospc)
-	if Duel.SelectYesNo(tp,aux.Stringid(c:GetOriginalCode(),15)) then
+	if Duel.SelectEffectYesNo(tp,c,aux.Stringid(c:GetOriginalCode(),15)) then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 		e1:SetCode(EVENT_LEAVE_DECK)
