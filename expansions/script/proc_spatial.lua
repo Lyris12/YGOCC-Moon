@@ -122,12 +122,15 @@ end
 --Custom Functions
 function Card.SwitchSpace(c)
 	if not Auxiliary.Spatials[c] then return false end
-	Auxiliary.Spatials[c]=nil
 	local ospc=c.spt_other_space
 	if not ospc or ospc==0 then return false end
 	c:SetEntityCode(ospc,true)
-	c:ReplaceEffect(ospc,0,0)
+	Duel.CreateToken(0,ospc)
 	Duel.SetMetatable(c,_G["c"..ospc])
+	c:ReplaceEffect(ospc,0,0)
+	c:ResetEffect(c:GetOriginalCode(),RESET_CARD)
+	c:ResetEffect(c:GetOriginalCode(),RESET_CARD)
+	_G["c"..ospc].initial_effect(c)
 	return true
 end
 function Card.IsCanBeSpaceMaterial(c,sptc)
@@ -186,8 +189,7 @@ function Auxiliary.SpaceMatFilter(c,sptc,tp,...)
 	return false
 end
 function Auxiliary.SptCheckRecursive(c,tp,sg,mg,fg,sptc,ct,djn,sptcheck,...)
-	if not c:IsLevelAbove(1) and not c:IsRankAbove(1)
-		or c:IsLevelAbove(djn+1) or c:IsRankAbove(djn+1) then return false end
+	if not c:IsLevelAbove(1) and not c:IsRankAbove(1) then return false end
 	sg:AddCard(c)
 	ct=ct+1
 	local funs,max,min,chk={...},0,0
@@ -211,7 +213,7 @@ function Auxiliary.SptCheckGoal(tp,sg,fg,sptc,ct,sptcheck,...)
 		if not sg:IsExists(funs[i][1],funs[i][2],nil) then return false end
 		min=min+funs[i][2]
 	end
-	local djn=sptc:GetLevel()+1
+	local djn=sptc:GetLevel()
 	if min<djn then Duel.SetSelectedCard(sg) end
 	return ct>=min and sg:CheckWithSumGreater(Auxiliary.SpatialValue,djn)
 		and sg:IsExists(Auxiliary.SptMatCheck,#sg,nil,sg,sptc)
@@ -348,9 +350,10 @@ function Auxiliary.SpatialOperation(e,tp,eg,ep,ev,re,r,rp,c,smat,mg)
 	Duel.ConfirmCards(tp,ospc)
 	if Duel.SelectYesNo(tp,aux.Stringid(c:GetOriginalCode(),15)) then
 		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e1:SetCode(EVENT_SPSUMMON)
+		e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+		e1:SetCode(EVENT_LEAVE_DECK)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e1:SetOperation(function() c:SwitchSpace() e1:Reset() end)
-		Duel.RegisterEffect(e1,tp)
+		c:RegisterEffect(e1,true)
 	end
 end
