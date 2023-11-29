@@ -330,6 +330,18 @@ function Auxiliary.SpatialTarget(sptcheck,...)
 end
 function Auxiliary.SpatialOperation(e,tp,eg,ep,ev,re,r,rp,c,smat,mg)
 	if Duel.SetSummonCancelable then Duel.SetSummonCancelable(true) end
+	local ospc=Duel.CreateToken(tp,c.spt_other_space)
+	if Duel.IsPlayerCanSpecialSummonMonster(tp,c:GetOriginalCode(),nil,c:GetType(),ospc:GetAttack(),ospc:GetDefense(),c:GetLevel(),ospc:GetRace(),ospc:GetAttribute()) then
+		Duel.ConfirmCards(tp,ospc)
+		if Duel.SelectEffectYesNo(tp,c,aux.Stringid(c:GetOriginalCode(),15)) then
+			local e1=Effect.CreateEffect(c)
+			e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+			e1:SetCode(EVENT_LEAVE_DECK)
+			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+			e1:SetOperation(function() c:SwitchSpace() e1:Reset() end)
+			c:RegisterEffect(e1,true)
+		end
+	end
 	local g=e:GetLabelObject()
 	c:SetMaterial(g)
 	local rg=Group.CreateGroup()
@@ -345,15 +357,4 @@ function Auxiliary.SpatialOperation(e,tp,eg,ep,ev,re,r,rp,c,smat,mg)
 	end
 	Duel.SendtoGrave(rg,REASON_MATERIAL+REASON_SPATIAL)
 	g:DeleteGroup()
-	local ospc=Duel.CreateToken(tp,c.spt_other_space)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	Duel.ConfirmCards(tp,ospc)
-	if Duel.SelectEffectYesNo(tp,c,aux.Stringid(c:GetOriginalCode(),15)) then
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-		e1:SetCode(EVENT_LEAVE_DECK)
-		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e1:SetOperation(function() c:SwitchSpace() e1:Reset() end)
-		c:RegisterEffect(e1,true)
-	end
 end

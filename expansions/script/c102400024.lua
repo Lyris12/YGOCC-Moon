@@ -87,7 +87,7 @@ function s.sptop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.RegisterEffect(e4,tp)
 		local e5=e4:Clone()
 		e5:SetCode(EVENT_CHAIN_SOLVED)
-		Duel.RegisterEffect(e5)
+		Duel.RegisterEffect(e5,tp)
 		if Duel.SetSummonCancelable then Duel.SetSummonCancelable(false) end
 		Duel.SpecialSummonRule(tp,sc)
 	end
