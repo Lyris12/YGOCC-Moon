@@ -33,7 +33,8 @@ function s.xfilter(c)
 	return c:IsSetCard("Hadouken") and c:IsType(TYPE_MONSTER)
 end
 function s.spttg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsPlayerCanSpecialSummon(tp) and not Duel.IsPlayerAffectedByEffect(tp,63060238) and Duel.IsExistingMatchingCard(s.xfilter,tp,LOCATION_DECK,0,1,nil) end
+	if chk==0 then return Duel.IsPlayerCanSpecialSummon(tp) and not Duel.IsPlayerAffectedByEffect(tp,63060238)
+		and Duel.IsExistingMatchingCard(s.xfilter,tp,LOCATION_DECK,0,1,nil) end
 end
 function s.sptop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(s.xfilter,tp,LOCATION_DECK,0,nil)
@@ -71,9 +72,10 @@ function s.sptop(e,tp,eg,ep,ev,re,r,rp)
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_FIELD)
 	e0:SetCode(EFFECT_CANNOT_BE_SPACE_MATERIAL)
-	e0:SetTargetRange(0xff,0)
+	e0:SetTargetRange(0xff,0xff)
+	e0:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
 	e0:SetTarget(aux.TargetBoolFunction(aux.NOT(Card.IsSetCard),"Hadouken"))
-	Duel.RegisterEffect(e1,tp)
+	Duel.RegisterEffect(e0,tp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local sc=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp):GetFirst()
 	if sc then
