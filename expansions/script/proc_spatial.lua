@@ -333,7 +333,8 @@ function Auxiliary.SpatialOperation(e,tp,eg,ep,ev,re,r,rp,c,smat,mg)
 	local ospc=Duel.CreateToken(tp,c.spt_other_space)
 	if Duel.IsPlayerCanSpecialSummonMonster(tp,c:GetOriginalCode(),nil,c:GetType(),ospc:GetAttack(),ospc:GetDefense(),c:GetLevel(),ospc:GetRace(),ospc:GetAttribute()) then
 		Duel.ConfirmCards(tp,ospc)
-		if Duel.SelectEffectYesNo(tp,c,aux.Stringid(c:GetOriginalCode(),15)) then
+		if not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_SPATIAL,tp,false,false)
+				or Duel.SelectEffectYesNo(tp,c,aux.Stringid(c:GetOriginalCode(),15)) then
 			local e1=Effect.CreateEffect(c)
 			e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 			e1:SetCode(EVENT_LEAVE_DECK)
