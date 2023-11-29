@@ -22,6 +22,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_DISABLE,g,0,0,0)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
 	local ct=Duel.GetFieldGroupCount(tp,0,LOCATION_ONFIELD)
 	if Duel.IsPlayerAffectedByEffect(tp,102400030) then ct=ct*2 end
 	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)<ct then return end

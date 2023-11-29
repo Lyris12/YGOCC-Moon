@@ -37,8 +37,8 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 	if ct>5 then for p=0,1 do Duel.ConfirmCards(p,g,true) end end
 	Duel.Draw(tp,g:FilterCount(Card.IsSetCard,nil,"Hadouken"),REASON_EFFECT)
-	for i=1,3 do Duel.MoveSequence(Duel.GetFieldCard(tp,LOCATION_DECK,0),SEQ_DECKTOP) end
-	Duel.SortDecktop(tp,tp,3)
+	for i=1,ct do Duel.MoveSequence(Duel.GetFieldCard(tp,LOCATION_DECK,0),SEQ_DECKTOP) end
+	Duel.SortDecktop(tp,tp,ct)
 end
 function s.filter(c)
 	return c:IsFaceupEx() and c:IsSetCard("Hadouken") and c:IsAbleToDeck()

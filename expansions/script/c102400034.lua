@@ -38,7 +38,7 @@ function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabelObject(tc)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-    if chk==0 then return true end
+	if chk==0 then return true end
 	Duel.SetTargetCard(e:GetLabelObject())
 	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
 end
@@ -50,7 +50,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if not (Duel.NegateActivation(ev) and mc:IsRelateToEffect(re)
 		and aux.MustMaterialCheck(mc,tp,EFFECT_MUST_BE_XMATERIAL)) or mc:IsImmuneToEffect(e) then return end
 	local sc=Duel.GetFirstTarget()
-	if sc and sc:IsRelateToEffect(e) and mc:IsCanBeXyzMaterial(nil,tp,REASON_EFFECT) and sc:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	if sc and sc:IsRelateToEffect(e) and mc:IsCanBeXyzMaterial(nil,tp,REASON_EFFECT) and sc:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
 		and Duel.GetLocationCountFromEx(tp,tp,mg,sc)>0 and Duel.SelectEffectYesNo(tp,e:GetHandler()) then
 		local mg=mc:GetOverlayGroup()
 		if mg:GetCount()~=0 then
@@ -66,5 +66,6 @@ function s.xfilter(c)
 	return c:IsFacedown() or not (c:IsAttribute(ATTRIBUTE_LIGHT) or c:IsRace(RACE_DRAGON))
 end
 function s.hcon(e,tp,eg,ep,ev,re,r,rp)
+	local tp=e:GetHandler():GetControler()
 	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0 or not Duel.IsExistingMatchingCard(s.xfilter,tp,LOCATION_MZONE,0,1,nil)
 end

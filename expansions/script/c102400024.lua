@@ -81,13 +81,15 @@ function s.sptop(e,tp,eg,ep,ev,re,r,rp)
 		e3:SetReset(RESET_EVENT+RESETS_STANDARD)
 		thcard:RegisterEffect(e3)
 		local e4=Effect.CreateEffect(c)
-		e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)	
 		e4:SetCode(EVENT_SPSUMMON)
 		e4:SetOperation(function(_,p,sg) e1:Reset() e2:Reset() e3:Reset() e4:Reset() end)
 		Duel.RegisterEffect(e4,tp)
+		local e5=e4:Clone()
+		e5:SetCode(EVENT_CHAIN_SOLVED)
+		Duel.RegisterEffect(e5)
 		if Duel.SetSummonCancelable then Duel.SetSummonCancelable(false) end
 		Duel.SpecialSummonRule(tp,sc)
-		Duel.DisableShuffleCheck()
 	end
 end
 function s.mattg(e,c)
