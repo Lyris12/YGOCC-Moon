@@ -63,7 +63,7 @@ function s.op(e,tp)
 		local c=e:GetHandler()
 		c:SetEntityCode(sc:GetOriginalCode(),true)
 		local trg=te:GetTarget()
-		if trg then trg(te,tep,eg,ep,ev,re,r,rp,1) end
+		if trg then trg(te,tep,eg,ep,ev,re,r,rp,1)
 		local op=te:GetOperation()
 		if op then
 			sc:CreateEffectRelation(te)
