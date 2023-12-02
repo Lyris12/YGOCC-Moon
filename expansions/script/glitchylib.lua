@@ -811,7 +811,6 @@ function Auxiliary.dbtg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 end
 
-
 -----------------------------------------------------------------------
 -------------------------------TRIBUTE-------------------------------
 local _Release = Duel.Release

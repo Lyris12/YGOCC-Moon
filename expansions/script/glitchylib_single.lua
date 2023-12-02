@@ -1344,7 +1344,6 @@ function Card.UnaffectedProtection(c,protection,reset,rc,range,cond,prop,desc)
 			local i=1
 			while i<=PROTECTION_MAX_VALUE do
 				if protection&i==i then
-					Debug.Message(i)
 					table.insert(list,UNAFFECTED_PROTECTION_FUNCTIONS[i])
 				end
 				i=i<<1

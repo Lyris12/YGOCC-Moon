@@ -212,7 +212,6 @@ function s.excop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 	local sg=Duel.Group(s.sumfilter,tp,LOCATION_HAND|LOCATION_MZONE,0,nil,tp)
-	Debug.Message(#sg)
 	if #sg>0 and e:GetHandler():AskPlayer(tp,3) then
 		local sg2=sg:Select(tp,1,1,nil)
 		if #sg2>0 then

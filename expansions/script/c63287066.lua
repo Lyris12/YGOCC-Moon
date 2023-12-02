@@ -98,7 +98,6 @@ function Card.IsPoisonFrogSummonable(c)
 	local peset={}
 	local res=c:FilterPoisonFrogSummonProc(tp,peset)
 	if #peset==0 and (aux.GetValueType(res)=="boolean" and not res or aux.GetValueType(res)=="number" and res==-2) then
-		Debug.Message(res)
 		return false
 	end
 	

@@ -42,7 +42,6 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToChain() or not c:IsFaceup() then return end
 	local ct=Duel.GetMatchingGroupCount(aux.Faceup(Card.IsRace),tp,LOCATION_MZONE,LOCATION_MZONE,nil,RACES_BEASTS)
-	Debug.Message(ct)
 	if ct>1 then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
