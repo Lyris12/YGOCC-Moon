@@ -41,7 +41,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SortDecktop(tp,tp,ct)
 end
 function s.filter(c)
-	return c:IsFaceupEx() and c:IsSetCard("Hadouken") and c:IsAbleToDeck()
+	return c:IsFaceupEx() and c:IsSetCard("Hadouken") and c:IsAbleToDeck() and not c:IsCode(id)
 end
 function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,e:GetHandler()) end
