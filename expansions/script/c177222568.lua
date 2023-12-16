@@ -2,12 +2,13 @@
 local s,id=GetID()
 function s.initial_effect(c)
 	--Target up to 6 of your "Oniritron" cards that are banished and/or in your GY; shuffle them into the Deck, and if you do, choose 1 "Oniritron" Xyz Monster you control,
-	--and attach 1 card your opponent controls to it for every 2 cards returned to the Deck or Extra Deck by this effect.
+	--and attach 1 card your opponent controls to it for every 3 cards returned to the Deck or Extra Deck by this effect.
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_TODECK)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetHintTiming(0,TIMINGS_CHECK_MONSTER+TIMING_END_PHASE)
 	e1:SetCountLimit(1,id)
 	e1:SetTarget(s.tdtg)
 	e1:SetOperation(s.tdop)
@@ -36,7 +37,7 @@ function s.atchfilter(c)
 end
 function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.tdfilter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(s.tdfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,2,nil) 
+	if chk==0 then return Duel.IsExistingTarget(s.tdfilter,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,3,nil) 
 		and Duel.IsExistingMatchingCard(s.atchfilter,tp,0,LOCATION_ONFIELD,1,nil) 
 		and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_MZONE,0,1,nil,e) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)

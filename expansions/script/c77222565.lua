@@ -42,7 +42,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 	g2:RemoveCard(tc)
 	local b1=aux.TRUE
-	local b2=#g2>1
+	local b2=#g2>=1
 	local off=1
 	local ops={}
 	local opval={}
