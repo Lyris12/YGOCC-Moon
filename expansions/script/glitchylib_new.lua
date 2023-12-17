@@ -1377,10 +1377,105 @@ function Card.GlitchyGetPreviousColumnGroup(c,left,right,without_center)
 end
 
 --Counters
+RELEVANT_REMOVE_EVENT_COUNTERS = {0x100e, COUNTER_ICE}
+COUNTED_COUNTERS_FOR_REMOVE_EVENT = {}
+
 function Card.HasCounter(c,ctype)
 	return c:GetCounter(ctype)>0
 end
+function Card.CountRelevantCountersForRemoveEvent(c)
+	for _,ctype in ipairs(RELEVANT_REMOVE_EVENT_COUNTERS) do
+		local ct=c:GetCounter(ctype)
+		if ct>0 then
+			if not COUNTED_COUNTERS_FOR_REMOVE_EVENT[ctype] then
+				COUNTED_COUNTERS_FOR_REMOVE_EVENT[ctype]=0
+			end
+			COUNTED_COUNTERS_FOR_REMOVE_EVENT[ctype]=COUNTED_COUNTERS_FOR_REMOVE_EVENT[ctype]+ct
+		end
+	end
+end
+function Duel.RaiseRelevantRemoveCounterEvents(eg,re,r,rp,ep)
+	for _,ctype in ipairs(RELEVANT_REMOVE_EVENT_COUNTERS) do
+		local count=COUNTED_COUNTERS_FOR_REMOVE_EVENT[ctype]
+		if count then
+			Duel.RaiseEvent(eg,EVENT_REMOVE_COUNTER+ctype,re,r,rp,ep,count)
+		end
+	end
+	COUNTED_COUNTERS_FOR_REMOVE_EVENT={}
+end
 
+--Auxiliary for Duel.DistributeCounters
+function Auxiliary.DistributeCountersGroupCheck(ctype)
+	return	function(g,val,n)
+				if val<1 then return false end
+				for c in aux.Next(g) do
+					for i=val,1,-1 do
+						if c:IsCanAddCounter(ctype,i) then
+							if val==i then
+								if not n then
+									return true
+								end
+								n=n-1
+								if n==0 then
+									return true
+								end
+								n=n+1
+							else
+								val=val-i
+								if n then n=n-1 end
+								local sg=g:Clone()
+								sg:RemoveCard(c)
+								local res=sg:CheckSubGroup(aux.DistributeCountersGroupCheck(ctype),#sg,#sg,val,n)
+								sg:DeleteGroup()
+								val=val+i
+								if n then n=n+1 end
+								if res then
+									return true
+								end
+							end
+						end
+					end
+				end
+				return false
+			end
+end
+
+--[[Distributes counters among cards
+• tp = Player that will distribute the counters
+• ctype = Counter type
+• n = Number of counters to distribute
+• g = Group of cards among which the counters will be distributed
+• id = Flag
+]]
+function Duel.DistributeCounters(tp,ctype,n,g,id)
+	local conjunction_success=false
+	Duel.HintMessage(tp,HINTMSG_COUNTER)
+	local sg=g:SelectSubGroup(tp,aux.DistributeCountersGroupCheck(ctype),false,1,math.min(#g,n),n)
+	local ct=0
+	for tc in aux.Next(sg) do
+		Duel.HintSelection(Group.FromCards(tc))
+		tc:RegisterFlagEffect(id,RESET_CHAIN,EFFECT_FLAG_IGNORE_IMMUNE,1)
+		local nums={}
+		for i=n-ct,1,-1 do
+			if tc:IsCanAddCounter(ctype,i,false) then
+				local ng=sg:Filter(Card.HasFlagEffect,nil,id)
+				local fg=sg:Filter(aux.NOT(Card.HasFlagEffect),nil,id)
+				if (#ng==#sg or fg:CheckSubGroup(aux.DistributeCountersGroupCheck(ctype),#fg,#fg,n-ct-i,#fg)) then
+					table.insert(nums,i)
+					if #ng==#sg then
+						break
+					end
+				end
+			end
+		end
+		local n=Duel.AnnounceNumber(tp,table.unpack(nums))
+		if tc:AddCounter(ctype,n) then
+			conjunction_success=true
+		end
+		ct=ct+n
+	end
+	return conjunction_success
+end
 --Exception
 function Auxiliary.ActivateException(e,chk)
 	local c=e:GetHandler()
