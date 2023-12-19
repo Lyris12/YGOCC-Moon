@@ -527,6 +527,12 @@ end
 function Duel.SetPossibleOperationInfo(ch,cat,g,ct,p,val,...)
 	local extra={...}
 	local chain = ch==0 and Duel.GetCurrentChain() or ch
+	if g then
+		if aux.GetValueType(g)=="Card" then
+			g=Group.FromCards(g)
+		end
+		g:KeepAlive()
+	end
 	if not global_possible_info_table[chain] then
 		global_possible_info_table[chain]={}
 	end
@@ -552,6 +558,12 @@ end
 function Duel.SetAdditionalOperationInfo(ch,cat,g,ct,p,val,...)
 	local extra={...}
 	local chain = ch==0 and Duel.GetCurrentChain() or ch
+	if g then
+		if aux.GetValueType(g)=="Card" then
+			g=Group.FromCards(g)
+		end
+		g:KeepAlive()
+	end
 	if not global_additional_info_table[chain] then
 		global_additional_info_table[chain]={}
 	end
