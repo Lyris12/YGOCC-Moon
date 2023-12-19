@@ -3,8 +3,8 @@
 --Scripted by: XGlitchy30
 
 local s,id,o=GetID()
-xpcall(function() require("expansions/script/glitchylib_helper") end,function() require("script/glitchylib_helper") end)
-xpcall(function() require("expansions/script/glitchylib_aeonstride") end,function() require("script/glitchylib_aeonstride") end)
+Duel.LoadScript("glitchylib_helper.lua")
+Duel.LoadScript("glitchylib_aeonstride.lua")
 function s.initial_effect(c)
 	aux.AddOrigTimeleapType(c)
 	aux.AddTimeleapProc(c,5,s.TLcon,{s.TLmaterial,true},{s.TLop,s.TLval})
