@@ -9,6 +9,7 @@ function cid.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCountLimit(1,id+EFFECT_COUNT_CODE_OATH)
+	e1:SetTarget(cid.target)
 	e1:SetOperation(cid.activate)
 	c:RegisterEffect(e1)
 	--tohand
@@ -38,10 +39,14 @@ function cid.rmfilter(c)
 	return c:IsSetCard(0x3ff) and c:IsType(TYPE_SPELL) and c:IsAbleToRemove()
 end
 --Activate
+function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then
+		return not Duel.PlayerHasFlagEffect(tp,CARD_LOTUS_BLADE_MIMICRY) or Duel.GetMatchingGroupCount(cid.tgfilter,tp,LOCATION_DECK,0,nil)>0
+	end
+end
 function cid.activate(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local g=Duel.GetMatchingGroup(cid.tgfilter,tp,LOCATION_DECK,0,nil)
-	if g:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
+	if g:GetCount()>0 and (Duel.PlayerHasFlagEffect(tp,CARD_LOTUS_BLADE_MIMICRY) or Duel.SelectYesNo(tp,aux.Stringid(id,0))) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 		local sg=g:Select(tp,1,1,nil)
 		Duel.SendtoGrave(sg,REASON_EFFECT)

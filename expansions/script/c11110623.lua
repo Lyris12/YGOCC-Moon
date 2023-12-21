@@ -2,7 +2,7 @@
 --Kjel Aesthetica, Orgoglio della Vitatessitrice
 --Scripted by: XGlitchy30
 
-xpcall(function() require("expansions/script/glitchylib_kjel_aesthetica") end,function() require("script/glitchylib_kjel_aesthetica") end)
+Duel.LoadScript("glitchylib_kjel_aesthetica.lua")
 
 local s,id,o=GetID()
 function s.initial_effect(c)
@@ -136,7 +136,7 @@ end
 --E2
 function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
-	if chkc then return chkc:IsInGY() and chkc:IsControler(tp) and s.actfilter(chkc) end
+	if chkc then return chkc:IsInGY() and chkc:IsControler(tp) and s.actfilter(chkc,c) end
 	if chk==0 then return c:IsAbleToExtra() and Duel.IsExistingTarget(s.actfilter,tp,LOCATION_GRAVE,0,1,nil,c) end
 	local g=Duel.Select(HINTMSG_TODECK,true,tp,s.actfilter,tp,LOCATION_GRAVE,0,1,1,nil,c)
 	g:AddCard(c)

@@ -31,20 +31,26 @@ function cid.atkfilter(c)
 end
 --activate
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	if Duel.IsExistingMatchingCard(cid.costfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil)
-		and Duel.IsPlayerCanDraw(tp,2) and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-		local g=Duel.SelectMatchingCard(tp,cid.costfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil)
-		Duel.Remove(g,POS_FACEUP,REASON_COST)
-		e:SetLabel(0)
-		Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,2)
+	if chk==0 then
+		return not Duel.PlayerHasFlagEffect(tp,CARD_LOTUS_BLADE_MIMICRY) or Duel.IsPlayerCanDraw(tp,2)
+	end
+	if Duel.PlayerHasFlagEffect(tp,CARD_LOTUS_BLADE_MIMICRY) then
+		return
 	else
-		e:SetLabel(1)
+		if Duel.IsExistingMatchingCard(cid.costfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil)
+			and Duel.IsPlayerCanDraw(tp,2) and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+			local g=Duel.SelectMatchingCard(tp,cid.costfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil)
+			Duel.Remove(g,POS_FACEUP,REASON_COST)
+			e:SetLabel(0)
+			Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,2)
+		else
+			e:SetLabel(1)
+		end
 	end
 end
 function cid.activate(e,tp,eg,ep,ev,re,r,rp,chk)
-	if e:GetHandler():IsRelateToEffect(e) and e:GetLabel()==0 then
+	if Duel.PlayerHasFlagEffect(tp,CARD_LOTUS_BLADE_MIMICRY) or e:GetLabel()==0 then
 		Duel.Draw(tp,2,REASON_EFFECT)
 	end
 end

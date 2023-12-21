@@ -48,6 +48,8 @@ end
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -------------------------------EFFECTS THAT CAN BE ACTIVATED BY AFFECTING THE CARD USED AS COST, EVEN WHEN THERE ARE NO OTHER VALID TARGETS-------------------------------------
+LOCATION_AFTER_COST_EFFECTS = {EFFECT_CANNOT_SPECIAL_SUMMON, EFFECT_CANNOT_SSET}
+
 function Card.SetLocationAfterCost(c,loc)
 	local s=getmetatable(c)
 	s.LocationAfterCost=loc
@@ -66,17 +68,21 @@ end
 local _IsLocation, _GetLocation = Card.IsLocation, Card.GetLocation
 
 Card.IsLocation = function(c,loc)
-	if self_reference_effect and self_reference_effect:GetCode()==EFFECT_CANNOT_SPECIAL_SUMMON then
-		if c:IsLocationAfterCost(loc) then
-			return true
+	if self_reference_effect then
+		local code=self_reference_effect:GetCode()
+		if aux.FindInTable(LOCATION_AFTER_COST_EFFECTS,code) then
+			return c:IsLocationAfterCost(loc)
 		end
 	end
 	return _IsLocation(c,loc)
 end
 Card.GetLocation = function(c)
 	local locs=_GetLocation(c)
-	if self_reference_effect and self_reference_effect:GetCode()==EFFECT_CANNOT_SPECIAL_SUMMON then
-		locs=locs|c:GetLocationAfterCost()
+	if self_reference_effect then
+		local code=self_reference_effect:GetCode()
+		if aux.FindInTable(LOCATION_AFTER_COST_EFFECTS,code) then
+			locs=locs|c:GetLocationAfterCost()
+		end
 	end
 	return locs
 end
@@ -390,6 +396,8 @@ function Auxiliary.RegisterMergedDelayedEventGlitchy(c,code,event,f,flag,range,e
 			se=aux.AddThisCardInFZoneAlreadyCheck(c)
 		elseif check_if_already_in_location&LOCATION_MZONE>0 then
 			se=aux.AddThisCardInMZoneAlreadyCheck(c)
+		elseif check_if_already_in_location&LOCATION_SZONE>0 then
+			se=aux.AddThisCardInSZoneAlreadyCheck(c)
 		end
 	end
 	

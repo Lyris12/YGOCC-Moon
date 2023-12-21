@@ -74,8 +74,10 @@ ARCHE_GRENADE_TYPE		= 0x302
 ARCHE_IDOLESCENT		= 0x5a3
 ARCHE_LEYLAH			= 0xd45
 ARCHE_LIFEWEAVER		= 0x5a5
+ARCHE_LOTUS_BLADE		= 0x3ff
 ARCHE_METALURGOS		= 0x5a4
 ARCHE_MMS				= 0xd71
+ARCHE_MUSCWOLE			= 0x777
 --
 ARCHE_NUMBER_I			= 0x2048
 ARCHE_NUMBER_I39		= 0x6048
@@ -84,6 +86,7 @@ ARCHE_NUMBER_IC39		= 0xa048
 ARCHE_ORIGIN_DRAGON		= 0xfc1
 ARCHE_OSCURION			= 0x5a6
 ARCHE_QUARPHEX			= 0x1a4
+ARCHE_SKYBURNER			= 0xf41
 ARCHE_TRAPPIT			= 0x54a
 ARCHE_VAISSEAU			= 0x4a8
 ARCHE_WINTER_SPIRIT		= 0xa8d
@@ -105,11 +108,13 @@ CARD_GOLDEN_SKIES_TREASURE_OF_WELFARE		= 11111029
 CARD_IN_THE_FOREST_BLACK_AS_MY_MEMORY		= 1
 CARD_KEEPER_OF_ARMONY						= 100000145
 CARD_LIMIERRE								= 19936278
+CARD_LOTUS_BLADE_MIMICRY					= 100000174
 CARD_METALURGOS_CONDUCTION					= 11110608
 CARD_MISTRESS_OF_THE_SKY					= 34847
 CARD_MMS_JACKLYN_ALLTRADES					= 19905907
 CARD_MMS_SHERLOCK_HOLMES					= 19905908
 CARD_MONOCHROME_VALKYRIE_RK4				= 100000167
+CARD_MUSCWOLE_MURDERMANIA					= 70070078
 CARD_OSCURION_TYPE0							= 11110633
 CARD_OSCURION_TYPE2							= 11110634
 CARD_REVERIE_DU_VAISSEAU					= 100000039
@@ -227,6 +232,7 @@ HINTMSG_TOEXTRA							=	2102
 HINTMSG_FLIPSUMMON						=	2103
 HINTMSG_ATTACH							=	2104
 HINTMSG_ATTACHTO						=	2105
+HINTMSG_ATKDEF							=	2106
 
 --Locations
 LOCATION_ENGAGED	=	0x1000
@@ -938,10 +944,11 @@ function Duel.Bounce(g)
 	return ct,#cg,cg
 end
 
-function Duel.ShuffleIntoDeck(g,p,loc,seq)
+function Duel.ShuffleIntoDeck(g,p,loc,seq,r)
 	if not loc then loc=LOCATION_DECK|LOCATION_EXTRA end
 	if not seq then seq=SEQ_DECKSHUFFLE end
-	local ct=Duel.SendtoDeck(g,p,seq,REASON_EFFECT)
+	if not r then r=REASON_EFFECT end
+	local ct=Duel.SendtoDeck(g,p,seq,r)
 	if ct>0 then
 		if seq==SEQ_DECKSHUFFLE then
 			aux.AfterShuffle(g)
@@ -2401,6 +2408,11 @@ function Auxiliary.CheckArchetypeReasonEffect(s,re,setc)
 	end
 end
 
+--Owner
+function Card.IsOwner(c,tp)
+	return c:GetOwner()==tp
+end
+
 --Pendulum-related
 function Card.IsCapableSendToExtra(c,tp)
 	if not c:IsMonster(TYPE_EXTRA|TYPE_PENDULUM|TYPE_PANDEMONIUM) or c:IsHasEffect(EFFECT_CANNOT_TO_DECK) or not Duel.IsPlayerCanSendtoDeck(tp,c) then return false end
@@ -2631,6 +2643,19 @@ function Auxiliary.AddThisCardInMZoneAlreadyCheck(c,setf,getf)
 	e1:SetCode(EVENT_MOVE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e1:SetCondition(function(e) return not e:GetHandler():IsPreviousLocation(LOCATION_MZONE) and e:GetHandler():IsLocation(LOCATION_MZONE) end)
+	e1:SetOperation(Auxiliary.ThisCardInLocationAlreadyCheckReg(setf,getf,true))
+	c:RegisterEffect(e1)
+	return e1
+end
+function Auxiliary.AddThisCardInSZoneAlreadyCheck(c,setf,getf)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE|EFFECT_TYPE_CONTINUOUS)
+	e1:SetCode(EVENT_MOVE)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e1:SetCondition(function(e)
+		local h=e:GetHandler()
+		return (not h:IsPreviousLocation(LOCATION_SZONE) or c:GetPreviousSequence()>=5) and h:IsLocation(LOCATION_SZONE) and h:GetSequence()<5
+	end)
 	e1:SetOperation(Auxiliary.ThisCardInLocationAlreadyCheckReg(setf,getf,true))
 	c:RegisterEffect(e1)
 	return e1

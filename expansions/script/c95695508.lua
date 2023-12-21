@@ -10,6 +10,7 @@ function cid.initial_effect(c)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCountLimit(1,id+EFFECT_COUNT_CODE_OATH)
 	e1:SetTarget(cid.target)
+	e1:SetOperation(cid.activate)
 	c:RegisterEffect(e1)
 	--excavate
 	local e2=Effect.CreateEffect(c)
@@ -31,27 +32,23 @@ function cid.cfilter(c)
 end
 --Activate
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>=3 and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
-		e:SetCategory(CATEGORY_TOHAND)
-		e:SetOperation(cid.activate)
-	else
-		e:SetCategory(0)
-		e:SetOperation(nil)
+	if chk==0 then
+		return not Duel.PlayerHasFlagEffect(tp,CARD_LOTUS_BLADE_MIMICRY) or (Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>=3 and Duel.GetDecktopGroup(tp,3):FilterCount(Card.IsAbleToHand,nil)>0)
 	end
 end
 function cid.activate(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
-	Duel.ConfirmDecktop(tp,3)
-	local g=Duel.GetDecktopGroup(tp,3)
-	if g:GetCount()>0 and g:IsExists(cid.thfilter,1,nil) then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-		local sg=g:FilterSelect(tp,cid.thfilter,1,1,nil)
-		Duel.SendtoHand(sg,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,sg)
-		Duel.ShuffleHand(tp)
+	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>=3 and (Duel.PlayerHasFlagEffect(tp,CARD_LOTUS_BLADE_MIMICRY) or Duel.SelectYesNo(tp,aux.Stringid(id,0))) then
+		Duel.ConfirmDecktop(tp,3)
+		local g=Duel.GetDecktopGroup(tp,3)
+		if g:GetCount()>0 and g:IsExists(cid.thfilter,1,nil) then
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+			local sg=g:FilterSelect(tp,cid.thfilter,1,1,nil)
+			Duel.SendtoHand(sg,nil,REASON_EFFECT)
+			Duel.ConfirmCards(1-tp,sg)
+			Duel.ShuffleHand(tp)
+		end
+		Duel.ShuffleDeck(tp)
 	end
-	Duel.ShuffleDeck(tp)
 end
 --excavate
 function cid.thcon(e,tp,eg,ep,ev,re,r,rp)
