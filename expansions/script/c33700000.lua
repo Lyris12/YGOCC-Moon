@@ -70,9 +70,9 @@ end
 function c33700000.desreptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return not c:IsReason(REASON_REPLACE) and c:IsOnField() and c:IsFaceup()
-		and Duel.CheckReleaseGroup(tp,c33700000.filter,1,c) end
+		and Duel.CheckReleaseGroup(REASON_COST,tp,c33700000.filter,1,c) end
 	if Duel.SelectYesNo(tp,aux.Stringid(33700000,1)) then
-		local g=Duel.SelectReleaseGroup(tp,c33700000.filter,1,1,c)
+		local g=Duel.SelectReleaseGroup(REASON_COST,tp,c33700000.filter,1,1,c)
 		Duel.Release(g,REASON_EFFECT+REASON_REPLACE)
 		Duel.BreakEffect()
 		Duel.Damage(1-tp,g:GetFirst():GetAttack(),REASON_EFFECT)

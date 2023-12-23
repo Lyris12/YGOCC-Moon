@@ -80,9 +80,9 @@ function c53313916.pspfilter(c,e,tp)
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c53313916.pspcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,c53313916.pspcfilter,1,nil,e,tp) end
+	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,c53313916.pspcfilter,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local g=Duel.SelectReleaseGroup(tp,c53313916.pspcfilter,1,1,nil,e,tp)
+	local g=Duel.SelectReleaseGroup(REASON_COST,tp,c53313916.pspcfilter,1,1,nil,e,tp)
 	Duel.Release(g,REASON_COST)
 end
 function c53313916.psptg(e,tp,eg,ep,ev,re,r,rp,chk)

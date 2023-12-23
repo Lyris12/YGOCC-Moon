@@ -62,10 +62,10 @@ function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	local chk1=Duel.CheckReleaseGroup(tp,s.choicefilter,1,e:GetHandler(),0,ATTRIBUTE_FIRE) and Duel.IsExistingMatchingCard(Card.IsType,tp,LOCATION_MZONE,0,1,nil,TYPE_MONSTER)
-	local chk2=Duel.CheckReleaseGroup(tp,s.choicefilter,1,e:GetHandler(),0,ATTRIBUTE_WATER) and Duel.GetMatchingGroupCount(Card.IsAbleToDeck,tp,0,LOCATION_ONFIELD,nil)>0
-	local chk3=Duel.CheckReleaseGroup(tp,s.choicefilter,1,e:GetHandler(),0,ATTRIBUTE_EARTH) and Duel.IsExistingMatchingCard(s.posfilter,tp,0,LOCATION_MZONE,1,nil)
-	local chk4=Duel.CheckReleaseGroup(tp,s.choicefilter,1,e:GetHandler(),0,ATTRIBUTE_WIND) and Duel.GetMatchingGroupCount(aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)>0
+	local chk1=Duel.CheckReleaseGroup(REASON_COST,tp,s.choicefilter,1,e:GetHandler(),0,ATTRIBUTE_FIRE) and Duel.IsExistingMatchingCard(Card.IsType,tp,LOCATION_MZONE,0,1,nil,TYPE_MONSTER)
+	local chk2=Duel.CheckReleaseGroup(REASON_COST,tp,s.choicefilter,1,e:GetHandler(),0,ATTRIBUTE_WATER) and Duel.GetMatchingGroupCount(Card.IsAbleToDeck,tp,0,LOCATION_ONFIELD,nil)>0
+	local chk3=Duel.CheckReleaseGroup(REASON_COST,tp,s.choicefilter,1,e:GetHandler(),0,ATTRIBUTE_EARTH) and Duel.IsExistingMatchingCard(s.posfilter,tp,0,LOCATION_MZONE,1,nil)
+	local chk4=Duel.CheckReleaseGroup(REASON_COST,tp,s.choicefilter,1,e:GetHandler(),0,ATTRIBUTE_WIND) and Duel.GetMatchingGroupCount(aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)>0
 	if chk==0 then
 		if e:GetLabel()~=100 then return false end
 		e:SetLabel(0)
@@ -74,7 +74,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(0)
 	e:SetCategory(0)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local g=Duel.SelectReleaseGroup(tp,s.choicefilter,1,1,e:GetHandler(),1,nil,chk1,chk2,chk3,chk4)
+	local g=Duel.SelectReleaseGroup(REASON_COST,tp,s.choicefilter,1,1,e:GetHandler(),1,nil,chk1,chk2,chk3,chk4)
 	local attr=g:GetFirst():GetAttribute()
 	g:AddCard(e:GetHandler())
 	Duel.Release(g,REASON_COST)

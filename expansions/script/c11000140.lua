@@ -23,9 +23,9 @@ end
 function c11000140.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c11000140.filter(chkc,e) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
-		and Duel.CheckReleaseGroup(tp,c11000140.filter,1,nil,e)
+		and Duel.CheckReleaseGroup(REASON_COST,tp,c11000140.filter,1,nil,e)
 		and Duel.IsExistingMatchingCard(c11000140.cfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil,e,tp) end
-	local g=Duel.SelectReleaseGroup(tp,c11000140.filter,1,1,nil,e)
+	local g=Duel.SelectReleaseGroup(REASON_COST,tp,c11000140.filter,1,1,nil,e)
 	Duel.SetTargetCard(g)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE)
 end

@@ -27,10 +27,10 @@ end
 function c11000121.spcon(e,c)
 	if c==nil then return true end
 	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-1
-		and Duel.CheckReleaseGroup(c:GetControler(),c11000121.rfilter,1,nil)
+		and Duel.CheckReleaseGroup(REASON_COST,c:GetControler(),c11000121.rfilter,1,nil)
 end
 function c11000121.operation(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.SelectReleaseGroup(c:GetControler(),c11000121.rfilter,1,1,nil)
+	local g=Duel.SelectReleaseGroup(REASON_COST,c:GetControler(),c11000121.rfilter,1,1,nil)
 	Duel.Release(g,REASON_COST)
 end
 function c11000121.sptg(e,tp,eg,ep,ev,re,r,rp,chk)

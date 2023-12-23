@@ -94,7 +94,7 @@ function s.dmfilter(c,tp)
     return c:IsReleasable()
 end
 function s.damcost(e,tp,eg,ep,ev,re,r,rp,chk)
-    if chk==0 then return Duel.CheckReleaseGroup(1-tp,nil,1,nil) end
+    if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,1-tp,nil,1,nil) end
     local sg=Duel.SelectMatchingCard(tp,s.dmfilter,tp,0,LOCATION_MZONE,1,1,nil,tp)
     e:SetLabel(sg:GetFirst():GetAttack())
     Duel.Release(sg,REASON_COST)

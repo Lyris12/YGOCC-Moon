@@ -77,9 +77,9 @@ function c1020089.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then 
 		if e:GetLabel()~=100 then return false end
 		e:SetLabel(0)
-		return Duel.CheckReleaseGroup(tp,c1020089.cfilter,1,e:GetHandler(),e,tp) 
+		return Duel.CheckReleaseGroup(REASON_COST,tp,c1020089.cfilter,1,e:GetHandler(),e,tp) 
 	end
-	local g=Duel.SelectReleaseGroup(tp,c1020089.cfilter,1,1,e:GetHandler(),e,tp)
+	local g=Duel.SelectReleaseGroup(REASON_COST,tp,c1020089.cfilter,1,1,e:GetHandler(),e,tp)
 	Duel.Release(g,REASON_COST)
 	local op=Duel.GetOperatedGroup()
 	e:SetLabel(op:GetFirst():GetCode())

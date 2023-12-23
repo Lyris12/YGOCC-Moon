@@ -169,8 +169,8 @@ end
 --mill
 function c62613311.tgcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local lg=e:GetHandler():GetLinkedGroup()
-	if chk==0 then return Duel.CheckReleaseGroup(tp,c62613311.cfilter,1,nil,lg) end
-	local g=Duel.SelectReleaseGroup(tp,c62613311.cfilter,1,1,nil,lg)
+	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,c62613311.cfilter,1,nil,lg) end
+	local g=Duel.SelectReleaseGroup(REASON_COST,tp,c62613311.cfilter,1,1,nil,lg)
 	Duel.Release(g,REASON_COST)
 end
 function c62613311.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)

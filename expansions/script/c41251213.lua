@@ -40,9 +40,9 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		return chkc:IsOnField() and s.filter(chkc,at)
 	end
 	if chk==0 then
-		return e:IsCostChecked() and Duel.CheckReleaseGroup(tp,s.cfilter,1,nil,tp)
+		return e:IsCostChecked() and Duel.CheckReleaseGroup(REASON_COST,tp,s.cfilter,1,nil,tp)
 	end
-	local tc=Duel.SelectReleaseGroup(tp,s.cfilter,1,1,nil,tp):GetFirst()
+	local tc=Duel.SelectReleaseGroup(REASON_COST,tp,s.cfilter,1,1,nil,tp):GetFirst()
 	local att=tc:GetOriginalAttribute()
 	local lv=tc:GetLevel()
 	Duel.Release(tc,REASON_COST)

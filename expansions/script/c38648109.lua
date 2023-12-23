@@ -23,8 +23,8 @@ function c38648109.thfilter(c)
 end
 --search
 function c38648109.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,c38648109.cfilter,1,nil) end
-	local cg=Duel.SelectReleaseGroup(tp,c38648109.cfilter,1,1,nil)
+	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,c38648109.cfilter,1,nil) end
+	local cg=Duel.SelectReleaseGroup(REASON_COST,tp,c38648109.cfilter,1,1,nil)
 	Duel.Release(cg,REASON_COST)
 end
 function c38648109.target(e,tp,eg,ep,ev,re,r,rp,chk)

@@ -78,10 +78,10 @@ function c53313932.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		if e:GetLabel()~=100 then return false end
 		e:SetLabel(0)
-		return Duel.CheckReleaseGroup(tp,c53313932.rfilter,1,nil,e,tp)
+		return Duel.CheckReleaseGroup(REASON_COST,tp,c53313932.rfilter,1,nil,e,tp)
 	end
 	e:SetLabel(0)
-	local g=Duel.SelectReleaseGroup(tp,c53313932.rfilter,1,1,nil,e,tp)
+	local g=Duel.SelectReleaseGroup(REASON_COST,tp,c53313932.rfilter,1,1,nil,e,tp)
 	Duel.Release(g,REASON_COST)
 	Duel.SetTargetCard(g)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE)

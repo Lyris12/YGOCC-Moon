@@ -56,10 +56,10 @@ function c27796621.spcon(e,c)
     if c==nil then return true end
     local tp=c:GetControler()
     return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
-        and Duel.CheckReleaseGroup(tp,c27796621.spfilter,1,nil)
+        and Duel.CheckReleaseGroup(REASON_COST,tp,c27796621.spfilter,1,nil)
 end
 function c27796621.spop(e,tp,eg,ep,ev,re,r,rp,c)
-    local g=Duel.SelectReleaseGroup(tp,c27796621.spfilter,1,1,nil)
+    local g=Duel.SelectReleaseGroup(REASON_COST,tp,c27796621.spfilter,1,1,nil)
     Duel.Release(g,REASON_COST)
     Duel.ShuffleDeck(tp)
 end

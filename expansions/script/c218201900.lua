@@ -27,11 +27,11 @@ function s.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	return ft>-1 and Duel.CheckReleaseGroup(tp,s.spfilter,1,nil,ft,tp)
+	return ft>-1 and Duel.CheckReleaseGroup(REASON_COST,tp,s.spfilter,1,nil,ft,tp)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	local g=Duel.SelectReleaseGroup(tp,s.spfilter,1,1,nil,ft,tp)
+	local g=Duel.SelectReleaseGroup(REASON_COST,tp,s.spfilter,1,1,nil,ft,tp)
 	Duel.Release(g,REASON_COST)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -42,8 +42,8 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return c:IsReleasable() and Duel.CheckReleaseGroup(tp,Card.IsCode,1,c,id) end
-	local g=Duel.SelectReleaseGroup(tp,Card.IsCode,1,1,c,id)
+	if chk==0 then return c:IsReleasable() and Duel.CheckReleaseGroup(REASON_COST,tp,Card.IsCode,1,c,id) end
+	local g=Duel.SelectReleaseGroup(REASON_COST,tp,Card.IsCode,1,1,c,id)
 	Duel.Release(g,REASON_COST)
 end
 function s.filter(c,e,tp)

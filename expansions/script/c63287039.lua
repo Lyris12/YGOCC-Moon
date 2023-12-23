@@ -66,12 +66,12 @@ function s.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	c:RemoveOverlayCard(tp,1,1,REASON_COST)
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroupEx(tp,aux.AND(Card.IsRace,aux.OR(Card.IsFaceup,aux.NOT(Card.IsOnField)),Card.IsReleasableByEffect),1,nil,RACE_PLANT)
+	if chk==0 then return Duel.CheckReleaseGroupEx(REASON_COST,tp,aux.AND(Card.IsRace,aux.OR(Card.IsFaceup,aux.NOT(Card.IsOnField)),Card.IsReleasableByEffect),1,nil,RACE_PLANT)
 		and Duel.IsExistingMatchingCard(nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,Duel.GetFieldGroup(tp,LOCATION_ONFIELD,LOCATION_ONFIELD),1,0,0)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.Release(Duel.SelectReleaseGroupEx(tp,aux.AND(Card.IsRace,aux.OR(Card.IsFaceup,aux.NOT(Card.IsOnField)),Card.IsReleasableByEffect),1,1,nil,RACE_PLANT),REASON_EFFECT)==0 then return end
+	if Duel.Release(Duel.SelectReleaseGroupEx(REASON_COST,tp,aux.AND(Card.IsRace,aux.OR(Card.IsFaceup,aux.NOT(Card.IsOnField)),Card.IsReleasableByEffect),1,1,nil,RACE_PLANT),REASON_EFFECT)==0 then return end
 	Duel.BreakEffect()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.GetMatchingGroup(tp,LOCATION_ONFIELD,LOCATION_ONFIELD):Select(tp,1,1,nil)

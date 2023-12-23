@@ -58,8 +58,8 @@ end
 
 function cid.rmcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return c:GetAttackAnnouncedCount()==0 and Duel.CheckReleaseGroup(tp,cid.cfilter,1,e:GetHandler()) and e:GetHandler():IsCanRemoveEC(tp,3,REASON_COST)  end
- local g=Duel.SelectReleaseGroup(tp,cid.cfilter,1,1,e:GetHandler())
+	if chk==0 then return c:GetAttackAnnouncedCount()==0 and Duel.CheckReleaseGroup(REASON_COST,tp,cid.cfilter,1,e:GetHandler()) and e:GetHandler():IsCanRemoveEC(tp,3,REASON_COST)  end
+ local g=Duel.SelectReleaseGroup(REASON_COST,tp,cid.cfilter,1,1,e:GetHandler())
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_OATH)

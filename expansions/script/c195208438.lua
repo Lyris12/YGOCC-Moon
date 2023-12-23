@@ -54,8 +54,8 @@ function s.cfilter(c,g)
 	return c:IsSetCard(0xee5) and c:IsLinkAbove(1) and g:IsContains(c)
 end
 function s.descost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,s.cfilter,1,nil,e:GetHandler():GetLinkedGroup()) end
-	local tc=Duel.SelectReleaseGroup(tp,s.cfilter,1,1,nil,e:GetHandler():GetLinkedGroup()):GetFirst()
+	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,s.cfilter,1,nil,e:GetHandler():GetLinkedGroup()) end
+	local tc=Duel.SelectReleaseGroup(REASON_COST,tp,s.cfilter,1,1,nil,e:GetHandler():GetLinkedGroup()):GetFirst()
 	Duel.Release(tc,REASON_COST)
 	e:SetLabel(tc:GetLink())
 end

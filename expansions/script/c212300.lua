@@ -46,9 +46,9 @@ function c212300.costfilter(c,e,tp)
 		and Duel.GetMZoneCount(tp,c)>0 and (c:IsLocation(LOCATION_HAND) or c:IsFaceup())
 end
 function c212300.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroupEx(tp,c212300.costfilter,1,nil,e,tp) end
+	if chk==0 then return Duel.CheckReleaseGroupEx(REASON_COST,tp,c212300.costfilter,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local g=Duel.SelectReleaseGroupEx(tp,c212300.costfilter,1,1,nil,e,tp)
+	local g=Duel.SelectReleaseGroupEx(REASON_COST,tp,c212300.costfilter,1,1,nil,e,tp)
 	Duel.Release(g,REASON_COST)
 end
 function c212300.filter(c,e,tp)

@@ -78,9 +78,9 @@ end
 --negate
 function c1020097.rmcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():GetAttackAnnouncedCount()==0
-		and Duel.CheckReleaseGroup(tp,c1020097.costfilter,1,e:GetHandler()) 
+		and Duel.CheckReleaseGroup(REASON_COST,tp,c1020097.costfilter,1,e:GetHandler()) 
 	end
-	local cg=Duel.SelectReleaseGroup(tp,c1020097.costfilter,1,1,e:GetHandler())
+	local cg=Duel.SelectReleaseGroup(REASON_COST,tp,c1020097.costfilter,1,1,e:GetHandler())
 	Duel.Release(cg,REASON_COST)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_SINGLE)

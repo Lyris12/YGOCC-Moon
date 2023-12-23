@@ -82,7 +82,7 @@ function s.matlim(e,c)
 end
 
 function s.gcheck(g,lv,tp)
-	return #g==lv and Duel.GetMZoneCount(tp,g)>0 and Duel.CheckReleaseGroup(tp,Auxiliary.IsInGroup,#g,nil,g)
+	return #g==lv and Duel.GetMZoneCount(tp,g)>0 and Duel.CheckReleaseGroup(REASON_COST,tp,Auxiliary.IsInGroup,#g,nil,g)
 end
 function s.filter(c,e,tp,rg)
 	if not (c:IsSetCard(ARCHE_ORIGIN_DRAGON) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)) then return false end

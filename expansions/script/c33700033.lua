@@ -89,7 +89,7 @@ end
 function c33700033.desreptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return not c:IsReason(REASON_REPLACE) and c:IsOnField() and c:IsFaceup() and c:IsReason(REASON_EFFECT)
-		and Duel.CheckReleaseGroup(PLAYER_ALL,c33700033.filter,1,c) end
+		and Duel.CheckReleaseGroup(REASON_COST,PLAYER_ALL,c33700033.filter,1,c) end
 	if Duel.SelectYesNo(tp,aux.Stringid(33700000,1)) then
 		local g=Duel.SelectMatchingCard(tp,c33700033.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,c)
 		Duel.Release(g,REASON_EFFECT+REASON_REPLACE)

@@ -129,14 +129,14 @@ function c249001238.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then
 		if e:GetLabel()==1 then
 			e:SetLabel(0)
-			return Duel.CheckReleaseGroup(tp,c249001238.costfilter,1,c,c,tp)
+			return Duel.CheckReleaseGroup(REASON_COST,tp,c249001238.costfilter,1,c,c,tp)
 		else
 			return Duel.IsExistingTarget(nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,c)
 		end
 	end
 	if e:GetLabel()==1 then
 		e:SetLabel(0)
-		local sg=Duel.SelectReleaseGroup(tp,c249001238.costfilter,1,1,c,c,tp)
+		local sg=Duel.SelectReleaseGroup(REASON_COST,tp,c249001238.costfilter,1,1,c,c,tp)
 		Duel.Release(sg,REASON_COST)
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)

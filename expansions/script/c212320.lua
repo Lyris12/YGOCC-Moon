@@ -56,8 +56,8 @@ function c212320.drop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c212320.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return Duel.CheckReleaseGroup(tp,aux.AND(Card.IsFaceup,Card.IsAttribute),1,c,ATTRIBUTE_LIGHT) end
-	local rg=Duel.SelectReleaseGroup(tp,aux.AND(Card.IsFaceup,Card.IsAttribute),1,1,c,ATTRIBUTE_LIGHT)
+	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,aux.AND(Card.IsFaceup,Card.IsAttribute),1,c,ATTRIBUTE_LIGHT) end
+	local rg=Duel.SelectReleaseGroup(REASON_COST,tp,aux.AND(Card.IsFaceup,Card.IsAttribute),1,1,c,ATTRIBUTE_LIGHT)
 	Duel.Release(rg,REASON_COST)
 end
 function c212320.disfilter(c)

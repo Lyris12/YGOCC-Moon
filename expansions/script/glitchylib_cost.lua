@@ -176,8 +176,8 @@ function Auxiliary.TributeCost(f,min,max,exc)
 	if not max then max=min end
 	return	function(e,tp,eg,ep,ev,re,r,rp,chk)
 				local exc=(not exc) and nil or e:GetHandler()
-				if chk==0 then return Duel.CheckReleaseGroup(tp,f,min,exc,e,tp,eg,ep,ev,re,r,rp) end
-				local rg=Duel.SelectReleaseGroup(tp,f,min,max,exc,e,tp,eg,ep,ev,re,r,rp)
+				if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,f,min,exc,e,tp,eg,ep,ev,re,r,rp) end
+				local rg=Duel.SelectReleaseGroup(REASON_COST,tp,f,min,max,exc,e,tp,eg,ep,ev,re,r,rp)
 				if #rg>0 then
 					local ct=Duel.Release(rg,REASON_COST)
 					return rg,ct

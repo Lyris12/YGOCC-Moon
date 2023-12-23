@@ -32,14 +32,14 @@ end
 function c53313912.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return c:IsReleasableByEffect() and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.CheckReleaseGroup(tp,c53313912.cfilter,1,c)
+		and Duel.CheckReleaseGroup(REASON_COST,tp,c53313912.cfilter,1,c)
 		and Duel.IsExistingMatchingCard(c53313912.spfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE)
 end
 function c53313912.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and not c:IsImmuneToEffect(e) then
-		local tc=Duel.SelectReleaseGroup(tp,c53313912.cfilter,1,1,c)
+		local tc=Duel.SelectReleaseGroup(REASON_COST,tp,c53313912.cfilter,1,1,c)
 		tc:AddCard(c)
 		if Duel.Release(tc,REASON_EFFECT)~=2 or Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)

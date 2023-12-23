@@ -55,8 +55,8 @@ function cm.rfilter(c,e)
 	return tfrsv.columntg2(e,c) 
 end
 function cm.atcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,cm.rfilter,1,e:GetHandler(),e) end
-	local g=Duel.SelectReleaseGroup(tp,cm.rfilter,1,1,e:GetHandler(),e)
+	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,cm.rfilter,1,e:GetHandler(),e) end
+	local g=Duel.SelectReleaseGroup(REASON_COST,tp,cm.rfilter,1,1,e:GetHandler(),e)
 	local atk=g:GetFirst():GetTextAttack()
 	if atk<0 then atk=0 end
 	local def=g:GetFirst():GetTextDefense()

@@ -38,8 +38,8 @@ function s.afilter(c)
 	return c:GetOriginalType()&TYPE_MONSTER~=0 or aux.GetOriginalPandemoniumType(c)~=nil
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,nil,1,nil) end
-	local sg=Duel.SelectReleaseGroup(tp,nil,1,1,nil)
+	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,nil,1,nil) end
+	local sg=Duel.SelectReleaseGroup(REASON_COST,tp,nil,1,1,nil)
 	Duel.Release(sg,REASON_COST)
 end
 function s.cfilter(c)

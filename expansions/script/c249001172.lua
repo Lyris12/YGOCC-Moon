@@ -80,8 +80,8 @@ function c249001172.desop(e,tp,eg,ep,ev,re,r,rp)
     end
 end
 function c249001172.addcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,nil,1,nil,tp) end
-	local g=Duel.SelectReleaseGroup(tp,nil,1,1,nil,tp)
+	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,nil,1,nil,tp) end
+	local g=Duel.SelectReleaseGroup(REASON_COST,tp,nil,1,1,nil,tp)
 	Duel.Release(g,REASON_COST)
 end
 function c249001172.addfilter(c)

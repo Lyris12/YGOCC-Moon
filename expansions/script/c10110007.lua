@@ -29,8 +29,8 @@ function c10110007.spcon(e,c)
 		Duel.IsExistingMatchingCard(c10110007.spfilter,c:GetControler(),LOCATION_MZONE,0,2,nil)
 end
 function c10110007.retcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsSetCard,1,e:GetHandler(),0x4a5) end
-	local g=Duel.SelectReleaseGroup(tp,Card.IsSetCard,1,1,e:GetHandler(),0x4a5)
+	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,Card.IsSetCard,1,e:GetHandler(),0x4a5) end
+	local g=Duel.SelectReleaseGroup(REASON_COST,tp,Card.IsSetCard,1,1,e:GetHandler(),0x4a5)
 	Duel.Release(g,REASON_COST)
 end
 function c10110007.rettg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

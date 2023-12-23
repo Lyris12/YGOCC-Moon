@@ -30,8 +30,8 @@ function s.cfilter(c)
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(1)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,s.cfilter,1,nil) end
-	Duel.Release(Duel.SelectReleaseGroup(tp,s.cfilter,1,1,nil),REASON_COST)
+	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,s.cfilter,1,nil) end
+	Duel.Release(Duel.SelectReleaseGroup(REASON_COST,tp,s.cfilter,1,1,nil),REASON_COST)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ft=e:GetLabel()==1 and -1 or 0

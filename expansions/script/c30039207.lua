@@ -29,9 +29,9 @@ function c30039207.target(e,tp,eg,ep,ev,re,r,rp,chk)
 		if e:GetLabel()~=100 then return false end
 		e:SetLabel(0)
 		return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
-			and Duel.CheckReleaseGroup(tp,c30039207.filter1,1,nil,e,tp)
+			and Duel.CheckReleaseGroup(REASON_COST,tp,c30039207.filter1,1,nil,e,tp)
 	end
-	local rg=Duel.SelectReleaseGroup(tp,c30039207.filter1,1,1,nil,e,tp)
+	local rg=Duel.SelectReleaseGroup(REASON_COST,tp,c30039207.filter1,1,1,nil,e,tp)
 	e:SetLabel(rg:GetFirst():GetLevel())
 	Duel.Release(rg,REASON_COST)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)

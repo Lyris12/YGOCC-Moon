@@ -52,8 +52,8 @@ function c96212372.rfilter(c)
     return c:IsSetCard(0x205)
 end
 function c96212372.descost(e,tp,eg,ep,ev,re,r,rp,chk)
-    if chk==0 then return Duel.CheckReleaseGroup(tp,c96212372.rfilter,1,e:GetHandler()) end
-    local g=Duel.SelectReleaseGroup(tp,c96212372.rfilter,1,1,e:GetHandler())
+    if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,c96212372.rfilter,1,e:GetHandler()) end
+    local g=Duel.SelectReleaseGroup(REASON_COST,tp,c96212372.rfilter,1,1,e:GetHandler())
     Duel.Release(g,REASON_COST)
 end
 function c96212372.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

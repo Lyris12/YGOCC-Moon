@@ -14,12 +14,12 @@ function c249001216.filter(c,e,tp)
 end
 function c249001216.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingMatchingCard(c249001216.filter,tp,LOCATION_DECK+LOCATION_HAND+LOCATION_GRAVE,0,1,nil,e,tp)
-		and Duel.CheckReleaseGroup(tp,nil,2,nil) end
+		and Duel.CheckReleaseGroup(REASON_COST,tp,nil,2,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK+LOCATION_HAND+LOCATION_GRAVE)
 end
 function c249001216.activate(e,tp,eg,ep,ev,re,r,rp)
-	if not Duel.CheckReleaseGroup(tp,nil,2,nil) or not Duel.IsExistingMatchingCard(c249001216.filter,tp,LOCATION_DECK+LOCATION_HAND+LOCATION_GRAVE,0,1,nil,e,tp) then return end
-	local rg=Duel.SelectReleaseGroup(tp,nil,2,2,nil)
+	if not Duel.CheckReleaseGroup(REASON_COST,tp,nil,2,nil) or not Duel.IsExistingMatchingCard(c249001216.filter,tp,LOCATION_DECK+LOCATION_HAND+LOCATION_GRAVE,0,1,nil,e,tp) then return end
+	local rg=Duel.SelectReleaseGroup(REASON_COST,tp,nil,2,2,nil)
 	Duel.Release(rg,REASON_COST)
 	local g=Duel.SelectMatchingCard(tp,c249001216.filter,tp,LOCATION_DECK+LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil,e,tp)
 	local tc=g:GetFirst()

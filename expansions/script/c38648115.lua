@@ -92,8 +92,8 @@ function c38648115.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 --destroy
 function c38648115.drycost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,c38648115.cfilter,1,nil) end
-	local cg=Duel.SelectReleaseGroup(tp,c38648115.cfilter,1,1,nil)
+	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,c38648115.cfilter,1,nil) end
+	local cg=Duel.SelectReleaseGroup(REASON_COST,tp,c38648115.cfilter,1,1,nil)
 	Duel.Release(cg,REASON_COST)
 end
 function c38648115.drytg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

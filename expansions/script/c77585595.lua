@@ -39,7 +39,7 @@ function s.rfilter(c)
 end
 function s.fselect(g,tp)
 	Duel.SetSelectedCard(g)
-	return g:CheckWithSumGreater(Card.GetLevel,8) and Duel.GetMZoneCount(tp,g)>0 and Duel.CheckReleaseGroupEx(tp,aux.IsInGroup,#g,nil,g)
+	return g:CheckWithSumGreater(Card.GetLevel,8) and Duel.GetMZoneCount(tp,g)>0 and Duel.CheckReleaseGroupEx(REASON_COST,tp,aux.IsInGroup,#g,nil,g)
 end
 function s.hspcon(e,c)
 	if c==nil then return true end
@@ -76,7 +76,7 @@ function s.sprop(e,tp,eg,ep,ev,re,r,rp,c)
 	local sg=Group.CreateGroup()
 	repeat
 		local cg=mg:Filter(s.relrec,sg,tp,sg,mg)
-		local g=Duel.SelectReleaseGroupEx(tp,s.relfilter,1,1,nil,cg)
+		local g=Duel.SelectReleaseGroupEx(REASON_COST,tp,s.relfilter,1,1,nil,cg)
 		sg:Merge(g)
 	until s.relgoal(tp,sg)
 	Duel.Release(sg,REASON_COST)

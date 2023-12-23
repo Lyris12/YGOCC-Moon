@@ -79,8 +79,8 @@ function c249000524.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
 end
 function c249000524.addcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,nil,1,nil,tp) end
-	local g=Duel.SelectReleaseGroup(tp,nil,1,1,nil,tp)
+	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,nil,1,nil,tp) end
+	local g=Duel.SelectReleaseGroup(REASON_COST,tp,nil,1,1,nil,tp)
 	Duel.Release(g,REASON_COST)
 end
 function c249000524.addfilter(c)

@@ -95,8 +95,8 @@ function c1020096.negcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c1020096.negcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local atk=e:GetHandler():GetAttack()
-	if chk==0 then return Duel.CheckReleaseGroup(tp,c1020096.costfilter,1,e:GetHandler(),atk) end
-	local cg=Duel.SelectReleaseGroup(tp,c1020096.costfilter,1,1,e:GetHandler(),atk)
+	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,c1020096.costfilter,1,e:GetHandler(),atk) end
+	local cg=Duel.SelectReleaseGroup(REASON_COST,tp,c1020096.costfilter,1,1,e:GetHandler(),atk)
 	Duel.Release(cg,REASON_COST)
 end
 function c1020096.negtg(e,tp,eg,ep,ev,re,r,rp,chk)

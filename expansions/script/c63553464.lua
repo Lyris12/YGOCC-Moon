@@ -87,8 +87,8 @@ function c63553464.p_act_tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 end
 function c63553464.tpcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,c63553464.tpcostfilter,1,nil) end
-	local cg=Duel.SelectReleaseGroup(tp,c63553464.tpcostfilter,1,1,nil)
+	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,c63553464.tpcostfilter,1,nil) end
+	local cg=Duel.SelectReleaseGroup(REASON_COST,tp,c63553464.tpcostfilter,1,1,nil)
 	e:SetLabel(cg:GetFirst():GetCounter(0x1554))
 	Duel.Release(cg,REASON_COST)
 end

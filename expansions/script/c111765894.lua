@@ -41,8 +41,8 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.sprcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,s.costfilter,1,nil,tp) end
-	local g=Duel.SelectReleaseGroup(tp,s.costfilter,1,1,nil,tp)
+	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,s.costfilter,1,nil,tp) end
+	local g=Duel.SelectReleaseGroup(REASON_COST,tp,s.costfilter,1,1,nil,tp)
 	Duel.Release(g,REASON_COST)
 end
 function s.sprtg(e,tp,eg,ep,ev,re,r,rp,chk)

@@ -38,8 +38,8 @@ function s.initial_effect(c)
 	c:RegisterEffect(e5)
 end
 function s.descost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroupEx(tp,Card.IsSetCard,1,nil,0x50b) end
-	local rg=Duel.SelectReleaseGroupEx(tp,Card.IsSetCard,1,1,nil,0x50b)
+	if chk==0 then return Duel.CheckReleaseGroupEx(REASON_COST,tp,Card.IsSetCard,1,nil,0x50b) end
+	local rg=Duel.SelectReleaseGroupEx(REASON_COST,tp,Card.IsSetCard,1,1,nil,0x50b)
 	Duel.Release(rg,REASON_EFFECT)
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)

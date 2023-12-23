@@ -109,12 +109,12 @@ end
 function cm.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	return Duel.CheckReleaseGroup(tp,cm.spfilter1,1,nil,tp,c) and Duel.CheckReleaseGroup(tp,cm.spfilter2,1,nil,tp,c)
+	return Duel.CheckReleaseGroup(REASON_COST,tp,cm.spfilter1,1,nil,tp,c) and Duel.CheckReleaseGroup(REASON_COST,tp,cm.spfilter2,1,nil,tp,c)
 end
 
 function cm.spop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g1=Duel.SelectReleaseGroup(tp,cm.spfilter1,1,1,nil,tp,c)
-	local g2=Duel.SelectReleaseGroup(tp,cm.spfilter2,1,1,g1:GetFirst(),c)
+	local g1=Duel.SelectReleaseGroup(REASON_COST,tp,cm.spfilter1,1,1,nil,tp,c)
+	local g2=Duel.SelectReleaseGroup(REASON_COST,tp,cm.spfilter2,1,1,g1:GetFirst(),c)
 	g1:Merge(g2)
 	c:SetMaterial(g1)
 	Duel.Release(g1,REASON_COST+REASON_FUSION+REASON_MATERIAL)

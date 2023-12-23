@@ -28,9 +28,9 @@ function c212325.costfilter(c)
 	return c:IsAttribute(ATTRIBUTE_LIGHT) and (c:IsLocation(LOCATION_HAND) or c:IsFaceup())
 end
 function c212325.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroupEx(tp,c212325.costfilter,1,nil) end
+	if chk==0 then return Duel.CheckReleaseGroupEx(REASON_COST,tp,c212325.costfilter,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local g=Duel.SelectReleaseGroupEx(tp,c212325.costfilter,1,1,nil)
+	local g=Duel.SelectReleaseGroupEx(REASON_COST,tp,c212325.costfilter,1,1,nil)
 	Duel.Release(g,REASON_COST)
 end
 function c212325.filter(c)

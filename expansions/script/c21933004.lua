@@ -84,7 +84,7 @@ function cid.costfilter(c,e,tp)
 		and Duel.GetMZoneCount(tp,c)>0 and (c:IsLocation(LOCATION_HAND) or c:IsFaceup())
 end
 function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroupEx(tp,cid.costfilter,1,e:GetHandler(),e,tp) and Duel.GetCustomActivityCount(id,tp,ACTIVITY_SPSUMMON)==0 end
+	if chk==0 then return Duel.CheckReleaseGroupEx(REASON_COST,tp,cid.costfilter,1,e:GetHandler(),e,tp) and Duel.GetCustomActivityCount(id,tp,ACTIVITY_SPSUMMON)==0 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)
@@ -94,7 +94,7 @@ function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e1:SetTarget(cid.sumlimit)
 	Duel.RegisterEffect(e1,tp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local g=Duel.SelectReleaseGroupEx(tp,cid.costfilter,1,1,e:GetHandler(),e,tp)
+	local g=Duel.SelectReleaseGroupEx(REASON_COST,tp,cid.costfilter,1,1,e:GetHandler(),e,tp)
 	Duel.Release(g,REASON_COST)
 end
 function cid.sumlimit(e,c,sump,sumtype,sumpos,targetp,se)

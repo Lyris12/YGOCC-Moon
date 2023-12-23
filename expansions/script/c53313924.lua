@@ -52,8 +52,8 @@ function c53313924.desop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c53313924.rmcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsControler,1,e:GetHandler(),tp) end
-	local sg=Duel.SelectReleaseGroup(tp,Card.IsControler,1,1,e:GetHandler(),tp)
+	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,Card.IsControler,1,e:GetHandler(),tp) end
+	local sg=Duel.SelectReleaseGroup(REASON_COST,tp,Card.IsControler,1,1,e:GetHandler(),tp)
 	Duel.Release(sg,REASON_COST)
 end
 function c53313924.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

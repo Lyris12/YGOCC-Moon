@@ -62,7 +62,7 @@ function s.hspfilter(c,tp,sc)
 		and c:IsControler(tp) and c:IsCanBeFusionMaterial(sc,SUMMON_TYPE_SPECIAL)
 end
 function s.gcheck(g,tp,sc)
-	return Duel.GetLocationCountFromEx(tp,tp,g,sc)>0 and Duel.CheckReleaseGroup(tp,aux.IsInGroup,#g,nil,g)
+	return Duel.GetLocationCountFromEx(tp,tp,g,sc)>0 and Duel.CheckReleaseGroup(REASON_COST,tp,aux.IsInGroup,#g,nil,g)
 end
 function s.sprcon(e,c)
 	if c==nil then return true end

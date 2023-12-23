@@ -14,8 +14,8 @@ function c16001001.initial_effect(c)
 end
 
 function c16001001.drcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsCanRemoveEC(tp,1,0,5,REASON_COST) and Duel.CheckReleaseGroup(tp,Card.IsReleasable,1,nil,nil) end
-	local g=Duel.SelectReleaseGroup(tp,Card.IsReleasable,1,1,nil,nil)
+	if chk==0 then return Duel.IsCanRemoveEC(tp,1,0,5,REASON_COST) and Duel.CheckReleaseGroup(REASON_COST,tp,Card.IsReleasable,1,nil,nil) end
+	local g=Duel.SelectReleaseGroup(REASON_COST,tp,Card.IsReleasable,1,1,nil,nil)
 	Duel.RemoveEC(tp,1,0,5,REASON_COST)
 	Duel.Release(g,REASON_COST)
 end

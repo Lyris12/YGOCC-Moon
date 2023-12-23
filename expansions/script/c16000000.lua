@@ -63,8 +63,8 @@ function c16000000.filter2(c,e,tp)
 	return (c:IsSetCard(0x85a) or  c:IsRace(RACE_PLANT) )and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c16000000.cost2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsReleasable,1,nil) end
-	local g=Duel.SelectReleaseGroup(tp,Card.IsReleasable,1,1,nil)
+	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,Card.IsReleasable,1,nil) end
+	local g=Duel.SelectReleaseGroup(REASON_COST,tp,Card.IsReleasable,1,1,nil)
 	Duel.Release(g,REASON_COST)
 end
 function c16000000.target2(e,tp,eg,ep,ev,re,r,rp,chk)

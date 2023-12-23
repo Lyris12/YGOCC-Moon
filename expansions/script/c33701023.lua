@@ -34,7 +34,7 @@ end
 function s.fgoal(sg,tp)
 	if sg:GetCount()>0 and Duel.GetMZoneCount(tp,sg)>0 then
 		Duel.SetSelectedCard(sg)
-		return Duel.CheckReleaseGroup(tp,nil,0,nil)
+		return Duel.CheckReleaseGroup(REASON_COST,tp,nil,0,nil)
 	else return false end
 end
 function s.cost(e, tp, eg, ep, ev, re, r, rp, chk)

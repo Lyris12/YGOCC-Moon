@@ -59,8 +59,8 @@ function cm.atop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function cm.atcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,cm.atfilter,1,nil) end
-	local g=Duel.SelectReleaseGroup(tp,cm.atfilter,1,1,nil)
+	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,cm.atfilter,1,nil) end
+	local g=Duel.SelectReleaseGroup(REASON_COST,tp,cm.atfilter,1,1,nil)
 	local atk=g:GetFirst():GetTextAttack()
 	if atk<0 then atk=0 end
 	e:SetLabel(atk)

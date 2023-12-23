@@ -42,8 +42,8 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroupEx(tp,Card.IsSetCard,1,e:GetHandler(),0x50b) end
-	local g=Duel.SelectReleaseGroupEx(tp,Card.IsSetCard,1,1,e:GetHandler(),0x50b)
+	if chk==0 then return Duel.CheckReleaseGroupEx(REASON_COST,tp,Card.IsSetCard,1,e:GetHandler(),0x50b) end
+	local g=Duel.SelectReleaseGroupEx(REASON_COST,tp,Card.IsSetCard,1,1,e:GetHandler(),0x50b)
 	Duel.Release(g,REASON_COST)
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)

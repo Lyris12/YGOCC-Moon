@@ -101,8 +101,8 @@ end
 ---------
 function cid.sscost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return Duel.CheckReleaseGroup(tp,cid.cfilter,1,c) end
-	local rg=Duel.SelectReleaseGroup(tp,cid.cfilter,1,1,c)
+	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,cid.cfilter,1,c) end
+	local rg=Duel.SelectReleaseGroup(REASON_COST,tp,cid.cfilter,1,1,c)
 	Duel.Release(rg,REASON_COST)
 end
 function cid.sstg(e,tp,eg,ep,ev,re,r,rp,chk)

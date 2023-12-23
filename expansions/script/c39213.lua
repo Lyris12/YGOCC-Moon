@@ -53,10 +53,10 @@ function scard.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		if e:GetLabel()~=1 then return false end
 		e:SetLabel(0)
-		return Duel.CheckReleaseGroup(tp,scard.costfilter,1,nil)
+		return Duel.CheckReleaseGroup(REASON_COST,tp,scard.costfilter,1,nil)
 	end
 	e:SetLabel(0)
-	local sg=Duel.SelectReleaseGroup(tp,scard.costfilter,1,1,nil)
+	local sg=Duel.SelectReleaseGroup(REASON_COST,tp,scard.costfilter,1,1,nil)
 	if #sg>0 then
 		local sc=sg:GetFirst()
 		local atk=sc:GetAttack()
