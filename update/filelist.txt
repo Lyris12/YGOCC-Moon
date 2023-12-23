@@ -1,4 +1,4 @@
-﻿expansions/cards-new.cdb	7627bc763ab9511fb48101e366b7b4a4
+﻿expansions/cards-new.cdb	e1b47fb01b37ce783b6dc3b4be77a754
 expansions/lflist.conf	6c9b33ad01698b7263c6c3c2477df4db
 expansions/strings.conf	dafc60354a6f1965aee5a2ed9b19e473
 expansions/pics/100000000.png	b67e8ff2c7f674f012be790c136b43e5
@@ -5913,7 +5913,7 @@ expansions/pics/97569839.jpg	be0cd3fcdc2fe6fe4c77b54588c4b93b
 expansions/pics/97569840.jpg	66f45728f8734b963673bc898ff10e9e
 expansions/pics/99189323.png	15cd1bfaa5a8c84d0821f067c447472c
 expansions/pics/99189324.png	5e8c14c6a49b080e44a1f1f2f0a28ce5
-expansions/pics/99189325.png	3e1fffeb2579e0de9928e61ab45c4be5
+expansions/pics/99189325.png	76862ef90f6e335ef98cce59f8e44bb9
 expansions/pics/99189326.png	b9a8bfa2e1cea1b91dcdac79cb47488c
 expansions/pics/99189327.png	3e400f7691c5de669e405e7419bc0cfa
 expansions/pics/99189328.png	70480693f68198826f19a69bc0ea1c0a
@@ -11748,7 +11748,7 @@ expansions/script/c99189347.lua	d4c2db12fcbda2026efa7bd5e626e1ed
 expansions/script/c99189348.lua	4cd738749f0690f2355bb1c770cb32b6
 expansions/script/c99189349.lua	e5b8346e8f2d0e48672ce4ccea44448e
 expansions/script/c99189350.lua	4b25c7257332011d51c2ec3c7e34c2dc
-expansions/script/c99189351.lua	0dbb29756050a28ebe5cf91a45871ade
+expansions/script/c99189351.lua	f6e249327acdec6f71628885a840fd25
 expansions/script/c99189352.lua	299be20c313e0f42c6bb10ee3d1013d6
 expansions/script/c99189353.lua	000a08a50f65e4a211dbfb92709421af
 expansions/script/c99189354.lua	0b9a45adbc6cb36f870d8bb44441bbf9
@@ -11997,6 +11997,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	d7c2e7704e2074b3476435f19adde6e5
+update/filelist.txt	ef9fa9db5cc40a03d099bce6652eec4d
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	cc516ca84af714c92168c3334d11053a
+update/version.txt	9e2469eae374053412a3fdd1e7c6346a

@@ -53,12 +53,12 @@ function cid.initial_effect(c)
 end
 --ATK/DEF
 function cid.stattg(e,c)
-	return c:IsRace(RACE_FIEND) and c:IsLevelAbove(5)
+	return c:IsRace(RACE_ZOMBIE) and c:IsLevelAbove(5)
 end
 
 --BANISH/SPSUMMON
 function cid.rfilter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsRace(RACE_FIEND) and c:IsAbleToRemoveAsCost()
+	return c:IsType(TYPE_MONSTER) and c:IsRace(RACE_ZOMBIE) and c:IsAbleToRemoveAsCost()
 end
 function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cid.rfilter,tp,LOCATION_GRAVE,0,1,nil) end
@@ -72,7 +72,7 @@ function cid.filter(c,e,tp)
 	return c:IsAbleToRemove() or cid.sgfilter(c,e,tp)
 end
 function cid.sgfilter(c,e,tp)
-	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and c:IsType(TYPE_MONSTER) and c:IsRace(RACE_FIEND) and c:IsLevelAbove(5) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and c:IsType(TYPE_MONSTER) and c:IsRace(RACE_ZOMBIE) and c:IsLevelAbove(5) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function cid.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
