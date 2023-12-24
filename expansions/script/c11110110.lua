@@ -35,7 +35,7 @@ function cm.rlcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_LINK)
 end
 function cm.rlfilter(c)
-	return (c:IsSetCard(0x223) or c:IsSetCard(0x2a7) or c:IsSetCard(0x528) or c:IsSetCard(0xd0a1)) and c:IsType(TYPE_MONSTER) and c:IsReleasable()
+	return (c:IsSetCard(0x223) or c:IsSetCard(0x2a7) or c:IsSetCard(0x528) or c:IsSetCard(0xd0a1)) and c:IsType(TYPE_MONSTER) and c:IsReleasableByEffect()
 end
 function cm.rltg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cm.rlfilter,tp,LOCATION_DECK,0,1,nil) end
