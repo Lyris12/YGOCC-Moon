@@ -26,6 +26,7 @@ function s.initial_effect(c)
 	e2:HOPT()
 	e2:SetFunctions(nil,s.setcost,s.settg,s.setop)
 	c:RegisterEffect(e2)
+	e2:SpecialSummonEventClone(c)
 	--[[If this card is in your GY (Quick Effect): You can send 1 "Lotus Blade" card from your hand or field to the GY;
 	Special Summon this card, then, if you control 2 or more "Lotus Blade" Spells, draw 1 card.]]
 	local e3=Effect.CreateEffect(c)
