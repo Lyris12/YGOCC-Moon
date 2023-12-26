@@ -264,24 +264,16 @@ function Auxiliary.Info(ctg,ct,p,v)
 			end
 end
 function Auxiliary.DamageInfo(p,v)
-	return	function(_,e,tp)
-				return Auxiliary.Info(CATEGORY_DAMAGE,0,p,v)
-			end
+	return Auxiliary.Info(CATEGORY_DAMAGE,0,p,v)
 end
 function Auxiliary.DrawInfo(p,v)
-	return	function(_,e,tp)
-				return Auxiliary.Info(CATEGORY_DRAW,0,p,v)
-			end
+	return Auxiliary.Info(CATEGORY_DRAW,0,p,v)
 end
 function Auxiliary.MillInfo(p,v)
-	return	function(_,e,tp)
-				return Auxiliary.Info(CATEGORY_DECKDES,0,p,v)
-			end
+	return Auxiliary.Info(CATEGORY_DECKDES,0,p,v)
 end
 function Auxiliary.RecoverInfo(p,v)
-	return	function(_,e,tp)
-				return Auxiliary.Info(CATEGORY_RECOVER,0,p,v)
-			end
+	return Auxiliary.Info(CATEGORY_RECOVER,0,p,v)
 end
 
 function Auxiliary.HandlerInfo(ctg,custom)
