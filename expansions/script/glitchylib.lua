@@ -50,25 +50,25 @@ end
 -------------------------------EFFECTS THAT CAN BE ACTIVATED BY AFFECTING THE CARD USED AS COST, EVEN WHEN THERE ARE NO OTHER VALID TARGETS-------------------------------------
 LOCATION_AFTER_COST_EFFECTS = {EFFECT_CANNOT_SPECIAL_SUMMON, EFFECT_CANNOT_SSET}
 
+local _IsLocation, _GetLocation = Card.IsLocation, Card.GetLocation
+
 function Card.SetLocationAfterCost(c,loc)
 	local s=getmetatable(c)
 	s.LocationAfterCost=loc
 end
 function Card.IsLocationAfterCost(c,loc)
-	if not c.LocationAfterCost then return false end
+	if not c.LocationAfterCost then return _IsLocation(c,loc) end
 	local s=getmetatable(c)
 	return s.LocationAfterCost&loc~=0
 end
 function Card.GetLocationAfterCost(c)
 	local s=getmetatable(c)
-	if not s.LocationAfterCost then return 0 end
+	if not s.LocationAfterCost then return _GetLocation(c) end
 	return s.LocationAfterCost
 end
 
-local _IsLocation, _GetLocation = Card.IsLocation, Card.GetLocation
-
 Card.IsLocation = function(c,loc)
-	if self_reference_effect then
+	if self_reference_effect and c.LocationAfterCost then
 		local code=self_reference_effect:GetCode()
 		if aux.FindInTable(LOCATION_AFTER_COST_EFFECTS,code) then
 			return c:IsLocationAfterCost(loc)
@@ -78,7 +78,7 @@ Card.IsLocation = function(c,loc)
 end
 Card.GetLocation = function(c)
 	local locs=_GetLocation(c)
-	if self_reference_effect then
+	if self_reference_effect and c.LocationAfterCost then
 		local code=self_reference_effect:GetCode()
 		if aux.FindInTable(LOCATION_AFTER_COST_EFFECTS,code) then
 			locs=locs|c:GetLocationAfterCost()
@@ -2316,15 +2316,10 @@ function Auxiliary.IsTunerCond(e)
 end
 
 -------------------------------XYZ-----------------------------------
-local _XyzLevelFreeGoal, _XyzAlterFilter = Auxiliary.XyzLevelFreeGoal, Auxiliary.XyzAlterFilter
+local _XyzLevelFreeGoal = Auxiliary.XyzLevelFreeGoal
 
 Auxiliary.XyzLevelFreeGoal = function(g,tp,xyzc,gf)
 	return (not gf or gf(g,tp,xyzc)) and Duel.GetLocationCountFromEx(tp,tp,g,xyzc)>0
-end
-
-Auxiliary.XyzAlterFilter = function (c,alterf,xyzc,e,tp,alterop)
-	return alterf(c,xyzc) and c:IsCanBeXyzMaterial(xyzc) and Duel.GetLocationCountFromEx(tp,tp,c,xyzc)>0
-		and Auxiliary.MustMaterialCheck(c,tp,EFFECT_MUST_BE_XMATERIAL) and (not alterop or alterop(e,tp,0,c))
 end
 
 -------------------------------LINKS-----------------------------------

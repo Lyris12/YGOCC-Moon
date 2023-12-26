@@ -1,5 +1,6 @@
 --Not yet finalized values
 --Custom constants
+
 self_reference_effect				= nil
 current_triggering_player			= nil
 current_reason_effect				= nil
@@ -2246,6 +2247,9 @@ end
 --Global Card Effect Table
 EVENT_CHAIN_CREATED = 39419
 
+Auxiliary.SpSummonProcCard = nil
+FLAG_SPSUMMON_PROC = 62613309
+
 function Card.GetEffects(c)
 	local eset=global_card_effect_table[c]
 	if not eset then return {} end
@@ -2303,13 +2307,38 @@ if not global_card_effect_table_global_check then
 			Card.register_global_card_effect_table(self,r,true)							
 		end
 		
-		if e:GetType()&(EFFECT_TYPE_ACTIONS)==0 then
+		local typ,code=e:GetType(),e:GetCode()
+		
+		if typ&(EFFECT_TYPE_ACTIONS)==0 then
 			local e = e:IsHasType(EFFECT_TYPE_GRANT) and e:GetLabelObject() or e
-			local code=e:GetCode()
 			
-			if code==EFFECT_UPDATE_LEVEL or code==EFFECT_CHANGE_LEVEL then
+			if code==EFFECT_SPSUMMON_PROC then
+				local cond=e:GetCondition()
+				if cond then
+					e:SetCondition(function(E,C)
+						if C==nil then return true end
+						aux.SpSummonProcCard=C
+						local res=cond(E,C)
+						aux.SpSummonProcCard=nil
+						return res
+					end)
+				end
+				
+				local op=e:GetOperation()
+				if not op then
+					e:SetOperation(function(E,TP,EG,EP,EV,RE,R,RP,C)
+						C:RegisterFlagEffect(FLAG_SPSUMMON_PROC,RESET_EVENT|RESETS_STANDARD,EFFECT_FLAG_IGNORE_IMMUNE,1)
+					end)
+				else
+					e:SetOperation(function(E,TP,EG,EP,EV,RE,R,RP,C)
+						C:RegisterFlagEffect(FLAG_SPSUMMON_PROC,RESET_EVENT|RESETS_STANDARD,EFFECT_FLAG_IGNORE_IMMUNE,1)
+						return op(E,TP,EG,EP,EV,RE,R,RP,C)
+					end)
+				end
+			
+			elseif code==EFFECT_UPDATE_LEVEL or code==EFFECT_CHANGE_LEVEL then
 				local ce=e:Clone()
-				if e:GetCode()==EFFECT_UPDATE_LEVEL then
+				if code==EFFECT_UPDATE_LEVEL then
 					ce:SetCode(EFFECT_UPDATE_RANK)
 				else
 					ce:SetCode(EFFECT_CHANGE_RANK)
@@ -2327,14 +2356,14 @@ if not global_card_effect_table_global_check then
 				self.register_global_card_effect_table(self,ce,forced)
 			
 			elseif code==EFFECT_DISABLE or code==EFFECT_DISABLE_EFFECT or code==EFFECT_DISABLE_CHAIN or code==EFFECT_DISABLE_TRAPMONSTER then
-				if e:GetType()==EFFECT_TYPE_SINGLE then
+				if typ==EFFECT_TYPE_SINGLE then
 					local cond=e:GetCondition()
 					if not cond then
 						e:SetCondition(aux.GlitchyCannotDisableCon())
 					else
 						e:SetCondition(aux.GlitchyCannotDisableCon(con))
 					end
-				elseif e:GetType()==EFFECT_TYPE_FIELD then
+				elseif typ==EFFECT_TYPE_FIELD then
 					local tg=e:GetTarget()
 					if not tg then
 						e:SetTarget(aux.GlitchyCannotDisable())
@@ -2368,7 +2397,7 @@ if not global_card_effect_table_global_check then
 					end
 					local cond=e:GetCondition()
 					local newcond =	function(e,...)
-										if e:GetCode()==EFFECT_UPDATE_ATTACK or e:GetCode()==EFFECT_SET_ATTACK or e:GetCode()==EFFECT_SET_ATTACK_FINAL or e:GetCode()==EFFECT_SWAP_AD then
+										if code==EFFECT_UPDATE_ATTACK or code==EFFECT_SET_ATTACK or code==EFFECT_SET_ATTACK_FINAL or code==EFFECT_SWAP_AD then
 											for _,ce in ipairs({e:GetHandler():IsHasEffect(EFFECT_GLITCHY_CANNOT_CHANGE_ATK)}) do
 												if ce and aux.GetValueType(ce)=="Effect" and ce.GetLabel then
 													local val=ce:GetValue()
@@ -2384,7 +2413,7 @@ if not global_card_effect_table_global_check then
 				elseif e:IsHasType(EFFECT_TYPE_EQUIP) then
 					local cond=e:GetCondition()
 					local newcond =	function(e,...)
-										if e:GetCode()==EFFECT_UPDATE_ATTACK or e:GetCode()==EFFECT_SET_ATTACK or e:GetCode()==EFFECT_SET_ATTACK_FINAL or e:GetCode()==EFFECT_SWAP_AD then
+										if code==EFFECT_UPDATE_ATTACK or code==EFFECT_SET_ATTACK or code==EFFECT_SET_ATTACK_FINAL or code==EFFECT_SWAP_AD then
 											for _,ce in ipairs({e:GetHandler():GetEquipTarget():IsHasEffect(EFFECT_GLITCHY_CANNOT_CHANGE_ATK)}) do
 												if ce and aux.GetValueType(ce)=="Effect" and ce.GetLabel then
 													local val=ce:GetValue()
@@ -2400,7 +2429,7 @@ if not global_card_effect_table_global_check then
 				elseif e:IsHasType(EFFECT_TYPE_FIELD) then
 					local tg=e:GetTarget()
 					local newtarg =	function(e,c,...)
-										if e:GetCode()==EFFECT_UPDATE_ATTACK or e:GetCode()==EFFECT_SET_ATTACK or e:GetCode()==EFFECT_SET_ATTACK_FINAL or e:GetCode()==EFFECT_SWAP_AD then
+										if code==EFFECT_UPDATE_ATTACK or code==EFFECT_SET_ATTACK or code==EFFECT_SET_ATTACK_FINAL or code==EFFECT_SWAP_AD then
 											for _,ce in ipairs({c:IsHasEffect(EFFECT_GLITCHY_CANNOT_CHANGE_ATK)}) do
 												if ce and aux.GetValueType(ce)=="Effect" and ce.GetLabel then
 													local val=ce:GetValue()
@@ -2418,7 +2447,7 @@ if not global_card_effect_table_global_check then
 		end
 		
 		local condition,cost,tg,op,val=e:GetCondition(),e:GetCost(),e:GetTarget(),e:GetOperation(),e:GetValue()
-		if condition and ((e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G) or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()==EFFECT_TYPE_XMATERIAL or e:GetType()==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or e:GetType()&EFFECT_TYPE_GRANT~=0)) then	
+		if condition and ((code==EFFECT_SPSUMMON_PROC or code==EFFECT_SPSUMMON_PROC_G) or not (typ==EFFECT_TYPE_FIELD or typ==EFFECT_TYPE_SINGLE or typ==EFFECT_TYPE_XMATERIAL or typ==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or typ&EFFECT_TYPE_GRANT~=0)) then	
 			local newcon =	function(...)
 								local x={...}
 								self_reference_effect=x[1]
@@ -2430,11 +2459,13 @@ if not global_card_effect_table_global_check then
 										current_reason_effect=x[6]
 									end
 								end
-								return condition(table.unpack(x))
+								local res=condition(table.unpack(x))
+								self_reference_effect=nil
+								return res
 							end
 			e:SetCondition(newcon)
 		end
-		if cost and not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()==EFFECT_TYPE_XMATERIAL or e:GetType()==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or e:GetType()&EFFECT_TYPE_GRANT~=0) then
+		if cost and not (typ==EFFECT_TYPE_FIELD or typ==EFFECT_TYPE_SINGLE or typ==EFFECT_TYPE_XMATERIAL or typ==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or typ&EFFECT_TYPE_GRANT~=0) then
 			local newcost =	function(...)
 								local x={...}
 								self_reference_effect=x[1]
@@ -2449,19 +2480,21 @@ if not global_card_effect_table_global_check then
 								if #x>=9 and x[9]~=0 then
 									Duel.RaiseEvent(x[1]:GetHandler(),EVENT_CHAIN_CREATED,x[1],0,x[2],x[2],Duel.GetCurrentChain())
 								end
-								return cost(table.unpack(x))
+								local res=cost(table.unpack(x))
+								self_reference_effect=nil
+								return res
 							end
 			e:SetCost(newcost)
 		end
 		if tg then
-			if e:GetCode()==EFFECT_CANNOT_SPECIAL_SUMMON then
+			if code==EFFECT_CANNOT_SPECIAL_SUMMON then
 				local newtg =	function(...)
 									local x={...}
 									self_reference_effect=x[1]
 									return tg(table.unpack(x))
 								end
 				e:SetTarget(newtg)
-			elseif e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()==EFFECT_TYPE_XMATERIAL or e:GetType()==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or e:GetType()&EFFECT_TYPE_GRANT~=0) then
+			elseif code==EFFECT_SPSUMMON_PROC or code==EFFECT_SPSUMMON_PROC_G or not (typ==EFFECT_TYPE_FIELD or typ==EFFECT_TYPE_SINGLE or typ==EFFECT_TYPE_XMATERIAL or typ==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or typ&EFFECT_TYPE_GRANT~=0) then
 				local newtg =	function(...)
 									local x={...}
 									self_reference_effect=x[1]
@@ -2476,12 +2509,14 @@ if not global_card_effect_table_global_check then
 									if #x>=9 and x[9]~=0 and (#x<10 or not x[10]) and (not x[1]:GetCost() or not x[1]:IsCostChecked()) then
 										Duel.RaiseEvent(x[1]:GetHandler(),EVENT_CHAIN_CREATED,x[1],0,x[2],x[2],Duel.GetCurrentChain())
 									end
-									return tg(table.unpack(x))
+									local res=tg(table.unpack(x))
+									self_reference_effect=nil
+									return res
 								end
 				e:SetTarget(newtg)
 			end
 		end
-		if op and ((e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G) or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()==EFFECT_TYPE_XMATERIAL or e:GetType()==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or e:GetType()&EFFECT_TYPE_GRANT~=0)) then
+		if op and ((code==EFFECT_SPSUMMON_PROC or code==EFFECT_SPSUMMON_PROC_G) or not (typ==EFFECT_TYPE_FIELD or typ==EFFECT_TYPE_SINGLE or typ==EFFECT_TYPE_XMATERIAL or typ==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or typ&EFFECT_TYPE_GRANT~=0)) then
 			local newop =	function(...)
 								local x={...}
 								self_reference_effect = x[1]
@@ -2493,20 +2528,24 @@ if not global_card_effect_table_global_check then
 										current_reason_effect=x[6]
 									end
 								end
-								return op(table.unpack(x))
+								local res=op(table.unpack(x))
+								self_reference_effect=nil
+								return res
 							end
 			e:SetOperation(newop)
 		end
 		if val then
-			if type(val)=="function" and ((e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G) or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()==EFFECT_TYPE_XMATERIAL or e:GetType()==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or e:GetType()&EFFECT_TYPE_GRANT~=0)) then
+			if type(val)=="function" and ((code==EFFECT_SPSUMMON_PROC or code==EFFECT_SPSUMMON_PROC_G) or not (typ==EFFECT_TYPE_FIELD or typ==EFFECT_TYPE_SINGLE or typ==EFFECT_TYPE_XMATERIAL or typ==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or typ&EFFECT_TYPE_GRANT~=0)) then
 				local newval =	function(...)
 									self_reference_effect=e
 									current_triggering_player = self_reference_effect:GetHandlerPlayer()
-									return val(...)
+									local res=val(...)
+									self_reference_effect=nil
+									return res
 								end
 				e:SetValue(newval)
 				
-			elseif (e:GetCode()==EFFECT_CHANGE_CODE or e:GetCode()==EFFECT_CHANGE_CODE) and e:GetOwner():IsHasEffect(EFFECT_GLITCHY_HACK_CODE) then
+			elseif (code==EFFECT_CHANGE_CODE or code==EFFECT_CHANGE_CODE) and e:GetOwner():IsHasEffect(EFFECT_GLITCHY_HACK_CODE) then
 				local ceg={e:GetOwner():IsHasEffect(EFFECT_GLITCHY_HACK_CODE)}
 				local ce=ceg[#ceg]
 				local val=ce:GetValue()
@@ -2558,12 +2597,14 @@ if not global_duel_effect_table_global_check then
 								global_reset_duel_effect_table[e]=true								
 							end
 							
-							if e:GetType()&(EFFECT_TYPE_ACTIONS)==0 then
+							local typ,code=e:GetType(),e:GetCode()
+							
+							if typ&(EFFECT_TYPE_ACTIONS)==0 then
 								local e = e:IsHasType(EFFECT_TYPE_GRANT) and e:GetLabelObject() or e
 								
-								if e:GetCode()==EFFECT_UPDATE_LEVEL or e:GetCode()==EFFECT_CHANGE_LEVEL then
+								if code==EFFECT_UPDATE_LEVEL or code==EFFECT_CHANGE_LEVEL then
 									local ce=e:Clone()
-									if e:GetCode()==EFFECT_UPDATE_LEVEL then
+									if code==EFFECT_UPDATE_LEVEL then
 										ce:SetCode(EFFECT_UPDATE_RANK)
 									else
 										ce:SetCode(EFFECT_CHANGE_RANK)
@@ -2575,7 +2616,7 @@ if not global_duel_effect_table_global_check then
 									Duel.register_global_duel_effect_table(ce,tp)	
 								end
 									
-								if e:GetCode()==EFFECT_EXTRA_SUMMON_COUNT or e:GetCode()==EFFECT_EXTRA_SET_COUNT then
+								if code==EFFECT_EXTRA_SUMMON_COUNT or code==EFFECT_EXTRA_SET_COUNT then
 									local s,o=e:GLGetTargetRange()
 									if s and s~=0 and s&LOCATION_GRAVE==0 then
 										s=s|LOCATION_GRAVE
@@ -2584,11 +2625,11 @@ if not global_duel_effect_table_global_check then
 										o=o|LOCATION_GRAVE
 									end
 								
-								elseif e:GetCode()==EFFECT_UPDATE_ATTACK or e:GetCode()==EFFECT_SET_ATTACK or e:GetCode()==EFFECT_SET_ATTACK_FINAL or e:GetCode()==EFFECT_SWAP_AD then
+								elseif code==EFFECT_UPDATE_ATTACK or code==EFFECT_SET_ATTACK or code==EFFECT_SET_ATTACK_FINAL or code==EFFECT_SWAP_AD then
 									if e:IsHasType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_XMATERIAL) then
 										local cond=e:GetCondition()
 										local newcond =	function(e,...)
-															if e:GetCode()==EFFECT_UPDATE_ATTACK or e:GetCode()==EFFECT_SET_ATTACK or e:GetCode()==EFFECT_SET_ATTACK_FINAL or e:GetCode()==EFFECT_SWAP_AD then
+															if code==EFFECT_UPDATE_ATTACK or code==EFFECT_SET_ATTACK or code==EFFECT_SET_ATTACK_FINAL or code==EFFECT_SWAP_AD then
 																for _,ce in ipairs({e:GetHandler():IsHasEffect(EFFECT_GLITCHY_CANNOT_CHANGE_ATK)}) do
 																	if ce and aux.GetValueType(ce)=="Effect" and ce.GetLabel then
 																		local val=ce:GetValue()
@@ -2604,7 +2645,7 @@ if not global_duel_effect_table_global_check then
 									elseif e:IsHasType(EFFECT_TYPE_EQUIP) then
 										local cond=e:GetCondition()
 										local newcond =	function(e,...)
-															if e:GetCode()==EFFECT_UPDATE_ATTACK or e:GetCode()==EFFECT_SET_ATTACK or e:GetCode()==EFFECT_SET_ATTACK_FINAL or e:GetCode()==EFFECT_SWAP_AD then
+															if code==EFFECT_UPDATE_ATTACK or code==EFFECT_SET_ATTACK or code==EFFECT_SET_ATTACK_FINAL or code==EFFECT_SWAP_AD then
 																for _,ce in ipairs({e:GetHandler():GetEquipTarget():IsHasEffect(EFFECT_GLITCHY_CANNOT_CHANGE_ATK)}) do
 																	if ce and aux.GetValueType(ce)=="Effect" and ce.GetLabel then
 																		local val=ce:GetValue()
@@ -2620,7 +2661,7 @@ if not global_duel_effect_table_global_check then
 									elseif e:IsHasType(EFFECT_TYPE_FIELD) then
 										local tg=e:GetTarget()
 										local newtarg =	function(e,c,...)
-															if e:GetCode()==EFFECT_UPDATE_ATTACK or e:GetCode()==EFFECT_SET_ATTACK or e:GetCode()==EFFECT_SET_ATTACK_FINAL or e:GetCode()==EFFECT_SWAP_AD then
+															if code==EFFECT_UPDATE_ATTACK or code==EFFECT_SET_ATTACK or code==EFFECT_SET_ATTACK_FINAL or code==EFFECT_SWAP_AD then
 																for _,ce in ipairs({c:IsHasEffect(EFFECT_GLITCHY_CANNOT_CHANGE_ATK)}) do
 																	if ce and aux.GetValueType(ce)=="Effect" and ce.GetLabel then
 																		local val=ce:GetValue()
@@ -2638,8 +2679,8 @@ if not global_duel_effect_table_global_check then
 							end
 							
 							
-							local condition,cost,tg,op,val=e:GetCondition(),e:GetCost(),e:GetTarget(),e:GetOperation(),e:GetValue()
-							if condition and ((e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G) or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()&EFFECT_TYPE_GRANT~=0)) then
+							local condition,cost,tg,op,val = e:GetCondition(),e:GetCost(),e:GetTarget(),e:GetOperation(),e:GetValue()
+							if condition and ((code==EFFECT_SPSUMMON_PROC or code==EFFECT_SPSUMMON_PROC_G) or not (typ==EFFECT_TYPE_FIELD or typ==EFFECT_TYPE_SINGLE or typ&EFFECT_TYPE_GRANT~=0)) then
 								local newcon =	function(...)
 													local x={...}
 													self_reference_effect=x[1]
@@ -2651,11 +2692,13 @@ if not global_duel_effect_table_global_check then
 															current_reason_effect=x[6]
 														end
 													end
-													return condition(table.unpack(x))
+													local res=condition(table.unpack(x))
+													self_reference_effect=nil
+													return res
 												end
 								e:SetCondition(newcon)
 							end
-							if cost and ((e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G) or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()&EFFECT_TYPE_GRANT~=0)) then
+							if cost and ((code==EFFECT_SPSUMMON_PROC or code==EFFECT_SPSUMMON_PROC_G) or not (typ==EFFECT_TYPE_FIELD or typ==EFFECT_TYPE_SINGLE or typ&EFFECT_TYPE_GRANT~=0)) then
 								local newcost =	function(...)
 													local x={...}
 													self_reference_effect=x[1]
@@ -2667,19 +2710,24 @@ if not global_duel_effect_table_global_check then
 															current_reason_effect=x[6]
 														end
 													end
-													return cost(table.unpack(x))
+													local res=cost(table.unpack(x))
+													self_reference_effect=nil
+													return res
 												end
 								e:SetCost(newcost)
 							end
 							if tg then
-								if e:GetCode()==EFFECT_CANNOT_SPECIAL_SUMMON then
+								if code==EFFECT_CANNOT_SPECIAL_SUMMON then
 									local newtg =	function(...)
 														local x={...}
 														self_reference_effect=x[1]
-														return tg(table.unpack(x))
+														local res=tg(...)
+														self_reference_effect=nil
+														return res
 													end
 									e:SetTarget(newtg)
-								elseif e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()&EFFECT_TYPE_GRANT~=0) then
+									
+								elseif code==EFFECT_SPSUMMON_PROC or code==EFFECT_SPSUMMON_PROC_G or not (typ==EFFECT_TYPE_FIELD or typ==EFFECT_TYPE_SINGLE or typ&EFFECT_TYPE_GRANT~=0) then
 									local newtg =	function(...)
 														local x={...}
 														self_reference_effect=x[1]
@@ -2691,12 +2739,14 @@ if not global_duel_effect_table_global_check then
 																current_reason_effect=x[6]
 															end
 														end
-														return tg(table.unpack(x))
+														local res=tg(table.unpack(x))
+														self_reference_effect=nil
+														return res
 													end
 									e:SetTarget(newtg)
 								end
 							end
-							if op and ((e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G) or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()&EFFECT_TYPE_GRANT~=0)) then
+							if op and ((code==EFFECT_SPSUMMON_PROC or code==EFFECT_SPSUMMON_PROC_G) or not (typ==EFFECT_TYPE_FIELD or typ==EFFECT_TYPE_SINGLE or typ&EFFECT_TYPE_GRANT~=0)) then
 								local newop =	function(...)
 													local x={...}
 													self_reference_effect=x[1]
@@ -2708,20 +2758,24 @@ if not global_duel_effect_table_global_check then
 															current_reason_effect=x[6]
 														end
 													end
-													return op(table.unpack(x))
+													local res=op(table.unpack(x))
+													self_reference_effect=nil
+													return res
 												end
 								e:SetOperation(newop)
 							end
 							if val then
-								if type(val)=="function" and ((e:GetCode()==EFFECT_SPSUMMON_PROC or e:GetCode()==EFFECT_SPSUMMON_PROC_G) or not (e:GetType()==EFFECT_TYPE_FIELD or e:GetType()==EFFECT_TYPE_SINGLE or e:GetType()&EFFECT_TYPE_GRANT~=0)) then
+								if type(val)=="function" and ((code==EFFECT_SPSUMMON_PROC or code==EFFECT_SPSUMMON_PROC_G) or not (typ==EFFECT_TYPE_FIELD or typ==EFFECT_TYPE_SINGLE or typ&EFFECT_TYPE_GRANT~=0)) then
 									local newval =	function(...)
 														self_reference_effect=e
 														current_triggering_player = e:GetHandlerPlayer()
-														return val(...)
+														local res=val(...)
+														self_reference_effect=nil
+														return res
 													end
 									e:SetValue(newval)
 								
-								elseif (e:GetCode()==EFFECT_CHANGE_CODE or e:GetCode()==EFFECT_CHANGE_CODE) and e:GetOwner():IsHasEffect(EFFECT_GLITCHY_HACK_CODE) then
+								elseif (code==EFFECT_CHANGE_CODE or code==EFFECT_CHANGE_CODE) and e:GetOwner():IsHasEffect(EFFECT_GLITCHY_HACK_CODE) then
 									local ceg={e:GetOwner():IsHasEffect(EFFECT_GLITCHY_HACK_CODE)}
 									local ce=ceg[#ceg]
 									local val=ce:GetValue()
