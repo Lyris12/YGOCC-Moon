@@ -13,6 +13,19 @@ function c249000860.initial_effect(c)
 			end
 		end
 	end
+	if AddXyzProcedureLevelFree then
+		if not c249000860_AddXyzProcedureLevelFree then
+			c249000860_AddXyzProcedureLevelFree=aux.AddXyzProcedureLevelFree
+			aux.AddXyzProcedureLevelFree = function (c,f,gf,minc,maxc,alterf,alterdesc,alterop)
+				local code=c:GetOriginalCode()
+				local mt=_G["c" .. code]
+				mt.xyz_minct=minc
+				if maxc then mt.xyz_maxct=maxc else mt.xyz_maxct=minc end
+				if f then mt.xyz_filter=f end
+				c249000860_AddXyzProcedureLevelFree(c,f,gf,minc,maxc,alterf,alterdesc,alterop)
+			end
+		end
+	end
 	if aux.AddLinkProcedure then
 		if not c249000860_AddLinkProcedure then
 			c249000860_AddLinkProcedure=aux.AddLinkProcedure

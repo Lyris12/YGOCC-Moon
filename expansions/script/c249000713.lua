@@ -66,14 +66,15 @@ end
 function c249000713.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0
 end
-function c249000713.costfilter(c)
-	return c:IsSetCard(0x1E9) and c:IsAbleToRemoveAsCost() and c:IsType(TYPE_MONSTER)
+function c249000713.costfilter(c,e,tp,c2)
+	local g=Group.FromCards(c,c2)
+	return c:IsSetCard(0x1E9) and c:IsAbleToRemoveAsCost() and c:IsType(TYPE_MONSTER) and Duel.IsExistingTarget(c249000713.filter1,tp,LOCATION_GRAVE,0,1,g,e,tp)
 end
 function c249000713.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return Duel.IsExistingMatchingCard(c249000713.costfilter,tp,LOCATION_GRAVE+LOCATION_EXTRA,0,1,c)
+	if chk==0 then return Duel.IsExistingMatchingCard(c249000713.costfilter,tp,LOCATION_GRAVE+LOCATION_EXTRA,0,1,c,e,tp,c)
 		and c:IsAbleToRemoveAsCost() end
-	local g=Duel.SelectMatchingCard(tp,c249000713.costfilter,tp,LOCATION_GRAVE+LOCATION_EXTRA,0,1,1,c)
+	local g=Duel.SelectMatchingCard(tp,c249000713.costfilter,tp,LOCATION_GRAVE+LOCATION_EXTRA,0,1,1,c,e,tp,c)
 	Duel.Remove(c,POS_FACEUP,REASON_COST)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
@@ -131,14 +132,14 @@ function c249000713.op2(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,tp)
 	local tg=Duel.SelectMatchingCard(tp,c249000713.filter3,tp,LOCATION_EXTRA,0,1,1,nil,c:GetRace(),c:GetRank()+1)
 	local tc=tg:GetFirst()
-	if tc ~= nil then
+	if tc then
 		local code=tc:GetCode()
 		Duel.ConfirmCards(1-tp,tc)
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e2:SetCode(EVENT_PHASE+PHASE_STANDBY)
+		e2:SetCode(EVENT_PHASE_START+PHASE_BATTLE_START)
 		e2:SetCountLimit(1)
-		e2:SetReset(RESET_EVENT+RESET_PHASE+PHASE_STANDBY)
+		e2:SetReset(RESET_EVENT+RESET_PHASE+PHASE_BATTLE)
 		e2:SetLabel(code)
 		e2:SetOperation(c249000713.spop)
 		Duel.RegisterEffect(e2,tp)
