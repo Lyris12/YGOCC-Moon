@@ -7,7 +7,8 @@ function c62613303.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_HAND)
-	e1:SetCountLimit(1,62613303)
+	e1:HOPT()
+	e1:SetCondition(c62613303.spcon)
 	e1:SetTarget(c62613303.sptg)
 	e1:SetOperation(c62613303.spop)
 	c:RegisterEffect(e1)
@@ -17,7 +18,7 @@ function c62613303.initial_effect(c)
 	e2:SetCategory(CATEGORY_TOHAND)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_SUMMON_SUCCESS)
-	e2:SetCountLimit(1,60613303)
+	e2:HOPT()
 	e2:SetTarget(c62613303.thtg)
 	e2:SetOperation(c62613303.thop)
 	c:RegisterEffect(e2)
@@ -28,7 +29,7 @@ function c62613303.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetProperty(EFFECT_FLAG_DELAY)
 	e3:SetCode(EVENT_BE_MATERIAL)
-	e3:SetCountLimit(1,61613303)
+	e3:HOPT()
 	e3:SetCondition(c62613303.rtcon)
 	e3:SetTarget(c62613303.rttg)
 	e3:SetOperation(c62613303.rtop)
@@ -36,25 +37,27 @@ function c62613303.initial_effect(c)
 end
 --filters
 function c62613303.cfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x6233) and c:IsType(TYPE_SYNCHRO+TYPE_XYZ)
+	return c:IsFaceup() and c:IsSetCard(ARCHE_NIGHTSHADE) and c:IsType(TYPE_SYNCHRO+TYPE_XYZ)
 end
 function c62613303.rtfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x6233)
+	return c:IsFaceup() and c:IsSetCard(ARCHE_NIGHTSHADE)
 end
 function c62613303.thfilter(c)
-	return c:IsSetCard(0x6233) and c:IsAbleToHand()
+	return c:IsSetCard(ARCHE_NIGHTSHADE) and c:IsAbleToHand()
 end
 --spsummon self
+function c62613303.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsExistingMatchingCard(c62613303.cfilter,tp,LOCATION_MZONE,0,1,nil)
+end
 function c62613303.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false)
-		and Duel.IsExistingMatchingCard(c62613303.cfilter,tp,LOCATION_MZONE,0,1,nil) 
+		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) 
 	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
 function c62613303.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) then 
+	if c:IsRelateToChain() then 
 		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
@@ -67,7 +70,6 @@ function c62613303.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(c62613303.thfilter),tp,LOCATION_GRAVE,0,1,1,nil)
 	if g:GetCount()>0 then
-		Duel.HintSelection(g)
 		Duel.SendtoHand(g,tc,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
 	end

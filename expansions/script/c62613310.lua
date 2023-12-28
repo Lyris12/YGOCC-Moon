@@ -1,185 +1,73 @@
 --Karasu, Ali Nottesfumo dell'Ascensione
 --Script by XGlitchy30
-function c62613310.initial_effect(c)
-	c:SetSPSummonOnce(62613310)
+
+local s,id=GetID()
+function s.initial_effect(c)
+	c:SetSPSummonOnce(id)
 	--link summon
 	c:EnableReviveLimit()
-	aux.AddLinkProcedure(c,c62613310.matfilter,1,1)
-	--zone limit (not fully implemented, requires a core update)
+	aux.AddLinkProcedure(c,s.matfilter,1,1)
+	--zone limit
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_MUST_USE_MZONE)
+	e1:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
+	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE|EFFECT_FLAG_CANNOT_DISABLE)
+	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetTargetRange(LOCATION_MZONE+LOCATION_SZONE+LOCATION_DECK+LOCATION_EXTRA+LOCATION_GRAVE+LOCATION_REMOVED+LOCATION_OVERLAY,LOCATION_MZONE+LOCATION_SZONE+LOCATION_DECK+LOCATION_EXTRA+LOCATION_GRAVE+LOCATION_REMOVED+LOCATION_OVERLAY)
-	e1:SetLabel(62613310)
-	e1:SetTarget(c62613310.limittg)
-	e1:SetValue(c62613310.limitzone)
+	e1:SetCondition(s.limitcon)
+	e1:SetOperation(s.limitzone)
 	c:RegisterEffect(e1)
-	--spsummon procs adjustments (not fully implemented, require a core update)
-	local e0x=Effect.CreateEffect(c)
-	e0x:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e0x:SetCode(EVENT_ADJUST)
-	e0x:SetRange(LOCATION_MZONE)
-	e0x:SetOperation(c62613310.adjustop)
-	c:RegisterEffect(e0x)
-	local e0y=Effect.CreateEffect(c)
-	e0y:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e0y:SetCode(EVENT_CHAINING)
-	e0y:SetRange(LOCATION_MZONE)
-	e0y:SetCondition(c62613310.handlimitcon)
-	e0y:SetOperation(c62613310.handlimit)
-	c:RegisterEffect(e0y)
 	--mill
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(62613310,0))
+	e2:SetDescription(aux.Stringid(id,0))
 	e2:SetCategory(CATEGORY_TOGRAVE)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCountLimit(1,62613310)
-	e2:SetCost(c62613310.tgcost)
-	e2:SetTarget(c62613310.tgtg)
-	e2:SetOperation(c62613310.tgop)
+	e2:HOPT()
+	e2:SetCost(s.tgcost)
+	e2:SetTarget(s.tgtg)
+	e2:SetOperation(s.tgop)
 	c:RegisterEffect(e2)
 end
-c62613310.linklimitid=62613310+0
+
 --filters
-function c62613310.matfilter(c)
-	return c:IsLinkSetCard(0x6233) and c:IsLinkType(TYPE_EFFECT) and not c:IsLinkType(TYPE_LINK)
+function s.matfilter(c)
+	return c:IsLinkSetCard(ARCHE_NIGHTSHADE) and c:IsLinkType(TYPE_EFFECT) and not c:IsLinkType(TYPE_LINK)
 end
-function c62613310.flagcheck(c)
-	return c:GetFlagEffect(62613310)<=0
+function s.cfilter(c,g)
+	return c:IsSetCard(ARCHE_NIGHTSHADE) and c:IsType(TYPE_SYNCHRO) and g:IsContains(c)
 end
-function c62613310.flagcheck2(c)
-	return c:GetFlagEffect(60613310)<=0 and c:IsType(TYPE_MONSTER) and not c:IsSetCard(0x6233)
-end
-function c62613310.cfilter(c,g)
-	return c:IsFaceup() and c:IsSetCard(0x6233) and c:IsType(TYPE_SYNCHRO)
-		and g:IsContains(c) and not c:IsStatus(STATUS_BATTLE_DESTROYED)
-end
-function c62613310.tgfilter(c)
-	return c:IsSetCard(0x6233) and c:IsAbleToGrave()
+function s.tgfilter(c)
+	return c:IsSetCard(ARCHE_NIGHTSHADE) and c:IsAbleToGrave()
 end
 --zone limit
-function c62613310.limittg(e,c)
-	return c:IsType(TYPE_MONSTER) and not c:IsSetCard(0x6233)
+function s.limfilter(c,tp,g)
+	return g:IsContains(c) and c:IsSummonPlayer(tp) and (c:IsFacedown() or not c:IsSetCard(ARCHE_NIGHTSHADE))
 end
-function c62613310.limitzone(e,c,fp,rp,r)
-	return ~(e:GetHandler():GetLinkedZone())
-end				
---spsummon procs adjustments
-function c62613310.adjustop(e,tp,eg,ep,ev,re,r,rp)
-	local cc=e:GetHandler()
-	local p=cc:GetControler()
-	if not cc:IsLocation(LOCATION_MZONE) or not cc:IsControler(p) then return end
-	local g=Duel.GetMatchingGroup(c62613310.flagcheck,tp,LOCATION_ONFIELD+LOCATION_HAND+LOCATION_GRAVE+LOCATION_EXTRA+LOCATION_REMOVED+LOCATION_OVERLAY+LOCATION_DECK,0,nil)
-	if g:GetCount()<=0 then return end
-	for rc in aux.Next(g) do
-		if rc:GetFlagEffect(62613310)<=0 then
-			rc:RegisterFlagEffect(62613310,RESET_EVENT+EVENT_CUSTOM+62613310,EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SET_AVAILABLE,1)
-			local m=_G["c"..rc:GetOriginalCode()]
-			if not m then return false end
-			local egroup=m.default_call_table
-			if egroup~=nil then
-				for cte=1,#egroup do
-					local ce=egroup[cte]
-					if ce and ce:GetCode()==EFFECT_SPSUMMON_PROC then
-						local val=ce:GetValue()
-						if aux.CheckKaijuProc(ce) then
-							ce:SetValue(function (e,c)
-											if type(val)~='number' then
-												local a1,seq=val(e,c)
-												if c:IsSetCard(0x6233) then
-													return a1,seq
-												else
-													return a1,seq&(~cc:GetLinkedZone(1-c:GetControler()))
-												end
-											else
-												if c:IsSetCard(0x6233) then
-													return val
-												else
-													return val,~cc:GetLinkedZone(1-c:GetControler())
-												end
-											end
-										end
-										)
-						else
-							ce:SetValue(function (e,c)
-											if type(val)~='number' then
-												local a1,seq=val(e,c)
-												if c:IsSetCard(0x6233) then
-													return a1,seq
-												else
-													return a1,seq&(~cc:GetLinkedZone(c:GetControler()))
-												end
-											else
-												if c:IsSetCard(0x6233) then
-													return val
-												else
-													return val,~cc:GetLinkedZone(c:GetControler())
-												end
-											end
-										end
-										)
-						end
-						local reset=Effect.CreateEffect(cc)
-						reset:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-						reset:SetProperty(EFFECT_FLAG_DELAY)
-						reset:SetCode(EVENT_ADJUST)
-						reset:SetLabel(p)
-						reset:SetCountLimit(1)
-						reset:SetCondition(c62613310.resetcostcon)
-						reset:SetOperation(aux.ResetEffectFunc(ce,'value',val))
-						Duel.RegisterEffect(reset,tp)
-						local reset2=reset:Clone()
-						reset2:SetLabelObject(rc)
-						reset2:SetOperation(c62613310.resetflag)
-						Duel.RegisterEffect(reset2,tp)
-					end
-				end
-			end
-		end
+function s.limitcon(e,tp,eg,ep,ev,re,r,rp)
+	return eg:IsExists(s.limfilter,1,nil,tp,e:GetHandler():GetLinkedGroup())
+end
+function s.limitzone(e,tp,eg,ep,ev,re,r,rp)
+	local g=eg:Filter(s.limfilter,nil,tp,e:GetHandler():GetLinkedGroup())
+	if #g>0 then
+		Duel.Hint(HINT_CARD,tp,id)
+		Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_RULE)
 	end
 end
-function c62613310.resetcostcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return not c:IsFaceup() or not c:IsLocation(LOCATION_MZONE) or not c:IsControler(e:GetLabel())
-end
-function c62613310.resetflag(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetLabelObject()
-	if c:GetFlagEffect(62613310)>0 then
-		c:ResetFlagEffect(62613310)
-	end
-	e:Reset()
-end
-function c62613310.handlimitcon(e,tp,eg,ep,ev,re,r,rp)
-	return re:IsHasCategory(CATEGORY_SPECIAL_SUMMON)
-end
-function c62613310.handlimit(e,tp,eg,ep,ev,re,r,rp)
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_UNCOPYABLE)
-	e1:SetCode(EFFECT_MUST_USE_MZONE)
-	e1:SetTargetRange(LOCATION_HAND,0)
-	e1:SetLabel(62613310)
-	e1:SetTarget(c62613310.limittg)
-	e1:SetValue(c62613310.limitzone)
-	e1:SetReset(RESET_CHAIN)
-	Duel.RegisterEffect(e1,tp)
-end
+
 --mill
-function c62613310.tgcost(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.tgcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local lg=e:GetHandler():GetLinkedGroup()
-	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,c62613310.cfilter,1,nil,lg) end
-	local g=Duel.SelectReleaseGroup(REASON_COST,tp,c62613310.cfilter,1,1,nil,lg)
+	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,s.cfilter,1,nil,lg) end
+	local g=Duel.SelectReleaseGroup(REASON_COST,tp,s.cfilter,1,1,nil,lg)
 	Duel.Release(g,REASON_COST)
 end
-function c62613310.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c62613310.tgfilter,tp,LOCATION_DECK,0,1,nil) end
+function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(s.tgfilter,tp,LOCATION_DECK,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
 end
-function c62613310.tgop(e,tp,eg,ep,ev,re,r,rp)
+function s.tgop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=Duel.SelectMatchingCard(tp,c62613310.tgfilter,tp,LOCATION_DECK,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,s.tgfilter,tp,LOCATION_DECK,0,1,1,nil)
 	if g:GetCount()>0 then
 		Duel.SendtoGrave(g,REASON_EFFECT)
 	end

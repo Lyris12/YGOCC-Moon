@@ -7,7 +7,7 @@ function c62613300.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_HAND+LOCATION_GRAVE)
-	e1:SetCountLimit(1,62613300)
+	e1:HOPT()
 	e1:SetCost(c62613300.spcost)
 	e1:SetTarget(c62613300.sptg)
 	e1:SetOperation(c62613300.spop)
@@ -19,7 +19,7 @@ function c62613300.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetProperty(EFFECT_FLAG_DELAY)
 	e2:SetCode(EVENT_BE_MATERIAL)
-	e2:SetCountLimit(1,60613300)
+	e2:HOPT()
 	e2:SetCondition(c62613300.rtcon)
 	e2:SetTarget(c62613300.rttg)
 	e2:SetOperation(c62613300.rtop)
@@ -27,10 +27,10 @@ function c62613300.initial_effect(c)
 end
 --filters
 function c62613300.cfilter(c)
-	return c:IsSetCard(0x6233) and c:IsAbleToRemoveAsCost()
+	return c:IsSetCard(ARCHE_NIGHTSHADE) and c:IsAbleToRemoveAsCost()
 end
 function c62613300.rtfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x6233)
+	return c:IsFaceup() and c:IsSetCard(ARCHE_NIGHTSHADE)
 end
 --spsummon self
 function c62613300.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -42,20 +42,20 @@ function c62613300.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 end
 function c62613300.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
+	local c=e:GetHandler()
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
 end
 function c62613300.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) then 
+	if c:IsRelateToChain() then 
 		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
 --return
 function c62613300.rtcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsLocation(LOCATION_GRAVE) and r==REASON_SYNCHRO
-		and e:GetHandler():GetReasonCard():IsSetCard(0x6233)
+	local c=e:GetHandler()
+	return c:IsLocation(LOCATION_GRAVE) and r==REASON_SYNCHRO and c:GetReasonCard():IsSetCard(ARCHE_NIGHTSHADE)
 end
 function c62613300.rttg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c62613300.rtfilter,tp,LOCATION_REMOVED,0,1,nil) end
