@@ -434,7 +434,7 @@ Duel.SelectTarget=function(actp,func,self,loc1,loc2,cmin,cmax,exc,...)
 end
 Duel.Remove=function(cc,pos,r,...)
 	local x={...}
-	local checkp=#x>0 and x[1] or self_reference_effect:GetHandlerPlayer()
+	local checkp=#x>0 and x[1] or self_reference_effect and current_triggering_player or nil
 	local cc=Group.CreateGroup()+cc
 	local tg=cc:Clone()
 	for c in aux.Next(tg) do
@@ -532,7 +532,7 @@ Card.IsFacedown=function(c)
 end
 Card.IsAbleToRemove=function(c,...)
 	local x={...}
-	local checkp=#x>0 and x[1] or self_reference_effect:GetHandlerPlayer()
+	local checkp=#x>0 and x[1] or self_reference_effect and current_triggering_player or nil
 	local checkpos=#x>1 and x[2] or POS_FACEUP
 	local checkr=#x>2 and x[3] or REASON_EFFECT
 	if c:IsHasEffect(EFFECT_CANNOT_BANISH) then
@@ -557,7 +557,7 @@ end
 Card.IsAbleToRemoveAsCost=function(c,...)
 	local x={...}
 	local checkpos=#x>0 and x[1] or POS_FACEUP
-	local checkp=#x>1 and x[2] or self_reference_effect:GetHandlerPlayer()
+	local checkp=#x>1 and x[2] or self_reference_effect and current_triggering_player or nil
 	
 	if c:IsHasEffect(EFFECT_CANNOT_BANISH_AS_COST) then
 		local ef={c:IsHasEffect(EFFECT_CANNOT_BANISH_AS_COST)}
@@ -580,7 +580,7 @@ Card.IsAbleToRemoveAsCost=function(c,...)
 end
 Card.IsAbleToHand=function(c,...)
 	local x={...}
-	local checkp=#x>0 and x[1] or self_reference_effect:GetHandlerPlayer()
+	local checkp=#x>0 and x[1] or self_reference_effect and current_triggering_player or nil
 	local checkrp=#x>1 and x[2] or x[1]
 	if c:IsHasEffect(EFFECT_CANNOT_ADD_TO_HAND) then
 		local ef={c:IsHasEffect(EFFECT_CANNOT_ADD_TO_HAND)}
@@ -1129,10 +1129,11 @@ Duel.CheckXyzMaterial=function(sc,f,lv,min,max,mg)
 	if mg~=nil then return res end
 	if res then
 		return true
-	else
+	elseif self_reference_effect then
 		local extramats=Duel.GetMatchingGroup(Auxiliary.XyzMaterialComplete,0,0xff,0xff,nil,sc,lv,self_reference_effect:GetHandlerPlayer())
 		return duel_check_xyz_mat(sc,f,lv,min,max,extramats)
 	end
+	return res
 end
 Duel.SelectXyzMaterial=function(p,sc,f,lv,min,max,mg)
 	if mg~=nil then
