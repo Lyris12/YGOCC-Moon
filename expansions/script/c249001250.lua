@@ -1,6 +1,7 @@
 --Neo World's Celestial Miracle
 function c249001250.initial_effect(c)
 	c:EnableCounterPermit(0x54)
+	c:SetUniqueOnField(1,0,249001250)
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)

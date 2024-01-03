@@ -13,12 +13,13 @@ function c249001261.initial_effect(c)
 	c:RegisterEffect(e1)
 	--extra summon
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(10719350,0))
-	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetDescription(1)
+	e2:SetCategory(CATEGORY_SUMMON)
+	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetTargetRange(LOCATION_HAND+LOCATION_MZONE,0)
-	e2:SetCode(EFFECT_EXTRA_SUMMON_COUNT)
-	e2:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x237))
+	e2:SetCountLimit(2)
+	e2:SetTarget(c249001261.sumtg)
+	e2:SetOperation(c249001261.sumop)
 	c:RegisterEffect(e2)
 	--destroy
 	local e3=Effect.CreateEffect(c)
@@ -46,6 +47,21 @@ function c249001261.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DISCARD)
 	local g=Duel.SelectMatchingCard(tp,c249001261.disfilter,tp,LOCATION_HAND,0,2,2,c)
 	Duel.SendtoGrave(g,REASON_COST+REASON_DISCARD)
+end
+function c249001261.filter(c)
+	return c:IsSetCard(0x237) and c:IsType(TYPE_MONSTER) and c:IsSummonable(true,nil)
+end
+function c249001261.sumtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(c249001261.filter,tp,LOCATION_HAND+LOCATION_MZONE,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_SUMMON,nil,1,0,0)
+end
+function c249001261.sumop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SUMMON)
+	local g=Duel.SelectMatchingCard(tp,c249001261.filter,tp,LOCATION_HAND+LOCATION_MZONE,0,1,1,nil)
+	local tc=g:GetFirst()
+	if tc then
+		Duel.Summon(tp,tc,true,nil)
+	end
 end
 function c249001261.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,nil) end

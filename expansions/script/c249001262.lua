@@ -43,7 +43,15 @@ function c249001262.desop(e,tp,eg,ep,ev,re,r,rp)
 		end
 		local atk=tc:GetAttack()
 		if Duel.Destroy(tc,REASON_EFFECT)>0 then
+			Duel.BreakEffect()
 			Duel.Damage(1-tp,math.floor(atk / 2),REASON_EFFECT)
 		end
+	end
+	if Duel.IsExistingMatchingCard(aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) and Duel.SelectYesNo(tp,504) then
+		Duel.BreakEffect()
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+		g=Duel.SelectMatchingCard(tp,aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
+		Duel.HintSelection(g)
+		Duel.SendtoGrave(g,REASON_EFFECT)
 	end
 end

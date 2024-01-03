@@ -1,5 +1,5 @@
 --Heterochromic Rank Enhancer
-xpcall(function() require("expansions/script/bannedlist") end,function() require("script/bannedlist") end)
+Duel.LoadScript("bannedlist.lua")
 function c249000438.initial_effect(c)
 	--summon success
 	local e1=Effect.CreateEffect(c)

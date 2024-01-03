@@ -18,8 +18,9 @@ function s.costfilter(c,tp)
 		and c:IsSetCard(0xe1f)
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.costfilter,tp,LOCATION_HAND+LOCATION_DECK,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.costfilter,tp,LOCATION_HAND+LOCATION_DECK,0,1,nil) and Duel.CheckLPCost(tp,1000) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+	Duel.PayLPCost(tp,1000)
 	local sg=Duel.SelectMatchingCard(tp,s.costfilter,tp,LOCATION_HAND+LOCATION_DECK,0,1,1,nil,tp)
 	e:SetLabel(sg:GetFirst():GetCode())
 	Duel.SendtoGrave(sg,REASON_COST)

@@ -28,11 +28,11 @@ function c249000391.cfilter2(c)
 	return c:IsSetCard(0x231) and (c:IsFaceup() or not c:IsLocation(LOCATION_REMOVED))
 end
 function c249000391.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c249000391.cfilter,tp,LOCATION_HAND,0,1,c) or Duel.IsExistingMatchingCard(c249000391.cfilter2,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,3,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c249000391.cfilter,tp,LOCATION_HAND,0,1,e:GetHandler()) or Duel.IsExistingMatchingCard(c249000391.cfilter2,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,3,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
 	local g1=Duel.GetMatchingGroup(c249000391.cfilter2,tp,LOCATION_GRAVE+LOCATION_REMOVED,0,nil)
 	if g1:GetCount() < 3 then
-		local g=Duel.SelectMatchingCard(tp,c249000391.cfilter,tp,LOCATION_HAND,0,1,1,nil)
+		local g=Duel.SelectMatchingCard(tp,c249000391.cfilter,tp,LOCATION_HAND,0,1,1,e:GetHandler())
 		Duel.ConfirmCards(1-tp,g)
 		Duel.ShuffleHand(tp)
 	end

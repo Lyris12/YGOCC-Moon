@@ -1,5 +1,5 @@
 --Varia-Mage Creation Ritualist
-xpcall(function() require("expansions/script/bannedlist") end,function() require("script/bannedlist") end)
+Duel.LoadScript("bannedlist.lua")
 function c249000525.initial_effect(c)
 	--create
 	local e1=Effect.CreateEffect(c)

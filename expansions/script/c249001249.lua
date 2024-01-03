@@ -77,7 +77,7 @@ function c249001249.getsummoncount(tp)
 	return Duel.GetActivityCount(tp,ACTIVITY_SUMMON)+Duel.GetActivityCount(tp,ACTIVITY_SPSUMMON)
 end
 function c249001249.recon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetOverlayCount()>0 and (e:GetHandler():IsFaceup() or e:GetHanlder():IsLocation(LOCATION_GRAVE)) and not e:GetHandler():IsLocation(LOCATION_DECK+LOCATION_EXTRA)
+	return e:GetHandler():GetOverlayCount()>0 and (e:GetHandler():IsFaceup() or e:GetHandler():IsLocation(LOCATION_GRAVE)) and not e:GetHandler():IsLocation(LOCATION_DECK+LOCATION_EXTRA)
 end
 function c249001249.reop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

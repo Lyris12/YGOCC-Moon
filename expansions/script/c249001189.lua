@@ -36,7 +36,7 @@ function c249001189.initial_effect(c)
 	c:RegisterEffect(e5)
 end
 function c249001189.filter(c)
-	return c:IsSetCard(0x103F) and c:IsAbleToHand() and not c:IsCode(249001189)
+	return c:IsSetCard(0x230) and c:IsAbleToHand() and not c:IsCode(249001189)
 end
 function c249001189.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c249001189.filter,tp,LOCATION_DECK,0,1,nil) end

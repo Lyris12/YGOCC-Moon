@@ -49,7 +49,7 @@ function c249001223.initial_effect(c)
 	local e5=Effect.CreateEffect(c)
 	e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e5:SetCategory(CATEGORY_DESTROY+CATEGORY_REMOVE)
-	e5:SetProperty(EFFECT_FLAG_DELAY)
+	e5:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
 	e5:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e5:SetRange(LOCATION_MZONE)
 	e5:SetCountLimit(1)
@@ -154,9 +154,9 @@ end
 function c249001223.filter1(c,e,tp)
 	return c:GetRank() < 5 and c:GetRank() > 0 and c:IsType(TYPE_XYZ)
 		and aux.MustMaterialCheck(c,tp,EFFECT_MUST_BE_XMATERIAL)
-		and Duel.IsExistingMatchingCard(c249001223.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,c,c:GetRank()*2,c:GetAttribute())
+		and Duel.IsExistingMatchingCard(c249001223.filter3,tp,LOCATION_EXTRA,0,1,nil,e,tp,c,c:GetRank()*2,c:GetAttribute())
 end
-function c249001223.filter2(c,e,tp,mc,rk,att)
+function c249001223.filter3(c,e,tp,mc,rk,att)
 	return c:IsRank(rk) and c:IsAttribute(att) and mc:IsCanBeXyzMaterial(c)
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false) and Duel.GetLocationCountFromEx(tp,tp,mc,c)>0
 end
@@ -174,7 +174,7 @@ function c249001223.spop(e,tp,eg,ep,ev,re,r,rp)
 	if not tc:IsRelateToEffect(e) or tc:IsImmuneToEffect(e) then return end
 	if not aux.MustMaterialCheck(tc,tp,EFFECT_MUST_BE_XMATERIAL) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,c249001223.filter2,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,tc,tc:GetRank()*2,tc:GetAttribute())
+	local g=Duel.SelectMatchingCard(tp,c249001223.filter3,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,tc,tc:GetRank()*2,tc:GetAttribute())
 	local sc=g:GetFirst()
 	if sc then
 		Duel.BreakEffect()

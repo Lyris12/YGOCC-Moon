@@ -1,5 +1,5 @@
 --Heterochromic Mysterious Fuser
-xpcall(function() require("expansions/script/bannedlist") end,function() require("script/bannedlist") end)
+Duel.LoadScript("bannedlist.lua")
 function c249000436.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)

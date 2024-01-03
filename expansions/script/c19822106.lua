@@ -46,7 +46,7 @@ function s.initial_effect(c)
 	e5:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e5:SetTargetRange(0,1)
 	e5:SetCondition(function() return c:GetFlagEffect(id)>0 and Duel.IsExistingMatchingCard(aux.AND(Card.IsFaceup,Card.IsSetCard),e5:GetHandlerPlayer(),LOCATION_MZONE,0,2,nil,0xe1f) end)
-	e5:SetValue(aux.TargetBoolFunction(Effect.IsActiveType,TYPE_MONSTER))
+	e5:SetValue(s.aclimit)
 	c:RegisterEffect(e5)
 end
 function s.filter(c,tp)
@@ -98,4 +98,7 @@ end
 function s.op(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	Duel.Damage(p,d,REASON_EFFECT)
+end
+function s.aclimit(e,re,tp)
+	return re:GetActivateLocation()==LOCATION_GRAVE and re:IsActiveType(TYPE_MONSTER)
 end

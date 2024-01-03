@@ -25,6 +25,16 @@ function c249000862.initial_effect(c)
 	e3:SetRange(LOCATION_HAND)
 	e3:SetCondition(c249000862.spcon)
 	c:RegisterEffect(e3)
+	--destroy when sent to GY
+	local e4=Effect.CreateEffect(c)
+	e4:SetCategory(CATEGORY_DESTROY)
+	e4:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
+	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e4:SetCode(EVENT_TO_GRAVE)
+	e4:SetCondition(c249000862.condition2)
+	e4:SetTarget(c249000862.target2)
+	e4:SetOperation(c249000862.operation2)
+	c:RegisterEffect(e4)
 end
 function c249000862.poscon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler()==Duel.GetAttacker() and e:GetHandler():IsRelateToBattle()
@@ -58,6 +68,21 @@ end
 function c249000862.spcon(e,c)
 	if c==nil then return true end
 	return Duel.GetFieldGroupCount(c:GetControler(),LOCATION_MZONE,0)==0
-		and	Duel.GetFieldGroupCount(c:GetControler(),0,LOCATION_MZONE)>0
 		and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
+end
+function c249000862.condition2(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
+end
+function c249000862.target2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) and chkc:IsFaceup() end
+	if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,0,LOCATION_ONFIELD,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+	local g=Duel.SelectTarget(tp,Card.IsFaceup,tp,0,LOCATION_ONFIELD,1,1,nil)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
+end
+function c249000862.operation2(e,tp,eg,ep,ev,re,r,rp,chk)
+	local tc=Duel.GetFirstTarget()
+	if tc:IsRelateToEffect(e) then
+		Duel.Destroy(tc,REASON_EFFECT)
+	end
 end

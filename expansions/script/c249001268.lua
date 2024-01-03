@@ -35,7 +35,7 @@ function c249001268.filter(c)
 	return c:IsSetCard(0x237) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
 function c249001268.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c249001268.filter,tp,LOCATION_DECK,0,1,nil)
+	if chk==0 then return Duel.IsExistingMatchingCard(aux.NecroValleyFilter(c249001268.filter),tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil)
 		and Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0,nil)<Duel.GetFieldGroupCount(tp,0,LOCATION_MZONE,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
@@ -43,7 +43,7 @@ function c249001268.operation(e,tp,eg,ep,ev,re,r,rp)
 	local ct=Duel.GetFieldGroupCount(tp,0,LOCATION_MZONE,nil)-Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0,nil)
 	if ct<1 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,c249001268.filter,tp,LOCATION_DECK,0,1,ct,nil)
+	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(c249001268.filter),tp,LOCATION_DECK+LOCATION_GRAVE,0,1,ct,nil)
 	if g:GetCount()>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)

@@ -1,5 +1,5 @@
 --Neo-Tempester Data Analyst
-xpcall(function() require("expansions/script/bannedlist") end,function() require("script/bannedlist") end)
+Duel.LoadScript("bannedlist.lua")
 function c249001093.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

@@ -1,5 +1,5 @@
 --Xyz-Gemini Knights
-xpcall(function() require("expansions/script/c115000000") end,function() require("script/c115000000") end)
+Duel.LoadScript("c115000000.lua")
 function c249000368.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)

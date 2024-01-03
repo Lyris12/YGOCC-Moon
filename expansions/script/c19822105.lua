@@ -57,6 +57,13 @@ function s.initial_effect(c)
 	e6:SetTarget(s.tg)
 	e6:SetOperation(s.op)
 	c:RegisterEffect(e6)
+	local e7=Effect.CreateEffect(c)
+	e7:SetType(EFFECT_TYPE_FIELD)
+	e7:SetCode(EFFECT_CANNOT_DISEFFECT)
+	e7:SetRange(LOCATION_MZONE)
+	e7:SetCondition(s.scon)
+	e7:SetValue(s.chainfilter)
+	c:RegisterEffect(e7)
 	if not s.global_check then
 		s.global_check=true
 		if not s.spsum_effects then s.spsum_effects={e4:Clone(),e5:Clone(),e6:Clone()}
@@ -116,4 +123,9 @@ function s.op(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.filter),tp,LOCATION_GRAVE,0,1,1,nil,e:GetLabel())
 	Duel.SendtoHand(g,nil,REASON_EFFECT)
 	Duel.ConfirmCards(1-tp,g)
+end
+function s.chainfilter(e,ct)
+	local p=e:GetHandlerPlayer()
+	local te=Duel.GetChainInfo(ct,CHAININFO_TRIGGERING_EFFECT)
+	return te:GetHandler():IsLocation(LOCATION_MZONE) and te:GetHandler():IsControler(p) and te:GetHandler():IsSetCard(0xe1f)
 end

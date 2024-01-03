@@ -1,5 +1,5 @@
 --Heterochromic Neo Tuner
-xpcall(function() require("expansions/script/bannedlist") end,function() require("script/bannedlist") end)
+Duel.LoadScript("bannedlist.lua")
 function c249000437.initial_effect(c)
 	if aux.AddSynchroProcedure then
 		if not c249000437_AddSynchroProcedure then

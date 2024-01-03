@@ -30,7 +30,7 @@ function c249001121.initial_effect(c)
 	e3:SetOperation(c249001121.thop)
 	c:RegisterEffect(e3)
 end
-c249001121.lvup={249001121}
+c249001121.lvup={249001120}
 c249001121.lvdn={249001120,249001999}
 function c249001121.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToRemoveAsCost,tp,LOCATION_GRAVE,0,2,nil) end
@@ -58,7 +58,7 @@ function c249001121.desop(e,tp,eg,ep,ev,re,r,rp)
 			Duel.Destroy(g1,REASON_EFFECT)
 		else
 			Duel.Hint(HINT_SELECTMSG,tp,0)
-			local ac=Duel.SelectOption(tp,aux.Stringid(249001121,2),aux.Stringid(249001121,3))
+			local ac=Duel.SelectOption(tp,aux.Stringid(99458769,2),aux.Stringid(99458769,3))
 			if ac==0 then Duel.Destroy(g1,REASON_EFFECT)
 			else Duel.Destroy(g2,REASON_EFFECT) end
 		end

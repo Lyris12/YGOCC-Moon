@@ -7,6 +7,7 @@ function s.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCountLimit(1,id)
 	e1:SetCondition(s.condition)
 	e1:SetCost(s.cost)
 	e1:SetTarget(s.target)
@@ -18,6 +19,7 @@ function s.initial_effect(c)
 	e2:SetRange(LOCATION_GRAVE)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetCode(EVENT_FREE_CHAIN)
+	e2:SetCountLimit(1,id)
 	e2:SetCost(aux.bfgcost)
 	e2:SetTarget(s.target2)
 	e2:SetOperation(s.activate2)
@@ -74,6 +76,6 @@ end
 function s.activate2(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
-		tc:RegisterFlagEffect(tc:GetCode(),RESET_EVENT+RESETS_STANDARD+RESET_DISABLE+RESET_PHASE+PHASE_END,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(tc:GetCode(),0))
+		tc:RegisterFlagEffect(tc:GetCode(),RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END-RESET_TOGRAVE-RESET_REMOVE-RESET_LEAVE,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(tc:GetCode(),0))
 	end
 end

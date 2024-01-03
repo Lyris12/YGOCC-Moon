@@ -9,6 +9,15 @@ function c249000867.initial_effect(c)
 	e1:SetTarget(c249000867.target)
 	e1:SetOperation(c249000867.activate)
 	c:RegisterEffect(e1)
+	--destroy replace
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e2:SetCode(EFFECT_DESTROY_REPLACE)
+	e2:SetRange(LOCATION_GRAVE)
+	e2:SetTarget(c249000867.reptg)
+	e2:SetValue(c249000867.repval)
+	e2:SetOperation(c249000867.repop)
+	c:RegisterEffect(e2)
 end
 function c249000867.cfilter(c,tp)
 	return c:IsLocation(LOCATION_ONFIELD) and c:GetControler()==tp
@@ -33,14 +42,28 @@ function c249000867.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.NegateActivation(ev)
 	if re:GetHandler():IsRelateToEffect(re) then
 		if Duel.Destroy(eg,REASON_EFFECT) then
-			if Duel.IsExistingMatchingCard(Card.IsDestructable,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
+			if Duel.IsExistingMatchingCard(aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
 				and Duel.SelectYesNo(tp,aux.Stringid(16037007,1)) then
 				Duel.BreakEffect()
 				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-				local g=Duel.SelectMatchingCard(tp,Card.IsDestructable,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
+				local g=Duel.SelectMatchingCard(tp,aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
 				Duel.HintSelection(g)
 				Duel.Destroy(g,REASON_EFFECT)
 			end
 		end
 	end
+end
+function c249000867.repfilter(c,tp)
+	return c:IsFaceup() and c:IsControler(tp) and c:IsLocation(LOCATION_MZONE) and c:IsSetCard(0x1F9)
+		and c:IsReason(REASON_EFFECT+REASON_BATTLE) and not c:IsReason(REASON_REPLACE)
+end
+function c249000867.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():IsAbleToRemove() and eg:IsExists(c249000867.repfilter,1,nil,tp) end
+	return Duel.SelectEffectYesNo(tp,e:GetHandler(),96)
+end
+function c249000867.repval(e,c)
+	return c249000867.repfilter(c,e:GetHandlerPlayer())
+end
+function c249000867.repop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_EFFECT)
 end

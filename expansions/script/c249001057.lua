@@ -102,17 +102,17 @@ function c249001057.operation(e,tp,eg,ep,ev,re,r,rp)
 		c:RegisterEffect(e4)
 		--cannot negate
 		local e5=Effect.CreateEffect(c)
-		e5:SetType(EFFECT_TYPE_EQUIP)
+		e5:SetType(EFFECT_TYPE_SINGLE)
 		e5:SetCode(EFFECT_CANNOT_DISABLE)
 		e5:SetReset(RESET_EVENT+RESETS_STANDARD)
-		c:RegisterEffect(e5,true)
+		tc:RegisterEffect(e5,true)
 		local e6=Effect.CreateEffect(c)
 		e6:SetType(EFFECT_TYPE_FIELD)
 		e6:SetCode(EFFECT_CANNOT_DISEFFECT)
-		e6:SetRange(LOCATION_SZONE)
+		e6:SetRange(LOCATION_MZONE)
 		e6:SetValue(c249001057.efilter)
 		e6:SetReset(RESET_EVENT+RESETS_STANDARD)
-		c:RegisterEffect(e6,true)
+		tc:RegisterEffect(e6,true)
 	else
 		c:CancelToGrave(false)
 	end
@@ -126,7 +126,10 @@ function c249001057.atkval(e,c)
 end
 function c249001057.efilter(e,ct)
 	local te=Duel.GetChainInfo(ct,CHAININFO_TRIGGERING_EFFECT)
-	return te:GetHandler()==e:GetHandler():GetEquipTarget()
+	return te:GetHandler()==e:GetHandler()
+end
+function c249001057.eftg(e,c)
+	return e:GetHandler():GetEquipTarget()==c
 end
 function c249001057.descon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousPosition(POS_FACEUP)
