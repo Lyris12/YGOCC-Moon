@@ -1,7 +1,7 @@
 --虚拟YouTuber Mirai Akari
 local m=33700344
 local cm=_G["c"..m]
-xpcall(function() require("expansions/script/c37564765") end,function() require("script/c37564765") end)
+Duel.LoadScript("c37564765.lua")
 cm.dfc_front_side=m+1
 function cm.initial_effect(c)
 	aux.AddSynchroMixProcedure(c,aux.TRUE,nil,nil,aux.TRUE,2,63,function(g)

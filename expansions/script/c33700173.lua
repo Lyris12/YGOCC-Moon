@@ -1,5 +1,5 @@
 --动物朋友 九尾狐
-xpcall(function() require("expansions/script/c37564765") end,function() require("script/c37564765") end)
+Duel.LoadScript("c37564765.lua")
 function c33700173.initial_effect(c)
 	Senya.AddSummonSE(c,aux.Stringid(33700173,1))
 	Senya.AddAttackSE(c,aux.Stringid(33700173,2))

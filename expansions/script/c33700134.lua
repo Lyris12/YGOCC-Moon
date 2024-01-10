@@ -1,5 +1,5 @@
 --霓火幻琴
-xpcall(function() require("expansions/script/c37564765") end,function() require("script/c37564765") end)
+Duel.LoadScript("c37564765.lua")
 function c33700134.initial_effect(c)
 	c:EnableReviveLimit()
 	Senya.AddXyzProcedureCustom(c,c33700134.ovfilter,nil,2,2)

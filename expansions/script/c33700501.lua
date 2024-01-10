@@ -3,7 +3,7 @@ local m=33700501
 local cm=_G["c"..m]
 cm.dfc_front_side=m+1
 cm.card_code_list={33700056}
-xpcall(function() require("expansions/script/c37564765") end,function() require("script/c37564765") end)
+Duel.LoadScript("c37564765.lua")
 function cm.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)

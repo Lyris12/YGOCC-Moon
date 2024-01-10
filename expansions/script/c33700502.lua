@@ -3,7 +3,7 @@ local m=33700502
 local cm=_G["c"..m]
 cm.dfc_back_side=m-1
 cm.card_code_list={33700056}
-xpcall(function() require("expansions/script/c37564765") end,function() require("script/c37564765") end)
+Duel.LoadScript("c37564765.lua")
 function cm.initial_effect(c)
 	Senya.DFCBackSideCommonEffect(c)
 	local e1=Effect.CreateEffect(c)

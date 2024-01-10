@@ -1,5 +1,5 @@
 --动物朋友 北之玄武
-xpcall(function() require("expansions/script/c37564765") end,function() require("script/c37564765") end)
+Duel.LoadScript("c37564765.lua")
 function c33700084.initial_effect(c)
 	Senya.AddSummonSE(c,aux.Stringid(33700084,2))
 	Senya.AddAttackSE(c,aux.Stringid(33700084,3))

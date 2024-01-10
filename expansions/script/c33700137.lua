@@ -1,5 +1,5 @@
 --霓火特警
-xpcall(function() require("expansions/script/c37564765") end,function() require("script/c37564765") end)
+Duel.LoadScript("c37564765.lua")
 function c33700137.initial_effect(c)
 	  --synchro summon
 	aux.AddSynchroProcedure2(c,nil,aux.NonTuner(nil))

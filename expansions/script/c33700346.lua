@@ -1,7 +1,7 @@
 --虚拟YouTuber 绊爱
 local m=33700346
 local cm=_G["c"..m]
-xpcall(function() require("expansions/script/c37564765") end,function() require("script/c37564765") end)
+Duel.LoadScript("c37564765.lua")
 function cm.initial_effect(c)
 	aux.AddLinkProcedure(c,aux.FilterBoolFunction(Card.IsAttackBelow,1500),2,63)
 	c:EnableReviveLimit()

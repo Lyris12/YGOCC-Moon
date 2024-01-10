@@ -1,7 +1,7 @@
 local m=77709002
 local cm=_G["c"..m]
 xpcall(function() require("expansions/script/lap") end,function() require("expansions/sekka1217/script/lap") end)
-xpcall(function() require("expansions/script/c37564765") end,function() require("script/c37564765") end)
+Duel.LoadScript("c37564765.lua")
 cm.Sekka_name_with_lap=true
 function cm.initial_effect(c)
     c:EnableReviveLimit()

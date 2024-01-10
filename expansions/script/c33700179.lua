@@ -1,7 +1,7 @@
 --动物朋友 赛马
 local m=33700179
 local cm=_G["c"..m]
-xpcall(function() require("expansions/script/c37564765") end,function() require("script/c37564765") end)
+Duel.LoadScript("c37564765.lua")
 function cm.initial_effect(c)
 	aux.EnablePendulumAttribute(c,false)
 	Senya.AddXyzProcedureCustom(c,aux.FilterBoolFunction(Card.IsSetCard,0x442),function(g) return g:GetClassCount(Card.GetCode)==2 end,2,2)

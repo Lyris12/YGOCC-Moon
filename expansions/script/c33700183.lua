@@ -1,7 +1,7 @@
 --动物朋友 左风狮爷
 local m=33700183
 local cm=_G["c"..m]
-xpcall(function() require("expansions/script/c37564765") end,function() require("script/c37564765") end)
+Duel.LoadScript("c37564765.lua")
 function cm.initial_effect(c)
 	Senya.AddSummonSE(c,aux.Stringid(m,2))
 	--synchro summon

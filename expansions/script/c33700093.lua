@@ -1,5 +1,5 @@
 --动物朋友 土狼
-xpcall(function() require("expansions/script/c37564765") end,function() require("script/c37564765") end)
+Duel.LoadScript("c37564765.lua")
 function c33700093.initial_effect(c)
 	   --tohand
 	local e1=Effect.CreateEffect(c)

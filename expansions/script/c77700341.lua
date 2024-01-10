@@ -1,7 +1,7 @@
 --BB，永久与炫目的月癌
 local m=77700341
 local cm=_G["c"..m]
-xpcall(function() require("expansions/script/c37564765") end,function() require("script/c37564765") end)
+Duel.LoadScript("c37564765.lua")
 function cm.initial_effect(c)
 	--cannot special summon
 	local e1=Effect.CreateEffect(c)

@@ -1,5 +1,5 @@
 --Keep the Faith -Sayuri Remix-
-xpcall(function() require("expansions/script/c37564765") end,function() require("script/c37564765") end)
+Duel.LoadScript("c37564765.lua")
 local m,cm=Senya.SayuriRitualPreload(37564910)
 cm.Senya_name_with_remix=true
 function cm.initial_effect(c)

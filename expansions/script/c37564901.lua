@@ -1,5 +1,5 @@
 --silver forest
-xpcall(function() require("expansions/script/c37564765") end,function() require("script/c37564765") end)
+Duel.LoadScript("c37564765.lua")
 local m,cm=Senya.SayuriSpellPreload(37564901)
 function cm.initial_effect(c)
 	Senya.SayuriSelfReturnCommonEffect(c,m)

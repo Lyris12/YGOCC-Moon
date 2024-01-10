@@ -1,7 +1,7 @@
 --虚拟YouTuber Nekomasu
 local m=33700349
 local cm=_G["c"..m]
-xpcall(function() require("expansions/script/c37564765") end,function() require("script/c37564765") end)
+Duel.LoadScript("c37564765.lua")
 function cm.initial_effect(c)
 	aux.AddLinkProcedure(c,aux.FilterBoolFunction(Card.IsDefenseAbove,2000),2,2)
 	c:EnableReviveLimit()
