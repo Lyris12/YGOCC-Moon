@@ -63,6 +63,7 @@ ARCHE_FAIRCASTER		= 0x4a88
 --
 ARCHE_BOMBER_GOBLIN		= 0x30ac
 ARCHE_CRYSTARION		= 0xc46
+ARCHE_CURSILVER			= 0xc72
 ARCHE_DOOMSDAY_ARTIFICE	= 0x3a6
 ARCHE_DREAMY_FOREST		= 0xd43
 ARCHE_DREARY_FOREST		= 0xd44
@@ -88,7 +89,9 @@ ARCHE_OSCURION			= 0x5a6
 ARCHE_QUARPHEX			= 0x1a4
 ARCHE_SKYBURNER			= 0xf41
 ARCHE_TRAPPIT			= 0x54a
+ARCHE_TRUESILVER		= 0x5e2
 ARCHE_VAISSEAU			= 0x4a8
+ARCHE_VIRAVOLVE			= 0xa67
 ARCHE_WINTER_SPIRIT		= 0xa8d
 ARCHE_ZEROST			= 0x1e4
 
@@ -211,6 +214,7 @@ STRING_ASK_EXCAVATE						=	917
 STRING_ASK_TO_EXTRA						=	918
 STRING_ASK_EXTRA_RELEASE_NONSUM			=	919
 STRING_ASK_ATTACH						=	920
+STRING_ASK_TO_DECK						=	921
 
 STRING_SEND_TO_EXTRA					=	1006
 STRING_BANISH							=	1102
@@ -1046,10 +1050,10 @@ function Card.IsAppropriateEquipSpell(c,ec,tp)
 end
 
 function Card.HasAttack(c)
-	return true
+	return c:IsMonster()
 end
 function Card.HasDefense(c)
-	return not c:IsOriginalType(TYPE_LINK)
+	return c:IsMonster() and not c:IsOriginalType(TYPE_LINK)
 end
 function Card.HasRank(c)
 	return c:IsOriginalType(TYPE_XYZ)
@@ -3476,6 +3480,57 @@ end
 function Auxiliary.VaisseauQECondition(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return Duel.GetTurnPlayer()==1-tp or c:IsSummonType(SUMMON_TYPE_RITUAL)
+end
+
+----VIRAVOLVE
+function Auxiliary.AddViravolveDamageEffect(c,id)
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_SINGLE|EFFECT_TYPE_CONTINUOUS)
+	e2:SetCode(EVENT_TO_GRAVE)
+	e2:SetCondition(
+		function(e,tp,eg,ep,ev,re,r,rp)
+			local c=e:GetHandler()
+			local loc=c:GetPreviousLocation()
+			return c:IsPreviousLocation(LOCATION_ONFIELD|LOCATION_OVERLAY) and r&REASON_LOST_TARGET==0
+		end
+	)
+	e2:SetOperation(
+		function(e,tp,eg,ep,ev,re,r,rp)
+			Duel.Hint(HINT_CARD,0,id)
+			Duel.Damage(1-tp,200,REASON_EFFECT)
+		end
+	)
+	c:RegisterEffect(e2)
+	local e3=e2:Clone()
+	e3:SetCode(EVENT_REMOVE)
+	e3:SetCondition(
+		function(e,tp,eg,ep,ev,re,r,rp)
+			local c=e:GetHandler()
+			local loc=c:GetPreviousLocation()
+			return c:IsPreviousLocation(LOCATION_OVERLAY) and r&REASON_LOST_TARGET==0
+		end
+	)
+	c:RegisterEffect(e3)
+	local e4=e3:Clone()
+	e4:SetCode(EVENT_TO_HAND)
+	c:RegisterEffect(e4)
+	local e5=e3:Clone()
+	e5:SetCode(EVENT_TO_DECK)
+	c:RegisterEffect(e5)
+	local e6=e2:Clone()
+	e6:SetCode(EVENT_MOVE)
+	e6:SetCondition(
+		function(e,tp,eg,ep,ev,re,r,rp)
+			local c=e:GetHandler()
+			local loc=c:GetPreviousLocation()
+			return c:IsPreviousLocation(LOCATION_OVERLAY) and r&REASON_LOST_TARGET==0 and c:IsLocation(LOCATION_SZONE)
+		end
+	)
+	c:RegisterEffect(e6)
+	local e7=e3:Clone()
+	e7:SetCode(EVENT_SPSUMMON_SUCCESS)
+	c:RegisterEffect(e7)
+	return e2,e3,e4,e5,e6,e7
 end
 
 ----WINTER SPIRIT

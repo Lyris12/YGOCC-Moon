@@ -287,20 +287,24 @@ function Auxiliary.RemoveCounterSelfCost(ctype,min,max)
 	end
 end
 function Auxiliary.ToDeckSelfCost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToDeckAsCost() end
-	Duel.SendtoDeck(e:GetHandler(),nil,SEQ_DECKSHUFFLE,REASON_COST)
+	local c=e:GetHandler()
+	if chk==0 then return c:IsAbleToDeckAsCost() end
+	Duel.SendtoDeck(c,nil,SEQ_DECKSHUFFLE,REASON_COST)
 end
 function Auxiliary.ToExtraSelfCost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToExtraAsCost() end
-	Duel.SendtoDeck(e:GetHandler(),nil,SEQ_DECKSHUFFLE,REASON_COST)
+	local c=e:GetHandler()
+	if chk==0 then return c:IsAbleToExtraAsCost() end
+	Duel.SendtoDeck(c,nil,SEQ_DECKSHUFFLE,REASON_COST)
 end
 function Auxiliary.ToGraveSelfCost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end
-	Duel.SendtoGrave(e:GetHandler(),REASON_COST)
+	local c=e:GetHandler()
+	if chk==0 then return c:IsAbleToGraveAsCost() end
+	Duel.SendtoGrave(c,REASON_COST)
 end
 function Auxiliary.TributeSelfCost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsReleasable() end
-	Duel.Release(e:GetHandler(),REASON_COST)
+	local c=e:GetHandler()
+	if chk==0 then return c:IsReleasable() end
+	Duel.Release(c,REASON_COST)
 end
 
 function Auxiliary.TributeForSummonFilter(f,sumtype,sump,ign1,ign2,pos,recp,zone)

@@ -114,6 +114,36 @@ Duel.SendtoGrave = function(tg,reason,...)
 end
 
 -------------------------------------------------------------------------------------
+-------------------------------DETACH MATERIALS--------------------------------------
+local _CardCheckRemoveOverlayCard, _DuelCheckRemoveOverlayCard, _CardRemoveOverlayCard, _DuelRemoveOverlayCard =
+Card.CheckRemoveOverlayCard, Duel.CheckRemoveOverlayCard, Card.RemoveOverlayCard, Duel.RemoveOverlayCard
+
+Card.CheckRemoveOverlayCard = function(c,p,ct,r)
+	aux.RemoveOverlayCard=c
+	local res=_CardCheckRemoveOverlayCard(c,p,ct,r)
+	aux.RemoveOverlayCard=nil
+	return res
+end
+Duel.CheckRemoveOverlayCard = function(p,s,o,ct,r)
+	aux.RemoveOverlayCard={s,o}
+	local res=_DuelCheckRemoveOverlayCard(p,s,o,ct,r)
+	aux.RemoveOverlayCard=nil
+	return res
+end
+Card.RemoveOverlayCard = function(c,p,min,max,r)
+	aux.RemoveOverlayCard=c
+	local res=_CardRemoveOverlayCard(c,p,min,max,r)
+	aux.RemoveOverlayCard=nil
+	return res
+end
+Duel.RemoveOverlayCard = function(p,s,o,min,max,r)
+	aux.RemoveOverlayCard={s,o}
+	local res=_DuelRemoveOverlayCard(p,s,o,min,max,r)
+	aux.RemoveOverlayCard=nil
+	return res
+end
+
+-------------------------------------------------------------------------------------
 -------------------------------PROXY EFFECTS FIX-------------------------------------
 Auxiliary.EffectBeingApplied = nil
 Auxiliary.ProxyEffect = nil
@@ -367,7 +397,9 @@ end
 EVENT_COUNTER_ID = 0
 aux.EventCounter = {}
 EVENT_ID = 0
+MERGED_ID = 1
 aux.MustUpdateEventID = {}
+aux.MergedDelayedEventInfotable = {}
 
 --[[Raises custom event with a compound Event Group containing all cards that raised the specified event at different times during a Chain.
 Handles correct interactions with Trigger Effects whose resolution depends on the specific card that raised the event (eg. Union Hangar)
@@ -383,8 +415,10 @@ check_if_already_in_location	= If a location is specified, the respective AddThi
 operation						= You can invoke a function before raising the custom event. The function must return the Event Value of the custom event.
 simult_check					= You can specify an id for an additional flag that separately keeps track of cards that were simultaneously involved in an instance of the specified event.
 forced							= Raises the custom event even if the final group is empty (required for mandatory Trigger Effects)
+customevgop						= Allows to call a custom function when the cards involved in the local Event Groups are receiving the flag
+								(useful for effects that must keep track of certain properties the cards had in a previous location, see BRAIN Boot Sector)
 ]]
-function Auxiliary.RegisterMergedDelayedEventGlitchy(c,code,event,f,flag,range,evgcheck,check_if_already_in_location,operation,simult_check,forced)
+function Auxiliary.RegisterMergedDelayedEventGlitchy(c,code,event,f,flag,range,evgcheck,check_if_already_in_location,operation,simult_check,forced,customevgop)
 	if type(event)~="table" then event={event} end
 	if not f then f=aux.TRUE end
 	if not flag then flag=c:GetOriginalCode() end
@@ -419,7 +453,7 @@ function Auxiliary.RegisterMergedDelayedEventGlitchy(c,code,event,f,flag,range,e
 			ge1:SetRange(range)
 			ge1:SetLabel(code)
 			ge1:SetLabelObject(g)
-			ge1:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy1(ev,flag,f,range,evgcheck,se,operation,simult_check,forced,EVENT_COUNTER_ID))
+			ge1:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy1(ev,flag,f,range,evgcheck,se,operation,simult_check,forced,customevgop,EVENT_COUNTER_ID))
 			Duel.RegisterEffect(ge1,0)
 		end
 		local ge2=ge1:Clone()
@@ -451,7 +485,7 @@ function Auxiliary.RegisterMergedDelayedEventGlitchy(c,code,event,f,flag,range,e
 				ge1:SetCode(ev)
 				ge1:SetLabel(code)
 				ge1:SetLabelObject(g)
-				ge1:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy1(ev,flag,f,nil,evgcheck,se,operation,simult_check,forced,EVENT_COUNTER_ID))
+				ge1:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy1(ev,flag,f,nil,evgcheck,se,operation,simult_check,forced,customevgop,EVENT_COUNTER_ID))
 				Duel.RegisterEffect(ge1,0)
 			end
 		end
@@ -461,12 +495,26 @@ function Auxiliary.RegisterMergedDelayedEventGlitchy(c,code,event,f,flag,range,e
 			ge2:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy2(flag,nil,evgcheck,se,operation,forced,EVENT_COUNTER_ID))
 			Duel.RegisterEffect(ge2,0)
 		end
+		if simult_check then
+			aux.MustUpdateEventID[c]=false
+			local ge3=Effect.CreateEffect(c)
+			ge3:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
+			ge3:SetCode(EVENT_BREAK_EFFECT)
+			ge3:SetOperation(aux.SignalEventIDUpdate)
+			Duel.RegisterEffect(ge3,0)
+			local ge4=ge3:Clone()
+			ge4:SetCode(EVENT_CHAIN_SOLVED)
+			Duel.RegisterEffect(ge4,0)
+			local ge5=ge3:Clone()
+			ge5:SetCode(EVENT_CHAINING)
+			Duel.RegisterEffect(ge5,0)
+		end
 	end
 end
 function Auxiliary.SignalEventIDUpdate(e,tp,eg,ep,ev,re,r,rp)
 	aux.MustUpdateEventID[e:GetOwner()] = true
 end
-function Auxiliary.MergedDelayEventCheckGlitchy1(event,id,f,range,evgcheck,se,operation,simult_check,forced,eid)
+function Auxiliary.MergedDelayEventCheckGlitchy1(event,id,f,range,evgcheck,se,operation,simult_check,forced,customevgop,eid)
 	return	function(e,tp,eg,ep,ev,re,r,rp)
 				local c=e:GetOwner()
 				local tp=c:GetControler()
@@ -501,6 +549,9 @@ function Auxiliary.MergedDelayEventCheckGlitchy1(event,id,f,range,evgcheck,se,op
 					end
 					if engage_label~=0 then
 						tc:RegisterFlagEffect(flagID,RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET,EFFECT_FLAG_SET_AVAILABLE,1,engage_label)
+					end
+					if customevgop then
+						customevgop(tc,e,tp,eg,ep,ev,re,r,rp,evg)
 					end
 				end
 				if aux.MustUpdateEventID[c]==true then
@@ -547,6 +598,7 @@ function Auxiliary.MergedDelayEventCheckGlitchy1(event,id,f,range,evgcheck,se,op
 								tc:ResetFlagEffect(cid)
 							end
 						end
+						MERGED_ID = MERGED_ID + 1
 					end
 					if type(aux.EventCounter[eid])=="number" then
 						aux.EventCounter[eid]=0
@@ -614,6 +666,7 @@ function Auxiliary.MergedDelayEventCheckGlitchy2(id,range,evgcheck,se,operation,
 								tc:ResetFlagEffect(cid)
 							end
 						end
+						MERGED_ID = MERGED_ID + 1
 					end
 					if type(aux.EventCounter[eid])=="number" then
 						aux.EventCounter[eid]=0
