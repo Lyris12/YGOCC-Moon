@@ -548,11 +548,6 @@ function Auxiliary.BigbangRecursiveFilter(c,tp,sg,mg,fg,bc,gf,ct,min,max,...)
 						end
 						if not aux.BigbangMaterialSelectionStep then
 							res = (Auxiliary.BigbangCheckGoal(tp,sg,fg,bc,gf,ct,...) or (ct<max and mg:IsExists(Auxiliary.BigbangRecursiveFilter,1,sg,tp,sg,mg,fg,bc,gf,ct,min,max,...)))
-							Debug.Message(res)
-							Debug.Message(c:GetCode())
-							--Debug.Message(c:GetBigbangDefense())
-							Debug.Message('---------')
-							
 							if res then
 								e:SetLabel(mcmax)
 								c:ResetFlagEffect(FLAG_BIGBANG_ATTACK)

@@ -12061,7 +12061,7 @@ expansions/script/muse_proc.lua	a66cf99f7a3cfa4630e806d0df693765
 expansions/script/Pastel Palettes Core.lua	d4ea2d75ecc081f5788a68ca84aded6a
 expansions/script/proc_accent.lua	51a6aafcef47a344fd140f7039e17354
 expansions/script/proc_annotee.lua	e417946e2d0ccf02609cfc522570e87f
-expansions/script/proc_bigbang.lua	7388858e4c39a971fb4523f4317fcab6
+expansions/script/proc_bigbang.lua	ddcb52225be95636cea3dfe120715534
 expansions/script/proc_bypath.lua	52c9484b28365833ffab7c760a17227a
 expansions/script/proc_chroma.lua	e10f8331d1565332b41c77ee8138ea05
 expansions/script/proc_conjoin.lua	73b4306e063882fcb59786484763394c
@@ -12166,6 +12166,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	55e732c980fee86967a3eca9067bdd9d
+update/filelist.txt	46493ad168a03e0285beb48c1616a8f9
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	b49332681d7ee3d7aea71088581b1778
+update/version.txt	434998af96f790379ee81c967d196cd3
