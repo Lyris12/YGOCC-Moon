@@ -409,7 +409,8 @@ code 							= The code of the custom event that will be raised. A progressive ID
 event							= The event that must be checked. You can specify multiple events by passing a table
 f								= Filter for the cards that are involved in the "event(s)"
 flag							= Specify the id for the flag effect that is used internally by this function
-range							= If specified, these checks will only be performed while "c" is in the "range". Otherwise, the checks are always performed during the Duel (the latter case applies 							for private-location Trigger Effects)
+range							= If specified, these checks will only be performed while "c" is in the "range". Otherwise, the checks are always performed during the Duel
+								 (the latter case applies for private-location Trigger Effects)
 evgcheck						= You can specify an additional check for the compound Event Group before raising the custom event. If this check is not passed, the custom event is not raised.
 check_if_already_in_location	= If a location is specified, the respective AddThisCardInLocationAlreadyCheck will be performed
 operation						= You can invoke a function before raising the custom event. The function must return the Event Value of the custom event.
