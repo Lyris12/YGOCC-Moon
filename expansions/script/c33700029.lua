@@ -97,9 +97,9 @@ end
 function c33700029.desreptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return not c:IsReason(REASON_REPLACE) and c:IsOnField() and c:IsFaceup()
-		and Duel.CheckReleaseGroup(REASON_COST,tp,c33700029.filter,1,c) end
+		and Duel.CheckReleaseGroup(tp,c33700029.filter,1,c) end
 	if Duel.SelectYesNo(tp,aux.Stringid(33700029,0)) then
-		local g=Duel.SelectReleaseGroup(REASON_COST,tp,c33700029.filter,1,1,c)
+		local g=Duel.SelectReleaseGroup(tp,c33700029.filter,1,1,c)
 		Duel.Release(g,REASON_EFFECT+REASON_REPLACE)
 		return true
 	else return false end
@@ -108,11 +108,11 @@ function c33700029.refilter(c)
 	return  c:IsFaceup() and  c:IsSetCard(0x6440) and c:IsType(TYPE_MONSTER)
 end
 function c33700029.retg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,c33700029.refilter,1,nil) end
+	if chk==0 then return Duel.CheckReleaseGroup(tp,c33700029.refilter,1,nil) end
    Duel.SetOperationInfo(0,CATEGORY_RELEASE,nil,1,tp,LOCATION_MZONE)
 end
 function c33700029.reop(e,tp,eg,ep,ev,re,r,rp)
-	local rg=Duel.SelectReleaseGroup(REASON_COST,tp,c33700029.refilter,1,1,nil)
+	local rg=Duel.SelectReleaseGroup(tp,c33700029.refilter,1,1,nil)
 	if rg:GetCount()>0 and Duel.Release(rg,REASON_EFFECT)>0 then
 	e:GetHandler():RegisterFlagEffect(33700029,RESET_EVENT+0x1fe0000,0,1)
 end

@@ -15,8 +15,8 @@ function c33701075.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x6440)
 end
 function c33701075.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,c33701075.filter,1,nil) or Duel.IsCanRemoveCounter(tp,1,1,0x1021,2,REASON_COST) end
-	local g=Duel.SelectReleaseGroup(REASON_COST,tp,c33701075.filter,1,1,nil)
+	if chk==0 then return Duel.CheckReleaseGroup(tp,c33701075.filter,1,nil) or Duel.IsCanRemoveCounter(tp,1,1,0x1021,2,REASON_COST) end
+	local g=Duel.SelectReleaseGroup(tp,c33701075.filter,1,1,nil)
 	Duel.Release(g,REASON_COST)
 	Duel.RemoveCounter(tp,1,1,0x1021,2,REASON_COST)
 end

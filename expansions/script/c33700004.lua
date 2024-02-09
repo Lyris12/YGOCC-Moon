@@ -67,8 +67,8 @@ function c33700004.costfilter(c,tp)
 	return c:IsControler(tp) and c:IsSetCard(0x6440)
 end
 function c33700004.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,c33700004.costfilter,1,nil,tp) end
-	local g=Duel.SelectReleaseGroup(REASON_COST,tp,c33700004.costfilter,1,1,nil,tp)
+	if chk==0 then return Duel.CheckReleaseGroup(tp,c33700004.costfilter,1,nil,tp) end
+	local g=Duel.SelectReleaseGroup(tp,c33700004.costfilter,1,1,nil,tp)
 	local atk=g:GetFirst():GetAttack()
 	local def=g:GetFirst():GetDefense()
 	if atk>def then

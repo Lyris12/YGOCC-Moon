@@ -41,7 +41,7 @@ function c33700083.ffilter(c,fc,sub,mg,sg)
 end
 function c33700083.spfilter1(c,tp,fc)
 	return c:IsFusionSetCard(0x442) and c:IsSummonableCard()  and c:IsCanBeFusionMaterial(fc)
-		and Duel.CheckReleaseGroup(REASON_COST,tp,c33700083.spfilter2,1,c,fc,c,tp)
+		and Duel.CheckReleaseGroup(tp,c33700083.spfilter2,1,c,fc,c,tp)
 end
 function c33700083.spfilter2(c,fc,mc,tp)
 	return c:IsFusionSetCard(0x442) and c:IsSummonableCard() and c:IsCanBeFusionMaterial(fc) and c:GetCode()~=mc:GetCode() and Duel.GetLocationCountFromEx(tp,tp,Group.FromCards(c,mc),fc)>0
@@ -49,11 +49,11 @@ end
 function c33700083.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	return Duel.CheckReleaseGroup(REASON_COST,tp,c33700083.spfilter1,1,nil,tp,c)
+	return Duel.CheckReleaseGroup(tp,c33700083.spfilter1,1,nil,tp,c)
 end
 function c33700083.spop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g1=Duel.SelectReleaseGroup(REASON_COST,tp,c33700083.spfilter1,1,1,nil,tp,c)
-	local g2=Duel.SelectReleaseGroup(REASON_COST,tp,c33700083.spfilter2,1,1,g1:GetFirst(),c,g1:GetFirst(),tp)
+	local g1=Duel.SelectReleaseGroup(tp,c33700083.spfilter1,1,1,nil,tp,c)
+	local g2=Duel.SelectReleaseGroup(tp,c33700083.spfilter2,1,1,g1:GetFirst(),c,g1:GetFirst(),tp)
 	g1:Merge(g2)
 	c:SetMaterial(g1)
 	Duel.Release(g1,REASON_COST+REASON_FUSION+REASON_MATERIAL)

@@ -75,8 +75,8 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 end
 
 function s.tdcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,Card.IsCode,3,nil,TOKEN_DRAGON_EGG) end
-	local g=Duel.SelectReleaseGroup(REASON_COST,tp,Card.IsCode,3,3,nil,TOKEN_DRAGON_EGG)
+	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsCode,3,nil,TOKEN_DRAGON_EGG) end
+	local g=Duel.SelectReleaseGroup(tp,Card.IsCode,3,3,nil,TOKEN_DRAGON_EGG)
 	Duel.Release(g,REASON_COST)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)

@@ -29,8 +29,8 @@ function cid.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(cid.cfilter,e:GetHandler():GetControler(),LOCATION_GRAVE,0,1,nil)
 end
 function cid.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-    if chk==0 then return Duel.CheckReleaseGroupEx(REASON_COST,tp,Card.IsRace,1,nil,RACE_ZOMBIE) end
-    local g=Duel.SelectReleaseGroupEx(REASON_COST,tp,Card.IsRace,1,1,nil,RACE_ZOMBIE)
+    if chk==0 then return Duel.CheckReleaseGroupEx(tp,Card.IsRace,1,nil,RACE_ZOMBIE) end
+    local g=Duel.SelectReleaseGroupEx(tp,Card.IsRace,1,1,nil,RACE_ZOMBIE)
 	e:SetLabel(g:GetFirst():GetCode())
     Duel.Release(g,REASON_COST)
 end

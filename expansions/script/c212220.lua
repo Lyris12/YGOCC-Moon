@@ -45,8 +45,8 @@ function c212220.cfilter(c,tp)
 	return c:IsSetCard(0x244d) and Duel.GetMZoneCount(tp,c)>0
 end
 function c212220.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,c212220.cfilter,1,nil,tp) end
-	local g=Duel.SelectReleaseGroup(REASON_COST,tp,c212220.cfilter,1,1,nil,tp)
+	if chk==0 then return Duel.CheckReleaseGroup(tp,c212220.cfilter,1,nil,tp) end
+	local g=Duel.SelectReleaseGroup(tp,c212220.cfilter,1,1,nil,tp)
 	Duel.Release(g,REASON_COST)
 end
 function c212220.sptg(e,tp,eg,ep,ev,re,r,rp,chk)

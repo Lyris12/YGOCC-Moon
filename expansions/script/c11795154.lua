@@ -51,8 +51,8 @@ function cid.cfilter(c)
 	return c:IsSetCard(0x684) and not c:IsStatus(STATUS_BATTLE_DESTROYED)
 end
 function cid.ctcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,cid.cfilter,1,e:GetHandler()) end
-	local g=Duel.SelectReleaseGroup(REASON_COST,tp,cid.cfilter,1,1,e:GetHandler())
+	if chk==0 then return Duel.CheckReleaseGroup(tp,cid.cfilter,1,e:GetHandler()) end
+	local g=Duel.SelectReleaseGroup(tp,cid.cfilter,1,1,e:GetHandler())
 	Duel.Release(g,REASON_COST)
 end
 function cid.cttg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

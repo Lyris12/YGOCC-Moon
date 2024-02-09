@@ -59,14 +59,14 @@ function cm.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then
 		if e:GetLabel()==1 then
 			e:SetLabel(0)
-			return Duel.CheckReleaseGroupEx(REASON_COST,tp,cm.costfilter,1,nil,c,tp)
+			return Duel.CheckReleaseGroupEx(tp,cm.costfilter,1,nil,c,tp)
 		else
 			return Duel.IsExistingTarget(aux.TRUE,tp,0,LOCATION_ONFIELD,1,nil)
 		end
 	end
 	if e:GetLabel()==1 then
 		e:SetLabel(0)
-		local sg=Duel.SelectReleaseGroupEx(REASON_COST,tp,cm.costfilter,1,1,nil,c,tp)
+		local sg=Duel.SelectReleaseGroupEx(tp,cm.costfilter,1,1,nil,c,tp)
 		Duel.Release(sg,REASON_COST)
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)

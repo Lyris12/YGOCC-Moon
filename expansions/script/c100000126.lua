@@ -36,7 +36,7 @@ function s.hspfilter(c,tp)
 	return c:IsMonster() and c:IsSetCard(ARCHE_MMS,ARCHE_PHOTON,ARCHE_GALAXY) and (c:IsControler(tp) or c:IsFaceup())
 end
 function s.gcheck(g,tp)
-	return aux.mzctcheck(g,tp) and Duel.CheckReleaseGroupEx(REASON_COST,tp,aux.IsInGroup,#g,nil,g)
+	return aux.mzctcheck(g,tp) and Duel.CheckReleaseGroupEx(tp,aux.IsInGroup,#g,nil,g)
 end
 function s.hspcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetReleaseGroup(tp,true):Filter(s.hspfilter,e:GetHandler(),tp)

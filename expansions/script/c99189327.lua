@@ -64,8 +64,8 @@ end
 --spsummon self
 function cid.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if chk==0 then return ft>-1 and Duel.CheckReleaseGroup(REASON_COST,tp,cid.cfilter,1,nil,ft,tp) end
-	local g=Duel.SelectReleaseGroup(REASON_COST,tp,cid.cfilter,1,1,nil,ft,tp)
+	if chk==0 then return ft>-1 and Duel.CheckReleaseGroup(tp,cid.cfilter,1,nil,ft,tp) end
+	local g=Duel.SelectReleaseGroup(tp,cid.cfilter,1,1,nil,ft,tp)
 	Duel.Release(g,REASON_COST)
 	if Duel.GetCurrentPhase()==PHASE_STANDBY and Duel.GetTurnPlayer()==tp then
 		e:GetHandler():RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN-RESET_TOFIELD,0,2,Duel.GetTurnCount())

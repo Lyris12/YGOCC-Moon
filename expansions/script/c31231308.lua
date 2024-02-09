@@ -74,9 +74,9 @@ end
 --add to hand
 function c31231308.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost()
-		and Duel.CheckReleaseGroup(REASON_COST,tp,Card.IsSetCard,1,nil,0x3233) end
+		and Duel.CheckReleaseGroup(tp,Card.IsSetCard,1,nil,0x3233) end
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
-	local g=Duel.SelectReleaseGroup(REASON_COST,tp,Card.IsSetCard,1,1,nil,0x3233)
+	local g=Duel.SelectReleaseGroup(tp,Card.IsSetCard,1,1,nil,0x3233)
 	Duel.Release(g,REASON_COST)
 end
 function c31231308.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

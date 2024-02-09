@@ -97,8 +97,8 @@ end
 function s.discost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	local lg=c:GetLinkedGroup()
-	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,s.cfilter,1,nil,lg,c) end
-	local rg=Duel.SelectReleaseGroup(REASON_COST,tp,s.cfilter,1,1,nil,lg,c)
+	if chk==0 then return Duel.CheckReleaseGroup(tp,s.cfilter,1,nil,lg,c) end
+	local rg=Duel.SelectReleaseGroup(tp,s.cfilter,1,1,nil,lg,c)
 	Duel.Release(rg,REASON_COST)
 end
 function s.distg(e,tp,eg,ep,ev,re,r,rp,chk)

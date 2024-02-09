@@ -47,11 +47,11 @@ function cid.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		if e:GetLabel()~=100 then return false end
 		e:SetLabel(0)
-		return Duel.CheckReleaseGroupEx(REASON_COST,tp,cid.costfilter,1,nil,tp) and Duel.GetCustomActivityCount(id,tp,ACTIVITY_SPSUMMON)==0
+		return Duel.CheckReleaseGroupEx(tp,cid.costfilter,1,nil,tp) and Duel.GetCustomActivityCount(id,tp,ACTIVITY_SPSUMMON)==0
 	end
 	e:SetLabel(0)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local g=Duel.SelectReleaseGroupEx(REASON_COST,tp,cid.costfilter,1,1,nil,tp)
+	local g=Duel.SelectReleaseGroupEx(tp,cid.costfilter,1,1,nil,tp)
 	if #g>0 then
 		Duel.Release(g,REASON_COST)
 		Duel.SetTargetCard(g)

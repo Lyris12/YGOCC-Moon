@@ -25,8 +25,8 @@ end
 --spsummon
 function c38648107.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if chk==0 then return ft>-1 and Duel.CheckReleaseGroup(REASON_COST,tp,c38648107.cfilter,1,nil,ft,tp) end
-	local g=Duel.SelectReleaseGroup(REASON_COST,tp,c38648107.cfilter,1,1,nil,ft,tp)
+	if chk==0 then return ft>-1 and Duel.CheckReleaseGroup(tp,c38648107.cfilter,1,nil,ft,tp) end
+	local g=Duel.SelectReleaseGroup(tp,c38648107.cfilter,1,1,nil,ft,tp)
 	Duel.Release(g,REASON_COST)
 	local op=Duel.GetOperatedGroup():GetFirst()
 	e:SetLabel(op:GetCode())

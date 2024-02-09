@@ -16,8 +16,8 @@ function cod.filter(c)
 end
 function cod.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-3
-			and Duel.CheckReleaseGroup(REASON_COST,tp,cod.filter,3,nil) end
-	local g=Duel.SelectReleaseGroup(REASON_COST,tp,cod.filter,3,3,nil)
+			and Duel.CheckReleaseGroup(tp,cod.filter,3,nil) end
+	local g=Duel.SelectReleaseGroup(tp,cod.filter,3,3,nil)
     Duel.Release(g,REASON_COST)
 end
 function cod.spfilter(c,e,tp)

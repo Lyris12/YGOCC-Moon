@@ -84,9 +84,9 @@ function s.dtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,0,LOCATION_MZONE,nil)
 	if chk==0 then
 		if not e:IsCostChecked() or #g<=0 then return false end
-		return Duel.CheckReleaseGroup(REASON_COST,tp,s.cfilter3,1,nil)
+		return Duel.CheckReleaseGroup(tp,s.cfilter3,1,nil)
 	end
-	local rg=Duel.SelectReleaseGroup(REASON_COST,tp,s.cfilter3,1,1,nil)
+	local rg=Duel.SelectReleaseGroup(tp,s.cfilter3,1,1,nil)
 	Duel.Release(rg,REASON_COST)
 	local atk=rg:GetFirst():GetTextAttack()
 	e:SetLabel(atk)

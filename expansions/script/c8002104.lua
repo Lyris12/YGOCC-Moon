@@ -64,8 +64,8 @@ function cm.ssop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function cm.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroupEx(REASON_COST,tp,cm.sfilter,1,e:GetHandler()) end
-	local g=Duel.SelectReleaseGroupEx(REASON_COST,tp,cm.sfilter,1,1,e:GetHandler())
+	if chk==0 then return Duel.CheckReleaseGroupEx(tp,cm.sfilter,1,e:GetHandler()) end
+	local g=Duel.SelectReleaseGroupEx(tp,cm.sfilter,1,1,e:GetHandler())
 	Duel.Release(g,REASON_COST)
 end
 function cm.thfilter(c,tp)

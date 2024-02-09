@@ -102,8 +102,8 @@ function s.synfilter(c,e,tp)
 	return c:IsType(TYPE_SYNCHRO) and c:IsSetCard(ARCHE_NIGHTSHADE) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.syncost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,s.cfilter,1,nil,tp) end
-	local g=Duel.SelectReleaseGroup(REASON_COST,tp,s.cfilter,1,1,nil,tp)
+	if chk==0 then return Duel.CheckReleaseGroup(tp,s.cfilter,1,nil,tp) end
+	local g=Duel.SelectReleaseGroup(tp,s.cfilter,1,1,nil,tp)
 	Duel.Release(g,REASON_COST)
 end
 function s.syntg(e,tp,eg,ep,ev,re,r,rp,chk)

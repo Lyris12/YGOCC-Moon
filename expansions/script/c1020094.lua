@@ -70,8 +70,8 @@ function c1020094.atkval(e,c)
 end
 --immunity
 function c1020094.imcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,c1020094.costfilter,1,e:GetHandler()) end
-	local cg=Duel.SelectReleaseGroup(REASON_COST,tp,c1020094.costfilter,1,1,e:GetHandler())
+	if chk==0 then return Duel.CheckReleaseGroup(tp,c1020094.costfilter,1,e:GetHandler()) end
+	local cg=Duel.SelectReleaseGroup(tp,c1020094.costfilter,1,1,e:GetHandler())
 	Duel.Release(cg,REASON_COST)
 end
 function c1020094.imop(e,tp,eg,ep,ev,re,r,rp)

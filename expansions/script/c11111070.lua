@@ -77,7 +77,7 @@ function cid.rlfilter(c, tp)
 	return c:IsSetCard(0x570) and c:IsReleasable()
 end
 function cid.drtg(e, tp, eg, ep, ev, re, r, rp, chk)
-	if chk==0 then return Duel.CheckReleaseGroupEx(REASON_COST,tp, cid.rlfilter, 1, nil)
+	if chk==0 then return Duel.CheckReleaseGroupEx(tp, cid.rlfilter, 1, nil)
 		and Duel.IsPlayerCanDraw(tp, 1) end
 	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(1)
@@ -86,7 +86,7 @@ end
 function cid.drop(e, tp, eg, ep, ev, re, r, rp)
 	local c=e:GetHandler()
 	Duel.Hint(HINT_SELECTMSG, tp, HINTMSG_RELEASE)
-	local g=Duel.SelectReleaseGroupEx(REASON_COST,tp, cid.rlfilter, 1, 1, nil)
+	local g=Duel.SelectReleaseGroupEx(tp, cid.rlfilter, 1, 1, nil)
 	local p, d=Duel.GetChainInfo(0, CHAININFO_TARGET_PLAYER, CHAININFO_TARGET_PARAM)
 	if g:GetCount()==0 then return end
 	if Duel.Release(g, REASON_EFFECT)~=0 then

@@ -57,8 +57,8 @@ function cm.ccondition(e,tp,eg,ep,ev,re,r,rp)
 	return tp~=ep and eg:IsExists(cm.ccfilter,1,nil,1-tp) and Duel.GetCurrentChain()==0
 end
 function cm.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,Card.IsCode,1,nil,28327000) end
-	local g=Duel.SelectReleaseGroup(REASON_COST,tp,Card.IsCode,1,1,nil,28327000)
+	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsCode,1,nil,28327000) end
+	local g=Duel.SelectReleaseGroup(tp,Card.IsCode,1,1,nil,28327000)
 	Duel.Release(g,REASON_COST)
 end
 function cm.ctarget(e,tp,eg,ep,ev,re,r,rp,chk)

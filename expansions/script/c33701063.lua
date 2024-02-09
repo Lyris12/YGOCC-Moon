@@ -37,8 +37,8 @@ function c33701063.cfilter(c)
 	return c:IsFaceup() and c:IsAttribute(ATTRIBUTE_EARTH)
 end
 function c33701063.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroupEx(REASON_COST,tp,c33701063.cfilter,1,nil) end
-	local cg=Duel.SelectReleaseGroupEx(REASON_COST,tp,c33701063.cfilter,1,1,nil)
+	if chk==0 then return Duel.CheckReleaseGroupEx(tp,c33701063.cfilter,1,nil) end
+	local cg=Duel.SelectReleaseGroupEx(tp,c33701063.cfilter,1,1,nil)
 	Duel.Release(cg,REASON_COST)
 end
 function c33701063.sptg(e,tp,eg,ep,ev,re,r,rp,chk)

@@ -32,12 +32,12 @@ function s.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
 	return Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_HAND,0,1,c)
-		and Duel.CheckReleaseGroup(REASON_COST,tp,s.cfilter,1,nil,tp)
+		and Duel.CheckReleaseGroup(tp,s.cfilter,1,nil,tp)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,s.spfilter,tp,LOCATION_HAND,0,1,1,c)
-	local rg=Duel.SelectReleaseGroup(REASON_COST,tp,s.cfilter,1,1,nil)
+	local rg=Duel.SelectReleaseGroup(tp,s.cfilter,1,1,nil)
 	Duel.SendtoGrave(g,REASON_COST)
 	Duel.Release(rg,REASON_COST)
 end

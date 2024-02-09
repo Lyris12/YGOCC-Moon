@@ -102,8 +102,8 @@ function s.rlfilter(c,tp)
 	return c:IsCode(TOKEN_DRAGON_EGG) and Duel.IsExistingTarget(nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,c)
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,s.rlfilter,1,nil,tp) end
-	local g=Duel.SelectReleaseGroup(REASON_COST,tp,s.rlfilter,1,1,nil,tp)
+	if chk==0 then return Duel.CheckReleaseGroup(tp,s.rlfilter,1,nil,tp) end
+	local g=Duel.SelectReleaseGroup(tp,s.rlfilter,1,1,nil,tp)
 	Duel.Release(g,REASON_COST)
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

@@ -31,8 +31,8 @@ function cid.cfilter(c)
 	return c:IsFaceup()  and c:IsRace(RACE_BEASTWARRIOR) and c:IsAttribute(ATTRIBUTE_DARK)
 end
 function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,cid.cfilter,1,nil) end
-	local g=Duel.SelectReleaseGroup(REASON_COST,tp,cid.cfilter,1,1,nil)
+	if chk==0 then return Duel.CheckReleaseGroup(tp,cid.cfilter,1,nil) end
+	local g=Duel.SelectReleaseGroup(tp,cid.cfilter,1,1,nil)
 	Duel.Release(g,REASON_COST)
 end
 function cid.condition1(e,tp,eg,ep,ev,re,r,rp)

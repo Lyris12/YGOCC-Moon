@@ -72,7 +72,7 @@ function cid.spcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function cid.rfilter(c,tp)
 	if not c:IsRace(RACE_ZOMBIE) then return false end
-	return not tp or (c:IsControler(tp) and Duel.CheckReleaseGroup(REASON_COST,tp,cid.rfilter,1,c,false))
+	return not tp or (c:IsControler(tp) and Duel.CheckReleaseGroup(tp,cid.rfilter,1,c,false))
 end
 
 function cid.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -87,7 +87,7 @@ function cid.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 		ge:SetValue(cid.relval)
 		ge:SetReset(RESET_CHAIN)
 		Duel.RegisterEffect(ge,tp)
-		local check=Duel.CheckReleaseGroup(REASON_COST,tp,cid.rfilter,1,nil,tp)
+		local check=Duel.CheckReleaseGroup(tp,cid.rfilter,1,nil,tp)
 		if check then
 			ge:Reset()
 			return true
@@ -107,9 +107,9 @@ function cid.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	ge:SetReset(RESET_CHAIN)
 	Duel.RegisterEffect(ge,tp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local g=Duel.SelectReleaseGroup(REASON_COST,tp,cid.rfilter,1,1,nil,tp)
+	local g=Duel.SelectReleaseGroup(tp,cid.rfilter,1,1,nil,tp)
 	if #g<=0 then ge:Reset() return end
-	local g2=Duel.SelectReleaseGroup(REASON_COST,tp,cid.rfilter,1,1,g,false)
+	local g2=Duel.SelectReleaseGroup(tp,cid.rfilter,1,1,g,false)
 	if #g2<=0 then ge:Reset() return end
 	g:Merge(g2)
 	Duel.Release(g,REASON_COST)

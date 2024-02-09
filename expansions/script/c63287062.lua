@@ -14,10 +14,10 @@ function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		if e:GetLabel()~=1 then return end
 		e:SetLabel(0)
-		return Duel.CheckReleaseGroup(REASON_COST,tp,aux.OR(Card.IsAttack,Card.IsDefense),1,nil,1000)
+		return Duel.CheckReleaseGroup(tp,aux.OR(Card.IsAttack,Card.IsDefense),1,nil,1000)
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local tc=Duel.SelectReleaseGroup(REASON_COST,tp,aux.OR(Card.IsAttack,Card.IsDefense),1,1,nil,1000):GetFirst()
+	local tc=Duel.SelectReleaseGroup(tp,aux.OR(Card.IsAttack,Card.IsDefense),1,1,nil,1000):GetFirst()
 	local d=math.max(tc:GetAttack(),tc:GetDefense())
 	Duel.Release(tc,REASON_COST)
 	Duel.SetTargetParam(d)

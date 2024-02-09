@@ -111,7 +111,7 @@ end
 function s.mzctcheckrel(g,tp)
 	--local gx=g:Filter(Card.IsLocation,nil,LOCATION_SZONE+LOCATION_EXTRA)
 	local gn=g:Filter(aux.NOT(Card.IsLocation),nil,LOCATION_SZONE+LOCATION_EXTRA)
-	return Duel.GetMZoneCount(tp,g)>0 and Duel.CheckReleaseGroup(REASON_COST,tp,Auxiliary.IsInGroup,#gn,nil,gn) 
+	return Duel.GetMZoneCount(tp,g)>0 and Duel.CheckReleaseGroup(tp,Auxiliary.IsInGroup,#gn,nil,gn) 
 end
 function s.sprcon(e,c)
 	if c==nil then return true end

@@ -41,11 +41,11 @@ function s.fselect(g,e,tp)
 		exg:AddCard(e:GetHandler())
 	end
 	return Duel.IsExistingMatchingCard(Card.IsCanOverlay,tp,LOCATION_HAND+LOCATION_GRAVE,0,#g,exg)
-		and Duel.CheckReleaseGroup(REASON_COST,tp,aux.IsInGroup,#g,nil,g)
+		and Duel.CheckReleaseGroup(tp,aux.IsInGroup,#g,nil,g)
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return true end
-	local opt=Duel.CheckReleaseGroup(REASON_COST,tp,s.costfilter,1,nil,e,tp)
+	local opt=Duel.CheckReleaseGroup(tp,s.costfilter,1,nil,e,tp)
 	if opt and Duel.SelectYesNo(tp,aux.Stringid(id,1)) then
 		local rg=Duel.GetReleaseGroup(tp):Filter(s.costfilter,nil,e,tp)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)

@@ -79,8 +79,8 @@ function c33701066.cfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x6440) and c:IsType(TYPE_MONSTER)
 end
 function c33701066.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroupEx(REASON_COST,tp,c33701066.cfilter,1,nil) end
-	local cg=Duel.SelectReleaseGroupEx(REASON_COST,tp,c33701066.cfilter,1,1,nil)
+	if chk==0 then return Duel.CheckReleaseGroupEx(tp,c33701066.cfilter,1,nil) end
+	local cg=Duel.SelectReleaseGroupEx(tp,c33701066.cfilter,1,1,nil)
 	Duel.Release(cg,REASON_COST)
 end
 function c33701066.spfilter(c,e,tp)

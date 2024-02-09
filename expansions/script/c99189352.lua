@@ -30,8 +30,8 @@ function cid.rlfilter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsRace(RACE_WINDBEAST) and c:GetLevel()>0 and c:IsLevelBelow(3)
 end
 function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,cid.rlfilter,1,nil) end
-	local g=Duel.SelectReleaseGroup(REASON_COST,tp,cid.rlfilter,1,1,nil)
+	if chk==0 then return Duel.CheckReleaseGroup(tp,cid.rlfilter,1,nil) end
+	local g=Duel.SelectReleaseGroup(tp,cid.rlfilter,1,1,nil)
 	Duel.Release(g,REASON_COST)
 end
 function cid.activate(e,tp,eg,ep,ev,re,r,rp)

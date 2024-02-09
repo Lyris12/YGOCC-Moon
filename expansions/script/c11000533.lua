@@ -78,10 +78,10 @@ end
 function c11000533.spcon(e,c)
 	if c==nil then return true end
 	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-1
-		and Duel.CheckReleaseGroup(REASON_COST,c:GetControler(),c11000533.rfilter,1,nil)
+		and Duel.CheckReleaseGroup(c:GetControler(),c11000533.rfilter,1,nil)
 end
 function c11000533.spop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.SelectReleaseGroup(REASON_COST,c:GetControler(),c11000533.rfilter,1,1,nil)
+	local g=Duel.SelectReleaseGroup(c:GetControler(),c11000533.rfilter,1,1,nil)
 	if Duel.Release(g,REASON_COST) then
 		Duel.SpecialSummonComplete()
 	end
@@ -90,8 +90,8 @@ function c11000533.cfilter(c,tp)
 	return c:IsSetCard(0x1FD) and (c:IsControler(tp) or c:IsFaceup()) and c:IsType(TYPE_MONSTER)
 end
 function c11000533.hdcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,c11000533.cfilter,1,nil,tp) end
-	local sg=Duel.SelectReleaseGroup(REASON_COST,tp,c11000533.cfilter,1,1,nil,tp)
+	if chk==0 then return Duel.CheckReleaseGroup(tp,c11000533.cfilter,1,nil,tp) end
+	local sg=Duel.SelectReleaseGroup(tp,c11000533.cfilter,1,1,nil,tp)
 	Duel.Release(sg,REASON_COST)
 end
 function c11000533.hdtg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -109,8 +109,8 @@ function c11000533.tdcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
 end
 function c11000533.tdcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,c11000533.cfilter,1,nil,tp) end
-	local sg=Duel.SelectReleaseGroup(REASON_COST,tp,c11000533.cfilter,1,1,nil,tp)
+	if chk==0 then return Duel.CheckReleaseGroup(tp,c11000533.cfilter,1,nil,tp) end
+	local sg=Duel.SelectReleaseGroup(tp,c11000533.cfilter,1,1,nil,tp)
 	Duel.Release(sg,REASON_COST)
 end
 function c11000533.tdtg(e,tp,eg,ep,ev,re,r,rp,chk)

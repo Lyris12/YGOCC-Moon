@@ -30,8 +30,8 @@ function c33710928.matfilter(c)
 	return not c:IsAttribute(ATTRIBUTE_DARK)
 end
 function c33710928.tdcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,Card.IsType,1,nil,TYPE_TOKEN) end
-	local g=Duel.SelectReleaseGroup(REASON_COST,tp,Card.IsType,1,1,nil,TYPE_TOKEN)
+	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsType,1,nil,TYPE_TOKEN) end
+	local g=Duel.SelectReleaseGroup(tp,Card.IsType,1,1,nil,TYPE_TOKEN)
 	Duel.Release(g,REASON_COST)
 end
 function c33710928.tdtg(e,tp,eg,ep,ev,re,r,rp,chk)

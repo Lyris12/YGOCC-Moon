@@ -35,7 +35,7 @@ function s.sppfilter(c)
 	return c:IsReleasable() and c:IsPosition(POS_FACEDOWN_DEFENSE)
 end
 function s.spcheck(g,tp)
-	return Duel.GetMZoneCount(tp,g)>0 and Duel.CheckReleaseGroup(REASON_COST,tp,s.spchkfil,1,nil,g,tp)
+	return Duel.GetMZoneCount(tp,g)>0 and Duel.CheckReleaseGroup(tp,s.spchkfil,1,nil,g,tp)
 end
 function s.spchkfil(c,g,tp)
 	return g:IsContains(c) and c:IsControler(tp)

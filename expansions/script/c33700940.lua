@@ -28,13 +28,13 @@ function cm.con(e,c)
 		return Duel.GetLocationCountFromEx(p,p,rc)>0 and rc:IsSetCard(0x442)
 	end
 	local g=Duel.GetMatchingGroup(f,tp,LOCATION_GRAVE,0,nil)
-	return g:GetClassCount(Card.GetCode)>=15 and Duel.CheckReleaseGroup(REASON_COST,tp,f2,1,nil,tp)
+	return g:GetClassCount(Card.GetCode)>=15 and Duel.CheckReleaseGroup(tp,f2,1,nil,tp)
 end
 function cm.op(e,tp,eg,ep,ev,re,r,rp,c)
 	local f=function(rc,p)
 		return Duel.GetLocationCountFromEx(p,p,rc)>0 and rc:IsSetCard(0x442)
 	end
-	local g=Duel.SelectReleaseGroup(REASON_COST,tp,f,1,1,nil,tp)
+	local g=Duel.SelectReleaseGroup(tp,f,1,1,nil,tp)
 	Duel.Release(g,REASON_COST)
 end
 function cm.ffilter(c,fc,sub,mg,sg)

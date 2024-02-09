@@ -35,8 +35,8 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e5)  
 end
 function cid.cost2(e,tp,eg,ep,ev,re,r,rp,chk)
-		if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,cid.costfilter,1,e:GetHandler()) end
-	local sg=Duel.SelectReleaseGroup(REASON_COST,tp,cid.costfilter,1,1,e:GetHandler())
+		if chk==0 then return Duel.CheckReleaseGroup(tp,cid.costfilter,1,e:GetHandler()) end
+	local sg=Duel.SelectReleaseGroup(tp,cid.costfilter,1,1,e:GetHandler())
 	Duel.Remove(sg,POS_FACEUP,REASON_COST)
 end
 function cid.sumlimit(e,c,sump,sumtype,sumpos,targetp,se)

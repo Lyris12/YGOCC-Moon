@@ -29,10 +29,10 @@ function c33700934.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		if e:GetLabel()~=1 then e:SetLabel(0) return false end
 		e:SetLabel(0)
-		return Duel.CheckReleaseGroup(REASON_COST,tp,c33700934.cfilter,1,nil,tp)
+		return Duel.CheckReleaseGroup(tp,c33700934.cfilter,1,nil,tp)
 	end
 	e:SetLabel(0)
-	local g=Duel.SelectReleaseGroup(REASON_COST,tp,c33700934.cfilter,1,1,nil,tp)
+	local g=Duel.SelectReleaseGroup(tp,c33700934.cfilter,1,1,nil,tp)
 	Duel.Release(g,REASON_COST)
 	e:SetLabelObject(g:GetFirst())
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)

@@ -18,12 +18,12 @@ end
 function c249000636.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return (Duel.IsExistingMatchingCard(c249000636.cfilter,tp,LOCATION_ONFIELD,0,1,nil)
 		and Duel.IsExistingTarget(Card.IsAbleToRemove,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,e:GetHandler()))
-		or (Duel.CheckReleaseGroup(REASON_COST,tp,nil,1,nil) and Duel.IsExistingMatchingCard(c249000636.spfilter,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_EXTRA,0,1,nil,e,tp)) end
+		or (Duel.CheckReleaseGroup(tp,nil,1,nil) and Duel.IsExistingMatchingCard(c249000636.spfilter,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_EXTRA,0,1,nil,e,tp)) end
 	local option
-	if Duel.CheckReleaseGroup(REASON_COST,tp,nil,1,nil) and Duel.IsExistingMatchingCard(c249000636.spfilter,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_EXTRA,0,1,nil,e,tp) then option=0 end
+	if Duel.CheckReleaseGroup(tp,nil,1,nil) and Duel.IsExistingMatchingCard(c249000636.spfilter,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_EXTRA,0,1,nil,e,tp) then option=0 end
 	if (Duel.IsExistingMatchingCard(c249000636.cfilter,tp,LOCATION_ONFIELD,0,1,nil)
 		and Duel.IsExistingTarget(aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,e:GetHandler())) then option=1 end
-	if Duel.CheckReleaseGroup(REASON_COST,tp,nil,1,nil) and Duel.IsExistingMatchingCard(c249000636.spfilter,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_EXTRA,0,1,nil,e,tp) and Duel.IsExistingMatchingCard(c249000636.cfilter,tp,LOCATION_ONFIELD,0,1,nil)
+	if Duel.CheckReleaseGroup(tp,nil,1,nil) and Duel.IsExistingMatchingCard(c249000636.spfilter,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_EXTRA,0,1,nil,e,tp) and Duel.IsExistingMatchingCard(c249000636.cfilter,tp,LOCATION_ONFIELD,0,1,nil)
 		and Duel.IsExistingTarget(aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,e:GetHandler()) then
 		option=Duel.SelectOption(tp,500,503)
 	end
@@ -42,8 +42,8 @@ end
 function c249000636.activate(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetLabel()==0 then
 		local g=Duel.SelectMatchingCard(tp,c249000636.spfilter,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_EXTRA,0,1,1,nil,e,tp)
-		if g:GetCount() < 1 or not Duel.CheckReleaseGroup(REASON_COST,tp,nil,1,nil) then return end
-		local rg=Duel.SelectReleaseGroup(REASON_COST,tp,nil,1,1,nil)
+		if g:GetCount() < 1 or not Duel.CheckReleaseGroup(tp,nil,1,nil) then return end
+		local rg=Duel.SelectReleaseGroup(tp,nil,1,1,nil)
 		Duel.Release(rg,REASON_EFFECT)
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	else

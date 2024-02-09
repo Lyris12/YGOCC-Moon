@@ -47,7 +47,7 @@ function c53313902.rfilter_check(c,sg)
 end
 function c53313902.gcheck(sg,tp)
 	local cg=sg:Filter(Card.IsLocation,nil,LOCATION_MZONE)
-	return Duel.GetMZoneCount(tp,sg)>0 and Duel.CheckReleaseGroup(REASON_COST,tp,Auxiliary.IsInGroup,#cg,nil,cg) and sg:IsExists(c53313902.rfilter_check,1,nil,sg)
+	return Duel.GetMZoneCount(tp,sg)>0 and Duel.CheckReleaseGroup(tp,Auxiliary.IsInGroup,#cg,nil,cg) and sg:IsExists(c53313902.rfilter_check,1,nil,sg)
 end
 function c53313902.sprcon(e,c)
 	if c==nil then return true end

@@ -112,8 +112,8 @@ function cid.costfilter(c)
 	return c:IsSetCard(0x522)
 end
 function cid.actcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,cid.costfilter,1,nil) end
-	local g=Duel.SelectReleaseGroup(REASON_COST,tp,cid.costfilter,1,1,nil)
+	if chk==0 then return Duel.CheckReleaseGroup(tp,cid.costfilter,1,nil) end
+	local g=Duel.SelectReleaseGroup(tp,cid.costfilter,1,1,nil)
 	Duel.Release(g,REASON_COST)
 end
 function cid.acttg(e,tp,eg,ep,ev,re,r,rp,chk)

@@ -30,10 +30,10 @@ function cm.cfilter(c)
 end
 function cm.dspcon(e,c)
 	if c==nil then return true end
-	return Duel.CheckReleaseGroup(REASON_COST,e:GetHandlerPlayer(),cm.cfilter,1,nil)
+	return Duel.CheckReleaseGroup(e:GetHandlerPlayer(),cm.cfilter,1,nil)
 end
 function cm.dspop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.SelectReleaseGroup(REASON_COST,tp,cm.cfilter,1,1,nil)
+	local g=Duel.SelectReleaseGroup(tp,cm.cfilter,1,1,nil)
 	Duel.Release(g,REASON_COST)
 end
 function cm.filter(c)

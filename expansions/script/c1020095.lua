@@ -59,10 +59,10 @@ function c1020095.lkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	--draw check
 	local dts=Duel.GetMatchingGroupCount(c1020095.draws,tp,LOCATION_MZONE,0,e:GetHandler())
 	local cg=Duel.GetMatchingGroup(c1020095.costfilter,tp,LOCATION_MZONE,0,e:GetHandler())
-	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,c1020095.costfilter,1,e:GetHandler()) and dts>1 end
+	if chk==0 then return Duel.CheckReleaseGroup(tp,c1020095.costfilter,1,e:GetHandler()) and dts>1 end
 	local ct
 	if dts>3 then ct=dts else ct=dts-1 end
-	local g=Duel.SelectReleaseGroup(REASON_COST,tp,c1020095.costfilter,1,ct,e:GetHandler())
+	local g=Duel.SelectReleaseGroup(tp,c1020095.costfilter,1,ct,e:GetHandler())
 	if #g>0 then
 		Duel.Release(g,REASON_COST)
 	end

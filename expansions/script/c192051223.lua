@@ -62,8 +62,8 @@ function s.spfilter(c,e,tp,code)
 	return c:IsSetCard(0x617) and c:GetCode()~=code and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,s.cfilter,1,nil,e,tp) end
-	local g=Duel.SelectReleaseGroup(REASON_COST,tp,s.cfilter,1,1,nil,e,tp)
+	if chk==0 then return Duel.CheckReleaseGroup(tp,s.cfilter,1,nil,e,tp) end
+	local g=Duel.SelectReleaseGroup(tp,s.cfilter,1,1,nil,e,tp)
 	e:SetLabel(g:GetFirst():GetCode())
 	Duel.Release(g,REASON_COST)
 end

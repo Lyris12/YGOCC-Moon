@@ -126,10 +126,10 @@ function cid.splimit(e,se,sp,st)
 end
 function cid.hspcon(e,c)
 	if c==nil then return true end
-	return Duel.CheckReleaseGroup(REASON_COST,c:GetControler(),cid.matfilter,1,nil,c:GetControler(),c)
+	return Duel.CheckReleaseGroup(c:GetControler(),cid.matfilter,1,nil,c:GetControler(),c)
 end
 function cid.hspop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.SelectReleaseGroup(REASON_COST,tp,cid.matfilter,1,1,nil,tp,c)
+	local g=Duel.SelectReleaseGroup(tp,cid.matfilter,1,1,nil,tp,c)
 	c:SetMaterial(g)
 	Duel.Release(g,REASON_COST)
 end

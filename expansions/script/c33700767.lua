@@ -40,8 +40,8 @@ function cm.rfilter(c,e)
 	return tfrsv.columntg2(e,c) and Duel.GetMZoneCount(tp,c,tp)>0
 end
 function cm.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,cm.rfilter,1,e:GetHandler(),e) end
-	local g=Duel.SelectReleaseGroup(REASON_COST,tp,cm.rfilter,1,1,e:GetHandler(),e)
+	if chk==0 then return Duel.CheckReleaseGroup(tp,cm.rfilter,1,e:GetHandler(),e) end
+	local g=Duel.SelectReleaseGroup(tp,cm.rfilter,1,1,e:GetHandler(),e)
 	Duel.Release(g,REASON_COST)
 end
 function cm.spfilter(c,e,tp)

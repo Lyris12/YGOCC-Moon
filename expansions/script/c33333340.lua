@@ -32,10 +32,10 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 		local lab=e:GetLabel()
 		if lab~=1 then return false end
 		e:SetLabel(0)
-		return Duel.CheckReleaseGroup(REASON_COST,tp,s.rfilter,1,nil,e,tp)
+		return Duel.CheckReleaseGroup(tp,s.rfilter,1,nil,e,tp)
 	end
 	e:SetLabel(0)
-	local g=Duel.SelectReleaseGroup(REASON_COST,tp,s.rfilter,1,1,nil,e,tp)
+	local g=Duel.SelectReleaseGroup(tp,s.rfilter,1,1,nil,e,tp)
 	if #g>0 then
 		local tc=g:GetFirst()
 		local l1=e:GetLabel()

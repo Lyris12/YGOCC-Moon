@@ -890,10 +890,10 @@ end
 function cm.PrismProcCondition(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	return Duel.CheckReleaseGroup(REASON_COST,tp,cm.PrismProcFilter,1,nil,tp)
+	return Duel.CheckReleaseGroup(tp,cm.PrismProcFilter,1,nil,tp)
 end
 function cm.PrismProcOperation(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.SelectReleaseGroup(REASON_COST,tp,cm.PrismProcFilter,1,1,nil,tp)
+	local g=Duel.SelectReleaseGroup(tp,cm.PrismProcFilter,1,1,nil,tp)
 	Duel.Release(g,REASON_COST)
 end
 --prism xyz multi-count xyz proc

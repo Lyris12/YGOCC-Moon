@@ -47,8 +47,8 @@ function c31157205.repop(e,tp,eg,ep,ev,re,r,rp)
     Duel.SendtoGrave(e:GetHandler(),REASON_EFFECT+REASON_DISCARD)
 end
 function c31157205.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-    if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,Card.IsSetCard,1,nil,0xc70) end
-    local g=Duel.SelectReleaseGroup(REASON_COST,tp,Card.IsSetCard,1,1,nil,0xc70)
+    if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsSetCard,1,nil,0xc70) end
+    local g=Duel.SelectReleaseGroup(tp,Card.IsSetCard,1,1,nil,0xc70)
     Duel.Release(g,REASON_COST)
 end
 function c31157205.spfilter(c,e,tp)

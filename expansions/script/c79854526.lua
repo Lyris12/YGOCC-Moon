@@ -67,8 +67,8 @@ function c79854526.lcostfilter(c)
 	return c:IsFaceup() and c:IsRace(RACE_PLANT) and c:GetEquipCount()>0
 end
 function c79854526.lcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,c79854526.lcostfilter,1,nil) end
-	local g=Duel.SelectReleaseGroup(REASON_COST,tp,c79854526.lcostfilter,1,1,nil)
+	if chk==0 then return Duel.CheckReleaseGroup(tp,c79854526.lcostfilter,1,nil) end
+	local g=Duel.SelectReleaseGroup(tp,c79854526.lcostfilter,1,1,nil)
 	Duel.Release(g,REASON_COST)
 end
 function c79854526.lfilter(c,e,tp)

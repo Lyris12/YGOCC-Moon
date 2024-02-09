@@ -63,8 +63,8 @@ function c33711003.spop2(e, tp, eg, ep, ev, re, r, rp)
 	end
 end
 function c33711003.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,Card.IsCode,1,nil,33711003) end
-	local g=Duel.SelectReleaseGroup(REASON_COST,tp,Card.IsCode,1,1,nil,33711003)
+	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsCode,1,nil,33711003) end
+	local g=Duel.SelectReleaseGroup(tp,Card.IsCode,1,1,nil,33711003)
 	Duel.Release(g,REASON_COST)
 end
 function c33711003.spfilter(c,e,tp)

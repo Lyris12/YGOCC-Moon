@@ -57,8 +57,8 @@ function cm.spop1(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function cm.spcost2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,Card.IsType,1,nil,TYPE_TUNER) end
-	local g=Duel.SelectReleaseGroup(REASON_COST,tp,Card.IsType,1,1,nil,TYPE_TUNER)
+	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsType,1,nil,TYPE_TUNER) end
+	local g=Duel.SelectReleaseGroup(tp,Card.IsType,1,1,nil,TYPE_TUNER)
 	Duel.Release(g,REASON_COST)
 end
 function cm.sptg2(e,tp,eg,ep,ev,re,r,rp,chk)

@@ -27,8 +27,8 @@ function s.filter(c)
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return c:IsReleasable() and Duel.CheckReleaseGroupEx(REASON_COST,tp,Card.IsSetCard,1,e:GetHandler(),0x50b) end
-	local rg=Duel.SelectReleaseGroupEx(REASON_COST,tp,Card.IsSetCard,1,1,e:GetHandler(),0x50b)+c
+	if chk==0 then return c:IsReleasable() and Duel.CheckReleaseGroupEx(tp,Card.IsSetCard,1,e:GetHandler(),0x50b) end
+	local rg=Duel.SelectReleaseGroupEx(tp,Card.IsSetCard,1,1,e:GetHandler(),0x50b)+c
 	Duel.Release(rg,REASON_EFFECT)
 end
 function s.spfilter(c,e,tp)

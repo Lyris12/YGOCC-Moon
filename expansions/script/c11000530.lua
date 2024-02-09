@@ -16,8 +16,8 @@ function c11000530.cfilter(c,tp)
 	return c:IsSetCard(0x1F3) and (c:IsControler(tp) or c:IsFaceup()) and c:IsType(TYPE_MONSTER) and c:IsType(TYPE_XYZ)
 end
 function c11000530.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,c11000530.cfilter,1,nil,tp) end
-	local sg=Duel.SelectReleaseGroup(REASON_COST,tp,c11000530.cfilter,1,1,nil,tp)
+	if chk==0 then return Duel.CheckReleaseGroup(tp,c11000530.cfilter,1,nil,tp) end
+	local sg=Duel.SelectReleaseGroup(tp,c11000530.cfilter,1,1,nil,tp)
 	Duel.Release(sg,REASON_COST)
 end
 function c11000530.filter(c,e,tp)

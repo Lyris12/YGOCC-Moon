@@ -37,9 +37,9 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		if e:GetLabel()~=100 then return false end
 		e:SetLabel(0)
-		return ft>-1 and Duel.CheckReleaseGroup(REASON_COST,tp,s.filter1,1,nil,e,tp,ft)
+		return ft>-1 and Duel.CheckReleaseGroup(tp,s.filter1,1,nil,e,tp,ft)
 	end
-	local rg=Duel.SelectReleaseGroup(REASON_COST,tp,s.filter1,1,1,nil,e,tp,ft)
+	local rg=Duel.SelectReleaseGroup(tp,s.filter1,1,1,nil,e,tp,ft)
 	e:SetLabel(rg:GetFirst():GetLevel())
 	Duel.Release(rg,REASON_COST)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)

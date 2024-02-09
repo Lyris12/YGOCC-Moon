@@ -120,8 +120,8 @@ function cid.costfilter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x522) and (c:IsControler(tp) or c:IsFaceup())
 end
 function cid.negcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(REASON_COST,tp,cid.costfilter,1,nil) end
-	local sg=Duel.SelectReleaseGroup(REASON_COST,tp,cid.costfilter,1,1,nil)
+	if chk==0 then return Duel.CheckReleaseGroup(tp,cid.costfilter,1,nil) end
+	local sg=Duel.SelectReleaseGroup(tp,cid.costfilter,1,1,nil)
 	Duel.Release(sg,REASON_COST)
 end
 function cid.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
