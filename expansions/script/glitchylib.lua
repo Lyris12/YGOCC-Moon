@@ -394,6 +394,14 @@ function Auxiliary.RegisterPreviousCustomSetCard(e,tp,eg,ep,ev,re,r,rp)
 end
 ---------------------------------------------------------------------------------
 -------------------------------DELAYED EVENT-------------------------------------
+
+local _rmde = Auxiliary.RegisterMergedDelayedEvent
+
+Auxiliary.RegisterMergedDelayedEvent = function(c,code,event,g)
+	if c:IsStatus(STATUS_COPYING_EFFECT) then return end
+	return _rmde(c,code,event,g)
+end
+
 EVENT_COUNTER_ID = 0
 aux.EventCounter = {}
 EVENT_ID = 0
@@ -582,7 +590,7 @@ function Auxiliary.MergedDelayEventCheckGlitchy1(event,id,f,range,evgcheck,se,op
 						--Debug.Message("NOCHAIN_FILTERED_COUNT "..tostring(cid)..": "..tostring(#_eg))
 						G:Merge(_eg)
 					end
-					if #G>0 or forced then
+					if g and #g>0 and (#G>0 or forced) then
 						if not evgcheck or evgcheck(G,e,tp,ep,ev,re,r,rp) then
 							--Debug.Message('a')
 							local customev=ev
@@ -647,7 +655,7 @@ function Auxiliary.MergedDelayEventCheckGlitchy2(id,range,evgcheck,se,operation,
 						end
 						G:Merge(_eg)
 					end
-					if #G>0 or forced then
+				    if g and #g>0 and (#G>0 or forced) then
 						--Debug.Message('b')
 						if not evgcheck or evgcheck(G,e,tp,ep,ev,re,r,rp) then
 							local customev=ev

@@ -1340,10 +1340,10 @@ function Auxiliary.CannotBeEDMaterial(c,f,range,isrule,reset,owner,prop,allow_cu
 	if not owner then owner=c end
 	local property = type(prop)=="number" and prop or 0
 	if (isrule == nil or isrule == true) then
-		property = property+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE
+		property = property|EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_UNCOPYABLE
 	end
 	if range ~=nil then
-		property = property+EFFECT_FLAG_SINGLE_RANGE
+		property = property|EFFECT_FLAG_SINGLE_RANGE
 	end
 	local allow_customs = type(allow_customs)=="nil" or allow_customs
 	for _,val in ipairs(Auxiliary.CannotBeEDMatCodes) do
