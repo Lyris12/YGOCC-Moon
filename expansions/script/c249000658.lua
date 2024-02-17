@@ -27,10 +27,10 @@ function c249000658.initial_effect(c)
 end
 
 function c249000658.tfilter(c,tp)
-	return c:IsLocation(LOCATION_MZONE) and c:IsControler(tp) and c:IsFaceup() and (c:IsSetCard(0x1052) or c:IsSetCard(0x2052))
+	return c:IsLocation(LOCATION_MZONE) and c:IsControler(tp) and c:IsFaceup() and (c:IsSetCard(0x3052) or c:IsSetCard(0x5052))
 end
 function c249000658.confilter(c)
-	return c:IsSetCard(0x2052) and not c:IsCode(249000658)
+	return c:IsSetCard(0x5052) and not c:IsCode(249000658)
 end
 function c249000658.negcon(e,tp,eg,ep,ev,re,r,rp)
 	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return false end
@@ -49,7 +49,7 @@ function c249000658.negop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.NegateEffect(ev)
 end
 function c249000658.cfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x2052) and c:IsType(TYPE_MONSTER) and (c:IsFaceup() or c:IsLocation(LOCATION_GRAVE)) and not c:IsCode(249000658)
+	return c:IsFaceup() and c:IsSetCard(0x5052) and c:IsType(TYPE_MONSTER) and (c:IsFaceup() or c:IsLocation(LOCATION_GRAVE)) and not c:IsCode(249000658)
 end
 function c249000658.drcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c249000658.cfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,0,1,nil)
@@ -62,7 +62,7 @@ function c249000658.drop(e,tp,eg,ep,ev,re,r,rp)
 	local ct=Duel.Draw(tp,1,REASON_EFFECT)
 	if ct==0 then return end
 	local dc=Duel.GetOperatedGroup():GetFirst()
-	if dc:IsSetCard(0x2052) and Duel.IsPlayerCanDraw(tp,1)
+	if dc:IsSetCard(0x5052) and Duel.IsPlayerCanDraw(tp,1)
 		and Duel.SelectYesNo(tp,aux.Stringid(69584564,0)) then
 		Duel.BreakEffect()
 		Duel.ConfirmCards(1-tp,dc)

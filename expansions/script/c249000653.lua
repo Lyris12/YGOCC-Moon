@@ -20,49 +20,32 @@ end
 function c249000653.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and c:IsFaceup() then
-		local d=Duel.TossDice(tp,1)
-		if d==3 or d==4 then
-			local e1=Effect.CreateEffect(e:GetHandler())
-			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetCode(EFFECT_UPDATE_ATTACK)
-			e1:SetValue(e:GetHandler():GetBaseAttack())
-			e1:SetReset(RESET_EVENT+0x1ff0000+RESET_PHASE+PHASE_END,2)
-			e:GetHandler():RegisterEffect(e1,true)
-			local e2=Effect.CreateEffect(e:GetHandler())
-			e2:SetType(EFFECT_TYPE_SINGLE)
-			e2:SetCode(EFFECT_CANNOT_DIRECT_ATTACK)
-			e2:SetReset(RESET_EVENT+0x1ff0000+RESET_PHASE+PHASE_END,2)
-			e:GetHandler():RegisterEffect(e2)
-		elseif d==5 or d==6 then
-			local g=Duel.SelectMatchingCard(tp,aux.TRUE,tp,0,LOCATION_MZONE,1,1,nil)
-			local tc=g:GetFirst()
-			if tc and Duel.SendtoGrave(tc,REASON_EFFECT)~=0 then
-				Duel.Damage(1-tp,tc:GetPreviousAttackOnField(),REASON_EFFECT)
+		for i=0,1 do
+			local d=Duel.TossDice(tp,1)
+			if d==3 or d==4 then
+				local e1=Effect.CreateEffect(c)
+				e1:SetType(EFFECT_TYPE_SINGLE)
+				e1:SetCode(EFFECT_UPDATE_ATTACK)
+				e1:SetValue(e:GetHandler():GetBaseAttack())
+				e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_DISABLE+RESET_PHASE+PHASE_END,2)
+				e:GetHandler():RegisterEffect(e1,true)
+				local e2=Effect.CreateEffect(e:GetHandler())
+				e2:SetType(EFFECT_TYPE_SINGLE)
+				e2:SetCode(EFFECT_CANNOT_DIRECT_ATTACK)
+				e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_DISABLE+RESET_PHASE+PHASE_END,2)
+				e:GetHandler():RegisterEffect(e2)
+			elseif d==5 or d==6 then
+				local g=Duel.SelectMatchingCard(tp,aux.TRUE,tp,0,LOCATION_MZONE,1,1,nil)
+				local tc=g:GetFirst()
+				if tc then
+					local atk=tc:GetAttack()
+					if Duel.SendtoGrave(tc,REASON_EFFECT)~=0 then
+						Duel.Damage(1-tp,atk,REASON_EFFECT)
+					end
+				end
+			else
+				Duel.Damage(1-tp,500,REASON_EFFECT)
 			end
-		else
-			Duel.Damage(1-tp,500,REASON_EFFECT)
-		end
-		local d=Duel.TossDice(tp,1)
-		if d==3 or d==4 then
-			local e1=Effect.CreateEffect(e:GetHandler())
-			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetCode(EFFECT_UPDATE_ATTACK)
-			e1:SetValue(e:GetHandler():GetBaseAttack())
-			e1:SetReset(RESET_EVENT+0x1ff0000+RESET_PHASE+PHASE_END,2)
-			e:GetHandler():RegisterEffect(e1,true)
-			local e2=Effect.CreateEffect(e:GetHandler())
-			e2:SetType(EFFECT_TYPE_SINGLE)
-			e2:SetCode(EFFECT_CANNOT_DIRECT_ATTACK)
-			e2:SetReset(RESET_EVENT+0x1ff0000+RESET_PHASE+PHASE_END,2)
-			e:GetHandler():RegisterEffect(e2)
-		elseif d==5 or d==6 then
-			local g=Duel.SelectMatchingCard(tp,aux.TRUE,tp,0,LOCATION_MZONE,1,1,nil)
-			local tc=g:GetFirst()
-			if tc and Duel.SendtoGrave(tc,REASON_EFFECT)~=0 then
-				Duel.Damage(1-tp,tc:GetTextAttack(),REASON_EFFECT)
-			end
-		else
-			Duel.Damage(1-tp,500,REASON_EFFECT)
 		end
 	end
 end

@@ -99,8 +99,11 @@ function c249001269.daop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c249001269.disop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_CARD,0,249001269)
-	Duel.NegateAttack()
+	local at=Duel.GetAttacker()
+	if at:IsControler(1-tp) then
+		Duel.Hint(HINT_CARD,0,249001269)
+		Duel.NegateAttack()
+	end
 end
 function c249001269.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() end

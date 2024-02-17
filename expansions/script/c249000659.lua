@@ -28,10 +28,10 @@ end
 function c249000659.efilter(e,ct)
 	local p=e:GetHandlerPlayer()
 	local te,tp=Duel.GetChainInfo(ct,CHAININFO_TRIGGERING_EFFECT,CHAININFO_TRIGGERING_PLAYER)
-	return p==tp and te:IsHasCategory(CATEGORY_SPECIAL_SUMMON) and te:GetHandler():IsSetCard(0x2052)
+	return p==tp and te:IsHasCategory(CATEGORY_SPECIAL_SUMMON) and te:GetHandler():IsSetCard(0x5052)
 end
 function c249000659.cfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x2052)
+	return c:IsFaceup() and c:IsSetCard(0x5052)
 end
 function c249000659.tdcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c249000659.cfilter,tp,LOCATION_MZONE,0,1,nil)

@@ -1,13 +1,14 @@
 --Mage-Guild Seer
 function c249000893.initial_effect(c)
 	--gain effect
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetCountLimit(1)
-	e2:SetCost(c249000893.cost)
-	e2:SetOperation(c249000893.operation)
-	c:RegisterEffect(e2)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1,2490008931)
+	e1:SetCost(c249000893.cost)
+	e1:SetTarget(c249000893.target)
+	e1:SetOperation(c249000893.operation)
+	c:RegisterEffect(e1)
 end
 function c249000893.costfilter(c)
 	return c:IsSetCard(0x1F9) and c:IsAbleToRemoveAsCost() and c:IsType(TYPE_MONSTER)
@@ -36,6 +37,9 @@ function c249000893.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 		Duel.Remove(g,POS_FACEUP,REASON_COST)
 	end
 end
+function c249000893.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0 end
+end
 function c249000893.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local e3=Effect.CreateEffect(c)
@@ -43,7 +47,7 @@ function c249000893.operation(e,tp,eg,ep,ev,re,r,rp)
 	e3:SetCode(EVENT_ADJUST)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetOperation(c249000893.op)
-	e3:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
+	e3:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 	c:RegisterEffect(e3)
 end
 function c249000893.op(e,tp,eg,ep,ev,re,r,rp)
@@ -57,9 +61,9 @@ function c249000893.op(e,tp,eg,ep,ev,re,r,rp)
 	local e2=Effect.CreateEffect(tc)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_DECK)
-	e2:SetCountLimit(2,249000893)
-	e2:SetReset(RESET_EVENT+RESETS_STANDARD)
-	e2:SetTarget(c249000893.target)
+	e2:SetCountLimit(2,2490008932)
+	e2:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
+	e2:SetTarget(c249000893.target2)
 	e2:SetOperation(c249000893.operation2)
 	tc:RegisterEffect(e2)
 	e:SetLabelObject(e2)
@@ -88,7 +92,7 @@ function c249000893.filter2(c,e,tp,eg,ep,ev,re,r,rp)
 	end
 	return false
 end
-function c249000893.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function c249000893.target2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
 	local c=e:GetHandler()
 	if chk==0 then

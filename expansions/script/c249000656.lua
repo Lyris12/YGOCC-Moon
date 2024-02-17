@@ -36,7 +36,7 @@ function c249000656.tgcon(e)
 	return Duel.GetFieldGroupCount(e:GetHandlerPlayer(),LOCATION_MZONE,0)>1
 end
 function c249000656.searchfilter(c)
-	return c:IsSetCard(0x2052) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
+	return c:IsSetCard(0x5052) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
 function c249000656.starget(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return  Duel.IsExistingMatchingCard(c249000656.searchfilter,tp,LOCATION_DECK,0,1,nil) end
@@ -66,10 +66,10 @@ function c249000656.aclimit(e,re,tp)
 	return re:GetHandler():IsCode(e:GetLabel())
 end
 function c249000656.costfilter(c)
-	return c:IsSetCard(0x2052) and c:IsAbleToRemoveAsCost() and c:IsType(TYPE_MONSTER)
+	return c:IsSetCard(0x5052) and c:IsAbleToRemoveAsCost() and c:IsType(TYPE_MONSTER)
 end
 function c249000656.costfilter2(c,e)
-	return c:IsSetCard(0x2052) and not c:IsPublic() and c:IsType(TYPE_MONSTER)
+	return c:IsSetCard(0x5052) and not c:IsPublic() and c:IsType(TYPE_MONSTER)
 end
 function c249000656.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

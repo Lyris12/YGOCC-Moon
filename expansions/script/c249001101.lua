@@ -37,7 +37,7 @@ end
 function c249001101.chop(e,tp,eg,ep,ev,re,r,rp)
 	if  rp==1-tp or not re:GetOwner():IsSetCard(0x61) or not e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) 
 		or not Duel.IsExistingMatchingCard(c249001101.tributefilter,tp,LOCATION_ONFIELD,0,2,nil)
-		or not Duel.SelectYesNo(tp,2) then return end
+		or not Duel.SelectEffectYesNo(tp,e:GetHandler()) then return end
 		local g=Duel.SelectMatchingCard(tp,c249001101.tributefilter,tp,LOCATION_ONFIELD,0,2,2,nil)
 		Duel.Release(g,REASON_COST)
 		Duel.SpecialSummon(e:GetHandler(),1,tp,tp,false,false,POS_FACEUP)

@@ -50,7 +50,7 @@ function c249000650.regop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetRange(LOCATION_GRAVE)
 		e1:SetTarget(c249000650.drtg)
 		e1:SetOperation(c249000650.drop)
-		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
+		e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 		c:RegisterEffect(e1)
 	end
 end
@@ -80,7 +80,7 @@ function c249000650.operation(e,tp,eg,ep,ev,re,r,rp)
 			e1:SetCode(EVENT_CHAIN_SOLVING)
 			e1:SetRange(LOCATION_MZONE)
 			e1:SetOperation(c249000650.disop)
-			e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
+			e1:SetReset(RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END)
 			tc:RegisterEffect(e1)
 			tc=g:GetNext()
 		end

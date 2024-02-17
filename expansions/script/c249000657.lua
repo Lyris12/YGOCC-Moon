@@ -20,7 +20,7 @@ function c249000657.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c249000657.filter1(c)
-	return c:IsSetCard(0x1052) or c:IsSetCard(0x2052) and c:IsAbleToDeck()
+	return c:IsSetCard(0x3052) or c:IsSetCard(0x5052) and c:IsAbleToDeck()
 end
 function c249000657.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end

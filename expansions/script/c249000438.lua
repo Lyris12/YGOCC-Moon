@@ -97,11 +97,11 @@ function c249000438.operation(e,tp,eg,ep,ev,re,r,rp)
 	local att=tc:GetOriginalAttribute()
 	local rk=tc:GetRank()
 	if tc:IsFacedown() or not tc:IsRelateToEffect(e) or tc:IsControler(1-tp) or tc:IsImmuneToEffect(e) then return end
+	if Duel.SendtoGrave(tc,REASON_EFFECT)==0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local ac=Duel.AnnounceCardFilter(tp,tc:GetOriginalAttribute(),OPCODE_ISATTRIBUTE,TYPE_XYZ,OPCODE_ISTYPE,OPCODE_AND,249000438,OPCODE_ISCODE,OPCODE_OR)
 	local sc=Duel.CreateToken(tp,ac)
 	if sc:IsCode(249000438) then return end
-	if Duel.SendtoGrave(tc,REASON_EFFECT)==0 then return end
 	while not (sc:IsType(TYPE_XYZ) and sc:GetRank() == rk +2 and sc:IsAttribute(att) and sc:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false) and not banned_list_table[ac])
 	do
 		ac=Duel.AnnounceCardFilter(tp,tc:GetOriginalAttribute(),OPCODE_ISATTRIBUTE,TYPE_XYZ,OPCODE_ISTYPE,OPCODE_AND,249000438,OPCODE_ISCODE,OPCODE_OR)

@@ -47,10 +47,10 @@ function c249000655.recop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Recover(tp,ct*400,REASON_EFFECT)
 end
 function c249000655.costfilter(c)
-	return c:IsSetCard(0x2052) and c:IsAbleToRemoveAsCost() and c:IsType(TYPE_MONSTER)
+	return c:IsSetCard(0x5052) and c:IsAbleToRemoveAsCost() and c:IsType(TYPE_MONSTER)
 end
 function c249000655.costfilter2(c,e)
-	return c:IsSetCard(0x2052) and not c:IsPublic() and c:IsType(TYPE_MONSTER)
+	return c:IsSetCard(0x5052) and not c:IsPublic() and c:IsType(TYPE_MONSTER)
 end
 function c249000655.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -75,10 +75,10 @@ function c249000655.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 end
 function c249000655.tgfilter1(c,e,tp)
-	return c:IsType(TYPE_MONSTER) and not c:IsSetCard(0x1052)
+	return c:IsType(TYPE_MONSTER) and not c:IsSetCard(0x3052)
 end
 function c249000655.tgfilter2(c,e,tp,att)
-	return c:IsSetCard(0x1052) and c:IsAttribute(att) and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
+	return c:IsSetCard(0x3052) and c:IsAttribute(att) and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
 end
 function c249000655.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c249000655.tgfilter1,tp,LOCATION_HAND+LOCATION_MZONE,0,1,nil,e,tp) end
@@ -88,7 +88,7 @@ function c249000655.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.SelectMatchingCard(tp,c249000655.tgfilter1,tp,LOCATION_HAND+LOCATION_MZONE,0,1,1,nil,e,tp):GetFirst()
 	if tc and Duel.SendtoGrave(tc,REASON_EFFECT)~=0 then
 		Duel.BreakEffect()
-		local ac=Duel.AnnounceCardFilter(tp,0x1052,OPCODE_ISSETCARD,TYPE_FUSION,OPCODE_ISTYPE,OPCODE_AND)
+		local ac=Duel.AnnounceCardFilter(tp,0x3052,OPCODE_ISSETCARD,TYPE_FUSION,OPCODE_ISTYPE,OPCODE_AND)
 		local sc=Duel.CreateToken(tp,ac)
 		Duel.SendtoDeck(sc,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
 		sc=Duel.SelectMatchingCard(tp,c249000655.tgfilter2,tp,LOCATION_EXTRA,0,1,1,tc,e,tp,tc:GetOriginalAttribute()):GetFirst()
@@ -123,7 +123,7 @@ function c249000655.retop(e,tp,eg,ep,ev,re,r,rp)
 	else Duel.SendtoDeck(e:GetHandler(),nil,0,REASON_EFFECT) end
 end
 function c249000655.repfilter(c,tp)
-	return c:IsFaceup() and c:IsControler(tp) and c:IsLocation(LOCATION_MZONE) and (c:IsSetCard(0x1052) or c:IsSetCard(0x2052))
+	return c:IsFaceup() and c:IsControler(tp) and c:IsLocation(LOCATION_MZONE) and (c:IsSetCard(0x3052) or c:IsSetCard(0x5052))
 		and c:IsReason(REASON_EFFECT+REASON_BATTLE)
 end
 function c249000655.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
