@@ -200,6 +200,7 @@ dofile("expansions/script/tables.lua") --Special Tables
 -- dofile("expansions/script/proc_perdition.lua") --Perditions
 -- dofile("expansions/script/proc_impure.lua") --Impures
 
+dofile("expansions/script/mods_fusion.lua") --Generic Fusion Procedure modifications
 dofile("expansions/script/mods_pendulum.lua") --Generic Pendulum Procedure modifications
 dofile("expansions/script/mods_archetype.lua") --SetCard modifcations for Custom Archetypes
 

@@ -31,14 +31,18 @@ end
 function s.fexfilter(c)
 	return c:IsFaceupEx() and c:IsType(TYPE_MONSTER) and c:IsSetCard(ARCHE_ZEROST) and c:IsCanBeFusionMaterial() and c:IsAbleToDeck()
 end
+function s.fcheckfilter(c,extra_mats,chk)
+	return c:IsLocation(LOCATION_GRAVE|LOCATION_REMOVED) and (not chk or chk~=0 or (not extra_mats or not extra_mats:IsContains(c)))
+		and (not aux.UsedExtraFusionMaterialGroup or not aux.UsedExtraFusionMaterialGroup:IsContains(c))
+end
 function s.frcheck(dc)
-	return	function(tp,sg,fc)
-				return sg:FilterCount(Card.IsLocation,nil,LOCATION_GRAVE|LOCATION_REMOVED)<=dc
+	return	function(tp,sg,fc,original_mats,extra_mats,eset,extra_maxs,chk)
+				return sg:FilterCount(s.fcheckfilter,nil,extra_mats,chk)<=dc
 			end
 end
 function s.gcheck(dc)
 	return	function(sg)
-				return sg:FilterCount(Card.IsLocation,nil,LOCATION_GRAVE|LOCATION_REMOVED)<=dc
+				return sg:FilterCount(s.fcheckfilter,nil)<=dc
 			end
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)

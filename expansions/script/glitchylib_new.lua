@@ -100,10 +100,12 @@ ARCHE_VOIDICTATOR_DEMON		= 0x9c97
 --
 ARCHE_WINTER_SPIRIT		= 0xa8d
 ARCHE_ZEROST			= 0x1e4
+ARCHE_ZEROTL			= 0x1e5
 
 CARD_ANCIENT_PIXIE_DRAGON				= 4179255
 CARD_BLACK_AND_WHITE_WAVE				= 31677606
 CARD_DESPAIR_FROM_THE_DARK				= 71200730
+CARD_EHERO_BLAZEMAN						= 63060238
 CARD_NUMBER_39_UTOPIA					= 84013237
 CARD_ROTA								= 32807846
 CARD_UMI								= 22702055
@@ -1827,13 +1829,17 @@ end
 --Gain Effect
 function Auxiliary.GainEffectType(c,oc,reset)
 	if not oc then oc=c end
-	if not reset then reset=0 end
+	if not reset then
+		reset=RESET_EVENT|RESETS_STANDARD
+	elseif reset&RESET_EVENT==0 then
+		reset=RESET_EVENT|RESETS_STANDARD|reset
+	end
 	if not c:IsType(TYPE_EFFECT) then
 		local e=Effect.CreateEffect(oc)
 		e:SetType(EFFECT_TYPE_SINGLE)
 		e:SetCode(EFFECT_ADD_TYPE)
 		e:SetValue(TYPE_EFFECT)
-		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
+		e:SetReset(reset)
 		c:RegisterEffect(e,true)
 	end
 end
@@ -2579,6 +2585,10 @@ Card.IsRelateToChain = function(c,...)
 			local re=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_EFFECT)
 			return c:IsRelateToEffect(re)
 		end
+		
+	elseif aux.GetValueType(aux.ProxyEffect)=="Effect" then
+		return c:IsRelateToEffect(aux.ProxyEffect)
+		
 	else
 		return _IsRelateToChain(c,...)
 	end
@@ -2634,6 +2644,8 @@ function Duel.SSetAndFastActivation(p,g,e)
 end
 
 --Location Check
+EFFECT_CARD_HAS_RESOLVED = 47987298
+
 function Auxiliary.AddThisCardBanishedAlreadyCheck(c,setf,getf)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE|EFFECT_TYPE_CONTINUOUS)
@@ -2666,6 +2678,12 @@ function Auxiliary.AddThisCardInExtraAlreadyCheck(c,pos,setf,getf)
 	return e1
 end
 function Auxiliary.AddThisCardInFZoneAlreadyCheck(c,setf,getf)
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_SINGLE)
+	e0:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e0:SetRange(LOCATION_FZONE)
+	e0:SetCode(EFFECT_CARD_HAS_RESOLVED)
+	c:RegisterEffect(e0)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE|EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_MOVE)
@@ -2686,6 +2704,12 @@ function Auxiliary.AddThisCardInMZoneAlreadyCheck(c,setf,getf)
 	return e1
 end
 function Auxiliary.AddThisCardInSZoneAlreadyCheck(c,setf,getf)
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_SINGLE)
+	e0:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e0:SetRange(LOCATION_SZONE)
+	e0:SetCode(EFFECT_CARD_HAS_RESOLVED)
+	c:RegisterEffect(e0)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE|EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_MOVE)
@@ -2699,6 +2723,12 @@ function Auxiliary.AddThisCardInSZoneAlreadyCheck(c,setf,getf)
 	return e1
 end
 function Auxiliary.AddThisCardInPZoneAlreadyCheck(c,pos,setf,getf)
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_SINGLE)
+	e0:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e0:SetRange(LOCATION_PZONE)
+	e0:SetCode(EFFECT_CARD_HAS_RESOLVED)
+	c:RegisterEffect(e0)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE|EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_MOVE)
@@ -3601,17 +3631,20 @@ end
 
 ① If this card is in your hand or GY: You can roll a six-sided die, banish other monsters from your field and/or GY equal to the result, and if you do, Special Summon this card, and if you do that, its ATK/DEF become equal to the number of monsters banished by this effect x 400.
 ② If this card is banished by the effect of a "Zerost" card: ...]]
-function Auxiliary.AddZerostMonsterEffects(c,category,property,target,operation)
+function Auxiliary.AddZerostMonsterEffects(c,category,property,target,operation,only_second)
 	if not property then property=0 end
-	local e1=Effect.CreateEffect(c)
-	e1:Desc(0)
-	e1:SetCategory(CATEGORY_DICE|CATEGORY_REMOVE|CATEGORY_SPECIAL_SUMMON)
-	e1:SetType(EFFECT_TYPE_IGNITION)
-	e1:SetRange(LOCATION_HAND|LOCATION_GRAVE)
-	e1:SHOPT()
-	e1:SetTarget(Auxiliary.ZerostFirstMonsterEffectTarget)
-	e1:SetOperation(Auxiliary.ZerostFirstMonsterEffectOperation)
-	c:RegisterEffect(e1)
+	local e1
+	if not only_second then
+		e1=Effect.CreateEffect(c)
+		e1:Desc(0)
+		e1:SetCategory(CATEGORY_DICE|CATEGORY_REMOVE|CATEGORY_SPECIAL_SUMMON)
+		e1:SetType(EFFECT_TYPE_IGNITION)
+		e1:SetRange(LOCATION_HAND|LOCATION_GRAVE)
+		e1:SHOPT()
+		e1:SetTarget(Auxiliary.ZerostFirstMonsterEffectTarget)
+		e1:SetOperation(Auxiliary.ZerostFirstMonsterEffectOperation)
+		c:RegisterEffect(e1)
+	end
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(1)
 	if category then
@@ -3620,7 +3653,11 @@ function Auxiliary.AddZerostMonsterEffects(c,category,property,target,operation)
 	e2:SetType(EFFECT_TYPE_SINGLE|EFFECT_TYPE_TRIGGER_O)
 	e2:SetProperty(EFFECT_FLAG_DELAY|property)
 	e2:SetCode(EVENT_REMOVE)
-	e2:SHOPT()
+	if not only_second then
+		e2:SHOPT()
+	else
+		e2:HOPT()
+	end
 	e2:SetCondition(Auxiliary.ZerostSecondMonsterEffectCondition)
 	e2:SetTarget(target)
 	e2:SetOperation(operation)
