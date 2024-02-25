@@ -66,8 +66,8 @@ function s.initial_effect(c)
 	c:RegisterEffect(e7)
 	if not s.global_check then
 		s.global_check=true
-		if not s.spsum_effects then s.spsum_effects={e4:Clone(),e5:Clone(),e6:Clone()}
-		else table.insert(s.spsum_effects,e4:Clone()) table.insert(s.spsum_effects,e5:Clone()) table.insert(s.spsum_effects,e6:Clone()) end
+		if not s.spsum_effects then s.spsum_effects={e4:Clone(),e5:Clone(),e6:Clone(),e7:Clone()}
+		else table.insert(s.spsum_effects,e4:Clone()) table.insert(s.spsum_effects,e5:Clone()) table.insert(s.spsum_effects,e6:Clone()) table.insert(s.spsum_effects,e7:Clone()) end
 	end
 end
 function s.con(e,tp,eg,ep,ev,re,r,rp)
