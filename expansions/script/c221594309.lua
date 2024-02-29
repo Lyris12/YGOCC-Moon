@@ -10,7 +10,7 @@ function s.initial_effect(c)
 	if not s.progressive_id then
 		s.progressive_id=id
 	else
-		s.progressive_id=s.progressive_id+1
+		s.progressive_id=s.progressive_id+100
 	end
 	--xyz summon
 	c:EnableReviveLimit()

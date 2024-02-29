@@ -16,6 +16,7 @@ CATEGORY_ACTIVATES_ON_NORMAL_SET	= 0x2000
 CATEGORY_UPDATE_ENERGY				= 0x4000
 CATEGORY_CHANGE_ENERGY				= 0x8000
 CATEGORY_RESET_ENERGY				= 0x10000
+CATEGORY_SPSUMMON_RITUAL_MONSTER	= 0x20000
 
 CATEGORIES_ATKDEF			=	CATEGORY_ATKCHANGE|CATEGORY_DEFCHANGE
 CATEGORIES_SEARCH 			= 	CATEGORY_SEARCH|CATEGORY_TOHAND
@@ -97,6 +98,8 @@ ARCHE_VOIDICTATOR			= 0xc97
 ARCHE_VOIDICTATOR_SERVANT	= 0x3c97
 ARCHE_VOIDICTATOR_DEITY		= 0x6c97
 ARCHE_VOIDICTATOR_DEMON		= 0x9c97
+ARCHE_VOIDICTATOR_RUNE		= 0xac97
+ARCHE_VOIDICTATOR_ENERGY	= 0xcc97
 --
 ARCHE_WINTER_SPIRIT		= 0xa8d
 ARCHE_ZEROST			= 0x1e4
@@ -110,40 +113,45 @@ CARD_NUMBER_39_UTOPIA					= 84013237
 CARD_ROTA								= 32807846
 CARD_UMI								= 22702055
 
-CARD_BRAIN_BOOT_SECTOR						= 221812211
-CARD_CHEVALIER_DU_VAISSEAU					= 100000032
-CARD_CRYSTARION_ASCENDANT_PILLAR_OF_COBALT	= 100000152
-CARD_DIABOLICAL_QUARPHEX_LV4				= 100000164
-CARD_DIABOLICAL_QUARPHEX_LV8				= 100000165
-CARD_DIABOLICAL_QUARPHEX_LV12				= 100000166
-CARD_EMISSARY_OF_ARMONY						= 11110642
-CARD_GOLDEN_SKIES_TREASURE					= 11111040
-CARD_GOLDEN_SKIES_TREASURE_OF_WELFARE		= 11111029
-CARD_IN_THE_FOREST_BLACK_AS_MY_MEMORY		= 1
-CARD_KEEPER_OF_ARMONY						= 100000145
-CARD_LIMIERRE								= 19936278
-CARD_LOTUS_BLADE_MIMICRY					= 100000174
-CARD_METALURGOS_CONDUCTION					= 11110608
-CARD_MISTRESS_OF_THE_SKY					= 34847
-CARD_MMS_JACKLYN_ALLTRADES					= 19905907
-CARD_MMS_SHERLOCK_HOLMES					= 19905908
-CARD_MONOCHROME_VALKYRIE_RK4				= 100000167
-CARD_MUSCWOLE_MURDERMANIA					= 70070078
-CARD_OSCURION_TYPE0							= 11110633
-CARD_OSCURION_TYPE2							= 11110634
-CARD_REVERIE_DU_VAISSEAU					= 100000039
-CARD_ROI_DU_VAISSEAU						= 100000035
-CARD_RUM_DREAM_DISTILL_FORCE				= 39518
-CARD_SACRED_EFFIGY_OF_WATER					= 34848
-CARD_SISTERS_OF_HARMONY						= 100000144
-CARD_SPACE_VALKYR							= 11210118
-CARD_STARFORCE_KNIGHT						= 39301
-CARD_THE_EMBODIMENTS_OF_MOVEMENTS			= 34853
-CARD_THE_ORIGIN_OF_DRAGONS					= 20157309
-CARD_VOIDICTATOR_DEMON_GUARDIAN_OF_CORVUS	= 1
-CARD_VOIDICTATOR_RUNE_COURT_OF_THE_VOID		= 1
-CARD_ZERO_HERO_MAGMA_MAN					= 30409
-CARD_ZEROST_BEAST_ZEROTL 					= 100000025
+CARD_BRAIN_BOOT_SECTOR							= 221812211
+CARD_CHEVALIER_DU_VAISSEAU						= 100000032
+CARD_CRYSTARION_ASCENDANT_PILLAR_OF_COBALT		= 100000152
+CARD_DIABOLICAL_QUARPHEX_LV4					= 100000164
+CARD_DIABOLICAL_QUARPHEX_LV8					= 100000165
+CARD_DIABOLICAL_QUARPHEX_LV12					= 100000166
+CARD_EMISSARY_OF_ARMONY							= 11110642
+CARD_GOLDEN_SKIES_TREASURE						= 11111040
+CARD_GOLDEN_SKIES_TREASURE_OF_WELFARE			= 11111029
+CARD_IN_THE_FOREST_BLACK_AS_MY_MEMORY			= 1
+CARD_KEEPER_OF_ARMONY							= 100000145
+CARD_LIMIERRE									= 19936278
+CARD_LOTUS_BLADE_MIMICRY						= 100000174
+CARD_METALURGOS_CONDUCTION						= 11110608
+CARD_MISTRESS_OF_THE_SKY						= 34847
+CARD_MMS_JACKLYN_ALLTRADES						= 19905907
+CARD_MMS_SHERLOCK_HOLMES						= 19905908
+CARD_MONOCHROME_VALKYRIE_RK4					= 100000167
+CARD_MUSCWOLE_MURDERMANIA						= 70070078
+CARD_OSCURION_TYPE0								= 11110633
+CARD_OSCURION_TYPE2								= 11110634
+CARD_REVERIE_DU_VAISSEAU						= 100000039
+CARD_ROI_DU_VAISSEAU							= 100000035
+CARD_RUM_DREAM_DISTILL_FORCE					= 39518
+CARD_SACRED_EFFIGY_OF_WATER						= 34848
+CARD_SISTERS_OF_HARMONY							= 100000144
+CARD_SPACE_VALKYR								= 11210118
+CARD_STARFORCE_KNIGHT							= 39301
+CARD_THE_EMBODIMENTS_OF_MOVEMENTS				= 34853
+CARD_THE_ORIGIN_OF_DRAGONS						= 20157309
+CARD_VOIDICTATOR_DEITY_NEMESIS					= 221594312
+CARD_VOIDICTATOR_DEMON_GUARDIAN_OF_CORVUS		= 221594314
+CARD_VOIDICTATOR_DEMON_THE_UNENDING_FLAME		= 221594309
+CARD_VOIDICTATOR_RUNE_COURT_OF_THE_VOID			= 221594332
+CARD_VOIDICTATOR_RUNE_GATES_OF_PERDITION		= 221594326
+CARD_VOIDICTATOR_SERVANT_GATE_ARCHITECT			= 221594302
+CARD_VOIDICTATOR_SERVANT_GATE_SORCERESS			= 221594303
+CARD_ZERO_HERO_MAGMA_MAN						= 30409
+CARD_ZEROST_BEAST_ZEROTL 						= 100000025
 
 TOKEN_CRYSTRON							= 55326323
 TOKEN_DAYLILLY							= 41251200
@@ -237,6 +245,7 @@ STRING_PLACE_IN_PZONE					=	1160
 STRING_ADD_TO_HAND						=	1190
 STRING_SEND_TO_GY						=	1191
 STRING_SET								=	1153
+STRING_SEND_TO_DECK						=	1193
 
 STRING_INPUT_ENERGY						=	2000
 STRING_INPUT_LEVEL						=	2001
@@ -965,7 +974,7 @@ function Duel.Bounce(g)
 	return ct,#cg,cg
 end
 
-function Duel.ShuffleIntoDeck(g,p,loc,seq,r)
+function Duel.ShuffleIntoDeck(g,p,loc,seq,r,f)
 	if not loc then loc=LOCATION_DECK|LOCATION_EXTRA end
 	if not seq then seq=SEQ_DECKSHUFFLE end
 	if not r then r=REASON_EFFECT end
@@ -974,10 +983,14 @@ function Duel.ShuffleIntoDeck(g,p,loc,seq,r)
 		if seq==SEQ_DECKSHUFFLE then
 			aux.AfterShuffle(g)
 		end
-		if aux.GetValueType(g)=="Card" and aux.PLChk(g,p,loc) then
+		if aux.GetValueType(g)=="Card" and aux.PLChk(g,p,loc) and (not f or f(g)) then
 			return 1
 		elseif aux.GetValueType(g)=="Group" then
-			return g:FilterCount(aux.PLChk,nil,p,loc)
+			local sg=g:Filter(aux.PLChk,nil,p,loc)
+			if f then
+				sg=sg:Filter(f,nil,sg)
+			end
+			return #sg
 		end
 	end
 	return 0
@@ -1014,6 +1027,11 @@ function Auxiliary.AfterShuffle(g)
 			Duel.ShuffleDeck(p)
 		end
 	end
+end
+function Auxiliary.BecauseOfThisEffect(e)
+	return	function(c)
+				return c:IsReason(REASON_EFFECT) and not c:IsReason(REASON_REDIRECT) and c:GetReasonEffect()==e
+			end
 end
 
 --Battle Phase
@@ -1670,6 +1688,62 @@ function Group.CheckSameProperty(g,f,...)
 	return true, chk
 end
 
+function Auxiliary.SelectUnselectLoop(c,sg,mg,e,tp,minc,maxc,rescon)
+	local res=not rescon
+	if #sg>=maxc then return false end
+	sg:AddCard(c)
+	if rescon then
+		local stop
+		res,stop=rescon(sg,e,tp,mg,c)
+		if stop then
+			sg:RemoveCard(c)
+			return false
+		end
+	end
+	if #sg<minc then
+		res=mg:IsExists(Auxiliary.SelectUnselectLoop,1,sg,sg,mg,e,tp,minc,maxc,rescon)
+	elseif #sg<maxc and not res then
+		res=mg:IsExists(Auxiliary.SelectUnselectLoop,1,sg,sg,mg,e,tp,minc,maxc,rescon)
+	end
+	sg:RemoveCard(c)
+	return res
+end
+function Auxiliary.SelectUnselectGroup(g,e,tp,minc,maxc,rescon,chk,seltp,hintmsg,finishcon,breakcon,cancelable)
+	local minc=minc or 1
+	local maxc=maxc or #g
+	if chk==0 then
+		if #g<minc then return false end
+		local eg=g:Clone()
+		for c in aux.Next(g) do
+			if Auxiliary.SelectUnselectLoop(c,Group.CreateGroup(),eg,e,tp,minc,maxc,rescon) then return true end
+			eg:RemoveCard(c)
+		end
+		return false
+	end
+	local hintmsg=hintmsg or 0
+	local sg=Group.CreateGroup()
+	while true do
+		local finishable = #sg>=minc and (not finishcon or finishcon(sg,e,tp,g))
+		local mg=g:Filter(Auxiliary.SelectUnselectLoop,sg,sg,g,e,tp,minc,maxc,rescon)
+		if (breakcon and breakcon(sg,e,tp,mg)) or #mg<=0 or #sg>=maxc then break end
+		Duel.Hint(HINT_SELECTMSG,seltp,hintmsg)
+		local tc=mg:SelectUnselect(sg,seltp,finishable,finishable or (cancelable and #sg==0),minc,maxc)
+		if not tc then break end
+		if sg:IsContains(tc) then
+			sg:RemoveCard(tc)
+		else
+			sg:AddCard(tc)
+		end
+	end
+	return sg
+end
+--check for Free Monster Zones
+function Auxiliary.ChkfMMZ(sumcount)
+	return	function(sg,e,tp,mg)
+				return Duel.GetMZoneCount(tp,sg)>=sumcount
+			end
+end
+
 --Excavate
 function Duel.IsPlayerCanExcavateAndSpecialSummon(tp)
 	return Duel.IsPlayerCanSpecialSummon(tp) and not Duel.IsPlayerAffectedByEffect(tp,CARD_EHERO_BLAZEMAN)
@@ -2215,8 +2289,12 @@ end
 function Duel.GetExtraDeckCount(p)
 	return Duel.GetFieldGroupCount(p,LOCATION_EXTRA,0)
 end
-function Duel.GetPendulums(p)
-	return Duel.GetFieldGroup(p,LOCATION_PZONE,0)
+function Duel.GetPendulums(p,c)
+	if c then
+		return Duel.GetFieldGroup(p,LOCATION_PZONE,0):Filter(aux.TRUE,c):GetFirst()
+	else
+		return Duel.GetFieldGroup(p,LOCATION_PZONE,0)
+	end
 end
 function Duel.GetPendulumsCount(p)
 	return Duel.GetFieldGroupCount(p,LOCATION_PZONE,0)

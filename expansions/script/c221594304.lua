@@ -1,66 +1,108 @@
---created by Walrus, coded by Lyris
---Voidictator Servant - Rune Artist
-local s,id,o=GetID()
+--[[
+Voidictator Servant - Rune Artist
+Servitore dei Vuotodespoti - Artista di Rune
+Card Author: Walrus
+Scripted by: XGlitchy30
+]]
+
+local s,id=GetID()
 function s.initial_effect(c)
-	aux.CannotBeEDMaterial(c,aux.FALSE,LOCATION_MZONE)
+	--This card cannot be used as a material for the Summon of a monster from the Extra Deck while it is on the field.
+	aux.CannotBeEDMaterial(c,nil,LOCATION_ONFIELD,true)
+	--[[You can send this card from your hand or field to the GY; add 1 "Voidictator Rune" Spell/Trap from your Deck or GY to your hand,
+	then if this card was sent from the field to the GY to activate this effect, you can banish 1 Spell/Trap your opponent controls.]]
 	local e1=Effect.CreateEffect(c)
+	e1:Desc(0)
+	e1:SetCategory(CATEGORIES_SEARCH)
 	e1:SetType(EFFECT_TYPE_IGNITION)
-	e1:SetRange(LOCATION_HAND)
+	e1:SetRange(LOCATION_HAND|LOCATION_MZONE)
 	e1:HOPT()
-	e1:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
-	e1:SetCost(s.thcost)
-	e1:SetTarget(s.thtg)
-	e1:SetOperation(s.thop)
+	e1:SetCost(s.cost)
+	e1:SetTarget(s.target)
+	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
+	--[[If this card is banished because of a "Voidictator" card you own: You can banish 1 "Voidictator Rune" Spell/Trap from your GY; add this card to your hand.]]
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e2:Desc(1)
+	e2:SetCategory(CATEGORY_TOHAND)
+	e2:SetType(EFFECT_TYPE_SINGLE|EFFECT_TYPE_TRIGGER_O)
+	e2:SetProperty(EFFECT_FLAG_DELAY)
 	e2:SetCode(EVENT_REMOVE)
 	e2:HOPT()
-	e2:SetProperty(EFFECT_FLAG_DELAY)
-	e2:SetCategory(CATEGORY_TOHAND)
-	e2:SetCondition(s.hscon)
-	e2:SetCost(s.hscost)
-	e2:SetTarget(s.hstg)
-	e2:SetOperation(s.hsop)
+	e2:SetCondition(s.thcon)
+	e2:SetCost(aux.BanishCost(s.cfilter,LOCATION_GRAVE))
+	e2:SetTarget(s.thtg)
+	e2:SetOperation(s.thop)
 	c:RegisterEffect(e2)
+	aux.RegisterTriggeringArchetypeCheck(c,ARCHE_VOIDICTATOR)
 end
-function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
+--E1
+function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return c:IsDiscardable() end
-	Duel.SendtoGrave(c,REASON_COST+REASON_DISCARD)
+	if chk==0 then return c:IsAbleToGraveAsCost() end
+	e:SetLabel(0)
+	local loc=c:GetLocation()
+	if Duel.SendtoGrave(c,REASON_COST)>0 then
+		if c:IsLocation(LOCATION_GRAVE) and loc&LOCATION_ONFIELD>0 then
+			e:SetLabel(1)
+		end
+	end
 end
 function s.filter(c)
-	return c:IsSetCard(0xac97) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToHand()
+	return c:IsSetCard(ARCHE_VOIDICTATOR_RUNE) and c:IsST() and c:IsAbleToHand()
 end
-function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE)
+function s.rmfilter(c)
+	return c:IsSpellTrapOnField() and c:IsAbleToRemove()
 end
-function s.thop(e,tp,eg,ep,ev,re,r,rp)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then
+		if not e:IsCostChecked() then e:SetLabel(0) end
+		return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_DECK|LOCATION_GRAVE,0,1,nil)
+	end
+	local lab=e:GetLabel()
+	Duel.SetTargetParam(lab)
+	if lab==1 then
+		e:SetCategory(CATEGORIES_SEARCH|CATEGORY_REMOVE)
+		local g=Duel.Group(s.rmfilter,tp,0,LOCATION_ONFIELD,nil)
+		Duel.SetPossibleOperationInfo(0,CATEGORY_REMOVE,g,1,1-tp,LOCATION_ONFIELD)
+	else
+		e:SetCategory(CATEGORIES_SEARCH)
+	end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK|LOCATION_GRAVE)
+end
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.filter),tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil)
-	Duel.SendtoHand(g,nil,REASON_EFFECT)
-	Duel.ConfirmCards(1-tp,g)
+	local g=Duel.SelectMatchingCard(tp,aux.Necro(s.filter),tp,LOCATION_DECK|LOCATION_GRAVE,0,1,1,nil)
+	if #g>0 and Duel.SearchAndCheck(g,tp) and Duel.GetTargetParam()==1 and e:IsActivated() then
+		local g=Duel.Group(s.rmfilter,tp,0,LOCATION_ONFIELD,nil)
+		if #g>0 and Duel.SelectYesNo(tp,STRING_ASK_BANISH) then
+			Duel.HintMessage(tp,HINTMSG_REMOVE)
+			local rg=g:Select(tp,1,1,nil)
+			if #rg>0 then
+				Duel.HintSelection(rg)
+				Duel.Remove(rg,POS_FACEUP,REASON_EFFECT)
+			end
+		end
+	end
 end
-function s.hscon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local rc=re and re:GetHandler() or c:GetReasonCard()
-	return rc and rc:IsSetCard(0xc97) and rc:GetOwner()==tp
+
+--E2
+function s.thcon(e,tp,eg,ep,ev,re,r,rp)
+	if not re then return false end
+	local rc=re:GetHandler()
+	return rc and aux.CheckArchetypeReasonEffect(s,re,ARCHE_VOIDICTATOR) and rc:IsOwner(tp)
 end
 function s.cfilter(c)
-	return c:IsSetCard(0xac97) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToRemoveAsCost()
+	return c:IsST() and c:IsSetCard(ARCHE_VOIDICTATOR_RUNE)
 end
-function s.hscost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_GRAVE,0,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	Duel.Remove(Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_GRAVE,0,1,1,nil),POS_FACEUP,REASON_COST)
-end
-function s.hstg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return c:IsAbleToHand() end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,c,1,0,0)
+	Duel.SetCardOperationInfo(c,CATEGORY_TOHAND)
 end
-function s.hsop(e,tp,eg,ep,ev,re,r,rp)
+function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToChain() then Duel.SendtoHand(c,nil,REASON_EFFECT) end
+	if c:IsRelateToChain() then
+		Duel.Search(c,tp)
+	end
 end

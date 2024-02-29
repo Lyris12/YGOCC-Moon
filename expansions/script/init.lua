@@ -20,6 +20,7 @@ EFFECT_INDESTRUCTABLE_COST			=1506
 EFFECT_EXTRA_XYZ_MATERIAL			=1507
 EFFECT_CHANGE_RECOVER				=1508
 EFFECT_ORIGINAL_LEVEL_RANK_DUALITY	=1509
+EFFECT_CANNOT_APPLY					=221594332
 
 TYPE_CUSTOM							=0
 CTYPE_CUSTOM						=0
@@ -200,9 +201,11 @@ dofile("expansions/script/tables.lua") --Special Tables
 -- dofile("expansions/script/proc_perdition.lua") --Perditions
 -- dofile("expansions/script/proc_impure.lua") --Impures
 
+dofile("expansions/script/mods_ritual.lua") --Generic Ritual Procedure modifications
 dofile("expansions/script/mods_fusion.lua") --Generic Fusion Procedure modifications
 dofile("expansions/script/mods_pendulum.lua") --Generic Pendulum Procedure modifications
 dofile("expansions/script/mods_archetype.lua") --SetCard modifcations for Custom Archetypes
+
 
 --overwrite functions
 local is_type, card_remcounter, duel_remcounter, effect_set_target_range, effect_set_reset, add_xyz_proc, add_xyz_proc_nlv, duel_overlay, duel_set_lp, duel_select_target, duel_banish, card_check_remove_overlay_card, is_reason, duel_check_tribute, select_tribute,card_sethighlander,
@@ -2311,6 +2314,26 @@ if not global_card_effect_table_global_check then
 		
 		local typ,code=e:GetType(),e:GetCode()
 		
+		--IMPLEMENT EFFECT_CANNOT_APPLY
+		if (typ&(EFFECT_TYPE_ACTIONS)==0 or typ&EFFECT_TYPE_CONTINUOUS==EFFECT_TYPE_CONTINUOUS) and (not e:IsHasProperty(EFFECT_FLAG_UNCOPYABLE) or not e:IsHasProperty(EFFECT_FLAG_CANNOT_DISABLE)) then
+			local cond=e:GetCondition()
+			local newcond =	function(E,...)
+								local x={...}
+								local tp=(#x>0 and type(x[1])=="number" and (x[1]==0 or x[1]==1)) and x[1] or E:GetHandlerPlayer()
+								if Duel.IsPlayerAffectedByEffect(tp,EFFECT_CANNOT_APPLY) then
+									local c=E:GetHandler()
+									for _,ce in ipairs({Duel.IsPlayerAffectedByEffect(tp,EFFECT_CANNOT_APPLY)}) do
+										local val=ce:GetValue()
+										if not val or val(ce,E,tp,c) then
+											return false
+										end
+									end
+								end
+								return not cond or cond(e,...)
+							end
+			e:SetCondition(newcond)
+		end
+		
 		if typ&(EFFECT_TYPE_ACTIONS)==0 then
 			local e = e:IsHasType(EFFECT_TYPE_GRANT) and e:GetLabelObject() or e
 			
@@ -2841,61 +2864,6 @@ function Auxiliary.GlobalCheck(s,func)
 		s.global_check=true
 		func()
 	end
-end
-function Auxiliary.SelectUnselectLoop(c,sg,mg,e,tp,minc,maxc,rescon)
-	local res=not rescon
-	if #sg>=maxc then return false end
-	sg:AddCard(c)
-	if rescon then
-		local stop
-		res,stop=rescon(sg,e,tp,mg,c)
-		if stop then
-			sg:RemoveCard(c)
-			return false
-		end
-	end
-	if #sg<minc then
-		res=mg:IsExists(Auxiliary.SelectUnselectLoop,1,sg,sg,mg,e,tp,minc,maxc,rescon)
-	elseif #sg<maxc and not res then
-		res=mg:IsExists(Auxiliary.SelectUnselectLoop,1,sg,sg,mg,e,tp,minc,maxc,rescon)
-	end
-	sg:RemoveCard(c)
-	return res
-end
-function Auxiliary.SelectUnselectGroup(g,e,tp,minc,maxc,rescon,chk,seltp,hintmsg,finishcon,breakcon,cancelable)
-	local minc=minc or 1
-	local maxc=maxc or #g
-	if chk==0 then
-		if #g<minc then return false end
-		local eg=g:Clone()
-		for c in g:Iter() do
-			if Auxiliary.SelectUnselectLoop(c,Group.CreateGroup(),eg,e,tp,minc,maxc,rescon) then return true end
-			eg:RemoveCard(c)
-		end
-		return false
-	end
-	local hintmsg=hintmsg and hintmsg or 0
-	local sg=Group.CreateGroup()
-	while true do
-		local finishable = #sg>=minc and (not finishcon or finishcon(sg,e,tp,g))
-		local mg=g:Filter(Auxiliary.SelectUnselectLoop,sg,sg,g,e,tp,minc,maxc,rescon)
-		if (breakcon and breakcon(sg,e,tp,mg)) or #mg<=0 or #sg>=maxc then break end
-		Duel.Hint(HINT_SELECTMSG,seltp,hintmsg)
-		local tc=mg:SelectUnselect(sg,seltp,finishable,finishable or (cancelable and #sg==0),minc,maxc)
-		if not tc then break end
-		if sg:IsContains(tc) then
-			sg:RemoveCard(tc)
-		else
-			sg:AddCard(tc)
-		end
-	end
-	return sg
-end
---check for Free Monster Zones
-function Auxiliary.ChkfMMZ(sumcount)
-	return	function(sg,e,tp,mg)
-				return Duel.GetMZoneCount(tp,sg)>=sumcount
-			end
 end
 --[[
 Function to perform "Either add it to the hand or do X"

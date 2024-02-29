@@ -288,11 +288,18 @@ function Card.UpdateATK(c,atk,reset,rc,range,cond,prop,desc)
 	if not reset and not range then
 		range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
 	end
+	
+	local donotdisable=false
 	local rc = rc and rc or c
     local rct=1
     if type(reset)=="table" then
         rct=reset[2]
         reset=reset[1]
+    end
+	
+	if type(rc)=="table" then
+        donotdisable=rc[2]
+        rc=rc[1]
     end
 	
 	local att=c:GetAttack()
@@ -309,7 +316,7 @@ function Card.UpdateATK(c,atk,reset,rc,range,cond,prop,desc)
 	end
 	if reset then
 		if type(reset)~="number" then reset=0 end
-		reset = rc==c and reset|RESET_DISABLE or reset
+		reset = (rc==c and not donotdisable) and reset|RESET_DISABLE or reset
 		e:SetReset(RESET_EVENT|RESETS_STANDARD|reset,rct)
 	end
 	c:RegisterEffect(e)
@@ -407,8 +414,8 @@ function Card.UpdateATKDEF(c,atk,def,reset,rc,range,cond,prop,desc)
 	if reset then
 		if type(reset)~="number" then reset=0 end
 		reset = (rc==c and not donotdisable) and reset|RESET_DISABLE or reset
-		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
-		e1x:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
+		e:SetReset(RESET_EVENT|RESETS_STANDARD|reset,rct)
+		e1x:SetReset(RESET_EVENT|RESETS_STANDARD|reset,rct)
 	end
 	c:RegisterEffect(e)
 	c:RegisterEffect(e1x)

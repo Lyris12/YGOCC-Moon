@@ -50,7 +50,7 @@ function s.initial_effect(c)
 end
 --E1
 function s.cfilter(c)
-	return c:IsFaceup() and c:IsMonster() and c:IsSetCard(ARCHE_VOIDICTATOR_SERVANT) and c:IsAbleToRemoveAsCost()
+	return c:IsFaceup() and (c:IsLocation(LOCATION_MZONE) or c:IsMonsterCard()) and c:IsSetCard(ARCHE_VOIDICTATOR_SERVANT) and c:IsAbleToRemoveAsCost()
 end
 function s.gcheck(g,e,tp)
 	return Duel.IsExistingMatchingCard(s.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,g)
@@ -61,7 +61,7 @@ function s.spfilter(c,e,tp,g)
 		and (not c:IsType(TYPE_XYZ) or Duel.IsExistingMatchingCard(Card.IsCanOverlay,tp,LOCATION_REMOVED,0,3,nil,tp))
 end
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	local g=Duel.Group(s.cfilter,tp,LOCATION_MZONE|LOCATION_GRAVE,0,nil)
+	local g=Duel.Group(s.cfilter,tp,LOCATION_ONFIELD|LOCATION_GRAVE,0,nil)
 	if chk==0 then return g:CheckSubGroup(s.gcheck,3,3,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local sg=g:SelectSubGroup(tp,s.gcheck,false,3,3,e,tp)

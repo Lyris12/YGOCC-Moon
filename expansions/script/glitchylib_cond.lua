@@ -119,6 +119,9 @@ function Auxiliary.CompareLocationGroupCond(res,f,loc,exc)
 end
 
 --When this card is X Summoned
+function Auxiliary.RitualSummonedCond(e)
+	return e:GetHandler():IsSummonType(SUMMON_TYPE_RITUAL)
+end
 function Auxiliary.FusionSummonedCond(e)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_FUSION)
 end

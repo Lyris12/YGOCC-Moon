@@ -20,7 +20,8 @@ function s.initial_effect(c)
 	by an amount equal to the Level of the Ritual Monster you Ritual Summon, and if you do, shuffle this card into the Deck.]]
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(1)
-	e2:SetCategory(CATEGORY_SPECIAL_SUMMON|CATEGORY_TODECK|CATEGORY_UPDATE_ENERGY)
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON|CATEGORY_TODECK)
+	e2:SetCustomCategory(CATEGORY_UPDATE_ENERGY|CATEGORY_SPSUMMON_RITUAL_MONSTER)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_GRAVE)
@@ -63,6 +64,7 @@ function s.rttg(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 	Duel.SetCustomOperationInfo(0,CATEGORY_UPDATE_ENERGY,en,1,INFOFLAG_DECREASE,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND|LOCATION_GRAVE)
+	Duel.SetCustomOperationInfo(0,CATEGORY_SPSUMMON_RITUAL_MONSTER,nil,1,tp,LOCATION_HAND|LOCATION_GRAVE)
 	Duel.SetCardOperationInfo(c,CATEGORY_TODECK)
 end
 function s.rtop(e,tp,eg,ep,ev,re,r,rp)

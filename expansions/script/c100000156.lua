@@ -10,7 +10,7 @@ function s.initial_effect(c)
 	aux.AddOrigDriveType(c)
 	aux.AddDriveProc(c,13)
 	--[[[-X]: Special Summon 1 Rock Ritual Monster from your hand with a Level equal to the Energy reduced to activate this effect. (This is treated as a Ritual Summon).]]
-	local d1=c:DriveEffect(false,0,CATEGORY_SPECIAL_SUMMON,EFFECT_TYPE_IGNITION,nil,nil,
+	local d1=c:DriveEffect(false,0,{CATEGORY_SPECIAL_SUMMON,CATEGORY_SPSUMMON_RITUAL_MONSTER},EFFECT_TYPE_IGNITION,nil,nil,
 		nil,
 		aux.DummyCost,
 		s.sptg,
@@ -77,6 +77,7 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local _,ct=c:UpdateEnergy(-an,tp,REASON_COST,true,c,e,nil,nil,nil,true)
 	e:SetLabel(math.abs(ct))
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
+	Duel.SetCustomOperationInfo(0,CATEGORY_SPSUMMON_RITUAL_MONSTER,nil,1,tp,LOCATION_HAND)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end

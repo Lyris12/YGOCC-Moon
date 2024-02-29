@@ -246,7 +246,7 @@ local _SetCountLimit = Effect.SetCountLimit
 Effect.SetCountLimit = function(e,ct,...)
 	local x={...}
 	local flag = #x>0 and x[1] or 0
-	if flag>EFFECT_COUNT_CODE_SINGLE then
+	if e:GetOwner():IsStatus(STATUS_INITIALIZING) and flag>EFFECT_COUNT_CODE_SINGLE then
 		local code=e:GetOwner():GetOriginalCodeRule()
 		local pureflag=flag
 		local extraflags=0
@@ -262,13 +262,10 @@ Effect.SetCountLimit = function(e,ct,...)
 			aux.EffectCountLimitFlagTable[pureflag]=code
 			
 		elseif aux.EffectCountLimitFlagTable[pureflag]~=code then
-			while aux.EffectCountLimitFlagTable[pureflag]~=code do
+			while aux.EffectCountLimitFlagTable[pureflag] do
 				pureflag=pureflag+1
 				if pureflag>MAX_ID then
 					pureflag=MIN_ID
-				end
-				if not aux.EffectCountLimitFlagTable[pureflag] then
-					break
 				end
 			end
 			aux.EffectCountLimitFlagTable[pureflag]=code
