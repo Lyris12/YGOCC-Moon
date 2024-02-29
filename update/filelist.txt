@@ -1,4 +1,4 @@
-﻿expansions/cards-new.cdb	45dfb661facd75172b1061bf70cc80fd
+﻿expansions/cards-new.cdb	993964352c9f38cf5bd3b5392dc53798
 expansions/lflist.conf	41f81624d866bf7bb8fa880f501dc6bb
 expansions/strings.conf	7ddcc8b4f71d1f1cbb2ab2b1ec83ff0e
 expansions/pics/100000000.png	b67e8ff2c7f674f012be790c136b43e5
@@ -6168,14 +6168,10 @@ expansions/pics/99988885.jpg	c94fb5a05803728a047e3d42ed5821b0
 expansions/pics/99988886.jpg	29e4727728dc45b551a4d9eb72361313
 expansions/pics/99998868.jpg	3203b229ba1d75c2eaf790d088d2aec7
 expansions/pics/99998869.jpg	7168eeae58cab7abf3b9ce3e90977476
-expansions/pics/99998875.jpg	4e99e3f41b6b4f0c3b3287243b0f0c87
-expansions/pics/99998876.jpg	dd827ea94bc4addc138ff73d8f304299
 expansions/pics/99998876.png	70b01af9fe155d8a0e66d4b051cc36ec
-expansions/pics/99998878.jpg	4e99e3f41b6b4f0c3b3287243b0f0c87
 expansions/pics/99998878.png	4e99e3f41b6b4f0c3b3287243b0f0c87
 expansions/pics/99998879.jpg	c350c68fa3d587b8e1d8ca511e0bb56c
 expansions/pics/99998879.png	783120fee275299c475616855c92fa33
-expansions/pics/99998880.jpg	34561bde52331d7eab1557a75e152888
 expansions/pics/99998880.png	30c9401262d4a53946d72c99d92a0dae
 expansions/pics/c99900200.png	3855b2aa43b8117b47a5685b5ef6cf4f
 expansions/pics/c99900202.png	927ca26c44f4c5999474045832023554
@@ -12266,6 +12262,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	ff352193ad2eb059e7eae5720209b775
+update/filelist.txt	a208189dae93cc59823ed7af5574fcce
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	5359bdd1536e9f478418af8355298f75
+update/version.txt	0b6666f7bdbe476c590f62a918854048
