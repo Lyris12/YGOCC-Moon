@@ -134,8 +134,8 @@ function s.hspcon(e,c)
 	local tp=c:GetControler()
 	return Duel.CheckReleaseGroupEx(tp,s.hspfilter,1,REASON_SPSUMMON,false,nil,ft,tp,c,c:GetLocation())
 end
-function s.hsptg(e,tp,eg,ep,ev,re,r,rp,c)
-	if not c then c=e:GetHandler() end
+function s.hsptg(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
 	local g=Duel.SelectReleaseGroupEx(tp,s.hspfilter,1,1,REASON_SPSUMMON,false,nil,ft,tp,c,c:GetLocation())
 	if g then
 		g:KeepAlive()
