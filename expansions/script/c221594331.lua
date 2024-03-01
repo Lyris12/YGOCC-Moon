@@ -92,17 +92,20 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 end
 
 --E2
+function s.thfilter2(c)
+	return c:IsFaceup() and c:IsSetCard(ARCHE_VOIDICTATOR) and c:IsAbleToHand() and not c:IsCode(id)
+end
 function s.setcon(e,tp,eg,ep,ev,re,r,rp)
 	if not re then return false end
 	local rc=re:GetHandler()
 	return rc and aux.CheckArchetypeReasonEffect(s,re,ARCHE_VOIDICTATOR) and rc:IsOwner(tp)
 end
 function s.settg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExists(false,s.thfilter,tp,LOCATION_REMOVED,0,1,nil) end
+	if chk==0 then return Duel.IsExists(false,s.thfilter2,tp,LOCATION_REMOVED,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_REMOVED)
 end
 function s.setop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.Select(HINTMSG_ATOHAND,false,tp,s.thfilter,tp,LOCATION_REMOVED,0,1,1,nil)
+	local g=Duel.Select(HINTMSG_ATOHAND,false,tp,s.thfilter2,tp,LOCATION_REMOVED,0,1,1,nil)
 	if #g>0 then
 		Duel.Search(g,tp)
 	end
