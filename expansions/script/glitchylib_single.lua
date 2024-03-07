@@ -302,11 +302,13 @@ function Card.UpdateATK(c,atk,reset,rc,range,cond,prop,desc)
         rc=rc[1]
     end
 	
+	if not prop then prop=0 end
+	
 	local att=c:GetAttack()
 	local e=Effect.CreateEffect(rc)
 	e:SetType(typ)
 	if range and not SCRIPT_AS_EQUIP then
-		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+		prop=prop|EFFECT_FLAG_SINGLE_RANGE
 		e:SetRange(range)
 	end
 	e:SetCode(EFFECT_UPDATE_ATTACK)
@@ -314,11 +316,21 @@ function Card.UpdateATK(c,atk,reset,rc,range,cond,prop,desc)
 	if cond then
 		e:SetCondition(cond)
 	end
+	
 	if reset then
 		if type(reset)~="number" then reset=0 end
-		reset = (rc==c and not donotdisable) and reset|RESET_DISABLE or reset
+		if rc==c and not donotdisable then
+			reset = reset|RESET_DISABLE
+		else
+			prop=prop|EFFECT_FLAG_CANNOT_DISABLE
+		end
 		e:SetReset(RESET_EVENT|RESETS_STANDARD|reset,rct)
 	end
+	
+	if prop~=0 then
+		e:SetProperty(prop)
+	end
+	
 	c:RegisterEffect(e)
 	
 	if reset then
@@ -342,12 +354,13 @@ function Card.UpdateDEF(c,def,reset,rc,range,cond,prop,desc)
         rct=reset[2]
         reset=reset[1]
     end
+	if not prop then prop=0 end
 	
 	local df=c:GetDefense()
 	local e=Effect.CreateEffect(rc)
 	e:SetType(typ)
 	if range and not SCRIPT_AS_EQUIP then
-		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+		prop=prop|EFFECT_FLAG_SINGLE_RANGE
 		e:SetRange(range)
 	end
 	e:SetCode(EFFECT_UPDATE_DEFENSE)
@@ -357,9 +370,18 @@ function Card.UpdateDEF(c,def,reset,rc,range,cond,prop,desc)
 	end
 	if reset then
 		if type(reset)~="number" then reset=0 end
-		reset = rc==c and reset|RESET_DISABLE or reset
-		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
+		if rc==c and not donotdisable then
+			reset = reset|RESET_DISABLE
+		else
+			prop=prop|EFFECT_FLAG_CANNOT_DISABLE
+		end
+		e:SetReset(RESET_EVENT|RESETS_STANDARD|reset,rct)
 	end
+	
+	if prop~=0 then
+		e:SetProperty(prop)
+	end
+	
 	c:RegisterEffect(e)
 	if reset then
 		return e,c:GetDefense()-df
@@ -378,7 +400,6 @@ function Card.UpdateATKDEF(c,atk,def,reset,rc,range,cond,prop,desc)
 	end
 	
 	local donotdisable=false
-	local rc = rc and rc or c
     local rct=1
     if type(reset)=="table" then
         rct=reset[2]
@@ -389,6 +410,7 @@ function Card.UpdateATKDEF(c,atk,def,reset,rc,range,cond,prop,desc)
         donotdisable=rc[2]
         rc=rc[1]
     end
+	local rc = rc and rc or c
 	
 	if not atk then
 		atk=def
@@ -396,29 +418,46 @@ function Card.UpdateATKDEF(c,atk,def,reset,rc,range,cond,prop,desc)
 		def=atk
 	end
 	
+	if not prop then prop=0 end
+	
 	local oatk,odef=c:GetAttack(),c:GetDefense()
 	local e=Effect.CreateEffect(rc)
 	e:SetType(typ)
+	
 	if range and not SCRIPT_AS_EQUIP then
-		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+		prop=prop|EFFECT_FLAG_SINGLE_RANGE
 		e:SetRange(range)
 	end
+	
 	e:SetCode(EFFECT_UPDATE_ATTACK)
 	e:SetValue(atk)
+	
 	if cond then
 		e:SetCondition(cond)
 	end
+	
+	if reset then
+		if type(reset)~="number" then reset=0 end
+		if rc==c and not donotdisable then
+			reset = reset|RESET_DISABLE
+		else
+			prop=prop|EFFECT_FLAG_CANNOT_DISABLE
+		end
+		e:SetReset(RESET_EVENT|RESETS_STANDARD|reset,rct)
+	end
+	
+	if prop~=0 then
+		e:SetProperty(prop)
+	end
+	
+	c:RegisterEffect(e)
+	
 	local e1x=e:Clone()
 	e1x:SetCode(EFFECT_UPDATE_DEFENSE)
 	e1x:SetValue(def)
-	if reset then
-		if type(reset)~="number" then reset=0 end
-		reset = (rc==c and not donotdisable) and reset|RESET_DISABLE or reset
-		e:SetReset(RESET_EVENT|RESETS_STANDARD|reset,rct)
-		e1x:SetReset(RESET_EVENT|RESETS_STANDARD|reset,rct)
-	end
-	c:RegisterEffect(e)
+	
 	c:RegisterEffect(e1x)
+	
 	if not reset then
 		return e,e1x
 	else
