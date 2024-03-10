@@ -18,10 +18,10 @@ function s.initial_effect(c)
 	e2:SHOPT(true)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e2:SetCategory(CATEGORY_TODECK)
-	e2:SetCondition(s.condition)
+	e2:SetCondition(s.tdcon)
 	e2:SetCost(aux.bfgcost)
 	e2:SetTarget(s.tdtg)
-	e2:SetOperation(s.operation)
+	e2:SetOperation(s.tdop)
 	c:RegisterEffect(e2)
 	local e3=e2:Clone()
 	e3:SetCode(EVENT_TO_GRAVE)
@@ -38,23 +38,28 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
-	local dg=Duel.GetMatchingGroup(nil,tp,0,LOCATION_ONFIELD,nil)
-	local ct=#dg
+	local tg=Duel.GetFieldGroup(tp,0,LOCATION_ONFIELD)
+	if #tg==0 then return end
 	local g=Duel.GetMatchingGroup(s.filter,tp,LOCATION_GRAVE+LOCATION_HAND+LOCATION_MZONE,0,nil)
-	if ct==0 or #g==0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local rc=Duel.Remove(g:SelectSubGroup(tp,aux.dlvcheck,false,1,ct),POS_FACEUP,REASON_EFFECT)
-	if rc>0 then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-		local sg=dg:Select(tp,rc,rc,nil)
-		Duel.HintSelection(sg)
-		Duel.Destroy(sg,REASON_EFFECT)
-	end
+	aux.GCheckAdditional=aux.dlvcheck
+	local rg=g:SelectSubGroup(tp,aux.TRUE,false,1,#tg)
+	aux.GCheckAdditional=aux.TRUE
+	if not rg then return end
+	local ct=Duel.Remove(rg,POS_FACEUP,REASON_EFFECT)
+	if ct<1 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+	local sg=tg:Select(tp,1,1,nil)
+	Duel.HintSelection(sg)
+	Duel.BreakEffect()
+	Duel.Destroy(sg,REASON_EFFECT)
 end
 function s.cfilter(c,tp)
-	return c:IsFaceupEx() and c:IsCode(212111808) and c:GetReasonPlayer()==1-tp and c:IsReason(REASON_EFFECT)
+	local code1,code2=c:GetPreviousCodeOnField()
+	return (code1==212111808 or code2==212111808) and c:GetReasonPlayer()==1-tp
+		and (c:IsLocation(LOCATION_REMOVED) or c:IsControler(tp))
 end
-function s.condition(e,tp,eg,ep,ev,re,r,rp)
+function s.tdcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(s.cfilter,1,nil,tp)
 end
 function s.dfilter(c)
@@ -67,6 +72,6 @@ function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local g=Duel.SelectTarget(tp,s.dfilter,tp,LOCATION_REMOVED,0,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,#g,0,0)
 end
-function s.operation(e,tp,eg,ep,ev,re,r,rp)
+function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SendtoDeck(Duel.GetTargetsRelateToChain(),nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
 end

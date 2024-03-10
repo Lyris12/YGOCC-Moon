@@ -1,15 +1,8 @@
---[[
-Voidictator Servant - Gate Architect
-Servitore dei Vuotodespoti - Architetto del Cancello
-Card Author: Walrus
-Scripted by: XGlitchy30
-]]
-
+--created by Walrus, coded by XGlitchy30
+--Voidictator Servant - Gate Architect
 local s,id=GetID()
 function s.initial_effect(c)
 	aux.EnablePendulumAttribute(c)
-	--[[While this card and "Voidictator Servant - Gate Sorceress" are in your Pendulum Zones, and you control a "Voidictator Deity" or "Voidictator Demon" monster,
-	negate the effects of all cards in your opponent's Pendulum Zones, and of all Pendulum Monsters they control.]]
 	local p1=Effect.CreateEffect(c)
 	p1:SetType(EFFECT_TYPE_FIELD)
 	p1:SetCode(EFFECT_DISABLE)
@@ -18,8 +11,6 @@ function s.initial_effect(c)
 	p1:SetCondition(s.discon)
 	p1:SetTarget(s.disable)
 	c:RegisterEffect(p1)
-	--[[Once per turn: You can banish up to 3 "Voidictator" cards from your GY; shuffle that many cards from your hand and/or field into the Deck,
-	and if you do, draw cards equal to the number of cards shuffled into the Deck by this effect, then, if you drew 3 cards this way, shuffle 1 card from your hand into the Deck.]]
 	local p2=Effect.CreateEffect(c)
 	p2:Desc(0)
 	p2:SetCategory(CATEGORY_TODECK|CATEGORY_DRAW)
@@ -30,9 +21,7 @@ function s.initial_effect(c)
 	p2:SetTarget(s.tdtg)
 	p2:SetOperation(s.tdop)
 	c:RegisterEffect(p2)
-	--This card cannot be used as a material for the Summon of a monster from the Extra Deck while it is on the field.
 	aux.CannotBeEDMaterial(c,nil,LOCATION_ONFIELD,true)
-	--You can Special Summon this card (from your hand or face-up Extra Deck) by Tributing 1 "Voidictator Servant" monster.
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(1)
 	e1:SetType(EFFECT_TYPE_FIELD)
@@ -44,7 +33,6 @@ function s.initial_effect(c)
 	e1:SetTarget(s.hsptg)
 	e1:SetOperation(s.hspop)
 	c:RegisterEffect(e1)
-	--[[If this card is Normal or Special Summoned: You can shuffle 3 of your banished cards into the Deck, and if you do, draw 1 card.]]
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(2)
 	e2:SetCategory(CATEGORY_TODECK|CATEGORY_DRAW)
@@ -56,7 +44,6 @@ function s.initial_effect(c)
 	e2:SetOperation(s.rmop)
 	c:RegisterEffect(e2)
 	e2:SpecialSummonEventClone(c)
-	--[[If this card is banished because of a "Voidictator" card you own: You can either place this card in your Pendulum Zone, or shuffle this card into the Deck.]]
 	local e3=Effect.CreateEffect(c)
 	e3:Desc(3)
 	e3:SetCategory(CATEGORY_TODECK)
@@ -70,7 +57,6 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 	aux.RegisterTriggeringArchetypeCheck(c,ARCHE_VOIDICTATOR)
 end
---P1
 function s.discon(e)
 	local c=e:GetHandler()
 	local tp=e:GetHandlerPlayer()
@@ -81,8 +67,6 @@ end
 function s.disable(e,c)
 	return not c:IsLocation(LOCATION_MZONE) or (c:IsType(TYPE_PENDULUM) and (c:IsType(TYPE_EFFECT) or (c:GetOriginalType()&TYPE_EFFECT)==TYPE_EFFECT))
 end
-
---P2
 function s.cfilter(c)
 	return c:IsSetCard(ARCHE_VOIDICTATOR) and c:IsAbleToRemoveAsCost()
 end
@@ -123,8 +107,6 @@ function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-
---E1
 function s.hspfilter(c,ft,tp,sc,loc)
 	return c:IsSetCard(ARCHE_VOIDICTATOR_SERVANT) and (c:IsControler(tp) or c:IsFaceup())
 		and ((loc&LOCATION_EXTRA==0 and Duel.GetMZoneCount(tp,c)>0) or (loc&LOCATION_EXTRA==LOCATION_EXTRA and Duel.GetLocationCountFromEx(tp,tp,c,sc)>0))
@@ -150,8 +132,6 @@ function s.hspop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Release(g,REASON_SPSUMMON)
 	g:DeleteGroup()
 end
-
---E2
 function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToDeck,tp,LOCATION_REMOVED,0,3,nil) and Duel.IsPlayerCanDraw(tp,1) end
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,3,tp,LOCATION_REMOVED)
@@ -166,8 +146,6 @@ function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-
---E3
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	if not re then return false end
 	local rc=re:GetHandler()

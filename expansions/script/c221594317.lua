@@ -1,10 +1,5 @@
---[[
-Voidictator Rune - Soul of the Guardian
-Runa dei Vuotodespoti - Anima del Guardiano
-Card Author: Walrus
-Scripted by: XGlitchy30
-]]
-
+--created by Walrus, coded by XGlitchy30
+--Voidictator Rune - Soul of the Guardian
 local s,id,o=GetID()
 function s.initial_effect(c)
 	if not s.progressive_id then
@@ -14,7 +9,6 @@ function s.initial_effect(c)
 	end
 	c:SetUniqueOnField(1,0,id)
 	aux.AddCodeList(c,CARD_VOIDICTATOR_DEMON_GUARDIAN_OF_CORVUS)
-	--Activation
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(0)
 	e1:SetCategory(CATEGORY_EQUIP)
@@ -30,7 +24,6 @@ function s.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e2:SetValue(s.eqlimit)
 	c:RegisterEffect(e2)
-	--Up to thrice per turn, if your opponent Special Summons a Ritual Monster(s): Activate this effect; this card gains the effects of 1 of those Ritual Monsters until the end of the next turn.
 	aux.RegisterMergedDelayedEventGlitchy(c,s.progressive_id,EVENT_SPSUMMON_SUCCESS,s.cfilter,id,LOCATION_SZONE,nil,LOCATION_SZONE,nil,nil,true)
 	local e3=Effect.CreateEffect(c)
 	e3:Desc(1)
@@ -47,7 +40,6 @@ function s.initial_effect(c)
 	ge:SetCondition(s.grantcon)
 	ge:SetTarget(s.grantfilter)
 	c:RegisterEffect(ge)
-	--If this card battles, your opponent cannot activate cards or effects until the end of the Damage Step.
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_FIELD)
 	e4:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
@@ -59,7 +51,6 @@ function s.initial_effect(c)
 	local ge2=ge:Clone()
 	ge2:SetLabelObject(e4)
 	c:RegisterEffect(ge2)
-	--If this card battles an opponent's monster, it gains ATK equal to the ATK or DEF (whichever is higher, or its ATK, if tied) of that monster during damage calculation only.
 	local e5=Effect.CreateEffect(c)
 	e5:SetType(EFFECT_TYPE_SINGLE)
 	e5:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
@@ -71,7 +62,6 @@ function s.initial_effect(c)
 	ge3:SetLabelObject(e5)
 	c:RegisterEffect(ge3)
 end
---E1
 function s.filter(c)
 	if not c:IsFaceup() then return false end
 	return c:IsCode(CARD_VOIDICTATOR_DEMON_GUARDIAN_OF_CORVUS)
@@ -91,13 +81,9 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Equip(tp,c,tc)
 	end
 end
-
---E2
 function s.eqlimit(e,c)
 	return c:IsCode(CARD_VOIDICTATOR_DEMON_GUARDIAN_OF_CORVUS)
 end
-
---E3
 function s.cfilter(c,_,tp)
 	return c:IsFaceup() and c:IsType(TYPE_RITUAL) and c:IsSummonPlayer(1-tp)
 end
@@ -126,13 +112,9 @@ function s.efop(e,tp,eg,ep,ev,re,r,rp)
 		local cid=c:CopyEffect(code,RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_END,2)
 	end
 end
-
---E4
 function s.actcon(e)
 	return Duel.GetAttacker()==e:GetHandler() or Duel.GetAttackTarget()==e:GetHandler()
 end
-
---E5
 function s.atkcon(e)
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
@@ -145,8 +127,6 @@ function s.atkval(e,c)
 	if not bc:HasDefense() then def=0 end
 	return math.max(atk,def)
 end
-
---GE
 function s.grantcon(e)
 	local ec=e:GetHandler():GetEquipTarget()
 	return ec and s.filter(ec)

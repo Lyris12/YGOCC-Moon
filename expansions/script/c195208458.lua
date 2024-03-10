@@ -31,13 +31,14 @@ function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0
 		and Duel.GetFieldGroupCount(tp,0,LOCATION_ONFIELD)>0 end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CARDTYPE)
-	e:SetLabel(Duel.AnnounceType(tp))
+	Duel.SetTargetParam(Duel.AnnounceType(tp))
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetFieldGroupCount(tp,0,LOCATION_DECK)==0 then return end
 	local tc=Duel.GetDecktopGroup(1-tp,1):GetFirst()
 	Duel.ConfirmDecktop(1-tp,1)
-	if not tc:IsType(1<<e:GetLabel()) then return end
+	if not tc:IsType(1<<Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)) then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local sg=Duel.GetFieldGroup(tp,0,LOCATION_ONFIELD):Select(tp,1,1,nil)
 	Duel.HintSelection(sg)
 	Duel.Destroy(sg,REASON_EFFECT)

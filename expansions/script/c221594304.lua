@@ -1,16 +1,8 @@
---[[
-Voidictator Servant - Rune Artist
-Servitore dei Vuotodespoti - Artista di Rune
-Card Author: Walrus
-Scripted by: XGlitchy30
-]]
-
+--created by Walrus, coded by XGlitchy30
+--Voidictator Servant - Rune Artist
 local s,id=GetID()
 function s.initial_effect(c)
-	--This card cannot be used as a material for the Summon of a monster from the Extra Deck while it is on the field.
 	aux.CannotBeEDMaterial(c,nil,LOCATION_ONFIELD,true)
-	--[[You can send this card from your hand or field to the GY; add 1 "Voidictator Rune" Spell/Trap from your Deck or GY to your hand,
-	then if this card was sent from the field to the GY to activate this effect, you can banish 1 Spell/Trap your opponent controls.]]
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(0)
 	e1:SetCategory(CATEGORIES_SEARCH)
@@ -21,7 +13,6 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
-	--[[If this card is banished because of a "Voidictator" card you own: You can banish 1 "Voidictator Rune" Spell/Trap from your GY; add this card to your hand.]]
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(1)
 	e2:SetCategory(CATEGORY_TOHAND)
@@ -36,7 +27,6 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 	aux.RegisterTriggeringArchetypeCheck(c,ARCHE_VOIDICTATOR)
 end
---E1
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return c:IsAbleToGraveAsCost() end
@@ -85,8 +75,6 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-
---E2
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	if not re then return false end
 	local rc=re:GetHandler()

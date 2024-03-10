@@ -1,18 +1,10 @@
---[[
-Voidictator Rune - Void Overrule
-Runa dei Vuotodespoti - Veto del Vuoto
-Card Author: Walrus
-Scripted by: XGlitchy30
-]]
-
+--created by Walrus, coded by XGlitchy30
+--Voidictator Rune - Void Overrule
 local s,id=GetID()
 function s.initial_effect(c)
 	if not aux.EnableSpSummonRitualMonsterOperationInfo then
 		aux.EnableSpSummonRitualMonsterOperationInfo=true
 	end
-	--[[When your opponent would Special Summon a monster(s) from the Extra Deck, and/or a Ritual Monster(s), while you control a "Voidictator" monster:
-	Banish 3 "Voidictator" cards from your hand or GY; negate the Summon, and if you do, banish that monster(s),  face-down.
-	If you control a "Voidictator Deity" or "Voidictator Demon" monster, your opponent cannot activate cards or effects in response to this card's activation.]]
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(0)
 	e1:SetCategory(CATEGORY_DISABLE_SUMMON|CATEGORY_REMOVE)
@@ -29,7 +21,6 @@ function s.initial_effect(c)
 	e1x:SHOPT()
 	e1x:SetFunctions(s.condition2,aux.BanishCost(aux.ArchetypeFilter(ARCHE_VOIDICTATOR),LOCATION_HAND|LOCATION_GRAVE,0,3),s.target2,s.activate2)
 	c:RegisterEffect(e1x)
-	--[[If this card is banished because of a "Voidictator" card you own: You can Tribute 1 "Voidictator Servant" monster; Set this card, but banish it face-down when it leaves the field.]]
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(1)
 	e2:SetType(EFFECT_TYPE_SINGLE|EFFECT_TYPE_TRIGGER_O)
@@ -44,8 +35,6 @@ function s.initial_effect(c)
 	aux.RegisterTriggeringArchetypeCheck(c,ARCHE_VOIDICTATOR)
 end
 s.PreventWrongRedirect=false
-
---E1
 function s.efilter(c,tp)
 	return (c:IsSummonLocation(LOCATION_EXTRA) or (c:IsFaceup() and c:IsType(TYPE_RITUAL))) and c:IsAbleToRemove(tp,POS_FACEDOWN)
 end
@@ -73,8 +62,6 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.NegateSummon(g)
 	Duel.Remove(g,POS_FACEDOWN,REASON_EFFECT)
 end
-
---E1X
 function s.checkfilter(c)
 	return c:IsLocation(LOCATION_EXTRA) or c:IsType(TYPE_RITUAL)
 end
@@ -111,8 +98,6 @@ function s.activate2(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Remove(eg,POS_FACEDOWN,REASON_EFFECT)
 	end
 end
-
---E2
 function s.setcon(e,tp,eg,ep,ev,re,r,rp)
 	if not re then return false end
 	local rc=re:GetHandler()

@@ -1,13 +1,7 @@
---[[
-Voidictator Rune - Gates of Perdition
-Runa dei Vuotodespoti - Cancelli della Perdizione
-Card Author: Walrus
-Scripted by: XGlitchy30
-]]
-
+--created by Walrus, coded by XGlitchy30
+--Voidictator Rune - Gates of Perdition
 local s,id=GetID()
 function s.initial_effect(c)
-	--[[When this card is activated: You can banish cards from the top of your Deck, up to the number of monsters your opponent controls.]]
 	local e0=Effect.CreateEffect(c)
 	e0:Desc(0)
 	e0:SetCategory(CATEGORY_REMOVE)
@@ -17,7 +11,6 @@ function s.initial_effect(c)
 	e0:SetTarget(s.target)
 	e0:SetOperation(s.activate)
 	c:RegisterEffect(e0)
-	--[[You cannot Special Summon monsters from the Extra Deck, except "Voidictator" monsters.]]
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
@@ -26,7 +19,6 @@ function s.initial_effect(c)
 	e2:SetTargetRange(1,0)
 	e2:SetTarget(s.splimit)
 	c:RegisterEffect(e2)
-	--[[All "Voidictator Deity" and "Voidictator Demon" monsters you control gain 300 ATK/DEF for each "Voidictator Deity" and "Voidictator Demon" monster you control with different original names.]]
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD)
 	e3:SetCode(EFFECT_UPDATE_ATTACK)
@@ -36,7 +28,6 @@ function s.initial_effect(c)
 	e3:SetValue(s.value)
 	c:RegisterEffect(e3)
 	e3:UpdateDefenseClone(c)
-	--[[While you control at least 1 each of "Voidictator Deity", "Voidictator Demon", and "Voidictator Servant" monsters, all "Voidictator Deity" and "Voidictator Demon" monsters you control are unaffected by your opponent's card effects.]]
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_FIELD)
 	e4:SetCode(EFFECT_IMMUNE_EFFECT)
@@ -47,7 +38,6 @@ function s.initial_effect(c)
 	e4:SetValue(s.efilter)
 	c:RegisterEffect(e4)
 end
---E0
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetPossibleOperationInfo(0,CATEGORY_REMOVE,nil,1,tp,LOCATION_DECK)
@@ -71,13 +61,9 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
 	end
 end
-
---E2
 function s.splimit(e,c,sump,sumtype,sumpos,targetp)
 	return c:IsLocation(LOCATION_EXTRA) and not c:IsSetCard(ARCHE_VOIDICTATOR)
 end
-
---E3
 function s.atktg(e,c)
 	return c:IsSetCard(ARCHE_VOIDICTATOR_DEITY,ARCHE_VOIDICTATOR_DEMON)
 end
@@ -85,8 +71,6 @@ function s.value(e,c)
 	local tp=e:GetHandlerPlayer()
 	return Duel.GetMatchingGroup(aux.FaceupFilter(Card.IsSetCard,ARCHE_VOIDICTATOR_DEITY,ARCHE_VOIDICTATOR_DEMON),tp,LOCATION_MZONE,0,nil):GetClassCount(Card.GetOriginalCodeRule)*300
 end
-
---E4
 function s.immcon(e)
 	local g=Duel.GetFieldGroup(tp,LOCATION_MZONE,0):Filter(Card.IsFaceup,nil)
 	return g:IsExists(Card.IsSetCard,1,nil,ARCHE_VOIDICTATOR_DEITY) and g:IsExists(Card.IsSetCard,1,nil,ARCHE_VOIDICTATOR_DEMON) and g:IsExists(Card.IsSetCard,1,nil,ARCHE_VOIDICTATOR_SERVANT)

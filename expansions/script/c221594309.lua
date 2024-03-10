@@ -1,10 +1,5 @@
---[[
-Voidictator Demon - The Unending Flame
-Demone Vuotodespota - La Fiamma Eterna
-Card Author: Walrus
-Scripted by: XGlitchy30
-]]
-
+--created by Walrus, coded by XGlitchy30
+--Voidictator Demon - The Unending Flame
 local s,id=GetID()
 function s.initial_effect(c)
 	if not s.progressive_id then
@@ -12,12 +7,9 @@ function s.initial_effect(c)
 	else
 		s.progressive_id=s.progressive_id+100
 	end
-	--xyz summon
 	c:EnableReviveLimit()
 	aux.AddXyzProcedureLevelFree(c,s.mfilter,s.xyzcheck,2,2)
-	--You can only control 1 "Voidictator Demon - The Unending Flame".
 	c:SetUniqueOnField(1,0,id)
-	--This card's ATK becomes 400 x the number of materials attached to it. 
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
@@ -25,7 +17,6 @@ function s.initial_effect(c)
 	e1:SetCode(EFFECT_SET_ATTACK)
 	e1:SetValue(s.value)
 	c:RegisterEffect(e1)
-	--If this card is Xyz Summoned: You can attach up to 5 banished cards to this card as material.
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(0)
 	e2:SetType(EFFECT_TYPE_SINGLE|EFFECT_TYPE_TRIGGER_O)
@@ -34,7 +25,6 @@ function s.initial_effect(c)
 	e2:HOPT()
 	e2:SetFunctions(aux.XyzSummonedCond,nil,s.attg,s.atop)
 	c:RegisterEffect(e2)
-	--Up to thrice per turn, if your opponent Special Summons an Xyz Monster(s): Activate this effect; this card gains the effects of 1 of those monsters until the end of the next turn.
 	aux.RegisterMergedDelayedEventGlitchy(c,s.progressive_id,EVENT_SPSUMMON_SUCCESS,s.cfilter,s.progressive_id,LOCATION_MZONE,nil,LOCATION_MZONE,nil,nil,true)
 	local e3=Effect.CreateEffect(c)
 	e3:Desc(1)
@@ -44,8 +34,6 @@ function s.initial_effect(c)
 	e3:SetCountLimit(3)
 	e3:SetFunctions(nil,nil,s.eftg,s.efop)
 	c:RegisterEffect(e3)
-	--[[If this card leaves the field because of an opponent's card, or if this card is banished because of a "Voidictator" card you own:
-	Return this card to the Extra Deck, then, you can Special Summon 1 "Voidictator Servant" from your hand or GY.]]
 	local e4=Effect.CreateEffect(c)
 	e4:Desc(2)
 	e4:SetCategory(CATEGORY_TODECK|CATEGORY_SPECIAL_SUMMON|CATEGORY_GRAVE_SPSUMMON)
@@ -68,13 +56,9 @@ end
 function s.xyzcheck(g)
 	return g:IsExists(Card.IsSetCard,1,nil,ARCHE_VOIDICTATOR)
 end
-
---E1
 function s.value(e,c)
 	return e:GetHandler():GetOverlayCount()*400
 end
-
---E2
 function s.attg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		return e:GetHandler():IsType(TYPE_XYZ) and Duel.IsExistingMatchingCard(Card.IsCanOverlay,tp,LOCATION_REMOVED,LOCATION_REMOVED,1,nil,tp)
@@ -90,8 +74,6 @@ function s.atop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-
---E3
 function s.cfilter(c,_,tp)
 	return c:IsFaceup() and c:IsType(TYPE_XYZ) and c:IsSummonPlayer(1-tp)
 end
@@ -120,8 +102,6 @@ function s.efop(e,tp,eg,ep,ev,re,r,rp)
 		local cid=c:CopyEffect(code,RESET_EVENT|RESETS_STANDARD|RESET_PHASE|PHASE_END,2)
 	end
 end
-
---E4
 function s.spfilter(c,e,tp)
 	return c:IsSetCard(ARCHE_VOIDICTATOR_SERVANT) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end

@@ -55,9 +55,8 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		or not tc:IsLocation(LOCATION_DECK) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local sg=Duel.SelectMatchingCard(tp,s.sfilter,tp,LOCATION_DECK,0,1,1,nil,tc:GetType()&0xf)
-	if #sg>0 then
-		Duel.BreakEffect()
-		Duel.SendtoHand(sg,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,sg)
-	end
+	if #sg<1 then return end
+	Duel.BreakEffect()
+	Duel.SendtoHand(sg,nil,REASON_EFFECT)
+	Duel.ConfirmCards(1-tp,sg)
 end

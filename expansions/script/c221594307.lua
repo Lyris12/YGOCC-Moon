@@ -1,10 +1,5 @@
---[[
-Voidictator Deity - Omen the Dark Angel
-Divinità Vuotodespota - Presagio l'Angelo Oscuro
-Card Author: Walrus
-Scripted by: XGlitchy30
-]]
-
+--created by Walrus, coded by XGlitchy30
+--Voidictator Deity - Omen the Dark Angel
 local s,id=GetID()
 function s.initial_effect(c)
 	if not s.progressive_id then
@@ -12,12 +7,9 @@ function s.initial_effect(c)
 	else
 		s.progressive_id=s.progressive_id+100
 	end
-	--fusion material
 	c:EnableReviveLimit()
 	aux.AddFusionProcFunRep(c,s.matfilter,3,true)
-	--You can only control 1 "Voidictator Deity - Omen the Dark Angel". 
 	c:SetUniqueOnField(1,0,id)
-	--[[If this card is Fusion Summoned: You can choose up to 2 of your opponent's unused Monster Zones and/or Spell & Trap Zones; while this card is face-up on the field, those zones cannot be used.]]
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(0)
 	e1:SetType(EFFECT_TYPE_SINGLE|EFFECT_TYPE_TRIGGER_O)
@@ -28,8 +20,6 @@ function s.initial_effect(c)
 	e1:SetTarget(s.lztg)
 	e1:SetOperation(s.lzop)
 	c:RegisterEffect(e1)
-	--[[If this card leaves the field due to an opponent's card, or is banished because of a "Voidictator" card you own: Return this card to the Extra Deck,
-	then you can add 2 "Voidictator Servant" monsters from your Deck to your hand.]]
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(1)
 	e2:SetCategory(CATEGORY_TODECK|CATEGORIES_SEARCH)
@@ -45,7 +35,6 @@ function s.initial_effect(c)
 	e2x:SetCondition(s.thcon2)
 	c:RegisterEffect(e2x)
 	aux.RegisterTriggeringArchetypeCheck(c,ARCHE_VOIDICTATOR)
-	--[[Up to thrice per turn, if your opponent Special Summons a Fusion Monster(s): Activate this effect; this card gains the effects of 1 of those face-up monsters until the end of the next turn.]]
 	aux.RegisterMergedDelayedEventGlitchy(c,s.progressive_id,EVENT_SPSUMMON_SUCCESS,s.cfilter,s.progressive_id,LOCATION_MZONE,nil,LOCATION_MZONE,nil,nil,true)
 	local e3=Effect.CreateEffect(c)
 	e3:Desc(2)
@@ -60,8 +49,6 @@ end
 function s.matfilter(c,fc,sub,mg,sg)
 	return c:IsFusionAttribute(ATTRIBUTE_DARK) and c:IsRace(RACE_FIEND) and (not sg or sg:FilterCount(aux.TRUE,c)==0 or sg:IsExists(Card.IsFusionSetCard,1,nil,ARCHE_VOIDICTATOR))
 end
-
---E1
 function s.lztg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(1-tp,LOCATION_MZONE,PLAYER_NONE,0)+Duel.GetLocationCount(1-tp,LOCATION_SZONE,PLAYER_NONE,0)>0 end
 	local dis=Duel.SelectDisableField(tp,2,0,LOCATION_ONFIELD,0xe000e0)
@@ -84,8 +71,6 @@ function s.lzop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetReset(RESET_EVENT|RESETS_STANDARD)
 	c:RegisterEffect(e1)
 end
-
---E2
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return rp~=tp and not c:IsLocation(LOCATION_DECK)
@@ -118,8 +103,6 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-
---E3
 function s.cfilter(c,_,tp)
 	return c:IsFaceup() and c:IsType(TYPE_FUSION) and c:IsSummonPlayer(1-tp)
 end

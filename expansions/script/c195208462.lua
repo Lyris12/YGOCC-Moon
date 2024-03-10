@@ -35,9 +35,7 @@ function s.plop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)<1 then return end
 	Duel.ConfirmDecktop(tp,1)
 	local tc=Duel.GetDecktopGroup(tp,1):GetFirst()
-	local op=Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)
 	local c=e:GetHandler()
-	if tc:IsType(1<<op) and c:IsRelateToEffect(e) and aux.NecroValleyFilter()(c) then
-		Duel.MoveToField(c,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
-	end
+	if not (tc:IsType(1<<Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)) and c:IsRelateToEffect(e) and aux.NecroValleyFilter()(c)) then return end
+	Duel.MoveToField(c,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
 end

@@ -1,14 +1,7 @@
---[[
-Voidictator Energy - Ritual Essence
-Energia dei Vuotodespoti - Essenza Rituale
-Card Author: Walrus
-Scripted by: XGlitchy30
-]]
-
+--created by Walrus, coded by XGlitchy30
+--Voidictator Energy - Ritual Essence
 local s,id=GetID()
 function s.initial_effect(c)
-	--[[This card can be used to Ritual Summon any "Voidictator" Ritual Monster. You must also Tribute DARK Fiend monsters from your hand or field,
-	and/or return your banished Level 4 or lower DARK Fiend monsters to the GY, whose total Levels equal or exceed the Level of the Ritual Monster you are Ritual Summoning.]]
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(0)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -18,7 +11,6 @@ function s.initial_effect(c)
 	e1:SetTarget(s.RitualUltimateTarget)
 	e1:SetOperation(s.RitualUltimateOperation)
 	c:RegisterEffect(e1)
-	--[[If this card is banished because of a "Voidictator" card you own: You can banish 1 "Voidictator Servant" monster from your hand or GY; add this card to your hand.]]
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(1)
 	e2:SetCategory(CATEGORY_TOHAND)
@@ -33,7 +25,6 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 	aux.RegisterTriggeringArchetypeCheck(c,ARCHE_VOIDICTATOR)
 end
---E1
 function s.matfilter(c)
 	return c:IsAttributeRace(ATTRIBUTE_DARK,RACE_FIEND)
 end
@@ -65,7 +56,6 @@ function s.RitualUltimateTarget(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
 end
-
 function s.RitualUltimateOperation(e,tp,eg,ep,ev,re,r,rp)
 	::RitualUltimateSelectStart::
 	local mg=Duel.GetRitualMaterial(tp):Filter(s.matfilter,nil)
@@ -103,8 +93,6 @@ function s.RitualUltimateOperation(e,tp,eg,ep,ev,re,r,rp)
 		tc:CompleteProcedure()
 	end
 end
-
---E2
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	if not re then return false end
 	local rc=re:GetHandler()

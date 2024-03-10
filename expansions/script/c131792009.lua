@@ -46,7 +46,7 @@ function s.filter(c)
 	return c:IsFaceup() and c:IsLevel(5) and c:IsSetCard(0xd16)
 end
 function s.discon(e)
-	return Duel.GetAttackTarget() and (s.filter(Duel.GetAttacker()) or s.filter(Duel.GetAttackTarget()))
+	return (s.filter(Duel.GetAttacker()) and Duel.GetAttackTarget()) or s.filter(Duel.GetAttackTarget())
 end
 function s.disop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

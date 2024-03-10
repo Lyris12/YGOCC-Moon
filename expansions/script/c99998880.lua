@@ -1,16 +1,8 @@
---[[
-Voidictator Servant - Shield of Corvus
-Servitore dei Vuotodespoti - Scudo di Corvus
-Card Author: Walrus
-Scripted by: XGlitchy30
-]]
-
+--created by Walrus, coded by XGlitchy30
+--Voidictator Servant - Shield of Corvus
 local s,id=GetID()
 function s.initial_effect(c)
-	--This card cannot be used as a material for the Summon of a monster from the Extra Deck while it is on the field.
 	aux.CannotBeEDMaterial(c,nil,LOCATION_ONFIELD,true)
-	--[[When your opponent declares a direct attack while this card is in your hand (Quick Effect): You can banish 1 "Voidictator" card from your GY;
-	Special Summon this card, and if you do, end the Battle Phase.]]
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(0)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -23,8 +15,6 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
-	--[[If this card is banished because of a "Voidictator" card you own, except "Voidictator Servant - Shield of Corvus":
-	You can shuffle this card into the Deck; Special Summon 1 Level 4 "Voidictator Servant" monster from your hand or GY.]]
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(1)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -39,7 +29,6 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 	aux.RegisterTriggeringArchetypeCheck(c,ARCHE_VOIDICTATOR)
 end
---E1
 function s.cfilter(c)
 	return c:IsSetCard(ARCHE_VOIDICTATOR)
 end
@@ -61,8 +50,6 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SkipPhase(Duel.GetTurnPlayer(),PHASE_BATTLE,RESET_PHASE|PHASE_BATTLE_STEP,1)
 	end
 end
-
---E2
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	if not re then return false end
 	local rc=re:GetHandler()
