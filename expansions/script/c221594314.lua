@@ -1,9 +1,17 @@
---created by Walrus, coded by XGlitchy30
---Voidictator Demon - Guardian of Corvus
+--[[
+Voidictator Demon - Guardian of Corvus
+Demone Vuotodespota - Guardiano di Corvus
+Card Author: Walrus
+Scripted by: XGlitchy30
+]]
+
 local s,id=GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
+	--This card cannot be used as a material for the Summon of a monster from the Extra Deck while it is on the field.
 	aux.CannotBeEDMaterial(c,nil,LOCATION_ONFIELD,true)
+	--[[If this card is Ritual Summoned: Banish all Special Summoned monsters your opponent controls, and if you do,
+	this card's original ATK/DEF become 800 x the number of cards banished by this effect.]]
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(0)
 	e1:SetCategory(CATEGORY_REMOVE|CATEGORIES_ATKDEF)
@@ -14,6 +22,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.rmtg)
 	e1:SetOperation(s.rmop)
 	c:RegisterEffect(e1)
+	--[[If this card is banished by a "Voidictator" card you own: You can banish 1 random face-down card from your Extra Deck, face-up; add this card to your hand.]]
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(1)
 	e2:SetCategory(CATEGORY_TOHAND)
@@ -27,6 +36,7 @@ function s.initial_effect(c)
 	e2:SetOperation(s.thop)
 	c:RegisterEffect(e2)
 	aux.RegisterTriggeringArchetypeCheck(c,ARCHE_VOIDICTATOR)
+	--[[Your opponent cannot activate the effects of Special Summoned monsters during the Battle Phase.]]
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD)
 	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
@@ -37,6 +47,7 @@ function s.initial_effect(c)
 	e3:SetValue(s.actlmtval)
 	c:RegisterEffect(e3)
 end
+--E1
 function s.rmfilter(c)
 	return c:IsSummonType(SUMMON_TYPE_SPECIAL) and c:IsAbleToRemove()
 end
@@ -67,6 +78,8 @@ function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
+
+--E2
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	if not re then return false end
 	local rc=re:GetHandler()
@@ -92,6 +105,8 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Search(c,tp)
 	end
 end
+
+--E3
 function s.actlmtval(e,re,rp)
 	local rc=re:GetHandler()
 	return rc:IsSummonType(SUMMON_TYPE_SPECIAL) and re:IsActiveType(TYPE_MONSTER)

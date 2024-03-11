@@ -1,7 +1,15 @@
---created by Walrus, coded by XGlitchy30
---Voidictator Rune - Void Renewal
+--[[
+Voidictator Rune - Void Renewal
+Runa dei Vuotodespoti - Rinnovo del Vuoto
+Card Author: Walrus
+Scripted by: XGlitchy30
+]]
+
+
 local s,id=GetID()
 function s.initial_effect(c)
+	--[[Shuffle as many of your banished cards into the Deck as possible, then banish the top 3 cards of your Deck.
+	You must control both "Voidictator Rune - Court of the Void" and "Voidictator Rune - Gates of Perdition" to activate and resolve this effect.]]
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(0)
 	e1:SetCategory(CATEGORY_TODECK|CATEGORY_REMOVE)
@@ -11,6 +19,8 @@ function s.initial_effect(c)
 	e1:SetRelevantTimings()
 	e1:SetFunctions(s.condition,nil,s.target,s.activate)
 	c:RegisterEffect(e1)
+	--[[If this card is banished because of a "Voidictator" card you own: You can take 2 "Voidictator" cards from your Deck, except "Voidictator Rune - Void Renewal",
+	add 1 of them to your hand, then banish the other.]]
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(1)
 	e2:SetCategory(CATEGORIES_SEARCH|CATEGORY_REMOVE)
@@ -24,6 +34,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 	aux.RegisterTriggeringArchetypeCheck(c,ARCHE_VOIDICTATOR)
 end
+--E1
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExists(false,aux.FaceupFilter(Card.IsCode,CARD_VOIDICTATOR_RUNE_COURT_OF_THE_VOID),tp,LOCATION_ONFIELD,0,1,nil)
 		and Duel.IsExists(false,aux.FaceupFilter(Card.IsCode,CARD_VOIDICTATOR_RUNE_GATES_OF_PERDITION),tp,LOCATION_ONFIELD,0,1,nil)
@@ -55,6 +66,8 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
+
+--E2
 function s.setcon(e,tp,eg,ep,ev,re,r,rp)
 	if not re then return false end
 	local rc=re:GetHandler()

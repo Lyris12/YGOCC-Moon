@@ -1,7 +1,13 @@
---created by Walrus, coded by XGlitchy30
---Voidictator Rune - Court of the Void
+--[[
+Voidictator Rune - Court of the Void
+Runa dei Vuotodespoti - Corte del Vuoto
+Card Author: Walrus
+Scripted by: XGlitchy30
+]]
+
 local s,id=GetID()
 function s.initial_effect(c)
+	--[[When this card is activated: You can add 2 "Voidictator" cards (including a Ritual Monster) from your Deck and/or GY to your hand, except "Voidictator Rune - Court of the Void".]]
 	local e0=Effect.CreateEffect(c)
 	e0:Desc(0)
 	e0:SetCategory(CATEGORIES_SEARCH|CATEGORY_GRAVE_ACTION)
@@ -11,6 +17,7 @@ function s.initial_effect(c)
 	e0:SetTarget(s.target)
 	e0:SetOperation(s.activate)
 	c:RegisterEffect(e0)
+	--[[Your opponent cannot apply or activate the effects of monsters with the same card type (Ritual, Fusion, Synchro, Xyz, Pendulum, Pandemonium, Link, Bigbang, Spatial, Time Leap, Drive, Perdition) as "Voidictator Deity" and "Voidictator Demon" monsters you control.]]
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
@@ -24,6 +31,7 @@ function s.initial_effect(c)
 	e2x:SetCode(EFFECT_CANNOT_ACTIVATE)
 	e2x:SetValue(s.actlim)
 	c:RegisterEffect(e2x)
+	--[[If this card is banished because of a "Voidictator" card you own: You can banish 1 "Voidictator" card from your hand or GY; Set this card.]]
 	local e3=Effect.CreateEffect(c)
 	e3:Desc(1)
 	e3:SetCategory(CATEGORY_TOHAND)
@@ -38,7 +46,10 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 	aux.RegisterTriggeringArchetypeCheck(c,ARCHE_VOIDICTATOR)
 end
+
 local TYPES = TYPE_RITUAL|TYPE_FUSION|TYPE_SYNCHRO|TYPE_XYZ|TYPE_PENDULUM|TYPE_LINK|TYPE_PANDEMONIUM|TYPE_BIGBANG|TYPE_SPATIAL|TYPE_TIMELEAP|TYPE_DRIVE
+
+--E1
 function s.thfilter(c)
 	return c:IsSetCard(ARCHE_VOIDICTATOR) and c:IsAbleToHand() and not c:IsCode(id)
 end
@@ -58,6 +69,8 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
+
+--E2
 function s.cfilter(c)
 	return c:IsFaceup() and c:IsSetCard(ARCHE_VOIDICTATOR_DEITY,ARCHE_VOIDICTATOR_DEMON) and c:IsType(TYPES)
 end
@@ -85,6 +98,8 @@ function s.actlim(e,re,rp)
 	end
 	return re:IsActiveType(typ)
 end
+
+--E3
 function s.setcon(e,tp,eg,ep,ev,re,r,rp)
 	if not re then return false end
 	local rc=re:GetHandler()

@@ -1,5 +1,10 @@
---created by Walrus, coded by XGlitchy30
---Voidictator Deity - Nemesis the Grand Judge
+--[[
+Voidictator Deity - Nemesis the Grand Judge
+Divinità Vuotodespota - Nemesi il Grande Giudice
+Card Author: Walrus
+Scripted by: XGlitchy30
+]]
+
 local s,id=GetID()
 function s.initial_effect(c)
 	if not s.progressive_id then
@@ -7,9 +12,13 @@ function s.initial_effect(c)
 	else
 		s.progressive_id=s.progressive_id+100
 	end
+	--synchro summon
 	c:EnableReviveLimit()
 	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsAttributeRace,ATTRIBUTE_DARK,RACE_FIEND),aux.NonTuner(Card.IsSetCard,ARCHE_VOIDICTATOR),1)
+	--You can only control 1 "Voidictator Deity - Nemesis the Grand Judge". 
 	c:SetUniqueOnField(1,0,id)
+	--[[If this card is Synchro Summoned: You can destroy 1 card your opponent controls, and if you do, your opponent cannot activate cards or effects with the same original name,
+	until the end of the next turn.]]
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(0)
 	e1:SetCategory(CATEGORY_DESTROY)
@@ -21,6 +30,8 @@ function s.initial_effect(c)
 	e1:SetTarget(s.destg)
 	e1:SetOperation(s.desop)
 	c:RegisterEffect(e1)
+	--[[If this card leaves the field due to an opponent's card, or if this card is banished because of a "Voidictator" card you own: Return this card to the Extra Deck,
+	then, you can banish up to 3 "Voidictator" cards from your hand or GY.]]
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(1)
 	e2:SetCategory(CATEGORY_TODECK|CATEGORY_REMOVE)
@@ -36,6 +47,8 @@ function s.initial_effect(c)
 	e2x:SetCondition(s.thcon2)
 	c:RegisterEffect(e2x)
 	aux.RegisterTriggeringArchetypeCheck(c,ARCHE_VOIDICTATOR)
+	--[[Up to thrice per turn, if your opponent Special Summons a Synchro Monster(s): Activate this effect;
+	this card gains the effects of 1 of those face-up monsters until the end of the next turn.]]
 	aux.RegisterMergedDelayedEventGlitchy(c,s.progressive_id,EVENT_SPSUMMON_SUCCESS,s.cfilter,s.progressive_id,LOCATION_MZONE,nil,LOCATION_MZONE,nil,nil,true)
 	local e3=Effect.CreateEffect(c)
 	e3:Desc(2)
@@ -47,6 +60,7 @@ function s.initial_effect(c)
 	e3:SetOperation(s.efop)
 	c:RegisterEffect(e3)
 end
+--E1
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(nil,tp,0,LOCATION_ONFIELD,nil)
 	if chk==0 then return #g>0 end
@@ -77,6 +91,8 @@ function s.aclimit(e,re,tp)
 	local codes={e:GetLabel()}
 	return re:GetHandler():IsCode(table.unpack(codes),true)
 end
+
+--E2
 function s.thcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return rp~=tp and not c:IsLocation(LOCATION_DECK)
@@ -110,6 +126,8 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
+
+--E3
 function s.cfilter(c,_,tp)
 	return c:IsFaceup() and c:IsType(TYPE_SYNCHRO) and c:IsSummonPlayer(1-tp)
 end

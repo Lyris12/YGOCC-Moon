@@ -1,8 +1,16 @@
---created by Walrus, coded by XGlitchy30
---Voidictator Servant - Knight of Corvus
+--[[
+Voidictator Servant - Knight of Corvus
+Servitore dei Vuotodespoti - Cavaliere di Corvus
+Card Author: Walrus
+Scripted by: XGlitchy30
+]]
+
 local s,id=GetID()
 function s.initial_effect(c)
+	--This card cannot be used as a material for the Summon of a monster from the Extra Deck while it is on the field.
 	aux.CannotBeEDMaterial(c,nil,LOCATION_ONFIELD,true)
+	--[[If this card is Normal or Special Summoned: You can take 1 "Voidictator" card from your Deck, except "Voidictator Servant - Knight of Corvus",
+	and either add it to your hand or banish it, then if "Voidictator Rune - Court of the Void" is in your Field Zone, you can Special Summon 1 "Voidictator" monster from your hand.]]
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(0)
 	e1:SetCategory(CATEGORY_SEARCH|CATEGORY_REMOVE|CATEGORY_SPECIAL_SUMMON)
@@ -14,6 +22,8 @@ function s.initial_effect(c)
 	e1:SetOperation(s.operation)
 	c:RegisterEffect(e1)
 	e1:SpecialSummonEventClone(c)
+	--[[If this card is banished because of a "Voidictator" card you own: You can banish 1 "Voidictator" card from your GY;
+	Special Summon this card (but shuffle it into the Deck when it leaves the field), and if you do, this card gains 500 ATK.]]
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(1)
 	e2:SetCategory(CATEGORY_ATKCHANGE|CATEGORY_SPECIAL_SUMMON)
@@ -28,6 +38,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 	aux.RegisterTriggeringArchetypeCheck(c,ARCHE_VOIDICTATOR)
 end
+--E1
 function s.filter(c)
 	return c:IsSetCard(ARCHE_VOIDICTATOR) and not c:IsCode(id) and (c:IsAbleToHand() or c:IsAbleToRemove())
 end
@@ -73,6 +84,8 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
+
+--E2
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	if not re then return false end
 	local rc=re:GetHandler()

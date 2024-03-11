@@ -1,7 +1,17 @@
---created by Walrus, coded by XGlitchy30
---Voidictator Rune - Gating Art
+--[[
+Voidictator Rune - Gating Art
+Runa dei Vuotodespoti - Arte del Cancello
+Card Author: Walrus
+Scripted by: XGlitchy30
+]]
+
+
 local s,id=GetID()
 function s.initial_effect(c)
+	--[[Activate 1 of the following effects (but you cannot apply that same effect of "Voidictator Rune - Gating Art" again this turn):
+	● Add 1 "Voidictator" card from your Deck or GY to your hand, except "Voidictator Rune - Gating Art".
+	● Special Summon 1 of your "Voidictator" monsters that is banished, in your hand, or in your GY.
+	● Return 1 "Voidictator" monster you control to the hand, then draw 1 card.]]
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(0)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
@@ -9,6 +19,7 @@ function s.initial_effect(c)
 	e1:SetRelevantTimings()
 	e1:SetFunctions(nil,nil,s.target,s.activate)
 	c:RegisterEffect(e1)
+	--[[If this card is banished because of a "Voidictator" card you own: You can add 1 of your banished "Voidictator" cards to your hand, except "Voidictator Rune - Gating Art".]]
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(1)
 	e2:SetCategory(CATEGORY_TOHAND)
@@ -22,6 +33,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 	aux.RegisterTriggeringArchetypeCheck(c,ARCHE_VOIDICTATOR)
 end
+--E1
 function s.scfilter(c)
 	return c:IsSetCard(ARCHE_VOIDICTATOR) and c:IsAbleToHand() and not c:IsCode(id)
 end
@@ -78,6 +90,8 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
+
+--E2
 function s.thfilter2(c)
 	return c:IsFaceup() and c:IsSetCard(ARCHE_VOIDICTATOR) and c:IsAbleToHand() and not c:IsCode(id)
 end

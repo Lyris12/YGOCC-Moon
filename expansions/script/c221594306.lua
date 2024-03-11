@@ -1,5 +1,10 @@
---created by Walrus, coded by XGlitchy30
---Voidictator Demon - The Gate Keeper
+--[[
+Voidictator Demon - The Gate Keeper
+Demone Vuotodespota - La Guardia del Cancello
+Card Author: Walrus
+Scripted by: XGlitchy30
+]]
+
 local s,id=GetID()
 function s.initial_effect(c)
 	if not s.progressive_id then
@@ -7,9 +12,12 @@ function s.initial_effect(c)
 	else
 		s.progressive_id=s.progressive_id+100
 	end
+	--link summon
 	c:EnableReviveLimit()
 	aux.AddLinkProcedure(c,s.matfilter,3,3,s.lcheck)
+	--You can only control 1 "Voidictator Demon - The Gate Keeper". 
 	c:SetUniqueOnField(1,0,id)
+	--If this card is Link Summoned: You can banish the top 5 cards of your Deck.
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(0)
 	e1:SetCategory(CATEGORY_REMOVE)
@@ -21,6 +29,8 @@ function s.initial_effect(c)
 	e1:SetTarget(s.rmtg)
 	e1:SetOperation(s.rmop)
 	c:RegisterEffect(e1)
+	--[[If this card leaves the field due to an opponent's card, or if this card is banished because of a "Voidictator" card you own:
+	Return this card to the Extra Deck, then, all "Voidictator" monsters you currently control gain 1000 ATK until the end of the turn.]]
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(1)
 	e2:SetCategory(CATEGORY_TODECK|CATEGORY_ATKCHANGE)
@@ -36,6 +46,8 @@ function s.initial_effect(c)
 	e2x:SetCondition(s.atkcon2)
 	c:RegisterEffect(e2x)
 	aux.RegisterTriggeringArchetypeCheck(c,ARCHE_VOIDICTATOR)
+	--[[Up to thrice per turn, if your opponent Special Summons a Link Monster(s): Activate this effect;
+	this card gains the effects of 1 of those face-up monsters until the end of the next turn.]]
 	aux.RegisterMergedDelayedEventGlitchy(c,s.progressive_id,EVENT_SPSUMMON_SUCCESS,s.cfilter,s.progressive_id,LOCATION_MZONE,nil,LOCATION_MZONE,nil,nil,true)
 	local e3=Effect.CreateEffect(c)
 	e3:Desc(2)
@@ -53,6 +65,8 @@ end
 function s.lcheck(g,lc)
 	return g:IsExists(Card.IsLinkSetCard,1,nil,ARCHE_VOIDICTATOR)
 end
+
+--E1
 function s.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local rg=Duel.GetDecktopGroup(tp,5)
 	if chk==0 then return rg:FilterCount(Card.IsAbleToRemove,nil)==5 end
@@ -65,6 +79,8 @@ function s.rmop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
 	end
 end
+
+--E2
 function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return rp~=tp and not c:IsLocation(LOCATION_DECK)
@@ -96,6 +112,8 @@ function s.atkop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
+
+--E3
 function s.cfilter(c,_,tp)
 	return c:IsFaceup() and c:IsType(TYPE_LINK) and c:IsSummonPlayer(1-tp)
 end

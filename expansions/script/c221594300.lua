@@ -1,14 +1,23 @@
---created by Walrus, coded by XGlitchy30
---Voidictator Energy - Fundamental Essence
+--[[
+Voidictator Energy - Fundamental Essence
+Energia dei Vuotodespoti - Essenza Fondamentale
+Card Author: Walrus
+Scripted by: XGlitchy30
+]]
+
 local s,id=GetID()
 function s.initial_effect(c)
+	--You can only control 1 "Voidictator Energy - Fundamental Essence".
 	c:SetUniqueOnField(1,0,id)
+	--Activate
 	local e0=Effect.CreateEffect(c)
 	e0:Desc(0)
 	e0:SetType(EFFECT_TYPE_ACTIVATE)
 	e0:SetCode(EVENT_FREE_CHAIN)
 	e0:HOPT(true)
 	c:RegisterEffect(e0)
+	--[[During your Main Phase: You can banish 3 "Voidictator Servant" monsters from your field or GY; Special Summon 1 "Voidictator Deity" or "Voidictator Demon" monster from your Extra Deck, ignoring its Summoning conditions (this Special Summon is treated as the respective Summon Mechanic),
+	then if you Special Summoned an Xyz Monster this way, attach 3 of your banished cards to it as material.]]
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(1)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -19,6 +28,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
+	--Each turn, the first and second time this face-up card would be destroyed by a card effect, it is not destroyed.
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
@@ -26,6 +36,7 @@ function s.initial_effect(c)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetValue(s.indct)
 	c:RegisterEffect(e2)
+	--If this card is banished by a "Voidictator" card you own: Shuffle this card into the Deck, and if you do, banish 1 Set card your opponent controls.
 	local e3=Effect.CreateEffect(c)
 	e3:Desc(2)
 	e3:SetCategory(CATEGORY_TODECK|CATEGORY_REMOVE)
@@ -37,6 +48,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 	aux.RegisterTriggeringArchetypeCheck(c,ARCHE_VOIDICTATOR)
 end
+--E1
 function s.cfilter(c)
 	return c:IsFaceup() and (c:IsLocation(LOCATION_MZONE) or c:IsMonsterCard()) and c:IsSetCard(ARCHE_VOIDICTATOR_SERVANT) and c:IsAbleToRemoveAsCost()
 end
@@ -77,6 +89,8 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 		end	
 	end
 end
+
+--E2
 function s.indct(e,re,r,rp)
 	if r&REASON_EFFECT>0 then
 		return 2
@@ -84,6 +98,8 @@ function s.indct(e,re,r,rp)
 		return 0
 	end
 end
+
+--E3
 function s.tdcon(e,tp,eg,ep,ev,re,r,rp)
 	if not re then return false end
 	local rc=re:GetHandler()

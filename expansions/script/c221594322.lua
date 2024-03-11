@@ -1,7 +1,15 @@
---created by Walrus, coded by XGlitchy30
---Voidictator Rune - Raging Flames
+--[[
+Voidictator Rune - Raging Flames
+Runa dei Vuotodespoti - Fiamme Furiose
+Card Author: Walrus
+Scripted by: XGlitchy30
+]]
+
 local s,id=GetID()
 function s.initial_effect(c)
+	--[[If you control a "Voidictator Demon" monster: Activate as Chain Link 4 or higher; negate the activation of your opponent's cards and effects activated before this card in this Chain,
+	and if you do, shuffle those cards into the Deck. If you control "Voidictator Demon - The Unending Flame", attach those cards to it as material, instead.
+	Your opponent cannot activate cards or effects in response to this effect's activation if you control "Voidictator Demon - The Unending Flame".]]
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(0)
 	e1:SetCategory(CATEGORY_NEGATE|CATEGORY_TOGRAVE)
@@ -10,6 +18,7 @@ function s.initial_effect(c)
 	e1:HOPT(true)
 	e1:SetFunctions(s.condition,nil,s.target,s.activate)
 	c:RegisterEffect(e1)
+	--[[If this card is banished because of a "Voidictator" card you own: You can Tribute 1 "Voidictator Servant" monster from your hand or field; Set this card.]]
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(1)
 	e2:SetType(EFFECT_TYPE_SINGLE|EFFECT_TYPE_TRIGGER_O)
@@ -22,6 +31,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 	aux.RegisterTriggeringArchetypeCheck(c,ARCHE_VOIDICTATOR)
 end
+--E1
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	if not (Duel.GetCurrentChain()>=3 and Duel.IsExists(false,aux.FaceupFilter(Card.IsSetCard,ARCHE_VOIDICTATOR_DEMON),tp,LOCATION_MZONE,0,1,nil)) then return false end
 	for i=1,ev do
@@ -114,6 +124,8 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
+
+--E2
 function s.setcon(e,tp,eg,ep,ev,re,r,rp)
 	if not re then return false end
 	local rc=re:GetHandler()
