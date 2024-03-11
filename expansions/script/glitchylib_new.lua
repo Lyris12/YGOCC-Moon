@@ -29,6 +29,9 @@ CATEGORY_FLAG_DELAYED_RESOLUTION	= 0x2
 --Custom Effects
 EFFECT_SET_SPSUMMON_LIMIT				= 39503
 
+--Custom Events
+EVENT_ACTIVATED_DIRECTLY = 61811408
+
 --Archetypes
 ARCHE_CRYSTRON						= 0xea
 ARCHE_GALAXY						= 0x7b
@@ -66,6 +69,7 @@ ARCHE_BOMBER_GOBLIN		= 0x30ac
 ARCHE_CRYSTARION		= 0xc46
 ARCHE_CURSILVER			= 0xc72
 ARCHE_DOOMSDAY_ARTIFICE	= 0x3a6
+ARCHE_DREAD_BASTILLE	= 0xb4c
 ARCHE_DREAMY_FOREST		= 0xd43
 ARCHE_DREARY_FOREST		= 0xd44
 ARCHE_EPTAMAGI			= 0xe07
@@ -120,6 +124,7 @@ CARD_CRYSTARION_ASCENDANT_PILLAR_OF_COBALT		= 100000152
 CARD_DIABOLICAL_QUARPHEX_LV4					= 100000164
 CARD_DIABOLICAL_QUARPHEX_LV8					= 100000165
 CARD_DIABOLICAL_QUARPHEX_LV12					= 100000166
+CARD_DREAD_BASTILLE_OVERTURE					= 61811408
 CARD_EMISSARY_OF_ARMONY							= 11110642
 CARD_GOLDEN_SKIES_TREASURE						= 11111040
 CARD_GOLDEN_SKIES_TREASURE_OF_WELFARE			= 11111029
@@ -166,6 +171,7 @@ COUNTER_CHRONUS						= 0x1ae0
 COUNTER_ICE_PRISON					= 0x1301
 COUNTER_ENGAGED_MASS				= 0xe67
 COUNTER_SORROW						= 0xd44
+COUNTER_SOULFLAME					= 0xb4c
 COUNTER_JOY							= 0xd43
 
 --Desc
@@ -215,6 +221,8 @@ STRING_ATK										=	746
 STRING_DEF										=	747
 STRING_PANDEPEND_SCALE							=	748
 STRING_SPECIAL_SUMMONED							=	749
+STRING_DECKTOP									=	754
+STRING_DECKBOTTOM								=	755
 
 STRING_ASK_REPLACE_UPDATE_ENERGY_COST	= 	900
 STRING_ASK_ENGAGE						=	901
@@ -301,7 +309,8 @@ RESETS_STANDARD_TOFIELD 		= RESETS_STANDARD&(~(RESET_TOFIELD))
 RESETS_STANDARD_EXC_GRAVE 		= RESETS_STANDARD&~(RESET_LEAVE|RESET_TOGRAVE)
 
 --timings
-RELEVANT_TIMINGS = TIMINGS_CHECK_MONSTER|TIMING_MAIN_END|TIMING_END_PHASE
+RELEVANT_TIMINGS 		= TIMINGS_CHECK_MONSTER|TIMING_MAIN_END|TIMING_END_PHASE
+RELEVANT_BATTLE_TIMINGS = TIMING_BATTLE_PHASE|TIMING_BATTLE_END|TIMING_ATTACK|TIMING_BATTLE_START|TIMING_BATTLE_STEP_END
 
 --win
 WIN_REASON_CUSTOM = 0xff
@@ -614,6 +623,37 @@ function Duel.SetAdditionalOperationInfo(ch,cat,g,ct,p,val,...)
 end
 
 --Card Actions
+function Duel.ActivateDirectly(tc,tp)
+	local te=tc:GetActivateEffect()
+	if not te:IsActivatable(tp,true,true) then return end
+	if tc:IsType(TYPE_FIELD) then
+		local fc=Duel.GetFieldCard(tp,LOCATION_FZONE,0)
+		if fc then
+			Duel.SendtoGrave(fc,REASON_RULE)
+			Duel.BreakEffect()
+		end
+		Duel.MoveToField(tc,tp,tp,LOCATION_FZONE,POS_FACEUP,true)
+		te:UseCountLimit(tp,1,true)
+		local tep=tc:GetControler()
+		local cost=te:GetCost()
+		if cost then cost(te,tep,eg,ep,ev,re,r,rp,1) end
+		Duel.RaiseEvent(tc,4179255,te,0,tp,tp,Duel.GetCurrentChain())
+	else
+		Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
+		te:UseCountLimit(tp,1,true)
+		local tep=tc:GetControler()
+		local cost=te:GetCost()
+		if cost then cost(te,tep,eg,ep,ev,re,r,rp,1) end
+		Duel.RaiseSingleEvent(tc,EVENT_ACTIVATED_DIRECTLY,te,0,tp,tp,Duel.GetCurrentChain())
+		Duel.RaiseEvent(tc,EVENT_ACTIVATED_DIRECTLY,te,0,tp,tp,Duel.GetCurrentChain())
+	end
+end
+function Card.IsDirectlyActivatable(c,tp,ignore_loc)
+	if not c:IsType(TYPE_FIELD|TYPE_CONTINUOUS) then return false end
+	local e=c:GetActivateEffect()
+	return e and (c:IsType(TYPE_FIELD) or ignore_loc or Duel.GetLocationCount(tp,LOCATION_SZONE)>0) and e:IsActivatable(tp,true,true)
+end
+
 function Duel.Attach(c,xyz)
 	if aux.GetValueType(c)=="Card" then
 		local og=c:GetOverlayGroup()
@@ -1012,6 +1052,20 @@ function Duel.PlaceOnTopOfDeck(g,p)
 		return ct
 	end
 	return 0
+end
+function Duel.PlaceOnTopOrBottomOfDeck(g,tp,p)
+	if aux.GetValueType(g)=="Card" then
+		g=Group.FromCards(g)
+	end
+	local ct=0
+	local seqs={SEQ_DECKTOP,SEQ_DECKBOTTOM}
+	for c in aux.Next(g) do
+		local opt=Duel.SelectOption(tp,STRING_DECKTOP,STRING_DECKBOTTOM)+1
+		if Duel.SendtoDeck(c,p,seqs[opt],REASON_EFFECT)>0 then
+			ct=ct+1
+		end
+	end
+	return ct
 end
 
 function Auxiliary.PLChk(c,p,loc,min,pos)
@@ -1942,6 +1996,10 @@ end
 function Effect.SetRelevantTimings(e,extra_timings)
 	if not extra_timings then extra_timings=0 end
 	return e:SetHintTiming(extra_timings,RELEVANT_TIMINGS|extra_timings)
+end
+function Effect.SetRelevantBattleTimings(e,extra_timings)
+	if not extra_timings then extra_timings=0 end
+	return e:SetHintTiming(extra_timings,RELEVANT_BATTLE_TIMINGS|extra_timings)
 end
 
 
