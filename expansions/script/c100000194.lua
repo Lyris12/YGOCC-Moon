@@ -55,7 +55,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not (c:IsRelateToChain() and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0) then return end
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToChain() and Duel.Destroy(tc,REASON_EFFECT)>0 then
+	if tc:IsRelateToChain() and tc:IsControler(1-tp) and Duel.Destroy(tc,REASON_EFFECT)>0 then
 		if Duel.IsExists(false,s.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp) and Duel.SelectYesNo(tp,STRING_ASK_SPSUMMON) then
 			local sc=Duel.Select(HINTMSG_SPSUMMON,false,tp,s.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp):GetFirst()
 			if not sc then return end
