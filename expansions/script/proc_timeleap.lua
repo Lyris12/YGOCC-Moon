@@ -376,7 +376,7 @@ function Auxiliary.TimeleapMaterialFilter(c,filter,e,tp,sg,mg,fg,tl,ct,sumcon,..
 		override_future_check=filter[2]
 		filter=filter[1]
 	end
-	if (not filter or filter(c,e,mg,tl) or aux.IgnoreTimeleapMatReqFilter(c,tl,e,tp,sg))
+	if (not filter or filter(c,e,mg,tl,tp) or aux.IgnoreTimeleapMatReqFilter(c,tl,e,tp,sg))
 	and (override_future_check or (c:HasLevel() and c:GetLevel()==tl:GetFuture()-1) or aux.IgnoreTimeleapFutReqFilter(c,tl,e,tp,sg)) then
 		chk=true
 	end
@@ -413,7 +413,7 @@ function Auxiliary.TimeleapCheckGoal(filter,e,tp,sg,fg,tl,ct,sumcon,...)
 	end
 	tl:RegisterFlagEffect(FLAG_CERULEAN_SEA_SIREN,0,0,1)
 	local res = ct>=min and (not fg or not fg:IsExists(aux.MustMaterialCounterFilter,1,nil,sg))
-		and (not sumcon or sumcon(e,tl,tp) or sg:IsExists(aux.IgnoreTimeleapCondFilter,1,nil,c,e,tp,sg))
+		and (not sumcon or sumcon(e,tl,tp,sg) or sg:IsExists(aux.IgnoreTimeleapCondFilter,1,nil,c,e,tp,sg))
 		and Duel.GetLocationCountFromEx(tp,tp,sg,tl)>0
 		and not sg:IsExists(Auxiliary.TimeleapUncompatibilityFilter,1,nil,sg,tl,tp)
 	tl:ResetFlagEffect(FLAG_CERULEAN_SEA_SIREN)

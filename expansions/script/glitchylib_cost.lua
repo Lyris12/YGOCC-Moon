@@ -59,7 +59,7 @@ function Auxiliary.DiscardCost(f,min,max,exc)
 	return	function(e,tp,eg,ep,ev,re,r,rp,chk)
 				local exc=(not exc) and nil or e:GetHandler()
 				if chk==0 then return Duel.IsExistingMatchingCard(aux.DiscardFilter(f,true),tp,LOCATION_HAND,0,min,exc) end
-				Duel.DiscardHand(tp,aux.DiscardFilter(f,true),min,max,REASON_COST+REASON_DISCARD,exc)
+				Duel.DiscardHand(tp,aux.DiscardFilter(f,true),min,max,REASON_COST|REASON_DISCARD,exc)
 			end
 end
 function Auxiliary.BanishCost(f,loc1,loc2,min,max,exc)

@@ -566,19 +566,30 @@ function Card.ChangeATK(c,atk,reset,rc,range,cond,prop,desc)
 		range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
 	end
 	
-	local rc = rc and rc or c
+	local donotdisable=false
     local rct=1
     if type(reset)=="table" then
         rct=reset[2]
         reset=reset[1]
     end
+	
+	if type(rc)=="table" then
+        donotdisable=rc[2]
+        rc=rc[1]
+    end
+	local rc = rc and rc or c
+	
+	if not prop then prop=0 end
+	
 	local oatk=c:GetAttack()
 	local e=Effect.CreateEffect(rc)
 	e:SetType(typ)
+	
 	if range and not SCRIPT_AS_EQUIP then
-		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+		prop=prop|EFFECT_FLAG_SINGLE_RANGE
 		e:SetRange(range)
 	end
+	
 	e:SetCode(EFFECT_SET_ATTACK_FINAL)
 	e:SetValue(atk)
 	if cond then
@@ -586,8 +597,16 @@ function Card.ChangeATK(c,atk,reset,rc,range,cond,prop,desc)
 	end
 	if reset then
 		if type(reset)~="number" then reset=0 end
-		reset = rc==c and reset|RESET_DISABLE or reset
+		if rc==c and not donotdisable then
+			reset = reset|RESET_DISABLE
+		else
+			prop=prop|EFFECT_FLAG_CANNOT_DISABLE
+		end
 		e:SetReset(RESET_EVENT|RESETS_STANDARD|reset,rct)
+	end
+	
+	if prop~=0 then
+		e:SetProperty(prop)
 	end
 	c:RegisterEffect(e)
 	if not reset then

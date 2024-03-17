@@ -168,11 +168,12 @@ TOKEN_RIVAL								= 11110646
 
 --Custom Counters
 COUNTER_CHRONUS						= 0x1ae0
-COUNTER_ICE_PRISON					= 0x1301
 COUNTER_ENGAGED_MASS				= 0xe67
+COUNTER_ICE_PRISON					= 0x1301
+COUNTER_JEWEL						= 0x34f
+COUNTER_JOY							= 0xd43
 COUNTER_SORROW						= 0xd44
 COUNTER_SOULFLAME					= 0xb4c
-COUNTER_JOY							= 0xd43
 
 --Desc
 STRING_CANNOT_CHANGE_POSITION 					= 	700
@@ -685,6 +686,29 @@ function Card.IsAbleToRemoveTemp(c,tp,r)
 	local pos = c:GetPosition()&POS_FACEDOWN>0 and POS_FACEDOWN or POS_FACEUP
 	return c:IsAbleToRemove(tp,pos,r|REASON_TEMPORARY)
 end
+
+--[[Banish a card temporarily
+- g: 			Card, or Group, to banish
+- e: 			Effect that banishes
+- tp:			Player that performs the banishing
+- pos:			If defined, forces the position the card will be banished in
+- phase:		Specify the Phase during which the banished cards will return to the field. It also accepts RESET_SELF_TURN and RESET_OPPO_TURN. Defaults to PHASE_END
+- id:			Specify the flag that will be registered to the banished cards. Only cards that retain the flag until the end of their banishment period will return to the field
+- phasect:		Specify how many of the specified phases have to pass before the cards can return. Defaults to 1.
+- phasenext:	If true, specifies that the cards will return only after the "next" [phasect] [phase]
+- rc:			If defined, forces the card that will own the global effect that will return the cards to the field. Defaults to e:GetHandler()
+- r:			If defined, forces the reason of the banishment. Defaults to REASON_EFFECT.
+
+- disregard_turncount : If true, the condition for the returning effect will not check whether the actual turn count of the Duel matches the label of the effect
+- counts_turns:			If the number of turns is set, the returning effect will be one that "counts turns" (for interactions with "Pyro Clock of Destiny")
+
+- op:  If defined, replaces the banishing action with a custom one
+- loc:  Set only if you defined a custom "op". Specifies the location the cards must be in after being affected by the effect, in order to be counted as successfully affected
+		and eligible for returning to the field.
+		Defaults to LOCATION_REMOVED
+
+- lingering_effect_to_reset: If it is a number, resets all flags of the returning cards with that number after returning to the field. If it is an effect, resets the specified effect.
+]]
 function Duel.BanishUntil(g,e,tp,pos,phase,id,phasect,phasenext,rc,r,disregard_turncount,counts_turns,op,loc,lingering_effect_to_reset)
 	if not e then
 		e=self_reference_effect
@@ -694,6 +718,7 @@ function Duel.BanishUntil(g,e,tp,pos,phase,id,phasect,phasenext,rc,r,disregard_t
 	end
 	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
 	if not phase then phase=PHASE_END end
+	if not id then id=e:GetOwner():GetOriginalCode() end
 	if not phasect then phasect=1 end
 	if not rc then rc=e:GetHandler() end
 	if not r then r=REASON_EFFECT end
@@ -713,7 +738,7 @@ function Duel.BanishUntil(g,e,tp,pos,phase,id,phasect,phasenext,rc,r,disregard_t
 		end
 	end
 	if ct>0 then
-		local og=g:Filter(Card.IsLocation,nil,loc)
+		local og=g:Filter(Card.IsLocation,nil,loc):Filter(aux.BecauseOfThisEffect,nil,e)
 		if #og>0 then
 			og:KeepAlive()
 			local turnct,turnct2=phasect-1,phasect
@@ -730,8 +755,10 @@ function Duel.BanishUntil(g,e,tp,pos,phase,id,phasect,phasenext,rc,r,disregard_t
 					turnct2=turnct2+1
 				end
 			end
+			
+			local eid=e:GetFieldID()
 			for tc in aux.Next(og) do
-				tc:RegisterFlagEffect(id,RESET_EVENT|RESETS_STANDARD|RESET_PHASE|phase,EFFECT_FLAG_SET_AVAILABLE|EFFECT_FLAG_CLIENT_HINT,turnct2,0,STRING_TEMPORARILY_BANISHED)
+				tc:RegisterFlagEffect(id,RESET_EVENT|RESETS_STANDARD|RESET_PHASE|phase,EFFECT_FLAG_SET_AVAILABLE|EFFECT_FLAG_CLIENT_HINT,turnct2,eid,STRING_TEMPORARILY_BANISHED)
 			end
 			local turnct0 = not p and Duel.GetTurnCount() or Duel.GetTurnCount(p)
 			local e1=Effect.CreateEffect(rc)
@@ -740,7 +767,7 @@ function Duel.BanishUntil(g,e,tp,pos,phase,id,phasect,phasenext,rc,r,disregard_t
 			e1:SetCode(EVENT_PHASE|ph)
 			e1:SetReset(RESET_PHASE|phase,turnct2)
 			e1:SetCountLimit(1)
-			e1:SetLabel(turnct0+turnct)
+			e1:SetLabel(turnct0+turnct,id,eid)
 			e1:SetLabelObject(og)
 			if not counts_turns then
 				e1:SetCondition(aux.TimingCondition(ph,p,disregard_turncount))
@@ -766,12 +793,24 @@ function Auxiliary.TimingCondition(phase,p,disregard_turncount)
 				--Debug.Message(Duel.GetTurnCount().." "..e:GetLabel())
 				--Debug.Message(e:GetLabelObject():GetFirst():GetReasonEffect())
 				--Debug.Message(Duel.GetTurnCount(p).." "..e:GetLabel())
+				local g=e:GetLabelObject()
+				local tct,id,eid=e:GetLabel()
+				if not g or g:FilterCount(Card.HasFlagEffectLabel,nil,id,eid)==0 then
+					e:Reset()
+					return false
+				end
 				local turnct = not p and Duel.GetTurnCount() or Duel.GetTurnCount(p)
-				return Duel.GetCurrentPhase()==phase and (not p or Duel.GetTurnPlayer()==p) and (disregard_turncount or turnct==e:GetLabel())
+				return Duel.GetCurrentPhase()==phase and (not p or Duel.GetTurnPlayer()==p) and (disregard_turncount or turnct==tct)
 			end
 end
 function Auxiliary.TimingConditionButCountsTurns(counts_turns)
 	return	function(e,tp,eg,ep,ev,re,r,rp)
+				local g=e:GetLabelObject()
+				local tct,id,eid=e:GetLabel()
+				if not g or g:FilterCount(Card.HasFlagEffectLabel,nil,id,eid)==0 then
+					e:Reset()
+					return false
+				end
 				local tc=e:GetOwner()
 				local ct=tc:GetTurnCounter()
 				--Debug.Message(ct.." "..counts_turns)
@@ -791,7 +830,8 @@ function Auxiliary.ReturnLabelObjectToFieldOp(id,lingering_effect_to_reset)
 				--Debug.Message("OBJSIZE: "..#g)
 				local sg=g:Filter(Card.HasFlagEffect,nil,id)
 				local rg=Group.CreateGroup()
-				for p=tp,1-tp,1-2*tp do
+				local turnp=Duel.GetTurnPlayer()
+				for p=turnp,1-turnp,1-2*turnp do
 					local sg1=sg:Filter(Card.IsPreviousControler,nil,p)
 					if #sg1>0 then
 						local sgm=sg1:Filter(Card.IsPreviousLocation,nil,LOCATION_MZONE)
@@ -828,6 +868,7 @@ function Auxiliary.ReturnLabelObjectToFieldOp(id,lingering_effect_to_reset)
 				end
 				--Debug.Message(#rg)
 				if #rg>0 then
+					sg:Sub(rg)
 					for tc in aux.Next(rg) do
 						if tc:IsPreviousLocation(LOCATION_FZONE) then
 							Duel.MoveToField(tc,tp,tc:GetPreviousControler(),LOCATION_FZONE,tc:GetPreviousPosition(),true)
@@ -851,6 +892,9 @@ function Auxiliary.ReturnLabelObjectToFieldOp(id,lingering_effect_to_reset)
 							tc:ResetFlagEffect(lingering_effect_to_reset)
 						end
 					end
+				end
+				for tc in aux.Next(sg) do
+					Duel.ReturnToField(tc)
 				end
 				if ltype=="Effect" then
 					lingering_effect_to_reset:Reset()
@@ -1145,9 +1189,21 @@ end
 function Card.HasAttack(c)
 	return c:IsMonster()
 end
+function Card.IsCanChangeAttack(c)
+	return c:IsFaceup() and c:HasAttack()
+end
+
 function Card.HasDefense(c)
 	return c:IsMonster() and not c:IsOriginalType(TYPE_LINK)
 end
+function Card.IsCanChangeDefense(c)
+	return c:IsFaceup() and c:HasDefense()
+end
+
+function Card.IsCanChangeStats(c)
+	return c:IsFaceup() and (c:HasAttack() or c:HasDefense())
+end
+
 function Card.HasRank(c)
 	return c:IsOriginalType(TYPE_XYZ)
 end
