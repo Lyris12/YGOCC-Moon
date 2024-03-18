@@ -14,6 +14,7 @@ function s.initial_effect(c)
 	e1:SetCategory(CATEGORY_NEGATE|CATEGORY_REMOVE)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_CHAINING)
+	e1:HOPT()
 	e1:SetFunctions(
 		s.condition,
 		aux.ToGraveCost(s.cfilter,LOCATION_HAND|LOCATION_ONFIELD,0,1,1,true),
@@ -26,6 +27,7 @@ function s.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
 	e2:SetCode(EFFECT_DESTROY_REPLACE)
 	e2:SetRange(LOCATION_GRAVE)
+	e2:HOPT()
 	e2:SetTarget(s.reptg)
 	e2:SetValue(s.repval)
 	e2:SetOperation(s.repop)
