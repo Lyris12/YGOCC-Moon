@@ -55,8 +55,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-  if Duel.GetCurrentChain()>0 then return false end
-  return true   
+	return Duel.GetCurrentChain()<=0
 end
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsReleasable() end

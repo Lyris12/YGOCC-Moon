@@ -248,6 +248,7 @@ STRING_ASK_TO_EXTRA						=	918
 STRING_ASK_EXTRA_RELEASE_NONSUM			=	919
 STRING_ASK_ATTACH						=	920
 STRING_ASK_TO_DECK						=	921
+STRING_ASK_TO_HAND						=	922
 
 STRING_SEND_TO_EXTRA					=	1006
 STRING_BANISH							=	1102
@@ -2835,6 +2836,23 @@ function Duel.SSetAndFastActivation(p,g,e)
 			e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE|EFFECT_FLAG_CLIENT_HINT)
 			e1:SetReset(RESET_EVENT|RESETS_STANDARD)
 			tc:RegisterEffect(e1)
+		end
+	end
+end
+function Duel.SSetAndRedirect(p,g,e)
+	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
+	if Duel.SSet(p,g)>0 then
+		local c=e:GetHandler()
+		local og=g:Filter(aux.SetSuccessfullyFilter,nil)
+		for tc in aux.Next(og) do
+			local e1=Effect.CreateEffect(c)
+			e1:SetDescription(STRING_BANISH_REDIRECT)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE|EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_CLIENT_HINT)
+			e1:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
+			e1:SetValue(LOCATION_REMOVED)
+			e1:SetReset(RESET_EVENT|RESETS_REDIRECT_FIELD)
+			tc:RegisterEffect(e1,true)
 		end
 	end
 end

@@ -222,7 +222,7 @@ function Auxiliary.AddPreTransformationCheck(c,e,condition,duel)
 		ce:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
 		ce:SetProperty((e:GetProperty()&(~EFFECT_FLAG_DELAY)))
 		ce:SetCode(EVENT_PRE_TRANSFORMED)
-		ce:SetOperation(aux.PreTransformationCheckOperation(condition))
+		ce:SetOperation(aux.PreTransformationGlobalCheckOperation(condition))
 		Duel.RegisterEffect(ce,0)
 		e:SetLabelObject(ce)
 		return ce
@@ -237,11 +237,26 @@ function Auxiliary.PreTransformationCheckOperation(condition)
 				end
 			end
 end
+function Auxiliary.PreTransformationGlobalCheckOperation(condition)
+	return	function(e,tp,eg,ep,ev,re,r,rp)
+				local labels={0,0}
+				for p=0,1 do
+					if condition and condition(e,p,eg,ep,ev,re,r,rp) then
+						labels[p+1]=1
+					end
+				end
+				e:SetLabel(table.unpack(labels))
+			end
+end
 function Auxiliary.PreTransformationCheckSuccessSingle(e)
 	return e:GetHandler():HasFlagEffect(FLAG_PRE_TRANSFORMED)
 end
 function Auxiliary.PreTransformationCheckSuccess(e)
 	return e:GetLabelObject():GetLabel()==1
+end
+function Auxiliary.PreTransformationGlobalCheckSuccess(e,tp)
+	local labels={e:GetLabelObject():GetLabel()}
+	return labels[tp+1]==1
 end
 
 --Add procedure that reverts a card from Reverse Side to Obverse Side as soon as it leaves the field.
