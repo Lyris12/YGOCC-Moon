@@ -1,54 +1,66 @@
-local m=11110109
-local cm=_G["c"..m]
-cm.name="Vesta, Royal Knight of Ichyaltas"
-function cm.initial_effect(c)
+--[[
+Vesta, Royal Knight of Ichyaltas
+Vesta, Cavaliere Reale di Ichyaltas
+Card Author: Zerry
+Original Script by: Seinector Phantasmagoria
+Updated by: XGlitchy30
+]]
+
+local s,id=GetID()
+function s.initial_effect(c)
+	--[[You can Special Summon this card (from your hand or GY) by Tributing 1 face-up "Ichyaltas" monster you control, except "Vesta, Royal Knight of Ichyaltas".]]
 	local e1=Effect.CreateEffect(c)
+	e1:Desc(0)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_SPSUMMON_PROC)
 	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
-	e1:SetRange(LOCATION_HAND)
-	e1:SetCondition(cm.dspcon)
-	e1:SetOperation(cm.dspop)
-	e1:SetValue(1)
-	e1:SetCountLimit(1,m)
+	e1:SetRange(LOCATION_HAND|LOCATION_GRAVE)
+	e1:HOPT(true)
+	e1:SetCondition(s.spcon)
+	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
-	local e2=e1:Clone()
-	e2:SetRange(LOCATION_GRAVE)
+	--[[If this card is Tributed: You can target 1 "Ichyaltas" card in your GY; add it to your hand.]]
+	local e2=Effect.CreateEffect(c)
+	e2:SetCategory(CATEGORY_TOHAND)
+	e2:SetType(EFFECT_TYPE_SINGLE|EFFECT_TYPE_TRIGGER_O)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET|EFFECT_FLAG_DELAY)
+	e2:SetCode(EVENT_RELEASE)
+	e2:HOPT()
+	e2:SetTarget(s.rltg)
+	e2:SetOperation(s.rlop)
 	c:RegisterEffect(e2)
-	local e3=Effect.CreateEffect(c)
-	e3:SetCategory(CATEGORY_TOHAND)
-	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetCode(EVENT_RELEASE)
-	e3:SetTarget(cm.rltg)
-	e3:SetOperation(cm.rlop)
-	e3:SetCountLimit(1,m+100000000)
-	c:RegisterEffect(e3)
 end
-function cm.cfilter(c)
-	return c:IsPosition(POS_FACEUP) and c:IsReleasable() and c:IsSetCard(0x2a7) and not c:IsCode(m)
+--E1
+function s.cfilter(c,tp)
+	return c:IsFaceup() and c:IsSetCard(ARCHE_ICHYALTAS) and not c:IsCode(id)
+		and Duel.GetMZoneCount(tp,c)>0
 end
-function cm.dspcon(e,c)
+function s.spcon(e,c)
 	if c==nil then return true end
-	return Duel.CheckReleaseGroup(e:GetHandlerPlayer(),cm.cfilter,1,nil)
+	if c:IsLocation(LOCATION_GRAVE) and c:IsHasEffect(EFFECT_NECRO_VALLEY) then return false end
+	local tp=c:GetControler()
+	return Duel.CheckReleaseGroupEx(tp,s.cfilter,1,REASON_SPSUMMON,false,nil,tp)
 end
-function cm.dspop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.SelectReleaseGroup(tp,cm.cfilter,1,1,nil)
-	Duel.Release(g,REASON_COST)
+function s.spop(e,tp,eg,ep,ev,re,r,rp,c)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
+	local g=Duel.SelectReleaseGroupEx(tp,s.cfilter,1,1,REASON_SPSUMMON,false,nil,tp)
+	Duel.Release(g,REASON_SPSUMMON)
 end
-function cm.filter(c)
-	return c:IsSetCard(0x2a7) and c:IsAbleToHand()
+
+--E2
+function s.filter(c)
+	return c:IsSetCard(ARCHE_ICHYALTAS) and c:IsAbleToHand()
 end
-function cm.rltg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and cm.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(cm.filter,tp,LOCATION_GRAVE,0,1,nil) end
+function s.rltg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and s.filter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(s.filter,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectTarget(tp,cm.filter,tp,LOCATION_GRAVE,0,1,1,nil)
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
+	local g=Duel.SelectTarget(tp,s.filter,tp,LOCATION_GRAVE,0,1,1,nil)
+	Duel.SetCardOperationInfo(g,CATEGORY_TOHAND)
 end
-function cm.rlop(e,tp,eg,ep,ev,re,r,rp)
+function s.rlop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) then
+	if tc:IsRelateToChain() then
 		Duel.SendtoHand(tc,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,tc)
 	end
