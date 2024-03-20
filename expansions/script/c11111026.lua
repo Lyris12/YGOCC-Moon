@@ -31,7 +31,7 @@ end
 function cid.tdfilter(c, tp, mc)
 	local g=Group.FromCards(c)
 	if mc then g:AddCard(mc) end
-	return c:IsCode(11111040) and c:IsAbleToDeck() and Duel.GetMZoneCount(tp, g)>0
+	return c:IsCode(CARD_GOLDEN_SKIES_TREASURE) and c:IsAbleToDeck() and Duel.GetMZoneCount(tp, g)>0
 end
 function cid.sptg(e, tp, eg, ep, ev, re, r, rp, chk)
     if chk==0 then return Duel.IsExistingMatchingCard(cid.tdfilter, tp, LOCATION_HAND+LOCATION_GRAVE, 0, 1, nil) 
@@ -68,7 +68,7 @@ function cid.tgcon(e, tp, eg, ep, ev, re, r, rp)
 	return ph==PHASE_MAIN1 or (ph>=PHASE_BATTLE_START and ph<=PHASE_BATTLE) or ph==PHASE_MAIN2
 end
 function cid.tgfilter(c)
-	return c:IsCode(11111040) and c:IsAbleToGrave()
+	return c:IsCode(CARD_GOLDEN_SKIES_TREASURE) and c:IsAbleToGrave()
 end
 function cid.tgtg(e, tp, eg, ep, ev, re, r, rp, chk)
     if chk==0 then return Duel.IsExistingMatchingCard(cid.tgfilter, tp, LOCATION_DECK, 0, 1, nil) end

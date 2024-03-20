@@ -44,7 +44,7 @@ function cid.tgcon(e, tp, eg, ep, ev, re, r, rp)
     return e:GetHandler():IsSummonType(SUMMON_TYPE_FUSION)
 end
 function cid.tgfilter(c)
-	return c:IsCode(11111040) and c:IsAbleToGrave()
+	return c:IsCode(CARD_GOLDEN_SKIES_TREASURE) and c:IsAbleToGrave()
 end
 function cid.tgtg(e, tp, eg, ep, ev, re, r, rp, chk)
     if chk==0 then return Duel.IsExistingMatchingCard(cid.tgfilter, tp, LOCATION_DECK, 0, 1, nil) end
@@ -64,7 +64,7 @@ function cid.negcon(e, tp, eg, ep, ev, re, r, rp)
 	return rp==1-tp and not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and Duel.IsChainNegatable(ev)
 end
 function cid.tdfilter(c)
-	return c:IsCode(11111040) and c:IsAbleToDeck()
+	return c:IsCode(CARD_GOLDEN_SKIES_TREASURE) and c:IsAbleToDeck()
 end
 function cid.negtg(e, tp, eg, ep, ev, re, r, rp, chk)
     if chk==0 then return Duel.IsExistingMatchingCard(cid.tdfilter, tp, LOCATION_GRAVE, 0, 1, nil) end

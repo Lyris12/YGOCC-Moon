@@ -37,7 +37,7 @@ function cid.fselect(g)
 	return g:GetClassCount(Card.GetOriginalCode)==g:GetCount()
 end
 function cid.tgfilter(c)
-	return c:IsCode(11111040) and c:IsAbleToGrave()
+	return c:IsCode(CARD_GOLDEN_SKIES_TREASURE) and c:IsAbleToGrave()
 end
 function cid.tgtg(e, tp, eg, ep, ev, re, r, rp, chk)
 	local g=Duel.GetMatchingGroup(cid.tgfilter, tp, LOCATION_HAND+LOCATION_DECK, 0, nil)

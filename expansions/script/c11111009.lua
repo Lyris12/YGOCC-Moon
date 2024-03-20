@@ -3,7 +3,7 @@
 
 local s,id=GetID()
 function s.initial_effect(c)
-	aux.EnableChangeCode(c,11111040,LOCATION_GRAVE)
+	aux.EnableChangeCode(c,CARD_GOLDEN_SKIES_TREASURE,LOCATION_GRAVE)
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(0)

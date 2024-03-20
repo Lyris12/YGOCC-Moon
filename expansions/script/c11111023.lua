@@ -28,7 +28,7 @@ end
 --Special Summon from hand if "Golden Skies Treasure" is in GY
 
 function cid.spfilter(c)
-    return c:IsCode(11111040)
+    return c:IsCode(CARD_GOLDEN_SKIES_TREASURE)
 end
 function cid.spcon(e, tp, eg, ep, ev, re, r, rp)
     return Duel.IsExistingMatchingCard(cid.spfilter, tp, LOCATION_GRAVE, 0, 1, nil)
@@ -60,7 +60,7 @@ end
 --Shuffle "Golden Skies Treasure" into deck and Search a "Golden Skies" spell
 
 function cid.tdfilter(c)
-    return c:IsCode(11111040) and c:IsAbleToDeck()
+    return c:IsCode(CARD_GOLDEN_SKIES_TREASURE) and c:IsAbleToDeck()
 end
 function cid.thfilter(c)
     return c:IsSetCard(0x528) and c:IsType(TYPE_SPELL) and c:IsAbleToHand()

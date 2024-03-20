@@ -41,7 +41,7 @@ function cid.tgcon(e, tp, eg, ep, ev, re, r, rp)
     return e:GetHandler():IsSummonType(SUMMON_TYPE_FUSION)
 end
 function cid.tgfilter(c)
-	return c:IsCode(11111040) and c:IsAbleToGrave()
+	return c:IsCode(CARD_GOLDEN_SKIES_TREASURE) and c:IsAbleToGrave()
 end
 function cid.tgtg(e, tp, eg, ep, ev, re, r, rp, chk)
     if chk==0 then return Duel.IsExistingMatchingCard(cid.tgfilter, tp, LOCATION_DECK, 0, 1, nil) end
@@ -58,7 +58,7 @@ end
 --Shuffle a "Golden Skies Treasure" to deck and Special Summon 3 "Golden Skies" monsters
 
 function cid.costfilter(c)
-	return c:IsCode(11111040) and c:IsAbleToDeckAsCost()
+	return c:IsCode(CARD_GOLDEN_SKIES_TREASURE) and c:IsAbleToDeckAsCost()
 end
 function cid.spcost(e, tp, eg, ep, ev, re, r, rp, chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cid.costfilter, tp, LOCATION_HAND+LOCATION_GRAVE, 0, 1, nil) end

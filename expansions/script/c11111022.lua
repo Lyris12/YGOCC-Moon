@@ -38,7 +38,7 @@ function cid.spcost(e, tp, eg, ep, ev, re, r, rp, chk)
 	Duel.ShuffleHand(tp)
 end
 function cid.tgfilter(c)
-	return c:IsCode(11111040) and c:IsAbleToGrave()
+	return c:IsCode(CARD_GOLDEN_SKIES_TREASURE) and c:IsAbleToGrave()
 end
 function cid.sptg(e, tp, eg, ep, ev, re, r, rp, chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cid.tgfilter, tp, LOCATION_DECK, 0, 1, nil) 
@@ -69,7 +69,7 @@ end
 
 --Shuffle "Golden Skies Treasure" and Fusion Summon
 function cid.tdfilter(c)
-	return c:IsCode(11111040) and c:IsAbleToDeck()
+	return c:IsCode(CARD_GOLDEN_SKIES_TREASURE) and c:IsAbleToDeck()
 end
 function cid.spfilter1(c, e)
 	return not c:IsImmuneToEffect(e)

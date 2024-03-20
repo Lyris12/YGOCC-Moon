@@ -27,7 +27,7 @@ function cid.condition(e, tp, eg, ep, ev, re, r, rp)
 	return Duel.IsExistingMatchingCard(cid.confilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function cid.tgfilter(c)
-	return c:IsCode(11111040) and c:IsAbleToGrave()
+	return c:IsCode(CARD_GOLDEN_SKIES_TREASURE) and c:IsAbleToGrave()
 end
 function cid.target(e, tp, eg, ep, ev, re, r, rp, chk, chkc)
 	if chkc then return chkc:IsLocation(LOCATION_ONFIELD) and chkc:IsFaceup() end

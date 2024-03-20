@@ -63,7 +63,7 @@ function s.splimit(e,c)
 	return not s.counterfilter(c)
 end
 function s.filter1(c)
-	return c:IsCode(11111040) and c:IsAbleToGrave()
+	return c:IsCode(CARD_GOLDEN_SKIES_TREASURE) and c:IsAbleToGrave()
 end
 function s.filter2(c)
 	return c:IsSetCard(0x223,0x528) and c:IsAbleToGrave()
@@ -91,7 +91,7 @@ function s.dtrfilter(c,e)
 	return c:IsMonster() and c:IsDestructable(e)
 end
 function s.tdfilter(c)
-	return c:IsCode(11111040) and c:IsAbleToDeckAsCost()
+	return c:IsCode(CARD_GOLDEN_SKIES_TREASURE) and c:IsAbleToDeckAsCost()
 end
 function s.dtrcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(1)

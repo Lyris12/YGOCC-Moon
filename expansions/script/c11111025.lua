@@ -56,7 +56,7 @@ end
 --Send "Golden Skies Treasure" from deck to GY
 
 function cid.tgfilter(c)
-	return c:IsCode(11111040) and c:IsAbleToGrave()
+	return c:IsCode(CARD_GOLDEN_SKIES_TREASURE) and c:IsAbleToGrave()
 end
 function cid.tgtg(e, tp, eg, ep, ev, re, r, rp, chk)
     if chk==0 then return Duel.IsExistingMatchingCard(cid.tgfilter, tp, LOCATION_DECK, 0, 1, nil) end

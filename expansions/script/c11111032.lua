@@ -54,7 +54,7 @@ end
 --Send "Golden Skies Treasure" to GY if a "Golden Skies" monster is Normal Summoned
 
 function cid.filter(c)
-	return c:IsCode(11111040) and c:IsAbleToGrave()
+	return c:IsCode(CARD_GOLDEN_SKIES_TREASURE) and c:IsAbleToGrave()
 end
 function cid.target(e, tp, eg, ep, ev, re, r, rp, chk)
 	local tc=eg:GetFirst()
