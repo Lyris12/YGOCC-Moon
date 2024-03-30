@@ -2,18 +2,26 @@
 --Not yet finalized values
 --Custom constants
 EFFECT_PANDEMONIUM						=726
-EFFECT_PANDEPEND_SCALE 					=727	--Allows to use a Pandemonium to complete a Pendulum Scale. The Pande must be located in the leftmost or rightmost S/T, and according to its position, it will use its left or right scale
-EFFECT_KEEP_PANDEMONIUM_ON_FIELD 		=728	--The Pandemonium won't be sent to the ED after a successful Pande Summon. If an X value is set, the effect will wear off after the Xth Pande Summon with that Pandemonium
+EFFECT_PANDEPEND_SCALE 					=727	--[[Allows to use a Pandemonium to complete a Pendulum Scale. The Pande must be located in the leftmost or rightmost S/T,
+													and according to its position, it will use its left or right scale]]
+EFFECT_KEEP_PANDEMONIUM_ON_FIELD 		=728	--[[The Pandemonium won't be sent to the ED after a successful Pande Summon. If an X value is set,
+													the effect will wear off after the Xth Pande Summon with that Pandemonium]]
 EFFECT_PANDEMONIUM_SUMMON_AFTERMATH 	=729	--Changes the operation that will be executed after a successful Pande Summon
-EFFECT_ALLOW_EXTRA_PANDEMONIUM_ZONE 	=730	--(DUEL EFFECT) Allows to have multiple Pandemonium Cards as scales at the same time. By setting a target to the effect, you can choose which kind of cards can be face-up
+EFFECT_ALLOW_EXTRA_PANDEMONIUM_ZONE 	=730	--[[(DUEL EFFECT) Allows to have multiple Pandemonium Cards as scales at the same time. By setting a target to the effect,
+													you can choose which kind of cards can be face-up]]
 EFFECT_EXTRA_PANDEMONIUM_SUMMON 		=731	--(DUEL EFFECT) Allows to execute multiple Pandemonium Summons during a turn. Works in the same way as EXTRA_PENDULUM_SUMMON
 EFFECT_PANDEMONIUM_LEVEL				=732	--A monster with this effect can be treated as having this effect's value as Level for a Pandemonium Summon
 EFFECT_DISABLE_PANDEMONIUM_SUMMON		=733	--A Pandemonium Scale with this effect won't be able to Pandemonium Summon monsters
 EFFECT_EXTRA_PANDEMONIUM_SUMMON_LOCATION=734	--Allows to choose extra locations from which the user can Pandemonium Summon
+
 TYPE_PANDEMONIUM						=0x200000000
 TYPE_CUSTOM								=TYPE_CUSTOM|TYPE_PANDEMONIUM
+
 CTYPE_PANDEMONIUM						=0x2
 CTYPE_CUSTOM							=CTYPE_CUSTOM|CTYPE_PANDEMONIUM
+
+LOCATION_PANDEZONE						=0x1000
+
 SUMMON_TYPE_PANDEMONIUM					=SUMMON_TYPE_SPECIAL+726
 
 --Custom Type Table
@@ -41,7 +49,7 @@ Card.GetOriginalType=function(c)
 	local tpe=get_orig_type(c)
 	if Auxiliary.Pandemoniums[c] then
 		local typ=c:GetFlagEffectLabel(1074)
-		tpe=tpe|TYPE_MONSTER|typ
+		tpe=tpe|TYPE_PANDEMONIUM|typ
 		if not Auxiliary.Pandemoniums[c]() then
 			tpe=tpe&~TYPE_PENDULUM
 		end
@@ -151,6 +159,23 @@ Card.GetRitualType=function(c)
 	return tpe
 end
 
+--Location function
+local _IsLocation, _GetLocation = Card.IsLocation, Card.GetLocation
+
+Card.IsLocation = function(c,loc)
+	if loc&LOCATION_PANDEZONE>0 and c:IsInPandemoniumZone() then
+		return true
+	end
+	return _IsLocation(c,loc)
+end
+Card.GetLocation = function(c)
+	local loc=_GetLocation(c)
+	if c:IsInPandemoniumZone() then
+		loc=loc|LOCATION_PANDEZONE
+	end
+	return loc
+end
+
 --Custom Functions
 function Auxiliary.AddOrigPandemoniumType(c,ispendulum,is_spell)
 	table.insert(Auxiliary.Pandemoniums,c)
@@ -163,7 +188,7 @@ function Auxiliary.EnablePandemoniumAttribute(c,...)
 	if c:IsStatus(STATUS_COPYING_EFFECT) then return end
 	local t={...}
 	local tclone={}
-	local regfield,typ,actcon,actcost,hoptnum,acthopt,forced=nil,TYPE_PANDEMONIUM+TYPE_EFFECT,nil,nil,1,nil,false
+	local regfield,typ,actcon,actcost,hoptnum,acthopt,forced=nil,get_orig_type(c),nil,nil,1,nil,false
 	for tt=1,#t do
 		if type(t[tt])~='userdata' then
 			table.insert(tclone,t[tt])
@@ -196,7 +221,7 @@ function Auxiliary.EnablePandemoniumAttribute(c,...)
 		table.remove(t)
 	end
 	if #tclone>=2 and type(t[#t])=='number' then
-		typ=t[#t]|TYPE_PANDEMONIUM
+		typ=t[#t]&(~TYPE_PANDEMONIUM)
 		table.remove(t)
 	end
 	if type(t[#t])=='boolean' then
@@ -706,9 +731,37 @@ end
 function Auxiliary.PandSSetFilter(f,...)
 	local params={...}
 	return	function(c,...)
-				return c:IsMonster(TYPE_PANDEMONIUM) and not c:IsForbidden() and (not f or f(c,...)) and Auxiliary.PandSSetCon(c,table.unpack(params))()
+				return c:IsPandemoniumSSetable() and (not f or f(c,...))
 			end
 end
+function Card.IsPandemoniumSSetable(c,ignore_zone_check,tp)
+	if not c:IsType(TYPE_PANDEMONIUM) or c:IsForbidden() then return false end
+	local tp=tp or c:GetControler()
+	
+	if not ignore_zone_check and Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return false end
+	if c:IsForbidden() then return false end
+	if c:IsHasEffect(EFFECT_CANNOT_SSET) then return false end
+	
+	local eset={Duel.IsPlayerAffectedByEffect(tp,EFFECT_CANNOT_SSET)}
+	for _,e in ipairs(eset) do
+		local tg=e:GetTarget()
+		if not tg or tg(e,c,tp) then
+			return false
+		end
+	end
+	
+	local eset={Duel.IsPlayerAffectedByEffect(tp,EFFECT_SSET_COST)}
+	for _,e in ipairs(eset) do
+		local cost=e:GetCost()
+		if not cost(e,c,tp) then
+			return false
+		end
+	end
+	
+	return true
+end	
+
+
 function Auxiliary.GetOriginalPandemoniumType(c)
 	return c:GetFlagEffectLabel(1074)
 end
@@ -716,6 +769,7 @@ function Card.GetOriginalPandemoniumType(c)
 	return c:GetFlagEffectLabel(1074)
 end
 function Duel.PandSSet(tc,e,tp,reason,tpe)
+	if not tpe then tpe=tc:GetOriginalPandemoniumType() end
 	return aux.PandSSet(tc,reason,tpe)(e,tp)
 end
 function Auxiliary.PandSSet(tc,reason,tpe)
@@ -726,25 +780,42 @@ function Auxiliary.PandSSet(tc,reason,tpe)
 				local sg=Group.CreateGroup()
 				sg:KeepAlive()
 				local tg=tc:Clone()
+				
+				local effects_not_to_reset={}
+				
 				for cc in aux.Next(tg) do
 					if not tpe then
 						tpe=aux.GetOriginalPandemoniumType(cc)
 					end
 					if cc:IsType(TYPE_PANDEMONIUM) or cc:GetFlagEffect(706)>0 then
-						local e1=Effect.CreateEffect(cc)
-						e1:SetType(EFFECT_TYPE_SINGLE)
-						e1:SetCode(EFFECT_MONSTER_SSET)
-						e1:SetValue(TYPE_TRAP)
-						e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD)
-						cc:RegisterEffect(e1,true)
+						local e1
+						if cc:IsLocation(LOCATION_HAND) then
+							for _,ce in ipairs({cc:IsHasEffect(EFFECT_CHANGE_TYPE)}) do
+								if ce:GetType()==EFFECT_TYPE_SINGLE and ce:GetOwner()==cc then
+									table.insert(effects_not_to_reset,ce)
+								end
+							end
+							e1=Effect.CreateEffect(cc)
+							e1:SetType(EFFECT_TYPE_SINGLE)
+							e1:SetCode(EFFECT_MONSTER_SSET)
+							e1:SetValue(TYPE_TRAP)
+							e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD)
+							cc:RegisterEffect(e1,true)
+						else
+							cc:SetCardData(CARDDATA_TYPE,TYPE_TRAP)
+						end
+						
 						if cc:IsLocation(LOCATION_SZONE) then
 							Duel.ChangePosition(cc,POS_FACEDOWN_ATTACK)
 							Duel.RaiseEvent(cc,EVENT_SSET,e,reason,tp,tp,0)
 							cc:RegisterFlagEffect(706,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SET_AVAILABLE,1)
-							e1:Reset()
+							if e1 then
+								e1:Reset()
+							end
 						else								
 							sg:AddCard(cc)
 						end
+						
 					elseif cc:IsType(TYPE_SPELL+TYPE_TRAP) and cc:GetFlagEffect(706)<=0 then
 						if not mixedset then mixedset=true end
 						sg:AddCard(cc)
@@ -755,7 +826,18 @@ function Auxiliary.PandSSet(tc,reason,tpe)
 					for cc in aux.Next(sg) do
 						local tpe = tpe~=nil and tpe or aux.GetOriginalPandemoniumType(cc)
 						if cc:IsType(TYPE_PANDEMONIUM) then
-							cc:RegisterFlagEffect(706,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SET_AVAILABLE,1)
+							if cc:GetOriginalType()&TYPE_TRAP==0 then
+								cc:SetCardData(CARDDATA_TYPE,TYPE_TRAP)
+							end
+							cc:RegisterFlagEffect(706,RESET_EVENT|RESETS_STANDARD,EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_SET_AVAILABLE,1)
+							for _,ce in ipairs({cc:IsHasEffect(EFFECT_CHANGE_TYPE)}) do
+								if ce:GetType()==EFFECT_TYPE_SINGLE and ce:GetOwner()==cc and not aux.FindInTable(effects_not_to_reset,ce) then
+									local val=ce:GetValue()
+									if val==TYPE_TRAP then
+										ce:Reset()
+									end
+								end
+							end
 							if not cc:IsLocation(LOCATION_SZONE) then
 								local edcheck=0
 								if cc:IsLocation(LOCATION_EXTRA) then edcheck=TYPE_PENDULUM end
@@ -895,17 +977,28 @@ function Auxiliary.PandAct(tc,...)
 						if tc:IsLocation(LOCATION_EXTRA) then edcheck=TYPE_PENDULUM end
 						tc:SetCardData(CARDDATA_TYPE,TYPE_MONSTER|edcheck|aux.GetOriginalPandemoniumType(tc))
 						return
+					else
+						tc:SetCardData(CARDDATA_TYPE,TYPE_TRAP)
 					end
-					local e1=Effect.CreateEffect(tc)
-					e1:SetType(EFFECT_TYPE_SINGLE)
-					e1:SetCode(EFFECT_CHANGE_TYPE)
-					e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-					e1:SetValue(TYPE_TRAP)
-					e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-					tc:RegisterEffect(e1,true)
 				end
 				tc:RegisterFlagEffect(726,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CANNOT_DISABLE,1)
 			end
+end
+function Duel.ActivatePandemonium(tc,tp,up,zone,fromfield)
+	local up=up or tp
+	local zone=zone or 0xff
+	if not tc:IsLocation(LOCATION_SZONE) then
+		Duel.MoveToField(tc,tp,p,LOCATION_SZONE,POS_FACEUP,true,zone)
+		if not tc:IsLocation(LOCATION_SZONE) then
+			local edcheck=0
+			if tc:IsLocation(LOCATION_EXTRA) then edcheck=TYPE_PENDULUM end
+			tc:SetCardData(CARDDATA_TYPE,TYPE_MONSTER|edcheck|aux.GetOriginalPandemoniumType(tc))
+			return
+		else
+			tc:SetCardData(CARDDATA_TYPE,TYPE_TRAP)
+		end
+	end
+	tc:RegisterFlagEffect(726,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CANNOT_DISABLE,1)
 end
 
 function Card.IsPandemoniumActivatable(c,tp,fp,neglect_loc,neglect_cond,neglect_cost,neglect_targ,eg,ep,ev,re,r,rp,...)
@@ -996,6 +1089,25 @@ function Card.IsPandemoniumActivatable(c,tp,fp,neglect_loc,neglect_cond,neglect_
 	end
 	
 	return true
+end
+
+--Cost handling
+local _IsAbleToExtra, _IsAbleToGraveAsCost = Card.IsAbleToExtra, Card.IsAbleToGraveAsCost
+
+Card.IsAbleToExtra = function(c)
+	if c:GetOriginalType()&TYPE_PANDEMONIUM>0 then
+		return not c:IsHasEffect(EFFECT_CANNOT_TO_DECK) and Duel.IsPlayerCanSendtoDeck(current_triggering_player,c)
+	else
+		return _IsAbleToExtra(c)
+	end
+end
+
+Card.IsAbleToGraveAsCost = function(c)
+	if c:GetOriginalType()&TYPE_PANDEMONIUM>0 and c:IsOnField() and c:IsAbleToExtra() then
+		return false
+	else
+		return _IsAbleToGraveAsCost(c)
+	end
 end
 
 ----------EFFECT_PANDEPEND_SCALE-------------
