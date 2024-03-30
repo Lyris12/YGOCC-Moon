@@ -721,92 +721,51 @@ end
 function Auxiliary.PandSSet(tc,reason,tpe)
 	return  function(e,tp,eg,ep,ev,re,r,rp,c)
 				local res=0
-				if pcall(Group.GetFirst,tc) then
-					local mixedset=false
-					local sg=Group.CreateGroup()
-					sg:KeepAlive()
-					local tg=tc:Clone()
-					for cc in aux.Next(tg) do
-						if cc:IsType(TYPE_PANDEMONIUM) or cc:GetFlagEffect(706)>0 then	
-							if not cc:IsLocation(LOCATION_HAND) then
-								cc:SetCardData(CARDDATA_TYPE,TYPE_TRAP)
-							end
-							local e1=Effect.CreateEffect(cc)
-							e1:SetType(EFFECT_TYPE_SINGLE)
-							e1:SetCode(EFFECT_MONSTER_SSET)
-							e1:SetValue(TYPE_TRAP)
-							e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-							cc:RegisterEffect(e1,true)
-							if cc:IsLocation(LOCATION_SZONE) then
-								--if cc:IsCanTurnSet() then
-									Duel.ChangePosition(cc,POS_FACEDOWN_ATTACK)
-									Duel.RaiseEvent(cc,EVENT_SSET,e,reason,tp,tp,0)
-									cc:RegisterFlagEffect(706,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SET_AVAILABLE,1)
-									e1:Reset()
-								--end
-							else								
-								sg:AddCard(cc)
-							end
-						elseif cc:IsType(TYPE_SPELL+TYPE_TRAP) and cc:GetFlagEffect(706)<=0 then
-							if not mixedset then mixedset=true end
+				if not pcall(Group.GetFirst,tc) then tc=Group.CreateGroup(tc) end
+				local mixedset=false
+				local sg=Group.CreateGroup()
+				sg:KeepAlive()
+				local tg=tc:Clone()
+				for cc in aux.Next(tg) do
+					if not tpe then
+						tpe=aux.GetOriginalPandemoniumType(cc)
+					end
+					if cc:IsType(TYPE_PANDEMONIUM) or cc:GetFlagEffect(706)>0 then
+						local e1=Effect.CreateEffect(cc)
+						e1:SetType(EFFECT_TYPE_SINGLE)
+						e1:SetCode(EFFECT_MONSTER_SSET)
+						e1:SetValue(TYPE_TRAP)
+						e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD)
+						cc:RegisterEffect(e1,true)
+						if cc:IsLocation(LOCATION_SZONE) then
+							Duel.ChangePosition(cc,POS_FACEDOWN_ATTACK)
+							Duel.RaiseEvent(cc,EVENT_SSET,e,reason,tp,tp,0)
+							cc:RegisterFlagEffect(706,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SET_AVAILABLE,1)
+							e1:Reset()
+						else								
 							sg:AddCard(cc)
 						end
+					elseif cc:IsType(TYPE_SPELL+TYPE_TRAP) and cc:GetFlagEffect(706)<=0 then
+						if not mixedset then mixedset=true end
+						sg:AddCard(cc)
 					end
-					if #sg>0 then
-						res=Duel.SSet(tp,sg,tp,false)
-						for cc in aux.Next(sg) do
-							local tpe = tpe~=nil and tpe or aux.GetOriginalPandemoniumType(cc)
-							if cc:IsType(TYPE_PANDEMONIUM) then
-								cc:RegisterFlagEffect(706,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SET_AVAILABLE,1)
-								if cc:IsPreviousLocation(LOCATION_HAND) then
-									cc:SetCardData(CARDDATA_TYPE,TYPE_TRAP)
-								end
-								if not cc:IsLocation(LOCATION_SZONE) then
-									local edcheck=0
-									if cc:IsLocation(LOCATION_EXTRA) then edcheck=TYPE_PENDULUM end
-									cc:SetCardData(CARDDATA_TYPE,TYPE_MONSTER|tpe|edcheck)
-								end
+				end
+				if #sg>0 then
+					res=Duel.SSet(tp,sg,tp,false)
+					for cc in aux.Next(sg) do
+						local tpe = tpe~=nil and tpe or aux.GetOriginalPandemoniumType(cc)
+						if cc:IsType(TYPE_PANDEMONIUM) then
+							cc:RegisterFlagEffect(706,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SET_AVAILABLE,1)
+							if not cc:IsLocation(LOCATION_SZONE) then
+								local edcheck=0
+								if cc:IsLocation(LOCATION_EXTRA) then edcheck=TYPE_PENDULUM end
+								cc:SetCardData(CARDDATA_TYPE,TYPE_MONSTER|tpe|edcheck)
 							end
 						end
 					end
-				else
-					if not tpe then
-						tpe=aux.GetOriginalPandemoniumType(tc)
-					end
-					local hand_chk=true
-					if not tc:IsLocation(LOCATION_HAND) then
-						hand_chk=false
-						tc:SetCardData(CARDDATA_TYPE,TYPE_TRAP)
-					end
-					local e1=Effect.CreateEffect(tc)
-					e1:SetType(EFFECT_TYPE_SINGLE)
-					e1:SetCode(EFFECT_MONSTER_SSET)
-					e1:SetValue(TYPE_TRAP)
-					e1:SetReset(RESET_EVENT+RESETS_STANDARD-RESET_TOFIELD)
-					tc:RegisterEffect(e1,true)
-					if tc:IsLocation(LOCATION_SZONE) then
-						if tc:IsCanTurnSet() then
-							Duel.ChangePosition(tc,POS_FACEDOWN_ATTACK)
-							Duel.RaiseEvent(tc,EVENT_SSET,e,reason,tp,tp,0)
-							tc:RegisterFlagEffect(706,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SET_AVAILABLE,1)
-						end
-					else
-						res=Duel.SSet(tp,tc,tp,false)
-						tc:RegisterFlagEffect(706,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_SET_AVAILABLE,1)
-					end
-					e1:Reset()
-					if hand_chk then
-						tc:SetCardData(CARDDATA_TYPE,TYPE_TRAP)
-					end
-					if not tc:IsLocation(LOCATION_SZONE) then
-						local edcheck=0
-						if tc:IsLocation(LOCATION_EXTRA) then edcheck=TYPE_PENDULUM end
-						tc:SetCardData(CARDDATA_TYPE,TYPE_MONSTER|tpe|edcheck)
-					else
-						if reason&REASON_RULE==0 then
-							Duel.ConfirmCards(1-tp,Group.FromCards(tc))
-						end
-					end
+				end
+				if reason&REASON_RULE==0 then
+					Duel.ConfirmCards(1-tp,sg)
 				end
 				return res
 			end
@@ -924,13 +883,12 @@ function Auxiliary.PandActOperation(...)
 end
 function Auxiliary.PandAct(tc,...)
 	local funs={...}
-	local player,zonechk,fromfield=funs[1],funs[2],funs[3]
+	local player,zonechk=funs[1],funs[2]
 	return  function(e,tp,eg,ep,ev,re,r,rp)
 				local p,zone=tp,0xff
 				if player then p=player end
 				if zonechk then zone=zonechk end
-				tc:SetCardData(CARDDATA_TYPE,TYPE_TRAP)
-				if not tc:IsOnField() or fromfield then
+				if not tc:IsLocation(LOCATION_SZONE) then
 					Duel.MoveToField(tc,tp,p,LOCATION_SZONE,POS_FACEUP,true,zone)
 					if not tc:IsLocation(LOCATION_SZONE) then
 						local edcheck=0
@@ -938,6 +896,13 @@ function Auxiliary.PandAct(tc,...)
 						tc:SetCardData(CARDDATA_TYPE,TYPE_MONSTER|edcheck|aux.GetOriginalPandemoniumType(tc))
 						return
 					end
+					local e1=Effect.CreateEffect(tc)
+					e1:SetType(EFFECT_TYPE_SINGLE)
+					e1:SetCode(EFFECT_CHANGE_TYPE)
+					e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+					e1:SetValue(TYPE_TRAP)
+					e1:SetReset(RESET_EVENT+RESETS_STANDARD)
+					tc:RegisterEffect(e1,true)
 				end
 				tc:RegisterFlagEffect(726,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CANNOT_DISABLE,1)
 			end
