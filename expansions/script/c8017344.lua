@@ -27,8 +27,8 @@ end
 function cid.filter(c)
 	return c:IsSetCard(0xf80) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToHand()
 end
-function cid.pfilter(c,e,tp,eg,ep,ev,re,r,rp)
-	return c:IsFaceup() and c:IsType(TYPE_PANDEMONIUM) and not c:IsForbidden() and aux.PandActCon(nil,c)(e,tp,eg,ep,ev,re,r,rp)
+function cid.pfilter(c,e,tp)
+	return c:IsFaceup() and c:IsType(TYPE_PANDEMONIUM) and not c:IsForbidden() and c:CheckUniqueOnField(tp,LOCATION_SZONE) and c:IsCanPlaceOnField(tp,tp,LOCATION_PANDEZONE,e,REASON_EFFECT)
 end
 function cid.cfilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_PANDEMONIUM) and c:IsType(TYPE_MONSTER)
@@ -44,10 +44,10 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 	if g:GetCount()>0 then
 		if Duel.SendtoHand(g,nil,REASON_EFFECT)~=0 then
 			Duel.ConfirmCards(1-tp,g)
-			if Duel.IsExistingMatchingCard(cid.pfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,eg,ep,ev,re,r,rp) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 
+			if Duel.IsExistingMatchingCard(cid.pfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 
 			and Duel.IsExistingMatchingCard(cid.cfilter,tp,LOCATION_MZONE,0,1,nil) and Duel.SelectYesNo(tp,aux.Stringid(id,0)) then
 				Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,1))
-				local tc=Duel.SelectMatchingCard(tp,cid.pfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,eg,ep,ev,re,r,rp)
+				local tc=Duel.SelectMatchingCard(tp,cid.pfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp)
 				if #tc>0 then
 					aux.PandAct(tc:GetFirst())(e,tp,eg,ep,ev,re,r,rp)
 				end

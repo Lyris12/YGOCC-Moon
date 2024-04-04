@@ -52,6 +52,11 @@ function Duel.MoveTurnCountCustom(ct,e,tp,r)
 	return diff
 end
 
+function Duel.SetTurnCountCustom(ct,e,tp,r)
+	local n=ct-Duel.GetTurnCount(nil,true)
+	return Duel.MoveTurnCountCustom(n,e,tp,r)
+end
+
 --Manage Turn Count Modification Event when players pass turns
 function Auxiliary.RegisterTurnCountTriggerEffectFlag(c,e)
 	local prop=EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_IGNORE_IMMUNE|EFFECT_FLAG_SET_AVAILABLE

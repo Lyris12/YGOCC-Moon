@@ -234,6 +234,4 @@ function Effect.IsFitTargetFunction(e,c)
 		return tg(e,c)
 	end
 	return true
-end
-
----------------------------------------
+end	

@@ -1342,18 +1342,28 @@ table.insert(Auxiliary.CannotBeEDMatCodes,EFFECT_CANNOT_BE_XYZ_MATERIAL)
 table.insert(Auxiliary.CannotBeEDMatCodes,EFFECT_CANNOT_BE_LINK_MATERIAL)
 function Auxiliary.CannotBeEDMaterial(c,f,range,isrule,reset,owner,prop,allow_customs)
 	if not owner then owner=c end
+	
+	local typ = EFFECT_TYPE_SINGLE
 	local property = type(prop)=="number" and prop or 0
+	
 	if (isrule == nil or isrule == true) then
 		property = property|EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_UNCOPYABLE
 	end
+	
 	if range ~=nil then
-		property = property|EFFECT_FLAG_SINGLE_RANGE
+		if range=="Equip" then
+			typ=EFFECT_TYPE_EQUIP
+			range=nil
+		else
+			property = property|EFFECT_FLAG_SINGLE_RANGE
+		end
 	end
+	
 	local allow_customs = type(allow_customs)=="nil" or allow_customs
 	for _,val in ipairs(Auxiliary.CannotBeEDMatCodes) do
 		if allow_customs or val==EFFECT_CANNOT_BE_FUSION_MATERIAL or val==EFFECT_CANNOT_BE_SYNCHRO_MATERIAL or val==EFFECT_CANNOT_BE_XYZ_MATERIAL or val==EFFECT_CANNOT_BE_LINK_MATERIAL then
 			local restrict = Effect.CreateEffect(owner)
-			restrict:SetType(EFFECT_TYPE_SINGLE)
+			restrict:SetType(typ)
 			restrict:SetCode(val)
 			if (property ~= 0) then
 				restrict:SetProperty(property)
@@ -2267,6 +2277,7 @@ function Card.GetEffects(c)
 	end
 	return global_card_effect_table[c]
 end
+
 if not global_card_effect_table_global_check then
 	global_card_effect_table_global_check=true
 	global_card_effect_table={}
@@ -2329,7 +2340,7 @@ if not global_card_effect_table_global_check then
 										end
 									end
 								end
-								return not cond or cond(e,...)
+								return not cond or cond(E,...)
 							end
 			e:SetCondition(newcond)
 		end
@@ -2378,7 +2389,7 @@ if not global_card_effect_table_global_check then
 					local tg=e:GetTarget()
 					ce:SetTarget(function(eff,c) return (not tg or tg(eff,c)) and c:IsHasEffect(EFFECT_ORIGINAL_LEVEL_RANK_DUALITY) end)
 				end
-				self.register_global_card_effect_table(self,ce,forced)
+				Card.register_global_card_effect_table(self,ce,forced)
 			
 			elseif code==EFFECT_DISABLE or code==EFFECT_DISABLE_EFFECT or code==EFFECT_DISABLE_CHAIN or code==EFFECT_DISABLE_TRAPMONSTER then
 				if typ==EFFECT_TYPE_SINGLE then
@@ -2386,7 +2397,7 @@ if not global_card_effect_table_global_check then
 					if not cond then
 						e:SetCondition(aux.GlitchyCannotDisableCon())
 					else
-						e:SetCondition(aux.GlitchyCannotDisableCon(con))
+						e:SetCondition(aux.GlitchyCannotDisableCon(cond))
 					end
 				elseif typ==EFFECT_TYPE_FIELD then
 					local tg=e:GetTarget()
@@ -2580,9 +2591,11 @@ if not global_card_effect_table_global_check then
 				end
 			end
 		end
-		return self.register_global_card_effect_table(self,e,forced)
+		
+		return Card.register_global_card_effect_table(self,e,forced)
 	end
 end
+
 function Auxiliary.OperationRegistrationProcedure(e,tp,eg,ep,ev,re,r,rp)
 	self_reference_effect = e
 	current_triggering_player = tp
@@ -2594,6 +2607,9 @@ function Auxiliary.OperationRegistrationProcedure(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 	return e,tp,eg,ep,ev,re,r,rp
+end
+function Auxiliary.EndRegistrationProcedure(e,tp,eg,ep,ev,re,r,rp)
+	self_reference_effect=nil
 end
 
 --Global Card Effect Table (for Duel.RegisterEffect)

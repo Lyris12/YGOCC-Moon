@@ -63,14 +63,17 @@ function c53313919.thop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
+function c53313919.pafilter(c,e,tp)
+	return not c:IsForbidden() and c:CheckUniqueOnField(tp,LOCATION_SZONE) and c:IsCanPlaceOnField(tp,tp,LOCATION_PANDEZONE,e,REASON_EFFECT)
+end
 function c53313919.patg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
-		and Duel.IsExistingMatchingCard(Card.IsType,tp,LOCATION_HAND,0,1,nil,TYPE_PANDEMONIUM) and aux.PandActCon(e,tp) end
+		and Duel.IsExistingMatchingCard(c53313919.pafilter,tp,LOCATION_HAND,0,1,nil,e,tp) end
 end
 function c53313919.paop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 or not aux.PandActCon(e,tp) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
-	local g=Duel.SelectMatchingCard(tp,Card.IsType,tp,LOCATION_HAND,0,1,1,nil,TYPE_PANDEMONIUM)
+	local g=Duel.SelectMatchingCard(tp,c53313919.pafilter,tp,LOCATION_HAND,0,1,1,nil,e,tp)
 	local tc=g:GetFirst()
 	if tc then
 		aux.PandAct(tc)(e,tp,eg,ep,ev,re,r,rp)

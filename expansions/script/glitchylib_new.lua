@@ -26,6 +26,13 @@ CATEGORIES_TOKEN 			= 	CATEGORY_SPECIAL_SUMMON|CATEGORY_TOKEN
 CATEGORY_FLAG_SELF					= 0x1
 CATEGORY_FLAG_DELAYED_RESOLUTION	= 0x2
 
+--Operation Info Special Values
+OPINFO_FLAG_HALVE	= 0x1
+OPINFO_FLAG_DOUBLE 	= 0x2
+OPINFO_FLAG_UNKNOWN = 0x4
+OPINFO_FLAG_HIGHER 	= 0x8
+OPINFO_FLAG_LOWER 	= 0x10
+
 --Custom Effects
 EFFECT_SET_SPSUMMON_LIMIT				= 39503
 
@@ -81,6 +88,7 @@ ARCHE_GRENADE_TYPE		= 0x302
 ARCHE_ICHYALTAS			= 0x2a7
 ARCHE_IDOLESCENT		= 0x5a3
 ARCHE_LEYLAH			= 0xd45
+ARCHE_LICH_LORD			= 0x2e7
 ARCHE_LIFEWEAVER		= 0x5a5
 ARCHE_LOTUS_BLADE		= 0x3ff
 ARCHE_METALURGOS		= 0x5a4
@@ -120,6 +128,7 @@ CARD_EHERO_BLAZEMAN						= 63060238
 CARD_NUMBER_39_UTOPIA					= 84013237
 CARD_ROTA								= 32807846
 CARD_UMI								= 22702055
+CARD_ZOMBIE_WORLD						= 4064256
 
 CARD_BRAIN_BOOT_SECTOR							= 221812211
 CARD_CHEVALIER_DU_VAISSEAU						= 100000032
@@ -133,6 +142,7 @@ CARD_GOLDEN_SKIES_TREASURE						= 11111060
 CARD_GOLDEN_SKIES_TREASURE_OF_WELFARE			= 11111029
 CARD_IN_THE_FOREST_BLACK_AS_MY_MEMORY			= 100000051
 CARD_KEEPER_OF_ARMONY							= 100000145
+CARD_LICH_LORD_PHYLACTERY						= 91630827
 CARD_LIMIERRE									= 19936278
 CARD_LORITHIA_SQUIRE_OF_ICHYALTAS				= 11110103
 CARD_LOTUS_BLADE_MIMICRY						= 100000174
@@ -142,6 +152,7 @@ CARD_MMS_JACKLYN_ALLTRADES						= 19905907
 CARD_MMS_SHERLOCK_HOLMES						= 19905908
 CARD_MONOCHROME_VALKYRIE_RK4					= 100000167
 CARD_MUSCWOLE_MURDERMANIA						= 70070078
+CARD_NUMBER_205_XEENAFAE						= 91630826
 CARD_OSCURION_TYPE0								= 11110633
 CARD_OSCURION_TYPE2								= 11110634
 CARD_REVERIE_DU_VAISSEAU						= 100000039
@@ -154,7 +165,9 @@ CARD_STARFORCE_KNIGHT							= 39301
 CARD_THE_EMBODIMENTS_OF_MOVEMENTS				= 34853
 CARD_THE_ORIGIN_OF_DRAGONS						= 20157309
 CARD_VOIDICTATOR_DEITY_NEMESIS					= 221594308
+CARD_VOIDICTATOR_DEITY_OMEN						= 221594307
 CARD_VOIDICTATOR_DEMON_GUARDIAN_OF_CORVUS		= 221594314
+CARD_VOIDICTATOR_DEMON_THE_GATEKEEPER			= 221594306
 CARD_VOIDICTATOR_DEMON_THE_UNENDING_FLAME		= 221594309
 CARD_VOIDICTATOR_RUNE_COURT_OF_THE_VOID			= 221594311
 CARD_VOIDICTATOR_RUNE_GATES_OF_PERDITION		= 221594326
@@ -255,6 +268,8 @@ STRING_ASK_EXTRA_RELEASE_NONSUM			=	919
 STRING_ASK_ATTACH						=	920
 STRING_ASK_TO_DECK						=	921
 STRING_ASK_TO_HAND						=	922
+STRING_ASK_RECOVER						=	923
+STRING_ASK_DAMAGE						=	924
 
 STRING_SEND_TO_EXTRA					=	1006
 STRING_BANISH							=	1102
@@ -278,6 +293,7 @@ HINTMSG_FLIPSUMMON						=	2103
 HINTMSG_ATTACH							=	2104
 HINTMSG_ATTACHTO						=	2105
 HINTMSG_ATKDEF							=	2106
+HINTMSG_HALVE_ATKDEF					=	2107
 
 --Locations
 LOCATION_ENGAGED	=	0x1000
@@ -315,6 +331,7 @@ RESETS_STANDARD_DISABLE			= RESETS_STANDARD|RESET_DISABLE
 RESETS_STANDARD_UNION 			= RESETS_STANDARD&(~(RESET_TOFIELD|RESET_LEAVE))
 RESETS_STANDARD_TOFIELD 		= RESETS_STANDARD&(~(RESET_TOFIELD))
 RESETS_STANDARD_EXC_GRAVE 		= RESETS_STANDARD&~(RESET_LEAVE|RESET_TOGRAVE)
+RESETS_STANDARD_FACEDOWN 		= RESETS_STANDARD&(~(RESET_TURN_SET))
 
 --timings
 RELEVANT_TIMINGS 		= TIMINGS_CHECK_MONSTER|TIMING_MAIN_END|TIMING_END_PHASE
@@ -977,7 +994,7 @@ function Card.CheckNegateConjunction(c,e1,e2,e3)
 end
 
 TYPE_NEGATE_ALL = TYPE_MONSTER|TYPE_SPELL|TYPE_TRAP
-function Duel.Negate(tc,e,reset,notfield,forced,typ)
+function Duel.Negate(tc,e,reset,notfield,forced,typ,cond)
 	local rct=1
 	if not reset then
 		reset=0
@@ -991,12 +1008,18 @@ function Duel.Negate(tc,e,reset,notfield,forced,typ)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e1:SetCode(EFFECT_DISABLE)
+	if cond then
+		e1:SetCondition(cond)
+	end
 	e1:SetReset(RESET_EVENT|RESETS_STANDARD|reset,rct)
 	tc:RegisterEffect(e1,forced)
 	local e2=Effect.CreateEffect(e:GetHandler())
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e2:SetCode(EFFECT_DISABLE_EFFECT)
+	if cond then
+		e2:SetCondition(cond)
+	end
 	if not notfield then
 		e2:SetValue(RESET_TURN_SET)
 	end
@@ -1007,6 +1030,9 @@ function Duel.Negate(tc,e,reset,notfield,forced,typ)
 		e3:SetType(EFFECT_TYPE_SINGLE)
 		e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e3:SetCode(EFFECT_DISABLE_TRAPMONSTER)
+		if cond then
+			e3:SetCondition(cond)
+		end
 		e3:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
 		tc:RegisterEffect(e3,forced)
 		local res=tc:CheckNegateConjunction(e1,e2,e3)
@@ -1755,7 +1781,7 @@ function Auxiliary.Option(id,tp,desc,...)
 	if #ops==0 then return end
 	local op=Duel.SelectOption(tp,table.unpack(ops))+1
 	local sel=opval[op]
-	Duel.Hint(HINT_OPSELECTED,1-tp,ops[op])
+	--Duel.Hint(HINT_OPSELECTED,1-tp,ops[op])
 	return sel
 end
 
@@ -2174,8 +2200,11 @@ function Card.DeactivateLinkMarker(c,markers,e,tp,r,reset,rc)
 end
 
 --LP
-function Duel.LoseLP(p,val)
+function Duel.LoseLP(tp,val)
 	return Duel.SetLP(tp,Duel.GetLP(tp)-math.abs(val))
+end
+function Duel.HalveLP(tp)
+	return Duel.SetLP(tp,math.ceil(Duel.GetLP(tp)/2))
 end
 
 --Locations
@@ -2421,10 +2450,32 @@ function Duel.GetDeckCount(p)
 	return Duel.GetFieldGroupCount(p,LOCATION_DECK,0)
 end
 function Duel.GetGY(p)
-	return Duel.GetFieldGroup(p,LOCATION_GY,0)
+	if not p then
+		return Duel.GetFieldGroup(0,LOCATION_GRAVE,LOCATION_GRAVE)
+	else
+		return Duel.GetFieldGroup(p,LOCATION_GRAVE,0)
+	end
 end
 function Duel.GetGYCount(p)
-	return Duel.GetFieldGroupCount(p,LOCATION_GY,0)
+	if not p then
+		return Duel.GetFieldGroupCount(0,LOCATION_GRAVE,LOCATION_GRAVE)
+	else
+		return Duel.GetFieldGroupCount(LOCATION_GRAVE)
+	end
+end
+function Duel.GetBanishment(p)
+	if not p then
+		return Duel.GetFieldGroup(0,LOCATION_REMOVED,LOCATION_REMOVED)
+	else
+		return Duel.GetFieldGroup(p,LOCATION_REMOVED,0)
+	end
+end
+function Duel.GetBanismentCount(p)
+	if not p then
+		return Duel.GetFieldGroupCount(0,LOCATION_REMOVED,LOCATION_REMOVED)
+	else
+		return Duel.GetFieldGroupCount(p,LOCATION_REMOVED,0)
+	end
 end
 function Duel.GetExtraDeck(p)
 	return Duel.GetFieldGroup(p,LOCATION_EXTRA,0)
@@ -2565,6 +2616,13 @@ end
 
 function Duel.GetNextPhaseCount(ph,p)
 	if Duel.GetCurrentPhase()==ph and (not p or Duel.GetTurnPlayer()==tp) then
+		return 2
+	else
+		return 1
+	end
+end
+function Duel.GetNextMainPhaseCount(p)
+	if Duel.IsMainPhase() and (not p or Duel.GetTurnPlayer()==tp) then
 		return 2
 	else
 		return 1
@@ -3741,6 +3799,15 @@ function Auxiliary.DreamyDrearyTransformationCondition(status)
 						and Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,ARCHE_DREAMY_FOREST,ARCHE_DREARY_FOREST),tp,LOCATION_ONFIELD,0,1,e:GetHandler())
 				end
 	end
+end
+
+----LICH-LORD
+function Auxiliary.PhylacteryCondition(e,tp)
+	local tp = tp or e:GetHandlerPlayer()
+	return Duel.IsExistingMatchingCard(Card.IsCode,tp,LOCATION_GRAVE,0,1,nil,CARD_LICH_LORD_PHYLACTERY)
+end
+function Auxiliary.PhylacteryCheck(tp)
+	return Duel.IsExistingMatchingCard(Card.IsCode,tp,LOCATION_GRAVE,0,1,nil,CARD_LICH_LORD_PHYLACTERY)
 end
 
 ----OSCURION

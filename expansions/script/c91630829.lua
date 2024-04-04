@@ -1,122 +1,176 @@
---Lich-Lord's Burial Grounds
-local cid,id=GetID()
-function cid.initial_effect(c)
+--[[
+Lich-Lord's Burial Grounds
+Terreni di Sepoltura del Signore-Lich
+Card Author: Walrus
+Scripted by: XGlitchy30
+]]
+
+local s,id=GetID()
+function s.initial_effect(c)
+	--You can only control 1 "Lich-Lord's Burial Grounds".
 	c:SetUniqueOnField(1,0,id)
-	--Activate
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetCode(EVENT_FREE_CHAIN)
-	c:RegisterEffect(e1)
-	--atk
+	c:Activation()
+	--While you have "Lich-Lord's Phylactery" in your GY, all "Lich-Lord" monsters you control gain 100 ATK/DEF for each Zombie monster on the field and in the GYs.
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_UPDATE_ATTACK)
 	e2:SetRange(LOCATION_SZONE)
-	e2:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-	e2:SetCondition(function(e) return Duel.IsExistingMatchingCard(Card.IsCode,e:GetHandlerPlayer(),LOCATION_GRAVE,0,1,nil,91630827) end)
-	e2:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x2e7))
-	e2:SetValue(cid.atkval)
+	e2:SetTargetRange(LOCATION_MZONE,0)
+	e2:SetCondition(aux.PhylacteryCondition)
+	e2:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,ARCHE_LICH_LORD))
+	e2:SetValue(s.statval)
 	c:RegisterEffect(e2)
-	local e3=e2:Clone()
-	e3:SetCode(EFFECT_UPDATE_DEFENSE)
+	e2:UpdateDefenseClone(c)
+	--Once per turn, if you control no monsters: You can Special Summon 1 "Lich-Lord" monster from your hand or GY, and if you do, negate its effects on the field until your next Main Phase.
+	local e3=Effect.CreateEffect(c)
+	e3:Desc(0)
+	e3:SetType(EFFECT_TYPE_IGNITION)
+	e3:SetRange(LOCATION_SZONE)
+	e3:OPT()
+	e3:SetFunctions(s.condition,nil,s.target,s.operation)
 	c:RegisterEffect(e3)
-	--special summon
-	local e5=Effect.CreateEffect(c)
-	e5:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e5:SetType(EFFECT_TYPE_IGNITION)
-	e5:SetRange(LOCATION_SZONE)
-	e5:SetCountLimit(1)
-	e5:SetCondition(cid.spcon)
-	e5:SetTarget(cid.sptg)
-	e5:SetOperation(cid.spop)
-	c:RegisterEffect(e5)
-	--If this card is in your GY, except during the turn it was sent to the GY: You can banish this card and 2 Zombie monsters from your GY; Special Summon 1 non-DARK monster from your Extra Deck, ignoring its Summoning conditions, and if you do, it becomes a Zombie monster, also it gains the following effect.(below)
+	--[[If this card and "Lich-Lord's Phylactery" are in your GY, except the turn this card was sent there: You can banish this card and up to 5 Zombie monsters from your GY;
+	destroy all monsters you control (if any), then Special Summon "Lich-Lord" monsters from your hand, Deck, or GY, up to the number of Zombie monsters banished to activate this effect.
+	Their effects are negated, also their original Levels become 7.]]
 	local e4=Effect.CreateEffect(c)
+	e4:Desc(1)
+	e4:SetCategory(CATEGORY_DESTROY|CATEGORY_SPECIAL_SUMMON)
 	e4:SetType(EFFECT_TYPE_IGNITION)
 	e4:SetRange(LOCATION_GRAVE)
-	e4:SetCountLimit(1,id)
-	e4:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e4:SetCondition(aux.exccon)
-	e4:SetCost(cid.cost)
-	e4:SetTarget(cid.tg)
-	e4:SetOperation(cid.op)
+	e4:HOPT()
+	e4:SetFunctions(s.spcon,aux.DummyCost,s.sptg,s.spop)
 	c:RegisterEffect(e4)
 end
-function cid.atkval(e,c)
-	return Duel.GetMatchingGroupCount(Card.IsRace,e:GetHandlerPlayer(),LOCATION_GRAVE+LOCATION_MZONE,LOCATION_GRAVE+LOCATION_MZONE,nil,RACE_ZOMBIE)*100
+
+--E2
+function s.statfilter(c)
+	return c:IsFaceupEx() and c:IsRace(RACE_ZOMBIE)
 end
-function cid.tglimit(e,c)
-	return not c:IsSetCard(0x2e7)
+function s.statval(e,c)
+	return Duel.GetMatchingGroupCount(s.statfilter,0,LOCATION_MZONE|LOCATION_GRAVE,LOCATION_MZONE|LOCATION_GRAVE,nil)*100
 end
-function cid.cfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x2e7)
+
+--E3
+function s.condition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0
 end
-function cid.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return not Duel.IsExistingMatchingCard(cid.cfilter,tp,LOCATION_MZONE,0,1,nil)
+function s.spfilter(c,e,tp)
+	return c:IsSetCard(ARCHE_LICH_LORD) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function cid.spfilter(c,e,tp)
-	return c:IsSetCard(0x2e7) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-end
-function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(cid.spfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil,e,tp) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_GRAVE)
-end
-function cid.spop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(cid.spfilter),tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil,e,tp)
-	local tc=g:GetFirst()
-	if tc and Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP) then
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_DISABLE)
-		e1:SetReset(RESET_PHASE+PHASE_END,2)
-		tc:RegisterEffect(e1,true)
-		local e2=Effect.CreateEffect(e:GetHandler())
-		e2:SetType(EFFECT_TYPE_SINGLE)
-		e2:SetCode(EFFECT_DISABLE_EFFECT)
-		e2:SetReset(RESET_PHASE+PHASE_END,2)
-		tc:RegisterEffect(e2,true)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chk==0 then
+		return Duel.IsExists(false,s.spfilter,tp,LOCATION_HAND|LOCATION_GRAVE,0,1,nil,e,tp)
 	end
-	Duel.SpecialSummonComplete()
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND|LOCATION_GRAVE)
 end
-function cid.filter(c)
+function s.operation(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.Select(HINTMSG_SPSUMMON,false,tp,aux.Necro(s.spfilter),tp,LOCATION_HAND|LOCATION_GRAVE,0,1,1,nil,e,tp):GetFirst()
+	if tc and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)>0 then
+		local turnct,ph=-1,0
+		if Duel.IsMainPhase(tp) then
+			turnct,ph=Duel.GetTurnCount(),Duel.GetCurrentPhase()
+		end
+		Duel.Negate(tc,e,0,false,false,TYPE_MONSTER,s.resetcon(tp,turnct,ph))
+	end
+end
+function s.resetcon(tp,turnct,ph)
+	return	function(e)
+				if Duel.IsMainPhase(tp) and (turnct==-1 or Duel.GetTurnCount()~=turnct or (ph~=0 and Duel.GetCurrentPhase()~=ph)) then
+					e:Reset()
+					return false
+				end
+				return true
+			end
+end
+
+--E4
+function s.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return aux.PhylacteryCheck(tp) and aux.exccon(e,tp,eg,ep,ev,re,r,rp)
+end
+function s.cfilter(c)
 	return c:IsRace(RACE_ZOMBIE) and c:IsAbleToRemoveAsCost()
 end
-function cid.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return aux.bfgcost(e,tp,eg,ep,ev,re,r,rp,0) and Duel.IsExistingMatchingCard(cid.filter,tp,LOCATION_GRAVE,0,2,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	Duel.Remove(Duel.SelectMatchingCard(tp,cid.filter,tp,LOCATION_GRAVE,0,2,2,nil)+e:GetHandler(),POS_FACEUP,REASON_COST)
+function s.rescon(dg)
+	return	function(g,e,tp)
+				local res=Duel.IsExists(false,s.spfilter,tp,LOCATION_HAND|LOCATION_GRAVE|LOCATION_DECK,0,1,g,e,tp)
+				return (Duel.GetMZoneCount(tp,g)>0 or Duel.GetMZoneCount(tp,dg)>0) and res, not res
+			end
 end
-function cid.sfilter(c,e,tp)
-	return not c:IsAttribute(ATTRIBUTE_DARK) and c:IsCanBeSpecialSummoned(e,0,tp,true,false) and Duel.GetLocationCountFromEx(tp,tp,nil,c:GetType()&TYPE_EXTRA)>0
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	local g=Duel.Group(s.cfilter,tp,LOCATION_GRAVE,0,c)
+	local dg=Duel.GetFieldGroup(tp,LOCATION_MZONE,0)
+	if chk==0 then
+		return e:IsCostChecked() and c:IsAbleToRemoveAsCost() and aux.SelectUnselectGroup(g,e,tp,1,5,s.rescon(dg),0)
+	end
+	local rg=aux.SelectUnselectGroup(g,e,tp,1,5,s.rescon(dg),1,tp,HINTMSG_REMOVE)
+	if #rg>0 then
+		rg:AddCard(c)
+		local ct=Duel.Remove(rg,POS_FACEUP,REASON_COST)
+		if Duel.GetOperatedGroup():IsContains(c) then
+			ct=ct-1
+		end
+		Duel.SetTargetParam(ct)
+		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND|LOCATION_GRAVE|LOCATION_DECK)
+	end
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,dg,#dg,tp,LOCATION_MZONE)
 end
-function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(cid.sfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
+	local dg=Duel.GetFieldGroup(tp,LOCATION_MZONE,0)
+	local check,breakchk=true,false
+	if #dg>0 then
+		check=Duel.Destroy(dg,REASON_EFFECT)>0
+		breakchk=true
+	end
+	if check then
+		local ct=Duel.GetTargetParam()
+		if not ct then return end
+		local ft=Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) and 1 or math.min(ct,Duel.GetMZoneCount(tp))
+		if ft<=0 then return end
+		local g=Duel.Select(HINTMSG_SPSUMMON,false,tp,aux.Necro(s.spfilter),tp,LOCATION_HAND|LOCATION_GRAVE|LOCATION_DECK,0,1,ft,nil,e,tp)
+		if #g>0 then
+			if breakchk then
+				Duel.BreakEffect()
+			end
+			local c=e:GetHandler()
+			local eid=e:GetFieldID()
+			for tc in aux.Next(g) do
+				if Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP) then
+					local e1=Effect.CreateEffect(c)
+					e1:SetType(EFFECT_TYPE_SINGLE)
+					e1:SetCode(EFFECT_DISABLE)
+					e1:SetReset(RESET_EVENT|RESETS_STANDARD)
+					tc:RegisterEffect(e1,true)
+					local e2=Effect.CreateEffect(c)
+					e2:SetType(EFFECT_TYPE_SINGLE)
+					e2:SetCode(EFFECT_DISABLE_EFFECT)
+					e2:SetReset(RESET_EVENT|RESETS_STANDARD)
+					tc:RegisterEffect(e2,true)
+					local temp=tc:GetOriginalLevel()
+					if temp~=7 then
+						tc:SetCardData(CARDDATA_LEVEL,7)
+						tc:RegisterFlagEffect(id,RESET_EVENT|RESETS_STANDARD_TOFIELD,0,1,eid)
+						local e3=Effect.CreateEffect(c)
+						e3:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
+						e3:SetCode(EVENT_ADJUST)
+						e3:SetLabel(eid)
+						e3:SetLabelObject(tc)
+						e3:SetOperation(s.resetlv(temp))
+						Duel.RegisterEffect(e3,tp)
+					end
+				end
+			end
+			Duel.SpecialSummonComplete()
+		end
+	end
 end
-function cid.op(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local tc=Duel.SelectMatchingCard(tp,cid.sfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp):GetFirst()
-	if not tc or not Duel.SpecialSummonStep(tc,0,tp,tp,true,false,POS_FACEUP) then return end
-	local e0=Effect.CreateEffect(e:GetHandler())
-	e0:SetType(EFFECT_TYPE_SINGLE)
-	e0:SetCode(EFFECT_CHANGE_RACE)
-	e0:SetValue(RACE_ZOMBIE)
-	e0:SetReset(RESET_EVENT+RESETS_STANDARD)
-	tc:RegisterEffect(e0,true)
-	--If there is no "Lich-Lord's Phylactery" in your GY, negate this card's other effects.
-	local e1=Effect.CreateEffect(tc)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e1:SetCode(EFFECT_DISABLE)
-	e1:SetCondition(function(e) return not Duel.IsExistingMatchingCard(Card.IsCode,e:GetHandlerPlayer(),LOCATION_GRAVE,0,1,nil,91630827) end)
-	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-	tc:RegisterEffect(e1,true)
-	local e2=e1:Clone()
-	e2:SetCode(EFFECT_DISABLE_EFFECT)
-	e2:SetValue(RESET_TURN_SET)
-	tc:RegisterEffect(e2,true)
-	Duel.SpecialSummonComplete()
+function s.resetlv(temp)
+	return	function(e,tp,eg,ep,ev,re,r,rp)
+				local eid=e:GetLabel()
+				local tc=e:GetLabelObject()
+				if not tc or not tc:HasFlagEffectLabel(id,eid) then
+					tc:SetCardData(CARDDATA_LEVEL,temp)
+					e:Reset()
+				end
+			end
 end

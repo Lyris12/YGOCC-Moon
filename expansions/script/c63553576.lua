@@ -97,15 +97,24 @@ function cid.sscon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp and (Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2)
 		and (Duel.GetCurrentChain()==0 or Duel.GetChainInfo(Duel.GetCurrentChain(),CHAININFO_TRIGGERING_PLAYER)~=1-tp)
 end
-function cid.dryfilter(c,e,tp,eg,ep,ev,re,r,rp)
-	return (not c:IsLocation(LOCATION_MZONE) or c:IsFaceup()) and c:IsType(TYPE_MONSTER) and c:IsType(TYPE_PENDULUM+TYPE_PANDEMONIUM) and c:IsSetCard(0x7a4)
-		and Duel.IsExistingMatchingCard(cid.pfilter,tp,LOCATION_DECK,0,1,nil,e,tp,eg,ep,ev,re,r,rp,c:GetOriginalAttribute(),c:GetType())
+function cid.dryfilter(c,e,tp)
+	return c:IsFaceupEx() and c:IsType(TYPE_MONSTER) and c:IsType(TYPE_PENDULUM|TYPE_PANDEMONIUM) and c:IsSetCard(0x7a4)
+		and Duel.IsExistingMatchingCard(cid.pfilter,tp,LOCATION_DECK,0,1,nil,e,tp,c:GetOriginalAttribute(),c:GetType())
 end
-function cid.pfilter(c,e,tp,eg,ep,ev,re,r,rp,attr,typ)
-	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x7a4) and c:IsAttribute(attr) and not c:IsForbidden()
-		and (c:IsType(TYPE_PENDULUM) and (Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,1))
-		or (c:IsType(TYPE_PANDEMONIUM) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and aux.PandActCon(nil,c)(e,tp,eg,ep,ev,re,r,rp)))
-		and bit.band(typ,c:GetType()&(TYPE_PENDULUM+TYPE_PANDEMONIUM))==0
+function cid.pfilter(c,e,tp,attr,typ)
+	local ptyp=c:GetType()&(TYPE_PENDULUM|TYPE_PANDEMONIUM)
+	if not (c:IsType(TYPE_MONSTER) and c:IsSetCard(0x7a4) and c:IsAttribute(attr) and not c:IsForbidden() and typ&ptyp==0) then return false end
+	if ptyp&TYPE_PENDULUM>0 then
+		if (Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,1)) and c:IsCanPlaceOnField(tp,tp,LOCATION_PZONE,e,REASON_EFFECT) then
+			return true
+		end
+	end
+	if ptyp&TYPE_PANDEMONIUM>0 then
+		if Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and c:IsCanPlaceOnField(tp,tp,LOCATION_PANDEZONE,e,REASON_EFFECT) then
+			return true
+		end
+	end
+	return false
 end
 function cid.sstg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cid.dryfilter,tp,LOCATION_HAND+LOCATION_MZONE,0,1,nil,e,tp,eg,ep,ev,re,r,rp) end
@@ -119,7 +128,7 @@ function cid.ssop(e,tp,eg,ep,ev,re,r,rp)
 		if Duel.Destroy(g1,REASON_EFFECT)~=0 then
 			local attr,typ=g1:GetFirst():GetOriginalAttribute(),g1:GetFirst():GetType()
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_OPERATECARD)
-			local g2=Duel.SelectMatchingCard(tp,cid.pfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp,eg,ep,ev,re,r,rp,attr,typ):GetFirst()
+			local g2=Duel.SelectMatchingCard(tp,cid.pfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp,attr,typ):GetFirst()
 			if not g2 then return end
 			if g2:IsType(TYPE_PENDULUM) then
 				Duel.MoveToField(g2,tp,tp,LOCATION_PZONE,POS_FACEUP,true)

@@ -68,10 +68,10 @@ end
 function c63553470.sprfilter1(c)
 	return c:IsType(TYPE_PENDULUM) and c:IsLocation(LOCATION_PZONE) and c:IsFaceup()
 end
-function c63553470.actfilter(c,tp)
-	return (c:IsType(TYPE_PENDULUM) and (Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,1)) and not c:IsForbidden())
-		or (c:GetType()&TYPE_PANDEMONIUM==TYPE_PANDEMONIUM and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and not c:IsForbidden()
-			and not Duel.IsExistingMatchingCard(c63553470.excfilter,tp,LOCATION_SZONE,0,1,c))
+function c63553470.actfilter(c,e,tp)
+	return not c:IsForbidden() and c:CheckUniqueOnField(tp,LOCATION_SZONE)
+		and ((c:IsType(TYPE_PENDULUM) and (Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,1)) and c:IsCanPlaceOnField(tp,tp,LOCATION_PZONE,e,REASON_EFFECT))
+		or (c:GetType()&TYPE_PANDEMONIUM==TYPE_PANDEMONIUM and c:IsCanPlaceOnField(tp,tp,LOCATION_PANDEZONE,e,REASON_EFFECT)))
 end
 function c63553470.drcfilter(c,tp)
 	return c:IsPreviousLocation(LOCATION_PZONE) and c:GetPreviousControler()==tp
@@ -131,25 +131,17 @@ function c63553470.actcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_LINK)
 end
 function c63553470.acttg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c63553470.actfilter,tp,LOCATION_DECK,0,1,nil,tp) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c63553470.actfilter,tp,LOCATION_DECK,0,1,nil,e,tp) end
 end
 function c63553470.actop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
-	local g=Duel.SelectMatchingCard(tp,c63553470.actfilter,tp,LOCATION_DECK,0,1,1,nil,tp)
+	local g=Duel.SelectMatchingCard(tp,c63553470.actfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
 	local tc=g:GetFirst()
 	if tc:IsType(TYPE_PENDULUM) then
 		Duel.MoveToField(tc,tp,tp,LOCATION_PZONE,POS_FACEUP,true)
 	else
-		Card.SetCardData(tc,CARDDATA_TYPE,TYPE_TRAP+TYPE_CONTINUOUS)
-		Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
-		if not tc:IsLocation(LOCATION_SZONE) then
-			local edcheck=0
-			if tc:IsLocation(LOCATION_EXTRA) then edcheck=TYPE_PENDULUM end
-			Card.SetCardData(tc,CARDDATA_TYPE,TYPE_MONSTER+TYPE_EFFECT+edcheck+aux.GetOriginalPandemoniumType(tc))
-		else
-			tc:RegisterFlagEffect(726,RESET_EVENT+0x1fe0000,EFFECT_FLAG_CANNOT_DISABLE,1)
-		end
+		Duel.ActivatePandemonium(tc,tp)
 	end
 end
 --to hand

@@ -1,117 +1,118 @@
---Lich-Lord Fulgrum
-local cid,id=GetID()
-function cid.initial_effect(c)
+--[[
+Lich-Lord Fulgrum
+Signore-Lich Fulgrum
+Card Author: Walrus
+Scripted by: XGlitchy30
+]]
+
+local s,id=GetID()
+function s.initial_effect(c)
+	--You can only control 1 "Lich-Lord Fulgrum".
 	c:SetUniqueOnField(1,0,id)
-	--special summon
-	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(id,0))
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e1:SetType(EFFECT_TYPE_IGNITION)
-	e1:SetRange(LOCATION_HAND+LOCATION_GRAVE)
-	e1:SetCountLimit(1)
-	e1:SetCondition(cid.spcon)
-	e1:SetCost(cid.spcost)
-	e1:SetTarget(cid.sptg)
-	e1:SetOperation(cid.spop)
-	c:RegisterEffect(e1)
-	local e2=e1:Clone()
+	--During the Main Phase (Quick Effect): You can banish 2 Zombie monsters from either GY, except "Lich-Lord Fulgrum"; Special Summon this card from your hand or GY.
+	local e2=Effect.CreateEffect(c)
+	e2:Desc(0)
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)
-	e2:SetCondition(cid.spcon2)
+	e2:SetRange(LOCATION_HAND|LOCATION_GRAVE)
+	e2:SetRelevantTimings()
+	e2:HOPT()
+	e2:SetFunctions(aux.MainPhaseCond(),s.spcost,s.sptg,s.spop)
 	c:RegisterEffect(e2)
-	--must attack
+	--During your Standby Phase, if you do not have "Lich-Lord's Phylactery" in your GY: Destroy this card, and if you do, add 1 Zombie monster from your Deck, GY, or banishment to your hand.
 	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_FIELD)
-	e3:SetCode(EFFECT_MUST_ATTACK)
+	e3:Desc(1)
+	e3:SetCategory(CATEGORY_DESTROY|CATEGORIES_SEARCH)
+	e3:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_TRIGGER_F)
+	e3:SetCode(EVENT_PHASE|PHASE_STANDBY)
 	e3:SetRange(LOCATION_MZONE)
-	e3:SetTargetRange(0,LOCATION_MZONE)
-	e3:SetCondition(cid.ccon)
+	e3:HOPT()
+	e3:SetFunctions(s.sdcon,nil,s.sdtg,s.sdop)
 	c:RegisterEffect(e3)
-	--actlimit
+	--[[If you have "Lich-Lord's Phylactery" in your GY, this card gains the following effects.
+	● All monsters your opponent controls must attack, if able.
+	● If your "Lich-Lord" monster battles, your opponent cannot activate cards or effects until the end of the Damage Step.]]
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_FIELD)
-	e4:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e4:SetCode(EFFECT_CANNOT_ACTIVATE)
+	e4:SetCode(EFFECT_MUST_ATTACK)
 	e4:SetRange(LOCATION_MZONE)
-	e4:SetTargetRange(0,1)
-	e4:SetValue(1)
-	e4:SetCondition(cid.actcon)
+	e4:SetTargetRange(0,LOCATION_MZONE)
+	e4:SetCondition(aux.PhylacteryCondition)
 	c:RegisterEffect(e4)
-	--Once per turn, during your Standby Phase, if there is no "Lich-Lord's Phylactery" in your GY: Destroy this card, and if you do, add 1 "Lich-Lord" Spell/Trap from your Deck, GY, or from among your banished cards to your hand.
 	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e5:SetCode(EVENT_PHASE+PHASE_STANDBY)
+	e5:SetType(EFFECT_TYPE_FIELD)
+	e5:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e5:SetCode(EFFECT_CANNOT_ACTIVATE)
 	e5:SetRange(LOCATION_MZONE)
-	e5:SetCountLimit(1)
-	e5:SetCategory(CATEGORY_DESTROY+CATEGORY_SEARCH+CATEGORY_TOHAND)
-	e5:SetCondition(function(e) return not cid.ccon(e) and Duel.GetTurnPlayer()==e:GetHandlerPlayer() end)
-	e5:SetTarget(cid.destg)
-	e5:SetOperation(cid.desop)
+	e5:SetTargetRange(0,1)
+	e5:SetValue(1)
+	e5:SetCondition(s.actcon)
 	c:RegisterEffect(e5)
 end
-function cid.thfilter(c)
-	return (c:IsFaceup() or not c:IsLocation(LOCATION_REMOVED)) and c:IsSetCard(0x2e7) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToHand()
+
+--E2
+function s.scfilter(c,tp)
+	return c:IsRace(RACE_ZOMBIE) and not c:IsCode(id) and c:IsAbleToRemoveAsCost()
 end
-function cid.destg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,e:GetHandler(),1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED)
-end
-function cid.desop(e,tp,eg,ep,ev,re,r,rp)
+function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) or Duel.Destroy(c,REASON_EFFECT)==0 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(cid.thfilter),tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_REMOVED,0,1,1,nil)
-	Duel.SendtoHand(g,nil,REASON_EFFECT)
-	Duel.ConfirmCards(1-tp,g)
-end
-function cid.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsLocation(LOCATION_HAND) or not Duel.IsPlayerAffectedByEffect(tp,91630825)
-end
-function cid.spcon2(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsLocation(LOCATION_GRAVE) and Duel.IsPlayerAffectedByEffect(tp,91630825)
-end
-function cid.cfilter(c)
-	return c:IsRace(RACE_ZOMBIE) and c:IsAbleToRemoveAsCost()
-end
-function cid.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(cid.cfilter,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,e:GetHandler()) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=Duel.SelectMatchingCard(tp,cid.cfilter,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,1,e:GetHandler())
-	Duel.Remove(g,POS_FACEUP,REASON_COST)
-end
-function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.GetFlagEffect(tp,id)==0
-		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
-end
-function cid.spop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
-		Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
+	local g=Duel.Group(s.scfilter,tp,LOCATION_GRAVE,LOCATION_GRAVE,c)
+	if chk==0 then
+		return aux.SelectUnselectGroup(g,e,tp,2,2,aux.ChkfMMZ(1),0)
+	end
+	local g=aux.SelectUnselectGroup(g,e,tp,2,2,aux.ChkfMMZ(1),1,tp,HINTMSG_REMOVE,false,false,false)
+	if #g>0 then
+		Duel.Remove(g,POS_FACEUP,REASON_COST)
 	end
 end
-function cid.rmcon(e,tp,eg,ep,ev,re,r,rp)
-	local tc=e:GetLabelObject()
-	return tc:GetFlagEffectLabel(id)==e:GetLabel()
+function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then
+		return (e:IsCostChecked() or Duel.GetMZoneCount(tp)>0) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP)
+	end
+	Duel.SetCardOperationInfo(c,CATEGORY_SPECIAL_SUMMON)
 end
-function cid.rmop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=e:GetLabelObject()
-	Duel.Hint(HINT_CARD,0,id)
-	Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)
+function s.spop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if c:IsRelateToChain() then
+		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+	end
 end
-function cid.cfilter1(c)
-	return c:IsCode(91630827)
+
+--E3
+function s.sdcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsTurnPlayer(tp) and not aux.PhylacteryCheck(tp)
 end
-function cid.ccon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(cid.cfilter1,e:GetHandler():GetControler(),LOCATION_GRAVE,0,1,nil)
+function s.sdtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	if chk==0 then
+		return true
+	end
+	Duel.SetCardOperationInfo(c,CATEGORY_DESTROY)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK|LOCATION_GB)
 end
-function cid.cfilter2(c,tp)
-	return c:IsFaceup() and c:IsSetCard(0x2e7) and c:IsControler(tp)
+function s.thfilter(c)
+	return c:IsFaceupEx() and c:IsRace(RACE_ZOMBIE) and c:IsAbleToHand()
 end
-function cid.actcon(e)
+function s.sdop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if c:IsRelateToChain() and Duel.Destroy(c,REASON_EFFECT)>0 then
+		local g=Duel.Select(HINTMSG_ATOHAND,false,tp,aux.Necro(s.thfilter),tp,LOCATION_DECK|LOCATION_GB,0,1,1,nil)
+		if #g>0 then
+			Duel.Search(g,tp)
+		end
+	end
+end
+
+--E4
+function s.cfilter(c,tp)
+	return c:IsFaceup() and c:IsSetCard(ARCHE_LICH_LORD) and c:IsControler(tp)
+end
+function s.actcon(e)
 	local tp=e:GetHandlerPlayer()
+	if not aux.PhylacteryCondition(e,tp) then return false end
 	local a=Duel.GetAttacker()
 	local d=Duel.GetAttackTarget()
-	return Duel.IsExistingMatchingCard(cid.cfilter1,e:GetHandler():GetControler(),LOCATION_GRAVE,0,1,nil) and (a and cid.cfilter2(a,tp)) or (d and cid.cfilter2(d,tp))
+	return (a and s.cfilter(a,tp)) or (d and s.cfilter(d,tp))
 end

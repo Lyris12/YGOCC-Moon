@@ -934,6 +934,22 @@ function Auxiliary.dbtg2(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 
 -----------------------------------------------------------------------
+-------------------------------PLACE ON FIELD-------------------------------
+
+EFFECT_CANNOT_PLACE_ON_FIELD = 221594318
+
+function Card.IsCanPlaceOnField(c,placer,receiver,loc,re,r)
+	local eset={Duel.IsPlayerAffectedByEffect(placer,EFFECT_CANNOT_PLACE_ON_FIELD)}
+	for _,e in ipairs(eset) do
+		local val=e:GetValue()
+		if not val or type(val)=="number" or val(e,c,placer,receiver,loc,re,r) then
+			return false
+		end
+	end
+	return true
+end
+
+-----------------------------------------------------------------------
 -------------------------------TRIBUTE-------------------------------
 local _Release = Duel.Release
 

@@ -150,7 +150,7 @@ function Card.IsCanBeBigbangMaterial(c,ec)
 		local val=te:GetValue()
 		if type(val)=="nil" or type(val)=="number" then
 			return false
-		elseif type(val)=="function" and val(te,ec) then
+		elseif type(val)=="function" and val(te,c) then
 			return false
 		end 
 	end
@@ -641,13 +641,16 @@ end
 function Auxiliary.BigbangCheckGoal(tp,sg,fg,bc,gf,ct,...)
 	if fg and fg:IsExists(aux.NOT(Card.IsContained),1,nil,sg) then return false end
 	
+	local max=0
 	local funs={...}
 	for i,ftab in ipairs(funs) do
-		local f,fmin=ftab[1],ftab[2]
+		local f,fmin,fmax=ftab[1],ftab[2],ftab[3]
 		if sg:FilterCount(f,nil,sg)<fmin then
 			return false
 		end
+		max=max+fmax
 	end
+	if #sg>max then return false end
 	
 	local bigbang_stats_res = false
 	if bc:IsHasEffect(EFFECT_IGNORE_BIGBANG_SUMREQ) then
@@ -658,7 +661,7 @@ function Auxiliary.BigbangCheckGoal(tp,sg,fg,bc,gf,ct,...)
 	end
 	
 	--LEAVE THIS FOR DEBUGGING PURPOSES IN CASE A BIGBANG MONSTER IS NOT BEING ABLE TO BE SUMMONED
-	-- if bc:IsCode(100000147,true) then
+	-- if bc:IsCode(100000146,true) then
 		-- Debug.Message(Duel.GetLocationCountFromEx(tp,tp,sg,bc)>0)
 		-- Debug.Message(not gf or gf(sg,bc,tp))
 		-- Debug.Message(tostring(sg:CheckWithSumGreater(Card.GetBigbangAttack,bc:GetAttack(),bc,sg))..": "..tostring(bc:GetAttack()))

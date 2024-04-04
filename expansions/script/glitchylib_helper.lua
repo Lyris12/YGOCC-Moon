@@ -1,6 +1,9 @@
 --Glitchy Helper
 TOKEN_GLITCHY_HELPER					= 1232
 GLITCHY_HELPER_TURN_COUNT_FLAG			= 0x1
+GLITCHY_HELPER_STICKER_FLAG				= 0x2
+
+local STRING_EXCLUDE_AI = STRING_EXCLUDE_AI or aux.Stringid(33730999,0)
 
 function Card.IsNonPlayableCard(c)
 	return c:HasFlagEffect(TOKEN_GLITCHY_HELPER)
@@ -124,7 +127,7 @@ function Auxiliary.SpawnGlitchyHelper(flags)
 		e:SetCountLimit(1)
 		e:SetOperation(function(eff)
 			aux.GlitchyHelper=Duel.CreateToken(0,TOKEN_GLITCHY_HELPER)
-			Duel.Banish(aux.GlitchyHelper,nil,REASON_RULE)
+			Duel.Remove(aux.GlitchyHelper,POS_FACEUP,REASON_RULE)
 			aux.GlitchyHelper:RegisterFlagEffect(TOKEN_GLITCHY_HELPER,0,0,1)
 			local e4=Effect.CreateEffect(aux.GlitchyHelper)
 			e4:SetType(EFFECT_TYPE_SINGLE)
@@ -149,6 +152,7 @@ function Auxiliary.SpawnGlitchyHelper(flags)
 		Duel.RegisterEffect(e,0)
 		
 	elseif aux.GetValueType(aux.GlitchyHelper)=="Card" then
+	
 		if flags&GLITCHY_HELPER_TURN_COUNT_FLAG>0 and aux.GlitchyHelperFlags&GLITCHY_HELPER_TURN_COUNT_FLAG==0 then
 			aux.GlitchyHelperFlags = aux.GlitchyHelperFlags|GLITCHY_HELPER_TURN_COUNT_FLAG
 			for p=0,1 do
@@ -162,8 +166,33 @@ function Auxiliary.SpawnGlitchyHelper(flags)
 				end
 			end
 		end
+		
+		if flags&GLITCHY_HELPER_STICKER_FLAG>0 and aux.GlitchyHelperFlags&GLITCHY_HELPER_STICKER_FLAG==0 then
+			aux.GlitchyHelperFlags = aux.GlitchyHelperFlags|GLITCHY_HELPER_STICKER_FLAG
+			for p=0,1 do
+				if aux.GlitchyHelperIgnorePlayerTable[p+1]==false then
+					local h1=Effect.CreateEffect(aux.GlitchyHelper)
+					h1:SetDescription(aux.Stringid(33730999,1))
+					h1:SetType(EFFECT_TYPE_CONTINUOUS|EFFECT_TYPE_FIELD)
+					h1:SetCode(EVENT_FREE_CHAIN)
+					h1:SetCountLimit(10)
+					h1:SetCondition(aux.GlitchyHelperShowStickersCondition)
+					h1:SetOperation(aux.GlitchyHelperShowStickers)
+					Duel.RegisterEffect(h1,p)
+					local h2=Effect.CreateEffect(aux.GlitchyHelper)
+					h2:SetDescription(aux.Stringid(33730999,2))
+					h2:SetType(EFFECT_TYPE_CONTINUOUS|EFFECT_TYPE_FIELD)
+					h2:SetCode(EVENT_FREE_CHAIN)
+					h2:SetCountLimit(10)
+					h2:SetCondition(aux.GlitchyHelperShowStickersCountCondition)
+					h2:SetOperation(aux.GlitchyHelperShowStickersCount)
+					Duel.RegisterEffect(h2,p)
+				end
+			end
+		end
 	end
 end
+
 function Auxiliary.GlitchyHelperTurnCount(e,tp,eg,ep,ev,re,r,rp)
 	local ct=Duel.GetTurnCount(nil,true)
 	if ct<=20 and ct>0 then
@@ -172,6 +201,36 @@ function Auxiliary.GlitchyHelperTurnCount(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Hint(HINT_CARD,tp,TOKEN_GLITCHY_HELPER)
 		Duel.AnnounceNumber(tp,ct)
 	end
+	Duel.SetChainLimit(aux.FALSE)
+	Duel.SetChainLimitTillChainEnd(aux.FALSE)
+end
+
+function Auxiliary.GlitchyHelperShowStickersCondition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsExistingMatchingCard(Card.HasFlagEffect,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil,STICKER_FLAG)
+end
+function Auxiliary.GlitchyHelperShowStickers(e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.GetMatchingGroup(Card.HasFlagEffect,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil,STICKER_FLAG)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
+	local tc=g:Select(tp,1,1,nil):GetFirst()
+	local _,owner=tc:GetSticker(tp)
+	--Duel.Hint(HINT_CARD,tp,TOKEN_GLITCHY_HELPER)
+	local token=Duel.CreateToken(tp,owner)
+	Duel.ConfirmCards(tp,token)
+	Duel.Exile(token,REASON_RULE)
+	Duel.SetChainLimit(aux.FALSE)
+	Duel.SetChainLimitTillChainEnd(aux.FALSE)
+end
+function Auxiliary.GlitchyHelperShowStickersCountCondition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsExistingMatchingCard(Card.HasFlagEffectHigher,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil,STICKER_FLAG,5)
+end
+function Auxiliary.GlitchyHelperShowStickersCount(e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.GetMatchingGroup(Card.HasFlagEffect,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil,STICKER_FLAG)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
+	local tc=g:Select(tp,1,1,nil):GetFirst()
+	local sticker=tc:GetSticker(tp)
+	local ct=tc:GetStickerCount(sticker)
+	--Duel.Hint(HINT_CARD,tp,TOKEN_GLITCHY_HELPER)
+	Duel.AnnounceNumber(tp,ct)
 	Duel.SetChainLimit(aux.FALSE)
 	Duel.SetChainLimitTillChainEnd(aux.FALSE)
 end

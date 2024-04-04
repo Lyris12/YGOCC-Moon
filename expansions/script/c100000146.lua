@@ -130,11 +130,12 @@ function s.pantg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then
 		return c:IsType(TYPE_PANDEMONIUM) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and c:CheckUniqueOnField(tp,LOCATION_SZONE) and not c:IsForbidden()
+			and c:IsCanPlaceOnField(tp,tp,LOCATION_PANDEZONE,e,REASON_EFFECT)
 	end
 end
 function s.panop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToChain() then
+	if c:IsRelateToChain() and c:IsCanPlaceOnField(tp,tp,LOCATION_PANDEZONE,e,REASON_EFFECT) then
 		aux.PandAct(c,tp,false,true)(e,tp,eg,ep,ev,re,r,rp)
 	end
 	local e2=Effect.CreateEffect(c)

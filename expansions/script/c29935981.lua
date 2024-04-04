@@ -173,15 +173,16 @@ function s.drawtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	Duel.SetCardOperationInfo(c,CATEGORY_TODECK)
 end
-function s.filter(c,tp)
+function s.filter(c,tp,e)
 	return c:IsFaceup() and c:IsMonster(TYPE_PANDEMONIUM) and c:IsSetCard(0x209) and not c:IsForbidden() and c:CheckUniqueOnField(tp)
+		and c:IsCanPlaceOnField(tp,tp,LOCATION_PANDEZONE,e,REASON_EFFECT)
 end
 function s.drawop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToChain() and Duel.ShuffleIntoDeck(c,tp)>0 and Duel.GetLocationCount(tp,LOCATION_SZONE)>0
-		and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_EXTRA,0,1,nil,tp) and Duel.SelectYesNo(tp,aux.Stringid(id,6)) then
+		and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_EXTRA,0,1,nil,tp,e) and Duel.SelectYesNo(tp,aux.Stringid(id,6)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
-		local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_EXTRA,0,1,1,nil,tp)
+		local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_EXTRA,0,1,1,nil,tp,e)
 		if #g>0 then
 			aux.PandAct(g:GetFirst())(e,tp,eg,ep,ev,re,r,rp)
 		end

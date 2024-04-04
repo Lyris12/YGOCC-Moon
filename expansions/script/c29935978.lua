@@ -17,7 +17,7 @@ function s.initial_effect(c)
 	p1:SetTarget(s.acttg)
 	p1:SetOperation(s.actop)
 	c:RegisterEffect(p1)
-	aux.EnablePandemoniumAttribute(c,p1,true,TYPE_PANDEMONIUM+TYPE_EFFECT)
+	aux.EnablePandemoniumAttribute(c,p1,true)
 	--protect
 	local p2=Effect.CreateEffect(c)
 	p2:SetType(EFFECT_TYPE_FIELD)

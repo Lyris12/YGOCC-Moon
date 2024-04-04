@@ -104,16 +104,16 @@ function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local g=Duel.SelectTarget(tp,aux.NecroValleyFilter(cid.filter),tp,LOCATION_GRAVE+LOCATION_REMOVED,0,1,1,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
 end
-function cid.pfilter(c,e,tp,eg,ep,ev,re,r,rp)
-	return c:IsFaceup() and c:IsType(TYPE_MONSTER) and not c:IsForbidden()
-		and (c:IsType(TYPE_PENDULUM) and (Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,1))
-			or (c:IsType(TYPE_PANDEMONIUM) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and aux.PandActCon(nil,c)(e,tp,eg,ep,ev,re,r,rp)))
+function cid.pfilter(c,e,tp)
+	return c:IsFaceup() and c:IsType(TYPE_MONSTER) and not c:IsForbidden() and c:CheckUniqueOnField(tp,LOCATION_SZONE)
+		and ((c:IsType(TYPE_PENDULUM) and (Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,1)) and c:IsCanPlaceOnField(tp,tp,LOCATION_PZONE,e,REASON_EFFECT))
+			or (c:IsType(TYPE_PANDEMONIUM) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and c:IsCanPlaceOnField(tp,tp,LOCATION_PANDEZONE,e,REASON_EFFECT)))
 end	
 function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)~=0 then
 		local b1=Duel.IsExistingMatchingCard(cid.dryfilter,tp,LOCATION_MZONE,0,1,nil)
-		local b2=Duel.IsExistingMatchingCard(cid.pfilter,tp,LOCATION_MZONE,0,1,nil,e,tp,eg,ep,ev,re,r,rp)
+		local b2=Duel.IsExistingMatchingCard(cid.pfilter,tp,LOCATION_MZONE,0,1,nil,e,tp)
 		local b={b1,b2}
 		if not b[1] and not b[2] then return end
 		local off=1
@@ -136,7 +136,7 @@ function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 				Duel.Destroy(g:GetFirst(),REASON_EFFECT)
 			end
 		elseif sel==1 then
-			local g=Duel.SelectMatchingCard(tp,cid.pfilter,tp,LOCATION_MZONE,0,1,1,nil,e,tp,eg,ep,ev,re,r,rp)
+			local g=Duel.SelectMatchingCard(tp,cid.pfilter,tp,LOCATION_MZONE,0,1,1,nil,e,tp)
 			if #g>0 then
 				if g:GetFirst():IsType(TYPE_PENDULUM) then
 					Duel.MoveToField(g:GetFirst(),tp,tp,LOCATION_PZONE,POS_FACEUP,true)
