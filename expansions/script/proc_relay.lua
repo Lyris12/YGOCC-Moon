@@ -61,7 +61,7 @@ function Auxiliary.AddRelayProc(c)
 end
 function Auxiliary.RelayPass(fc,tc)
 	for _,te in pairs(global_card_effect_table[fc]) do
-		if aux.GetValueType(te)=="Effect" and (te:IsHasType(EFFECT_TYPE_CONTINUOUS) or te:GetType()==EFFECT_TYPE_SINGLE)
+		if aux.GetValueType(te)=="Effect" and (te:IsHasType(0xfc0) or te:GetType()==EFFECT_TYPE_SINGLE)
 			and not te:IsHasProperty(EFFECT_FLAG_INITIAL+EFFECT_FLAG_UNCOPYABLE) then
 			local res=te:GLGetReset()
 			if te:GetOwner()~=fc or te:IsHasProperty(EFFECT_FLAG_CANNOT_DISABLE) or (res and res&RESET_DISABLE==0) then
