@@ -18,6 +18,7 @@ function s.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCode(EFFECT_TO_GRAVE_REDIRECT)
 	e1:SetTargetRange(0xfe,0xfe)
+	e1:SetCondition(s.condition)
 	e1:SetValue(LOCATION_DECKBOT)
 	c:RegisterEffect(e1)
 	local e3=Effect.CreateEffect(c)
@@ -40,6 +41,9 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 s.spt_other_space=102400026
+function s.condition(e)
+	return Duel.GetFieldGroupCount(e:GetHandlerPlayer(),LOCATION_DECK,0)%2<1
+end
 function s.cfilter(c)
 	return c:IsFaceupEx() and c:IsSetCard("Hadouken") and c:IsAbleToDeckAsCost()
 end

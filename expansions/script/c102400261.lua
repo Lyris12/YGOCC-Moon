@@ -19,8 +19,8 @@ function s.initial_effect(c)
 	e2:SetOperation(s.sumop)
 	c:RegisterEffect(e2)
 end
-function s.filter(c,code)
-	return c:IsSetCard(0xa6c) and c:IsType(TYPE_MONSTER) and not c:IsCode(code)
+function s.filter(c,...)
+	return c:IsSetCard(0xa6c) and c:IsType(TYPE_MONSTER) and not (#({...}))>0 and c:IsCode(...))
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(aux.AND(s.filter,Card.IsAbleToHand),tp,LOCATION_DECK,0,1,nil) end
