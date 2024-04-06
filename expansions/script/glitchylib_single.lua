@@ -612,7 +612,8 @@ function Card.ChangeATK(c,atk,reset,rc,range,cond,prop,desc)
 	if not reset then
 		return e
 	else
-		return e,oatk,c:GetAttack()
+		local natk=c:GetAttack()
+		return e,oatk,natk,natk-oatk
 	end
 end
 function Auxiliary.ChangeATKOperation(subject,atk,reset,rc,range,cond,loc1,loc2,min,max,exc)
@@ -624,19 +625,31 @@ function Card.ChangeDEF(c,def,reset,rc,range,cond,prop,desc)
 	if not reset and not range then
 		range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
 	end
-	local rc = rc and rc or c
+	
+	local donotdisable=false
     local rct=1
     if type(reset)=="table" then
         rct=reset[2]
         reset=reset[1]
     end
+	
+	if type(rc)=="table" then
+        donotdisable=rc[2]
+        rc=rc[1]
+    end
+	local rc = rc and rc or c
+	
+	if not prop then prop=0 end
+	
 	local odef=c:GetDefense()
 	local e=Effect.CreateEffect(rc)
 	e:SetType(typ)
+	
 	if range and not SCRIPT_AS_EQUIP then
-		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+		prop=prop|EFFECT_FLAG_SINGLE_RANGE
 		e:SetRange(range)
 	end
+	
 	e:SetCode(EFFECT_SET_DEFENSE_FINAL)
 	e:SetValue(def)
 	if cond then
@@ -644,16 +657,28 @@ function Card.ChangeDEF(c,def,reset,rc,range,cond,prop,desc)
 	end
 	if reset then
 		if type(reset)~="number" then reset=0 end
-		reset = rc==c and reset|RESET_DISABLE or reset
-		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
+		if rc==c and not donotdisable then
+			reset = reset|RESET_DISABLE
+			prop=prop|EFFECT_FLAG_COPY_INHERIT
+		else
+			prop=prop|EFFECT_FLAG_CANNOT_DISABLE
+		end
+		e:SetReset(RESET_EVENT|RESETS_STANDARD|reset,rct)
 	end
+	
+	if prop~=0 then
+		e:SetProperty(prop)
+	end
+	
 	c:RegisterEffect(e)
 	if not reset then
 		return e
 	else
-		return e,odef,c:GetDefense()
+		local ndef=c:GetDefense()
+		return e,odef,ndef,ndef-odef
 	end
 end
+
 function Auxiliary.ChangeDEFOperation(subject,def,reset,rc,range,cond,loc1,loc2,min,max,exc)
 	return aux.ChangeStatsOperationTemplate(Card.ChangeDEF,subject,def,reset,rc,range,cond,loc1,loc2,min,max,exc)
 end
@@ -663,12 +688,22 @@ function Card.ChangeATKDEF(c,atk,def,reset,rc,range,cond,prop,desc)
 	if not reset and not range then
 		range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
 	end
-	local rc = rc and rc or c
+	
+	local donotdisable=false
     local rct=1
     if type(reset)=="table" then
         rct=reset[2]
         reset=reset[1]
     end
+	
+	if type(rc)=="table" then
+        donotdisable=rc[2]
+        rc=rc[1]
+    end
+	local rc = rc and rc or c
+	
+	if not prop then prop=0 end
+	
 	if not atk then
 		atk=def
 	elseif not def then
@@ -679,30 +714,43 @@ function Card.ChangeATKDEF(c,atk,def,reset,rc,range,cond,prop,desc)
 	local odef=c:GetDefense()
 	local e=Effect.CreateEffect(rc)
 	e:SetType(typ)
+	
 	if range and not SCRIPT_AS_EQUIP then
-		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+		prop=prop|EFFECT_FLAG_SINGLE_RANGE
 		e:SetRange(range)
 	end
+	
 	e:SetCode(EFFECT_SET_ATTACK_FINAL)
 	e:SetValue(atk)
 	if cond then
 		e:SetCondition(cond)
 	end
+	
+	if reset then
+		if type(reset)~="number" then reset=0 end
+		if rc==c and not donotdisable then
+			reset = reset|RESET_DISABLE
+			prop=prop|EFFECT_FLAG_COPY_INHERIT
+		else
+			prop=prop|EFFECT_FLAG_CANNOT_DISABLE
+		end
+		e:SetReset(RESET_EVENT|RESETS_STANDARD|reset,rct)
+	end
+	
+	if prop~=0 then
+		e:SetProperty(prop)
+	end
+	c:RegisterEffect(e)
+	
 	local e1x=e:Clone()
 	e1x:SetCode(EFFECT_SET_DEFENSE_FINAL)
 	e1x:SetValue(def)
-	if reset then
-		if type(reset)~="number" then reset=0 end
-		reset = rc==c and reset|RESET_DISABLE or reset
-		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
-		e1x:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
-	end
-	c:RegisterEffect(e)
 	c:RegisterEffect(e1x)
 	if not reset then
 		return e,e1x
 	else
-		return e,e1x,oatk,c:GetAttack(),odef,c:GetDefense()
+		local natk,ndef=c:GetAttack(),c:GetDefense()
+		return e,e1x,oatk,natk,odef,ndef,natk-oatk,ndef-odef
 	end
 end
 function Auxiliary.ChangeATKDEFOperation(subject,atk,def,reset,rc,range,cond,loc1,loc2,min,max,exc)
