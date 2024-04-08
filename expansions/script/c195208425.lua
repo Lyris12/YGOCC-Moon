@@ -84,8 +84,8 @@ end
 			c:RegisterEffect(e1)
 	end
 end
-	function s.spfilter(c,e,tp)
-	return c:IsSetCard(0x83e) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+function s.spfilter(c,e,tp)
+	return c:IsFaceup() and c:IsSetCard(0x83e) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 	function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_REMOVED) and s.spfilter(chkc,e,tp) end
