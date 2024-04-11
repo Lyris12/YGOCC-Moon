@@ -125,6 +125,10 @@ CARD_ANCIENT_PIXIE_DRAGON				= 4179255
 CARD_BLACK_AND_WHITE_WAVE				= 31677606
 CARD_DESPAIR_FROM_THE_DARK				= 71200730
 CARD_EHERO_BLAZEMAN						= 63060238
+CARD_HELIOS_DUO_MEGISTUS				= 80887952
+CARD_HELIOS_THE_PRIMORDIAL_SUN			= 54493213
+CARD_HELIOS_TRICE_MEGISTUS				= 17286057
+CARD_MACRO_COSMOS						= 30241314
 CARD_NUMBER_39_UTOPIA					= 84013237
 CARD_ROTA								= 32807846
 CARD_UMI								= 22702055
@@ -152,7 +156,7 @@ CARD_MMS_JACKLYN_ALLTRADES						= 19905907
 CARD_MMS_SHERLOCK_HOLMES						= 19905908
 CARD_MONOCHROME_VALKYRIE_RK4					= 100000167
 CARD_MUSCWOLE_MURDERMANIA						= 70070078
-CARD_NUMBER_205_XEENAFAE						= 91630826
+CARD_NUMBER_206_XEENAFAE						= 91630826
 CARD_OSCURION_TYPE0								= 11110633
 CARD_OSCURION_TYPE2								= 11110634
 CARD_REVERIE_DU_VAISSEAU						= 100000039
@@ -161,6 +165,7 @@ CARD_RUM_DREAM_DISTILL_FORCE					= 39518
 CARD_SACRED_EFFIGY_OF_WATER						= 34848
 CARD_SISTERS_OF_HARMONY							= 100000144
 CARD_SPACE_VALKYR								= 11210118
+CARD_SPARK_OF_THE_PRIMORDIAL_SUN				= 85120900
 CARD_STARFORCE_KNIGHT							= 39301
 CARD_THE_EMBODIMENTS_OF_MOVEMENTS				= 34853
 CARD_THE_ORIGIN_OF_DRAGONS						= 20157309
@@ -1067,19 +1072,21 @@ end
 function Duel.PositionChange(c)
 	return Duel.ChangePosition(c,POS_FACEUP_DEFENSE,POS_FACEDOWN_DEFENSE,POS_FACEUP_ATTACK,POS_FACEUP_ATTACK)
 end
-function Duel.Search(g,tp,p)
+function Duel.Search(g,tp,p,r)
 	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
-	local ct=Duel.SendtoHand(g,p,REASON_EFFECT)
-	local cg=g:Filter(aux.PLChk,nil,tp,LOCATION_HAND)
+	if not r then r=REASON_EFFECT end
+	local ct=Duel.SendtoHand(g,p,r)
+	local cg=g:Filter(aux.PLChk,nil,p,LOCATION_HAND)
 	if #cg>0 then
 		Duel.ConfirmCards(1-tp,cg)
 	end
 	return ct,#cg,cg
 end
-function Duel.SearchAndCheck(g,tp,p,brk)
+function Duel.SearchAndCheck(g,tp,p,brk,r)
 	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
-	local ct=Duel.SendtoHand(g,p,REASON_EFFECT)
-	local cg=g:Filter(aux.PLChk,nil,tp,LOCATION_HAND)
+	if not r then r=REASON_EFFECT end
+	local ct=Duel.SendtoHand(g,p,r)
+	local cg=g:Filter(aux.PLChk,nil,p,LOCATION_HAND)
 	if #cg>0 then
 		if brk then
 			Duel.BreakEffect()
@@ -1509,9 +1516,31 @@ function Effect.SetDefenseFinalClone(e,c,notreg)
 	end
 	return ex
 end
+
 --codes
 function Card.IsOriginalCode(c,code)
 	return c:GetOriginalCode()==code
+end
+function Card.IsCodeOrMentions(c,code,...)
+	local codes={...}
+	table.insert(codes,1,code)
+	if #codes==0 then return false end
+	return c:IsCode(table.unpack(codes)) or c:Mentions(table.unpack(codes))
+end
+function Card.Mentions(c,code,...)
+	local codes={...}
+	table.insert(codes,1,code)
+	if #codes==0 then return false end
+	for _,cd in ipairs(codes) do
+		if aux.IsCodeListed(c,cd) then
+			return true
+		end
+	end
+	return false
+end
+function Card.IsMentioned(c1,c2)
+	local codes={c1:GetCode()}
+	return c2:Mentions(table.unpack(codes))
 end
 
 --Columns
@@ -1717,15 +1746,19 @@ end
 --Descriptions
 function Effect.Desc(e,id,...)
 	local x = {...}
-	local c=e:GetOwner()
-	if aux.GetValueType(aux.EffectBeingApplied)=="Effect" and aux.GetValueType(aux.ProxyEffect)=="Effect" and aux.ProxyEffect:GetOwner()==c then
-		c=aux.EffectBeingApplied:GetOwner()
-	end
-	local code = #x>0 and x[1] or c:GetOriginalCode()
-	if id<16 then
-		return e:SetDescription(aux.Stringid(code,id))
+	if #x>0 then
+		return e:SetDescription(aux.Stringid(x[1],id))
 	else
-		return e:SetDescription(id)
+		local c=e:GetOwner()
+		if aux.GetValueType(aux.EffectBeingApplied)=="Effect" and aux.GetValueType(aux.ProxyEffect)=="Effect" and aux.ProxyEffect:GetOwner()==c then
+			c=aux.EffectBeingApplied:GetOwner()
+		end
+		local code = c:GetOriginalCode()
+		if id<16 then
+			return e:SetDescription(aux.Stringid(code,id))
+		else
+			return e:SetDescription(id)
+		end
 	end
 end
 function Card.AskPlayer(c,tp,desc)

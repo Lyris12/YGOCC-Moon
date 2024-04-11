@@ -44,21 +44,21 @@ function s.initial_effect(c)
 	matchk:SetLabel(0)
 	c:RegisterEffect(matchk)
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(CARD_NUMBER_205_XEENAFAE,0))
+	e3:SetDescription(aux.Stringid(CARD_NUMBER_206_XEENAFAE,0))
 	e3:SetCategory(CATEGORY_DESTROY|CATEGORY_DRAW)
 	e3:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_TRIGGER_F)
 	e3:SetCode(EVENT_PHASE|PHASE_STANDBY)
 	e3:SetRange(LOCATION_MZONE)
-	e3:SetCountLimit(1,CARD_NUMBER_205_XEENAFAE)
+	e3:SetCountLimit(1,CARD_NUMBER_206_XEENAFAE)
 	e3:SetLabelObject(matchk)
 	e3:SetFunctions(s.sdcon,nil,s.sdtg,s.sdop)
 	c:RegisterEffect(e3)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE)
 	e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e4:SetCode(CARD_NUMBER_205_XEENAFAE)
+	e4:SetCode(CARD_NUMBER_206_XEENAFAE)
 	e4:SetRange(LOCATION_MZONE)
-	e4:SetLabel(CARD_NUMBER_205_XEENAFAE)
+	e4:SetLabel(CARD_NUMBER_206_XEENAFAE)
 	e4:SetCondition(aux.AND(aux.PhylacteryCondition,s.matchkcon))
 	e4:SetLabelObject(matchk)
 	c:RegisterEffect(e4)
@@ -66,7 +66,7 @@ function s.initial_effect(c)
 	e5:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
 	e5:SetCode(EVENT_ADJUST)
 	e5:SetRange(LOCATION_MZONE)
-	e5:SetLabel(CARD_NUMBER_205_XEENAFAE)
+	e5:SetLabel(CARD_NUMBER_206_XEENAFAE)
 	e5:SetCondition(aux.AND(aux.PhylacteryCondition,s.matchkcon))
 	e5:SetOperation(s.adjustop)
 	e5:SetLabelObject(matchk)
@@ -137,7 +137,7 @@ end
 --MATCHK
 function s.valcheck(e,c)
 	local g=c:GetMaterial()
-	if g and g:IsExists(Card.IsCode,1,nil,CARD_NUMBER_205_XEENAFAE) then
+	if g and g:IsExists(Card.IsCode,1,nil,CARD_NUMBER_206_XEENAFAE) then
 		e:SetLabel(1)
 	else
 		e:SetLabel(0)
@@ -209,29 +209,29 @@ function s.disfieldeff(typ,code)
 end
 function s.xmateffcon(cond)
 	return	function(e,...)
-				return e:GetHandler():IsHasEffect(CARD_NUMBER_205_XEENAFAE) and (not cond or cond(e,...))
+				return e:GetHandler():IsHasEffect(CARD_NUMBER_206_XEENAFAE) and (not cond or cond(e,...))
 			end
 end
 function s.xmateffcon_fix(c,cond)
 	return	function(e,...)
-				return e:GetHandler():IsHasEffect(CARD_NUMBER_205_XEENAFAE) and (not cond or cond(e,...)) and c:IsAttachedTo(e:GetHandler())
+				return e:GetHandler():IsHasEffect(CARD_NUMBER_206_XEENAFAE) and (not cond or cond(e,...)) and c:IsAttachedTo(e:GetHandler())
 			end
 end
 function s.matfilter(c)
-	return c:IsMonster() and not c:IsCode(CARD_NUMBER_205_XEENAFAE) and not c:HasFlagEffect(CARD_NUMBER_205_XEENAFAE)
+	return c:IsMonster() and not c:IsCode(CARD_NUMBER_206_XEENAFAE) and not c:HasFlagEffect(CARD_NUMBER_206_XEENAFAE)
 end
 
 function s.adjustop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local g=c:GetOverlayGroup():Filter(s.matfilter,nil)
 	for tc in aux.Next(g) do
-		tc:RegisterFlagEffect(CARD_NUMBER_205_XEENAFAE,RESET_EVENT|RESETS_STANDARD,0,1)
+		tc:RegisterFlagEffect(CARD_NUMBER_206_XEENAFAE,RESET_EVENT|RESETS_STANDARD,0,1)
 		local eset=tc:GetEffects()
 		for _,effect in ipairs(eset) do
 			if effect:GetOwner()==tc then
 				local changed=false
 				local typ=effect:GetType()
-				if effect:GetLabel()~=CARD_NUMBER_205_XEENAFAE and not effect:IsHasProperty(EFFECT_FLAG_UNCOPYABLE) and typ&(EFFECT_TYPE_ACTIVATE|EFFECT_TYPE_XMATERIAL)==0 then
+				if effect:GetLabel()~=CARD_NUMBER_206_XEENAFAE and not effect:IsHasProperty(EFFECT_FLAG_UNCOPYABLE) and typ&(EFFECT_TYPE_ACTIVATE|EFFECT_TYPE_XMATERIAL)==0 then
 					local fixchk=true
 					local range=effect:GetRange()
 					local code=effect:GetCode()

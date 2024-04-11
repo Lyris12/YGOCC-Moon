@@ -8,7 +8,7 @@ Scripted by: XGlitchy30
 local s,id=GetID()
 function s.initial_effect(c)
 	--[[Target 1 "Number" Xyz Monster you control, and reveal 1 "Number C" Xyz Monster in your Extra Deck with the same Attribute as that target, but with a higher Rank;
-	banish Zombie monsters from your GY, up to the difference between the Rank of that target and the revealed monster (min. 1), and if you do,
+	banish Zombie monsters from your GY, equal to the difference between the Rank of that target and the revealed monster (min. 1), and if you do,
 	Special Summon that revealed monster by using that target as the material (This is treated as an Xyz Summon. Transfer its materials to that target).
 	Then, if you have "Lich-Lord's Phylactery" in your GY, and you also had "Lich-Lord's Phylactery" in your GY at activation,
 	attach all cards that were banished by this effect to that monster as materials.]]
@@ -35,14 +35,14 @@ function s.filter2(c,e,tp,mc,rk,attr,g)
 	end
 	local cg=g:Clone()
 	cg:AddCard(mc)
-	return aux.SelectUnselectGroup(cg,e,tp,2,#cg,s.ChkfMMZ(c,mc),0)
+	return aux.SelectUnselectGroup(cg,e,tp,2,#cg,s.ChkfMMZ(c,mc,c:GetRank()-rk),0)
 end
 function s.rmfilter(c)
 	return c:IsRace(RACE_ZOMBIE) and c:IsAbleToRemove()
 end
-function s.ChkfMMZ(c,mc)
+function s.ChkfMMZ(c,mc,ct)
 	return	function(sg,e,tp,mg)
-				return sg:IsContains(mc) and Duel.GetLocationCountFromEx(tp,tp,sg,c)>0
+				return ct==#sg and sg:IsContains(mc) and Duel.GetLocationCountFromEx(tp,tp,sg,c)>0, #sg>ct
 			end
 end
 function s.ChkfMMZ2(c)
@@ -85,12 +85,12 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local ct=xyzc:GetRank()-tc:GetRank()
 	if ct<=0 then return end
 	local g=Duel.Group(s.rmfilter,tp,LOCATION_GRAVE,0,nil)
-	if #g<=0 then return end
+	if #g<ct then return end
 	local rg
 	if Duel.GetLocationCountFromEx(tp,tp,tc,xyzc)>0 then
-		rg=g:Select(tp,1,ct,nil)
+		rg=g:Select(tp,ct,ct,nil)
 	else
-		rg=aux.SelectUnselectGroup(g,e,tp,1,#cg,s.ChkfMMZ2(c),1,tp,HINTMSG_REMOVE)
+		rg=aux.SelectUnselectGroup(g,e,tp,ct,ct,s.ChkfMMZ2(c),1,tp,HINTMSG_REMOVE)
 	end
 	if #rg<=0 then return end
 	Duel.HintSelection(rg)
