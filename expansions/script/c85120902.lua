@@ -1,7 +1,8 @@
---created by LeonDuvall, coded by Lyris
+--created by LeonDuvall, coded by Lyris, fixed by XGlitchy30
 --Radiant Child of Light
 local s,id,o=GetID()
 function s.initial_effect(c)
+	--This card's original ATK/DEF are each equal to the number of banished cards x 50.
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_SET_BASE_ATTACK)
@@ -12,39 +13,52 @@ function s.initial_effect(c)
 	local e2=e1:Clone()
 	e2:SetCode(EFFECT_SET_BASE_DEFENSE)
 	c:RegisterEffect(e2)
+	--When your opponent activates a card or effect (Quick Effect): You can banish this card from your hand or field and 1 other card from your hand; banish that card.
 	local e3=Effect.CreateEffect(c)
+	e3:Desc(0)
+	e3:SetCategory(CATEGORY_REMOVE)
 	e3:SetType(EFFECT_TYPE_QUICK_O)
 	e3:SetCode(EVENT_CHAINING)
-	e3:SetRange(LOCATION_HAND+LOCATION_MZONE)
+	e3:SetRange(LOCATION_HAND|LOCATION_MZONE)
 	e3:HOPT()
-	e3:SetDescription(1192)
-	e3:SetCategory(CATEGORY_REMOVE)
 	e3:SetCondition(s.con)
 	e3:SetCost(s.cost)
 	e3:SetTarget(s.tg)
 	e3:SetOperation(s.op)
 	c:RegisterEffect(e3)
 end
+
+--E1
 function s.value()
 	return Duel.GetFieldGroupCount(0,LOCATION_REMOVED,LOCATION_REMOVED)*50
 end
+
+--E2
 function s.con(e,tp,eg,ep,ev,re,r,rp)
-	return rp==1-tp
+	local rc=re:GetHandler()
+	return rc and rp==1-tp and rc:IsRelateToChain(ev)
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return c:IsAbleToRemoveAsCost()
-		and Duel.IsExistingMatchingCard(Card.IsAbleToRemoveAsCost,tp,LOCATION_HAND,0,1,c) end
+	if chk==0 then
+		return c:IsAbleToRemoveAsCost() and Duel.IsExistingMatchingCard(Card.IsAbleToRemoveAsCost,tp,LOCATION_HAND,0,1,c)
+	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	Duel.Remove(Duel.SelectMatchingCard(tp,Card.IsAbleToRemoveAsCost,tp,LOCATION_HAND,0,1,1,c)+c,POS_FACEUP,REASON_COST)
+	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToRemoveAsCost,tp,LOCATION_HAND,0,1,1,c)
+	g:AddCard(c)
+	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
 function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local rc=re:GetHandler()
 	if chk==0 then
-		local rc=re:GetHandler()
-		return rc:IsRelateToEffect(e) and rc:IsAbleToRemove()
+		return rc:IsAbleToRemove() and not rc:IsLocation(LOCATION_REMOVED)
 	end
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,eg,1,0,0)
+	Duel.SetTargetCard(rc)
+	Duel.SetCardOperationInfo(rc,CATEGORY_REMOVE)
 end
 function s.op(e,tp,eg,ep,ev,re)
-	if re:GetHandler():IsRelateToEffect(e) then Duel.Remove(eg,POS_FACEUP,REASON_EFFECT) end
+	local rc=re:GetHandler()
+	if rc:IsRelateToChain() then
+		Duel.Remove(rc,POS_FACEUP,REASON_EFFECT)
+	end
 end

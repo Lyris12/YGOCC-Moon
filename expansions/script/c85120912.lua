@@ -1,41 +1,48 @@
---created by LeonDuvall, coded by Lyris
+--created by LeonDuvall, coded by Lyris, fixed by XGlitchy30
 --Alignment of the Cosmos
 local s,id,o=GetID()
 function s.initial_effect(c)
-	aux.AddCodeList(c,54493213,30241314)
+	aux.AddCodeList(c,id,CARD_HELIOS_THE_PRIMORDIAL_SUN,CARD_MACRO_COSMOS)
+	--If you control "Helios - The Primordial Sun": Destroy 1 card your opponent controls in this card's column.
 	local e1=Effect.CreateEffect(c)
+	e1:Desc(0)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:HOPT(true)
 	e1:SetProperty(EFFECT_FLAG_LIMIT_ZONE)
 	e1:SetCategory(CATEGORY_DESTROY)
+	e1:SetRelevantTimings()
 	e1:SetCondition(s.condition)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	e1:SetValue(s.zones)
 	c:RegisterEffect(e1)
+	--[[If this card is currently banished, except the turn it was banished: You can shuffle this card into the Deck, and if you do,
+	Set 1 Spell/Trap that mentions "Helios - The Primordial Sun" or "Macro Cosmos" directly from your Deck, except "Alignment of the Cosmos".]]
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e2:SetCode(EVENT_REMOVE)
-	e2:SetProperty(EFFECT_FLAG_DELAY)
+	e2:Desc(1)
 	e2:SetCategory(CATEGORY_TODECK)
-	e2:SetCondition(aux.exccon)
-	e2:SetTarget(s.settg)
-	e2:SetOperation(s.setop)
+	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetCode(EVENT_FREE_CHAIN)
+	e2:SetRange(LOCATION_REMOVED)
+	e2:SetRelevantTimings()
+	e2:SetFunctions(s.setcon,nil,s.settg,s.setop)
 	c:RegisterEffect(e2)
 end
+--E1
 function s.zones(e,tp,eg,ep,ev,re,r,rp)
-	if e:GetHandler():IsLocation(LOCATION_SZONE) then return 0xff end
+	if e:GetHandler():IsInBackrow() then return 0xff end
 	local zone=0
 	for i=0,4 do
-		if Duel.GetFieldCard(tp,LOCATION_MZONE,4-1<<i) or Duel.GetFieldCard(tp,LOCATION_SZONE,4-1<<i) then
-			zone=zone|1<<i
+		if Duel.GetFieldCard(1-tp,LOCATION_MZONE,i) or Duel.GetFieldCard(1-tp,LOCATION_SZONE,i) then
+			local val=Duel.GetColumnZoneFromSequence(i,LOCATION_ONFIELD,LOCATION_SZONE)>>24
+			zone=zone|val
 		end
 	end
 	return zone
 end
 function s.cfilter(c)
-	return c:IsFaceup() and c:IsCode(54493213)
+	return c:IsFaceup() and c:IsCode(CARD_HELIOS_THE_PRIMORDIAL_SUN)
 end
 function s.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_ONFIELD,0,1,nil)
@@ -45,29 +52,40 @@ function s.filter(c,tc)
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return c:IsLocation(LOCATION_HAND)
-		or Duel.IsExistingMatchingCard(s.filter,tp,0,LOCATION_ONFIELD,1,nil,c) end
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,c:GetColumnGroup():Filter(Card.IsControler,nil,1-tp),1,0,0)
+	if chk==0 then return c:IsLocation(LOCATION_HAND) or Duel.IsExistingMatchingCard(s.filter,tp,0,LOCATION_ONFIELD,1,nil,c) end
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,c:GetColumnGroup():Filter(Card.IsControler,nil,1-tp),1,1-tp,LOCATION_ONFIELD)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) then
-		Duel.Destroy(c:GetColumnGroup():Filter(Card.IsControler,nil,1-tp):Select(tp,1,1,nil),REASON_EFFECT)
+	if c:IsRelateToChain() then
+		Duel.HintMessage(tp,HINTMSG_DESTROY)
+		local g=c:GetColumnGroup():Filter(Card.IsControler,nil,1-tp):Select(tp,1,1,nil)
+		if #g>0 then
+			Duel.HintSelection(g)
+			Duel.Destroy(g,REASON_EFFECT)
+		end
 	end
 end
+
+--E2
+function s.setcon(e)
+	return Duel.GetTurnCount()~=e:GetHandler():GetTurnID()
+end
 function s.sfilter(c)
-	return (aux.IsCodeListed(c,54493213) or aux.IsCodeListed(c,30241314) or c:IsCode(80887952,30241314,38430673))
-		and c:IsSSetable() and not c:IsCode(id)
+	return c:Mentions(CARD_HELIOS_THE_PRIMORDIAL_SUN,CARD_MACRO_COSMOS) and c:IsSSetable() and not c:IsCode(id)
 end
 function s.settg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToDeck()
-		and Duel.IsExistingMatchingCard(s.sfilter,tp,LOCATION_DECK,0,1,nil) end
+	local c=e:GetHandler()
+	if chk==0 then return c:IsAbleToDeck() and Duel.IsExistingMatchingCard(s.sfilter,tp,LOCATION_DECK,0,1,nil) end
+	Duel.SetCardOperationInfo(c,CATEGORY_TODECK)
 end
 function s.setop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not (c:IsRelateToEffect(e) and Duel.SendtoDeck(c,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)>0
-		and c:IsLocation(LOCATION_DECK)) then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
-	local tc=Duel.SelectMatchingCard(tp,s.sfilter,tp,LOCATION_DECK,0,1,1,nil):GetFirst()
-	if tc then Duel.SSet(tp,tc) end
+	if c:IsRelateToChain() and Duel.ShuffleIntoDeck(c)>0 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
+		local tc=Duel.SelectMatchingCard(tp,s.sfilter,tp,LOCATION_DECK,0,1,1,nil):GetFirst()
+		if tc then
+			Duel.SSet(tp,tc)
+		end
+	end
 end

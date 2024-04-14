@@ -275,6 +275,7 @@ STRING_ASK_TO_DECK						=	921
 STRING_ASK_TO_HAND						=	922
 STRING_ASK_RECOVER						=	923
 STRING_ASK_DAMAGE						=	924
+STRING_ASK_DESTROY						=	925
 
 STRING_SEND_TO_EXTRA					=	1006
 STRING_BANISH							=	1102
@@ -441,7 +442,7 @@ end
 function Auxiliary.Necro(f)
 	return aux.NecroValleyFilter(f)
 end
-function Card.Activation(c,oath)
+function Card.Activation(c,oath,timings)
 	local e1=Effect.CreateEffect(c)
 	if c:IsOriginalType(TYPE_PENDULUM) then
 		e1:SetDescription(STRING_ACTIVATE_PENDULUM)
@@ -450,6 +451,9 @@ function Card.Activation(c,oath)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	if oath then
 		e1:HOPT(true)
+	end
+	if timings then
+		e1:SetRelevantTimings()
 	end
 	c:RegisterEffect(e1)
 	return e1
@@ -2937,11 +2941,17 @@ end
 function Auxiliary.SetSuccessfullyFilter(c)
 	return c:IsFacedown() and c:IsLocation(LOCATION_SZONE)
 end
-function Duel.SSetAndFastActivation(p,g,e)
+function Card.MustWaitOneTurnToActivateAfterBeingSet(c)
+	return c:IsTrap() or c:IsSpell(TYPE_QUICKPLAY)
+end
+function Duel.SSetAndFastActivation(p,g,e,cond,brk)
 	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
-	if Duel.SSet(p,g)>0 then
+	if Duel.SSet(p,g)>0 and (not cond or cond(e,p)) then
 		local c=e:GetHandler()
-		local og=g:Filter(aux.SetSuccessfullyFilter,nil)
+		local og=g:Filter(aux.AND(Card.MustWaitOneTurnToActivateAfterBeingSet,aux.SetSuccessfullyFilter),nil)
+		if #og>0 and brk then
+			Duel.BreakEffect()
+		end
 		for tc in aux.Next(og) do
 			local code = tc:IsTrap() and EFFECT_TRAP_ACT_IN_SET_TURN or EFFECT_QP_ACT_IN_SET_TURN
 			local e1=Effect.CreateEffect(c)
@@ -2974,6 +2984,13 @@ end
 
 --Location Check
 EFFECT_CARD_HAS_RESOLVED = 47987298
+
+function Auxiliary.AlreadyInRangeFilter(e,f)
+	local se=e:GetLabelObject():GetLabelObject()
+	return	function(c,...)
+				return (se==nil or c:GetReasonEffect()~=se) and (not f or f(c,...))
+			end
+end
 
 function Auxiliary.AddThisCardBanishedAlreadyCheck(c,setf,getf)
 	local e1=Effect.CreateEffect(c)
