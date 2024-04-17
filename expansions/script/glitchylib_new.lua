@@ -80,6 +80,7 @@ ARCHE_DREAD_BASTILLE	= 0xb4c
 ARCHE_DREAMY_FOREST		= 0xd43
 ARCHE_DREARY_FOREST		= 0xd44
 ARCHE_EPTAMAGI			= 0xe07
+ARCHE_ETERNADIR			= 0xe56
 ARCHE_EVIL_DRAGON		= 0xe80
 ARCHE_FLIBBERTY			= 0x855
 ARCHE_FROM_THE_DARK		= 0x2ed
@@ -142,6 +143,7 @@ CARD_DIABOLICAL_QUARPHEX_LV8					= 100000165
 CARD_DIABOLICAL_QUARPHEX_LV12					= 100000166
 CARD_DREAD_BASTILLE_OVERTURE					= 61811408
 CARD_EMISSARY_OF_ARMONY							= 11110642
+CARD_ETERNADIR_SCOUT_ESOM						= 100000209
 CARD_GOLDEN_SKIES_TREASURE						= 11111060
 CARD_GOLDEN_SKIES_TREASURE_OF_WELFARE			= 11111029
 CARD_IN_THE_FOREST_BLACK_AS_MY_MEMORY			= 100000051
@@ -1095,7 +1097,9 @@ function Duel.SearchAndCheck(g,tp,p,brk,r)
 		if brk then
 			Duel.BreakEffect()
 		end
-		Duel.ConfirmCards(1-tp,cg)
+		if tp then
+			Duel.ConfirmCards(1-tp,cg)
+		end
 	end
 	return ct>0 and #cg>0
 end
@@ -1477,6 +1481,10 @@ end
 
 function Card.IsContained(c,g,exc)
 	return g:IsContains(c) and (not exc or not exc:IsContains(c))
+end
+
+function Card.GetResidence(c)
+	return c:GetControler(),c:GetLocation(),c:GetSequence(),c:GetPosition()
 end
 
 --Chain Info

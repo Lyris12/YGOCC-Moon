@@ -6,7 +6,7 @@ end
 
 local _PendCondition, _PConditionFilter, _PendOperation = aux.PendCondition, aux.PConditionFilter, aux.PendOperation
 		
-Auxiliary.PendCondition = function()
+Auxiliary.PendCondition = function(leaving)
 	return	function(e,c,og)
 				if c==nil then return true end
 				local tp=c:GetControler()
@@ -40,8 +40,8 @@ Auxiliary.PendCondition = function()
 				end
 				
 				local loc=0
-				if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then loc=loc|LOCATION_HAND end
-				if Duel.GetLocationCountFromEx(tp,tp,nil,TYPE_PENDULUM)>0 then loc=loc|LOCATION_EXTRA end
+				if Duel.GetMZoneCount(tp,leaving)>0 then loc=loc|LOCATION_HAND end
+				if Duel.GetLocationCountFromEx(tp,tp,leaving,TYPE_PENDULUM)>0 then loc=loc|LOCATION_EXTRA end
 				if loc==0 then return false end
 				local g=nil
 				if og then
@@ -127,14 +127,14 @@ function Auxiliary.PConditionFilter(c,e,tp,lscale,rscale,eset,tg)
 		and (Auxiliary.PendulumChecklist&(0x1<<tp)==0 or Auxiliary.PConditionExtraFilter(c,e,tp,lscale,rscale,eset))
 end
 
-function Auxiliary.PendOperation()
+function Auxiliary.PendOperation(leaving)
 	return	function(e,tp,eg,ep,ev,re,r,rp,c,sg,og)
 				
 				local eset={Duel.IsPlayerAffectedByEffect(tp,EFFECT_EXTRA_PENDULUM_SUMMON)}
 				local tg=nil
 				local loc=0
-				local ft1=Duel.GetLocationCount(tp,LOCATION_MZONE)
-				local ft2=Duel.GetLocationCountFromEx(tp,tp,nil,TYPE_PENDULUM)
+				local ft1=Duel.GetMZoneCount(tp,leaving)
+				local ft2=Duel.GetLocationCountFromEx(tp,tp,leaving,TYPE_PENDULUM)
 				local ft=Duel.GetUsableMZoneCount(tp)
 				local ect=c29724053 and Duel.IsPlayerAffectedByEffect(tp,29724053) and c29724053[tp]
 				if ect and ect<ft2 then ft2=ect end
