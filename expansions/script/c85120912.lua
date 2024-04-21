@@ -76,7 +76,8 @@ function s.sfilter(c)
 end
 function s.settg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return c:IsAbleToDeck() and Duel.IsExistingMatchingCard(s.sfilter,tp,LOCATION_DECK,0,1,nil) end
+	if chk==0 then return not c:HasFlagEffect(id) and c:IsAbleToDeck() and Duel.IsExistingMatchingCard(s.sfilter,tp,LOCATION_DECK,0,1,nil) end
+	c:RegisterFlagEffect(id,RESET_CHAIN,0,1)
 	Duel.SetCardOperationInfo(c,CATEGORY_TODECK)
 end
 function s.setop(e,tp,eg,ep,ev,re,r,rp)
