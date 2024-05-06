@@ -51,7 +51,9 @@ end
 function ref.acttg(e,tp,eg,ep,ev,re,r,rp,chk) local c=e:GetHandler()
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
 		and not c:IsForbidden()
+		and not (Duel.GetFlagEffect(tp,id)>0)
 	end
+	Duel.RegisterFlagEffect(tp,id,RESET_CHAIN,0,1)
 end
 function ref.actop(e,tp) local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 then

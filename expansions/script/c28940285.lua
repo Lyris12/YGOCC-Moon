@@ -29,16 +29,17 @@ function ref.initial_effect(c)
 	e3:SetTarget(ref.nultg)
 	e3:SetOperation(ref.nulop)
 	c:RegisterEffect(e3)
-	--Swap Field
+	--Swap Hand
 	local e4=Effect.CreateEffect(c)
 	e4:Desc(2)
 	e4:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOGRAVE)
 	e4:SetType(EFFECT_TYPE_IGNITION)
 	e4:SetRange(LOCATION_GRAVE)
+	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e4:HOPT()
-	e4:SetCost(ref.spcost)
-	e4:SetTarget(ref.sptg)
-	e4:SetOperation(ref.spop)
+	e4:SetCost(ref.thcost)
+	e4:SetTarget(ref.thtg)
+	e4:SetOperation(ref.thop)
 	c:RegisterEffect(e4)
 end
 
@@ -55,7 +56,8 @@ function ref.ssfilter(c,e,tp)
 end
 function ref.hdfilter(c) return c:IsDiscardable() and c:GetFlagEffect(FLAG_ENGAGE)<1 end
 function ref.sstg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(ref.ssfilter,tp,LOCATION_DECK,0,1,nil,e,tp)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE>0)
+		and Duel.IsExistingMatchingCard(ref.ssfilter,tp,LOCATION_DECK,0,1,nil,e,tp)
 		and Duel.IsExistingMatchingCard(ref.hdfilter,tp,LOCATION_HAND,0,1,nil)
 	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
@@ -104,38 +106,36 @@ function ref.nulop(e,tp,eg,ep,ev,re,r,rp) local c=e:GetHandler()
 	local e3=e2:Clone()
 	e3:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 	Duel.RegisterEffect(e3,tp)
+	local e4=e2:Clone()
+	e4:SetCode(EFFECT_CANNOT_FLIP_SUMMON)
+	Duel.RegisterEffect(e4,tp)
 end
 function ref.limval(e,re,tp)
-	return re:GetHandler():IsCode(e:GetLabel()) and re:IsActiveType(TYPE_SPELL+TYPE_TRAP)
-		and re:IsHasType(EFFECT_TYPE_ACTIVATE)
+	local ac=e:GetLabel()
+	return re:GetHandler():IsCode(ac) and re:IsHasType(EFFECT_TYPE_ACTIVATE)
 end
 function ref.splimit(e,c,sump,sumtype,sumpos,targetp,se)
 	return c:IsCode(e:GetLabel())
 end
 
---Swap Field
-function ref.spcost(e,tp,eg,ep,ev,re,r,rp,chk) local c=e:GetHandler()
-	if chk==0 then return c:IsAbleToDeckAsCost() end
+--Swap Hand
+function ref.thcost(e,tp,eg,ep,ev,re,r,rp,chk) local c=e:GetHandler()
+	if chk==0 then return c:IsAbleToDeckAsCost()
+		and Duel.IsExistingMatchingCard(ref.thfilter,tp,LOCATION_GRAVE,0,1,nil)
+	end
 	Duel.SendtoDeck(c,nil,SEQ_DECKSHUFFLE,REASON_COST)
 end
-function ref.spfilter(c,e,tp)
-	return Sunhew.Is(c) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+function ref.thfilter(c) return Sunhew.Is(c) and c:IsAbleToHand() end
+function ref.thtg(e,tp,eg,ep,ev,re,r,rp,chk) local c=e:GetHandler()
+	if chk==0 then return Duel.IsExistingTarget(ref.thfilter,tp,LOCATION_GRAVE,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local g=Duel.SelectTarget(tp,ref.thfilter,tp,LOCATION_GRAVE,0,1,1,nil)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,tp,LOCATION_GRAVE)
+	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,1,tp,LOCATION_HAND)
 end
-function ref.sptg(e,tp,eg,ep,ev,re,r,rp,chk) local c=e:GetHandler()
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(ref.spfilter,tp,LOCATION_GRAVE,0,1,c,e,tp)
-	end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,1,nil,tp,LOCATION_GRAVE)
-	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,1,nil,tp,LOCATION_MZONE)
-end
-function ref.spop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(ref.spfilter),tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
-	local tc=g:GetFirst()
-	if tc and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)>0 then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-		local g=Duel.SelectMatchingCard(tp,Card.IsAbleToGrave,tp,LOCATION_MZONE,0,1,1,nil)
-		if #g>0 then Duel.BreakEffect() Duel.SendtoGrave(g,REASON_EFFECT) end
+function ref.thop(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.GetFirstTarget()
+	if tc:IsRelateToEffect(e) and Duel.SendtoHand(tc,nil,REASON_EFFECT)~=0 then
+		Duel.DiscardHand(tp,nil,1,1,REASON_EFFECT,nil)
 	end
 end

@@ -239,6 +239,10 @@ function Auxiliary.AddTimeleapProc(c,futureval,sumcon,filter,custom_matop,custom
 		e1:SetOperation(Auxiliary.TimeleapOperation(customop))
 		e1:SetValue(SUMMON_TYPE_TIMELEAP)
 		c:RegisterEffect(e1)
+        local mt=getmetatable(c)
+        mt.timeleap_proc=e1
+        mt.timeleap_condition=sumcon
+        mt.timeleap_filter=filter
 	end
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)

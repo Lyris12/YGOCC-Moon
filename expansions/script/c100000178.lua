@@ -116,18 +116,18 @@ function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then
 		return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_GRAVE,0,1,c)
-			and (Duel.CheckReleaseGroup(REASON_COST,tp,nil,1,nil) or Duel.IsExistingMatchingCard(Card.IsReleasable,tp,LOCATION_SZONE,0,1,nil))
+			and (Duel.CheckReleaseGroup(tp,nil,1,nil) or Duel.IsExistingMatchingCard(Card.IsReleasable,tp,LOCATION_SZONE,0,1,nil))
 	end
 	local rg=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_GRAVE,0,1,1,c)
 	local sg
-	local b1=Duel.CheckReleaseGroup(REASON_COST,tp,nil,1,nil)
+	local b1=Duel.CheckReleaseGroup(tp,nil,1,nil)
 	local b2=Duel.IsExistingMatchingCard(Card.IsReleasable,tp,LOCATION_SZONE,0,1,nil)
 	local opt=aux.Option(tp,id-1,2,b1,b2)
 	if opt==1 then
 		Duel.HintMessage(tp,HINTMSG_RELEASE)
 		sg=Duel.SelectMatchingCard(tp,Card.IsReleasable,tp,LOCATION_SZONE,0,1,1,nil)
 	else
-		sg=Duel.SelectReleaseGroup(REASON_COST,tp,nil,1,1,nil)
+		sg=Duel.SelectReleaseGroup(tp,nil,1,1,nil)
 	end
 	Duel.Remove(rg,POS_FACEUP,REASON_COST)
 	Duel.Release(sg,REASON_COST)

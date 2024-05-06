@@ -106,17 +106,17 @@ end
 function s.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then
-		return Duel.CheckReleaseGroup(REASON_COST,tp,s.cfilter,1,c,tp) or Duel.IsExistingMatchingCard(Card.IsReleasable,tp,LOCATION_SZONE,0,1,c)
+		return Duel.CheckReleaseGroup(tp,s.cfilter,1,c,tp) or Duel.IsExistingMatchingCard(Card.IsReleasable,tp,LOCATION_SZONE,0,1,c)
 	end
 	local sg
-	local b1=Duel.CheckReleaseGroup(REASON_COST,tp,s.cfilter,1,c,tp)
+	local b1=Duel.CheckReleaseGroup(tp,s.cfilter,1,c,tp)
 	local b2=Duel.IsExistingMatchingCard(Card.IsReleasable,tp,LOCATION_SZONE,0,1,c)
 	local opt=aux.Option(tp,id,2,b1,b2)
 	if opt==1 then
 		Duel.HintMessage(tp,HINTMSG_RELEASE)
 		sg=Duel.SelectMatchingCard(tp,Card.IsReleasable,tp,LOCATION_SZONE,0,1,1,c)
 	else
-		sg=Duel.SelectReleaseGroup(REASON_COST,tp,s.cfilter,1,1,c,tp)
+		sg=Duel.SelectReleaseGroup(tp,s.cfilter,1,1,c,tp)
 	end
 	Duel.Release(sg,REASON_COST)
 end
