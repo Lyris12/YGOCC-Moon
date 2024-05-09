@@ -2,7 +2,6 @@
 --Radiant Child of Light
 local s,id,o=GetID()
 function s.initial_effect(c)
-	--This card's original ATK/DEF are each equal to the number of banished cards x 50.
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_SET_BASE_ATTACK)
@@ -13,7 +12,6 @@ function s.initial_effect(c)
 	local e2=e1:Clone()
 	e2:SetCode(EFFECT_SET_BASE_DEFENSE)
 	c:RegisterEffect(e2)
-	--When your opponent activates a card or effect (Quick Effect): You can banish this card from your hand or field and 1 other card from your hand; banish that card.
 	local e3=Effect.CreateEffect(c)
 	e3:Desc(0)
 	e3:SetCategory(CATEGORY_REMOVE)
@@ -27,13 +25,9 @@ function s.initial_effect(c)
 	e3:SetOperation(s.op)
 	c:RegisterEffect(e3)
 end
-
---E1
 function s.value()
 	return Duel.GetFieldGroupCount(0,LOCATION_REMOVED,LOCATION_REMOVED)*50
 end
-
---E2
 function s.con(e,tp,eg,ep,ev,re,r,rp)
 	local rc=re:GetHandler()
 	return rc and rp==1-tp and rc:IsRelateToChain(ev)

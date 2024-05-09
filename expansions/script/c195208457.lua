@@ -44,9 +44,8 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)<1 then return end
-	local tc=Duel.GetDecktopGroup(tp,1):GetFirst()
 	Duel.ConfirmDecktop(tp,1)
-	if not tc:IsType(1<<Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)) or Duel.GetLocationCount(tp,LOCATION_MZONE)<1 then return end
+	if not Duel.GetDecktopGroup(tp,1):GetFirst():IsType(1<<Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)) or Duel.GetLocationCount(tp,LOCATION_MZONE)<1 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	Duel.SpecialSummon(Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil,e,tp),0,tp,tp,false,false,POS_FACEUP)
 end

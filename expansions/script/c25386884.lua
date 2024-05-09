@@ -1,4 +1,4 @@
---created by Jake, coded by Keddy; updated by Lyris
+--created by Jake, coded by Keddy, updated by Lyris
 --Steinitz's Castling
 local s,id,o=GetID()
 function s.initial_effect(c)

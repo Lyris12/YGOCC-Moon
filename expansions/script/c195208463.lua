@@ -49,9 +49,8 @@ function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.thop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)<1 then return end
-	local tc=Duel.GetDecktopGroup(tp,1):GetFirst()
 	Duel.ConfirmDecktop(tp,1)
-	if not tc:IsType(1<<Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)) then return end
+	if not Duel.GetDecktopGroup(tp,1):GetFirst():IsType(1<<Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil)
 	Duel.SendtoHand(g,nil,REASON_EFFECT)
