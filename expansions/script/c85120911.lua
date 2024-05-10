@@ -3,6 +3,7 @@
 local s,id,o=GetID()
 function s.initial_effect(c)
 	aux.AddCodeList(c,id,CARD_HELIOS_THE_PRIMORDIAL_SUN,CARD_MACRO_COSMOS)
+	--When your opponent activates a card or effect while you control "Helios - The Primordial Sun" and "Macro Cosmos": Negate the activation, and if you do, destroy it.
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(0)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
@@ -13,6 +14,8 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
+	--[[If this card is currently banished, except the turn it was banished: You can shuffle this card into the Deck;
+	Set 1 Spell/Trap that mentions "Helios - The Primordial Sun" directly from your Deck, except "Praise the Immortal Sun".]]
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(1)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
@@ -22,6 +25,8 @@ function s.initial_effect(c)
 	e2:SetFunctions(s.setcon,aux.ToDeckSelfCost,s.settg,s.setop)
 	c:RegisterEffect(e2)
 end
+
+--E1
 function s.cfilter(c,code)
 	return c:IsFaceup() and c:IsCode(code)
 end
@@ -37,9 +42,12 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local rc=re:GetHandler()
 	if rc:IsDestructable() and rc:IsRelateToChain(ev) then Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0) end
 end
+
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToChain(ev) then Duel.Destroy(eg,REASON_EFFECT) end
 end
+
+--E2
 function s.setcon(e)
 	return Duel.GetTurnCount()~=e:GetHandler():GetTurnID()
 end

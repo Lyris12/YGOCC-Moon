@@ -21,25 +21,22 @@ function s.initial_effect(c)
 	e2:SetTarget(s.atktg)
 	e2:SetOperation(s.atkop)
 	c:RegisterEffect(e2)
-	if not s.global_check then
-		s.global_check=true
-		local mg,mc=Card.GetMutualLinkedGroup,Card.GetMutualLinkedGroupCount
-		Card.GetMutualLinkedGroup=function(c)
-			local g=mg(c)
-			local ct=c:GetFlagEffectLabel(19520843)
-			if ct and c:GetCardTargetCount()+1>=ct then
-				g:Merge(Duel.GetMatchingGroup(s.lfilter,tp,LOCATION_MZONE,0,nil))
-			end
-			return g
+	local mg,mc=Card.GetMutualLinkedGroup,Card.GetMutualLinkedGroupCount
+	Card.GetMutualLinkedGroup=function(c)
+		local g=mg(c)
+		local ct=c:GetFlagEffectLabel(19520843)
+		if ct and c:GetCardTargetCount()+1>=ct then
+			g:Merge(Duel.GetMatchingGroup(s.lfilter,tp,LOCATION_MZONE,0,nil))
 		end
-		Card.GetMutualLinkedGroupCount=function(c)
-			return math.max(#mg(c),mc(c))
-		end
-		if not Mextro then Mextro={} end
-		Mextro.MutualLinkFilter=Mextro.Mextro.MutualLinkFilter or function(c)
-			local ct=c:GetFlagEffectLabel(19520843)
-			return ct and c:GetCardTargetCount()+1>=ct
-		end
+		return g
+	end
+	Card.GetMutualLinkedGroupCount=function(c)
+		return math.max(#mg(c),mc(c))
+	end
+	if not Mextro then Mextro={} end
+	Mextro.MutualLinkFilter=Mextro.Mextro.MutualLinkFilter or function(c)
+		local ct=c:GetFlagEffectLabel(19520843)
+		return ct and c:GetCardTargetCount()+1>=ct
 	end
 end
 function s.mlcost(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -60,8 +57,8 @@ function s.mlop(e,tp)
 	local g=Duel.GetTargetsRelateToChain()
 	if #g<2 then return end
 	for tc in aux.Next(g) do
-		tc:RegisterFlagEffect(19520843,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CLIENT_HINT,1,2,aux.Stringid(19520843,0))
-		tc:SetCardTarget((g-c):GetFirst())
+		tc:RegisterFlagEffect(19520843,RESET_EVENT+RESETS_STANDARD,0,1,2)
+		tc:SetCardTarget((g-c):GetFirst()) end
 	end
 end
 function s.atkcon(e)

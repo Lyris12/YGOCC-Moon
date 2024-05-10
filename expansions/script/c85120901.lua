@@ -3,6 +3,7 @@
 local s,id,o=GetID()
 function s.initial_effect(c)
 	aux.AddCodeList(c,CARD_HELIOS_THE_PRIMORDIAL_SUN,CARD_SPARK_OF_THE_PRIMORDIAL_SUN,CARD_HELIOS_DUO_MEGISTUS)
+	--This card's ATK/DEF are equal to the number of banished cards x 100.
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_SET_ATTACK)
@@ -13,7 +14,9 @@ function s.initial_effect(c)
 	local e2=e1:Clone()
 	e2:SetCode(EFFECT_SET_DEFENSE)
 	c:RegisterEffect(e2)
+	--This card's name becomes "Helios - The Primordial Sun" while in the hand, on the field or while it is banished.
 	aux.EnableChangeCode(c,CARD_HELIOS_THE_PRIMORDIAL_SUN,LOCATION_HAND|LOCATION_MZONE|LOCATION_REMOVED)
+	--You can banish 1 "Spark of the Primordial Sun" you control; Special Summon this card from your hand.
 	local e3=Effect.CreateEffect(c)
 	e3:Desc(0)
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -23,6 +26,7 @@ function s.initial_effect(c)
 	e3:SetTarget(s.spstg)
 	e3:SetOperation(s.spsop)
 	c:RegisterEffect(e3)
+	--If this card is Tributed or banished: You can Special Summon 1 "Helios Duo Megistus" from your Deck, ignoring its Summoning conditions.
 	local e4=Effect.CreateEffect(c)
 	e4:Desc(1)
 	e4:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -37,9 +41,13 @@ function s.initial_effect(c)
 	e5:SetCode(EVENT_RELEASE)
 	c:RegisterEffect(e5)
 end
+
+--E1
 function s.adval(e,c)
 	return Duel.GetFieldGroupCount(0,LOCATION_REMOVED,LOCATION_REMOVED)*100
 end
+
+--E3
 function s.cfilter(c,tp)
 	return c:IsFaceup() and c:IsCode(CARD_SPARK_OF_THE_PRIMORDIAL_SUN) and Duel.GetMZoneCount(tp,c)>0 and c:IsAbleToRemoveAsCost()
 end
@@ -62,6 +70,8 @@ function s.spsop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
+
+--E4
 function s.filter(c,e,tp)
 	return c:IsMonster() and c:IsCode(CARD_HELIOS_DUO_MEGISTUS) and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
 end

@@ -3,7 +3,10 @@
 local s,id,o=GetID()
 function s.initial_effect(c)
 	aux.AddCodeList(c,CARD_MACRO_COSMOS,CARD_HELIOS_THE_PRIMORDIAL_SUN,CARD_HELIOS_DUO_MEGISTUS)
+	--This card's name becomes "Macro Cosmos" while on the field, in the GY or while it is banished.
 	aux.EnableChangeCode(c,CARD_MACRO_COSMOS,LOCATION_SZONE|LOCATION_GRAVE|LOCATION_REMOVED)
+	--[[When this card is activated: You can Special Summon 1 "Helios - The Primordial Sun" from your hand or Deck, also, for the rest of this turn,
+	you cannot Special Summon monsters, except LIGHT Pyro monsters.]]
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(0)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON|CATEGORY_DECKDES)
@@ -12,6 +15,7 @@ function s.initial_effect(c)
 	e1:SetTarget(s.target)
 	e1:SetOperation(s.activate)
 	c:RegisterEffect(e1)
+	--While you control "Helios - The Primordial Sun" or "Helios Duos Megistus", any card sent to the GY is banished instead.
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_TO_GRAVE_REDIRECT)
@@ -22,6 +26,7 @@ function s.initial_effect(c)
 	e2:SetValue(LOCATION_REMOVED)
 	c:RegisterEffect(e2)
 end
+--E1
 function s.filter(c,e,tp)
 	return c:IsCode(CARD_HELIOS_THE_PRIMORDIAL_SUN) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
@@ -52,6 +57,8 @@ end
 function s.limit(e,c,sp,st,spos,tp,se)
 	return not (c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsRace(RACE_PYRO))
 end
+
+--E2
 function s.cfilter(c)
 	return c:IsFaceup() and c:IsCode(CARD_HELIOS_THE_PRIMORDIAL_SUN,CARD_HELIOS_DUO_MEGISTUS)
 end

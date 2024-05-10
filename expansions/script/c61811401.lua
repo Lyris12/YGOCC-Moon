@@ -1,5 +1,10 @@
---created by Swag, coded by Lyris
---Dread Bastille - Oratorio
+--[[
+Dread Bastille - Oratorio
+Bastiglia dell'Angoscia - Oratorio
+Card Author: Swag
+Scripted by: Lyris
+]]
+
 local s,id,o=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
