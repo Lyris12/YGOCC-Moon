@@ -91,6 +91,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 					_e:Reset()
 				end
 				)
+				Duel.RegisterEffect(e0,tp)
 				Duel.LinkSummon(tp,sc,mg)
 			
 			elseif sc:IsType(TYPE_BIGBANG) then

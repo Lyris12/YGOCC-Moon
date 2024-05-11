@@ -747,6 +747,19 @@ function Auxiliary.SimultaneousEventGroupCheck(g,simult_check,og)
 	return true
 end
 
+function Auxiliary.SelectSimultaneousEventGroup(g,flag,ct)
+	local ct=ct and ct or 1
+	if #g>1 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_OPERATECARD)
+		local tg=g:SelectSubGroup(tp,aux.SimultaneousEventGroupCheck,false,ct,#g,flag,g)
+		Duel.HintSelection(tg)
+		return tg
+	else
+		Duel.HintSelection(g)
+		return g
+	end
+end
+
 ---------------------------------------------------------------------------------
 -------------------------------CONTACT FUSION---------------------------------
 function Auxiliary.AddContactFusionProcedureGlitchy(c,desc,rule,sumtype,filter,self_location,opponent_location,mat_operation,...)

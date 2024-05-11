@@ -540,11 +540,7 @@ function Auxiliary.NotConfirmed(f)
 end
 
 --Activate
-function Auxiliary.ActivateFilter(f)
-	return	function(c,e,tp)
-				return (not f or f(c,e,tp)) and c:GetActivateEffect():IsActivatable(tp,true,true)
-			end
-end
+
 function Auxiliary.ActivateFilterIgnoringPlayer(f)
 	return	function(c,e,tp)
 				local act=c:GetActivateEffect()
@@ -595,16 +591,7 @@ end
 
 -----------------------------------------------------------------------
 --Attach
-function Auxiliary.AttachFilter(f)
-	return	function(c,e,...)
-				return (not f or f(c,e,...)) and not c:IsType(TYPE_TOKEN) and not c:IsImmuneToEffect(e)
-			end
-end
-function Auxiliary.AttachFilter2(f)
-	return	function(c,...)
-				return (not f or f(c,e,...)) and c:IsType(TYPE_XYZ)
-			end
-end
+
 function Auxiliary.AttachTarget(f,loc1,loc2,min,exc,f2,loc3,loc4,exc2,targeted)
 	if not loc1 then loc1=LOCATION_ONFIELD end
 	if not loc2 then loc2=0 end
@@ -682,11 +669,7 @@ end
 
 -----------------------------------------------------------------------
 --Banish
-function Auxiliary.BanishFilter(f,cost)
-	return	function(c,...)
-				return (not f or f(c,...)) and (not cost and c:IsAbleToRemove() or cost and c:IsAbleToRemoveAsCost())
-			end
-end
+
 function Auxiliary.BanishTarget(f,loc1,loc2,min,exc)
 	if not loc1 then loc1=LOCATION_ONFIELD end
 	if not loc2 then loc2=LOCATION_ONFIELD end
@@ -740,11 +723,7 @@ end
 
 -----------------------------------------------------------------------
 --Control
-function Auxiliary.ControlFilter(f)
-	return	function(c,...)
-				return (not f or f(c,...)) and c:IsControlerCanBeChanged()
-			end
-end
+
 
 -----------------------------------------------------------------------
 --Add Counter
@@ -830,11 +809,7 @@ end
 
 -----------------------------------------------------------------------
 --Destroy
-function Auxiliary.DestroyFilter(f)
-	return	function(c,e,...)
-				return (not f or f(c,e,...)) and (c:IsOnField() or c:IsDestructable(e))
-			end
-end
+
 function Auxiliary.DestroyTarget(f,loc1,loc2,min,exc)
 	if not loc1 then loc1=LOCATION_ONFIELD end
 	if not loc2 then loc2=LOCATION_ONFIELD end
@@ -1017,11 +992,7 @@ end
 
 -----------------------------------------------------------------------
 --Disable
-function Auxiliary.DisableFilter(f)
-	return	function(c,...)
-				return (not f or f(c,...)) and aux.NegateAnyFilter(c)
-			end
-end
+
 function Auxiliary.DisableTarget(f,loc1,loc2,min,exc)
 	if not loc1 then loc1=LOCATION_ONFIELD end
 	if not loc2 then loc2=0 end
@@ -1062,12 +1033,7 @@ function Auxiliary.DisableOperation(f,loc1,loc2,min,max,exc,reset)
 end
 -----------------------------------------------------------------------
 --Discard
-function Auxiliary.DiscardFilter(f,cost)
-	local r = (not cost) and REASON_EFFECT or REASON_COST
-	return	function(c)
-				return (not f or f(c)) and c:IsDiscardable(r)
-			end
-end
+
 function Auxiliary.DiscardTarget(f,min,max,p)
 	if not min then min=1 end
 	
@@ -1206,11 +1172,7 @@ end
 
 -----------------------------------------------------------------------
 --Search
-function Auxiliary.SearchFilter(f)
-	return	function(c,...)
-				return (not f or f(c,...)) and c:IsAbleToHand()
-			end
-end
+
 function Auxiliary.SearchTarget(f,min,loc,max)
 	if not min then min=1 end
 	if not loc then loc=LOCATION_DECK end
@@ -1246,14 +1208,8 @@ end
 
 -----------------------------------------------------------------------
 --Send To GY
-function Auxiliary.ToGYFilter(f,cost)
-	return	function(c,...)
-				return (not f or f(c,...)) and (not cost and c:IsAbleToGrave() or (cost and c:IsAbleToGraveAsCost()))
-			end
-end
-function Auxiliary.ToGraveFilter(f,cost)
-	return aux.ToGYFilter(f,cost)
-end
+
+
 function Auxiliary.SendToGYTarget(f,loc1,loc2,min,exc)
 	if not loc1 then loc1=LOCATION_ONFIELD end
 	if not loc2 then loc2=0 end
@@ -1328,11 +1284,7 @@ end
 
 -----------------------------------------------------------------------
 --Send To Hand
-function Auxiliary.ToHandFilter(f,cost)
-	return	function(c,...)
-				return (not f or f(c,...)) and (not cost and c:IsAbleToHand() or (cost and c:IsAbleToHandAsCost()))
-			end
-end
+
 function Auxiliary.SendToHandTarget(f,loc1,loc2,min,exc)
 	if not loc1 then loc1=LOCATION_ONFIELD end
 	if not loc2 then loc2=0 end
@@ -1386,25 +1338,7 @@ end
 
 
 --To Deck
-function Auxiliary.ToDeckFilter(f,cost,loc)
-	if not cost then
-		return	function(c,...)
-			return (not f or f(c,...)) and c:IsAbleToDeck()
-		end
-	else
-		local check=Card.IsAbleToDeckOrExtraAsCost
-		if loc then
-			if loc==LOCATION_DECK then
-				check=Card.IsAbleToDeckAsCost
-			elseif loc==LOCATION_EXTRA then
-				check=Card.IsAbleToExtraAsCost
-			end
-		end
-		return	function(c,...)
-					return (not f or f(c,...)) and check(c)
-				end
-	end
-end
+
 
 -----------------------------------------------------------------------
 --Negates
@@ -1529,11 +1463,7 @@ end
 
 -----------------------------------------------------------------------
 --Normal Summons
-function Auxiliary.NSFilter(f)
-	return	function(c,...)
-				return (not f or f(c,...)) and c:IsSummonable(true,nil)
-			end
-end
+
 function Auxiliary.NSTarget(f,loc1)
 	if not loc1 then loc1=LOCATION_HAND+LOCATION_MZONE else loc1=loc1&(LOCATION_HAND+LOCATION_MZONE) end
 	
@@ -1637,46 +1567,7 @@ SPSUM_MOD_NEGATE   		= 0x1
 SPSUM_MOD_REDIRECT 		= 0x2
 SPSUM_MOD_CHANGE_ATKDEF	=	0x4
 
-function Auxiliary.SSFilter(f,sumtype,sump,ign1,ign2,pos,recp,zone)
-	if not sumtype then sumtype=0 end
-	if not ign1 then ign1=false end
-	if not ign2 then ign2=false end
-	if not pos then pos=POS_FACEUP end
-	if not zone then zone=0xff end
-	return	function(c,e,tp,...)
-				if not sump then sump=tp end
-				if not recp then recp=tp end
-				local zone = type(zone)=="number" and zone or zone(e,tp)
-				return (not f or f(c,e,tp,...)) and c:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos,recp,zone)
-			end
-end
-function Auxiliary.SSFromExtraDeckFilter(f,sumtype,sump,ign1,ign2,pos,recp,zone)
-	if not sumtype then sumtype=0 end
-	if not ign1 then ign1=false end
-	if not ign2 then ign2=false end
-	if not pos then pos=POS_FACEUP end
-	if not zone then zone=0xff end
-	return	function(c,e,tp,...)
-				if not sump then sump=tp end
-				if not recp then recp=tp end
-				local zone = type(zone)=="number" and zone or zone(e,tp)
-				return (not f or f(c,e,tp,...)) and c:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos,recp,zone)
-					and Duel.GetLocationCountFromEx(recp,sump,nil,c,zone)>0
-			end
-end
-function Auxiliary.SSToEitherFieldFilter(f,sumtype,sump,ign1,ign2,pos,zone1,zone2)
-	if not sumtype then sumtype=0 end
-	if not ign1 then ign1=false end
-	if not ign2 then ign2=false end
-	if not pos then pos=POS_FACEUP end
-	if not zone then zone=0xff end
-	return	function(c,e,tp,...)
-				if not sump then sump=tp end
-				local zone = type(zone)=="number" and zone or zone(e,tp)
-				return (not f or f(c,e,tp,...))
-					and (c:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos,tp,zone1) or c:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos,1-tp,zone2))
-			end
-end
+
 
 function Auxiliary.SSTarget(f,loc1,loc2,min,exc,sumtype,sump,ign1,ign2,pos,recp,zone)
 	if not loc1 then loc1=LOCATION_DECK end
@@ -3038,144 +2929,6 @@ function Duel.SpecialSummonMod(e,g,styp,sump,tp,ign1,ign2,pos,zone,...)
 	end
 	Duel.SpecialSummonComplete()
 	return ct
-end
-
-function Duel.SpecialSummonATK(e,g,styp,sump,tp,ign1,ign2,pos,zone,atk,reset,rc)
-	if not zone then zone=0xff end
-	if not reset then reset=0 end
-	if not rc then rc=e:GetHandler() end
-	if aux.GetValueType(g)=="Card" then
-		if g==e:GetHandler() and rc==e:GetHandler() then reset=reset|RESET_DISABLE end
-		g=Group.FromCards(g)
-	end
-	local ct=0
-	for dg in aux.Next(g) do
-		local finalzone=zone
-		if type(zone)=="table" then
-			finalzone=zone[tp+1]
-			if tc:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos,1-tp,zone[2-tp]) and (not tc:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos,tp,finalzone) or Duel.SelectYesNo(sump,aux.Stringid(61665245,2))) then
-				tp=1-tp
-				finalzone=zone[tp+1]
-			end
-		end
-		if Duel.SpecialSummonStep(dg,styp,sump,tp,ign1,ign2,pos,finalzone) then
-			ct=ct+1
-			local e1=Effect.CreateEffect(rc)
-			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetCode(EFFECT_UPDATE_ATTACK)
-			e1:SetValue(atk)
-			e1:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
-			dg:RegisterEffect(e1)
-		end
-	end
-	Duel.SpecialSummonComplete()
-	return ct
-end
-function Duel.SpecialSummonNegate(e,g,styp,sump,tp,ign1,ign2,pos,zone,reset,rc)
-	if not zone then zone=0xff end
-	if not reset then reset=0 end
-	if not rc then rc=e:GetHandler() end
-	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
-	for dg in aux.Next(g) do
-		local finalzone=zone
-		if type(zone)=="table" then
-			finalzone=zone[tp+1]
-			if tc:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos,1-tp,zone[2-tp]) and (not tc:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos,tp,finalzone) or Duel.SelectYesNo(sump,aux.Stringid(61665245,2))) then
-				tp=1-tp
-				finalzone=zone[tp+1]
-			end
-		end
-		if Duel.SpecialSummonStep(dg,styp,sump,tp,ign1,ign2,pos,finalzone) then
-			local e1=Effect.CreateEffect(rc)
-			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetCode(EFFECT_DISABLE)
-			e1:SetReset(RESET_EVENT|RESETS_STANDARD|reset)
-			dg:RegisterEffect(e1,true)
-			local e2=Effect.CreateEffect(rc)
-			e2:SetType(EFFECT_TYPE_SINGLE)
-			e2:SetCode(EFFECT_DISABLE_EFFECT)
-			e2:SetReset(RESET_EVENT|RESETS_STANDARD|reset)
-			dg:RegisterEffect(e2,true)
-		end
-	end
-	return Duel.SpecialSummonComplete()
-end
-function Duel.SpecialSummonRedirect(e,g,styp,sump,tp,ign1,ign2,pos,zone,loc,desc)
-	if not zone then zone=0xff end
-	if not loc then loc=LOCATION_REMOVED end
-	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
-	
-	if not desc then
-		if loc==LOCATION_REMOVED then
-			desc=STRING_BANISH_REDIRECT
-		elseif loc==LOCATION_DECKSHF then
-			desc=STRING_SHUFFLE_INTO_DECK_REDIRECT
-		end
-	end
-	
-	for dg in aux.Next(g) do
-		local finalzone=zone
-		if type(zone)=="table" then
-			finalzone=zone[tp+1]
-			if tc:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos,1-tp,zone[2-tp]) and (not tc:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos,tp,finalzone) or Duel.SelectYesNo(sump,aux.Stringid(61665245,2))) then
-				tp=1-tp
-				finalzone=zone[tp+1]
-			end
-		end
-		if Duel.SpecialSummonStep(dg,styp,sump,tp,ign1,ign2,pos,finalzone) then
-			local e=Effect.CreateEffect(e:GetHandler())
-			e:SetType(EFFECT_TYPE_SINGLE)
-			e:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
-			if desc then
-				e:SetDescription(desc)
-				e:SetProperty(EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_CLIENT_HINT)
-			else
-				e:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-			end
-			e:SetValue(loc)
-			e:SetReset(RESET_EVENT|RESETS_REDIRECT_FIELD)
-			dg:RegisterEffect(e,true)
-		end
-	end
-	return Duel.SpecialSummonComplete()
-end
-
-function Duel.SpecialSummonATKDEF(e,g,styp,sump,tp,ign1,ign2,pos,zone,atk,def,reset,rc)
-	if not zone then zone=0xff end
-	if not reset then reset=0 end
-	if not rc then rc=e:GetHandler() end
-	if aux.GetValueType(g)=="Card" then
-		if g==e:GetHandler() and rc==e:GetHandler() then reset=reset|RESET_DISABLE end
-		g=Group.FromCards(g)
-	end
-	for dg in aux.Next(g) do
-		local finalzone=zone
-		if type(zone)=="table" then
-			finalzone=zone[tp+1]
-			if tc:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos,1-tp,zone[2-tp]) and (not tc:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos,tp,finalzone) or Duel.SelectYesNo(sump,aux.Stringid(61665245,2))) then
-				tp=1-tp
-				finalzone=zone[tp+1]
-			end
-		end
-		if Duel.SpecialSummonStep(dg,styp,sump,tp,ign1,ign2,pos,finalzone) then
-			local e=Effect.CreateEffect(rc)
-			e:SetType(EFFECT_TYPE_SINGLE)
-			e:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
-			e:SetReset(RESET_EVENT|RESETS_STANDARD|reset)
-			if atk then
-				e:SetCode(EFFECT_SET_ATTACK)
-				e:SetValue(atk)
-				dg:RegisterEffect(e,true)
-			end
-			if def then
-				local e=e:Clone()
-				e:SetCode(EFFECT_SET_DEFENSE)
-				e:SetValue(def)
-				dg:RegisterEffect(e,true)
-			end
-		end
-	end
-	return Duel.SpecialSummonComplete()
 end
 
 ------------------------------------------------

@@ -150,7 +150,7 @@ function Auxiliary.DriveSummonedCond(e)
 	return e:GetHandler():IsSummonType(SUMMON_TYPE_DRIVE)
 end
 function Auxiliary.ProcSummonedCond(e)
-	return e:GetHandler():IsSummonType(SUMMON_TYPE_SPECIAL+1)
+	return e:GetHandler():IsSummonType(SUMMON_TYPE_SPECIAL|SUMMON_VALUE_SELF)
 end
 
 --Equip

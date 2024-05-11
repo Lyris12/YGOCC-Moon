@@ -1141,7 +1141,7 @@ Duel.CheckXyzMaterial=function(sc,f,lv,min,max,mg)
 end
 Duel.SelectXyzMaterial=function(p,sc,f,lv,min,max,mg)
 	if mg~=nil then
-		return duel_select_xyz_mat(p,sc,f,lv,min,max,extramats)
+		return duel_select_xyz_mat(p,sc,f,lv,min,max,mg)
 	else
 		local extramats=Duel.GetMatchingGroup(Auxiliary.XyzMaterialComplete,0,0xff,0xff,nil,sc,lv,p)
 		return duel_select_xyz_mat(p,sc,f,lv,min,max,extramats)
@@ -2262,7 +2262,12 @@ end
 --Global Card Effect Table
 EVENT_CHAIN_CREATED = 39419
 
-Auxiliary.SpSummonProcCard = nil
+Auxiliary.ContinuousEffects={
+[EFFECT_OVERLAY_REMOVE_REPLACE]={}
+}
+
+Auxiliary.SpSummonProcCard  = nil
+Auxiliary.SpSummonProcGCard = nil
 FLAG_SPSUMMON_PROC = 62613309
 
 function Card.GetEffects(c)
@@ -2345,16 +2350,23 @@ if not global_card_effect_table_global_check then
 			e:SetCondition(newcond)
 		end
 		
+		--ADD CONTINUOUS EFFECTS TO TABLE
+		if typ&EFFECT_TYPE_CONTINUOUS~=0 and type(aux.ContinuousEffects[code])=="table" then
+			table.insert(aux.ContinuousEffects[code],e)
+		end
+		
+		--MODIFY PASSIVE EFFECTS
 		if typ&(EFFECT_TYPE_ACTIONS)==0 then
 			local e = e:IsHasType(EFFECT_TYPE_GRANT) and e:GetLabelObject() or e
 			
 			if code==EFFECT_SPSUMMON_PROC then
 				local cond=e:GetCondition()
 				if cond then
-					e:SetCondition(function(E,C)
+					e:SetCondition(function(E,C,...)
 						if C==nil then return true end
 						aux.SpSummonProcCard=C
-						local res=cond(E,C)
+						aux.SpSummonProcGCard=nil
+						local res=cond(E,C,...)
 						aux.SpSummonProcCard=nil
 						return res
 					end)
@@ -2366,9 +2378,43 @@ if not global_card_effect_table_global_check then
 						C:RegisterFlagEffect(FLAG_SPSUMMON_PROC,RESET_EVENT|RESETS_STANDARD,EFFECT_FLAG_IGNORE_IMMUNE,1)
 					end)
 				else
-					e:SetOperation(function(E,TP,EG,EP,EV,RE,R,RP,C)
+					e:SetOperation(function(E,TP,EG,EP,EV,RE,R,RP,C,...)
 						C:RegisterFlagEffect(FLAG_SPSUMMON_PROC,RESET_EVENT|RESETS_STANDARD,EFFECT_FLAG_IGNORE_IMMUNE,1)
-						return op(E,TP,EG,EP,EV,RE,R,RP,C)
+						return op(E,TP,EG,EP,EV,RE,R,RP,C,...)
+					end)
+				end
+				
+				local val=e:GetValue()
+				if not val then
+					e:SetValue(function(E,C)
+						aux.SpSummonProcCard=C
+						aux.SpSummonProcGCard=nil
+						local sumtype,zones=nil,0xff
+						return sumtype,zones
+					end)
+				elseif type(val)=="number" then
+					e:SetValue(function(E,C)
+						aux.SpSummonProcCard=C
+						aux.SpSummonProcGCard=nil
+						local sumtype,zones=val,0xff
+						return sumtype,zones
+					end)
+				elseif type(val)=="function" then
+					e:SetValue(function(E,C,...)
+						aux.SpSummonProcCard=C
+						aux.SpSummonProcGCard=nil
+						local sumtype,zones=val(E,C,...)
+						return sumtype,zones
+					end)
+				end
+			
+			elseif code==EFFECT_SPSUMMON_PROC_G then
+				local op=e:GetOperation()
+				if op then
+					e:SetOperation(function(E,TP,EG,EP,EV,RE,R,RP,C,SG,OG,...)
+						aux.SpSummonProcGCard=C
+						local res=op(E,TP,EG,EP,EV,RE,R,RP,C,SG,OG,...)
+						return res
 					end)
 				end
 			
@@ -2639,6 +2685,11 @@ if not global_duel_effect_table_global_check then
 							end
 							
 							local typ,code=e:GetType(),e:GetCode()
+							
+							--ADD CONTINUOUS EFFECTS TO TABLE
+							if typ&EFFECT_TYPE_CONTINUOUS~=0 and type(aux.ContinuousEffects[code])=="table" then
+								table.insert(aux.ContinuousEffects[code],e)
+							end
 							
 							if typ&(EFFECT_TYPE_ACTIONS)==0 then
 								local e = e:IsHasType(EFFECT_TYPE_GRANT) and e:GetLabelObject() or e

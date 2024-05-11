@@ -1,113 +1,122 @@
---Lich-Lord's Effluvial Cloud
-local cid,id=GetID()
-function cid.initial_effect(c)
-	c:EnableCounterPermit(0x2e7)
+--[[
+Lich-Lord's Effluvial Cloud
+Nuvola Effluviale del Signore-Lich
+Card Author: Walrus
+Scripted by: XGlitchy30
+]]
+
+local s,id,o=GetID()
+function s.initial_effect(c)
 	c:SetUniqueOnField(1,0,id)
-	--Activate
+	c:EnableCounterPermit(COUNTER_EFFLUVIAL)
+	aux.AddCodeList(c,CARD_LICH_LORD_PHYLACTERY)
+	--You can only activate this card if a "Lich-Lord's Phylactery" is in your GY.
+	c:Activation(false,false,aux.PhylacteryCondition)
+	--[[Each time a Zombie monster(s) is Special Summoned from the GY, place 1 Effluvial Counter on this card.]]
+	local SZChk=aux.AddThisCardInSZoneAlreadyCheck(c)
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
+	e1:SetRange(LOCATION_SZONE)
+	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e1:SetLabelObject(SZChk)
+	e1:SetCondition(s.ctcon)
+	e1:SetOperation(s.ctop)
 	c:RegisterEffect(e1)
-	--add counter
+	--[[All monsters your opponent controls lose 100 ATK for each Effluvial Counter on this card.]]
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetCode(EFFECT_UPDATE_ATTACK)
 	e2:SetRange(LOCATION_SZONE)
-	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e2:SetOperation(cid.ctop)
+	e2:SetTargetRange(0,LOCATION_MZONE)
+	e2:SetValue(s.atkval)
 	c:RegisterEffect(e2)
-	--atk down
+	--[[If this card leaves the field while it had 1 or more Effluvial Counters on it: You can activate this effect; send as many cards from the top of your Deck to the GY as possible,
+	up to the number of Effluvial counters this card had on the field.]]
+	local reg=aux.RegisterCountersBeforeLeavingField(c,COUNTER_EFFLUVIAL)
 	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_FIELD)
-	e3:SetCode(EFFECT_UPDATE_ATTACK)
-	e3:SetRange(LOCATION_SZONE)
-	e3:SetTargetRange(0,LOCATION_MZONE)
-	e3:SetValue(cid.atkval)
+	e3:SetDescription(id,0)
+	e3:SetCategory(CATEGORY_DECKDES)
+	e3:SetType(EFFECT_TYPE_SINGLE|EFFECT_TYPE_TRIGGER_O)
+	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET|EFFECT_FLAG_DELAY)
+	e3:SetCode(EVENT_LEAVE_FIELD)
+	e3:HOPT()
+	e3:SetFunctions(s.ddcon,nil,s.ddtg,s.ddop)
+	e3:SetLabelObject(reg)
 	c:RegisterEffect(e3)
-	--spsummon
+	--[[If this card is in the GY, except during the turn it was sent there: You can banish this card from your GY; draw cards up to the number of "Lich-Lord" monsters you currently control +1,
+	then shuffle 1 card from your hand into the Deck.]]
 	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e4:SetCode(EVENT_LEAVE_FIELD_P)
-	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e4:SetOperation(cid.regop)
+	e4:SetDescription(id,1)
+	e4:SetCategory(CATEGORY_DRAW|CATEGORY_TODECK)
+	e4:SetType(EFFECT_TYPE_IGNITION)
+	e4:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e4:SetRange(LOCATION_GRAVE)
+	e4:HOPT()
+	e4:SetFunctions(aux.exccon,aux.bfgcost,s.drawtg,s.drawop)
 	c:RegisterEffect(e4)
-	local e5=Effect.CreateEffect(c)
-	e5:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e5:SetProperty(EFFECT_FLAG_DELAY)
-	e5:SetCode(EVENT_TO_GRAVE)
-	e5:SetCountLimit(1,id)
-	e5:SetCondition(cid.spcon)
-	e5:SetTarget(cid.sptg)
-	e5:SetOperation(cid.spop)
-	e5:SetLabelObject(e4)
-	c:RegisterEffect(e5)
-	--If this card is in the GY, except during the turn it was sent to the GY: You can banish this card from your GY; draw cards up to the number of "Lich-Lord" monsters you currently control +1, then shuffle 1 card back into your Deck from your hand.
-	local e6=Effect.CreateEffect(c)
-	e6:SetType(EFFECT_TYPE_IGNITION)
-	e6:SetRange(LOCATION_GRAVE)
-	e6:SetCountLimit(1,id+1000)
-	e6:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e6:SetCategory(CATEGORY_DRAW+CATEGORY_TODECK)
-	e6:SetCondition(aux.exccon)
-	e6:SetCost(aux.bfgcost)
-	e6:SetTarget(cid.tg)
-	e6:SetOperation(cid.op)
-	c:RegisterEffect(e6)
 end
-function cid.ctfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x2e7)
+--E1
+function s.ctfilter(c)
+	return c:IsFaceup() and c:IsRace(RACE_ZOMBIE) and c:IsSummonLocation(LOCATION_GRAVE)
 end
-function cid.ctop(e,tp,eg,ep,ev,re,r,rp)
-	if eg:IsExists(cid.ctfilter,1,nil) then e:GetHandler():AddCounter(0x2e7,1) end
+function s.ctcon(e,tp,eg,ep,ev,re,r,rp)
+	return eg:IsExists(aux.AlreadyInRangeFilter(e,s.ctfilter),1,nil)
 end
-function cid.atkval(e)
-	return e:GetHandler():GetCounter(0x2e7)*-100
-end
-function cid.regop(e,tp,eg,ep,ev,re,r,rp)
+function s.ctop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local ct=c:GetCounter(0x2e7)
-	e:SetLabel(ct)
-end
-function cid.spcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local ct=e:GetLabelObject():GetLabel()
-	return ct>=5 and c:IsPreviousLocation(LOCATION_ONFIELD)
-end
-function cid.spfilter(c,e,tp)
-	return c:IsSetCard(0x2e7) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-end
-function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then 
-		local g=Duel.GetMatchingGroup(cid.spfilter,tp,LOCATION_GRAVE,0,nil,e,tp)
-		return not Duel.IsPlayerAffectedByEffect(tp,59822133)
-			and Duel.GetLocationCount(tp,LOCATION_MZONE)>1
-			and g:GetClassCount(Card.GetCode)>1 end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,tp,LOCATION_GRAVE)
-end
-function cid.spop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.IsPlayerAffectedByEffect(tp,59822133) then return end
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<2 then return end
-	local g=Duel.GetMatchingGroup(cid.spfilter,tp,LOCATION_GRAVE,0,nil,e,tp)
-	if g:GetClassCount(Card.GetCode)<2 then return end
-	if g:GetCount()>=2 then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		Duel.SpecialSummon(g:SelectSubGroup(tp,aux.dncheck,false,2,2),0,tp,tp,false,false,POS_FACEUP)
+	if c:IsCanAddCounter(COUNTER_EFFLUVIAL,1) then
+		c:AddCounter(COUNTER_EFFLUVIAL,1)
 	end
 end
-function cid.tg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local ct=Duel.GetMatchingGroupCount(aux.AND(Card.IsFaceup,Card.IsSetCard),tp,LOCATION_MZONE,0,nil,0x2e7)
-	if chk==0 then return Duel.IsPlayerCanDraw(tp,ct+1) end
-	Duel.SetTargetPlayer(tp)
-	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,ct+1)
-	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,0,tp,1)
+
+--E2
+function s.atkval(e,c)
+	return e:GetHandler():GetCounter(COUNTER_EFFLUVIAL)*-100
 end
-function cid.op(e,tp,eg,ep,ev,re,r,rp)
+
+--E3
+function s.ddcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():IsPreviousPosition(POS_FACEUP) and e:GetLabelObject():GetLabel()>0
+end
+function s.ddtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local ct=e:GetLabelObject():GetLabel()
+	if chk==0 then return ct>0 and Duel.IsPlayerCanDiscardDeck(tp,1) end
+	Duel.SetTargetPlayer(tp)
+	Duel.SetTargetParam(ct)
+	Duel.SetOperationInfo(0,CATEGORY_DECKDES,nil,0,tp,ct)
+end
+function s.ddop(e,tp,eg,ep,ev,re,r,rp)
+	local p,val=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
+	Duel.DiscardDeck(p,val,REASON_EFFECT)
+end
+
+--E4
+function s.filter(c)
+	return c:IsFaceup() and c:IsSetCard(ARCHE_LICH_LORD)
+end
+function s.drawtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
+	Duel.SetTargetPlayer(tp)
+	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
+end
+function s.drawop(e,tp,eg,ep,ev,re,r,rp)
 	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
-	if Duel.Draw(p,Duel.GetMatchingGroupCount(aux.AND(Card.IsFaceup,Card.IsSetCard),tp,LOCATION_MZONE,0,nil,0x2e7)+1,REASON_EFFECT)==0 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToDeck,tp,LOCATION_HAND,0,1,1,nil)
-	if #g>0 then
-		Duel.BreakEffect()
-		Duel.SendtoDeck(g,nil,2,REASON_EFFECT)
+	local ct=Duel.GetMatchingGroupCount(s.filter,p,LOCATION_MZONE,0,nil)+1
+	local av={}
+	for i=1,ct do
+		if Duel.IsPlayerCanDraw(p,i) then
+			table.insert(av,i)
+		end
+	end
+	local n=Duel.AnnounceNumber(p,table.unpack(av))
+	local drew=Duel.Draw(p,n,REASON_EFFECT)
+	if drew~=0 then
+		Duel.Hint(HINT_SELECTMSG,p,HINTMSG_TODECK)
+		local g=Duel.SelectMatchingCard(p,Card.IsAbleToDeck,p,LOCATION_HAND,0,1,1,nil)
+		if #g>0 then
+			Duel.ShuffleHand(p)
+			Duel.BreakEffect()
+			Duel.SendtoDeck(g,nil,SEQ_DECKSHUFFLE,REASON_EFFECT)
+		end
 	end
 end

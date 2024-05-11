@@ -1,3 +1,5 @@
+GLITCHYCORE_LOADED = true
+
 ---------------------------------------
 --[[Card.IsAffectedByEffect]]
 function Card.IsAffectedByEffect(c,code,cc)
@@ -93,6 +95,81 @@ function Duel.FlipSummon(tp,c)
 	end
 end
 -- ---------------------------------------
+function Effect.IsApplicable(e,tp,event,neglect_cond,neglect_cost,neglect_target,neglect_loc,neglect_faceup)
+	local type=e:GetType()
+	if type&EFFECT_TYPE_ACTIONS==0 then return false end
+	if not e:CheckCountLimit(tp) then return false end
+	if not e:IsHasProperty(EFFECT_FLAG_FIELD_ONLY) then
+		if type&EFFECT_TYPE_CONTINUOUS>0 then
+			local c,owner=e:GetHandler(),e:GetOwner()
+			local issingle,isfield=type&EFFECT_TYPE_SINGLE>0,type&EFFECT_TYPE_FIELD>0
+			local hasSingleRange,hasOwnerRelate,hasCannotDisable=e:IsHasProperty(EFFECT_FLAG_SINGLE_RANGE),e:IsHasProperty(EFFECT_FLAG_OWNER_RELATE),e:IsHasProperty(EFFECT_FLAG_CANNOT_DISABLE)
+			if not e:IsHasProperty(0,EFFECT_FLAG2_AVAILABLE_BD) and isfield and c:IsStatus(STATUS_BATTLE_DESTROYED) then
+				return false
+			end
+			
+			if (isfield or (issingle and hasSingleRange)) and c:IsOnField() and (not c:IsFaceup() or not c:IsStatus(STATUS_EFFECT_ENABLED)) then
+				return false
+			end
+			
+			if issingle and hasSingleRange and not c:IsLocation(e:GetRange()) then
+				return false
+			end
+			
+			if hasOwnerRelate and e:IsCanBeForbidden() and owner:IsForbidden() then
+				return false
+			end
+			
+			if c==owner and e:IsCanBeForbidden() and c:IsForbidden() then
+				return false
+			end
+			
+			if hasOwnerRelate and not hasCannotDisable and owner:IsDisabled() then
+				return false
+			end
+			
+			if c==owner and not hasCannotDisable and c:IsDisabled() then
+				return false
+			end
+		end
+	
+	else
+		if e:GetOwnerPlayer()~=tp and not e:IsHasProperty(EFFECT_FLAG_BOTH_SIDE) then
+			return false
+		end
+	end
+	
+	local result=e:IsActivateReady(tp,event,neglect_cond,neglect_cost,neglect_target)
+	
+	return result
+end
+
+function Effect.IsActivateReady(e,tp,event,neglect_cond,neglect_cost,neglect_target)
+	local eg,ep,ev,re,r,rp=table.unpack(event)
+	local cond,cost,target=e:GetCondition(),e:GetCost(),e:GetTarget()
+	if not neglect_cond and cond and not cond(e,tp,eg,ep,ev,re,r,rp) then
+		return false
+	end
+	
+	if not neglect_cost and not e:IsHasType(EFFECT_TYPE_CONTINUOUS) then
+		--note: add cost checked thing
+		if cost and not cost(e,tp,eg,ep,ev,re,r,rp,0) then
+			--note: add cost checked thing
+			return false
+		end
+	else
+		--note: add cost checked thing
+	end
+	
+	if not neglect_target and target and not target(e,tp,eg,ep,ev,re,r,rp,0) then
+		--note: add cost checked thing
+		return false
+	end
+	
+	--note: add cost checked thing
+	return true
+end
+
 CODE_CUSTOM,CODE_COUNTER,CODE_PHASE,CODE_VALUE = 1,2,3,4
 function Effect.GetCodeType(code)
 	if code&EVENT_CUSTOM>0 then
@@ -173,9 +250,6 @@ function Effect.IsCanBeForbidden(e)
 	if e:IsHasProperty(EFFECT_FLAG_CANNOT_DISABLE) and not e:IsHasProperty(EFFECT_FLAG_CANNOT_NEGATE) then
 		return false
 	end
-	if e:GetCode()==EFFECT_CHANGE_CODE then
-		return false
-	end
 	return true
 end
 
@@ -199,18 +273,18 @@ function Effect.IsChainable(e,tp)
 		end
 	end
 	
-	for _,chlim in ipairs(Core.ChainLimit) do 
-		local f,p = chlim[1],chlim[2]
-		if f and not f(e,p,tp) then
-			return false
-		end
-	end
-	for _,chlimp in ipairs(Core.ChainLimitP) do 
-		local f,p = chlimp[1],chlimp[2]
-		if f and not f(e,p,tp) then
-			return false
-		end
-	end
+	-- for _,chlim in ipairs(Core.ChainLimit) do 
+		-- local f,p = chlim[1],chlim[2]
+		-- if f and not f(e,p,tp) then
+			-- return false
+		-- end
+	-- end
+	-- for _,chlimp in ipairs(Core.ChainLimitP) do 
+		-- local f,p = chlimp[1],chlimp[2]
+		-- if f and not f(e,p,tp) then
+			-- return false
+		-- end
+	-- end
 	
 	return true
 end
@@ -234,4 +308,83 @@ function Effect.IsFitTargetFunction(e,c)
 		return tg(e,c)
 	end
 	return true
-end	
+end
+
+---------------------------------
+-----------OPERATIONS------------
+---------------------------------	
+
+function Card.RemoveCustomOverlayCard(c,tp,f,min,max,re,r,...)
+	if tp~=0 and tp~=1 then return false end
+	local options,effs={},{}
+	--Step 1
+	--Debug.Message(1)
+	local eset={Duel.IsPlayerAffectedByEffect(tp,EFFECT_OVERLAY_REMOVE_COST_CHANGE_KOISHI)}
+	for _,e in ipairs(eset) do
+		min=e:Evaluate(re,tp,min,r,c)
+	end
+	if c:GetOverlayCount()>=min then
+		table.insert(options,12)
+		table.insert(effs,0)
+	end
+	
+	local event={0,tp,min,re,r,tp}
+	local resethandlers,resetpos={},{}
+	for i,e in ipairs(aux.ContinuousEffects[EFFECT_OVERLAY_REMOVE_REPLACE]) do
+		if e and not e:WasReset() then
+			if e:IsApplicable(e:GetHandlerPlayer(),event) then
+				table.insert(options,e:GetDescription())
+				table.insert(effs,e)
+			end
+		else
+			local h=e:IsHasProperty(EFFECT_FLAG_FIELD_ONLY) and e:GetHandlerPlayer() or e:GetHandler()
+			table.insert(resethandlers,h)
+			table.insert(resetpos,1,h)
+			aux.MarkResettedEffect(h,i)
+		end
+	end
+	for i,h in ipairs(resethandlers) do
+		aux.DeleteResettedEffects(h)
+		table.remove(aux.ContinuousEffects[EFFECT_OVERLAY_REMOVE_REPLACE],resetpos[i])
+	end
+
+	if #options==0 then return 0 end
+	local opt=0
+	if effs[1]==0 and #effs==2 then
+		opt=Duel.SelectEffectYesNo(tp,effs[2]:GetHandler(),219) and 1 or 0
+	elseif #options~=1 then
+		opt=Duel.SelectOption(tp,table.unpack(options))
+	end
+	
+	--Step 2
+	--Debug.Message(2)
+	local res=0
+	local eff=effs[opt+1]
+	local appliedEffect=aux.GetValueType(eff)=="Effect"
+	if appliedEffect then
+		--local event={0,tp,min+(max<<16),re,r,tp}
+		local tg,op=eff:GetTarget(),eff:GetOperation()
+		if tg then
+			tg(e,tp,0,tp,min+(max<<16),re,r,tp,0)
+		end
+		if op then
+			res=op(e,tp,0,tp,min+(max<<16),re,r,tp,0)
+		end
+	end
+	
+	--Step 3
+	--Debug.Message(3)
+	local cancelable=false
+	if appliedEffect then
+		if res>=max then return res end
+		min=min-res
+		max=max-res
+		if min<=0 then
+			cancelable=true
+			min=0
+		end
+	end
+	Duel.HintMessage(tp,519)
+	local g=c:GetOverlayGroup():FilterSelect(tp,f,min,max,nil,...)
+	return Duel.SendtoGrave(g,REASON_EFFECT)
+end
