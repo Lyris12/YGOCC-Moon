@@ -50,6 +50,7 @@ function s.initial_effect(c)
 	)
 	c:RegisterEffect(e2)
 end
+aux.xyz_number[id]=210
 function s.mfilter(c,e,tp,xyzc)
 	return c:IsFaceup() and c:IsXyzType(TYPE_MONSTER) and c:IsXyzType(TYPE_RITUAL) and c:IsSetCard(ARCHE_VERDANSE) and c:IsXyzLevel(xyzc,10) and c:IsSummonType(SUMMON_TYPE_RITUAL)
 end

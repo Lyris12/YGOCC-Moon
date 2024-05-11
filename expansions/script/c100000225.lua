@@ -57,6 +57,7 @@ function s.initial_effect(c)
 	e4:SetTargetRange(0,1)
 	c:RegisterEffect(e4)
 end
+aux.xyz_number[id]=203
 
 --E1
 function s.spfilter(c,e,tp)

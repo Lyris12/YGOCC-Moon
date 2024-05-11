@@ -56,6 +56,8 @@ function s.initial_effect(c)
 	)
 	c:RegisterEffect(e2)
 end
+aux.xyz_number[id]=210
+
 --E1
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.Group(Card.IsFacedown,tp,0,LOCATION_EXTRA,nil)
