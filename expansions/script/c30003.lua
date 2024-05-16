@@ -3,6 +3,7 @@
 
 local s,id=GetID()
 function s.initial_effect(c)
+	aux.AddSetNameMonsterList(c,0x10ec)
 	--banish GY
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(0)
