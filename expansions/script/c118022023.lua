@@ -6,6 +6,7 @@ Scripted by: XGlitchy30
 
 local s,id,o=GetID()
 function s.initial_effect(c)
+	aux.AddSetNameMonsterList(c,0x10ec)
 	--[[Fusion Summon 1 "Abyss Actor" Fusion Monster from your Extra Deck, using monsters you control and/or by using cards in your Pendulum Zones as Fusion Material.
 	If your opponent controls a monster, you can also shuffle "Abyss Actor" Pendulum Monsters from the Extra Deck to the Main Deck as Fusion Material.]]
 	local e1=Effect.CreateEffect(c)
