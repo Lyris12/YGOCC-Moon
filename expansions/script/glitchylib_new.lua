@@ -93,6 +93,7 @@ ARCHE_LICH_LORD			= 0x2e7
 ARCHE_LIFEWEAVER		= 0x5a5
 ARCHE_LOTUS_BLADE		= 0x3ff
 ARCHE_METALURGOS		= 0x5a4
+ARCHE_MEXTRO			= 0xee5
 ARCHE_MMS				= 0xd71
 ARCHE_MUSCWOLE			= 0x777
 --
@@ -105,6 +106,7 @@ ARCHE_ORIGIN_DRAGON		= 0xfc1
 ARCHE_OSCURION			= 0x5a6
 ARCHE_QUARPHEX			= 0x1a4
 ARCHE_SILENT_STAR		= 0xd0a1
+ARCHE_SPECULOMIRIC		= 0x20c
 ARCHE_STAR_REGALIA		= 0xd0a2
 ARCHE_SKYBURNER			= 0xf41
 ARCHE_TRAPPIT			= 0x54a
@@ -176,6 +178,7 @@ CARD_SPACE_VALKYR								= 11210118
 CARD_SPARK_OF_THE_PRIMORDIAL_SUN				= 85120900
 CARD_STARFORCE_KNIGHT							= 39301
 CARD_THE_EMBODIMENTS_OF_MOVEMENTS				= 34853
+CARD_THE_FIGURE_IN_THE_MIRROR					= 100000233
 CARD_THE_ORIGIN_OF_DRAGONS						= 20157309
 CARD_VOIDICTATOR_DEITY_NEMESIS					= 221594308
 CARD_VOIDICTATOR_DEITY_OMEN						= 221594307
@@ -256,6 +259,8 @@ STRING_PANDEPEND_SCALE							=	748
 STRING_SPECIAL_SUMMONED							=	749
 STRING_DECKTOP									=	754
 STRING_DECKBOTTOM								=	755
+STRING_TREATED_AS_CONTINUOUS_SPELL				=	756
+STRING_TREATED_AS_CONTINUOUS_TRAP				=	757
 
 STRING_ASK_REPLACE_UPDATE_ENERGY_COST	= 	900
 STRING_ASK_ENGAGE						=	901
@@ -285,6 +290,7 @@ STRING_ASK_TO_HAND						=	922
 STRING_ASK_RECOVER						=	923
 STRING_ASK_DAMAGE						=	924
 STRING_ASK_DESTROY						=	925
+STRING_ASK_ACTIVATE						=	926
 
 STRING_SEND_TO_EXTRA					=	1006
 STRING_BANISH							=	1102
@@ -789,9 +795,9 @@ end
 - loc:  Set only if you defined a custom "op". Specifies the location the cards must be in after being affected by the effect, in order to be counted as successfully affected
 		and eligible for returning to the field.
 		Defaults to LOCATION_REMOVED
-
 - lingering_effect_to_reset: If it is a number, resets all flags of the returning cards with that number after returning to the field. If it is an effect, resets the specified effect.
 ]]
+
 function Duel.BanishUntil(g,e,tp,pos,phase,id,phasect,phasenext,rc,r,disregard_turncount,counts_turns,op,loc,lingering_effect_to_reset)
 	if not e then
 		e=self_reference_effect
@@ -1404,7 +1410,6 @@ function Card.GetRating(c)
 	return list
 end
 function Card.GetRatingAuto(c)
-	local typ
 	if c:HasLevel() then
 		return c:GetLevel(),0
 	end
@@ -1414,7 +1419,7 @@ function Card.GetRatingAuto(c)
 	if c:IsOriginalType(TYPE_LINK) then
 		return c:GetLink(),TYPE_LINK
 	end
-	return 0,typ
+	return 0,nil
 end
 function Card.GetOriginalRating(c)
 	local list={false,false,false}
@@ -1431,15 +1436,15 @@ function Card.GetOriginalRating(c)
 end
 function Card.GetOriginalRatingAuto(c)
 	if c:HasLevel(true) then
-		return c:GetOriginalLevel()
+		return c:GetOriginalLevel(),0
 	end
 	if c:IsOriginalType(TYPE_XYZ) then
-		return c:GetOriginalRank()
+		return c:GetOriginalRank(),TYPE_XYZ
 	end
 	if c:IsOriginalType(TYPE_LINK) then
-		return c:GetOriginalLink()
+		return c:GetOriginalLink(),TYPE_LINK
 	end
-	return 0
+	return 0,nil
 end
 	
 function Card.IsRating(c,rtyp,...)
@@ -3023,6 +3028,35 @@ function Card.IsAbleToExtraFaceupAsCost(c,p,tp)
 		dest=redirect
 	end
 	return dest==LOCATION_DECK
+end
+
+--Place in backrow
+function Duel.PlaceAsContinuousCard(g,movep,recp,owner,type,desc,...)
+	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
+	if not desc then
+		desc=type==TYPE_SPELL and STRING_TREATED_AS_CONTINUOUS_SPELL or STRING_TREATED_AS_CONTINUOUS_TRAP
+	end
+	local effs={...}
+	local ct=0
+	for tc in aux.Next(g) do
+		local recp=recp and recp or tc:GetOwner()
+		if Duel.MoveToField(tc,movep,recp,LOCATION_SZONE,POS_FACEUP,true) then
+			ct=ct+1
+			local e1=Effect.CreateEffect(owner)
+			e1:SetDescription(desc)
+			e1:SetCode(EFFECT_CHANGE_TYPE)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_CLIENT_HINT)
+			e1:SetReset(RESET_EVENT|RESETS_STANDARD_FACEDOWN)
+			e1:SetValue(type|TYPE_CONTINUOUS)
+			tc:RegisterEffect(e1)
+			for _,e in ipairs(effs) do
+				e:SetReset(RESET_EVENT|RESETS_STANDARD_FACEDOWN)
+				tc:RegisterEffect(e)
+			end
+		end
+	end
+	return ct
 end
 
 --redirect
