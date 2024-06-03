@@ -1,4 +1,4 @@
-﻿expansions/cards-new.cdb	312ca4740a74afb4fb6b2c1cbbee1b36
+﻿expansions/cards-new.cdb	fd72584896a5cb0a8880f9478ed9bff9
 expansions/lflist.conf	dd5cdb14ece42cc9134bdd29f98208ef
 expansions/strings.conf	590cdc7bffbce4d51d0d97509f9e5a69
 expansions/pics/100000000.png	b67e8ff2c7f674f012be790c136b43e5
@@ -4266,7 +4266,7 @@ expansions/pics/39507130.jpg	57ef13b76892d89f0db73170acd307db
 expansions/pics/39507140.jpg	d18b4a04ce428559beaaa76520a2ad15
 expansions/pics/39507150.jpg	a570c1ef561c84c4ce11bd3761c78fb9
 expansions/pics/39507160.jpg	166da205b7a0eb124fb29a18cc00289b
-expansions/pics/39507162.jpg	ca6960dc9a8f5627bdac795fac6ff7ee
+expansions/pics/39507163.jpg	ca6960dc9a8f5627bdac795fac6ff7ee
 expansions/pics/39507170.jpg	fb38c50849dd3fcf45c87465736b2418
 expansions/pics/39507180.jpg	4080c87e94aecceedb99aed2b7471b79
 expansions/pics/39507190.jpg	84716effe5c14c977ae93739064ce303
@@ -10436,7 +10436,7 @@ expansions/script/c39507130.lua	3d1898b1d00ff8300009bbf24aa78ae2
 expansions/script/c39507140.lua	0be3d1e39dc2d33aa8f76ade52bc5a7e
 expansions/script/c39507150.lua	cbf07e442df8104232843441cae5dc77
 expansions/script/c39507160.lua	e281910f89232dccfd9bd9c3e83b9cf2
-expansions/script/c39507162.lua	d8785c322385fa6fa30b1d0efd935eb9
+expansions/script/c39507163.lua	d8785c322385fa6fa30b1d0efd935eb9
 expansions/script/c39507170.lua	e249e8a1304f9a35fe69c169bd8148ba
 expansions/script/c39507180.lua	ec4e31fd922faaf30ea84069b8551a3f
 expansions/script/c39507190.lua	c1dcdefaa4657e8ec46fe3fc0133e450
@@ -12402,6 +12402,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	be437c69e2e29b51b76ecc4baf65c8ef
+update/filelist.txt	35b16bc9b3f48b77d5d142c17e9e0843
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	84a0141cf8d8ed35c8947449d7882ee7
+update/version.txt	f54b306eed233a295ac0f128d849f58e
