@@ -145,7 +145,7 @@ function s.drop2(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ResetFlagEffect(tp,id)
 	for i=1,n do
 		local dam=0
-		local g=eg:Filter(s.chkfilter,nil,tp,e:GetLabel()):Filter(Card.HasFlagEffectLabel,nil,id,n)
+		local g=Duel.Group(Card.HasFlagEffectLabel,0,0xff,0xff,nil,id,n)
 		for tc in aux.Next(g) do
 			local atk,def=tc:HasAttack() and tc:GetAttack() or 0,tc:HasDefense() and tc:GetDefense() or 0
 			dam=dam+math.max(atk,def)
