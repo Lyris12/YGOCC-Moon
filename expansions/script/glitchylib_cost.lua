@@ -185,6 +185,69 @@ function Auxiliary.TributeCost(f,min,max,exc)
 				return g,0
 			end
 end
+function Auxiliary.TributeGlitchyCost(f,min,max,exc,use_hand,use_oppo,exf,exloc1,exloc2,exmin,exmax,exexc,pretribute)
+	if not min then min=1 end
+	if not max then max=min end
+	if (exloc1|exloc2)~=LOCATION_MZONE then
+		return function(e,tp,eg,ep,ev,re,r,rp,chk)
+			if use_oppo then aux.TributeOppoCostFlag=true end
+			local g1=Duel.GetReleaseGroup(tp)
+			if exf then
+				local g2=Duel.Group(Card.IsReleasable,tp,exloc1,exloc2,exexc):Filter(exf,nil)
+				g1:Merge(g2)
+			end
+			g1=g1:Filter(f,exc,e,tp)
+			if chk==0 then
+				local res=#g1>0
+				aux.TributeOppoCostFlag=false
+				return res
+			end
+			Duel.HintMessage(tp,HINTMSG_RELEASE)
+			local sg=g1:Select(tp,min,max,exc)
+			aux.TributeOppoCostFlag=false
+			local exg=sg:Filter(Auxiliary.ExtraReleaseFilter,nil,tp)
+			for ec in Auxiliary.Next(exg) do
+				local te=ec:IsHasEffect(EFFECT_EXTRA_RELEASE_NONSUM,tp)
+				if te and (not g2:IsContains(ec) or Duel.SelectYesNo(tp,STRING_ASK_EXTRA_RELEASE_NONSUM)) then
+					Duel.Hint(HINT_CARD,tp,te:GetHandler():GetOriginalCode())
+					te:UseCountLimit(tp)
+				end
+			end
+			if pretribute then
+				pretribute(sg,e,tp,eg,ep,ev,re,r,rp)
+			end
+			Duel.Release(sg,REASON_COST)
+		end
+	else
+		if exf then
+			f=aux.TributeGlitchyCostFilter(f,exf)
+		end
+		return function(e,tp,eg,ep,ev,re,r,rp,chk)
+			if use_oppo then aux.TributeOppoCostFlag=true end
+			if chk==0 then
+				local res=Duel.CheckReleaseGroupEx(tp,f,min,REASON_COST,use_hand,exc,e,tp)
+				aux.TributeOppoCostFlag=false
+				return res
+			end
+			Duel.HintMessage(tp,HINTMSG_RELEASE)
+			local sg=Duel.SelectReleaseGroupEx(tp,f,min,max,REASON_COST,use_hand,exc,e,tp)
+			aux.TributeOppoCostFlag=false
+			if pretribute then
+				pretribute(sg,e,tp,eg,ep,ev,re,r,rp)
+			end
+			Duel.Release(sg,REASON_COST)
+		end
+	end
+end
+function Auxiliary.TributeGlitchyCostFilter(f,exf)
+	return	function(c,e,tp)
+				if not f(c,e,tp) then return false end
+				if c:IsControler(1-tp) then
+					return exf(c,e,tp)
+				end
+				return true
+			end
+end
 -----------------------------------------------------------------------
 --Self as Cost
 function Auxiliary.BanishFacedownSelfCost(e,tp,eg,ep,ev,re,r,rp,chk)

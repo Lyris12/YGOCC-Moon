@@ -74,6 +74,7 @@ ARCHE_FAIRCASTER		= 0x4a88
 --
 ARCHE_BOMBER_GOBLIN		= 0x30ac
 ARCHE_CRYSTARION		= 0xc46
+ARCHE_CURSEFLAME		= 0xa56
 ARCHE_CURSILVER			= 0xc72
 ARCHE_DOOMSDAY_ARTIFICE	= 0x3a6
 ARCHE_DREAD_BASTILLE	= 0xb4c
@@ -201,10 +202,14 @@ TOKEN_NEBULA							= 218201917
 TOKEN_RIVAL								= 11110646
 
 --Custom Counters
+----Generic 
 COUNTER_CHRONUS						= 0x1ae0
+COUNTER_CURSEFLAME					= 0x1a56
+COUNTER_ICE_PRISON					= 0x1301
+
+----Specific
 COUNTER_EFFLUVIAL					= 0x2e7
 COUNTER_ENGAGED_MASS				= 0xe67
-COUNTER_ICE_PRISON					= 0x1301
 COUNTER_JEWEL						= 0x34f
 COUNTER_JOY							= 0xd43
 COUNTER_SORROW						= 0xd44
@@ -410,10 +415,11 @@ Duel.AnnounceNumber = function(p,n1,...)
 	end
 end
 
-function Duel.AnnounceNumberMinMax(p,min,max,f)
+function Duel.AnnounceNumberMinMax(p,min,max,f,step)
+	if not step then step=1 end
 	local tab={}
-	for i=min,max do
-		if not f or f(i) then
+	for i=min,max,step do
+		if not f or f(i,p) then
 			table.insert(tab,i)
 		end
 	end
@@ -1567,6 +1573,24 @@ function Duel.GetTargetParam()
 end
 
 --Cloned Effects
+function Effect.QuickEffectClone(e,c,cond,notreg)
+	local ex=e:Clone()
+	ex:SetType(EFFECT_TYPE_QUICK_O)
+	ex:SetCode(EVENT_FREE_CHAIN)
+	ex:SetRelevantTimings()
+	if cond then
+		local ogcond=e:GetCondition()
+		if ogcond then
+			ex:SetCondition(aux.AND(cond,ogcond))
+		else
+			ex:SetCondition(cond)
+		end
+	end
+	if not notreg then
+		c:RegisterEffect(ex)
+	end
+	return ex
+end
 function Effect.SpecialSummonEventClone(e,c,notreg)
 	local ex=e:Clone()
 	ex:SetCode(EVENT_SPSUMMON_SUCCESS)
@@ -1712,6 +1736,93 @@ function Card.GlitchyGetPreviousColumnGroup(c,left,right,without_center)
 	end
 end
 
+--Continuous Effects
+function Auxiliary.RegisterMaxxCEffect(c,id,p,range,event,cond,outchainop,inchainop,flaglabel,reset)
+	local rct=1
+	if type(reset)=="table" then
+		rct=reset[2]
+		reset=reset[1]
+	end
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
+	e2:SetCode(event)
+	e2:SetProperty(EFFECT_FLAG_DELAY)
+	e2:SetCondition(aux.OutsideChainMaxxCCondition(cond))
+	e2:SetOperation(outchainop)
+	if reset then
+		e2:SetReset(reset,rct)
+	end
+	if p then
+		Duel.RegisterEffect(e2,p)
+	else
+		e2:SetRange(range)
+		c:RegisterEffect(e2)
+	end
+	--
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_CONTINUOUS|EFFECT_TYPE_FIELD)
+	e3:SetCode(event)
+	e3:SetCondition(aux.InsideChainMaxxCCondition(cond))
+	e3:SetOperation(aux.RegisterMaxxCFlag(id,flaglabel,reset,rct))
+	if reset then
+		e3:SetReset(reset,rct)
+	end
+	if p then
+		Duel.RegisterEffect(e3,p)
+	else
+		e3:SetRange(range)
+		c:RegisterEffect(e3)
+	end
+	--
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_CONTINUOUS|EFFECT_TYPE_FIELD)
+	e4:SetCode(EVENT_CHAIN_SOLVED)
+	e4:SetCondition(aux.MaxxCFlagCondition(id))
+	e4:SetOperation(aux.ResolvedChainMaxxCOperation(id,inchainop))
+	if reset then
+		e4:SetReset(reset,rct)
+	end
+	if p then
+		Duel.RegisterEffect(e4,p)
+	else
+		e4:SetRange(range)
+		c:RegisterEffect(e4)
+	end
+end
+function Auxiliary.OutsideChainMaxxCCondition(cond)
+	return	function(e,tp,eg,ep,ev,re,r,rp)
+				return (not cond or cond(e,tp,eg,ep,ev,re,r,rp)) and not Duel.IsChainSolving()
+			end
+end
+function Auxiliary.InsideChainMaxxCCondition(cond)
+	return	function(e,tp,eg,ep,ev,re,r,rp)
+				return (not cond or cond(e,tp,eg,ep,ev,re,r,rp)) and Duel.IsChainSolving()
+			end
+end
+function Auxiliary.RegisterMaxxCFlag(id,flaglabel,reset,rct)
+	if not reset then reset=0 end
+	local resets=RESET_CHAIN|reset
+	return	function(e,tp,eg,ep,ev,re,r,rp)
+				local lab=0
+				if flaglabel then
+					lab=flaglabel(e,tp,eg,ep,ev,re,r,rp)
+				end
+				Duel.RegisterFlagEffect(tp,id,resets,0,rct,lab)
+			end
+end
+function Auxiliary.MaxxCFlagCondition(id)
+	return	function(e,tp,eg,ep,ev,re,r,rp)
+				return Duel.PlayerHasFlagEffect(tp,id)
+			end
+end
+function Auxiliary.ResolvedChainMaxxCOperation(id,op)
+	return	function(e,tp,eg,ep,ev,re,r,rp)
+				local n=Duel.GetFlagEffect(tp,id)
+				op(e,tp,eg,ep,ev,re,r,rp,n)
+				Duel.ResetFlagEffect(tp,id)
+			end
+end
+
 --Counters
 RELEVANT_REMOVE_EVENT_COUNTERS = {0x100e, COUNTER_ICE}
 COUNTED_COUNTERS_FOR_REMOVE_EVENT = {}
@@ -1720,15 +1831,31 @@ function Card.HasCounter(c,ctype)
 	return c:GetCounter(ctype)>0
 end
 
-function aux.RegisterCountersBeforeLeavingField(c,counter)
+function aux.RegisterCountersBeforeLeavingField(c,counter,range,f,id)
+	local type=range and EFFECT_TYPE_FIELD or EFFECT_TYPE_SINGLE
+	if not f then f=aux.TRUE end
+	
 	local e=Effect.CreateEffect(c)
-	e:SetType(EFFECT_TYPE_SINGLE|EFFECT_TYPE_CONTINUOUS)
+	e:SetType(type|EFFECT_TYPE_CONTINUOUS)
 	e:SetCode(EVENT_LEAVE_FIELD_P)
 	e:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e:SetOperation(function (E)
-		local ct=E:GetHandler():GetCounter(counter)
-		E:SetLabel(ct)
-	end)
+	if not range then
+		e:SetOperation(function (E)
+			local ct=E:GetHandler():GetCounter(counter)
+			E:SetLabel(ct)
+		end)
+	else
+		e:SetRange(range)
+		e:SetOperation(function (E,TP,EG,EP,EV,RE,R,RP)
+			local g=EG:Filter(f,nil)
+			for tc in aux.Next(g) do
+				local ct=tc:GetCounter(counter)
+				if ct>0 then
+					tc:RegisterFlagEffect(id,RESET_EVENT|RESET_TOFIELD,0,0,ct)
+				end
+			end
+		end)
+	end
 	c:RegisterEffect(e)
 	return e
 end
@@ -1756,12 +1883,17 @@ function Duel.RaiseRelevantRemoveCounterEvents(eg,re,r,rp,ep)
 end
 
 --Auxiliary for Duel.DistributeCounters
-function Auxiliary.DistributeCountersGroupCheck(ctype)
+function Auxiliary.DistributeCountersGroupCheck(ctype,least_one,defaultloc)
+	if type(least_one)=="nil" then least_one=false end
 	return	function(g,val,n)
 				if val<1 then return false end
 				for c in aux.Next(g) do
+					local loc=0
+					if not c:IsOnField() and defaultloc then
+						loc=defaultloc
+					end
 					for i=val,1,-1 do
-						if c:IsCanAddCounter(ctype,i) then
+						if c:IsCanAddCounter(ctype,i,least_one,loc) then
 							if val==i then
 								if not n then
 									return true
@@ -1799,33 +1931,134 @@ end
 • id = Flag
 ]]
 function Duel.DistributeCounters(tp,ctype,n,g,id)
-	local conjunction_success=false
 	Duel.HintMessage(tp,HINTMSG_COUNTER)
 	local sg=g:SelectSubGroup(tp,aux.DistributeCountersGroupCheck(ctype),false,1,math.min(#g,n),n)
+	if #sg==0 then return 0 end
+	local cardct=0
 	local ct=0
-	for tc in aux.Next(sg) do
-		Duel.HintSelection(Group.FromCards(tc))
-		tc:RegisterFlagEffect(id,RESET_CHAIN,EFFECT_FLAG_IGNORE_IMMUNE,1)
-		local nums={}
-		for i=n-ct,1,-1 do
-			if tc:IsCanAddCounter(ctype,i,false) then
-				local ng=sg:Filter(Card.HasFlagEffect,nil,id)
-				local fg=sg:Filter(aux.NOT(Card.HasFlagEffect),nil,id)
-				if (#ng==#sg or fg:CheckSubGroup(aux.DistributeCountersGroupCheck(ctype),#fg,#fg,n-ct-i,#fg)) then
-					table.insert(nums,i)
-					if #ng==#sg then
-						break
+	if #sg==1 then
+		Duel.HintSelection(sg)
+		if sg:GetFirst():AddCounter(ctype,n) then
+			return 1
+		end
+		return 0
+	elseif #sg==n then
+		for tc in aux.Next(sg) do
+			Duel.HintSelection(Group.FromCards(tc))
+			if tc:AddCounter(ctype,1) then
+				cardct=cardct+1
+			end
+		end
+		return cardct
+	else
+		for tc in aux.Next(sg) do
+			Duel.HintSelection(Group.FromCards(tc))
+			tc:RegisterFlagEffect(id,RESET_CHAIN,EFFECT_FLAG_IGNORE_IMMUNE,1)
+			local nums={}
+			for i=n-ct,1,-1 do
+				if tc:IsCanAddCounter(ctype,i,false) then
+					local ng=sg:Filter(Card.HasFlagEffect,nil,id)
+					local fg=sg:Filter(aux.NOT(Card.HasFlagEffect),nil,id)
+					if (#ng==#sg or fg:CheckSubGroup(aux.DistributeCountersGroupCheck(ctype),#fg,#fg,n-ct-i,#fg)) then
+						table.insert(nums,i)
+						if #ng==#sg then
+							break
+						end
 					end
 				end
 			end
+			local n=Duel.AnnounceNumber(tp,table.unpack(nums))
+			if tc:AddCounter(ctype,n) then
+				cardct=cardct+1
+			end
+			ct=ct+n
 		end
-		local n=Duel.AnnounceNumber(tp,table.unpack(nums))
-		if tc:AddCounter(ctype,n) then
-			conjunction_success=true
-		end
-		ct=ct+n
+		return cardct
 	end
-	return conjunction_success
+	return cardct
+end
+
+function Auxiliary.PickCountersGroupCheck(ctype)
+	return	function(g,val,n,tp,r)
+				if val<1 then return false end
+				for c in aux.Next(g) do
+					for i=val,1,-1 do
+						if c:IsCanRemoveCounter(tp,ctype,i,r) then
+							if val==i then
+								if not n then
+									return true
+								end
+								n=n-1
+								if n==0 then
+									return true
+								end
+								n=n+1
+							else
+								val=val-i
+								if n then n=n-1 end
+								local sg=g:Clone()
+								sg:RemoveCard(c)
+								local res=sg:CheckSubGroup(aux.PickCountersGroupCheck(ctype),#sg,#sg,val,n,tp,r)
+								sg:DeleteGroup()
+								val=val+i
+								if n then n=n+1 end
+								if res then
+									return true
+								end
+							end
+						end
+					end
+				end
+				return false
+			end
+end
+function Duel.PickCounters(tp,ctype,n,g,id,r)
+	if not r then r=REASON_EFFECT end
+	Duel.HintMessage(tp,HINTMSG_COUNTER)
+	local sg=g:SelectSubGroup(tp,aux.PickCountersGroupCheck(ctype),false,1,math.min(#g,n),n,nil,tp,r)
+	if #sg==0 then return 0 end
+	local cardct=0
+	local ct=0
+	if #sg==1 then
+		Duel.HintSelection(sg)
+		if sg:GetFirst():RemoveCounter(tp,ctype,n,r) then
+			return 1
+		end
+		return 0
+	elseif #sg==n then
+		for tc in aux.Next(sg) do
+			Duel.HintSelection(Group.FromCards(tc))
+			if tc:RemoveCounter(tp,ctype,1,r) then
+				cardct=cardct+1
+			end
+		end
+		return cardct
+	else
+		for tc in aux.Next(sg) do
+			Duel.HintSelection(Group.FromCards(tc))
+			tc:RegisterFlagEffect(id,RESET_CHAIN,EFFECT_FLAG_IGNORE_IMMUNE,1)
+			local nums={}
+			for i=n-ct,1,-1 do
+				if tc:IsCanAddCounter(ctype,i,false) then
+					local ng=sg:Filter(Card.HasFlagEffect,nil,id)
+					local fg=sg:Filter(aux.NOT(Card.HasFlagEffect),nil,id)
+					if (#ng==#sg or fg:CheckSubGroup(aux.PickCountersGroupCheck(ctype),#fg,#fg,n-ct-i,#fg,tp,r)) then
+						table.insert(nums,i)
+						if #ng==#sg then
+							break
+						end
+					end
+				end
+			end
+			local n=Duel.AnnounceNumber(tp,table.unpack(nums))
+			if tc:RemoveCounter(tp,ctype,n,r) then
+				cardct=cardct+1
+			end
+			ct=ct+n
+		end
+		return cardct
+	end
+	return cardct
 end
 
 
@@ -1932,7 +2165,13 @@ function Duel.RegisterHint(p,flag,reset,rct,id,desc,prop)
 	if not reset then reset=PHASE_END end
 	if not rct then rct=1 end
 	if not prop then prop=0 end
-	return Duel.RegisterFlagEffect(p,flag,RESET_PHASE+reset,EFFECT_FLAG_CLIENT_HINT|prop,rct,0,aux.Stringid(id,desc))
+	--return Duel.RegisterFlagEffect(p,flag,RESET_PHASE+reset,EFFECT_FLAG_CLIENT_HINT|prop,rct,0,aux.Stringid(id,desc))
+	local e2=Effect.GlobalEffect()
+	e2:SetDescription(id,desc)
+	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET|EFFECT_FLAG_CLIENT_HINT|prop)
+	e2:SetReset(RESET_PHASE|reset,rct)
+	e2:SetTargetRange(1,0)
+	Duel.RegisterEffect(e2,p)
 end
 
 --EDOPro Imports
@@ -2332,6 +2571,24 @@ function Auxiliary.GainEffectType(c,oc,reset)
 		e:SetReset(reset)
 		c:RegisterEffect(e,true)
 	end
+end
+
+--Grant Effect
+function Auxiliary.RegisterGrantEffect(c,range,s,o,tg,...)
+	local effs={...}
+	if #effs==0 then return end
+	local returns={}
+	for _,e in ipairs(effs) do
+		local e3=Effect.CreateEffect(c)
+		e3:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_GRANT)
+		e3:SetRange(range)
+		e3:SetTargetRange(s,o)
+		e3:SetTarget(tg)
+		e3:SetLabelObject(e)
+		c:RegisterEffect(e3)
+		table.insert(returns,e3)
+	end
+	return table.unpack(returns)
 end
 
 --Groups
@@ -2767,6 +3024,120 @@ end
 function Auxiliary.GetMustMaterialGroup(p,eff)
 	return Duel.GetMustMaterial(p,eff)
 end
+
+function Auxiliary.CannotBeTributeOrMaterial(c)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetCode(EFFECT_UNRELEASABLE_SUM)
+	e1:SetValue(1)
+	c:RegisterEffect(e1)
+	local e2=e1:Clone()
+	e2:SetCode(EFFECT_UNRELEASABLE_NONSUM)
+	c:RegisterEffect(e2)
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_UNCOPYABLE)
+	e3:SetCode(EFFECT_CANNOT_BE_FUSION_MATERIAL)
+	e3:SetValue(1)
+	c:RegisterEffect(e3)
+	local e4=e3:Clone()
+	e4:SetCode(EFFECT_CANNOT_BE_SYNCHRO_MATERIAL)
+	e4:SetValue(1)
+	c:RegisterEffect(e4)
+	local e5=e4:Clone()
+	e5:SetCode(EFFECT_CANNOT_BE_XYZ_MATERIAL)
+	c:RegisterEffect(e5)
+	local e6=e4:Clone()
+	e6:SetCode(EFFECT_CANNOT_BE_LINK_MATERIAL)
+	c:RegisterEffect(e6)
+end
+
+function Auxiliary.FieldCannotBeTributeOrMaterial(c,range,trange1,trange2,f)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetRange(range)
+	e1:SetCode(EFFECT_UNRELEASABLE_SUM)
+	e1:SetTargetRange(trange1,trange2)
+	if f then
+		e1:SetTarget(f)
+	end
+	e1:SetValue(1)
+	c:RegisterEffect(e1)
+	local e2=e1:Clone()
+	e2:SetCode(EFFECT_UNRELEASABLE_NONSUM)
+	c:RegisterEffect(e2)
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_FIELD)
+	e3:SetRange(range)
+	e3:SetCode(EFFECT_CANNOT_BE_FUSION_MATERIAL)
+	e3:SetTargetRange(trange1,trange2)
+	if f then
+		e3:SetTarget(f)
+	end
+	e3:SetValue(1)
+	c:RegisterEffect(e3)
+	local e4=e3:Clone()
+	e4:SetCode(EFFECT_CANNOT_BE_SYNCHRO_MATERIAL)
+	c:RegisterEffect(e4)
+	local e5=e4:Clone()
+	e5:SetCode(EFFECT_CANNOT_BE_XYZ_MATERIAL)
+	c:RegisterEffect(e5)
+	local e6=e4:Clone()
+	e6:SetCode(EFFECT_CANNOT_BE_LINK_MATERIAL)
+	c:RegisterEffect(e6)
+end
+
+function Auxiliary.PlayerCannotTributeOrUseAsMaterial(c,range,s,o,trange1,trange2,f)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e1:SetRange(range)
+	e1:SetCode(EFFECT_CANNOT_RELEASE)
+	e1:SetTargetRange(s,o)
+	if f then
+		e1:SetTarget(aux.PlayerCannotTributeTarget(trange1,trange2,f))
+	end
+	c:RegisterEffect(e1)
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_FIELD)
+	e3:SetRange(range)
+	e3:SetCode(EFFECT_CANNOT_BE_FUSION_MATERIAL)
+	e3:SetTargetRange(trange1,trange2)
+	if f then
+		e3:SetTarget(f)
+	end
+	if s~=o then
+		e3:SetValue(aux.PlayerCannotUseAsMaterialFilter(s,o))
+	else
+		e3:SetValue(1)
+	end
+	c:RegisterEffect(e3)
+	local e4=e3:Clone()
+	e4:SetCode(EFFECT_CANNOT_BE_SYNCHRO_MATERIAL)
+	c:RegisterEffect(e4)
+	local e5=e4:Clone()
+	e5:SetCode(EFFECT_CANNOT_BE_XYZ_MATERIAL)
+	c:RegisterEffect(e5)
+	local e6=e4:Clone()
+	e6:SetCode(EFFECT_CANNOT_BE_LINK_MATERIAL)
+	c:RegisterEffect(e6)
+end
+function Auxiliary.PlayerCannotTributeTarget(loc1,loc2,f)
+	local shared=loc1&loc2
+	return	function(e,c,tp)
+				local p=e:GetHandlerPlayer()
+				return (not f or f(e,c)) and ((shared~=0 and c:IsLocation(shared)) or (c:IsControler(p) and c:IsLocation(loc1)) or (c:IsControler(1-p) and c:IsLocation(loc2)))
+			end
+end
+function Auxiliary.PlayerCannotUseAsMaterialFilter(s,o)
+	return	function(e,c)
+				if not c then return false end
+				local p=s==1 and e:GetHandlerPlayer() or 1-e:GetHandlerPlayer()
+				return c:IsControler(p)
+			end
+end	
 
 --Normal Summon/set
 function Card.IsSummonableOrSettable(c)
@@ -3409,6 +3780,22 @@ function Auxiliary.RegisterResetAfterSpecialSummonRule(c,tp,e1)
 	)
 	Duel.RegisterEffect(e0,tp)
 	return e0
+end
+
+--Tributing
+Auxiliary.TributeOppoCostFlag = false
+function Auxiliary.EnableGlobalEffectTributeOppoCost()
+	if not aux.TributeOppoCostCheck then
+		aux.TributeOppoCostCheck=true
+		local e1=Effect.GlobalEffect()
+		e1:SetType(EFFECT_TYPE_FIELD)
+		e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE|EFFECT_FLAG_SET_AVAILABLE)
+		e1:SetCode(EFFECT_EXTRA_RELEASE)
+		e1:SetTargetRange(0,LOCATION_MZONE)
+		e1:SetCondition(function() return aux.TributeOppoCostFlag end)
+		e1:SetValue(1)
+		Duel.RegisterEffect(e1,0)
+	end
 end
 
 --Location Check

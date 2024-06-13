@@ -204,6 +204,7 @@ dofile("expansions/script/tables.lua") --Special Tables
 dofile("expansions/script/mods_ritual.lua") --Generic Ritual Procedure modifications
 dofile("expansions/script/mods_fusion.lua") --Generic Fusion Procedure modifications
 dofile("expansions/script/mods_pendulum.lua") --Generic Pendulum Procedure modifications
+dofile("expansions/script/mods_link.lua") --Generic Link Procedure modifications
 dofile("expansions/script/mods_archetype.lua") --SetCard modifcations for Custom Archetypes
 
 
@@ -276,13 +277,12 @@ end
 
 Card.RemoveCounter=function(c,p,typ,ct,r)
 	local n=c:GetCounter(typ)
-	card_remcounter(c,p,typ,ct,r)
-	if n-c:GetCounter(typ)==ct then return true else return false end
+	local res=card_remcounter(c,p,typ,ct,r)
+	return res,n-c:GetCounter(typ)==ct
 end
 Duel.RemoveCounter=function(p,s,o,typ,ct,r,rp)
 	if rp==nil or rp==PLAYER_NONE --[[2]] then
-		duel_remcounter(p,s,o,typ,ct,r)
-		return nil
+		return duel_remcounter(p,s,o,typ,ct,r)
 	elseif rp==PLAYER_ALL --[[3]] then
 		local n=Duel.GetCounter(p,s,o,typ)
 		duel_remcounter(p,s,o,typ,ct,r)
@@ -2268,6 +2268,7 @@ Auxiliary.ContinuousEffects={
 
 Auxiliary.SpSummonProcCard  = nil
 Auxiliary.SpSummonProcGCard = nil
+Auxiliary.PreventCannotApplyConditionCheckLoop = false
 FLAG_SPSUMMON_PROC = 62613309
 
 function Card.GetEffects(c)
@@ -2331,16 +2332,33 @@ if not global_card_effect_table_global_check then
 		local typ,code=e:GetType(),e:GetCode()
 		
 		--IMPLEMENT EFFECT_CANNOT_APPLY
-		if (typ&(EFFECT_TYPE_ACTIONS)==0 or typ&EFFECT_TYPE_CONTINUOUS==EFFECT_TYPE_CONTINUOUS) and (not e:IsHasProperty(EFFECT_FLAG_UNCOPYABLE) or not e:IsHasProperty(EFFECT_FLAG_CANNOT_DISABLE)) then
+		if (typ&(EFFECT_TYPE_ACTIONS)==0 or typ&EFFECT_TYPE_CONTINUOUS==EFFECT_TYPE_CONTINUOUS) and (typ~=EFFECT_TYPE_SINGLE or e:IsHasProperty(EFFECT_FLAG_SINGLE_RANGE)) and (not e:IsHasProperty(EFFECT_FLAG_UNCOPYABLE) or not e:IsHasProperty(EFFECT_FLAG_CANNOT_DISABLE)) then
 			local cond=e:GetCondition()
 			local newcond =	function(E,...)
 								local x={...}
 								local tp=(#x>0 and type(x[1])=="number" and (x[1]==0 or x[1]==1)) and x[1] or E:GetHandlerPlayer()
+								
+								local c=E:GetHandler()
+								local looping=aux.PreventCannotApplyConditionCheckLoop
+								if not aux.PreventCannotApplyConditionCheckLoop then
+									aux.PreventCannotApplyConditionCheckLoop=true
+								end
+								if not looping then
+									if c:IsHasEffect(EFFECT_CANNOT_APPLY) then
+										for _,ce in ipairs({c:IsHasEffect(EFFECT_CANNOT_APPLY)}) do
+											if ce~=E then
+												aux.PreventCannotApplyConditionCheckLoop=false
+												return false
+											end
+										end
+									end
+									aux.PreventCannotApplyConditionCheckLoop=false
+								end
+								
 								if Duel.IsPlayerAffectedByEffect(tp,EFFECT_CANNOT_APPLY) then
-									local c=E:GetHandler()
 									for _,ce in ipairs({Duel.IsPlayerAffectedByEffect(tp,EFFECT_CANNOT_APPLY)}) do
 										local val=ce:GetValue()
-										if not val or val(ce,E,tp,c) then
+										if ce~=E and (not val or val(ce,E,tp,c)) then
 											return false
 										end
 									end
