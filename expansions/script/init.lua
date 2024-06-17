@@ -207,6 +207,50 @@ dofile("expansions/script/mods_pendulum.lua") --Generic Pendulum Procedure modif
 dofile("expansions/script/mods_link.lua") --Generic Link Procedure modifications
 dofile("expansions/script/mods_archetype.lua") --SetCard modifcations for Custom Archetypes
 
+--fix for Duel.IsSummonCancelable wrong return
+local fix1=Effect.GlobalEffect()
+fix1:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
+fix1:SetCode(EVENT_SUMMON)
+fix1:SetOperation(aux.ResetSummonCancelable)
+Duel.RegisterEffect(fix1,0)
+local fix2=Effect.GlobalEffect()
+fix2:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
+fix2:SetCode(EVENT_MSET)
+fix2:SetOperation(aux.ResetSummonCancelable)
+Duel.RegisterEffect(fix2,0)
+local fix3=Effect.GlobalEffect()
+fix3:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
+fix3:SetCode(EVENT_SPSUMMON)
+fix3:SetOperation(aux.ResetSummonCancelable)
+Duel.RegisterEffect(fix3,0)
+
+Debug.ReloadFieldBegin=(function()
+	local old=Debug.ReloadFieldBegin
+	return function(...)
+			old(...)
+			local fix1=Effect.GlobalEffect()
+			fix1:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
+			fix1:SetCode(EVENT_SUMMON)
+			fix1:SetOperation(aux.ResetSummonCancelable)
+			Duel.RegisterEffect(fix1,0)
+			local fix2=Effect.GlobalEffect()
+			fix2:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
+			fix2:SetCode(EVENT_MSET)
+			fix2:SetOperation(aux.ResetSummonCancelable)
+			Duel.RegisterEffect(fix2,0)
+			local fix3=Effect.GlobalEffect()
+			fix3:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
+			fix3:SetCode(EVENT_SPSUMMON)
+			fix3:SetOperation(aux.ResetSummonCancelable)
+			Duel.RegisterEffect(fix3,0)
+		end
+	end
+)()
+
+function Auxiliary.ResetSummonCancelable()
+	Duel.SetSummonCancelable(false)
+end
+
 
 --overwrite functions
 local is_type, card_remcounter, duel_remcounter, effect_set_target_range, effect_set_reset, add_xyz_proc, add_xyz_proc_nlv, duel_overlay, duel_set_lp, duel_select_target, duel_banish, card_check_remove_overlay_card, is_reason, duel_check_tribute, select_tribute,card_sethighlander,
