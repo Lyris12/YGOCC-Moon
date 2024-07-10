@@ -203,6 +203,7 @@ dofile("expansions/script/tables.lua") --Special Tables
 
 dofile("expansions/script/mods_ritual.lua") --Generic Ritual Procedure modifications
 dofile("expansions/script/mods_fusion.lua") --Generic Fusion Procedure modifications
+dofile("expansions/script/mods_xyz.lua") --Generic Fusion Procedure modifications
 dofile("expansions/script/mods_pendulum.lua") --Generic Pendulum Procedure modifications
 dofile("expansions/script/mods_link.lua") --Generic Link Procedure modifications
 dofile("expansions/script/mods_archetype.lua") --SetCard modifcations for Custom Archetypes
@@ -253,13 +254,11 @@ end
 
 
 --overwrite functions
-local is_type, card_remcounter, duel_remcounter, effect_set_target_range, effect_set_reset, add_xyz_proc, add_xyz_proc_nlv, duel_overlay, duel_set_lp, duel_select_target, duel_banish, card_check_remove_overlay_card, is_reason, duel_check_tribute, select_tribute,card_sethighlander,
-	card_is_facedown, card_is_able_to_remove, card_is_able_to_remove_as_cost, card_is_able_to_hand, card_is_can_be_ssed, card_get_level, card_get_original_level, card_get_previous_level, card_is_level, card_is_level_below, card_is_level_above, card_is_destructable, card_get_syn_level, card_get_rit_level, card_is_xyz_level,
-	duel_check_xyz_mat, duel_select_xyz_mat, duel_recover, duel_damage, effect_set_count_limit = 
+local is_type, card_remcounter, duel_remcounter, effect_set_target_range, effect_set_reset, duel_set_lp, duel_select_target, duel_banish, card_check_remove_overlay_card, is_reason, duel_check_tribute, select_tribute,card_sethighlander,
+	card_is_facedown, card_is_able_to_remove, card_is_able_to_remove_as_cost, card_is_able_to_hand, card_is_can_be_ssed, card_get_level, card_is_xyz_level, card_get_original_level, card_get_previous_level, card_is_level, card_is_level_below, card_is_level_above, card_is_destructable, card_get_syn_level, card_get_rit_level, duel_recover, duel_damage, effect_set_count_limit = 
 	
-	Card.IsType, Card.RemoveCounter, Duel.RemoveCounter, Effect.SetTargetRange, Effect.SetReset, Auxiliary.AddXyzProcedure, Auxiliary.AddXyzProcedureLevelFree, Duel.Overlay, Duel.SetLP, Duel.SelectTarget, Duel.Remove, Card.CheckRemoveOverlayCard, Card.IsReason, Duel.CheckTribute, Duel.SelectTribute, Card.SetUniqueOnField,
-	Card.IsFacedown, Card.IsAbleToRemove, Card.IsAbleToRemoveAsCost, Card.IsAbleToHand, Card.IsCanBeSpecialSummoned, Card.GetLevel, Card.GetOriginalLevel, Card.GetPreviousLevelOnField, Card.IsLevel, Card.IsLevelBelow, Card.IsLevelAbove, Card.IsDestructable, Card.GetSynchroLevel, Card.GetRitualLevel, Card.IsXyzLevel,
-	Duel.CheckXyzMaterial, Duel.SelectXyzMaterial, Duel.Recover, Duel.Damage, Effect.SetCountLimit
+	Card.IsType, Card.RemoveCounter, Duel.RemoveCounter, Effect.SetTargetRange, Effect.SetReset, Duel.SetLP, Duel.SelectTarget, Duel.Remove, Card.CheckRemoveOverlayCard, Card.IsReason, Duel.CheckTribute, Duel.SelectTribute, Card.SetUniqueOnField,
+	Card.IsFacedown, Card.IsAbleToRemove, Card.IsAbleToRemoveAsCost, Card.IsAbleToHand, Card.IsCanBeSpecialSummoned, Card.GetLevel, Card.IsXyzLevel, Card.GetOriginalLevel, Card.GetPreviousLevelOnField, Card.IsLevel, Card.IsLevelBelow, Card.IsLevelAbove, Card.IsDestructable, Card.GetSynchroLevel, Card.GetRitualLevel, Duel.Recover, Duel.Damage, Effect.SetCountLimit
 
 Card.IsReason=function(c,rs)
 	local cusrs=rs>>32
@@ -364,51 +363,6 @@ Effect.SetReset=function(e,reset,rct)
 	return effect_set_reset(e,reset,rct)
 end
 
-Auxiliary.AddXyzProcedure=function(tc,f,lv,ct,alterf,desc,maxct,op)
-	add_xyz_proc(tc,f,lv,ct,alterf,desc,maxct,op)
-	local mt=getmetatable(tc)
-	mt.material_filter=f
-	mt.material_minct=ct
-	mt.material_maxct=maxct~=nil and maxct or ct
-end
-Auxiliary.AddXyzProcedureLevelFree=function(tc,f,gf,minc,maxc,alterf,desc,op)
-	add_xyz_proc_nlv(tc,f,gf,minc,maxc,alterf,desc,op)
-	local mt=getmetatable(tc)
-	mt.material_filter=f
-	mt.material_minct=minc
-	mt.material_maxct=maxc
-end
-Duel.Overlay=function(xyz,mat)
-	local og,oct
-	if xyz:IsLocation(LOCATION_MZONE) then
-		og=xyz:GetOverlayGroup()
-		oct=#og
-	end
-	duel_overlay(xyz,mat)
-	if oct and xyz:GetOverlayCount()>oct then
-		Duel.RaiseEvent(mat,EVENT_XYZATTACH,nil,0,0,xyz:GetControler(),xyz:GetOverlayCount()-oct)
-	end
-	local mg=Group.CreateGroup()
-	if aux.GetValueType(mat)=="Card" then
-		mg:AddCard(mat)
-	else
-		mg:Merge(mat)
-	end
-	for mc in aux.Next(mg) do
-		if not mc:IsHasEffect(EFFECT_REMEMBER_XYZ_HOLDER) then
-			local e1=Effect.CreateEffect(mc)
-			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_IGNORE_IMMUNE|EFFECT_FLAG_SET_AVAILABLE|EFFECT_FLAG_UNCOPYABLE)
-			e1:SetCode(EFFECT_REMEMBER_XYZ_HOLDER)
-			e1:SetLabelObject(xyz)
-			mc:RegisterEffect(e1)
-		else
-			local ef={mc:IsHasEffect(EFFECT_REMEMBER_XYZ_HOLDER)}
-			local e1=ef[1]
-			e1:SetLabelObject(xyz)
-		end
-	end
-end
 Duel.SetLP=function(p,setlp,...)
 	local opt={...}
 	local rule,rplayer=nil,0
@@ -729,6 +683,69 @@ Card.GetLevel=function(c)
 		end
 	end
 	return card_get_level(c)
+end
+
+Card.IsXyzLevel=function(c,sc,lv)
+	if (card_get_level(c)==0 or not card_get_level(c)) then
+		if c:IsHasEffect(EFFECT_ORIGINAL_LEVEL_RANK_DUALITY) then
+			return c:GetRank()==lv
+		elseif c:IsHasEffect(EFFECT_GRANT_LEVEL) then
+			local ef={c:IsHasEffect(EFFECT_GRANT_LEVEL)}
+			local te1=ef[#ef]
+			local cf=te1:GetValue()
+			local typ=aux.GetValueType(cf)
+			local level
+			if not cf then
+				level = 0
+			elseif typ=="number" then
+				level = cf
+			elseif typ=="function" then
+				templv,sumtyp = cf(te1,c,sc)
+				if not sumtyp or sumtyp&TYPE_XYZ>0 then
+					level=templv
+				else
+					level=0
+				end
+			end
+			
+			if c:IsHasEffect(EFFECT_UPDATE_LEVEL) or c:IsHasEffect(EFFECT_CHANGE_LEVEL) then
+				local l={}
+				if c:IsHasEffect(EFFECT_UPDATE_LEVEL) then
+					for _,v in ipairs({c:IsHasEffect(EFFECT_UPDATE_LEVEL)}) do
+						table.insert(l,v)
+					end
+				end
+				if c:IsHasEffect(EFFECT_CHANGE_LEVEL) then
+					for _,v in ipairs({c:IsHasEffect(EFFECT_CHANGE_LEVEL)}) do
+						table.insert(l,v)
+					end
+				end
+				table.sort(l, function(a,b) return a:GetFieldID() < b:GetFieldID() end)
+				for _,ce in ipairs(l) do
+					if ce:GetCode()==EFFECT_UPDATE_LEVEL then
+						local val=ce:GetValue()
+						if aux.GetValueType(val)=="number" then
+							level=level+val
+						else
+							level=level+val(ce,c)
+						end
+					else
+						local val=ce:GetValue()
+						if aux.GetValueType(val)=="number" then
+							level=val
+						else
+							level=val(ce,c)
+						end
+					end
+				end
+			end
+		
+			if lv==level then
+				return true
+			end
+		end
+	end
+	return card_is_xyz_level(c,sc,lv) 
 end
 
 Card.GetOriginalLevel=function(c)
@@ -1090,106 +1107,6 @@ Card.GetRitualLevel=function(c,sc)
 		synlv=level*65536+synlv
 	end
 	return synlv
-end
-Card.IsXyzLevel=function(c,sc,lv)
-	if (card_get_level(c)==0 or not card_get_level(c)) then
-		if c:IsHasEffect(EFFECT_ORIGINAL_LEVEL_RANK_DUALITY) then
-			return c:GetRank()==lv
-		elseif c:IsHasEffect(EFFECT_GRANT_LEVEL) then
-			local ef={c:IsHasEffect(EFFECT_GRANT_LEVEL)}
-			local te1=ef[#ef]
-			local cf=te1:GetValue()
-			local typ=aux.GetValueType(cf)
-			local level
-			if not cf then
-				level = 0
-			elseif typ=="number" then
-				level = cf
-			elseif typ=="function" then
-				templv,sumtyp = cf(te1,c,sc)
-				if not sumtyp or sumtyp&TYPE_XYZ>0 then
-					level=templv
-				else
-					level=0
-				end
-			end
-			
-			if c:IsHasEffect(EFFECT_UPDATE_LEVEL) or c:IsHasEffect(EFFECT_CHANGE_LEVEL) then
-				local l={}
-				if c:IsHasEffect(EFFECT_UPDATE_LEVEL) then
-					for _,v in ipairs({c:IsHasEffect(EFFECT_UPDATE_LEVEL)}) do
-						table.insert(l,v)
-					end
-				end
-				if c:IsHasEffect(EFFECT_CHANGE_LEVEL) then
-					for _,v in ipairs({c:IsHasEffect(EFFECT_CHANGE_LEVEL)}) do
-						table.insert(l,v)
-					end
-				end
-				table.sort(l, function(a,b) return a:GetFieldID() < b:GetFieldID() end)
-				for _,ce in ipairs(l) do
-					if ce:GetCode()==EFFECT_UPDATE_LEVEL then
-						local val=ce:GetValue()
-						if aux.GetValueType(val)=="number" then
-							level=level+val
-						else
-							level=level+val(ce,c)
-						end
-					else
-						local val=ce:GetValue()
-						if aux.GetValueType(val)=="number" then
-							level=val
-						else
-							level=val(ce,c)
-						end
-					end
-				end
-			end
-		
-			if lv==level then
-				return true
-			end
-		end
-	end
-	return card_is_xyz_level(c,sc,lv) 
-end
-
-function Auxiliary.XyzMaterialComplete(c,sc,lv,tp)
-	if not c:IsCanBeXyzMaterial(sc) then return false end
-	if c:IsLocation(LOCATION_MZONE) then
-		return c:IsFaceup() and (c:IsControler(tp) or c:IsHasEffect(EFFECT_XYZ_MATERIAL))
-	else
-		if not c:IsHasEffect(EFFECT_EXTRA_XYZ_MATERIAL) then return false end
-		for _,ce in ipairs({c:IsHasEffect(EFFECT_EXTRA_XYZ_MATERIAL)}) do
-			local val=ce:GetValue()
-			if not val or aux.GetValueType(val)=="number" then
-				return true
-			elseif aux.GetValueType(val)=="function" then
-				return val(ce,c,sc)
-			else
-				return false
-			end
-		end
-	end
-end
-Duel.CheckXyzMaterial=function(sc,f,lv,min,max,mg)
-	local res=duel_check_xyz_mat(sc,f,lv,min,max,mg)
-	if mg~=nil then return res end
-	if res then
-		return true
-	elseif self_reference_effect then
-		local extramats=Duel.GetMatchingGroup(Auxiliary.XyzMaterialComplete,0,0xff,0xff,nil,sc,lv,self_reference_effect:GetHandlerPlayer())
-		return duel_check_xyz_mat(sc,f,lv,min,max,extramats)
-	end
-	return res
-end
-Duel.SelectXyzMaterial=function(p,sc,f,lv,min,max,mg)
-	if mg~=nil then
-		return duel_select_xyz_mat(p,sc,f,lv,min,max,mg)
-	else
-		local extramats=Duel.GetMatchingGroup(Auxiliary.XyzMaterialComplete,0,0xff,0xff,nil,sc,lv,p)
-		return duel_select_xyz_mat(p,sc,f,lv,min,max,extramats)
-	end
 end
 
 Duel.Recover = function(p,v,r,...)

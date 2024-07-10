@@ -32,6 +32,7 @@ OPINFO_FLAG_DOUBLE 	= 0x2
 OPINFO_FLAG_UNKNOWN = 0x4
 OPINFO_FLAG_HIGHER 	= 0x8
 OPINFO_FLAG_LOWER 	= 0x10
+OPINFO_FLAG_FUNCTION= 0x20
 
 --Custom Effects
 EFFECT_SET_SPSUMMON_LIMIT				= 39503
@@ -72,6 +73,7 @@ ARCHE_FLAIRCASTER		= 0x1a88
 ARCHE_DESPAIRCASTER		= 0x2a88
 ARCHE_FAIRCASTER		= 0x4a88
 --
+ARCHE_AUTOMATYRANT		= 0x303
 ARCHE_BOMBER_GOBLIN		= 0x30ac
 ARCHE_CRYSTARION		= 0xc46
 ARCHE_CURSEFLAME		= 0xa56
@@ -141,6 +143,7 @@ CARD_UMI								= 22702055
 CARD_ZOMBIE_WORLD						= 4064256
 
 CARD_ANGEL_OF_VERDANSE							= 100000214
+CARD_AUTOMATYRANT_CLOCKWORK_DRAGON				= 100000249
 CARD_BRAIN_BOOT_SECTOR							= 221812211
 CARD_CHEVALIER_DU_VAISSEAU						= 100000032
 CARD_CRYSTARION_ASCENDANT_PILLAR_OF_COBALT		= 100000152
@@ -266,6 +269,8 @@ STRING_DECKTOP									=	754
 STRING_DECKBOTTOM								=	755
 STRING_TREATED_AS_CONTINUOUS_SPELL				=	756
 STRING_TREATED_AS_CONTINUOUS_TRAP				=	757
+STRING_CANNOT_BE_SPECIAL_SUMMONED				=	758
+STRING_ATTACH									=	759	
 
 STRING_ASK_REPLACE_UPDATE_ENERGY_COST	= 	900
 STRING_ASK_ENGAGE						=	901
@@ -296,6 +301,8 @@ STRING_ASK_RECOVER						=	923
 STRING_ASK_DAMAGE						=	924
 STRING_ASK_DESTROY						=	925
 STRING_ASK_ACTIVATE						=	926
+STRING_ASK_CHANGE_LEVEL					=	927
+STRING_ASK_DECKDES						=	928
 
 STRING_SEND_TO_EXTRA					=	1006
 STRING_BANISH							=	1102
@@ -374,7 +381,7 @@ ATTRIBUTES_CHAOS = ATTRIBUTE_LIGHT|ATTRIBUTE_DARK
 
 RACES_BEASTS = RACE_BEAST|RACE_BEASTWARRIOR|RACE_WINDBEAST
 
-LOCATION_ALL = LOCATION_DECK|LOCATION_HAND|LOCATION_MZONE|LOCATION_SZONE|LOCATION_GRAVE|LOCATION_REMOVED|LOCATION_EXTRA
+LOCATION_ALL = LOCATION_DECK|LOCATION_HAND|LOCATION_MZONE|LOCATION_SZONE|LOCATION_GRAVE|LOCATION_REMOVED|LOCATION_EXTRA|LOCATION_OVERLAY
 LOCATION_GB  = LOCATION_GRAVE|LOCATION_REMOVED
 
 LINK_MARKER_ALL = 0x1ef
@@ -1152,17 +1159,26 @@ end
 function Duel.PositionChange(c)
 	return Duel.ChangePosition(c,POS_FACEUP_DEFENSE,POS_FACEDOWN_DEFENSE,POS_FACEUP_ATTACK,POS_FACEUP_ATTACK)
 end
-function Duel.Search(g,tp,p,r)
+function Duel.Search(g,_,p,r)
 	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
 	if not r then r=REASON_EFFECT end
 	local ct=Duel.SendtoHand(g,p,r)
 	local cg=g:Filter(aux.PLChk,nil,p,LOCATION_HAND)
 	if #cg>0 then
-		Duel.ConfirmCards(1-tp,cg)
+		if p then
+			Duel.ConfirmCards(1-p,cg)
+		else
+			for tp=0,1 do
+				local pg=cg:Filter(Card.IsControler,nil,tp)
+				if #pg>0 then
+					Duel.ConfirmCards(1-tp,pg)
+				end
+			end
+		end
 	end
 	return ct,#cg,cg
 end
-function Duel.SearchAndCheck(g,tp,p,brk,r)
+function Duel.SearchAndCheck(g,_,p,brk,r)
 	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
 	if not r then r=REASON_EFFECT end
 	local ct=Duel.SendtoHand(g,p,r)
@@ -1171,8 +1187,15 @@ function Duel.SearchAndCheck(g,tp,p,brk,r)
 		if brk then
 			Duel.BreakEffect()
 		end
-		if tp then
-			Duel.ConfirmCards(1-tp,cg)
+		if p then
+			Duel.ConfirmCards(1-p,cg)
+		else
+			for tp=0,1 do
+				local pg=cg:Filter(Card.IsControler,nil,tp)
+				if #pg>0 then
+					Duel.ConfirmCards(1-tp,pg)
+				end
+			end
 		end
 	end
 	return ct>0 and #cg>0
@@ -1182,6 +1205,15 @@ function Duel.Bounce(g)
 	local ct=Duel.SendtoHand(g,nil,REASON_EFFECT)
 	local cg=g:Filter(aux.PLChk,nil,nil,LOCATION_HAND)
 	return ct,#cg,cg
+end
+
+function Duel.SendtoGraveAndCheck(g,p,r)
+	if type(g)=="Card" then g=Group.FromCards(g) end
+	r = r or REASON_EFFECT
+	local ct=Duel.SendtoGrave(g,r)
+	if ct<=0 then return false end
+	local cg=g:Filter(aux.PLChk,nil,p,LOCATION_GRAVE)
+	return #cg>0
 end
 
 function Duel.ShuffleIntoDeck(g,p,loc,seq,r,f)
@@ -1260,6 +1292,14 @@ end
 function Duel.GetGroupOperatedByThisEffect(e,exc)
 	return Duel.GetOperatedGroup():Filter(aux.BecauseOfThisEffect(e),exc)
 end
+function Auxiliary.BecauseOfThisCost(e)
+	return	function(c)
+				return c:IsReason(REASON_COST) and not c:IsReason(REASON_REDIRECT) and c:GetReasonEffect()==e
+			end
+end
+function Duel.GetGroupOperatedByThisCost(e,exc)
+	return Duel.GetOperatedGroup():Filter(aux.BecauseOfThisCost(e),exc)
+end
 
 --Battle Phase
 function Card.IsCapableOfAttacking(c,tp)
@@ -1288,6 +1328,9 @@ function Card.IsNormalST(c)
 end
 function Card.IsST(c,typ)
 	return c:IsType(TYPE_ST) and (aux.GetValueType(typ)~="number" or c:IsType(typ))
+end
+function Card.IsEquipCard(c)
+	return c:GetEquipTarget()~=nil
 end
 function Card.IsMonsterCard(c)
 	return c:IsOriginalType(TYPE_MONSTER)
@@ -1737,11 +1780,15 @@ function Card.GlitchyGetPreviousColumnGroup(c,left,right,without_center)
 end
 
 --Continuous Effects
-function Auxiliary.RegisterMaxxCEffect(c,id,p,range,event,cond,outchainop,inchainop,flaglabel,reset)
-	local rct=1
+function Auxiliary.RegisterMaxxCEffect(c,id,p,range,event,cond,outchainop,inchainop,flaglabel,reset,flagreset)
+	local rct,flagrct=1,1
 	if type(reset)=="table" then
 		rct=reset[2]
 		reset=reset[1]
+	end
+	if type(flagreset)=="table" then
+		flagrct=flagreset[2]
+		flagreset=flagreset[1]
 	end
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
@@ -1763,7 +1810,7 @@ function Auxiliary.RegisterMaxxCEffect(c,id,p,range,event,cond,outchainop,inchai
 	e3:SetType(EFFECT_TYPE_CONTINUOUS|EFFECT_TYPE_FIELD)
 	e3:SetCode(event)
 	e3:SetCondition(aux.InsideChainMaxxCCondition(cond))
-	e3:SetOperation(aux.RegisterMaxxCFlag(id,flaglabel,reset,rct))
+	e3:SetOperation(aux.RegisterMaxxCFlag(id,flaglabel,flagreset,flagrct))
 	if reset then
 		e3:SetReset(reset,rct)
 	end
@@ -2161,17 +2208,31 @@ function Auxiliary.Option(id,tp,desc,...)
 	return sel
 end
 
-function Duel.RegisterHint(p,flag,reset,rct,id,desc,prop)
+function Duel.RegisterHint(p,flag,reset,rct,id,desc,prop,refeff)
 	if not reset then reset=PHASE_END end
 	if not rct then rct=1 end
 	if not prop then prop=0 end
-	--return Duel.RegisterFlagEffect(p,flag,RESET_PHASE+reset,EFFECT_FLAG_CLIENT_HINT|prop,rct,0,aux.Stringid(id,desc))
-	local e2=Effect.GlobalEffect()
-	e2:SetDescription(id,desc)
-	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET|EFFECT_FLAG_CLIENT_HINT|prop)
-	e2:SetReset(RESET_PHASE|reset,rct)
-	e2:SetTargetRange(1,0)
-	Duel.RegisterEffect(e2,p)
+	local e=Effect.GlobalEffect()
+	e:Desc(desc,id)
+	e:SetType(EFFECT_TYPE_FIELD)
+	e:SetProperty(EFFECT_FLAG_CLIENT_HINT|EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_PLAYER_TARGET|prop)
+	e:SetCode(EFFECT_FLAG_EFFECT|id)
+	e:SetTargetRange(1,0)
+	if refeff then
+		e:SetLabelObject(refeff)
+		e:SetCondition(aux.ResetHintCondition)
+	end
+	e:SetReset(RESET_PHASE|reset,rct)
+	Duel.RegisterEffect(e,p)
+	return e
+end
+function Auxiliary.ResetHintCondition(e)
+	local refeff=e:GetLabelObject()
+	if not refeff or refeff:WasReset() then
+		e:Reset()
+		return false
+	end
+	return true
 end
 
 --EDOPro Imports
@@ -2832,14 +2893,15 @@ end
 
 --Zones
 function Card.GetZone(c,tp)
-	local rzone
+	local rzone=0
+	local seq=c:GetSequence()
 	if c:IsLocation(LOCATION_MZONE) then
-		rzone = c:IsControler(tp) and (1 <<c:GetSequence()) or (1 << (16+c:GetSequence()))
+		rzone = c:IsControler(tp) and (1<<seq) or (1 << (16+seq))
 		if c:IsSequence(5,6) then
-			rzone = rzone | (c:IsControler(tp) and (1 << (16 + 11 - c:GetSequence())) or (1 << (11 - c:GetSequence())))
+			rzone = rzone | (c:IsControler(tp) and (1 << (16+11-seq)) or (1 << (11-seq)))
 		end
 	elseif c:IsLocation(LOCATION_SZONE) then
-		rzone = c:IsControler(tp) and (1 << (8+c:GetSequence())) or (1 << (24+c:GetSequence()))
+		rzone = c:IsControler(tp) and (1 << (8+seq)) or (1 << (24+seq))
 	end
 	
 	return rzone
@@ -2963,11 +3025,18 @@ end
 
 --Location Groups
 function Duel.GetHand(p)
-	local g=Duel.GetFieldGroup(p,LOCATION_HAND,0)
-	return g,#g
+	if not p then
+		return Duel.GetFieldGroup(0,LOCATION_HAND,LOCATION_HAND)
+	else
+		return Duel.GetFieldGroup(p,LOCATION_HAND,0), Duel.GetFieldGroupCount(p,LOCATION_HAND,0) --compatibility
+	end
 end
 function Duel.GetHandCount(p)
-	return Duel.GetFieldGroupCount(p,LOCATION_HAND,0)
+	if not p then
+		return Duel.GetFieldGroupCount(0,LOCATION_HAND,LOCATION_HAND)
+	else
+		return Duel.GetFieldGroupCount(p,LOCATION_HAND,0)
+	end
 end
 function Duel.GetDeck(p)
 	return Duel.GetFieldGroup(p,LOCATION_DECK,0)
@@ -3255,7 +3324,7 @@ function Duel.IsEndPhase(tp)
 end
 
 function Duel.GetNextPhaseCount(ph,p)
-	if Duel.GetCurrentPhase()==ph and (not p or Duel.GetTurnPlayer()==tp) then
+	if Duel.GetCurrentPhase()==ph and (not p or Duel.GetTurnPlayer()==p) then
 		return 2
 	else
 		return 1

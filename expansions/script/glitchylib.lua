@@ -44,10 +44,21 @@ function Auxiliary.FindInTable(tab,a,...)
 	
 	return false
 end
+function Auxiliary.ClearTable(tab)
+	local size=#tab
+	if size>0 then
+		for k=1,size do
+			table.remove(tab)
+		end
+	end
+end
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -------------------------------EFFECTS THAT CAN BE ACTIVATED BY AFFECTING THE CARD USED AS COST, EVEN WHEN THERE ARE NO OTHER VALID TARGETS-------------------------------------
-LOCATION_AFTER_COST_EFFECTS = {EFFECT_CANNOT_SPECIAL_SUMMON, EFFECT_CANNOT_SSET}
+aux.LocationAfterCostEffects = {
+[EFFECT_CANNOT_SPECIAL_SUMMON]=true;
+[EFFECT_CANNOT_SSET]=true;
+}
 
 local _IsLocation, _GetLocation = Card.IsLocation, Card.GetLocation
 
@@ -69,7 +80,7 @@ end
 Card.IsLocation = function(c,loc)
 	if self_reference_effect and c.LocationAfterCost then
 		local code=self_reference_effect:GetCode()
-		if aux.FindInTable(LOCATION_AFTER_COST_EFFECTS,code) then
+		if aux.LocationAfterCostEffects[code]==true then
 			return c:IsLocationAfterCost(loc)
 		end
 	end
@@ -79,7 +90,7 @@ Card.GetLocation = function(c)
 	local locs=_GetLocation(c)
 	if self_reference_effect and c.LocationAfterCost then
 		local code=self_reference_effect:GetCode()
-		if aux.FindInTable(LOCATION_AFTER_COST_EFFECTS,code) then
+		if aux.LocationAfterCostEffects[code]==true then
 			locs=locs|c:GetLocationAfterCost()
 		end
 	end
@@ -747,15 +758,27 @@ function Auxiliary.SimultaneousEventGroupCheck(g,simult_check,og)
 	return true
 end
 
-function Auxiliary.SelectSimultaneousEventGroup(g,flag,ct)
+function Auxiliary.SelectSimultaneousEventGroup(g,flag,ct,e,excflag)
 	local ct=ct and ct or 1
+	local fid=e and e:GetHandler():GetFieldID() or 0
+	if excflag then
+		g=g:Filter(aux.NOT(Card.HasFlagEffectLabel),nil,excflag,fid)
+	end
 	if #g>1 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_OPERATECARD)
 		local tg=g:SelectSubGroup(tp,aux.SimultaneousEventGroupCheck,false,ct,#g,flag,g)
 		Duel.HintSelection(tg)
+		if excflag then
+			for tc in aux.Next(tg) do
+				tc:RegisterFlagEffect(excflag,RESET_CHAIN,0,1,fid)
+			end
+		end
 		return tg
 	else
 		Duel.HintSelection(g)
+		if excflag then
+			g:GetFirst():RegisterFlagEffect(excflag,RESET_CHAIN,0,1,fid)
+		end
 		return g
 	end
 end
@@ -1272,13 +1295,6 @@ end
 function Auxiliary.IsTunerCond(e)
 	local c=e:GetHandler()
 	return c:IsType(TYPE_TUNER)
-end
-
--------------------------------XYZ-----------------------------------
-local _XyzLevelFreeGoal = Auxiliary.XyzLevelFreeGoal
-
-Auxiliary.XyzLevelFreeGoal = function(g,tp,xyzc,gf)
-	return (not gf or gf(g,tp,xyzc)) and Duel.GetLocationCountFromEx(tp,tp,g,xyzc)>0
 end
 
 -------------------------------LINKS-----------------------------------

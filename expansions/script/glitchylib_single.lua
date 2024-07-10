@@ -283,7 +283,7 @@ function Auxiliary.ChangeStatsOperationTemplate(fn,subject,atk,reset,rc,range,co
 end
 ----------------------------------------
 
-function Card.UpdateATK(c,atk,reset,rc,range,cond,prop,desc)
+function Card.UpdateATK(c,atk,reset,rc,range,cond,prop,desc,pause)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
 	if not reset and not range then
 		range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
@@ -330,6 +330,8 @@ function Card.UpdateATK(c,atk,reset,rc,range,cond,prop,desc)
 	if prop~=0 then
 		e:SetProperty(prop)
 	end
+	
+	if pause then return e end
 	
 	c:RegisterEffect(e)
 	
@@ -1055,6 +1057,7 @@ function Card.ChangeLevel(c,lv,reset,rc,range,cond,prop,desc)
 		range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
 	end
 	
+	local donotdisable=false
 	local rc = rc and rc or c
     local rct=1
     if type(reset)=="table" then
@@ -1062,11 +1065,18 @@ function Card.ChangeLevel(c,lv,reset,rc,range,cond,prop,desc)
         reset=reset[1]
     end
 	
+	if type(rc)=="table" then
+        donotdisable=rc[2]
+        rc=rc[1]
+    end
+	
+	if not prop then prop=0 end
+	
 	local olv=c:GetLevel()
 	local e=Effect.CreateEffect(rc)
 	e:SetType(typ)
 	if range and not SCRIPT_AS_EQUIP then
-		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+		prop=prop|EFFECT_FLAG_SINGLE_RANGE
 		e:SetRange(range)
 	end
 	e:SetCode(EFFECT_CHANGE_LEVEL)
@@ -1074,14 +1084,25 @@ function Card.ChangeLevel(c,lv,reset,rc,range,cond,prop,desc)
 	if cond then
 		e:SetCondition(cond)
 	end
+	
 	if reset then
 		if type(reset)~="number" then reset=0 end
-		reset = rc==c and reset|RESET_DISABLE or reset
-		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
+		if rc==c and not donotdisable then
+			reset = reset|RESET_DISABLE
+		else
+			prop=prop|EFFECT_FLAG_CANNOT_DISABLE
+		end
+		e:SetReset(RESET_EVENT|RESETS_STANDARD|reset,rct)
 	end
+	
+	if prop~=0 then
+		e:SetProperty(prop)
+	end
+	
 	c:RegisterEffect(e)
+	
 	if reset then
-		return e,olv,c:GetLevel()
+		return e,c:GetLevel()-olv
 	else
 		return e
 	end

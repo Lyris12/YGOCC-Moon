@@ -53,6 +53,23 @@ function Auxiliary.CustomLabelCost(lab)
 end
 
 --Card Action Costs
+function Auxiliary.DestroyCost(f,loc1,loc2,min,max,exc)
+	loc1=loc1 or LOCATION_ONFIELD
+	loc2=loc2 or 0
+	min=min or 1
+	max=max or min
+	return	function(e,tp,eg,ep,ev,re,r,rp,chk)
+				local exc=(not exc) and nil or e:GetHandler()
+				if chk==0 then return Duel.IsExistingMatchingCard(aux.DestroyFilter(f),tp,loc1,loc2,min,exc,e,tp) end
+				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+				local g=Duel.SelectMatchingCard(tp,aux.DestroyFilter(f),tp,loc1,loc2,min,max,exc,e,tp)
+				if #g>0 then
+					local ct=Duel.Destroy(g,REASON_COST)
+					return g,ct
+				end
+				return g,0
+			end
+end
 function Auxiliary.DiscardCost(f,min,max,exc)
 	if not min then min=1 end
 	if not max then max=min end
@@ -188,15 +205,18 @@ end
 function Auxiliary.TributeGlitchyCost(f,min,max,exc,use_hand,use_oppo,exf,exloc1,exloc2,exmin,exmax,exexc,pretribute)
 	if not min then min=1 end
 	if not max then max=min end
+	local isfilter=type(f)=="function"
 	if (exloc1|exloc2)~=LOCATION_MZONE then
 		return function(e,tp,eg,ep,ev,re,r,rp,chk)
 			if use_oppo then aux.TributeOppoCostFlag=true end
-			local g1=Duel.GetReleaseGroup(tp)
+			local g1=isfilter and Duel.GetReleaseGroup(tp) or Group.CreateGroup()
 			if exf then
 				local g2=Duel.Group(Card.IsReleasable,tp,exloc1,exloc2,exexc):Filter(exf,nil)
 				g1:Merge(g2)
 			end
-			g1=g1:Filter(f,exc,e,tp)
+			if isfilter or exc then
+				g1=g1:Filter(f,exc,e,tp)
+			end
 			if chk==0 then
 				local res=#g1>0
 				aux.TributeOppoCostFlag=false
@@ -440,6 +460,10 @@ function Auxiliary.PayLPCost(lp)
 				if chk==0 then return Duel.CheckLPCost(tp,lp) end
 				Duel.PayLPCost(tp,lp)
 			end
+end
+function Auxiliary.PayHalfLPCost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.PayLPCost(tp,math.floor(Duel.GetLP(tp)/2))
 end
 
 -----------------------------------------------------------------------
