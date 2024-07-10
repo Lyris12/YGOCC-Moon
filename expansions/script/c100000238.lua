@@ -81,8 +81,8 @@ function s.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	return bc and bc:IsControler(1-tp) and bc:IsRelateToBattle()
 end
 function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:IsCostChecked() and Duel.IsPlayerCanDiscardDeckAsCost(1-tp,3) end
-	Duel.DiscardDeck(1-tp,3,REASON_COST)
+	if chk==0 then return e:IsCostChecked() and Duel.IsPlayerCanDiscardDeckAsCost(tp,3) end
+	Duel.DiscardDeck(tp,3,REASON_COST)
 	local og=Duel.GetGroupOperatedByThisCost(e):Filter(Card.IsSetCard,nil,ARCHE_AUTOMATYRANT):Filter(Card.IsLocation,nil,LOCATION_GRAVE)
 	local ct=og:GetCount()
 	Duel.SetTargetParam(ct)
