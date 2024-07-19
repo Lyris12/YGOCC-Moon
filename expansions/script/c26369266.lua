@@ -147,12 +147,12 @@ function s.setcost(e,tp,eg,ep,ev,re,r,rp,chk)
 		Duel.Destroy(g,REASON_COST)
 	end
 end
-function s.filter(c,e,tp,eg,ep,ev,re,r,rp)
-	return c:IsSetCard(0x2c2) and c:IsType(TYPE_PANDEMONIUM) and (c:IsFaceup() or not c:IsLocation(LOCATION_EXTRA)) and aux.PandSSetCon(c,tp,true)(nil,e,tp,eg,ep,ev,re,r,rp) and not c:IsForbidden()
+function s.filter(c)
+	return c:IsSetCard(0x2c2) and c:IsFaceupEx() and c:IsPandemoniumSSetable()
 end
 function s.settg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
-		local res=(e:GetLabel()==1) or (Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_HAND+LOCATION_EXTRA,0,1,nil,e,tp,eg,ep,ev,re,r,rp))
+		local res=(e:GetLabel()==1) or (Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_HAND+LOCATION_EXTRA,0,1,nil))
 		e:SetLabel(0)
 		return res
 	end
@@ -160,9 +160,8 @@ end
 function s.setop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,1601)
-	local tc=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_HAND+LOCATION_EXTRA,0,1,1,nil,e,tp,eg,ep,ev,re,r,rp):GetFirst()
+	local tc=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_HAND+LOCATION_EXTRA,0,1,1,nil):GetFirst()
 	if tc then
-		aux.PandSSet(tc,REASON_EFFECT)(e,tp,eg,ep,ev,re,r,rp)
-		Duel.ConfirmCards(1-tp,Group.FromCards(tc))
+		Duel.PandSSet(tc,e,tp,REASON_EFFECT)
 	end
 end

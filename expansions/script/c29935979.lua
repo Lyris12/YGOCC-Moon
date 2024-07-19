@@ -59,7 +59,7 @@ end
 function s.setfilter(c,e,tp,eg,ep,ev,re,r,rp)
 	if c:IsForbidden() then return false end
 	if not c:IsSetCard(0x209) or not c:IsType(TYPE_PANDEMONIUM) then return false end
-	return aux.PandSSetCon(c,tp,true)(nil,e,tp,eg,ep,ev,re,r,rp) 
+	return c:IsPandemoniumSSetable()
 end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
@@ -69,7 +69,7 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 		local g=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.setfilter),tp,LOCATION_GRAVE,0,1,1,nil,e,tp,eg,ep,ev,re,r,rp)
 		local tc=g:GetFirst()
 		if tc then
-			aux.PandSSet(tc,REASON_EFFECT)(e,tp,eg,ep,ev,re,r,rp)
+			Duel.PandSSet(tc,e,tp,REASON_EFFECT)
 		end
 	end
 end
@@ -80,7 +80,7 @@ function s.spfilter(c,e,tp,eg,ep,ev,re,r,rp)
 	end
 	local ec=c:GetEquipTarget()
 	return ec and ec:IsControler(tp) and ec:IsFaceup() and ec:IsMonster(TYPE_PANDEMONIUM) and ec:IsSetCard(0x209)
-		and aux.PandSSetCon(ec,tp)(nil,e,tp,eg,ep,ev,re,r,rp)
+		and ec:IsPandemoniumSSetable()
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_SZONE) and s.spfilter(chkc,e,tp) end
@@ -99,8 +99,8 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 			ec:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_CHAIN,EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE,1,fid)
 		end
 		if Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)>0
-			and ec and ec:HasFlagEffectLabel(id,fid) and (ec:IsControler(tp) or ec:IsAbleToChangeControler()) and ec:IsMonster(TYPE_PANDEMONIUM) and aux.PandSSetCon(ec,tp)(nil,e,tp,eg,ep,ev,re,r,rp) then
-			aux.PandSSet(ec,REASON_EFFECT)(e,tp,eg,ep,ev,re,r,rp)
+			and ec and ec:HasFlagEffectLabel(id,fid) and (ec:IsControler(tp) or ec:IsAbleToChangeControler()) and ec:IsMonster(TYPE_PANDEMONIUM) and ec:IsPandemoniumSSetable(false,tp) then
+			Duel.PandSSet(ec,e,tp,REASON_EFFECT)
 		end
 	end
 end

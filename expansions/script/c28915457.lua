@@ -39,26 +39,21 @@ end
 
 --Set
 function ref.setfilter(c)
-	return c:IsSetCard(0x732) and c:GetType()&TYPE_PANDEMONIUM==TYPE_PANDEMONIUM
+	return c:IsSetCard(0x732) and c:IsPandemoniumSSetable()
 end
 function ref.maketg(loc)
 	return function(e,tp,eg,ep,ev,re,r,rp,chk)
 		if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
 			and Duel.IsExistingMatchingCard(ref.setfilter,tp,loc,0,1,nil)
-			and aux.PandSSetCon(ref.setfilter,nil,loc)(nil,e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
 function ref.makeop(loc,actturn)
 	return function(e,tp,eg,ep,ev,re,r,rp)
-		if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 or not aux.PandSSetCon(ref.setfilter,nil,loc)(nil,e,tp,eg,ep,ev,re,r,rp) then return end
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
-		local g=Duel.SelectMatchingCard(tp,aux.PandSSetFilter(ref.setfilter),tp,loc,0,1,1,nil,e,tp,eg,ep,ev,re,r,rp)
+		local g=Duel.SelectMatchingCard(tp,ref.setfilter,tp,loc,0,1,1,nil,e,tp,eg,ep,ev,re,r,rp)
 		local tc=g:GetFirst()
-		if tc then
-			aux.PandSSet(tc,REASON_EFFECT,aux.GetOriginalPandemoniumType(tc))(e,tp,eg,ep,ev,re,r,rp)
-			Duel.ConfirmCards(1-tp,tc)
-			if actturn then
+		if tc and Duel.PandSSet(tc,e,tp,REASON_EFFECT)>0 and actturn then
 				local e1=Effect.CreateEffect(e:GetHandler())
 				e1:SetType(EFFECT_TYPE_SINGLE)
 				e1:SetCode(EFFECT_TRAP_ACT_IN_SET_TURN)

@@ -45,32 +45,27 @@ function cid.tdfilter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsType(TYPE_PENDULUM+TYPE_PANDEMONIUM) and (not c:IsLocation(LOCATION_EXTRA) or c:IsFaceup())
 		and c:IsAbleToDeckAsCost()
 end
-function cid.setfilter(c)
-	return c:GetType()&TYPE_PANDEMONIUM==TYPE_PANDEMONIUM
-end
 function cid.actcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(cid.tdfilter,tp,LOCATION_HAND+LOCATION_GRAVE+LOCATION_EXTRA,0,3,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g=Duel.SelectMatchingCard(tp,cid.tdfilter,tp,LOCATION_HAND+LOCATION_GRAVE+LOCATION_EXTRA,0,3,3,nil)
 	if #g>0 then
+		Duel.HintSelection(g)
 		Duel.SendtoDeck(g,nil,2,REASON_COST)
 	end
 end
 function cid.acttg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
-		return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
-		and aux.PandSSetCon(cid.setfilter,nil,LOCATION_DECK)(nil,e,tp,eg,ep,ev,re,r,rp)
+		return Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and Duel.IsExistingMatchingCard(Card.IsPandemoniumSSetable,tp,LOCATION_DECK,0,1,nil)
 	end
 end
 function cid.actop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 or not aux.PandSSetCon(cid.setfilter,nil,LOCATION_DECK)(nil,e,tp,eg,ep,ev,re,r,rp) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
-	local g=Duel.SelectMatchingCard(tp,aux.PandSSetFilter(cid.setfilter),tp,LOCATION_DECK,0,1,1,nil,e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.SelectMatchingCard(tp,Card.IsPandemoniumSSetable,tp,LOCATION_DECK,0,1,1,nil)
 	if #g>0 then
-		aux.PandSSet(g,REASON_EFFECT,aux.GetOriginalPandemoniumType(g:GetFirst()))(e,tp,eg,ep,ev,re,r,rp)
-		Duel.ConfirmCards(1-tp,g)
-		if g:GetFirst():IsLocation(LOCATION_SZONE) and g:GetFirst():IsFacedown() and g:GetFirst():IsSetCard(0x7a4) then
-			local cg=g:GetFirst():GetColumnGroup():Filter(aux.TRUE,g:GetFirst())
+		local tc=g:GetFirst()
+		if Duel.PandSSet(tc,e,tp,REASON_EFFECT)>0 then
+			local cg=g:GetFirst():GetColumnGroup():Filter(aux.TRUE,tc)
 			if #cg==0 then return end
 			Duel.Destroy(cg,REASON_EFFECT)
 		end

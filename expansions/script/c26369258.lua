@@ -72,21 +72,20 @@ function s.actop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SpecialSummon(c,0,tp,tp,true,false,POS_FACEUP)
 end
 
-function s.stfilter(c,e,tp,eg,ep,ev,re,r,rp)
-	return c:IsSetCard(0x2c2) and c:IsType(TYPE_PANDEMONIUM) and aux.PandSSetCon(c,tp,true)(nil,e,tp,eg,ep,ev,re,r,rp) and not c:IsForbidden()
+function s.stfilter(c)
+	return c:IsSetCard(0x2c2) and c:IsPandemoniumSSetable()
 end
 function s.sttg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
-		and Duel.IsExistingMatchingCard(s.stfilter,tp,LOCATION_DECK,0,1,nil,e,tp,eg,ep,ev,re,r,rp)
+		and Duel.IsExistingMatchingCard(s.stfilter,tp,LOCATION_DECK,0,1,nil)
 	end
 end
 function s.stop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,1601)
-	local tc=Duel.SelectMatchingCard(tp,s.stfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp,eg,ep,ev,re,r,rp):GetFirst()
+	local tc=Duel.SelectMatchingCard(tp,s.stfilter,tp,LOCATION_DECK,0,1,1,nil):GetFirst()
 	if tc then
-		aux.PandSSet(tc,REASON_EFFECT)(e,tp,eg,ep,ev,re,r,rp)
-		Duel.ConfirmCards(1-tp,tc)
+		Duel.PandSSet(tc,e,tp,REASON_EFFECT)
 	end
 end
 
@@ -142,7 +141,7 @@ function s.spop2(e,tp,eg,ep,ev,re,r,rp)
 		tc:AddMonsterAttribute(TYPE_EFFECT+TYPE_PANDEMONIUM)
 		Duel.SpecialSummon(tc,0,tp,tp,true,false,POS_FACEUP)
 	elseif check2 and Duel.Destroy(tc,REASON_EFFECT)>0 and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and e:GetHandler():IsRelateToEffect(e) then
-		aux.PandAct(e:GetHandler())(e,tp,eg,ep,ev,re,r,rp)
+		Duel.ActivatePandemonium(e:GetHandler(),tp)
 		local te=e:GetHandler():GetActivateEffect()
 		te:UseCountLimit(tp,1,true)
 		local tep=e:GetHandler():GetControler()

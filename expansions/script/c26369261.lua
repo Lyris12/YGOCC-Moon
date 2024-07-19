@@ -107,35 +107,32 @@ function s.scop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 
-function s.setfilter(c,e,tp,eg,ep,ev,re,r,rp)
+function s.setfilter(c)
 	if c:IsForbidden() then return false end
 	if not c:IsSetCard(0x2c2) or not c:IsType(TYPE_PANDEMONIUM+TYPE_TRAP) then return false end
 	if c:IsType(TYPE_TRAP) then
 		return c:IsSSetable(false)
 	elseif c:IsType(TYPE_PANDEMONIUM) then
-		return aux.PandSSetCon(c,tp,true)(nil,e,tp,eg,ep,ev,re,r,rp) 
+		return c:IsPandemoniumSSetable()
 	end
 	return false
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
-		return Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and Duel.IsExistingMatchingCard(s.setfilter,tp,LOCATION_DECK,0,1,nil,e,tp,eg,ep,ev,re,r,rp)
+		return Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and Duel.IsExistingMatchingCard(s.setfilter,tp,LOCATION_DECK,0,1,nil)
 	end
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
-	local g=Duel.SelectMatchingCard(tp,s.setfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.SelectMatchingCard(tp,s.setfilter,tp,LOCATION_DECK,0,1,1,nil)
 	if #g<=0 then return end
 	local tc=g:GetFirst()
 	if tc then
 		if tc:IsType(TYPE_PANDEMONIUM) then
-			aux.PandSSet(tc,REASON_EFFECT)(e,tp,eg,ep,ev,re,r,rp)
+			Duel.PandSSet(tc,e,tp,REASON_EFFECT)
 		else
 			Duel.SSet(tp,tc)
-		end
-		if tc:IsLocation(LOCATION_SZONE) and tc:IsFacedown() then
-			Duel.ConfirmCards(1-tp,Group.FromCards(tc))
 		end
 	end
 end
@@ -187,7 +184,7 @@ function s.spop2(e,tp,eg,ep,ev,re,r,rp)
 			if c:IsRelateToEffect(e) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and c:IsPandemoniumActivatable(tp,tp,true,false,false,false,eg,ep,ev,re,r,rp,true) and r&REASON_EFFECT==0
 			and Duel.SelectYesNo(tp,aux.Stringid(id,4)) then
 				Duel.BreakEffect()
-				aux.PandAct(c)(e,tp,eg,ep,ev,re,r,rp)
+				Duel.ActivatePandemonium(c,tp)
 				local te=c:GetActivateEffect()
 				te:UseCountLimit(tp,1,true)
 				local tep=c:GetControler()

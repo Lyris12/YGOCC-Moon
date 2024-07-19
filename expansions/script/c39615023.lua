@@ -114,17 +114,19 @@ function cid.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
 end
+function cid.setfilterpande(c)
+	return c:IsFaceup() and c:IsPandemoniumSSetable()
+end
 function cid.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 then
-		local g=Duel.GetMatchingGroup(aux.AND(aux.FilterBoolFunction(Card.IsFaceup),aux.FilterBoolFunction(Card.IsType,TYPE_PANDEMONIUM)),tp,LOCATION_EXTRA,0,nil)
-		if g:GetCount()>0 and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and aux.PandSSetCon(cid.setfilter,nil,LOCATION_EXTRA)(nil,e,tp,eg,ep,ev,re,r,rp) and Duel.SelectYesNo(tp,1159) then
+		local g=Duel.GetMatchingGroup(cid.setfilterpande,tp,LOCATION_EXTRA,0,nil)
+		if g:GetCount()>0 and Duel.SelectYesNo(tp,1159) then
 			Duel.BreakEffect()
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
-			local sg=g:FilterSelect(tp,aux.PandSSetFilter(aux.TRUE),1,1,nil,e,tp,eg,ep,ev,re,r,rp)
-			aux.PandSSet(sg,REASON_EFFECT,aux.GetOriginalPandemoniumType(sg:GetFirst()))(e,tp,eg,ep,ev,re,r,rp)
-			Duel.ConfirmCards(1-tp,sg)
+			local sg=g:Select(tp,1,1,nil)
+			Duel.PandSSet(sg,e,tp,REASON_EFFECT)
 		end
 	end
 end

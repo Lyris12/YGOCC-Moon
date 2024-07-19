@@ -65,25 +65,25 @@ function cid.activate(e,tp,eg,ep,ev,re,r,rp)
 end
 
 --PLACE OR SET
-function cid.filter(c,e,tp,eg,ep,ev,re,r,rp)
-	return c:IsFaceup() and c:IsType(TYPE_PENDULUM+TYPE_PANDEMONIUM) and Duel.IsExistingMatchingCard(cid.pfilter,tp,LOCATION_DECK,0,1,nil,c:GetOriginalAttribute(),e,tp,eg,ep,ev,re,r,rp)
+function cid.filter(c,tp)
+	return c:IsFaceup() and c:IsType(TYPE_PENDULUM+TYPE_PANDEMONIUM) and Duel.IsExistingMatchingCard(cid.pfilter,tp,LOCATION_DECK,0,1,nil,c:GetOriginalAttribute(),tp)
 end
-function cid.pfilter(c,attr,e,tp,eg,ep,ev,re,r,rp)
+function cid.pfilter(c,attr,tp)
 	return c:IsSetCard(0x7a4) and c:GetOriginalAttribute()~=attr and c:IsType(TYPE_MONSTER) and not c:IsForbidden()
 		and (c:IsType(TYPE_PENDULUM) and (Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,1))
-		or (c:IsType(TYPE_PANDEMONIUM) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and aux.PandSSetCon(c)(nil,e,tp,eg,ep,ev,re,r,rp)))
+		or (c:IsPandemoniumSSetable()))
 end
 function cid.pctg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and cid.filter(chkc,e,tp,eg,ep,ev,re,r,rp) end
-	if chk==0 then return Duel.IsExistingTarget(cid.filter,tp,LOCATION_SZONE,0,1,nil,e,tp,eg,ep,ev,re,r,rp) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and cid.filter(chkc,tp) end
+	if chk==0 then return Duel.IsExistingTarget(cid.filter,tp,LOCATION_SZONE,0,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	Duel.SelectTarget(tp,cid.filter,tp,LOCATION_SZONE,0,1,1,nil,e,tp,eg,ep,ev,re,r,rp)
+	Duel.SelectTarget(tp,cid.filter,tp,LOCATION_SZONE,0,1,1,nil,tp)
 end
 function cid.pcop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) and tc:IsFaceup() and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 then
 		local attr=tc:GetOriginalAttribute()
-		local g=Duel.GetMatchingGroup(cid.pfilter,tp,LOCATION_DECK,0,nil,attr,e,tp,eg,ep,ev,re,r,rp)
+		local g=Duel.GetMatchingGroup(cid.pfilter,tp,LOCATION_DECK,0,nil,attr,tp)
 		if #g<=0 then return end
 		local b1=g:FilterCount(Card.IsType,nil,TYPE_PENDULUM)>0
 		local b2=g:FilterCount(Card.IsType,nil,TYPE_PANDEMONIUM)>0
@@ -108,7 +108,7 @@ function cid.pcop(e,tp,eg,ep,ev,re,r,rp)
 		else
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_OPERATECARD)
 			local sg=g:FilterSelect(tp,Card.IsType,1,1,nil,TYPE_PANDEMONIUM)
-			aux.PandSSet(sg:GetFirst(),REASON_EFFECT)(e,tp,eg,ep,ev,re,r,rp)
+			Duel.PandSSet(sg:GetFirst(),e,tp,REASON_EFFECT)
 		end
 	end
 end

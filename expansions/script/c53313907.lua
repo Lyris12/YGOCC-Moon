@@ -51,7 +51,7 @@ function s.thfilter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xcf6) and c:IsAbleToHand() and not c:IsCode(id)
 end
 function s.setfilter(c)
-	return c:IsSetCard(0xcf6) and c:IsType(TYPE_PANDEMONIUM) and not c:IsCode(id)
+	return c:IsSetCard(0xcf6) and c:IsPandemoniumSSetable() and not c:IsCode(id)
 end
 --change effect
 function s.chtg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -116,16 +116,13 @@ end
 --
 function s.settg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
-		and aux.PandSSetCon(s.setfilter,nil,LOCATION_DECK)(nil,e,tp,eg,ep,ev,re,r,rp)
 		and Duel.IsExistingMatchingCard(s.setfilter,tp,LOCATION_DECK,0,1,nil) end
 end
 function s.setop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 or not aux.PandSSetCon(s.setfilter,nil,LOCATION_DECK)(nil,e,tp,eg,ep,ev,re,r,rp) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,1601)
-	local g=Duel.SelectMatchingCard(tp,aux.PandSSetFilter(s.setfilter),tp,LOCATION_DECK,0,1,1,nil,e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.SelectMatchingCard(tp,s.setfilter,tp,LOCATION_DECK,0,1,1,nil)
 	local tc=g:GetFirst()
 	if tc then
-		aux.PandSSet(tc,REASON_EFFECT)(e,tp,eg,ep,ev,re,r,rp)
-		Duel.ConfirmCards(1-tp,tc)
+		Duel.PandSSet(tc,e,tp,REASON_EFFECT)
 	end
 end

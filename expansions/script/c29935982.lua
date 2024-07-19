@@ -84,13 +84,13 @@ function s.scop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 
-function s.scfilter2(c,e,tp,eg,ep,ev,re,r,rp)
+function s.scfilter2(c)
 	return c:IsMonster(TYPE_PANDEMONIUM) and c:IsSetCard(0x209)
-		and (c:IsAbleToHand() or aux.PandSSetCon(tc,tp)(e,tp,eg,ep,ev,re,r,rp))
+		and (c:IsAbleToHand() or c:IsPandemoniumSSetable())
 end
 function s.sctg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
-		return Duel.IsExistingMatchingCard(s.scfilter2,tp,LOCATION_DECK,0,1,nil,e,tp,eg,ep,ev,re,r,rp)
+		return Duel.IsExistingMatchingCard(s.scfilter2,tp,LOCATION_DECK,0,1,nil)
 	end
 end
 function s.scop2(e,tp,eg,ep,ev,re,r,rp)
@@ -99,12 +99,12 @@ function s.scop2(e,tp,eg,ep,ev,re,r,rp)
 	if #g>0 then
 		local tc=g:GetFirst()
 		local b1=tc:IsAbleToHand()
-		local b2=aux.PandSSetCon(tc,tp)(e,tp,eg,ep,ev,re,r,rp)
+		local b2=tc:IsPandemoniumSSetable()
 		local opt=aux.Option(id,tp,5,b1,b2)
 		if opt==0 then
 			Duel.Search(tc,tp)
 		elseif opt==1 then
-			aux.PandSSet(tc,REASON_EFFECT)(e,tp,eg,ep,ev,re,r,rp)
+			Duel.PandSSet(tc,e,tp,REASON_EFFECT)
 		end
 	end
 end

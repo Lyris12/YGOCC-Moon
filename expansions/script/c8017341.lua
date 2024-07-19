@@ -99,7 +99,7 @@ function cid.desrepop(e,tp,eg,ep,ev,re,r,rp)
 end
 --SET
 function cid.setfilter(c,e,tp)
-	return c:IsFaceup() and c:GetFlagEffect(726)>0 and aux.PandSSetCon(c,nil,c:GetLocation())(nil,e,tp)
+	return c:IsFaceup() and c:GetFlagEffect(726)>0 and c:IsPandemoniumSSetable()
 end
 ------------
 function cid.settg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
@@ -112,32 +112,29 @@ function cid.settg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function cid.setop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsFaceup() and tc:IsRelateToEffect(e) and aux.PandSSetCon(tc,nil,tc:GetLocation())(nil,e,tp,eg,ep,ev,re,r,rp) then
-		aux.PandSSet(tc,REASON_EFFECT,aux.GetOriginalPandemoniumType(tc))(e,tp,eg,ep,ev,re,r,rp)
-		if tc:IsFacedown() then
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEDOWN)
-			local rc=Duel.SelectMatchingCard(tp,Card.IsFacedown,tp,LOCATION_SZONE,LOCATION_SZONE,1,1,e:GetHandler())
-			local rct=rc:GetFirst()
-			if #rc>0 then
-				Duel.HintSelection(rc)
-				Duel.ConfirmCards(1-tp,rc)
-				if aux.Pandemoniums[rct] and aux.GetOriginalPandemoniumType(rct)~=0 then
-					local actcon=rct:GetActivateEffect():GetCondition()
-					if actcon(rct:GetActivateEffect(),tp,eg,ep,ev,re,r,rp) then
-						if rct:GetActivateEffect():GetCost() then
-							if rct:GetActivateEffect():GetCost()(e,tp,eg,ep,ev,re,r,rp,0) then
-								rct:GetActivateEffect():GetCost()(e,tp,eg,ep,ev,re,r,rp,1)
-							else
-								return
-							end
+	if tc and tc:IsFaceup() and tc:IsRelateToEffect(e) and tc:IsPandemoniumSSetable() and Duel.PandSSet(tc,e,tp,REASON_EFFECT)>0 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEDOWN)
+		local rc=Duel.SelectMatchingCard(tp,Card.IsFacedown,tp,LOCATION_SZONE,LOCATION_SZONE,1,1,e:GetHandler())
+		local rct=rc:GetFirst()
+		if #rc>0 then
+			Duel.HintSelection(rc)
+			Duel.ConfirmCards(1-tp,rc)
+			if aux.Pandemoniums[rct] and aux.GetOriginalPandemoniumType(rct)~=0 then
+				local actcon=rct:GetActivateEffect():GetCondition()
+				if actcon(rct:GetActivateEffect(),tp,eg,ep,ev,re,r,rp) then
+					if rct:GetActivateEffect():GetCost() then
+						if rct:GetActivateEffect():GetCost()(e,tp,eg,ep,ev,re,r,rp,0) then
+							rct:GetActivateEffect():GetCost()(e,tp,eg,ep,ev,re,r,rp,1)
+						else
+							return
 						end
-						Duel.ChangePosition(rct,POS_FACEUP)
-						rct:RegisterFlagEffect(726,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CANNOT_DISABLE,1)
 					end
-				else
-					Duel.Destroy(rct,REASON_EFFECT)
+					Duel.ChangePosition(rct,POS_FACEUP)
+					rct:RegisterFlagEffect(726,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CANNOT_DISABLE,1)
 				end
+			else
+				Duel.Destroy(rct,REASON_EFFECT)
 			end
 		end
 	end
-end	
+end

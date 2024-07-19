@@ -78,7 +78,7 @@ function c63553470.drcfilter(c,tp)
 end
 function c63553470.drcfilter2(c,e,tp,eg,ep,ev,re,r,rp)
 	return c:GetType()&TYPE_PANDEMONIUM==TYPE_PANDEMONIUM and c:IsPreviousLocation(LOCATION_SZONE) and c:GetPreviousControler()==tp and c:IsPreviousPosition(POS_FACEUP_ATTACK)
-		and aux.PandSSetCon(c,nil,c:GetLocation(),c:GetLocation())(nil,e,tp,eg,ep,ev,re,r,rp)
+		and c:IsPandemoniumSSetable()
 end
 function c63553470.excfilter(c)
 	return c:GetType()&TYPE_PANDEMONIUM==TYPE_PANDEMONIUM and c:IsFaceup()

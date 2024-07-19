@@ -65,11 +65,6 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetCardOperationInfo(g,CATEGORY_DISABLE)
 	Duel.SetCustomOperationInfo(0,CATEGORY_UPDATE_ENERGY,c,1,INFOFLAG_INCREASE,5)
 end
-function s.setfilter(c,e,tp,eg,ep,ev,re,r,rp)
-	if c:IsForbidden() then return false end
-	if not c:IsSetCard(0x209) or not c:IsType(TYPE_PANDEMONIUM) then return false end
-	return aux.PandSSetCon(c,tp,true)(nil,e,tp,eg,ep,ev,re,r,rp) 
-end
 function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToChain() then
@@ -84,17 +79,17 @@ function s.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 
-function s.spfilter(c,e,tp,eg,ep,ev,re,r,rp)
+function s.spfilter(c,e,tp)
 	if not c:IsFaceup() or not c:IsOriginalType(TYPE_MONSTER) or not c:IsCanBeSpecialSummoned(e,0,tp,false,false) then return false end
 	local ec=c:GetEquipTarget()
-	return ec and ec:IsControler(tp) and ec:IsFaceup() and ec:IsMonster(TYPE_PANDEMONIUM) and ec:IsSetCard(0x209)
-		and aux.PandSSetCon(ec,tp)(nil,e,tp,eg,ep,ev,re,r,rp)
+	return ec and ec:IsControler(tp) and ec:IsFaceup() and ec:IsSetCard(0x209)
+		and ec:IsPandemoniumSSetable()
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_SZONE) and s.spfilter(chkc,e,tp) end
-	if chk==0 then return Duel.GetMZoneCount(tp)>0 and Duel.IsExistingTarget(s.spfilter,tp,LOCATION_SZONE,LOCATION_SZONE,1,nil,e,tp,eg,ep,ev,re,r,rp) end
+	if chk==0 then return Duel.GetMZoneCount(tp)>0 and Duel.IsExistingTarget(s.spfilter,tp,LOCATION_SZONE,LOCATION_SZONE,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectTarget(tp,s.spfilter,tp,LOCATION_SZONE,LOCATION_SZONE,1,1,nil,e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.SelectTarget(tp,s.spfilter,tp,LOCATION_SZONE,LOCATION_SZONE,1,1,nil,e,tp)
 	Duel.SetCardOperationInfo(g,CATEGORY_SPECIAL_SUMMON)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
@@ -107,8 +102,8 @@ function s.spop(e,tp,eg,ep,ev,re,r,rp)
 			ec:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_CHAIN,EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE,1,fid)
 		end
 		if Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)>0
-			and ec and ec:HasFlagEffectLabel(id,fid) and (ec:IsControler(tp) or ec:IsAbleToChangeControler()) and ec:IsMonster(TYPE_PANDEMONIUM) and aux.PandSSetCon(ec,tp)(nil,e,tp,eg,ep,ev,re,r,rp) then
-			aux.PandSSet(ec,REASON_EFFECT)(e,tp,eg,ep,ev,re,r,rp)
+			and ec and ec:HasFlagEffectLabel(id,fid) and (ec:IsControler(tp) or ec:IsAbleToChangeControler()) and ec:IsPandemoniumSSetable(false,tp) then
+			Duel.PandSSet(ec,e,tp,REASON_EFFECT)
 		end
 	end
 end

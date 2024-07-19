@@ -28,23 +28,19 @@ function cid.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function cid.thfilter(c)
-	return c:IsFaceup() and c:IsType(TYPE_PANDEMONIUM) and c:IsType(TYPE_MONSTER) and c:IsSetCard(0xcf80)
+	return c:IsFaceup() and c:IsSetCard(0xcf80) and c:IsPandemoniumSSetable()
 end
 function cid.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
-		and aux.PandSSetCon(cid.thfilter,nil,LOCATION_EXTRA)(nil,e,tp,eg,ep,ev,re,r,rp) 
 		and Duel.IsExistingMatchingCard(cid.thfilter,tp,LOCATION_EXTRA,0,1,nil) 
 	end
 end
 function cid.thop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 or not aux.PandSSetCon(cid.thfilter,nil,LOCATION_EXTRA)(nil,e,tp,eg,ep,ev,re,r,rp) then return end
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,1601)
-	local g=Duel.SelectMatchingCard(tp,aux.PandSSetFilter(cid.thfilter),tp,LOCATION_EXTRA,0,1,1,nil,e,tp,eg,ep,ev,re,r,rp)
-	if g:GetCount()>0 then
-		aux.PandSSet(g,REASON_EFFECT,aux.GetOriginalPandemoniumType(g:GetFirst()))(e,tp,eg,ep,ev,re,r,rp)
-		Duel.ConfirmCards(1-tp,g)
+	local g=Duel.SelectMatchingCard(tp,cid.thfilter,tp,LOCATION_EXTRA,0,1,1,nil)
+	if g:GetCount()>0 and Duel.PandSSet(g,e,tp,REASON_EFFECT)>0 then
 		local tc=g:GetFirst()
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_FIELD)
