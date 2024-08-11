@@ -66,6 +66,7 @@ ARCHE_BIGBANG		= 0xbba
 ARCHE_HYPERDRIVE	= 0x660
 
 ARCHE_ABYSSLYM			= 0x49c
+ARCHE_AENGELIC			= 0xae6
 ARCHE_AEONSTRIDE		= 0xae0
 --
 ARCHE_AIRCASTER			= 0xa88
@@ -87,6 +88,7 @@ ARCHE_ETERNADIR			= 0xe56
 ARCHE_EVIL_DRAGON		= 0xe80
 ARCHE_FLIBBERTY			= 0x855
 ARCHE_FROM_THE_DARK		= 0x2ed
+ARCHE_GODSPARK			= 0x412
 ARCHE_GOLDEN_SKIES		= 0x528
 ARCHE_GRENADE_TYPE		= 0x302
 ARCHE_ICHYALTAS			= 0x2a7
@@ -108,6 +110,7 @@ ARCHE_NUMBER_IC39		= 0xb048
 ARCHE_ORIGIN_DRAGON		= 0xfc1
 ARCHE_OSCURION			= 0x5a6
 ARCHE_QUARPHEX			= 0x1a4
+ARCHE_SCARLET_RED		= 0xd78
 ARCHE_SILENT_STAR		= 0xd0a1
 ARCHE_SPECULOMIRIC		= 0x20c
 ARCHE_STAR_REGALIA		= 0xd0a2
@@ -131,6 +134,7 @@ ARCHE_ZEROTL			= 0x1e5
 
 CARD_ANCIENT_PIXIE_DRAGON				= 4179255
 CARD_BLACK_AND_WHITE_WAVE				= 31677606
+CARD_CYBER_HARPIE_LADY					= 80316585
 CARD_DESPAIR_FROM_THE_DARK				= 71200730
 CARD_EHERO_BLAZEMAN						= 63060238
 CARD_HELIOS_DUO_MEGISTUS				= 80887952
@@ -155,6 +159,7 @@ CARD_EMISSARY_OF_ARMONY							= 11110642
 CARD_ETERNADIR_SCOUT_ESOM						= 100000209
 CARD_GOLDEN_SKIES_TREASURE						= 11111060
 CARD_GOLDEN_SKIES_TREASURE_OF_WELFARE			= 11111029
+CARD_GORGEOUS_GIFT_OF_HEAVEN_THE_GODSPARK		= 4200100
 CARD_IN_THE_FOREST_BLACK_AS_MY_MEMORY			= 100000051
 CARD_KEEPER_OF_ARMONY							= 100000145
 CARD_LICH_LORD_PHYLACTERY						= 91630827
@@ -319,14 +324,14 @@ STRING_INPUT_DICE_ROLL					=	2002
 STRING_INPUT_NONNEGATIVE_NUMBER			=	2003
 STRING_INPUT_NEGATIVE_NUMBER			=	2004
 
-HINTMSG_ENERGY							=	2100
-HINTMSG_TRANSFORM						=	2101
-HINTMSG_TOEXTRA							=	2102
-HINTMSG_FLIPSUMMON						=	2103
-HINTMSG_ATTACH							=	2104
-HINTMSG_ATTACHTO						=	2105
-HINTMSG_ATKDEF							=	2106
-HINTMSG_HALVE_ATKDEF					=	2107
+HINTMSG_ENERGY							=	2005
+HINTMSG_TRANSFORM						=	2006
+HINTMSG_TOEXTRA							=	2007
+HINTMSG_FLIPSUMMON						=	2008
+HINTMSG_ATTACH							=	2009
+HINTMSG_ATTACHTO						=	2010
+HINTMSG_ATKDEF							=	2011
+HINTMSG_HALVE_ATKDEF					=	2012
 
 --Locations
 LOCATION_ENGAGED	=	0x1000
@@ -1080,7 +1085,7 @@ function Duel.Negate(g,e,reset,notfield,forced,typ,cond)
 		rct=reset[2]
 		reset=reset[1]
 	end
-	if not typ then typ=0 end
+	if not typ then typ=TYPE_NEGATE_ALL end
 	
 	local returntype=aux.GetValueType(g)
 	if returntype=="Card" then
@@ -2216,7 +2221,7 @@ function Duel.RegisterHint(p,flag,reset,rct,id,desc,prop,refeff)
 	e:Desc(desc,id)
 	e:SetType(EFFECT_TYPE_FIELD)
 	e:SetProperty(EFFECT_FLAG_CLIENT_HINT|EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_PLAYER_TARGET|prop)
-	e:SetCode(EFFECT_FLAG_EFFECT|id)
+	e:SetCode(EFFECT_FLAG_EFFECT|flag)
 	e:SetTargetRange(1,0)
 	if refeff then
 		e:SetLabelObject(refeff)
@@ -2427,9 +2432,10 @@ function Auxiliary.AttachFilter2(f)
 				return (not f or f(c,e,...)) and c:IsType(TYPE_XYZ)
 			end
 end
-function Auxiliary.BanishFilter(f,cost)
+function Auxiliary.BanishFilter(f,cost,pos)
+	pos = pos and pos or POS_FACEUP
 	return	function(c,...)
-				return (not f or f(c,...)) and (not cost and c:IsAbleToRemove() or cost and c:IsAbleToRemoveAsCost())
+				return (not f or f(c,...)) and (not cost and c:IsAbleToRemove() or cost and c:IsAbleToRemoveAsCost(pos))
 			end
 end
 function Auxiliary.ControlFilter(f)
@@ -2668,6 +2674,13 @@ function Group.GetControlers(g)
 	return p
 end
 
+--For some reason, this function was removed from KPro's core... Redefined it here in order to make customs that use it work as normal
+function Group.ForEach(g,f,...)
+	for tc in aux.Next(g) do
+		f(tc,...)
+	end
+end
+
 --Hint timing
 function Effect.SetRelevantTimings(e,extra_timings)
 	if not extra_timings then extra_timings=0 end
@@ -2690,6 +2703,19 @@ function Effect.SetLabelPair(e,l1,l2)
 		local o1,_=e:GetLabel()
 		e:SetLabel(o1,l2)
 	end
+end
+function Effect.SetSpecificLabel(e,l,pos)
+	if not pos then pos=1 end
+	local tab={e:GetLabel()}
+	if #tab<pos then
+		for i=1,pos-#tab-1 do
+			table.insert(tab,0)
+		end
+		table.insert(tab,l)
+	else
+		tab[pos]=l
+	end
+	e:SetLabel(table.unpack(tab))
 end
 function Effect.GetSpecificLabel(e,pos)
 	if not pos then pos=1 end
@@ -3324,7 +3350,8 @@ function Duel.IsEndPhase(tp)
 end
 
 function Duel.GetNextPhaseCount(ph,p)
-	if Duel.GetCurrentPhase()==ph and (not p or Duel.GetTurnPlayer()==p) then
+	if not ph and not p then return 1 end
+	if (not ph or Duel.GetCurrentPhase()==ph) and (not p or Duel.GetTurnPlayer()==p) then
 		return 2
 	else
 		return 1
@@ -3851,6 +3878,26 @@ function Auxiliary.RegisterResetAfterSpecialSummonRule(c,tp,e1)
 	return e0
 end
 
+--Tables
+function Auxiliary.TableRemove(t,fnKeep)
+    local j, n = 1, #t
+
+    for i=1,n do
+        if (fnKeep(t, i, j)) then
+            if (i ~= j) then
+                t[j] = t[i]
+                t[i] = nil
+            end
+            j = j + 1
+        else
+            t[i] = nil
+        end
+    end
+
+    return t;
+end
+
+
 --Tributing
 Auxiliary.TributeOppoCostFlag = false
 function Auxiliary.EnableGlobalEffectTributeOppoCost()
@@ -3870,6 +3917,12 @@ end
 --Location Check
 EFFECT_CARD_HAS_RESOLVED = 47987298
 
+function Auxiliary.AlreadyInRangeCondition(e,re,se)
+	local se=e and e:GetLabelObject():GetLabelObject() or se
+	return	function(c,...)
+				return se==nil or re~=se
+			end
+end
 function Auxiliary.AlreadyInRangeFilter(e,f)
 	local se=e:GetLabelObject():GetLabelObject()
 	return	function(c,...)

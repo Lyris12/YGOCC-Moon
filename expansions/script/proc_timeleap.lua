@@ -234,8 +234,8 @@ function Auxiliary.AddTimeleapProc(c,futureval,sumcon,filter,custom_matop,custom
 		e1:SetCode(EFFECT_SPSUMMON_PROC)
 		e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE)
 		e1:SetRange(LOCATION_EXTRA)
-		e1:SetCondition(Auxiliary.TimeleapCondition(sumcon,filter,table.unpack(list)))
-		e1:SetTarget(Auxiliary.TimeleapTarget(sumcon,filter,table.unpack(list)))
+		e1:SetCondition(Auxiliary.TimeleapCondition(sumcon,filter,customop,table.unpack(list)))
+		e1:SetTarget(Auxiliary.TimeleapTarget(sumcon,filter,customop,table.unpack(list)))
 		e1:SetOperation(Auxiliary.TimeleapOperation(customop))
 		e1:SetValue(SUMMON_TYPE_TIMELEAP)
 		c:RegisterEffect(e1)
@@ -266,7 +266,7 @@ function Auxiliary.AddTimeleapProc(c,futureval,sumcon,filter,custom_matop,custom
 	if custom_matop then
 		local e5=Effect.CreateEffect(c)
 		e5:SetType(EFFECT_TYPE_SINGLE)
-		e5:SetProperty(EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_UNCOPYABLE)
+		e5:SetProperty(EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_UNCOPYABLE|EFFECT_FLAG_IGNORE_IMMUNE)
 		e5:SetCode(EFFECT_TIMELEAP_CUSTOM_MATERIAL_OPERATION)
 		e5:SetOperation(custom_matop[1])
 		e5:SetValue(custom_matop[2])
@@ -448,6 +448,7 @@ function Auxiliary.TimeleapTarget(sumcon,filter,customop,...)
 	end
 	if max>99 then max=99 end
 	return  function(e,tp,eg,ep,ev,re,r,rp,chk,c)
+				if customop and not customop(e,tp,eg,ep,ev,re,r,rp,c,g,0) then return false end
 				local f
 				local custom_matop=c:IsHasEffect(EFFECT_TIMELEAP_CUSTOM_MATERIAL_OPERATION)
 				if custom_matop then
@@ -566,7 +567,7 @@ function Auxiliary.TimeleapOperation(customop)
 						Duel.RegisterFlagEffect(tp,830,RESET_PHASE+PHASE_END,0,1)
 					end
 				else
-					customop(e,tp,eg,ep,ev,re,r,rp,c,g)
+					customop(e,tp,eg,ep,ev,re,r,rp,c,g,1)
 				end
 				g:DeleteGroup()
 			end
@@ -603,15 +604,18 @@ function Card.GetFuture(c)
 	end
 end
 function Card.IsFuture(c,...)
+	if not Auxiliary.Timeleaps[c] then return false end
 	for _,future in ipairs({...}) do
 		if c:GetFuture()==future then return true end
 	end
 	return false
 end
 function Card.IsFutureAbove(c,future)
+	if not Auxiliary.Timeleaps[c] then return false end
 	return c:GetFuture()>=future
 end
 function Card.IsFutureBelow(c,future)
+	if not Auxiliary.Timeleaps[c] then return false end
 	local ft=c:GetFuture()
 	return ft>0 and ft<=future
 end
@@ -627,4 +631,14 @@ function Card.GetPreviousFutureOnField(c)
 	return val
 end
 
-
+--Special Timeleap Material Operations
+function Auxiliary.TimeleapMaterialBanishFacedown()
+	return {
+		function(e,tp,eg,ep,ev,re,r,rp,c,g)
+			Duel.Remove(g,POS_FACEDOWN,REASON_MATERIAL|REASON_TIMELEAP)
+		end,
+		function(c,e,tp)
+			return c:IsAbleToRemove(tp,POS_FACEDOWN)
+		end
+	}
+end

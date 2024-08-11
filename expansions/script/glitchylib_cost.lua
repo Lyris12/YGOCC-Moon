@@ -79,18 +79,19 @@ function Auxiliary.DiscardCost(f,min,max,exc)
 				Duel.DiscardHand(tp,aux.DiscardFilter(f,true),min,max,REASON_COST|REASON_DISCARD,exc)
 			end
 end
-function Auxiliary.BanishCost(f,loc1,loc2,min,max,exc)
-	if not loc1 then loc1=LOCATION_ONFIELD end
-	if not loc2 then loc2=0 end
-	if not min then min=1 end
-	if not max then max=min end
+function Auxiliary.BanishCost(f,loc1,loc2,min,max,exc,pos)
+	loc1 = loc1 and loc1 or LOCATION_ONFIELD
+	loc2 = loc2 and loc2 or 0
+	min = min and min or 1
+	max = max and max or min
+	pos = pos and pos or POS_FACEUP
 	return	function(e,tp,eg,ep,ev,re,r,rp,chk)
 				local exc=(not exc) and nil or e:GetHandler()
-				if chk==0 then return Duel.IsExistingMatchingCard(aux.BanishFilter(f,true),tp,loc1,loc2,min,exc,e,tp,eg,ep,ev,re,r,rp) end
+				if chk==0 then return Duel.IsExistingMatchingCard(aux.BanishFilter(f,true,pos),tp,loc1,loc2,min,exc,e,tp) end
 				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-				local g=Duel.SelectMatchingCard(tp,aux.BanishFilter(f,true),tp,loc1,loc2,min,max,exc,e,tp,eg,ep,ev,re,r,rp)
+				local g=Duel.SelectMatchingCard(tp,aux.BanishFilter(f,true,pos),tp,loc1,loc2,min,max,exc,e,tp)
 				if #g>0 then
-					local ct=Duel.Remove(g,POS_FACEUP,REASON_COST)
+					local ct=Duel.Remove(g,pos,REASON_COST)
 					return g,ct
 				end
 				return g,0
