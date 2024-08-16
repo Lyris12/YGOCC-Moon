@@ -203,28 +203,33 @@ function Auxiliary.TributeCost(f,min,max,exc)
 				return g,0
 			end
 end
-function Auxiliary.TributeGlitchyCost(f,min,max,exc,use_hand,use_oppo,exf,exloc1,exloc2,exmin,exmax,exexc,pretribute)
+--Remember to call aux.EnableGlobalEffectTributeOppoCost when using this to Tribute cards controlled by the opponent
+function Auxiliary.TributeGlitchyCost(f,min,max,exc,use_hand,use_oppo,exf,exloc1,exloc2,exmin,exmax,exexc,pretribute,gf,finishcon)
 	if not min then min=1 end
 	if not max then max=min end
 	local isfilter=type(f)=="function"
-	if (exloc1|exloc2)~=LOCATION_MZONE then
+	finishcon=finishcon==true and gf or finishcon
+	if exloc2&LOCATION_MZONE>0 then
+		aux.EnableGlobalEffectTributeOppoCost()
+	end
+	if gf or not (exloc1==0 and exloc2~=LOCATION_MZONE) then
 		return function(e,tp,eg,ep,ev,re,r,rp,chk)
 			if use_oppo then aux.TributeOppoCostFlag=true end
 			local g1=isfilter and Duel.GetReleaseGroup(tp) or Group.CreateGroup()
 			if exf then
-				local g2=Duel.Group(Card.IsReleasable,tp,exloc1,exloc2,exexc):Filter(exf,nil)
+				local g2=Duel.Group(Card.IsReleasable,tp,exloc1,exloc2,exexc):Filter(exf,nil,e,tp)
 				g1:Merge(g2)
 			end
 			if isfilter or exc then
 				g1=g1:Filter(f,exc,e,tp)
 			end
 			if chk==0 then
-				local res=#g1>0
+				local res=gf and aux.SelectUnselectGroup(g1,e,tp,min,max,gf,0) or #g1>=min
 				aux.TributeOppoCostFlag=false
 				return res
 			end
 			Duel.HintMessage(tp,HINTMSG_RELEASE)
-			local sg=g1:Select(tp,min,max,exc)
+			local sg=gf and aux.SelectUnselectGroup(g1,e,tp,min,max,gf,1,tp,HINTMSG_RELEASE,finishcon) or g1:Select(tp,min,max,exc)
 			aux.TributeOppoCostFlag=false
 			local exg=sg:Filter(Auxiliary.ExtraReleaseFilter,nil,tp)
 			for ec in Auxiliary.Next(exg) do
@@ -285,8 +290,9 @@ function Auxiliary.DetachSelfCost(min,max)
 	
 	if min==max then
 		return	function(e,tp,eg,ep,ev,re,r,rp,chk)
-					if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,min,REASON_COST) end
-					e:GetHandler():RemoveOverlayCard(tp,min,min,REASON_COST)
+					local c=e:GetHandler()
+					if chk==0 then return c:CheckRemoveOverlayCard(tp,min,REASON_COST) end
+					c:RemoveOverlayCard(tp,min,min,REASON_COST)
 				end
 	else
 		return	function(e,tp,eg,ep,ev,re,r,rp,chk)

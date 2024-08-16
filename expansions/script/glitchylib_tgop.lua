@@ -251,30 +251,6 @@ function Auxiliary.TargetOperation(op,f,hardchk,prechk,postchk)
 end
 
 -----------------------------------------------------------------------
---Infos
-function Duel.SetCardOperationInfo(g,cat)
-	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
-	return Duel.SetOperationInfo(0,cat,g,#g,g:GetFirst():GetControler(),g:GetFirst():GetLocation())
-end
-
-function Auxiliary.Info(ctg,ct,p,v)
-	return	function(_,e,tp)
-				local p=(p>1) and p or (p==0) and tp or (p==1) and 1-tp 
-				return Duel.SetOperationInfo(0,ctg,nil,ct,p,v)
-			end
-end
-function Auxiliary.DamageInfo(p,v)
-	return Auxiliary.Info(CATEGORY_DAMAGE,0,p,v)
-end
-function Auxiliary.DrawInfo(p,v)
-	return Auxiliary.Info(CATEGORY_DRAW,0,p,v)
-end
-function Auxiliary.MillInfo(p,v)
-	return Auxiliary.Info(CATEGORY_DECKDES,0,p,v)
-end
-function Auxiliary.RecoverInfo(p,v)
-	return Auxiliary.Info(CATEGORY_RECOVER,0,p,v)
-end
 
 function Auxiliary.HandlerInfo(ctg,custom)
 	if not custom then

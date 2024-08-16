@@ -48,6 +48,7 @@ function Card.UpdateDEFField(c,def,range,selfzones,oppozones,f,cond,reset,rc)
 	return e
 end
 function Card.UpdateATKDEFField(c,atk,def,range,selfzones,oppozones,f,cond,reset,rc)
+	def = def or atk
 	local e1=c:FieldEffect(EFFECT_UPDATE_ATTACK,range,selfzones,oppozones,f,atk,cond,reset,rc)
 	c:RegisterEffect(e1)
 	local e2=e1:Clone()

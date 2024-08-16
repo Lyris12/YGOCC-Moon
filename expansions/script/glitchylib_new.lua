@@ -42,6 +42,7 @@ EVENT_ACTIVATED_DIRECTLY = 61811408
 
 --Archetypes
 ARCHE_CRYSTRON						= 0xea
+ARCHE_FUSION						= 0x46
 ARCHE_GALAXY						= 0x7b
 ARCHE_GALAXY_EYES					= 0x107b
 ARCHE_LV							= 0x41
@@ -51,6 +52,7 @@ ARCHE_NUMBER_C39					= 0x5048
 ARCHE_PHOTON						= 0x55
 ARCHE_RUM							= 0x95
 ARCHE_UTOPIA						= 0x107f
+ARCHE_XYZ							= 0x73
 ARCHE_ZW							= 0x107e
 
 --Counters
@@ -60,7 +62,6 @@ COUNTER_ICE							= 0x1015
 CUSTOM_ARCHE_ZERO_HERO				= 0x1
 
 --Custom Cards
-ARCHE_FUSION		= 0x46
 ARCHE_PANDEMONIUM	= 0xf80
 ARCHE_BIGBANG		= 0xbba
 ARCHE_HYPERDRIVE	= 0x660
@@ -111,6 +112,7 @@ ARCHE_ORIGIN_DRAGON		= 0xfc1
 ARCHE_OSCURION			= 0x5a6
 ARCHE_QUARPHEX			= 0x1a4
 ARCHE_SCARLET_RED		= 0xd78
+ARCHE_SCELUSPECTER		= 0x304
 ARCHE_SILENT_STAR		= 0xd0a1
 ARCHE_SPECULOMIRIC		= 0x20c
 ARCHE_STAR_REGALIA		= 0xd0a2
@@ -172,8 +174,11 @@ CARD_MMS_JACKLYN_ALLTRADES						= 19905907
 CARD_MMS_SHERLOCK_HOLMES						= 19905908
 CARD_MONOCHROME_VALKYRIE_RK4					= 100000167
 CARD_MUSCWOLE_MURDERMANIA						= 70070078
+CARD_NUMBER_201									= 100000275
+CARD_NUMBER_C201								= 100000276
 CARD_NUMBER_203_ARCHANGEL_OF_VERDANSE			= 100000225
 CARD_NUMBER_206_XEENAFAE						= 91630826
+CARD_NUMBER_I208								= 100000277
 CARD_NUMBER_I209_FALLEN_OF_VERDANSE				= 100000227
 CARD_OSCURION_TYPE0								= 11110633
 CARD_OSCURION_TYPE2								= 11110634
@@ -182,6 +187,7 @@ CARD_ROI_DU_VAISSEAU							= 100000035
 CARD_RUM_DREAM_DISTILL_FORCE					= 39518
 CARD_RUM_RITUAL_OF_VERDANSE						= 100000220
 CARD_SACRED_EFFIGY_OF_WATER						= 34848
+CARD_SCELUSCEPTER_DOOMED_BASTILLE				= 100000267
 CARD_SISTERS_OF_HARMONY							= 100000144
 CARD_SPACE_VALKYR								= 11210118
 CARD_SPARK_OF_THE_PRIMORDIAL_SUN				= 85120900
@@ -216,6 +222,7 @@ COUNTER_CURSEFLAME					= 0x1a56
 COUNTER_ICE_PRISON					= 0x1301
 
 ----Specific
+COUNTER_BLADE						= 0x304
 COUNTER_EFFLUVIAL					= 0x2e7
 COUNTER_ENGAGED_MASS				= 0xe67
 COUNTER_JEWEL						= 0x34f
@@ -562,6 +569,31 @@ function Effect.IsHasCustomCategory(e,cat1,cat2)
 	return (cat1 and ocat1&cat1>0) or (cat2 and ocat2&cat2>0)
 end
 
+--Operation Infos
+function Duel.SetCardOperationInfo(g,cat)
+	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
+	return Duel.SetOperationInfo(0,cat,g,#g,g:GetFirst():GetControler(),g:GetFirst():GetLocation())
+end
+
+function Auxiliary.Info(ctg,ct,p,v)
+	return	function(_,e,tp)
+				local p=(p>1) and p or (p==0) and tp or (p==1) and 1-tp 
+				return Duel.SetOperationInfo(0,ctg,nil,ct,p,v)
+			end
+end
+function Auxiliary.DamageInfo(p,v)
+	return Auxiliary.Info(CATEGORY_DAMAGE,0,p,v)
+end
+function Auxiliary.DrawInfo(p,v)
+	return Auxiliary.Info(CATEGORY_DRAW,0,p,v)
+end
+function Auxiliary.MillInfo(p,v)
+	return Auxiliary.Info(CATEGORY_DECKDES,0,p,v)
+end
+function Auxiliary.RecoverInfo(p,v)
+	return Auxiliary.Info(CATEGORY_RECOVER,0,p,v)
+end
+
 --New Operation Infos
 function Auxiliary.ClearCustomOperationInfo(e,tp,eg,ep,ev,re,r,rp)
 	for _,chtab in pairs(global_effect_info_table) do
@@ -750,8 +782,15 @@ function Card.IsDirectlyActivatable(c,tp,ignore_loc)
 	return e and (c:IsType(TYPE_FIELD) or ignore_loc or Duel.GetLocationCount(tp,LOCATION_SZONE)>0) and e:IsActivatable(tp,true,true)
 end
 
-function Duel.Attach(c,xyz,transfer)
+--Attach as material
+function Card.IsCanBeAttachedTo(c,xyzc,e,p,r)
+	return c:IsCanOverlay(xyzc:GetControler()) and not c:IsForbidden() --futureproofing
+end
+function Duel.Attach(c,xyz,transfer,e,r,rp)
 	if aux.GetValueType(c)=="Card" then
+		if e and r&REASON_EFFECT>0 and c:IsImmuneToEffect(e) then
+			return false
+		end
 		local og=c:GetOverlayGroup()
 		if #og>0 then
 			if transfer then
@@ -766,11 +805,13 @@ function Duel.Attach(c,xyz,transfer)
 	elseif aux.GetValueType(c)=="Group" then
 		for tc in aux.Next(c) do
 			local og=tc:GetOverlayGroup()
-			if #og>0 then
-				if transfer then
-					Duel.Overlay(xyz,og)
-				else
-					Duel.SendtoGrave(og,REASON_RULE)
+			if not (e and r&REASON_EFFECT>0 and tc:IsImmuneToEffect(e)) then
+				if #og>0 then
+					if transfer then
+						Duel.Overlay(xyz,og)
+					else
+						Duel.SendtoGrave(og,REASON_RULE)
+					end
 				end
 			end
 		end
@@ -1010,7 +1051,8 @@ function Auxiliary.ReturnLabelObjectToFieldOp(id,lingering_effect_to_reset)
 			end
 end
 
---For cards that equip other cards to themselves ONLY
+--EQUIP
+----For cards that equip other cards to themselves ONLY
 function Duel.EquipAndRegisterLimit(e,p,be_equip,equip_to,...)
 	local res=Duel.Equip(p,be_equip,equip_to,...)
 	if res and equip_to:GetEquipGroup():IsContains(be_equip) then
@@ -1028,7 +1070,7 @@ function Duel.EquipAndRegisterLimit(e,p,be_equip,equip_to,...)
 	end
 	return false
 end
---For effects that equip a card to another card
+----For effects that equip a card to another card
 function Duel.EquipToOtherCardAndRegisterLimit(e,p,be_equip,equip_to,...)
 	local res=Duel.Equip(p,be_equip,equip_to,...)
 	if res and equip_to:GetEquipGroup():IsContains(be_equip) then
@@ -1061,6 +1103,17 @@ function Duel.EquipAndRegisterCustomLimit(f,p,be_equip,equip_to,...)
 	return res and equip_to:GetEquipGroup():IsContains(be_equip)
 end
 
+----Equip-related filters
+function Card.IsAppropriateEquipSpell(c,ec,tp)
+	return c:IsSpell(TYPE_EQUIP) and c:CheckEquipTarget(ec) and c:CheckUniqueOnField(tp,LOCATION_SZONE) and not c:IsForbidden()
+end
+function Card.IsCanBeEquippedWith(c,ec,e,p,r)
+	return c:IsFaceup() and (not ec or (not ec:IsForbidden() and ec:CheckUniqueOnField(p,LOCATION_SZONE)))
+	--futureproofing (more checks could be added in the future)
+end
+
+
+--
 function Card.Recreate(c,...)
 	local x={...}
 	if #x==0 then return end
@@ -1072,6 +1125,8 @@ function Card.Recreate(c,...)
 	end
 end
 
+
+--NEGATES
 function Card.CheckNegateConjunction(c,e1,e2,e3)
 	return not c:IsImmuneToEffect(e1) and not c:IsImmuneToEffect(e2) and (not e3 or not c:IsImmuneToEffect(e3))
 end
@@ -1161,9 +1216,13 @@ function Duel.NegateInGY(tc,e,reset)
 	tc:RegisterEffect(e2)
 	return e1,e2
 end
+
+--POSITION
 function Duel.PositionChange(c)
 	return Duel.ChangePosition(c,POS_FACEUP_DEFENSE,POS_FACEDOWN_DEFENSE,POS_FACEUP_ATTACK,POS_FACEUP_ATTACK)
 end
+
+--SEARCHING AND CHECKS
 function Duel.Search(g,_,p,r)
 	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
 	if not r then r=REASON_EFFECT end
@@ -1221,6 +1280,7 @@ function Duel.SendtoGraveAndCheck(g,p,r)
 	return #cg>0
 end
 
+--RETURN TO DECK
 function Duel.ShuffleIntoDeck(g,p,loc,seq,r,f)
 	if not loc then loc=LOCATION_DECK|LOCATION_EXTRA end
 	if not seq then seq=SEQ_DECKSHUFFLE end
@@ -1271,6 +1331,7 @@ function Duel.PlaceOnTopOrBottomOfDeck(g,tp,p)
 	return ct
 end
 
+--OPERATION CHECKS
 function Auxiliary.PLChk(c,p,loc,min,pos)
 	if aux.GetValueType(c)=="Card" then
 		if min and not pos then pos=min end
@@ -1304,6 +1365,14 @@ function Auxiliary.BecauseOfThisCost(e)
 end
 function Duel.GetGroupOperatedByThisCost(e,exc)
 	return Duel.GetOperatedGroup():Filter(aux.BecauseOfThisCost(e),exc)
+end
+function Auxiliary.BecauseOfThisRule(e)
+	return	function(c)
+				return c:IsReason(REASON_RULE) and not c:IsReason(REASON_REDIRECT) and c:GetReasonEffect()==e
+			end
+end
+function Duel.GetGroupOperatedByThisRule(e,exc)
+	return Duel.GetOperatedGroup():Filter(aux.BecauseOfThisRule(e),exc)
 end
 
 --Battle Phase
@@ -1353,10 +1422,6 @@ end
 
 function Card.IsAttributeRace(c,attr,race)
 	return c:IsAttribute(attr) and c:IsRace(race)
-end
-
-function Card.IsAppropriateEquipSpell(c,ec,tp)
-	return c:IsSpell(TYPE_EQUIP) and c:CheckEquipTarget(ec) and c:CheckUniqueOnField(tp) and not c:IsForbidden()
 end
 
 function Card.HasAttack(c)
@@ -1620,6 +1685,18 @@ function Duel.GetTargetParam()
 	return Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)
 end
 
+function Effect.GetChainLink(e)
+	local max=Duel.GetCurrentChain()
+	if max==0 then return 0 end
+	for i=1,max do
+		local ce=Duel.GetChainInfo(i,CHAININFO_TRIGGERING_EFFECT)
+		if ce==e then
+			return i
+		end
+	end
+	return 0
+end
+
 --Cloned Effects
 function Effect.QuickEffectClone(e,c,cond,notreg)
 	local ex=e:Clone()
@@ -1785,7 +1862,7 @@ function Card.GlitchyGetPreviousColumnGroup(c,left,right,without_center)
 end
 
 --Continuous Effects
-function Auxiliary.RegisterMaxxCEffect(c,id,p,range,event,cond,outchainop,inchainop,flaglabel,reset,flagreset)
+function Auxiliary.RegisterMaxxCEffect(c,id,p,range,event,cond,outchainop,inchainop,flaglabel,reset,flagreset,label,labelobj)
 	local rct,flagrct=1,1
 	if type(reset)=="table" then
 		rct=reset[2]
@@ -1801,6 +1878,12 @@ function Auxiliary.RegisterMaxxCEffect(c,id,p,range,event,cond,outchainop,inchai
 	e2:SetProperty(EFFECT_FLAG_DELAY)
 	e2:SetCondition(aux.OutsideChainMaxxCCondition(cond))
 	e2:SetOperation(outchainop)
+	if label then
+		e2:SetLabel(label)
+	end
+	if labelobj then
+		e2:SetLabelObject(labelobj)
+	end
 	if reset then
 		e2:SetReset(reset,rct)
 	end
@@ -1816,6 +1899,12 @@ function Auxiliary.RegisterMaxxCEffect(c,id,p,range,event,cond,outchainop,inchai
 	e3:SetCode(event)
 	e3:SetCondition(aux.InsideChainMaxxCCondition(cond))
 	e3:SetOperation(aux.RegisterMaxxCFlag(id,flaglabel,flagreset,flagrct))
+	if label then
+		e3:SetLabel(label)
+	end
+	if labelobj then
+		e3:SetLabelObject(labelobj)
+	end
 	if reset then
 		e3:SetReset(reset,rct)
 	end
@@ -1829,8 +1918,14 @@ function Auxiliary.RegisterMaxxCEffect(c,id,p,range,event,cond,outchainop,inchai
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_CONTINUOUS|EFFECT_TYPE_FIELD)
 	e4:SetCode(EVENT_CHAIN_SOLVED)
-	e4:SetCondition(aux.MaxxCFlagCondition(id))
+	e4:SetCondition(aux.MaxxCFlagCondition(id,cond))
 	e4:SetOperation(aux.ResolvedChainMaxxCOperation(id,inchainop))
+	if label then
+		e4:SetLabel(label)
+	end
+	if labelobj then
+		e4:SetLabelObject(labelobj)
+	end
 	if reset then
 		e4:SetReset(reset,rct)
 	end
@@ -1840,6 +1935,8 @@ function Auxiliary.RegisterMaxxCEffect(c,id,p,range,event,cond,outchainop,inchai
 		e4:SetRange(range)
 		c:RegisterEffect(e4)
 	end
+	
+	return e2,e3,e4
 end
 function Auxiliary.OutsideChainMaxxCCondition(cond)
 	return	function(e,tp,eg,ep,ev,re,r,rp)
@@ -1864,7 +1961,7 @@ function Auxiliary.RegisterMaxxCFlag(id,flaglabel,reset,rct)
 end
 function Auxiliary.MaxxCFlagCondition(id)
 	return	function(e,tp,eg,ep,ev,re,r,rp)
-				return Duel.PlayerHasFlagEffect(tp,id)
+				return (not cond or cond(e,tp,eg,ep,ev,re,r,rp)) and Duel.PlayerHasFlagEffect(tp,id)
 			end
 end
 function Auxiliary.ResolvedChainMaxxCOperation(id,op)
@@ -1873,6 +1970,14 @@ function Auxiliary.ResolvedChainMaxxCOperation(id,op)
 				op(e,tp,eg,ep,ev,re,r,rp,n)
 				Duel.ResetFlagEffect(tp,id)
 			end
+end
+
+--Control
+function Card.CanOnlyControlOne(c,id)
+	return c:SetUniqueOnField(1,0,id)
+end
+function Card.OnlyOneOnField(c,id)
+	return c:SetUniqueOnField(1,1,id)
 end
 
 --Counters
@@ -2337,9 +2442,25 @@ function Auxiliary.SelectUnselectGroup(g,e,tp,minc,maxc,rescon,chk,seltp,hintmsg
 end
 --check for Free Monster Zones
 function Auxiliary.ChkfMMZ(sumcount)
-	return	function(sg,e,tp,mg)
-				return Duel.GetMZoneCount(tp,sg)>=sumcount
+	sumcount=sumcount or 1
+	return	function(g,e,tp,mg)
+				return Duel.GetMZoneCount(tp,g)>=sumcount
 			end
+end
+function Auxiliary.ChkfMMZRel(sumcount,reason)
+	sumcount=sumcount or 1
+	reason=reason or REASON_COST
+	return	function(g,e,tp,mg)
+				return Duel.GetMZoneCount(tp,g)>=sumcount and Duel.CheckReleaseGroupEx(tp,Auxiliary.IsInGroup,#g,reason,false,nil,g)
+			end
+end
+function Auxiliary.dncheckbrk(g,e,tp,mg,c)
+	local res=g:GetClassCount(Card.GetCode)==#g
+	return res, not res
+end
+function Auxiliary.ogdncheckbrk(g,e,tp,mg,c)
+	local res=g:GetClassCount(Card.GetOriginalCodeRule)==#g
+	return res, not res
 end
 
 --Excavate
@@ -3149,20 +3270,23 @@ function Auxiliary.CannotBeTributeOrMaterial(c)
 	c:RegisterEffect(e6)
 end
 
-function Auxiliary.FieldCannotBeTributeOrMaterial(c,range,trange1,trange2,f)
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetRange(range)
-	e1:SetCode(EFFECT_UNRELEASABLE_SUM)
-	e1:SetTargetRange(trange1,trange2)
-	if f then
-		e1:SetTarget(f)
+function Auxiliary.FieldCannotBeTributeOrMaterial(c,range,trange1,trange2,f,exclude)
+	exclude = exclude or 0
+	if exclude&TYPE_NORMAL==0 then
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_FIELD)
+		e1:SetRange(range)
+		e1:SetCode(EFFECT_UNRELEASABLE_SUM)
+		e1:SetTargetRange(trange1,trange2)
+		if f then
+			e1:SetTarget(f)
+		end
+		e1:SetValue(1)
+		c:RegisterEffect(e1)
+		local e2=e1:Clone()
+		e2:SetCode(EFFECT_UNRELEASABLE_NONSUM)
+		c:RegisterEffect(e2)
 	end
-	e1:SetValue(1)
-	c:RegisterEffect(e1)
-	local e2=e1:Clone()
-	e2:SetCode(EFFECT_UNRELEASABLE_NONSUM)
-	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD)
 	e3:SetRange(range)
@@ -3172,16 +3296,27 @@ function Auxiliary.FieldCannotBeTributeOrMaterial(c,range,trange1,trange2,f)
 		e3:SetTarget(f)
 	end
 	e3:SetValue(1)
-	c:RegisterEffect(e3)
+	if exclude&TYPE_FUSION==0 then
+		c:RegisterEffect(e3)
+	end
+	
 	local e4=e3:Clone()
 	e4:SetCode(EFFECT_CANNOT_BE_SYNCHRO_MATERIAL)
-	c:RegisterEffect(e4)
-	local e5=e4:Clone()
-	e5:SetCode(EFFECT_CANNOT_BE_XYZ_MATERIAL)
-	c:RegisterEffect(e5)
-	local e6=e4:Clone()
-	e6:SetCode(EFFECT_CANNOT_BE_LINK_MATERIAL)
-	c:RegisterEffect(e6)
+	if exclude&TYPE_SYNCHRO==0 then
+		c:RegisterEffect(e4)
+	end
+	
+	if exclude&TYPE_XYZ==0 then
+		local e5=e4:Clone()
+		e5:SetCode(EFFECT_CANNOT_BE_XYZ_MATERIAL)
+		c:RegisterEffect(e5)
+	end
+	
+	if exclude&TYPE_LINK==0 then
+		local e6=e4:Clone()
+		e6:SetCode(EFFECT_CANNOT_BE_LINK_MATERIAL)
+		c:RegisterEffect(e6)
+	end
 end
 
 function Auxiliary.PlayerCannotTributeOrUseAsMaterial(c,range,s,o,trange1,trange2,f)
@@ -3527,6 +3662,16 @@ function Duel.PlaceAsContinuousCard(g,movep,recp,owner,type,desc,...)
 end
 
 --redirect
+function Card.IsAbleToLocationAsCost(c,loc)
+	local loclist={
+		[LOCATION_HAND]=Card.IsAbleToHandAsCost;
+		[LOCATION_GRAVE]=Card.IsAbleToGraveAsCost;
+		[LOCATION_DECK]=Card.IsAbleToDeckAsCost;
+		[LOCATION_EXTRA]=Card.IsAbleToExtraAsCost;
+		[LOCATION_REMOVED]=Card.IsAbleToRemoveAsCost;
+	}
+	return loclist[loc](c)
+end
 function Card.GetDestinationReset(c)
 	if c:IsOriginalType(TYPE_TOKEN) then return 0 end
 	local dest=c:GetDestination()
@@ -3663,6 +3808,14 @@ function Auxiliary.RemainOnFieldCostFunction(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetOwner():IsRelateToChain(ev) then
 		e:GetOwner():CancelToGrave(false)
 	end
+end
+
+--RETURN TO GRAVE
+function Card.IsAbleToReturnToGrave(c,e,p,r)
+	return true --futureproofing
+end
+function Card.IsAbleToReturnToGraveAsCost(c,e,p)
+	return true --futureproofing
 end
 
 --Set Backrow
@@ -4085,6 +4238,27 @@ function Auxiliary.ThisCardInLocationAlreadyReset2(getf)
 				e1:Reset()
 				e:Reset()
 			end
+end
+
+--XYZ
+function Card.GetXyzLevel(c,xyzc)
+	local eset={c:IsHasEffect(EFFECT_XYZ_LEVEL)}
+	if #eset==0 then
+		return c:GetLevel()
+	else
+		local levels={}
+		for _,ce in ipairs(eset) do
+			local level=ce:Evaluate(c,xyzc)
+			local lv1,lv2=level&0xffff,(level>>16)&0xffff
+			if not aux.FindInTable(levels,lv1) then
+				table.insert(levels,lv1)
+			end
+			if lv2~=0 and not aux.FindInTable(levels,lv2) then
+				table.insert(levels,lv2)
+			end
+		end
+		return table.unpack(levels)
+	end
 end
 
 -----------------------------------------------------------------------
