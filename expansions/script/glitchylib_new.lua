@@ -46,11 +46,14 @@ ARCHE_FUSION						= 0x46
 ARCHE_GALAXY						= 0x7b
 ARCHE_GALAXY_EYES					= 0x107b
 ARCHE_LV							= 0x41
+ARCHE_MAGISTUS						= 0x150
 ARCHE_NUMBER						= 0x48
 ARCHE_NUMBER_C						= 0x1048
 ARCHE_NUMBER_C39					= 0x5048
 ARCHE_PHOTON						= 0x55
+ARCHE_PROPHECY						= 0x6e
 ARCHE_RUM							= 0x95
+ARCHE_SPELLBOOK						= 0x106e
 ARCHE_UTOPIA						= 0x107f
 ARCHE_XYZ							= 0x73
 ARCHE_ZW							= 0x107e
@@ -388,6 +391,10 @@ WIN_REASON_CUSTOM = 0xff
 --constants aliases
 TYPE_ST			= TYPE_SPELL|TYPE_TRAP
 TYPE_GEMINI		= TYPE_DUAL
+
+SUBTYPES_SPELL	= TYPE_CONTINUOUS|TYPE_RITUAL|TYPE_QUICKPLAY|TYPE_FIELD|TYPE_EQUIP
+SUBTYPES_TRAP	= TYPE_CONTINUOUS|TYPE_COUNTER
+SUBTYPES_ST		= TYPE_CONTINUOUS|TYPE_COUNTER|TYPE_RITUAL|TYPE_QUICKPLAY|TYPE_FIELD|TYPE_EQUIP
 
 ATTRIBUTES_CHAOS = ATTRIBUTE_LIGHT|ATTRIBUTE_DARK
 
@@ -1107,8 +1114,8 @@ end
 function Card.IsAppropriateEquipSpell(c,ec,tp)
 	return c:IsSpell(TYPE_EQUIP) and c:CheckEquipTarget(ec) and c:CheckUniqueOnField(tp,LOCATION_SZONE) and not c:IsForbidden()
 end
-function Card.IsCanBeEquippedWith(c,ec,e,p,r)
-	return c:IsFaceup() and (not ec or (not ec:IsForbidden() and ec:CheckUniqueOnField(p,LOCATION_SZONE)))
+function Card.IsCanBeEquippedWith(c,ec,e,p,r,ignore_faceup)
+	return (ignore_faceup or c:IsFaceup()) and (not ec or (not ec:IsForbidden() and ec:CheckUniqueOnField(p,LOCATION_SZONE)))
 	--futureproofing (more checks could be added in the future)
 end
 
@@ -1424,24 +1431,51 @@ function Card.IsAttributeRace(c,attr,race)
 	return c:IsAttribute(attr) and c:IsRace(race)
 end
 
+--Stats modifiers (futureproofing)
 function Card.HasAttack(c)
 	return c:IsMonster()
 end
+function Card.HasATK(c)
+	return c:HasAttack()
+end
+function Card.IsCanUpdateATK(c,atk,e,tp,r,exactly)
+	return c:IsFaceup() and c:HasATK() and (not exactly or atk>=0 or c:IsAttackAbove(-atk))
+end
 function Card.IsCanChangeAttack(c,atk)
-	return c:IsFaceup() and c:HasAttack()
+	return c:IsFaceup() and c:HasATK() and (not atk or not c:IsAttack(atk))
+end
+function Card.IsCanChangeATK(c,atk,e,tp,r)
+	return c:IsCanChangeAttack(atk,e,tp,r)
 end
 
 function Card.HasDefense(c)
 	return c:IsMonster() and not c:IsOriginalType(TYPE_LINK)
 end
+function Card.HasDEF(c)
+	return c:HasDefense()
+end
+function Card.IsCanUpdateDEF(c,def,e,tp,r,exactly)
+	return c:IsFaceup() and c:HasDEF() (not exactly or def>=0 or c:IsDefenseAbove(-def))
+end
 function Card.IsCanChangeDefense(c,def)
-	return c:IsFaceup() and c:HasDefense()
+	return c:IsFaceup() and c:HasDEF() and (not def or not c:IsDefense(def))
+end
+function Card.IsCanChangeDEF(c,def,e,tp,r)
+	return c:IsCanChangeDefense(def,e,tp,r)
 end
 
-function Card.IsCanChangeStats(c,atk,def)
-	return c:IsFaceup() and (c:HasAttack() or c:HasDefense())
+function Card.IsCanChangeStats(c,atk,def,e,tp,r)
+	return c:IsCanChangeATK(atk,e,tp,r) or c:IsCanChangeDEF(def,e,tp,r)
+end
+function Card.IsCanUpdateStats(c,atk,def,e,tp,r,exactly)
+	return c:IsCanUpdateATK(atk,e,tp,r) or c:IsCanUpdateDEF(def,e,tp,r)
 end
 
+function Card.IsCanChangeLevel(c,lv,e,tp,r)
+	return c:HasLevel() and not c:IsLevel(lv)
+end
+
+--
 function Card.HasRank(c)
 	return c:IsOriginalType(TYPE_XYZ)
 end
@@ -3987,19 +4021,87 @@ function Duel.SpecialSummonATKDEF(e,g,styp,sump,tp,ign1,ign2,pos,zone,atk,def,re
 			e:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 			e:SetReset(RESET_EVENT|RESETS_STANDARD|reset)
 			if atk then
-				e:SetCode(EFFECT_SET_ATTACK)
+				e:SetCode(EFFECT_SET_ATTACK_FINAL)
 				e:SetValue(atk)
 				dg:RegisterEffect(e,true)
 			end
 			if def then
 				local e=e:Clone()
-				e:SetCode(EFFECT_SET_DEFENSE)
+				e:SetCode(EFFECT_SET_DEFENSE_FINAL)
 				e:SetValue(def)
 				dg:RegisterEffect(e,true)
 			end
 		end
 	end
 	return Duel.SpecialSummonComplete()
+end
+
+SPSUM_MOD_NEGATE   		= 0x1
+SPSUM_MOD_REDIRECT 		= 0x2
+SPSUM_MOD_CHANGE_ATKDEF	=	0x4
+
+function Duel.SpecialSummonMod(e,g,styp,sump,tp,ign1,ign2,pos,zone,...)
+	local mods={...}
+	for i,mod in ipairs(mods) do
+		--tables are expected as ...
+		local obj=mod[1]
+		if obj==SPSUM_MOD_NEGATE then
+			mods[i][1]={EFFECT_DISABLE,EFFECT_DISABLE_EFFECT}
+		elseif obj==SPSUM_MOD_REDIRECT then
+			mods[i][1]={EFFECT_LEAVE_FIELD_REDIRECT}
+		elseif obj==SPSUM_MOD_CHANGE_ATKDEF then
+			mods[i][1]={EFFECT_SET_ATTACK_FINAL,EFFECT_SET_DEFENSE_FINAL}
+		end
+	end
+	
+	if not zone then zone=0xff end
+	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
+	local ct=0
+	for dg in aux.Next(g) do
+		local finalzone=zone
+		if type(zone)=="table" then
+			finalzone=zone[tp+1]
+			if tc:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos,1-tp,zone[2-tp]) and (not tc:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos,tp,finalzone) or Duel.SelectYesNo(sump,aux.Stringid(61665245,2))) then
+				tp=1-tp
+				finalzone=zone[tp+1]
+			end
+		end
+		
+		local c=e:GetHandler()
+		local selfchk=#g==1 and g:GetFirst()==c
+		
+		if Duel.SpecialSummonStep(dg,styp,sump,tp,ign1,ign2,pos,finalzone) then
+			ct=ct+1
+			for i,mod in ipairs(mods) do
+				local code=mod[1]
+				local val=#mod>1 and mod[2] or nil
+				local reset=#mod>2 and mod[3] or 0
+				if selfchk then
+					reset=reset|RESET_DISABLE
+				end
+				
+				for _,cd in ipairs(code) do
+					local e1=Effect.CreateEffect(c)
+					e1:SetType(EFFECT_TYPE_SINGLE)
+					e1:SetCode(cd)
+					if cd==EFFECT_LEAVE_FIELD_REDIRECT then
+						e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+					elseif cd==EFFECT_SET_ATTACK_FINAL or cd==EFFECT_SET_DEFENSE_FINAL then
+						local prop=reset&RESET_DISABLE==0 and EFFECT_FLAG_IGNORE_IMMUNE|EFFECT_FLAG_CANNOT_DISABLE or EFFECT_FLAG_IGNORE_IMMUNE
+						e1:SetProperty(prop)
+					end
+					if val then
+						e1:SetValue(val)
+					end
+					e1:SetReset(RESET_EVENT|RESETS_STANDARD|reset)
+					dg:RegisterEffect(e1)
+				end
+				
+			end
+		end
+	end
+	Duel.SpecialSummonComplete()
+	return ct
 end
 
 --Special Summon Procedures and After Effect Resolution

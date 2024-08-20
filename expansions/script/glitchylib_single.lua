@@ -1058,7 +1058,6 @@ function Card.ChangeLevel(c,lv,reset,rc,range,cond,prop,desc)
 	end
 	
 	local donotdisable=false
-	local rc = rc and rc or c
     local rct=1
     if type(reset)=="table" then
         rct=reset[2]
@@ -1069,6 +1068,7 @@ function Card.ChangeLevel(c,lv,reset,rc,range,cond,prop,desc)
         donotdisable=rc[2]
         rc=rc[1]
     end
+	local rc = rc and rc or c
 	
 	if not prop then prop=0 end
 	

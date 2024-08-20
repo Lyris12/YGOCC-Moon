@@ -172,7 +172,8 @@ dofile("expansions/script/glitchylib_trigger.lua") --Glitchy's Trigger Effects
 dofile("expansions/script/glitchylib_global.lua") --Glitchy's Global Effects
 dofile("expansions/script/glitchylib_cond.lua") --Glitchy's Conditions
 dofile("expansions/script/glitchylib_cost.lua") --Glitchy's Costs
-dofile("expansions/script/glitchylib_tgop.lua") --Glitchy's Target+Operations
+dofile("expansions/script/glitchylib_tgop.lua") --Glitchy's Target+Operations (will be deprecated once all scripts that use these functions are updated)
+dofile("expansions/script/glitchylib_activated.lua") --Glitchy's shortcuts for common activated effects
 
 dofile("expansions/script/proc_evolute.lua") --Evolutes				0 x 1 0000 0000
 dofile("expansions/script/proc_pandemonium.lua") --Pandemoniums		0 x 2 0000 0000
@@ -2508,7 +2509,7 @@ if not global_card_effect_table_global_check then
 		end
 		
 		local condition,cost,tg,op,val=e:GetCondition(),e:GetCost(),e:GetTarget(),e:GetOperation(),e:GetValue()
-		if condition and ((code==EFFECT_SPSUMMON_PROC or code==EFFECT_SPSUMMON_PROC_G) or not (typ==EFFECT_TYPE_FIELD or typ==EFFECT_TYPE_SINGLE or typ==EFFECT_TYPE_XMATERIAL or typ==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or typ&EFFECT_TYPE_GRANT~=0)) then	
+		if condition and ((code==EFFECT_SPSUMMON_PROC or code==EFFECT_SPSUMMON_PROC_G) or not (typ==EFFECT_TYPE_XMATERIAL or typ==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or typ&EFFECT_TYPE_GRANT~=0)) then	
 			local newcon =	function(...)
 								local x={...}
 								self_reference_effect=x[1]
@@ -2526,7 +2527,7 @@ if not global_card_effect_table_global_check then
 							end
 			e:SetCondition(newcon)
 		end
-		if cost and not (typ==EFFECT_TYPE_FIELD or typ==EFFECT_TYPE_SINGLE or typ==EFFECT_TYPE_XMATERIAL or typ==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or typ&EFFECT_TYPE_GRANT~=0) then
+		if cost and not (typ==EFFECT_TYPE_XMATERIAL or typ==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or typ&EFFECT_TYPE_GRANT~=0) then
 			local newcost =	function(...)
 								local x={...}
 								self_reference_effect=x[1]
@@ -2555,7 +2556,7 @@ if not global_card_effect_table_global_check then
 									return tg(table.unpack(x))
 								end
 				e:SetTarget(newtg)
-			elseif code==EFFECT_SPSUMMON_PROC or code==EFFECT_SPSUMMON_PROC_G or not (typ==EFFECT_TYPE_FIELD or typ==EFFECT_TYPE_SINGLE or typ==EFFECT_TYPE_XMATERIAL or typ==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or typ&EFFECT_TYPE_GRANT~=0) then
+			elseif code==EFFECT_SPSUMMON_PROC or code==EFFECT_SPSUMMON_PROC_G or not (typ==EFFECT_TYPE_XMATERIAL or typ==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or typ&EFFECT_TYPE_GRANT~=0) then
 				local newtg =	function(...)
 									local x={...}
 									self_reference_effect=x[1]
@@ -2577,7 +2578,7 @@ if not global_card_effect_table_global_check then
 				e:SetTarget(newtg)
 			end
 		end
-		if op and ((code==EFFECT_SPSUMMON_PROC or code==EFFECT_SPSUMMON_PROC_G) or not (typ==EFFECT_TYPE_FIELD or typ==EFFECT_TYPE_SINGLE or typ==EFFECT_TYPE_XMATERIAL or typ==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or typ&EFFECT_TYPE_GRANT~=0)) then
+		if op and ((code==EFFECT_SPSUMMON_PROC or code==EFFECT_SPSUMMON_PROC_G) or not (typ==EFFECT_TYPE_XMATERIAL or typ==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or typ&EFFECT_TYPE_GRANT~=0)) then
 			local newop =	function(...)
 								local x={...}
 								self_reference_effect = x[1]
@@ -2596,7 +2597,7 @@ if not global_card_effect_table_global_check then
 			e:SetOperation(newop)
 		end
 		if val then
-			if type(val)=="function" and ((code==EFFECT_SPSUMMON_PROC or code==EFFECT_SPSUMMON_PROC_G) or not (typ==EFFECT_TYPE_FIELD or typ==EFFECT_TYPE_SINGLE or typ==EFFECT_TYPE_XMATERIAL or typ==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or typ&EFFECT_TYPE_GRANT~=0)) then
+			if type(val)=="function" and ((code==EFFECT_SPSUMMON_PROC or code==EFFECT_SPSUMMON_PROC_G) or not (typ==EFFECT_TYPE_XMATERIAL or typ==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or typ&EFFECT_TYPE_GRANT~=0)) then
 				local newval =	function(...)
 									self_reference_effect=e
 									current_triggering_player = self_reference_effect:GetHandlerPlayer()
@@ -2751,7 +2752,7 @@ if not global_duel_effect_table_global_check then
 							
 							
 							local condition,cost,tg,op,val = e:GetCondition(),e:GetCost(),e:GetTarget(),e:GetOperation(),e:GetValue()
-							if condition and ((code==EFFECT_SPSUMMON_PROC or code==EFFECT_SPSUMMON_PROC_G) or not (typ==EFFECT_TYPE_FIELD or typ==EFFECT_TYPE_SINGLE or typ&EFFECT_TYPE_GRANT~=0)) then
+							if condition and ((code==EFFECT_SPSUMMON_PROC or code==EFFECT_SPSUMMON_PROC_G) or not (typ&EFFECT_TYPE_GRANT~=0)) then
 								local newcon =	function(...)
 													local x={...}
 													self_reference_effect=x[1]
@@ -2769,7 +2770,7 @@ if not global_duel_effect_table_global_check then
 												end
 								e:SetCondition(newcon)
 							end
-							if cost and ((code==EFFECT_SPSUMMON_PROC or code==EFFECT_SPSUMMON_PROC_G) or not (typ==EFFECT_TYPE_FIELD or typ==EFFECT_TYPE_SINGLE or typ&EFFECT_TYPE_GRANT~=0)) then
+							if cost and ((code==EFFECT_SPSUMMON_PROC or code==EFFECT_SPSUMMON_PROC_G) or not (typ&EFFECT_TYPE_GRANT~=0)) then
 								local newcost =	function(...)
 													local x={...}
 													self_reference_effect=x[1]
@@ -2798,7 +2799,7 @@ if not global_duel_effect_table_global_check then
 													end
 									e:SetTarget(newtg)
 									
-								elseif code==EFFECT_SPSUMMON_PROC or code==EFFECT_SPSUMMON_PROC_G or not (typ==EFFECT_TYPE_FIELD or typ==EFFECT_TYPE_SINGLE or typ&EFFECT_TYPE_GRANT~=0) then
+								elseif code==EFFECT_SPSUMMON_PROC or code==EFFECT_SPSUMMON_PROC_G or not (typ&EFFECT_TYPE_GRANT~=0) then
 									local newtg =	function(...)
 														local x={...}
 														self_reference_effect=x[1]
@@ -2817,7 +2818,7 @@ if not global_duel_effect_table_global_check then
 									e:SetTarget(newtg)
 								end
 							end
-							if op and ((code==EFFECT_SPSUMMON_PROC or code==EFFECT_SPSUMMON_PROC_G) or not (typ==EFFECT_TYPE_FIELD or typ==EFFECT_TYPE_SINGLE or typ&EFFECT_TYPE_GRANT~=0)) then
+							if op and ((code==EFFECT_SPSUMMON_PROC or code==EFFECT_SPSUMMON_PROC_G) or not (typ&EFFECT_TYPE_GRANT~=0)) then
 								local newop =	function(...)
 													local x={...}
 													self_reference_effect=x[1]
@@ -2836,7 +2837,7 @@ if not global_duel_effect_table_global_check then
 								e:SetOperation(newop)
 							end
 							if val then
-								if type(val)=="function" and ((code==EFFECT_SPSUMMON_PROC or code==EFFECT_SPSUMMON_PROC_G) or not (typ==EFFECT_TYPE_FIELD or typ==EFFECT_TYPE_SINGLE or typ&EFFECT_TYPE_GRANT~=0)) then
+								if type(val)=="function" and ((code==EFFECT_SPSUMMON_PROC or code==EFFECT_SPSUMMON_PROC_G) or not (typ&EFFECT_TYPE_GRANT~=0)) then
 									local newval =	function(...)
 														self_reference_effect=e
 														current_triggering_player = e:GetHandlerPlayer()
@@ -2867,10 +2868,10 @@ end
 ----------------------------------------------------------------------------------------------------------------
 function Card.HasLevel(c,general)
 	if c:IsType(TYPE_MONSTER) then
-		return ((c:GetType()&TYPE_LINK~=TYPE_LINK and c:GetType()&TYPE_TIMELEAP~=TYPE_TIMELEAP and c:GetType()&TYPE_XYZ~=TYPE_XYZ) or c:IsHasEffect(EFFECT_GRANT_LEVEL) or c:IsHasEffect(EFFECT_ORIGINAL_LEVEL_RANK_DUALITY))
+		return (not c:IsOriginalType(TYPE_XYZ|TYPE_LINK|TYPE_TIMELEAP) or c:IsHasEffect(EFFECT_GRANT_LEVEL) or c:IsHasEffect(EFFECT_ORIGINAL_LEVEL_RANK_DUALITY))
 			and not c:IsStatus(STATUS_NO_LEVEL)
 	elseif general and c:IsOriginalType(TYPE_MONSTER) then
-		return not (c:IsOriginalType(TYPE_XYZ+TYPE_LINK+TYPE_TIMELEAP) or c:IsStatus(STATUS_NO_LEVEL))
+		return not (c:IsOriginalType(TYPE_XYZ|TYPE_LINK|TYPE_TIMELEAP) or c:IsStatus(STATUS_NO_LEVEL))
 	end
 	return false
 end

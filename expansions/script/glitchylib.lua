@@ -58,6 +58,7 @@ end
 aux.LocationAfterCostEffects = {
 [EFFECT_CANNOT_SPECIAL_SUMMON]=true;
 [EFFECT_CANNOT_SSET]=true;
+[EFFECT_CANNOT_TO_DECK]=true;
 }
 
 local _IsLocation, _GetLocation = Card.IsLocation, Card.GetLocation
@@ -257,8 +258,17 @@ local _SetCountLimit = Effect.SetCountLimit
 Effect.SetCountLimit = function(e,ct,...)
 	local x={...}
 	local flag = #x>0 and x[1] or 0
-	if e:GetOwner():IsStatus(STATUS_INITIALIZING) and flag>EFFECT_COUNT_CODE_SINGLE then
-		local code=e:GetOwner():GetOriginalCodeRule()
+	local owner
+	local etype=e:GetType()
+	if etype&EFFECT_TYPE_XMATERIAL>0 then
+		e:SetType(0)
+		owner=e:GetOwner()
+		e:SetType(etype)
+	else
+		owner=e:GetOwner()
+	end
+	if owner:IsStatus(STATUS_INITIALIZING) and flag>EFFECT_COUNT_CODE_SINGLE then
+		local code=owner:GetOriginalCodeRule()
 		local pureflag=flag
 		local extraflags=0
 		local flagtable={EFFECT_COUNT_CODE_OATH,EFFECT_COUNT_CODE_DUEL,EFFECT_COUNT_CODE_CHAIN}

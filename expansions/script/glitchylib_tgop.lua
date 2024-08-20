@@ -1539,11 +1539,6 @@ end
 
 -----------------------------------------------------------------------
 --Special Summons
-SPSUM_MOD_NEGATE   		= 0x1
-SPSUM_MOD_REDIRECT 		= 0x2
-SPSUM_MOD_CHANGE_ATKDEF	=	0x4
-
-
 
 function Auxiliary.SSTarget(f,loc1,loc2,min,exc,sumtype,sump,ign1,ign2,pos,recp,zone)
 	if not loc1 then loc1=LOCATION_DECK end
@@ -2830,83 +2825,6 @@ function Auxiliary.SSSelfOperation(complete_proc)
 				return ct
 			end
 end
-
------------------------------------------------
---SPECIAL SUMMON MODS
-function Duel.SpecialSummonMod(e,g,styp,sump,tp,ign1,ign2,pos,zone,...)
-	local mods={...}
-	for i,mod in ipairs(mods) do
-		local obj=type(mod)=="table" and mod[1] or mod
-		if obj==SPSUM_MOD_NEGATE then
-			mods[i][1]={EFFECT_DISABLE,EFFECT_DISABLE_EFFECT}
-		elseif obj==SPSUM_MOD_REDIRECT then
-			mods[i][1]=EFFECT_LEAVE_FIELD_REDIRECT
-		elseif obj==SPSUM_MOD_CHANGE_ATKDEF then
-			mods[i][1]={EFFECT_SET_ATTACK,EFFECT_SET_DEFENSE}
-		end
-	end
-	
-	if not zone then zone=0xff end
-	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
-	local ct=0
-	for dg in aux.Next(g) do
-		local finalzone=zone
-		if type(zone)=="table" then
-			finalzone=zone[tp+1]
-			if tc:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos,1-tp,zone[2-tp]) and (not tc:IsCanBeSpecialSummoned(e,sumtype,sump,ign1,ign2,pos,tp,finalzone) or Duel.SelectYesNo(sump,aux.Stringid(61665245,2))) then
-				tp=1-tp
-				finalzone=zone[tp+1]
-			end
-		end
-		if Duel.SpecialSummonStep(dg,styp,sump,tp,ign1,ign2,pos,finalzone) then
-			ct=ct+1
-			for i,mod in ipairs(mods) do
-				local code=(type(mod)=="table") and mod[1] or mod
-				local val=(type(mod)=="table" and #mod>1) and mod[2] or nil
-				local reset=(type(mod)=="table" and #mod>2) and mod[3] or 0
-				local rc=(type(mod)=="table" and #mod>3) and mod[4] or e:GetHandler()
-				if #g==1 and g:GetFirst()==e:GetHandler() and rc==e:GetHandler() then
-					reset=reset|RESET_DISABLE
-				end
-				
-				if type(code)=="table" then
-					for j,cd in ipairs(code) do
-						local e1=Effect.CreateEffect(rc)
-						e1:SetType(EFFECT_TYPE_SINGLE)
-						e1:SetCode(cd)
-						if cd==EFFECT_LEAVE_FIELD_REDIRECT then
-							e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-						elseif cd==EFFECT_SET_ATTACK or cd==EFFECT_SET_DEFENSE then
-							e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
-						end
-						if val then
-							e1:SetValue(val)
-						end
-						e1:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
-						dg:RegisterEffect(e1)
-					end
-				else
-					local e1=Effect.CreateEffect(rc)
-					e1:SetType(EFFECT_TYPE_SINGLE)
-					e1:SetCode(code)
-					if code==EFFECT_LEAVE_FIELD_REDIRECT then
-						e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-					elseif code==EFFECT_SET_ATTACK or code==EFFECT_SET_DEFENSE then
-						e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
-					end
-					if val then
-						e1:SetValue(val)
-					end
-					e1:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
-					dg:RegisterEffect(e1)
-				end
-			end
-		end
-	end
-	Duel.SpecialSummonComplete()
-	return ct
-end
-
 ------------------------------------------------
 --FUSION SUMMON
 function Auxiliary.FusionMaterialFilter(f)
