@@ -2293,6 +2293,10 @@ if not global_card_effect_table_global_check then
 		
 		local typ,code=e:GetType(),e:GetCode()
 		
+		local IsSingleOrField=typ==EFFECT_TYPE_SINGLE or typ==EFFECT_TYPE_FIELD
+		local IsInherentSummonProc=code==EFFECT_SPSUMMON_PROC or code==EFFECT_SPSUMMON_PROC_G
+		local IsHasExceptionType=typ==EFFECT_TYPE_XMATERIAL or typ==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or typ&EFFECT_TYPE_GRANT~=0
+		
 		--IMPLEMENT EFFECT_CANNOT_APPLY
 		if (typ&(EFFECT_TYPE_ACTIONS)==0 or typ&EFFECT_TYPE_CONTINUOUS==EFFECT_TYPE_CONTINUOUS) and (typ~=EFFECT_TYPE_SINGLE or e:IsHasProperty(EFFECT_FLAG_SINGLE_RANGE)) and (not e:IsHasProperty(EFFECT_FLAG_UNCOPYABLE) or not e:IsHasProperty(EFFECT_FLAG_CANNOT_DISABLE)) then
 			local cond=e:GetCondition()
@@ -2509,11 +2513,12 @@ if not global_card_effect_table_global_check then
 		end
 		
 		local condition,cost,tg,op,val=e:GetCondition(),e:GetCost(),e:GetTarget(),e:GetOperation(),e:GetValue()
-		if condition and ((code==EFFECT_SPSUMMON_PROC or code==EFFECT_SPSUMMON_PROC_G) or not (typ==EFFECT_TYPE_XMATERIAL or typ==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or typ&EFFECT_TYPE_GRANT~=0)) then	
+		if condition and not IsHasExceptionType then	
 			local newcon =	function(...)
 								local x={...}
+								local previous_sre=self_reference_effect
 								self_reference_effect=x[1]
-								current_triggering_player = #x>1 and x[2] or x[1]:GetHandlerPlayer()
+								current_triggering_player = (#x>1 and not IsSingleOrField) and x[2] or x[1]:GetHandlerPlayer()
 								if global_override_reason_effect_check then
 									current_reason_effect = #x>=6 and x[6] or nil
 									if aux.GetValueType(current_reason_effect)=="Effect" and current_reason_effect:IsHasCheatCode(GECC_OVERRIDE_REASON_EFFECT) then
@@ -2522,16 +2527,17 @@ if not global_card_effect_table_global_check then
 									end
 								end
 								local res=condition(table.unpack(x))
-								self_reference_effect=nil
+								self_reference_effect=previous_sre
 								return res
 							end
 			e:SetCondition(newcon)
 		end
-		if cost and not (typ==EFFECT_TYPE_XMATERIAL or typ==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or typ&EFFECT_TYPE_GRANT~=0) then
+		if cost and not IsHasExceptionType then
 			local newcost =	function(...)
 								local x={...}
+								local previous_sre=self_reference_effect
 								self_reference_effect=x[1]
-								current_triggering_player = #x>1 and x[2] or x[1]:GetHandlerPlayer()
+								current_triggering_player = (#x>1 and not IsSingleOrField) and x[2] or x[1]:GetHandlerPlayer()
 								if global_override_reason_effect_check then
 									current_reason_effect = #x>=6 and x[6] or nil
 									if aux.GetValueType(current_reason_effect)=="Effect" and current_reason_effect:IsHasCheatCode(GECC_OVERRIDE_REASON_EFFECT) then
@@ -2543,46 +2549,39 @@ if not global_card_effect_table_global_check then
 									Duel.RaiseEvent(x[1]:GetHandler(),EVENT_CHAIN_CREATED,x[1],0,x[2],x[2],Duel.GetCurrentChain())
 								end
 								local res=cost(table.unpack(x))
-								self_reference_effect=nil
+								self_reference_effect=previous_sre
 								return res
 							end
 			e:SetCost(newcost)
 		end
-		if tg then
-			if code==EFFECT_CANNOT_SPECIAL_SUMMON then
-				local newtg =	function(...)
-									local x={...}
-									self_reference_effect=x[1]
-									return tg(table.unpack(x))
-								end
-				e:SetTarget(newtg)
-			elseif code==EFFECT_SPSUMMON_PROC or code==EFFECT_SPSUMMON_PROC_G or not (typ==EFFECT_TYPE_XMATERIAL or typ==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or typ&EFFECT_TYPE_GRANT~=0) then
-				local newtg =	function(...)
-									local x={...}
-									self_reference_effect=x[1]
-									current_triggering_player = #x>2 and x[2] or x[1]:GetHandlerPlayer()
-									if global_override_reason_effect_check then
-										current_reason_effect = #x>=6 and x[6] or nil
-										if aux.GetValueType(current_reason_effect)=="Effect" and current_reason_effect:IsHasCheatCode(GECC_OVERRIDE_REASON_EFFECT) then
-											x[6]=current_reason_effect:GetCheatCodeValue(GECC_OVERRIDE_REASON_EFFECT)
-											current_reason_effect=x[6]
-										end
+		if tg and not IsHasExceptionType then
+			local newtg =	function(...)
+								local x={...}
+								local previous_sre=self_reference_effect
+								self_reference_effect=x[1]
+								current_triggering_player = (#x>1 and not IsSingleOrField) and x[2] or x[1]:GetHandlerPlayer()
+								if global_override_reason_effect_check then
+									current_reason_effect = #x>=6 and x[6] or nil
+									if aux.GetValueType(current_reason_effect)=="Effect" and current_reason_effect:IsHasCheatCode(GECC_OVERRIDE_REASON_EFFECT) then
+										x[6]=current_reason_effect:GetCheatCodeValue(GECC_OVERRIDE_REASON_EFFECT)
+										current_reason_effect=x[6]
 									end
-									if #x>=9 and x[9]~=0 and (#x<10 or not x[10]) and (not x[1]:GetCost() or not x[1]:IsCostChecked()) then
-										Duel.RaiseEvent(x[1]:GetHandler(),EVENT_CHAIN_CREATED,x[1],0,x[2],x[2],Duel.GetCurrentChain())
-									end
-									local res=tg(table.unpack(x))
-									self_reference_effect=nil
-									return res
 								end
-				e:SetTarget(newtg)
-			end
+								if #x>=9 and x[9]~=0 and (#x<10 or not x[10]) and (not x[1]:GetCost() or not x[1]:IsCostChecked()) then
+									Duel.RaiseEvent(x[1]:GetHandler(),EVENT_CHAIN_CREATED,x[1],0,x[2],x[2],Duel.GetCurrentChain())
+								end
+								local res=tg(table.unpack(x))
+								self_reference_effect=previous_sre
+								return res
+							end
+			e:SetTarget(newtg)
 		end
-		if op and ((code==EFFECT_SPSUMMON_PROC or code==EFFECT_SPSUMMON_PROC_G) or not (typ==EFFECT_TYPE_XMATERIAL or typ==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or typ&EFFECT_TYPE_GRANT~=0)) then
+		if op and not IsHasExceptionType then
 			local newop =	function(...)
 								local x={...}
+								local previous_sre=self_reference_effect
 								self_reference_effect = x[1]
-								current_triggering_player = x[2]
+								current_triggering_player = (#x>1 and not IsSingleOrField) and x[2] or x[1]:GetHandlerPlayer()
 								if global_override_reason_effect_check then
 									current_reason_effect = #x>=6 and x[6] or nil
 									if aux.GetValueType(current_reason_effect)=="Effect" and current_reason_effect:IsHasCheatCode(GECC_OVERRIDE_REASON_EFFECT) then
@@ -2591,18 +2590,22 @@ if not global_card_effect_table_global_check then
 									end
 								end
 								local res=op(table.unpack(x))
-								self_reference_effect=nil
+								self_reference_effect=previous_sre
 								return res
 							end
 			e:SetOperation(newop)
 		end
 		if val then
-			if type(val)=="function" and ((code==EFFECT_SPSUMMON_PROC or code==EFFECT_SPSUMMON_PROC_G) or not (typ==EFFECT_TYPE_XMATERIAL or typ==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or typ&EFFECT_TYPE_GRANT~=0)) then
+			if type(val)=="function" and not IsHasExceptionType then
 				local newval =	function(...)
-									self_reference_effect=e
-									current_triggering_player = self_reference_effect:GetHandlerPlayer()
+									local x={...}
+									local previous_sre=self_reference_effect
+									if aux.GetValueType(x[1])=="Effect" then
+										self_reference_effect = x[1]
+										current_triggering_player = self_reference_effect:GetHandlerPlayer()
+									end
 									local res=val(...)
-									self_reference_effect=nil
+									self_reference_effect=previous_sre
 									return res
 								end
 				e:SetValue(newval)
@@ -2635,7 +2638,7 @@ function Auxiliary.OperationRegistrationProcedure(e,tp,eg,ep,ev,re,r,rp)
 	return e,tp,eg,ep,ev,re,r,rp
 end
 function Auxiliary.EndRegistrationProcedure(e,tp,eg,ep,ev,re,r,rp)
-	self_reference_effect=nil
+	self_reference_effect=previous_sre
 end
 
 --Global Card Effect Table (for Duel.RegisterEffect)
@@ -2665,6 +2668,10 @@ if not global_duel_effect_table_global_check then
 							end
 							
 							local typ,code=e:GetType(),e:GetCode()
+							
+							local IsSingleOrField=typ==EFFECT_TYPE_SINGLE or typ==EFFECT_TYPE_FIELD
+							local IsInherentSummonProc=code==EFFECT_SPSUMMON_PROC or code==EFFECT_SPSUMMON_PROC_G
+							local IsHasExceptionType=typ==EFFECT_TYPE_XMATERIAL or typ==EFFECT_TYPE_XMATERIAL+EFFECT_TYPE_FIELD or typ&EFFECT_TYPE_GRANT~=0
 							
 							--ADD CONTINUOUS EFFECTS TO TABLE
 							if typ&EFFECT_TYPE_CONTINUOUS~=0 and type(aux.ContinuousEffects[code])=="table" then
@@ -2752,11 +2759,12 @@ if not global_duel_effect_table_global_check then
 							
 							
 							local condition,cost,tg,op,val = e:GetCondition(),e:GetCost(),e:GetTarget(),e:GetOperation(),e:GetValue()
-							if condition and ((code==EFFECT_SPSUMMON_PROC or code==EFFECT_SPSUMMON_PROC_G) or not (typ&EFFECT_TYPE_GRANT~=0)) then
+							if condition and not IsHasExceptionType then
 								local newcon =	function(...)
 													local x={...}
+													local previous_sre=self_reference_effect
 													self_reference_effect=x[1]
-													current_triggering_player = #x>1 and x[2] or x[1]:GetHandlerPlayer()
+													current_triggering_player = (#x>1 and not IsSingleOrField) and x[2] or x[1]:GetHandlerPlayer()
 													if global_override_reason_effect_check then
 														current_reason_effect = #x>=6 and x[6] or nil
 														if aux.GetValueType(current_reason_effect)=="Effect" and current_reason_effect:IsHasCheatCode(GECC_OVERRIDE_REASON_EFFECT) then
@@ -2765,16 +2773,17 @@ if not global_duel_effect_table_global_check then
 														end
 													end
 													local res=condition(table.unpack(x))
-													self_reference_effect=nil
+													self_reference_effect=previous_sre
 													return res
 												end
 								e:SetCondition(newcon)
 							end
-							if cost and ((code==EFFECT_SPSUMMON_PROC or code==EFFECT_SPSUMMON_PROC_G) or not (typ&EFFECT_TYPE_GRANT~=0)) then
+							if cost and not IsHasExceptionType then
 								local newcost =	function(...)
 													local x={...}
+													local previous_sre=self_reference_effect
 													self_reference_effect=x[1]
-													current_triggering_player = #x>1 and x[2] or x[1]:GetHandlerPlayer()
+													current_triggering_player = (#x>1 and not IsSingleOrField) and x[2] or x[1]:GetHandlerPlayer()
 													if global_override_reason_effect_check then
 														current_reason_effect = #x>=6 and x[6] or nil
 														if aux.GetValueType(current_reason_effect)=="Effect" and current_reason_effect:IsHasCheatCode(GECC_OVERRIDE_REASON_EFFECT) then
@@ -2783,46 +2792,36 @@ if not global_duel_effect_table_global_check then
 														end
 													end
 													local res=cost(table.unpack(x))
-													self_reference_effect=nil
+													self_reference_effect=previous_sre
 													return res
 												end
 								e:SetCost(newcost)
 							end
-							if tg then
-								if code==EFFECT_CANNOT_SPECIAL_SUMMON then
-									local newtg =	function(...)
-														local x={...}
-														self_reference_effect=x[1]
-														local res=tg(...)
-														self_reference_effect=nil
-														return res
-													end
-									e:SetTarget(newtg)
-									
-								elseif code==EFFECT_SPSUMMON_PROC or code==EFFECT_SPSUMMON_PROC_G or not (typ&EFFECT_TYPE_GRANT~=0) then
-									local newtg =	function(...)
-														local x={...}
-														self_reference_effect=x[1]
-														current_triggering_player = #x>2 and x[2] or x[1]:GetHandlerPlayer()
-														if global_override_reason_effect_check then
-															current_reason_effect = #x>=6 and x[6] or nil
-															if aux.GetValueType(current_reason_effect)=="Effect" and current_reason_effect:IsHasCheatCode(GECC_OVERRIDE_REASON_EFFECT) then
-																x[6]=current_reason_effect:GetCheatCodeValue(GECC_OVERRIDE_REASON_EFFECT)
-																current_reason_effect=x[6]
-															end
+							if tg and not IsHasExceptionType then
+								local newtg =	function(...)
+													local x={...}
+													local previous_sre=self_reference_effect
+													self_reference_effect=x[1]
+													current_triggering_player = (#x>1 and not IsSingleOrField) and x[2] or x[1]:GetHandlerPlayer()
+													if global_override_reason_effect_check then
+														current_reason_effect = #x>=6 and x[6] or nil
+														if aux.GetValueType(current_reason_effect)=="Effect" and current_reason_effect:IsHasCheatCode(GECC_OVERRIDE_REASON_EFFECT) then
+															x[6]=current_reason_effect:GetCheatCodeValue(GECC_OVERRIDE_REASON_EFFECT)
+															current_reason_effect=x[6]
 														end
-														local res=tg(table.unpack(x))
-														self_reference_effect=nil
-														return res
 													end
-									e:SetTarget(newtg)
-								end
+													local res=tg(table.unpack(x))
+													self_reference_effect=previous_sre
+													return res
+												end
+								e:SetTarget(newtg)
 							end
-							if op and ((code==EFFECT_SPSUMMON_PROC or code==EFFECT_SPSUMMON_PROC_G) or not (typ&EFFECT_TYPE_GRANT~=0)) then
+							if op and not IsHasExceptionType then
 								local newop =	function(...)
 													local x={...}
+													local previous_sre=self_reference_effect
 													self_reference_effect=x[1]
-													current_triggering_player = #x>1 and x[2] or x[1]:GetHandlerPlayer()
+													current_triggering_player = (#x>1 and not IsSingleOrField) and x[2] or x[1]:GetHandlerPlayer()
 													if global_override_reason_effect_check then
 														current_reason_effect = #x>=6 and x[6] or nil
 														if aux.GetValueType(current_reason_effect)=="Effect" and current_reason_effect:IsHasCheatCode(GECC_OVERRIDE_REASON_EFFECT) then
@@ -2831,18 +2830,22 @@ if not global_duel_effect_table_global_check then
 														end
 													end
 													local res=op(table.unpack(x))
-													self_reference_effect=nil
+													self_reference_effect=previous_sre
 													return res
 												end
 								e:SetOperation(newop)
 							end
 							if val then
-								if type(val)=="function" and ((code==EFFECT_SPSUMMON_PROC or code==EFFECT_SPSUMMON_PROC_G) or not (typ&EFFECT_TYPE_GRANT~=0)) then
+								if type(val)=="function" and not IsHasExceptionType then
 									local newval =	function(...)
-														self_reference_effect=e
-														current_triggering_player = e:GetHandlerPlayer()
+														local x={...}
+														local previous_sre=self_reference_effect
+														if aux.GetValueType(x[1])=="Effect" then
+															self_reference_effect = x[1]
+															current_triggering_player = self_reference_effect:GetHandlerPlayer()
+														end
 														local res=val(...)
-														self_reference_effect=nil
+														self_reference_effect=previous_sre
 														return res
 													end
 									e:SetValue(newval)
