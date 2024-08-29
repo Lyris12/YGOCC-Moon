@@ -499,7 +499,7 @@ function Auxiliary.BigbangRecursiveFilter(c,tp,sg,mg,fg,bc,gf,ct,min,max,...)
 			if sg:FilterCount(f,nil,sg)>fmax then
 				for i2,ftab2 in ipairs(funs) do
 					local f2,fmax2=ftab2[1],ftab2[3]
-					if i2~=i and sg:FilterCount(f2,nil,sg)<fmax2 then
+					if i2~=i and f2(c,sg) and sg:FilterCount(f2,nil,sg)<fmax2 then
 						chk=true
 					end
 				end
