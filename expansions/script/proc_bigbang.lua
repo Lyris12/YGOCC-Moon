@@ -150,7 +150,7 @@ function Card.IsCanBeBigbangMaterial(c,ec)
 		local val=te:GetValue()
 		if type(val)=="nil" or type(val)=="number" then
 			return false
-		elseif type(val)=="function" and val(te,c) then
+		elseif type(val)=="function" and val(te,ec) then
 			return false
 		end 
 	end
