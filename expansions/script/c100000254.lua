@@ -81,6 +81,10 @@ function s.initial_effect(c)
 end
 s.has_text_type=TYPE_UNION
 
+function s.matfilter(c)
+	return c:IsLinkType(TYPE_UNION) or c:IsLinkRace(RACE_MACHINE)
+end
+
 --PROC
 function s.hspfilter(c,tp,sc)
 	return c:IsEquipCard() and Duel.GetLocationCountFromEx(tp,tp,c,sc)>0 and c:IsCanBeLinkMaterial(sc) and c:IsReleasable(REASON_SPSUMMON)
