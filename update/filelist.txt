@@ -1,4 +1,4 @@
-﻿expansions/cards-new.cdb	bbca6c09979913100a1a00a93bf5fd54
+﻿expansions/cards-new.cdb	d66187fd086537f8658562b2961ba088
 expansions/lflist.conf	dd5cdb14ece42cc9134bdd29f98208ef
 expansions/strings.conf	c645719d063c31eb6e4817b0a25c3812
 expansions/pics/100000000.png	b67e8ff2c7f674f012be790c136b43e5
@@ -4700,7 +4700,7 @@ expansions/pics/47511804.jpg	de5c48c4c2d365d86a2ece3a3678f7b9
 expansions/pics/47511805.jpg	0aae36105278d261acc924af86ea997f
 expansions/pics/47511806.jpg	e037c2adad38d9bd735feb67e6c4dba8
 expansions/pics/47511807.jpg	82af72eacb7cdbccf1f25e4b6f48270d
-expansions/pics/47511808.jpg	dc6ca142e3237422db881747c952195c
+expansions/pics/47511808.jpg	bd97a37e87a9627badb431644903263b
 expansions/pics/47511809.jpg	6e86a21a7a20d669b7b6ae2950f8f17d
 expansions/pics/47511810.jpg	df4715793a7ff00ce77ef6ed3dd4ff6c
 expansions/pics/47511811.jpg	c1d03ed7c1e7e21d8fd83a4c36107cc3
@@ -10869,7 +10869,7 @@ expansions/script/c47511804.lua	bcb4a2259b3d728f09fbd891d4d48ca3
 expansions/script/c47511805.lua	08f6a6f416f2833135027afbbeb7449f
 expansions/script/c47511806.lua	7d4b121872bf17d093b017add31a3421
 expansions/script/c47511807.lua	f41d6fc4f827e1a18b9714b662d7b2be
-expansions/script/c47511808.lua	3f2ca5c1de39d1dfa4fdf01637c8a80b
+expansions/script/c47511808.lua	04ec409c644f496e596d1f4fed3d9215
 expansions/script/c47511809.lua	4bd16d9c84785507f379eb9dee102cfd
 expansions/script/c47511810.lua	edb45faed790631a7a8c708c9f5388b5
 expansions/script/c47511811.lua	2fd41b55c65151e7789cd3f1592eac1f
@@ -12533,6 +12533,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	c525ab379a8aba3d4e2a568d5566ce91
+update/filelist.txt	41166986701931fc0f1ffd7bfae72385
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	0bb04046010b9e5757a250cfd4d4eded
+update/version.txt	b64702df6a1c433c1ac5afa631e1e667
