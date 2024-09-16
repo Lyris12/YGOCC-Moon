@@ -1,4 +1,4 @@
---created by Jake, coded by Keddy; updated by Lyris
+--created by Jake, coded by Keddy, updated by Lyris
 --Steinitz's Castling
 local s,id,o=GetID()
 function s.initial_effect(c)
@@ -64,12 +64,9 @@ end
 function s.efilter(e,re)
 	return e:GetOwnerPlayer()~=re:GetOwnerPlayer()
 end
-function s.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0x63d0)
-end
 function s.tdtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return c:IsAbleToDeck() and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_MZONE,0,1,nil) end
+	if chk==0 then return c:IsAbleToDeck() and Duel.GetFlagEffect(tp,id)<1 end
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,c,1,0,0)
 end
 function s.tdop(e,tp,eg,ep,ev,re,r,rp)
@@ -83,4 +80,5 @@ function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x63d0))
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
+	Duel.RegisterFlagEffect(tp,id,RESET_PHASE+PHASE_END,0,1)
 end

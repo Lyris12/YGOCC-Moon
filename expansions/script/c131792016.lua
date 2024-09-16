@@ -2,7 +2,6 @@
 --Concentrating Magitate
 local s,id,o=GetID()
 function s.initial_effect(c)
-	c:RegisterSetCardString({0xd16, "Concentrated"})
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
@@ -39,7 +38,7 @@ function s.drcon(e)
 	return e:GetHandler():IsPreviousControler(tp) and e:GetHandler():IsPreviousLocation(LOCATION_GRAVE)
 end
 function s.filter(c)
-	return c:IsSetCard({0xd16, "Concentrated"}) and c:IsAbleToRemove()
+	return c:IsSetCard(0x1d16) and c:IsAbleToRemove()
 end
 function s.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_EXTRA,0,1,nil)

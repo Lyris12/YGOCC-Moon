@@ -2,7 +2,6 @@
 --Great London Clue - Bloody Message
 local s,id,o=GetID()
 function s.initial_effect(c)
-	c:RegisterSetCardString({"Great London", "Clue"})
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
@@ -21,7 +20,7 @@ function s.initial_effect(c)
 	e3:SetRange(LOCATION_SZONE)
 	e3:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e3:SetTargetRange(LOCATION_MZONE,0)
-	e3:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,"Great London"))
+	e3:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0xd3f))
 	e3:SetValue(aux.tgoval)
 	c:RegisterEffect(e3)
 end
@@ -34,8 +33,7 @@ end
 function s.plop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)<1 then return end
 	Duel.ConfirmDecktop(tp,1)
-	local tc=Duel.GetDecktopGroup(tp,1):GetFirst()
 	local c=e:GetHandler()
-	if not (tc:IsType(1<<Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)) and c:IsRelateToEffect(e) and aux.NecroValleyFilter()(c)) then return end
+	if not (Duel.GetDecktopGroup(tp,1):GetFirst():IsType(1<<Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)) and c:IsRelateToEffect(e) and aux.NecroValleyFilter()(c)) then return end
 	Duel.MoveToField(c,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
 end

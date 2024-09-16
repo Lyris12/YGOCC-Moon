@@ -2,7 +2,6 @@
 --Elflair - Healing Aura
 local s,id,o=GetID()
 function s.initial_effect(c)
-	c:RegisterSetCardString("Elflair")
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
@@ -22,7 +21,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function s.filter(c,e,tp)
-	return c:IsSetCard("Elflair") and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0x355) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
@@ -42,7 +41,7 @@ function s.act(e,tp,eg,ep,ev,re,r,rp)
 	tc:RegisterEffect(e1)
 end
 function s.afilter(c)
-	return c:IsSetCard("Elflair") and c:IsAbleToHand() and not c:IsCode(id)
+	return c:IsSetCard(0x355) and c:IsAbleToHand() and not c:IsCode(id)
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.afilter(chkc) end

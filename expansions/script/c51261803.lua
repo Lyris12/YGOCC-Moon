@@ -2,7 +2,6 @@
 --Elflair - Nihilis, Elf Sorcerer
 local s,id,o=GetID()
 function s.initial_effect(c)
-	c:RegisterSetCardString("Elflair")
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_HAND)
@@ -24,7 +23,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function s.filter(c)
-	return c:IsFaceup() and c:IsSetCard("Elflair")
+	return c:IsFaceup() and c:IsSetCard(0x355)
 end
 function s.sscon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_MZONE,0,1,nil)
@@ -42,7 +41,7 @@ end
 function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local rc=c:GetReasonCard()
-	return c:IsLocation(LOCATION_GRAVE) and r==REASON_LINK and rc:IsSetCard("Elflair")
+	return c:IsLocation(LOCATION_GRAVE) and r==REASON_LINK and rc:IsSetCard(0x355)
 end
 function s.sfilter(c,e,tp)
 	local rc=e:GetHandler():GetReasonCard()

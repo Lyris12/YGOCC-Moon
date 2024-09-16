@@ -2,9 +2,8 @@
 --Elflair - Iro, Enraged Dark Elf
 local s,id,o=GetID()
 function s.initial_effect(c)
-	c:RegisterSetCardString("Elflair")
 	c:EnableReviveLimit()
-	aux.AddLinkProcedure(c,aux.FilterBoolFunction(Card.IsLinkSetCard,"Elflair"),2,99,aux.FilterBoolFunction(Group.IsExists,Card.IsLinkAttribute,1,nil,ATTRIBUTE_DARK))
+	aux.AddLinkProcedure(c,aux.FilterBoolFunction(Card.IsLinkSetCard,0x355),2,99,aux.FilterBoolFunction(Group.IsExists,Card.IsLinkAttribute,1,nil,ATTRIBUTE_DARK))
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
@@ -49,7 +48,7 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function s.cfilter(c,g)
-	return c:IsFaceup() and c:IsSetCard("Elflair") and g:IsContains(c)
+	return c:IsFaceup() and c:IsSetCard(0x355) and g:IsContains(c)
 end
 function s.count(e,tp,eg,ep,ev,re,r,rp)
 	if eg:IsExists(s.cfilter,1,nil,c:GetLinkedGroup()) then c:AddCounter(0x156e,1) end

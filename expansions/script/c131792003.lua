@@ -30,7 +30,7 @@ function s.indval(e,re,rp)
 	return aux.indoval(e,re,rp) and re:IsActiveType(TYPE_MONSTER)
 end
 function s.filter(c)
-	return c:IsSetCard({0xd16, "Concentrated"}) and c:IsAbleToRemoveAsCost()
+	return c:IsSetCard(0x1d16) and c:IsAbleToRemoveAsCost()
 end
 function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) and chkc:IsType(TYPE_SPELL+TYPE_TRAP) end

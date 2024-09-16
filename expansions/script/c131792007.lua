@@ -27,7 +27,7 @@ function s.pierce(e,c)
 	return c:IsLevel(5) and c:IsSetCard(0xd16)
 end
 function s.cfilter(c)
-	return c:IsSetCard({0xd16, "Concentrated"}) and c:IsAbleToRemoveAsCost()
+	return c:IsSetCard(0x1d16) and c:IsAbleToRemoveAsCost()
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_GRAVE,0,1,nil) end

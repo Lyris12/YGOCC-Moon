@@ -2,7 +2,6 @@
 --Elflair - May, Elf Archer
 local s,id,o=GetID()
 function s.initial_effect(c)
-	c:RegisterSetCardString("Elflair")
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_CHAINING)
@@ -19,7 +18,7 @@ function s.con(e,tp,eg,ep,ev,re,r,rp)
 	return (re:IsActiveType(TYPE_MONSTER) or re:IsHasType(EFFECT_TYPE_ACTIVATE)) and e:GetHandler():GetColumnGroup():IsContains(re:GetHandler())
 end
 function s.filter(c)
-	return c:IsSetCard("Elflair") and c:IsAbleToDeck()
+	return c:IsSetCard(0x355) and c:IsAbleToDeck()
 end
 function s.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end

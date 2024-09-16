@@ -2,7 +2,6 @@
 --Radiant Concentrated Magitate
 local s,id,o=GetID()
 function s.initial_effect(c)
-	c:RegisterSetCardString({0xd16, "Concentrated"})
 	c:EnableReviveLimit()
 	aux.AddLinkProcedure(c,s.mfilter,1,1)
 	local e1=Effect.CreateEffect(c)

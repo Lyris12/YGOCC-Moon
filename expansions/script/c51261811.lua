@@ -2,7 +2,6 @@
 --Elflair - Broken Curse
 local s,id,o=GetID()
 function s.initial_effect(c)
-	c:RegisterSetCardString("Elflair")
 	aux.AddEquipProcedure(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_EQUIP)
@@ -28,13 +27,13 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function s.con(e)
-	return e:GetHandler():GetEquipTarget():IsSetCard("Elflair")
+	return e:GetHandler():GetEquipTarget():IsSetCard(0x355)
 end
 function s.val(e,c)
 	return 100*Duel.GetCounter(tp,1,1,0x156e)
 end
 function s.filter(c)
-	return c:IsFaceup() and c:IsSetCard("Elflair")
+	return c:IsFaceup() and c:IsSetCard(0x355)
 end
 function s.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and s.filter(chkc) end

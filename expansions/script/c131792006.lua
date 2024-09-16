@@ -40,7 +40,7 @@ function s.thop(e,tp)
 	Duel.ConfirmCards(1-tp,g)
 end
 function s.cfilter(c,tp)
-	return c:IsAttribute(ATTRIBUTE_FIRE) and c:IsSetCard({0xd16, "Concentrated"})
+	return c:IsAttribute(ATTRIBUTE_FIRE) and c:IsSetCard(0x1d16)
 		and Duel.GetMZoneCount(tp,c)>0
 end
 function s.spcost(e,tp,eg,ep,ev,re,r,rp,chk)

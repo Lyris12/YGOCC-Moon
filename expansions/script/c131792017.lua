@@ -48,7 +48,7 @@ function s.tgcon(e,tp,eg)
 	return eg:FilterCount(s.cfilter,nil,tp)==1
 end
 function s.gfilter(c)
-	return c:IsSetCard({0xd16, "Concentrated"}) and c:IsAbleToGrave()
+	return c:IsSetCard(0x1d16) and c:IsAbleToGrave()
 end
 function s.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.gfilter,tp,LOCATION_EXTRA,0,1,nil) end

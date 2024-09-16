@@ -57,7 +57,7 @@ function s.mlop(e,tp)
 	local g=Duel.GetTargetsRelateToChain()
 	if #g<2 then return end
 	for tc in aux.Next(g) do
-		tc:RegisterFlagEffect(19520843,RESET_EVENT+RESETS_STANDARD,0,1,2)
+		tc:RegisterFlagEffect(19520843,RESET_EVENT+RESETS_STANDARD,EFFECT_FLAG_CLIENT_HINT,1,2,aux.Stringid(19520843,0))
 		tc:SetCardTarget((g-c):GetFirst()) end
 	end
 end

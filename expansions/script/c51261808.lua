@@ -2,16 +2,15 @@
 --Elflair - Roseth, Awakened Noxious Elf
 local s,id,o=GetID()
 function s.initial_effect(c)
-	c:RegisterSetCardString("Elfair")
 	c:EnableReviveLimit()
-	aux.AddLinkProcedure(c,aux.FilterBoolFunction(Card.IsLinkSetCard,"Elfair"),1,1)
+	aux.AddLinkProcedure(c,aux.FilterBoolFunction(Card.IsLinkSetCard,0x355),1,1)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetTargetRange(1,0)
-	e1:SetTarget(aux.TargetBoolFunction(aux.NOT(Card.IsSetCard), "Elfair"))
+	e1:SetTarget(aux.TargetBoolFunction(aux.NOT(Card.IsSetCard), 0x355))
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_IGNITION)
@@ -25,7 +24,7 @@ function s.initial_effect(c)
 end
 function s.GetMultiLinkedZone(tp)
 	local f=function(c)
-		return c:IsFaceup() and c:IsType(TYPE_LINK) and c:IsSetCard("Elfair")
+		return c:IsFaceup() and c:IsType(TYPE_LINK) and c:IsSetCard(0x355)
 	end
 	local lg=Duel.GetMatchingGroup(f,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
 	local multi_linked_zone=0
@@ -38,7 +37,7 @@ function s.GetMultiLinkedZone(tp)
 	return multi_linked_zone
 end
 function s.filter(c,e,tp,zone)
-	return c:IsSetCard("Elfair") and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,tp,zone)
+	return c:IsSetCard(0x355) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,tp,zone)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local zone=s.GetMultiLinkedZone(tp)

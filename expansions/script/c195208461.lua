@@ -2,7 +2,6 @@
 --Great London Clue - Footprints
 local s,id,o=GetID()
 function s.initial_effect(c)
-	c:RegisterSetCardString({"Great London", "Clue"})
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
@@ -12,7 +11,7 @@ function s.initial_effect(c)
 	e2:SetCode(EFFECT_UPDATE_ATTACK)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetTargetRange(LOCATION_MZONE,0)
-	e2:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,"Great London"))
+	e2:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0xd3f))
 	e2:SetValue(s.val)
 	c:RegisterEffect(e2)
 	local e3=e2:Clone()
@@ -29,17 +28,17 @@ function s.initial_effect(c)
 	c:SetUniqueOnField(1,0,id)
 end
 function s.filter(c)
-	return c:IsFaceup() and c:IsSetCard({"Great London", "Clue"})
+	return c:IsFaceup() and c:IsSetCard(0x1d3f)
 end
 function s.val(e,c)
 	return 300*Duel.GetMatchingGroupCount(s.filter,e:GetHandlerPlayer(),LOCATION_ONFIELD,0,nil)
 end
 function s.dfilter(c,tp)
-	return c:IsSetCard("Great London") and c:IsAbleToDeck()
+	return c:IsSetCard(0xd3f) and c:IsAbleToDeck()
 		and Duel.IsExistingMatchingCard(s.sfilter,tp,LOCATION_DECK,0,1,nil,c:GetType()&0xf)
 end
 function s.sfilter(c,typ)
-	return c:IsSetCard("Great London") and not c:IsType(typ) and c:IsAbleToHand()
+	return c:IsSetCard(0xd3f) and not c:IsType(typ) and c:IsAbleToHand()
 end
 function s.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.dfilter,tp,LOCATION_HAND,0,1,nil,tp) end

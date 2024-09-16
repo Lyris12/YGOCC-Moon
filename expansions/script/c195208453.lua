@@ -2,7 +2,6 @@
 --Great London Brother Mark
 local s,id,o=GetID()
 function s.initial_effect(c)
-	c:RegisterSetCardString("Great London")
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
@@ -37,7 +36,7 @@ function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Destroy(sg,REASON_EFFECT)
 end
 function s.filter(c)
-	return c:IsFaceup() and c:IsSetCard({"Great London", "Clue"})
+	return c:IsFaceup() and c:IsSetCard(0x1d3f)
 end
 function s.descon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -52,7 +51,7 @@ function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.afilter(c,tp)
 	local e=c:GetActivateEffect()
-	return c:IsSetCard({"Great London", "Clue"}) and e and e:IsActivatable(tp,true,true)
+	return c:IsSetCard(0x1d3f) and e and e:IsActivatable(tp,true,true)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local bc=e:GetLabelObject()

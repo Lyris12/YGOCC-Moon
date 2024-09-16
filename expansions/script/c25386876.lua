@@ -1,7 +1,8 @@
---created by Jake, coded by XGlitchy30; updated by _
+--created by Jake
 --Steinitz's Check Call
 function c25386876.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
+	--Target 1 face-up "Steinitz" monster you control whose effect(s) includes preventing monsters your opponent controls from attacking: Your opponent can perform any of the following actions depending on the number of columns with monsters affected by the target, otherwise destroy all monsters affected by the target. ● 1: Your opponent chooses 1 of the affected monsters they have; while it is face-up on the field, it cannot attack and has its effects negated (if any), then negate this card's effect. ● 2: Destroy 1 of the affected monsters they have and the target, then negate this card's effect. ● 3: Move 1 monster they control to another of their Main Monster Zones.  During the End Phase: You can shuffle this card from your GY into the Deck, and if you do, neither player can return your "Steinitz" monsters to the hand this turn.
 	e1:SetCategory(CATEGORY_DESTROY)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)

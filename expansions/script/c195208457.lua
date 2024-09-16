@@ -2,7 +2,6 @@
 --Great London Streets
 local s,id,o=GetID()
 function s.initial_effect(c)
-	c:RegisterSetCardString("Great London")
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
@@ -33,7 +32,7 @@ function s.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function s.filter(c,e,tp)
-	return c:IsSetCard("Great London") and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0xd3f) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
@@ -44,18 +43,17 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)<1 then return end
-	local tc=Duel.GetDecktopGroup(tp,1):GetFirst()
 	Duel.ConfirmDecktop(tp,1)
-	if not tc:IsType(1<<Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)) or Duel.GetLocationCount(tp,LOCATION_MZONE)<1 then return end
+	if not Duel.GetDecktopGroup(tp,1):GetFirst():IsType(1<<Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)) or Duel.GetLocationCount(tp,LOCATION_MZONE)<1 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	Duel.SpecialSummon(Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_DECK,0,1,1,nil,e,tp),0,tp,tp,false,false,POS_FACEUP)
 end
 function s.pcon(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
-	return a:IsControler(tp) and a:IsSetCard("Great London")
+	return a:IsControler(tp) and a:IsSetCard(0xd3f)
 end
 function s.pfilter(c,tp)
-	return c:IsSetCard({"Great London", "Clue"}) and c:GetActivateEffect():IsActivatable(tp,true)
+	return c:IsSetCard(0x1d3f) and c:GetActivateEffect():IsActivatable(tp,true)
 		and c:CheckUniqueOnField(tp)
 end
 function s.ptg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -79,7 +77,7 @@ function s.tdcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,0))
-	local tc=Duel.SelectMatchingCard(tp,Card.IsSetCard,tp,LOCATION_DECK,0,1,nil,"Great London"):GetFirst()
+	local tc=Duel.SelectMatchingCard(tp,Card.IsSetCard,tp,LOCATION_DECK,0,1,nil,0xd3f):GetFirst()
 	if not tc then return end
 	Duel.ShuffleDeck(tp)
 	Duel.MoveSequence(tc,SEQ_DECKTOP)

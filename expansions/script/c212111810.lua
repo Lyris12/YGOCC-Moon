@@ -21,7 +21,7 @@ function s.initial_effect(c)
 end
 function s.filter(c,tp)
 	return (c:IsCode(212111811) or Duel.IsEnvironment(212111811,tp,LOCATION_FZONE) and c:IsType(TYPE_DRIVE)
-		and c:IsSetCard("Kronologistics") and c:IsLocation(LOCATION_DECK)) and c:IsAbleToHand()
+		and c:IsSetCard(0x44a) and c:IsLocation(LOCATION_DECK)) and c:IsAbleToHand()
 end
 function s.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil) end
