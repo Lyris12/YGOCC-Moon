@@ -94,7 +94,8 @@ function Duel.FlipSummon(tp,c)
 		return false
 	end
 end
--- ---------------------------------------
+
+--EFFECTS---------------------------------------
 function Effect.IsApplicable(e,tp,event,neglect_cond,neglect_cost,neglect_target,neglect_loc,neglect_faceup)
 	local type=e:GetType()
 	if type&EFFECT_TYPE_ACTIONS==0 then return false end
@@ -143,6 +144,53 @@ function Effect.IsApplicable(e,tp,event,neglect_cond,neglect_cost,neglect_target
 	
 	return result
 end
+
+function Effect.IsAvailable(e,neglect_disabled)
+	local type=e:GetType()
+	if type&EFFECT_TYPE_ACTIONS~=0 then
+		return false
+	elseif type&(EFFECT_TYPE_FIELD|EFFECT_TYPE_TARGET)~=0 then
+		local h,o=e:GetHandler(),e:GetOwner()
+		
+		if not e:IsHasProperty(EFFECT_FLAG_FIELD_ONLY) then
+			local hasOwnerRelate, hasCannotDisable = e:IsHasProperty(EFFECT_FLAG_OWNER_RELATE), e:IsHasProperty(EFFECT_FLAG_CANNOT_DISABLE)
+			local IsCanBeForbidden = e:IsCanBeForbidden()
+			if h:GetControler()==PLAYER_NONE then
+				return false
+			end
+			if not e:InRange(h) then
+				return false
+			end
+			if not h:IsStatus(STATUS_EFFECT_ENABLED) and not e:IsHasProperty(EFFECT_FLAG_IMMEDIATELY_APPLY) then
+				return false
+			end
+			if h:IsOnField() and not h:IsFaceup() then
+				return false
+			end
+			if h:IsLocation(LOCATION_SZONE) and h:IsOriginalType(TYPE_SPELL|TYPE_TRAP) and h:IsHasEffect(EFFECT_CHANGE_TYPE) then
+				return false
+			end
+			if hasOwnerRelate and isCanBeForbidden and o:IsForbidden() then
+				return false
+			end
+			if o==h and isCanBeForbidden and h:IsForbidden() then
+				return false
+			end
+			if hasOwnerRelate and not (hasCannotDisable or neglect_disabled) and o:IsDisabled() then
+				return false
+			end
+			if o==h and not (hasCannotDisable or neglect_disabled) and h:IsDisabled() then
+				return false
+			end
+			if h:IsStatus(STATUS_BATTLE_DESTROYED) and not e:IsHasProperty(EFFECT_FLAG2_AVAILABLE_BD) then
+				return false
+			end
+		end
+	end
+	local condition=e:GetCondition()
+	return not cond or cond(e)
+end
+	
 
 function Effect.IsActivateReady(e,tp,event,neglect_cond,neglect_cost,neglect_target)
 	local eg,ep,ev,re,r,rp=table.unpack(event)
@@ -309,6 +357,7 @@ function Effect.IsFitTargetFunction(e,c)
 	end
 	return true
 end
+
 
 ---------------------------------
 -----------OPERATIONS------------

@@ -214,27 +214,3 @@ function Auxiliary.ThisCardPointsToCond(f,min)
 				return e:GetHandler():GetLinkedGroup():IsExists(f,min,nil,e,tp)
 			end
 end
-
------------------------------------------------------------------------
---Summon Conditions
-function Card.MustFirstBeSummoned(c,sumtype,rc)
-	local rc = rc and rc or c
-	local e=Effect.CreateEffect(rc)
-	e:SetType(EFFECT_TYPE_SINGLE)
-	e:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e:SetValue(	function(eff,se,sp,st)
-					return not e:GetHandler():IsLocation(LOCATION_EXTRA) or (sumtype and st&sumtype==sumtype)
-				end
-			  )
-	c:RegisterEffect(e)
-	return e
-end
-function Card.MustBeSSedByOwnProcedure(c,rc)
-	local rc = rc and rc or c
-	local e=Effect.CreateEffect(rc)
-	e:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e:SetType(EFFECT_TYPE_SINGLE)
-	e:SetCode(EFFECT_SPSUMMON_CONDITION)
-	c:RegisterEffect(e)
-end

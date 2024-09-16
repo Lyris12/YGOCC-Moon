@@ -66,7 +66,7 @@ function s.filter1(c,e,tp)
 		and aux.MustMaterialCheck(c,tp,EFFECT_MUST_BE_XMATERIAL)
 end
 function s.filter2(c,e,tp,mc,rk,code)
-	if c:GetOriginalCode()==6165656 and code~=48995978 then return false end
+	if c.rum_limit and not c.rum_limit(mc,e,tp,c) then return false end
 	return c:IsType(TYPE_XYZ) and c:IsAttribute(ATTRIBUTE_DARK) and c:IsSetCard(0x48) and c:IsRank(rk) and mc:IsCanBeXyzMaterial(c)
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false) and Duel.GetLocationCountFromEx(tp,tp,mc,c)>0
 end

@@ -202,6 +202,7 @@ function s.matfilter(c,e,tp)
 		and Duel.IsExistingMatchingCard(s.xyzfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,c,no)
 end
 function s.xyzfilter(c,e,tp,mc,no)
+	if c.rum_limit and not c.rum_limit(mc,e,tp,c) then return false end
 	return c:IsSetCard(ARCHE_NUMBER_C) and aux.GetXyzNumber(c)==no and mc:IsCanBeXyzMaterial(c)
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false) and Duel.GetLocationCountFromEx(tp,tp,mc,c)>0
 end

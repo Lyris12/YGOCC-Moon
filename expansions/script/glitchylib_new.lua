@@ -40,309 +40,6 @@ EFFECT_SET_SPSUMMON_LIMIT				= 39503
 --Custom Events
 EVENT_ACTIVATED_DIRECTLY = 61811408
 
---Archetypes
-ARCHE_CRYSTRON						= 0xea
-ARCHE_FUSION						= 0x46
-ARCHE_GALAXY						= 0x7b
-ARCHE_GALAXY_EYES					= 0x107b
-ARCHE_LV							= 0x41
-ARCHE_MAGISTUS						= 0x150
-ARCHE_NUMBER						= 0x48
-ARCHE_NUMBER_C						= 0x1048
-ARCHE_NUMBER_C39					= 0x5048
-ARCHE_PHOTON						= 0x55
-ARCHE_PROPHECY						= 0x6e
-ARCHE_RUM							= 0x95
-ARCHE_SPELLBOOK						= 0x106e
-ARCHE_UTOPIA						= 0x107f
-ARCHE_XYZ							= 0x73
-ARCHE_ZW							= 0x107e
-
---Counters
-COUNTER_ICE							= 0x1015
-
---Custom Archetypes
-CUSTOM_ARCHE_ZERO_HERO				= 0x1
-
---Custom Cards
-ARCHE_PANDEMONIUM	= 0xf80
-ARCHE_BIGBANG		= 0xbba
-ARCHE_HYPERDRIVE	= 0x660
-
-ARCHE_ABYSSLYM			= 0x49c
-ARCHE_AENGELIC			= 0xae6
-ARCHE_AEONSTRIDE		= 0xae0
---
-ARCHE_AIRCASTER			= 0xa88
-ARCHE_FLAIRCASTER		= 0x1a88
-ARCHE_DESPAIRCASTER		= 0x2a88
-ARCHE_FAIRCASTER		= 0x4a88
---
-ARCHE_AUTOMATYRANT		= 0x303
-ARCHE_BOMBER_GOBLIN		= 0x30ac
-ARCHE_CRYSTARION		= 0xc46
-ARCHE_CURSEFLAME		= 0xa56
-ARCHE_CURSILVER			= 0xc72
-ARCHE_DOOMSDAY_ARTIFICE	= 0x3a6
-ARCHE_DREAD_BASTILLE	= 0xb4c
-ARCHE_DREAMY_FOREST		= 0xd43
-ARCHE_DREARY_FOREST		= 0xd44
-ARCHE_EPTAMAGI			= 0xe07
-ARCHE_ETERNADIR			= 0xe56
-ARCHE_EVIL_DRAGON		= 0xe80
-ARCHE_FLIBBERTY			= 0x855
-ARCHE_FROM_THE_DARK		= 0x2ed
-ARCHE_GODSPARK			= 0x412
-ARCHE_GOLDEN_SKIES		= 0x528
-ARCHE_GRENADE_TYPE		= 0x302
-ARCHE_ICHYALTAS			= 0x2a7
-ARCHE_IDOLESCENT		= 0x5a3
-ARCHE_LEYLAH			= 0xd45
-ARCHE_LICH_LORD			= 0x2e7
-ARCHE_LIFEWEAVER		= 0x5a5
-ARCHE_LOTUS_BLADE		= 0x3ff
-ARCHE_METALURGOS		= 0x5a4
-ARCHE_MEXTRO			= 0xee5
-ARCHE_MMS				= 0xd71
-ARCHE_MUSCWOLE			= 0x777
---
-ARCHE_NUMBER_I			= 0x2048
-ARCHE_NUMBER_IC			= 0x3048
-ARCHE_NUMBER_I39		= 0x6048
-ARCHE_NUMBER_IC39		= 0xb048
---
-ARCHE_ORIGIN_DRAGON		= 0xfc1
-ARCHE_OSCURION			= 0x5a6
-ARCHE_QUARPHEX			= 0x1a4
-ARCHE_SCARLET_RED		= 0xd78
-ARCHE_SCELUSPECTER		= 0x304
-ARCHE_SILENT_STAR		= 0xd0a1
-ARCHE_SPECULOMIRIC		= 0x20c
-ARCHE_STAR_REGALIA		= 0xd0a2
-ARCHE_SKYBURNER			= 0xf41
-ARCHE_TRAPPIT			= 0x54a
-ARCHE_TRUESILVER		= 0x5e2
-ARCHE_VAISSEAU			= 0x4a8
-ARCHE_VERDANSE			= 0x4ed
-ARCHE_VIRAVOLVE			= 0xa67
---
-ARCHE_VOIDICTATOR			= 0xc97
-ARCHE_VOIDICTATOR_SERVANT	= 0x3c97
-ARCHE_VOIDICTATOR_DEITY		= 0x6c97
-ARCHE_VOIDICTATOR_DEMON		= 0x9c97
-ARCHE_VOIDICTATOR_RUNE		= 0xac97
-ARCHE_VOIDICTATOR_ENERGY	= 0xcc97
---
-ARCHE_WINTER_SPIRIT		= 0xa8d
-ARCHE_ZEROST			= 0x1e4
-ARCHE_ZEROTL			= 0x1e5
-
-CARD_ANCIENT_PIXIE_DRAGON				= 4179255
-CARD_BLACK_AND_WHITE_WAVE				= 31677606
-CARD_CYBER_HARPIE_LADY					= 80316585
-CARD_DESPAIR_FROM_THE_DARK				= 71200730
-CARD_EHERO_BLAZEMAN						= 63060238
-CARD_HELIOS_DUO_MEGISTUS				= 80887952
-CARD_HELIOS_THE_PRIMORDIAL_SUN			= 54493213
-CARD_HELIOS_TRICE_MEGISTUS				= 17286057
-CARD_MACRO_COSMOS						= 30241314
-CARD_NUMBER_39_UTOPIA					= 84013237
-CARD_ROTA								= 32807846
-CARD_UMI								= 22702055
-CARD_ZOMBIE_WORLD						= 4064256
-
-CARD_ANGEL_OF_VERDANSE							= 100000214
-CARD_AUTOMATYRANT_CLOCKWORK_DRAGON				= 100000241
-CARD_BRAIN_BOOT_SECTOR							= 221812211
-CARD_CHEVALIER_DU_VAISSEAU						= 100000032
-CARD_CRYSTARION_ASCENDANT_PILLAR_OF_COBALT		= 100000152
-CARD_DIABOLICAL_QUARPHEX_LV4					= 100000164
-CARD_DIABOLICAL_QUARPHEX_LV8					= 100000165
-CARD_DIABOLICAL_QUARPHEX_LV12					= 100000166
-CARD_DREAD_BASTILLE_OVERTURE					= 61811408
-CARD_EMISSARY_OF_ARMONY							= 11110642
-CARD_ETERNADIR_SCOUT_ESOM						= 100000209
-CARD_GOLDEN_SKIES_TREASURE						= 11111060
-CARD_GOLDEN_SKIES_TREASURE_OF_WELFARE			= 11111029
-CARD_GORGEOUS_GIFT_OF_HEAVEN_THE_GODSPARK		= 4200100
-CARD_IN_THE_FOREST_BLACK_AS_MY_MEMORY			= 100000051
-CARD_KEEPER_OF_ARMONY							= 100000145
-CARD_LICH_LORD_PHYLACTERY						= 91630827
-CARD_LIMIERRE									= 19936278
-CARD_LORITHIA_SQUIRE_OF_ICHYALTAS				= 11110103
-CARD_LOTUS_BLADE_MIMICRY						= 100000174
-CARD_METALURGOS_CONDUCTION						= 11110608
-CARD_MISTRESS_OF_THE_SKY						= 34847
-CARD_MMS_JACKLYN_ALLTRADES						= 19905907
-CARD_MMS_SHERLOCK_HOLMES						= 19905908
-CARD_MONOCHROME_VALKYRIE_RK4					= 100000167
-CARD_MUSCWOLE_MURDERMANIA						= 70070078
-CARD_NUMBER_201									= 100000275
-CARD_NUMBER_C201								= 100000276
-CARD_NUMBER_203_ARCHANGEL_OF_VERDANSE			= 100000225
-CARD_NUMBER_206_XEENAFAE						= 91630826
-CARD_NUMBER_I208								= 100000277
-CARD_NUMBER_I209_FALLEN_OF_VERDANSE				= 100000227
-CARD_OSCURION_TYPE0								= 11110633
-CARD_OSCURION_TYPE2								= 11110634
-CARD_REVERIE_DU_VAISSEAU						= 100000039
-CARD_ROI_DU_VAISSEAU							= 100000035
-CARD_RUM_DREAM_DISTILL_FORCE					= 39518
-CARD_RUM_RITUAL_OF_VERDANSE						= 100000220
-CARD_SACRED_EFFIGY_OF_WATER						= 34848
-CARD_SCELUSCEPTER_DOOMED_BASTILLE				= 100000267
-CARD_SISTERS_OF_HARMONY							= 100000144
-CARD_SPACE_VALKYR								= 11210118
-CARD_SPARK_OF_THE_PRIMORDIAL_SUN				= 85120900
-CARD_STARFORCE_KNIGHT							= 39301
-CARD_THE_EMBODIMENTS_OF_MOVEMENTS				= 34853
-CARD_THE_FIGURE_IN_THE_MIRROR					= 100000233
-CARD_THE_ORIGIN_OF_DRAGONS						= 20157309
-CARD_VOIDICTATOR_DEITY_NEMESIS					= 221594308
-CARD_VOIDICTATOR_DEITY_OMEN						= 221594307
-CARD_VOIDICTATOR_DEMON_GUARDIAN_OF_CORVUS		= 221594314
-CARD_VOIDICTATOR_DEMON_THE_GATEKEEPER			= 221594306
-CARD_VOIDICTATOR_DEMON_THE_UNENDING_FLAME		= 221594309
-CARD_VOIDICTATOR_RUNE_COURT_OF_THE_VOID			= 221594311
-CARD_VOIDICTATOR_RUNE_GATES_OF_PERDITION		= 221594326
-CARD_VOIDICTATOR_SERVANT_GATE_ARCHITECT			= 221594302
-CARD_VOIDICTATOR_SERVANT_GATE_SORCERESS			= 221594303
-CARD_ZERO_HERO_MAGMA_MAN						= 30409
-CARD_ZEROST_BEAST_ZEROTL 						= 100000025
-
-TOKEN_CRYSTRON							= 55326323
-TOKEN_DAYLILLY							= 41251200
-TOKEN_DRAGON_EGG						= 20157305
-TOKEN_EVIL_DRAGON						= 5418114
-TOKEN_ICHYALTAS_SQUIRE					= 100000201
-TOKEN_NEBULA							= 218201917
-TOKEN_RIVAL								= 11110646
-
---Custom Counters
-----Generic 
-COUNTER_CHRONUS						= 0x1ae0
-COUNTER_CURSEFLAME					= 0x1a56
-COUNTER_ICE_PRISON					= 0x1301
-
-----Specific
-COUNTER_BLADE						= 0x304
-COUNTER_EFFLUVIAL					= 0x2e7
-COUNTER_ENGAGED_MASS				= 0xe67
-COUNTER_JEWEL						= 0x34f
-COUNTER_JOY							= 0xd43
-COUNTER_SORROW						= 0xd44
-COUNTER_SOULFLAME					= 0xb4c
-
---Desc
-STRING_CANNOT_CHANGE_POSITION 					= 	700
-STRING_CANNOT_TRIGGER							=	701
-STRING_BANISH_REDIRECT							=	702
-STRING_CANNOT_BE_DESTROYED_BY_BATTLE			=	703
-STRING_CANNOT_BE_DESTROYED_BY_EFFECT			=	704
-STRING_CANNOT_ATTACK							=	705
-STRING_TREATED_AS_TUNER							=	706
-STRING_UNAFFECTED_BY_OPPONENT_EFFECT			=	707
-STRING_TEMPORARILY_BANISHED						=   708
-STRING_INCREASE_DICE_RESULT						=   709
-STRING_DECREASE_DICE_RESULT						=   710
-STRING_IGNORE_BATTLE_TARGET						=	711
-STRING_FAST_ACTIVATION							=	712
-STRING_GAINED_ADDITIONAL_ATTACK					=	713
-STRING_SHUFFLE_INTO_DECK_REDIRECT				=	714
-STRING_CANNOT_BE_TARGETED_BY_OPPONENT_EFFECT	=	715
-STRING_CANNOT_BE_DESTROYED_BY_OPPONENT_EFFECT	=	716
-STRING_INCREASE									=	721
-STRING_DECREASE 								=	722
-STRING_ACTIVATE_PENDULUM						=	723
-STRING_RETURN_TO_FIELD							=	724
-STRING_LINK_MARKER_BOTTOM_LEFT					=	725
-STRING_LINK_MARKER_BOTTOM						=	726
-STRING_LINK_MARKER_BOTTOM_RIGHT					=	727
-STRING_LINK_MARKER_LEFT							=	728
-STRING_LINK_MARKER_RIGHT						=	729
-STRING_LINK_MARKER_TOP_LEFT						=	730
-STRING_LINK_MARKER_TOP							=	731
-STRING_LINK_MARKER_TOP_RIGHT					=	732
-STRING_CANNOT_BE_FUSION_MATERIAL				=	733
-STRING_CANNOT_BE_RITUAL_MATERIAL				=	734
-STRING_CANNOT_BE_SYNCHRO_MATERIAL				=	735
-STRING_CANNOT_BE_XYZ_MATERIAL					=	736
-STRING_CANNOT_BE_LINK_MATERIAL					=	737
-STRING_CANNOT_BE_BIGBANG_MATERIAL				=	738
-STRING_CANNOT_BE_TIMELEAP_MATERIAL				=	739
-STRING_CANNOT_BE_TRIBUTED						=	740
-STRING_CANNOT_BE_MATERIAL						=	741
-STRING_CAN_BE_TREATED_AS_TUNER					=	742
-STRING_UNAFFECTED_BY_OTHER_EFFECT				=	743
-STRING_REGULAR_TIMELEAP_SUMMON					=	744
-STRING_CANNOT_DIRECT_ATTACK						=	745
-STRING_ATK										=	746
-STRING_DEF										=	747
-STRING_PANDEPEND_SCALE							=	748
-STRING_SPECIAL_SUMMONED							=	749
-STRING_DECKTOP									=	754
-STRING_DECKBOTTOM								=	755
-STRING_TREATED_AS_CONTINUOUS_SPELL				=	756
-STRING_TREATED_AS_CONTINUOUS_TRAP				=	757
-STRING_CANNOT_BE_SPECIAL_SUMMONED				=	758
-STRING_ATTACH									=	759	
-
-STRING_ASK_REPLACE_UPDATE_ENERGY_COST	= 	900
-STRING_ASK_ENGAGE						=	901
-STRING_ASK_UPDATE_ENERGY				=	902
-STRING_ASK_IGNORE_OVERDRIVE_COST		= 	903
-STRING_ASK_DISABLE						= 	904
-STRING_ASK_ATKCHANGE					= 	905
-STRING_ASK_SEARCH						= 	906
-STRING_ASK_PLACE_IN_PZONE				=	907
-STRING_ASK_PLACE_COUNTER				=	908
-STRING_ASK_BANISH						=	909
-STRING_EXCLUDE_AI						=	910
-STRING_ASK_DISCARD						=	911
-STRING_ASK_REVEAL						=	912
-STRING_ASK_SEND_TO_GY					=	913
-STRING_ASK_TO_GY						=	913
-STRING_ASK_TO_GRAVE						=	913
-STRING_ASK_SPSUMMON						=	914
-STRING_ASK_DRAW							=	915
-STRING_ASK_SUMMON						=	916
-STRING_ASK_EXCAVATE						=	917
-STRING_ASK_TO_EXTRA						=	918
-STRING_ASK_EXTRA_RELEASE_NONSUM			=	919
-STRING_ASK_ATTACH						=	920
-STRING_ASK_TO_DECK						=	921
-STRING_ASK_TO_HAND						=	922
-STRING_ASK_RECOVER						=	923
-STRING_ASK_DAMAGE						=	924
-STRING_ASK_DESTROY						=	925
-STRING_ASK_ACTIVATE						=	926
-STRING_ASK_CHANGE_LEVEL					=	927
-STRING_ASK_DECKDES						=	928
-
-STRING_SEND_TO_EXTRA					=	1006
-STRING_BANISH							=	1102
-STRING_SPECIAL_SUMMON					=	1152
-STRING_PLACE_IN_PZONE					=	1160
-STRING_ADD_TO_HAND						=	1190
-STRING_SEND_TO_GY						=	1191
-STRING_SET								=	1153
-STRING_SEND_TO_DECK						=	1193
-
-STRING_INPUT_ENERGY						=	2000
-STRING_INPUT_LEVEL						=	2001
-STRING_INPUT_DICE_ROLL					=	2002
-STRING_INPUT_NONNEGATIVE_NUMBER			=	2003
-STRING_INPUT_NEGATIVE_NUMBER			=	2004
-
-HINTMSG_ENERGY							=	2005
-HINTMSG_TRANSFORM						=	2006
-HINTMSG_TOEXTRA							=	2007
-HINTMSG_FLIPSUMMON						=	2008
-HINTMSG_ATTACH							=	2009
-HINTMSG_ATTACHTO						=	2010
-HINTMSG_ATKDEF							=	2011
-HINTMSG_HALVE_ATKDEF					=	2012
-
 --Locations
 LOCATION_ENGAGED	=	0x1000
 
@@ -400,8 +97,9 @@ ATTRIBUTES_CHAOS = ATTRIBUTE_LIGHT|ATTRIBUTE_DARK
 
 RACES_BEASTS = RACE_BEAST|RACE_BEASTWARRIOR|RACE_WINDBEAST
 
-LOCATION_ALL = LOCATION_DECK|LOCATION_HAND|LOCATION_MZONE|LOCATION_SZONE|LOCATION_GRAVE|LOCATION_REMOVED|LOCATION_EXTRA|LOCATION_OVERLAY
-LOCATION_GB  = LOCATION_GRAVE|LOCATION_REMOVED
+LOCATION_ALL 		= LOCATION_DECK|LOCATION_HAND|LOCATION_MZONE|LOCATION_SZONE|LOCATION_GRAVE|LOCATION_REMOVED|LOCATION_EXTRA|LOCATION_OVERLAY
+LOCATION_GB  		= LOCATION_GRAVE|LOCATION_REMOVED
+LOCATIONS_PRIVATE 	= LOCATION_HAND|LOCATION_DECK|LOCATION_EXTRA
 
 LINK_MARKER_ALL = 0x1ef
 
@@ -551,6 +249,30 @@ function Effect.Evaluate(e,...)
 	end
 end
 
+--Alternative Actions
+function Duel.ToHandOrSpecialSummon(c,e,tp,cond)
+	local b1=c:IsAbleToHand()
+	local b2=Duel.GetMZoneCount(tp)>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and (cond==nil or cond)
+	if not b1 and not b2 then return end
+	local opt=aux.Option(tp,nil,nil,{b1,STRING_ADD_TO_HAND},{b2,STRING_SPECIAL_SUMMON})
+	if opt==0 then
+		return Duel.Search(c)
+	elseif opt==1 then
+		return Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+	end
+end
+function Duel.ToHandOrGrave(c,tp,p,cond)
+	local b1=c:IsAbleToHand()
+	local b2=c:IsAbleToGrave() and (cond==nil or cond)
+	if not b1 and not b2 then return end
+	local opt=aux.Option(tp,nil,nil,{b1,STRING_ADD_TO_HAND},{b2,STRING_SEND_TO_GY})
+	if opt==0 then
+		return Duel.Search(c,nil,p)
+	elseif opt==1 then
+		return Duel.SendtoGrave(c,REASON_EFFECT)
+	end
+end
+
 --Custom Categories
 if not global_effect_category_table_global_check then
 	global_effect_category_table_global_check=true
@@ -603,15 +325,15 @@ end
 
 --New Operation Infos
 function Auxiliary.ClearCustomOperationInfo(e,tp,eg,ep,ev,re,r,rp)
-	for _,chtab in pairs(global_effect_info_table) do
+	for i,chtab in pairs(global_effect_info_table) do
 		for _,tab in ipairs(chtab) do
 			local dg=tab[2]
 			if dg then
 				dg:DeleteGroup()
 			end
 		end
+		global_effect_info_table[i]=nil
 	end
-	global_effect_info_table={}
 	e:Reset()
 end
 function Duel.SetCustomOperationInfo(ch,cat,g,ct,p,val,...)
@@ -649,15 +371,15 @@ function Duel.GetCustomOperationInfo(chain,cat)
 	end
 end
 function Auxiliary.ClearPossibleCustomOperationInfo(e,tp,eg,ep,ev,re,r,rp)
-	for _,chtab in pairs(global_possible_custom_effect_info_table) do
+	for i,chtab in pairs(global_possible_custom_effect_info_table) do
 		for _,tab in ipairs(chtab) do
 			local dg=tab[2]
 			if dg then
 				dg:DeleteGroup()
 			end
 		end
+		global_possible_custom_effect_info_table[i]=nil
 	end
-	global_possible_custom_effect_info_table={}
 	e:Reset()
 end
 function Duel.SetPossibleCustomOperationInfo(ch,cat,g,ct,p,val,...)
@@ -680,15 +402,15 @@ function Duel.SetPossibleCustomOperationInfo(ch,cat,g,ct,p,val,...)
 	table.insert(global_possible_custom_effect_info_table[chain],{cat,g,ct,p,val,table.unpack(extra)})
 end
 function Auxiliary.ClearPossibleOperationInfo(e,tp,eg,ep,ev,re,r,rp)
-	for _,chtab in pairs(global_possible_info_table) do
+	for i,chtab in pairs(global_possible_info_table) do
 		for _,tab in ipairs(chtab) do
 			local dg=tab[2]
 			if dg then
 				dg:DeleteGroup()
 			end
 		end
+		global_possible_info_table[i]=nil
 	end
-	global_possible_info_table={}
 	e:Reset()
 end
 function Duel.SetPossibleOperationInfo(ch,cat,g,ct,p,val,...)
@@ -711,15 +433,15 @@ function Duel.SetPossibleOperationInfo(ch,cat,g,ct,p,val,...)
 	table.insert(global_possible_info_table[chain],{cat,g,ct,p,val,table.unpack(extra)})
 end
 function Auxiliary.ClearAdditionalOperationInfo(e,tp,eg,ep,ev,re,r,rp)
-	for _,chtab in pairs(global_additional_info_table) do
+	for i,chtab in pairs(global_additional_info_table) do
 		for _,tab in ipairs(chtab) do
 			local dg=tab[2]
 			if dg then
 				dg:DeleteGroup()
 			end
 		end
+		global_additional_info_table[i]=nil
 	end
-	global_additional_info_table={}
 	e:Reset()
 end
 function Duel.SetAdditionalOperationInfo(ch,cat,g,ct,p,val,...)
@@ -1230,26 +952,8 @@ function Duel.PositionChange(c)
 end
 
 --SEARCHING AND CHECKS
-function Duel.Search(g,_,p,r)
-	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
-	if not r then r=REASON_EFFECT end
-	local ct=Duel.SendtoHand(g,p,r)
-	local cg=g:Filter(aux.PLChk,nil,p,LOCATION_HAND)
-	if #cg>0 then
-		if p then
-			Duel.ConfirmCards(1-p,cg)
-		else
-			for tp=0,1 do
-				local pg=cg:Filter(Card.IsControler,nil,tp)
-				if #pg>0 then
-					Duel.ConfirmCards(1-tp,pg)
-				end
-			end
-		end
-	end
-	return ct,#cg,cg
-end
-function Duel.SearchAndCheck(g,_,p,brk,r)
+function Duel.Search(g,_,p,brk,r)
+	if type(brk)=="number" then r=brk brk=nil end	--compatibility
 	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
 	if not r then r=REASON_EFFECT end
 	local ct=Duel.SendtoHand(g,p,r)
@@ -1269,13 +973,22 @@ function Duel.SearchAndCheck(g,_,p,brk,r)
 			end
 		end
 	end
-	return ct>0 and #cg>0
-end
-function Duel.Bounce(g)
-	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
-	local ct=Duel.SendtoHand(g,nil,REASON_EFFECT)
-	local cg=g:Filter(aux.PLChk,nil,nil,LOCATION_HAND)
 	return ct,#cg,cg
+end
+function Duel.SearchAndCheck(g,_,p,brk,r)
+	local ct,cgct=Duel.Search(g,_,p,brk,r)
+	return ct>0 and cgct>0
+end
+function Duel.Bounce(g,p,r)
+	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
+	r = r and r or REASON_EFFECT
+	local ct=Duel.SendtoHand(g,p,r)
+	local cg=g:Filter(aux.PLChk,nil,p,LOCATION_HAND)
+	return ct,#cg,cg
+end
+function Duel.BounceAndCheck(g,p,r)
+	local ct,cgct=Duel.Bounce(g,p,r)
+	return ct>0 and cgct>0
 end
 
 function Duel.SendtoGraveAndCheck(g,p,r)
@@ -1294,7 +1007,7 @@ function Duel.ShuffleIntoDeck(g,p,loc,seq,r,f)
 	if not r then r=REASON_EFFECT end
 	local ct=Duel.SendtoDeck(g,p,seq,r)
 	if ct>0 then
-		if seq==SEQ_DECKSHUFFLE then
+		if seq==SEQ_DECKSHUFFLE and loc&LOCATION_DECK>0 then
 			aux.AfterShuffle(g)
 		end
 		if aux.GetValueType(g)=="Card" and aux.PLChk(g,p,loc) and (not f or f(g)) then
@@ -1641,6 +1354,18 @@ function Card.IsRatingBelow(c,rtyp,...)
 	end
 end
 
+function Card.GetMinStat(c)
+	return math.min(c:GetAttack(),c:GetDefense())
+end
+function Card.GetMaxStat(c)
+	return math.max(c:GetAttack(),c:GetDefense())
+end
+function Card.GetMinBaseStat(c)
+	return math.min(c:GetBaseAttack(),c:GetBaseDefense())
+end
+function Card.GetMaxBaseStat(c)
+	return math.max(c:GetBaseAttack(),c:GetBaseDefense())
+end
 function Card.IsStats(c,atk,def)
 	return (not atk or (c:HasAttack() and c:IsAttack(atk))) and (not def or (c:HasDefense() and c:IsDefense(def)))
 end
@@ -1731,8 +1456,14 @@ function Effect.GetChainLink(e)
 	return 0
 end
 
+--Chain Limits
+function Auxiliary.ChainLimitOppo(e,ep,tp)
+	return tp==ep
+end
+
 --Cloned Effects
-function Effect.QuickEffectClone(e,c,cond,notreg)
+--not_simultaneous : If true, prevents the original effect and the QE clone from being both  activatable in a certain gamestate
+function Effect.QuickEffectClone(e,c,cond,notreg,not_simultaneous)
 	local ex=e:Clone()
 	ex:SetType(EFFECT_TYPE_QUICK_O)
 	ex:SetCode(EVENT_FREE_CHAIN)
@@ -1743,6 +1474,9 @@ function Effect.QuickEffectClone(e,c,cond,notreg)
 			ex:SetCondition(aux.AND(cond,ogcond))
 		else
 			ex:SetCondition(cond)
+		end
+		if not_simultaneous then
+			e:SetCondition(aux.AND(ogcond,aux.NOT(cond)))
 		end
 	end
 	if not notreg then
@@ -2498,8 +2232,24 @@ function Auxiliary.ogdncheckbrk(g,e,tp,mg,c)
 end
 
 --Excavate
-function Duel.IsPlayerCanExcavateAndSpecialSummon(tp)
-	return Duel.IsPlayerCanSpecialSummon(tp) and not Duel.IsPlayerAffectedByEffect(tp,CARD_EHERO_BLAZEMAN)
+function Auxiliary.excthfilter(c,tp)
+	if not Duel.IsPlayerCanSendtoHand(tp,c) then return false end
+	if not c:IsHasEffect(EFFECT_CANNOT_TO_HAND) then return true end
+	local eset={c:IsHasEffect(EFFECT_CANNOT_TO_HAND)}
+	for _,e in ipairs(eset) do
+		if e:GetOwner()~=c then
+			return false
+		end
+	end
+	return true
+end
+function Duel.IsPlayerCanExcavateAndSearch(tp,ct)
+	local g=Duel.GetDecktopGroup(tp,ct)
+	return #g==ct and g:FilterCount(aux.excthfilter,nil,tp)>0
+end
+function Duel.IsPlayerCanExcavateAndSpecialSummon(tp,ct)
+	local g=Duel.GetDecktopGroup(tp,ct)
+	return #g==ct and Duel.IsPlayerCanSpecialSummon(tp) and not Duel.IsPlayerAffectedByEffect(tp,CARD_EHERO_BLAZEMAN)
 end
 
 --Filters
@@ -2698,6 +2448,22 @@ function Auxiliary.SSToEitherFieldFilter(f,sumtype,sump,ign1,ign2,pos,zone1,zone
 end
 
 --Flag Effects
+function Card.GetFlagEffectWithSpecificLabel(c,flag,label,reset)
+	flag=flag&MAX_ID
+	local eset={c:IsHasEffect(EFFECT_FLAG_EFFECT|flag)}
+	for i=#eset,1,-1 do
+		local e=eset[i]
+		local x=e:GetLabel()
+		if x==label then
+			if not reset then
+				return e
+			else
+				e:Reset()
+			end
+		end
+	end
+	return
+end
 function Card.HasFlagEffect(c,id,...)
 	local flags={...}
 	if id then
@@ -3062,6 +2828,27 @@ end
 function Card.IsAttachedTo(c,xyzc)
 	return c:IsLocation(LOCATION_OVERLAY) and xyzc:HasCardAttached(c)
 end
+function Duel.GetXyzMaterialGroup(tp,s,o,xyzf,matf,...)
+	xyzf=xyzf and xyzf or aux.TRUE
+	matf=matf and matf or aux.TRUE
+	local sloc=s==1 and LOCATION_MZONE or 0
+	local oloc=o==1 and LOCATION_MZONE or 0
+	local g=Group.CreateGroup()
+	local xyzg=Duel.Group(xyzf,tp,sloc,oloc,nil,...):Filter(Card.IsType,nil,TYPE_XYZ)
+	if #xyzg>0 then
+		for xyz in aux.Next(xyzg) do
+			local matg=xyz:GetOverlayGroup():Filter(matf,nil,...)
+			if #matg>0 then
+				g:Merge(matg)
+			end
+		end
+	end
+	return g
+end
+function Duel.GetXyzMaterialGroupCount(tp,s,o,xyzf,matf,...)
+	local g=Duel.GetXyzMaterialGroup(tp,s,o,xyzf,matf,...)
+	return #g
+end
 
 function Card.GetPreviousXyzHolder(c)
 	local e=c:IsHasEffect(EFFECT_REMEMBER_XYZ_HOLDER)
@@ -3090,13 +2877,13 @@ end
 function Card.GetPreviousZone(c,tp)
 	local rzone
 	if c:IsPreviousLocation(LOCATION_MZONE) then
-		rzone = c:IsControler(tp) and (1 <<c:GetPreviousSequence()) or (1 << (16+c:GetPreviousSequence()))
+		rzone = c:IsPreviousControler(tp) and (1 <<c:GetPreviousSequence()) or (1 << (16+c:GetPreviousSequence()))
 		if c:GetPreviousSequence()==5 or c:GetPreviousSequence()==6 then
-			rzone = rzone | (c:IsControler(tp) and (1 << (16 + 11 - c:GetPreviousSequence())) or (1 << (11 - c:GetPreviousSequence())))
+			rzone = rzone | (c:IsPreviousControler(tp) and (1 << (16 + 11 - c:GetPreviousSequence())) or (1 << (11 - c:GetPreviousSequence())))
 		end
 	
 	elseif c:IsPreviousLocation(LOCATION_SZONE) then
-		rzone = c:IsControler(tp) and (1 << (8+c:GetPreviousSequence())) or (1 << (24+c:GetPreviousSequence()))
+		rzone = c:IsPreviousControler(tp) and (1 << (8+c:GetPreviousSequence())) or (1 << (24+c:GetPreviousSequence()))
 	end
 	return rzone
 end
@@ -3204,6 +2991,26 @@ function Duel.GetMZoneCountFromLocation(tp,up,g,c)
 	end
 end
 
+function Duel.GetDisabledZones(p)
+	local dis1,dis2=0,0
+	local eset=Duel.GetAuraEffects(EFFECT_DISABLE_FIELD)
+	for _,e in ipairs(eset) do
+		if e:IsAvailable(false) then
+			local hp=e:GetHandlerPlayer()
+			local val=e:GetValue()
+			dis1=hp==0 and dis1|(val&0x1f7f) or dis1|((val>>16)&0x1f7f)
+			dis2=hp==0 and dis2|((val>>16)&0x1f7f) or dis2|(val&0x1f7f)
+		end
+	end
+	if not p then
+		return dis1,dis2
+	elseif p==0 then
+		return dis1
+	elseif p==1 then
+		return dis2
+	end
+end
+
 --Location Groups
 function Duel.GetHand(p)
 	if not p then
@@ -3275,33 +3082,40 @@ function Auxiliary.GetMustMaterialGroup(p,eff)
 	return Duel.GetMustMaterial(p,eff)
 end
 
-function Auxiliary.CannotBeTributeOrMaterial(c)
+function Auxiliary.CannotBeTributeOrMaterial(c,forced,reset,prop)
+	local prop=prop or 0
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE|prop)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCode(EFFECT_UNRELEASABLE_SUM)
 	e1:SetValue(1)
-	c:RegisterEffect(e1)
+	if reset then
+		e1:SetReset(reset)
+	end
+	c:RegisterEffect(e1,forced)
 	local e2=e1:Clone()
 	e2:SetCode(EFFECT_UNRELEASABLE_NONSUM)
-	c:RegisterEffect(e2)
+	c:RegisterEffect(e2,forced)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_UNCOPYABLE)
+	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_UNCOPYABLE|prop)
 	e3:SetCode(EFFECT_CANNOT_BE_FUSION_MATERIAL)
 	e3:SetValue(1)
-	c:RegisterEffect(e3)
+	if reset then
+		e3:SetReset(reset)
+	end
+	c:RegisterEffect(e3,forced)
 	local e4=e3:Clone()
 	e4:SetCode(EFFECT_CANNOT_BE_SYNCHRO_MATERIAL)
 	e4:SetValue(1)
-	c:RegisterEffect(e4)
+	c:RegisterEffect(e4,forced)
 	local e5=e4:Clone()
 	e5:SetCode(EFFECT_CANNOT_BE_XYZ_MATERIAL)
-	c:RegisterEffect(e5)
+	c:RegisterEffect(e5,forced)
 	local e6=e4:Clone()
 	e6:SetCode(EFFECT_CANNOT_BE_LINK_MATERIAL)
-	c:RegisterEffect(e6)
+	c:RegisterEffect(e6,forced)
 end
 
 function Auxiliary.FieldCannotBeTributeOrMaterial(c,range,trange1,trange2,f,exclude)
@@ -3528,6 +3342,13 @@ function Duel.GetNextPhaseCount(ph,p)
 end
 function Duel.GetNextMainPhaseCount(p)
 	if Duel.IsMainPhase() and (not p or Duel.GetTurnPlayer()==tp) then
+		return 2
+	else
+		return 1
+	end
+end
+function Duel.GetNextBattlePhaseCount(p)
+	if Duel.IsBattlePhase() and (not p or Duel.GetTurnPlayer()==tp) then
 		return 2
 	else
 		return 1
@@ -4043,8 +3864,12 @@ SPSUM_MOD_CHANGE_ATKDEF	=	0x4
 function Duel.SpecialSummonMod(e,g,styp,sump,tp,ign1,ign2,pos,zone,...)
 	local mods={...}
 	for i,mod in ipairs(mods) do
-		--tables are expected as ...
-		local obj=mod[1]
+		if type(mod)=="table" then
+			obj=mod[1]
+		else
+			obj=mod
+			mods[i]={0}
+		end
 		if obj==SPSUM_MOD_NEGATE then
 			mods[i][1]={EFFECT_DISABLE,EFFECT_DISABLE_EFFECT}
 		elseif obj==SPSUM_MOD_REDIRECT then
@@ -4074,19 +3899,26 @@ function Duel.SpecialSummonMod(e,g,styp,sump,tp,ign1,ign2,pos,zone,...)
 			ct=ct+1
 			for i,mod in ipairs(mods) do
 				local code=mod[1]
-				local val=#mod>1 and mod[2] or nil
+				
+				local val
+				if #mod>1 then val=mod[2] end
+				
 				local reset=#mod>2 and mod[3] or 0
-				if selfchk then
-					reset=reset|RESET_DISABLE
-				end
 				
 				for _,cd in ipairs(code) do
 					local e1=Effect.CreateEffect(c)
 					e1:SetType(EFFECT_TYPE_SINGLE)
 					e1:SetCode(cd)
 					if cd==EFFECT_LEAVE_FIELD_REDIRECT then
-						e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+						e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_CLIENT_HINT)
+						if not val then
+							val=LOCATION_REMOVED
+							e1:SetDescription(STRING_BANISH_REDIRECT)
+						end
 					elseif cd==EFFECT_SET_ATTACK_FINAL or cd==EFFECT_SET_DEFENSE_FINAL then
+						if selfchk then
+							reset=reset|RESET_DISABLE
+						end
 						local prop=reset&RESET_DISABLE==0 and EFFECT_FLAG_IGNORE_IMMUNE|EFFECT_FLAG_CANNOT_DISABLE or EFFECT_FLAG_IGNORE_IMMUNE
 						e1:SetProperty(prop)
 					end
@@ -4105,27 +3937,38 @@ function Duel.SpecialSummonMod(e,g,styp,sump,tp,ign1,ign2,pos,zone,...)
 end
 
 --Special Summon Procedures and After Effect Resolution
-function Auxiliary.ApplyEffectImmediatelyAfterResolution(f,c,e,tp,eg,ep,ev,re,r,rp)
+SUMMON_VALUE_PRIVATE = 0x1000000
+
+--for usage of ignore_reset, see Dynastygian Launch
+function Auxiliary.ApplyEffectImmediatelyAfterResolution(f,c,e,tp,eg,ep,ev,re,r,rp,ignore_reset)
+	local chain_end=Duel.GetCurrentChain()==1
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
-	e1:SetCode(EVENT_CHAIN_SOLVED)
+	e1:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
+	e1:SetCode(chain_end and EVENT_CHAIN_END or EVENT_CHAIN_SOLVED)
 	e1:SetLabelObject(e)
+	e1:OPT()
 	e1:SetOperation(function(_e,_tp,_eg,_ep,_ev,_re,_r,_rp)
-		f(e,tp,eg,ep,ev,re,r,rp,_e)
-		_e:Reset()
+		f(e,tp,eg,ep,ev,re,r,rp,_e,chain_end)
+		if not ignore_reset then
+			_e:Reset()
+		end
 	end
 	)
 	e1:SetOwnerPlayer(tp)
 	Duel.RegisterEffect(e1,tp)
 	return e1
 end
-function Auxiliary.RegisterResetAfterSpecialSummonRule(c,tp,e1)
+function Auxiliary.RegisterResetAfterSpecialSummonRule(c,tp,...)
+	local effs={...}
 	local e0=Effect.CreateEffect(c)
 	e0:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
 	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_UNCOPYABLE)
 	e0:SetCode(EVENT_SPSUMMON)
 	e0:SetOperation(function(_e,_tp,_eg,_ep,_ev,_re,_r,_rp)
-		e1:Reset()
+		for _,e in ipairs(effs) do
+			e:Reset()
+		end
 		_e:Reset()
 	end
 	)
@@ -4169,6 +4012,7 @@ function Auxiliary.EnableGlobalEffectTributeOppoCost()
 	end
 end
 
+
 --Location Check
 EFFECT_CARD_HAS_RESOLVED = 47987298
 
@@ -4176,6 +4020,11 @@ function Auxiliary.AlreadyInRangeCondition(e,re,se)
 	local se=e and e:GetLabelObject():GetLabelObject() or se
 	return	function(c,...)
 				return se==nil or re~=se
+			end
+end
+function Auxiliary.AlreadyInRangeEventCondition(f)
+	return	function(e,tp,eg,ep,ev,re,r,rp)
+				return not eg:IsContains(e:GetHandler()) and eg:IsExists(aux.AlreadyInRangeFilter(e,f),1,nil,e,tp,eg,ep,ev,re,r,rp)
 			end
 end
 function Auxiliary.AlreadyInRangeFilter(e,f)
@@ -4705,6 +4554,61 @@ function Card.CreateNegateEffect(c,negateact,rp,rf,desc,range,ctlim,cond,cost,tg
 	end
 end
 
+--FUNCTIONS FOR SPECIAL CARDS
+function Auxiliary.ManagePyroClockInteraction(c,tp,p,phase,rct,cond,op,...)
+	phase=phase and phase or PHASE_END
+	rct=rct and rct or 1
+	local resetp=0
+	if p then
+		resetp = p==tp and RESET_SELF_TURN or RESET_OPPO_TURN
+	end
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
+	e1:SetCode(EVENT_PHASE|phase)
+	e1:OPT()
+	e1:SetCondition(
+		function(_e,_tp)
+			return (not p or Duel.IsTurnPlayer(p)) and (not cond or cond(_e,_tp))
+		end
+	)
+	e1:SetOperation(aux.PyroClockOperation(rct,op))
+	e1:SetReset(RESET_PHASE|phase|resetp,rct)
+	Duel.RegisterEffect(e1,tp)
+	c:RegisterFlagEffect(CARD_PYRO_CLOCK,RESET_PHASE|phase|resetp,0,rct)
+	local s=getmetatable(c)
+	s[c]=e1
+	local effs_to_reset={...}
+	if #effs_to_reset>0 then
+		if not aux.EffectsToResetByPyroClock then
+			aux.EffectsToResetByPyroClock={}
+		end
+		aux.EffectsToResetByPyroClock[e1]={}
+		for _,re in ipairs(effs_to_reset) do
+			table.insert(aux.EffectsToResetByPyroClock[e1],re)
+		end
+	end
+end
+function Auxiliary.PyroClockOperation(rct,op)
+	return	function(e,tp,eg,ep,ev,re,r,rp)
+				local ct=e:GetLabel()
+				ct=ct+1
+				e:SetLabel(ct)
+				e:GetHandler():SetTurnCounter(ct)
+				if ct==rct then
+					if aux.EffectsToResetByPyroClock[e] then
+						while #aux.EffectsToResetByPyroClock[e]>0 do
+							local re=aux.EffectsToResetByPyroClock[e][#aux.EffectsToResetByPyroClock[e]]
+							re:Reset()
+							table.remove(aux.EffectsToResetByPyroClock[e])
+						end
+						aux.EffectsToResetByPyroClock[e]=nil
+					end
+					if op then op(e,tp,eg,ep,ev,re,r,rp) end
+					e:GetOwner():ResetFlagEffect(CARD_PYRO_CLOCK)
+				end
+			end
+end
+
 --ARCHETYPAL FUNCTIONS
 
 ----ILLUSION MONSTERS
@@ -4722,6 +4626,17 @@ end
 function Auxiliary.IllusionBattleEffectTarget(e,c)
 	local h=e:GetHandler()
 	return c==h or c==h:GetBattleTarget()
+end
+
+----RUM
+function Auxiliary.CreateRUMLimitFunction(f)
+	return	function(mc,e,tp,c)
+				if aux.GetValueType(mc)=="Group" then
+					return mc:IsExists(f,1,nil,e,tp,c)
+				else
+					return f(mc,e,tp,c)
+				end
+			end
 end
 
 ----AIRCASTER

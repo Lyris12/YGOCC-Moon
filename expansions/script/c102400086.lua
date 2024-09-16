@@ -26,6 +26,7 @@ function s.filter1(c,e,tp)
 		and Duel.GetLocationCountFromEx(tp,tp,c)>0
 end
 function s.filter2(c,e,tp,mc,rk)
+	if c.rum_limit and not c.rum_limit(mc,e,tp,c) then return false end
 	return c:GetRank()==rk and c:IsAttribute(ATTRIBUTE_DARK) and c:IsRace(RACE_WARRIOR) and mc:IsCanBeXyzMaterial(c)
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
 end

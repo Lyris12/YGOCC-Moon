@@ -7,6 +7,7 @@ Scripted by: XGlitchy30
 
 local s,id=GetID()
 function s.initial_effect(c)
+	aux.EnablePendulumMod()
 	if not s.progressive_id then
 		s.progressive_id=id
 	else
@@ -132,8 +133,10 @@ function s.pcheck(e,tp,c)
 	end
 	local g=Duel.GetMatchingGroup(s.psfilter,tp,LOCATION_HAND|LOCATION_EXTRA,0,nil)
 	if #g==0 then return false end
-	local pcon=aux.PendCondition(c)
-	return pcon(e,lpz,g)
+	aux.LeavingCardForPendulumSummon=e:GetHandler()
+	local res=aux.PendCondition(e,lpz,g)
+	aux.LeavingCardForPendulumSummon=nil
+	return res
 end
 function s.excostfilter(c,tp)
 	return c:IsAbleToRemoveAsCost() and c:IsHasEffect(CARD_ETERNADIR_SCOUT_ESOM,tp)
@@ -174,8 +177,9 @@ function s.psop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(s.psfilter,tp,LOCATION_HAND|LOCATION_EXTRA,0,nil)
 	if #g==0 then return end
 	local sg=Group.CreateGroup()
-	local pop=aux.PendOperation()
-	pop(e,tp,eg,ep,ev,re,r,rp,lpz,sg,g)
+	aux.LeavingCardForPendulumSummon=e:GetHandler()
+	aux.PendOperation(e,tp,eg,ep,ev,re,r,rp,lpz,sg,g)
+	aux.LeavingCardForPendulumSummon=nil
 	Duel.RaiseEvent(sg,EVENT_SPSUMMON_SUCCESS_G_P,e,REASON_EFFECT,tp,tp,0)
 	Duel.SpecialSummon(sg,SUMMON_TYPE_PENDULUM,tp,tp,true,true,POS_FACEUP)
 end

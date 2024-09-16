@@ -14,6 +14,8 @@ function Card.SingleEffect(c,code,val,reset,rc,range,cond,prop,desc)
 	if not reset and not range then
 		range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
 	end
+	
+	local donotdisable=false
 	local rc = rc and rc or c
     local rct=1
     if type(reset)=="table" then
@@ -21,18 +23,18 @@ function Card.SingleEffect(c,code,val,reset,rc,range,cond,prop,desc)
         reset=reset[1]
     end
 	
+	if type(rc)=="table" then
+        donotdisable=rc[2]
+        rc=rc[1]
+    end
+	
+	if not prop then prop=0 end
+	
 	local e=Effect.CreateEffect(rc)
-	if desc then
-		e:Desc(desc)
-	end
 	e:SetType(typ)
 	if range and not SCRIPT_AS_EQUIP then
-		local prop=prop and prop or 0
-		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE|prop)
+		prop=prop|EFFECT_FLAG_SINGLE_RANGE
 		e:SetRange(range)
-	end
-	if prop then
-		e:SetProperty(prop)
 	end
 	e:SetCode(code)
 	if val then
@@ -41,13 +43,27 @@ function Card.SingleEffect(c,code,val,reset,rc,range,cond,prop,desc)
 	if cond then
 		e:SetCondition(cond)
 	end
+	
 	if reset then
 		if type(reset)~="number" then reset=0 end
-		if prop and prop&EFFECT_FLAG_CANNOT_DISABLE==0 then
-			reset = rc==c and reset|RESET_DISABLE or reset
+		if rc==c and not donotdisable then
+			reset = reset|RESET_DISABLE
+			prop=prop|EFFECT_FLAG_COPY_INHERIT
+		else
+			prop=prop|EFFECT_FLAG_CANNOT_DISABLE
 		end
-		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
+		e:SetReset(RESET_EVENT|RESETS_STANDARD|reset,rct)
 	end
+	
+	if desc then
+		prop=prop|EFFECT_FLAG_CLIENT_HINT
+		e:SetDescription(desc)
+	end
+	
+	if prop~=0 then
+		e:SetProperty(prop)
+	end	
+	
 	return e
 end
 
@@ -321,6 +337,7 @@ function Card.UpdateATK(c,atk,reset,rc,range,cond,prop,desc,pause)
 		if type(reset)~="number" then reset=0 end
 		if rc==c and not donotdisable then
 			reset = reset|RESET_DISABLE
+			prop=prop|EFFECT_FLAG_COPY_INHERIT
 		else
 			prop=prop|EFFECT_FLAG_CANNOT_DISABLE
 		end
@@ -350,12 +367,19 @@ function Card.UpdateDEF(c,def,reset,rc,range,cond,prop,desc)
 	if not reset and not range then
 		range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
 	end
+	local donotdisable=false
 	local rc = rc and rc or c
     local rct=1
     if type(reset)=="table" then
         rct=reset[2]
         reset=reset[1]
     end
+	
+	if type(rc)=="table" then
+        donotdisable=rc[2]
+        rc=rc[1]
+    end
+	
 	if not prop then prop=0 end
 	
 	local df=c:GetDefense()
@@ -374,6 +398,7 @@ function Card.UpdateDEF(c,def,reset,rc,range,cond,prop,desc)
 		if type(reset)~="number" then reset=0 end
 		if rc==c and not donotdisable then
 			reset = reset|RESET_DISABLE
+			prop=prop|EFFECT_FLAG_COPY_INHERIT
 		else
 			prop=prop|EFFECT_FLAG_CANNOT_DISABLE
 		end
@@ -442,6 +467,7 @@ function Card.UpdateATKDEF(c,atk,def,reset,rc,range,cond,prop,desc)
 		if type(reset)~="number" then reset=0 end
 		if rc==c and not donotdisable then
 			reset = reset|RESET_DISABLE
+			prop=prop|EFFECT_FLAG_COPY_INHERIT
 		else
 			prop=prop|EFFECT_FLAG_CANNOT_DISABLE
 		end
@@ -601,6 +627,7 @@ function Card.ChangeATK(c,atk,reset,rc,range,cond,prop,desc)
 		if type(reset)~="number" then reset=0 end
 		if rc==c and not donotdisable then
 			reset = reset|RESET_DISABLE
+			prop=prop|EFFECT_FLAG_COPY_INHERIT
 		else
 			prop=prop|EFFECT_FLAG_CANNOT_DISABLE
 		end
@@ -852,7 +879,7 @@ function Auxiliary.ChangeATKDEFOperation(subject,atk,def,reset,rc,range,cond,loc
 end
 
 function Card.HalveATK(c,reset,rc,range,cond,prop,desc)
-	local atk=math.floor(c:GetAttack()/2)
+	local atk=math.floor(c:GetAttack()/2 + 0.5)
 	return c:ChangeATK(atk,reset,rc,range,cond,prop,desc)
 end
 function Auxiliary.HalveATKOperation(subject,reset,rc,range,cond,loc1,loc2,min,max,exc)
@@ -860,7 +887,7 @@ function Auxiliary.HalveATKOperation(subject,reset,rc,range,cond,loc1,loc2,min,m
 	return aux.ChangeStatsOperationTemplate(Card.ChangeATK,subject,atk,reset,rc,range,cond,loc1,loc2,min,max,exc)
 end
 function Card.HalveDEF(c,reset,rc,range,cond,prop,desc)
-	local def=math.floor(c:GetDefense()/2)
+	local def=math.floor(c:GetDefense()/2 + 0.5)
 	return c:ChangeDEF(def,reset,rc,range,cond,prop,desc)
 end
 function Auxiliary.HalveDEFOperation(subject,reset,rc,range,cond,loc1,loc2,min,max,exc)
@@ -884,39 +911,9 @@ function Auxiliary.DoubleDEFOperation(subject,reset,rc,range,cond,loc1,loc2,min,
 	return aux.ChangeStatsOperationTemplate(Card.ChangeDEF,subject,def,reset,rc,range,cond,loc1,loc2,min,max,exc)
 end
 
-function Card.AddType(c,ctyp,reset,rc,range,cond,prop)
-	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
-	if not reset and not range then
-		range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
-	end
-	
-	local rc = rc and rc or c
-    local rct=1
-    if type(reset)=="table" then
-        rct=reset[2]
-        reset=reset[1]
-    end
-	
+function Card.AddType(c,ctyp,reset,rc,range,cond,prop,desc)
 	local otyp=c:GetType()
-	local e=Effect.CreateEffect(rc)
-	e:SetType(typ)
-	if range and not SCRIPT_AS_EQUIP then
-		local prop = prop and prop or 0
-		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE|prop)
-		e:SetRange(range)
-	elseif prop then
-		e:SetProperty(prop)
-	end
-	e:SetCode(EFFECT_ADD_TYPE)
-	e:SetValue(ctyp)
-	if cond then
-		e:SetCondition(cond)
-	end
-	if reset then
-		if type(reset)~="number" then reset=0 end
-		reset = rc==c and reset|RESET_DISABLE or reset
-		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
-	end
+	local e=c:SingleEffect(EFFECT_ADD_TYPE,ctyp,reset,rc,range,cond,prop,desc)
 	c:RegisterEffect(e)
 	if reset then
 		return e,otyp,c:GetType()&ctyp
@@ -929,35 +926,8 @@ function Auxiliary.AddTypeOperation(subject,attr,reset,rc,range,cond,loc1,loc2,m
 end
 
 function Card.ChangeAttribute(c,attr,reset,rc,range,cond,prop,desc)
-	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
-	if not reset and not range then
-		range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
-	end
-	
-	local rc = rc and rc or c
-    local rct=1
-    if type(reset)=="table" then
-        rct=reset[2]
-        reset=reset[1]
-    end
-	
 	local oatt=c:GetAttribute()
-	local e=Effect.CreateEffect(rc)
-	e:SetType(typ)
-	if range and not SCRIPT_AS_EQUIP then
-		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-		e:SetRange(range)
-	end
-	e:SetCode(EFFECT_CHANGE_ATTRIBUTE)
-	e:SetValue(attr)
-	if cond then
-		e:SetCondition(cond)
-	end
-	if reset then
-		if type(reset)~="number" then reset=0 end
-		reset = rc==c and reset|RESET_DISABLE or reset
-		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
-	end
+	local e=c:SingleEffect(EFFECT_CHANGE_ATTRIBUTE,attr,reset,rc,range,cond,prop,desc)
 	c:RegisterEffect(e)
 	if reset then
 		return e,oatt,c:GetAttribute()
@@ -970,35 +940,8 @@ function Auxiliary.ChangeAttributeOperation(subject,attr,reset,rc,range,cond,loc
 end
 
 function Card.ChangeRace(c,race,reset,rc,range,cond,prop,desc)
-	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
-	if not reset and not range then
-		range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
-	end
-	
-	local rc = rc and rc or c
-    local rct=1
-    if type(reset)=="table" then
-        rct=reset[2]
-        reset=reset[1]
-    end
-	
 	local orac=c:GetRace()
-	local e=Effect.CreateEffect(rc)
-	e:SetType(typ)
-	if range and not SCRIPT_AS_EQUIP then
-		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-		e:SetRange(range)
-	end
-	e:SetCode(EFFECT_CHANGE_RACE)
-	e:SetValue(race)
-	if cond then
-		e:SetCondition(cond)
-	end
-	if reset then
-		if type(reset)~="number" then reset=0 end
-		reset = rc==c and reset|RESET_DISABLE or reset
-		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
-	end
+	local e=c:SingleEffect(EFFECT_CHANGE_RACE,race,reset,rc,range,cond,prop,desc)
 	c:RegisterEffect(e)
 	if reset then
 		return e,orac,c:GetRace()
@@ -1011,35 +954,8 @@ function Auxiliary.ChangeRaceOperation(subject,race,reset,rc,range,cond,loc1,loc
 end
 
 function Card.UpdateLevel(c,lv,reset,rc,range,cond,prop,desc)
-	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
-	if not reset and not range then
-		range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
-	end
-	
-	local rc = rc and rc or c
-    local rct=1
-    if type(reset)=="table" then
-        rct=reset[2]
-        reset=reset[1]
-    end
-	
 	local olv=c:GetLevel()
-	local e=Effect.CreateEffect(rc)
-	e:SetType(typ)
-	if range and not SCRIPT_AS_EQUIP then
-		e:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-		e:SetRange(range)
-	end
-	e:SetCode(EFFECT_UPDATE_LEVEL)
-	e:SetValue(lv)
-	if cond then
-		e:SetCondition(cond)
-	end
-	if reset then
-		if type(reset)~="number" then reset=0 end
-		reset = rc==c and reset|RESET_DISABLE or reset
-		e:SetReset(RESET_EVENT|RESETS_STANDARD|reset,rct)
-	end
+	local e=c:SingleEffect(EFFECT_UPDATE_LEVEL,lv,reset,rc,range,cond,prop,desc)
 	c:RegisterEffect(e)
 	if reset then
 		return e,c:GetLevel()-olv
@@ -1052,55 +968,9 @@ function Auxiliary.UpdateLevelOperation(subject,lv,reset,rc,range,cond,loc1,loc2
 end
 
 function Card.ChangeLevel(c,lv,reset,rc,range,cond,prop,desc)
-	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
-	if not reset and not range then
-		range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
-	end
-	
-	local donotdisable=false
-    local rct=1
-    if type(reset)=="table" then
-        rct=reset[2]
-        reset=reset[1]
-    end
-	
-	if type(rc)=="table" then
-        donotdisable=rc[2]
-        rc=rc[1]
-    end
-	local rc = rc and rc or c
-	
-	if not prop then prop=0 end
-	
 	local olv=c:GetLevel()
-	local e=Effect.CreateEffect(rc)
-	e:SetType(typ)
-	if range and not SCRIPT_AS_EQUIP then
-		prop=prop|EFFECT_FLAG_SINGLE_RANGE
-		e:SetRange(range)
-	end
-	e:SetCode(EFFECT_CHANGE_LEVEL)
-	e:SetValue(lv)
-	if cond then
-		e:SetCondition(cond)
-	end
-	
-	if reset then
-		if type(reset)~="number" then reset=0 end
-		if rc==c and not donotdisable then
-			reset = reset|RESET_DISABLE
-		else
-			prop=prop|EFFECT_FLAG_CANNOT_DISABLE
-		end
-		e:SetReset(RESET_EVENT|RESETS_STANDARD|reset,rct)
-	end
-	
-	if prop~=0 then
-		e:SetProperty(prop)
-	end
-	
+	local e=c:SingleEffect(EFFECT_CHANGE_LEVEL,lv,reset,rc,range,cond,prop,desc)
 	c:RegisterEffect(e)
-	
 	if reset then
 		return e,c:GetLevel()-olv
 	else
@@ -1111,31 +981,18 @@ function Auxiliary.ChangeLevelOperation(subject,lv,reset,rc,range,cond,loc1,loc2
 	return aux.ChangeStatsOperationTemplate(Card.ChangeLevel,subject,lv,reset,rc,range,cond,loc1,loc2,min,max,exc)
 end
 
---Effect
+--Battle Restrictions
+function Card.CannotAttack(c,val,reset,rc,cond,prop,desc)
+	if not desc and reset then
+		desc=STRING_CANNOT_ATTACK
+	end
+	local e=c:SingleEffect(EFFECT_CANNOT_ATTACK,val,reset,rc,nil,cond,prop,desc)
+	c:RegisterEffect(e)
+	return e
+end
 
 
 --Battle Related
-PROTECTION_FROM_OPPONENT 			= 0x1
-PROTECTION_FROM_MONSTER_EFFECTS		= 0x2
-PROTECTION_FROM_SPELL_EFFECTS		= 0x4
-PROTECTION_FROM_TRAP_EFFECTS		= 0x8
-PROTECTION_FROM_EFFECTS				= 0xe
-PROTECTION_FROM_SPELLS_TRAPS		= 0xc
-PROTECTION_MAX_VALUE				= 0x8
-
-PROTECTION_FUNCTIONS={
-[PROTECTION_FROM_OPPONENT]=function(eff,re,rp) return rp~=eff:GetHandlerPlayer() end;
-[PROTECTION_FROM_MONSTER_EFFECTS]=function(eff,re,rp) return re:IsActiveType(TYPE_MONSTER) end;
-[PROTECTION_FROM_SPELL_EFFECTS]=function(eff,re,rp) return re:IsActiveType(TYPE_SPELL) end;
-[PROTECTION_FROM_TRAP_EFFECTS]=function(eff,re,rp) return re:IsActiveType(TYPE_TRAP) end;
-}
-
-UNAFFECTED_PROTECTION_FUNCTIONS={
-[PROTECTION_FROM_OPPONENT]=function(eff,re) return re:GetOwnerPlayer()~=eff:GetOwnerPlayer() end;
-[PROTECTION_FROM_MONSTER_EFFECTS]=function(eff,re) return re:IsActiveType(TYPE_MONSTER) end;
-[PROTECTION_FROM_SPELL_EFFECTS]=function(eff,re) return re:IsActiveType(TYPE_SPELL) end;
-[PROTECTION_FROM_TRAP_EFFECTS]=function(eff,re) return re:IsActiveType(TYPE_TRAP) end;
-}
 
 BATTLE_TIMING_BATTLES				= 1
 BATTLE_TIMING_ATTACKS				= 2
@@ -1179,23 +1036,11 @@ BATTLE_TIMING_FUNCTIONS_SINGLE={
 								end;
 }
 
-function Card.CanAttackDirectly(c,reset,rc,cond,prop,desc)
-	local rc = rc and rc or c
-    local rct=1
-    if type(reset)=="table" then
-        rct=reset[2]
-        reset=reset[1]
-    end
-	local e=Effect.CreateEffect(rc)
-	e:SetType(EFFECT_TYPE_SINGLE)
-	e:SetCode(EFFECT_DIRECT_ATTACK)
-	if cond then
-		e:SetCondition(cond)
+function Card.CanAttackDirectly(c,val,reset,rc,cond,prop,desc)
+	if not desc and reset then
+		desc=STRING_DIRECT_ATTACK
 	end
-	if reset then
-		if type(reset)~="number" then reset=0 end
-		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
-	end
+	local e=c:SingleEffect(EFFECT_DIRECT_ATTACK,val,reset,rc,nil,cond,prop,desc)
 	c:RegisterEffect(e)
 	return e
 end
@@ -1300,6 +1145,417 @@ function Card.SetMaximumNumberOfAttacksOnMonsters(c,ct,reset,rc,cond,prop,desc)
 end
 
 --Protections
+function Card.CannotBeDestroyedByBattle(c,val,cond,reset,rc,range,prop,desc,forced,typ)
+	if not typ and c:IsOriginalType(TYPE_EQUIP) and not range then
+		typ = EFFECT_TYPE_EQUIP
+	else
+		typ = typ or EFFECT_TYPE_SINGLE
+	end
+	
+	if typ==EFFECT_TYPE_SINGLE and not reset and not range then
+		range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	end
+	
+	local donotdisable=false
+	local rc = rc and rc or c
+    local rct=1
+    if type(reset)=="table" then
+        rct=reset[2]
+        reset=reset[1]
+    end
+	
+	if type(rc)=="table" then
+        donotdisable=rc[2]
+        rc=rc[1]
+    end
+	
+	if not prop then prop=0 end
+	
+	if not val then val=1 end
+	
+	local e=Effect.CreateEffect(rc)
+	e:SetType(typ)
+	if range then
+		prop=prop|EFFECT_FLAG_SINGLE_RANGE
+		e:SetRange(range)
+	end
+	e:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
+	e:SetValue(val)
+	if cond then
+		e:SetCondition(cond)
+	end
+	
+	if reset then
+		if type(reset)~="number" then reset=0 end
+		prop=prop|EFFECT_FLAG_CANNOT_DISABLE
+		e:SetReset(RESET_EVENT|RESETS_STANDARD|reset,rct)
+	end
+	
+	if prop~=0 then
+		e:SetProperty(prop)
+	end
+	
+	c:RegisterEffect(e,forced)
+	
+	return e
+end
+
+function Card.CannotBeDestroyedByEffects(c,val,cond,reset,rc,range,prop,desc,forced,typ)
+	if not typ and c:IsOriginalType(TYPE_EQUIP) and not range then
+		typ = EFFECT_TYPE_EQUIP
+	else
+		typ = typ or EFFECT_TYPE_SINGLE
+	end
+	
+	if typ==EFFECT_TYPE_SINGLE and not reset and not range then
+		range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	end
+	
+	local donotdisable=false
+	local rc = rc and rc or c
+    local rct=1
+    if type(reset)=="table" then
+        rct=reset[2]
+        reset=reset[1]
+    end
+	
+	if type(rc)=="table" then
+        donotdisable=rc[2]
+        rc=rc[1]
+    end
+	
+	if not prop then prop=0 end
+	
+	if not val then val=1 end
+	
+	local e=Effect.CreateEffect(rc)
+	e:SetType(typ)
+	if range then
+		prop=prop|EFFECT_FLAG_SINGLE_RANGE
+		e:SetRange(range)
+	end
+	e:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
+	e:SetValue(val)
+	if cond then
+		e:SetCondition(cond)
+	end
+	
+	if reset then
+		if type(reset)~="number" then reset=0 end
+		prop=prop|EFFECT_FLAG_CANNOT_DISABLE
+		e:SetReset(RESET_EVENT|RESETS_STANDARD|reset,rct)
+	end
+	
+	if prop~=0 then
+		e:SetProperty(prop)
+	end
+	
+	c:RegisterEffect(e,forced)
+	
+	return e
+end
+
+--Protections: Immunity
+UNAFFECTED_OTHER		= 0x1
+UNAFFECTED_OPPO			= 0x2
+UNAFFECTED_OTHER_EQUIP	= 0x100
+
+function Auxiliary.imother(e,te)
+	return e:GetOwner()~=te:GetOwner()
+end
+function Auxiliary.imoval(e,te)
+	return e:GetOwnerPlayer()~=te:GetOwnerPlayer()
+end
+function Auxiliary.imothereq(e,te)
+	local owner,affecting_owner=e:GetOwner(),te:GetOwner()
+	return owner~=affecting_owner and affecting_owner~=owner:GetEquipTarget()
+end
+
+Auxiliary.UnaffectedProtections={
+	[UNAFFECTED_OTHER]			= aux.imother;
+	[UNAFFECTED_OPPO]			= aux.imoval;
+	[UNAFFECTED_OTHER_EQUIP]	= aux.imothereq;
+}
+
+function Card.Unaffected(c,immunity,cond,reset,rc,range,prop,desc,forced,typ)
+	if not typ and c:IsOriginalType(TYPE_EQUIP) and not range then
+		typ = EFFECT_TYPE_EQUIP
+	else
+		typ = typ or EFFECT_TYPE_SINGLE
+	end
+	
+	if typ==EFFECT_TYPE_SINGLE and not reset and not range then
+		range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	end
+	
+	local donotdisable=false
+	local rc = rc and rc or c
+    local rct=1
+    if type(reset)=="table" then
+        rct=reset[2]
+        reset=reset[1]
+    end
+	
+	if type(rc)=="table" then
+        donotdisable=rc[2]
+        rc=rc[1]
+    end
+	
+	if not prop then prop=0 end
+	
+	if type(immunity)=="number" then
+		immunity=aux.UnaffectedProtections[immunity]
+	end
+	
+	local e=Effect.CreateEffect(rc)
+	if desc then
+		e:SetDescription(desc)
+		prop=prop|EFFECT_FLAG_CLIENT_HINT
+	end
+	e:SetType(typ)
+	if range then
+		prop=prop|EFFECT_FLAG_SINGLE_RANGE
+		e:SetRange(range)
+	end
+	e:SetCode(EFFECT_IMMUNE_EFFECT)
+	e:SetValue(immunity)
+	if cond then
+		e:SetCondition(cond)
+	end
+	
+	if reset then
+		if type(reset)~="number" then reset=0 end
+		prop=prop|EFFECT_FLAG_CANNOT_DISABLE
+		e:SetReset(RESET_EVENT|RESETS_STANDARD|reset,rct)
+	end
+	
+	if prop~=0 then
+		e:SetProperty(prop)
+	end
+	
+	c:RegisterEffect(e,forced)
+	
+	return e
+end
+
+function Card.CannotBeTributed(c,reset,rc,range,cond,prop,desc)
+	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
+	local rc = rc and rc or c
+    local rct=1
+    if type(reset)=="table" then
+        rct=reset[2]
+        reset=reset[1]
+    end
+	local range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	--
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(typ)
+	if not SCRIPT_AS_EQUIP then
+		e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+		e4:SetRange(range)
+	end
+	e4:SetCode(EFFECT_UNRELEASABLE_SUM)
+	e4:SetValue(1)
+	if cond then
+		e:SetCondition(cond)
+	end
+	if reset then
+		if type(reset)~="number" then reset=0 end
+		e4:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
+	end
+	c:RegisterEffect(e4)
+	--
+	local e5=e4:Clone()
+	e5:SetCode(EFFECT_UNRELEASABLE_NONSUM)
+	c:RegisterEffect(e5)
+	return e4,e5
+end
+
+--Restriction and Rules
+function Card.MustBeSummoned(c,sumtype,rc)
+	local rc = rc and rc or c
+	local e=Effect.CreateEffect(rc)
+	e:SetType(EFFECT_TYPE_SINGLE)
+	e:SetProperty(EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_UNCOPYABLE)
+	e:SetCode(EFFECT_SPSUMMON_CONDITION)
+	e:SetValue(	function(eff,se,sp,st)
+					return st&sumtype==sumtype
+				end
+			  )
+	c:RegisterEffect(e)
+	return e
+end
+function Card.MustFirstBeSummoned(c,sumtype,rc)
+	local rc = rc and rc or c
+	local e=Effect.CreateEffect(rc)
+	e:SetType(EFFECT_TYPE_SINGLE)
+	e:SetProperty(EFFECT_FLAG_SINGLE_RANGE|EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_UNCOPYABLE)
+	e:SetCode(EFFECT_SPSUMMON_CONDITION)
+	e:SetRange(LOCATION_EXTRA)
+	e:SetValue(	function(eff,se,sp,st)
+					return st&sumtype==sumtype
+				end
+			  )
+	c:RegisterEffect(e)
+	return e
+end
+function Card.MustBeSSedByOwnProcedure(c,rc)
+	local rc = rc and rc or c
+	local e=Effect.CreateEffect(rc)
+	e:SetProperty(EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_UNCOPYABLE)
+	e:SetType(EFFECT_TYPE_SINGLE)
+	e:SetCode(EFFECT_SPSUMMON_CONDITION)
+	c:RegisterEffect(e)
+end
+function Card.CannotBeMaterial(c,ed_types,f,reset,rc,range,cond,prop,desc)
+	local rc = rc and rc or c
+    local rct=1
+    if type(reset)=="table" then
+        rct=reset[2]
+        reset=reset[1]
+    end
+	local effs={}
+	local elist={235,236,238,239,624,825}
+	local list={TYPE_FUSION,TYPE_SYNCHRO,TYPE_XYZ,TYPE_LINK,TYPE_BIGBANG,TYPE_TIMELEAP}
+	for i,typ in ipairs(list) do
+		if ed_types&typ==typ then
+			local e=Effect.CreateEffect(rc)
+			e:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+			e:SetType(EFFECT_TYPE_SINGLE)
+			e:SetCode(elist[i])
+			if type(f)=="function" then
+				e:SetValue(function(eff,cc) if not cc then return false end return f(cc,eff) end)
+			else
+				e:SetValue(1)
+			end
+			if cond then
+				e:SetCondition(cond)
+			end
+			if reset then
+				if type(reset)~="number" then reset=0 end
+				e:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
+			end
+			c:RegisterEffect(e)
+			table.insert(effs,e)
+		end
+	end
+	if #effs>0 then
+		return table.unpack(effs)
+	else
+		return false
+	end
+end
+function Card.CannotBeTributedForATributeSummon(c,forced,reset,rc,cond,prop,desc)
+	if not prop then prop=0 end
+	if desc then prop=prop|EFFECT_FLAG_CLIENT_HINT end
+	local e=c:SingleEffect(EFFECT_UNRELEASABLE_SUM,1,reset,rc,nil,cond,prop,desc)
+	c:RegisterEffect(e,forced)
+	return e
+end
+
+function Card.CannotBeSet(c,reset,rc,cond,prop,desc)
+	local rc = rc and rc or c
+    local rct=1
+    if type(reset)=="table" then
+        rct=reset[2]
+        reset=reset[1]
+    end
+	local e=Effect.CreateEffect(rc)
+	e:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e:SetType(EFFECT_TYPE_SINGLE)
+	e:SetCode(EFFECT_CANNOT_SSET)
+	if cond then
+		e:SetCondition(cond)
+	end
+	if reset then
+		if type(reset)~="number" then reset=0 end
+		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
+	end
+	c:RegisterEffect(e)
+end
+
+function Card.SetSummonLimit(c,sumtype,lim,flag)
+	if type(sumtype)~="number" then sumtype=SUMMON_TYPE_SPECIAL end
+	if type(lim)~="number" then lim=1 end
+	local e=Effect.CreateEffect(c)
+	e:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	e:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e:SetCondition(function(eff) return eff:GetHandler():IsSummonType(sumtype) end)
+	if not lim or lim==1 then
+		e:SetOperation(
+			function(eff,tp)
+				local e1=Effect.CreateEffect(eff:GetHandler())
+				e1:SetType(EFFECT_TYPE_FIELD)
+				e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+				e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+				if eff:GetHandler():GetSummonPlayer()==tp then
+					e1:SetTargetRange(1,0)
+				else
+					e1:SetTargetRange(0,1)
+				end
+				e1:SetReset(RESET_PHASE+PHASE_END)
+				e1:SetTarget(
+					function(e,card,sump,styp,sumpos,targetp,se)
+						return card:IsCode(c:GetCode()) and styp&sumtype==sumtype
+					end
+				)
+				Duel.RegisterEffect(e1,tp)
+			end
+		)
+	else
+		if not flag then flag=c:GetOriginalCode() end
+		e:SetOperation(
+			function(eff,tp)
+				local p=eff:GetHandler():GetSummonPlayer()
+				Duel.RegisterFlagEffect(p,flag,RESET_PHASE+PHASE_END,0,1)
+				if Duel.PlayerHasFlagEffect(p,flag) then
+					local e1=Effect.CreateEffect(eff:GetHandler())
+					e1:SetType(EFFECT_TYPE_FIELD)
+					e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+					e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+					if p==tp then
+						e1:SetTargetRange(1,0)
+					else
+						e1:SetTargetRange(0,1)
+					end
+					e1:SetReset(RESET_PHASE+PHASE_END)
+					e1:SetTarget(
+						function(e,c,sump,styp,sumpos,targetp,se)
+							return c:IsCode(c:GetCode()) and styp&sumtype==sumtype
+						end
+					)
+					Duel.RegisterEffect(e1,tp)
+				end
+			end
+		)
+	end
+	c:RegisterEffect(e)
+	return e
+end
+
+--Protections (OUTDATED: DO NOT USE - SOON TO BE DEPRECATED)
+PROTECTION_FROM_OPPONENT 			= 0x1
+PROTECTION_FROM_MONSTER_EFFECTS		= 0x2
+PROTECTION_FROM_SPELL_EFFECTS		= 0x4
+PROTECTION_FROM_TRAP_EFFECTS		= 0x8
+PROTECTION_FROM_EFFECTS				= 0xe
+PROTECTION_FROM_SPELLS_TRAPS		= 0xc
+PROTECTION_MAX_VALUE				= 0x8
+
+PROTECTION_FUNCTIONS={
+[PROTECTION_FROM_OPPONENT]=function(eff,re,rp) return rp~=eff:GetHandlerPlayer() end;
+[PROTECTION_FROM_MONSTER_EFFECTS]=function(eff,re,rp) return re:IsActiveType(TYPE_MONSTER) end;
+[PROTECTION_FROM_SPELL_EFFECTS]=function(eff,re,rp) return re:IsActiveType(TYPE_SPELL) end;
+[PROTECTION_FROM_TRAP_EFFECTS]=function(eff,re,rp) return re:IsActiveType(TYPE_TRAP) end;
+}
+
+UNAFFECTED_PROTECTION_FUNCTIONS={
+[PROTECTION_FROM_OPPONENT]=function(eff,re) return re:GetOwnerPlayer()~=eff:GetOwnerPlayer() end;
+[PROTECTION_FROM_MONSTER_EFFECTS]=function(eff,re) return re:IsActiveType(TYPE_MONSTER) end;
+[PROTECTION_FROM_SPELL_EFFECTS]=function(eff,re) return re:IsActiveType(TYPE_SPELL) end;
+[PROTECTION_FROM_TRAP_EFFECTS]=function(eff,re) return re:IsActiveType(TYPE_TRAP) end;
+}
 function Card.BattleProtection(c,reset,rc,cond,prop,desc)
 	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
 	local prop = prop and prop or 0
@@ -1578,167 +1834,6 @@ function Card.FirstTimeProtection(c,each_turn,battle,effect,protection,reset,rc,
 	if reset then
 		if type(reset)~="number" then reset=0 end
 		e:SetReset(RESET_EVENT|RESETS_STANDARD|reset,rct)
-	end
-	c:RegisterEffect(e)
-	return e
-end
-
-function Card.CannotBeTributed(c,reset,rc,range,cond,prop,desc)
-	local typ = (SCRIPT_AS_EQUIP==true) and EFFECT_TYPE_EQUIP or EFFECT_TYPE_SINGLE
-	local rc = rc and rc or c
-    local rct=1
-    if type(reset)=="table" then
-        rct=reset[2]
-        reset=reset[1]
-    end
-	local range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
-	--
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(typ)
-	if not SCRIPT_AS_EQUIP then
-		e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-		e4:SetRange(range)
-	end
-	e4:SetCode(EFFECT_UNRELEASABLE_SUM)
-	e4:SetValue(1)
-	if cond then
-		e:SetCondition(cond)
-	end
-	if reset then
-		if type(reset)~="number" then reset=0 end
-		e4:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
-	end
-	c:RegisterEffect(e4)
-	--
-	local e5=e4:Clone()
-	e5:SetCode(EFFECT_UNRELEASABLE_NONSUM)
-	c:RegisterEffect(e5)
-	return e4,e5
-end
-
---Restriction and Rules
-function Card.CannotBeMaterial(c,ed_types,f,reset,rc,range,cond,prop,desc)
-	local rc = rc and rc or c
-    local rct=1
-    if type(reset)=="table" then
-        rct=reset[2]
-        reset=reset[1]
-    end
-	local effs={}
-	local elist={235,236,238,239,624,825}
-	local list={TYPE_FUSION,TYPE_SYNCHRO,TYPE_XYZ,TYPE_LINK,TYPE_BIGBANG,TYPE_TIMELEAP}
-	for i,typ in ipairs(list) do
-		if ed_types&typ==typ then
-			local e=Effect.CreateEffect(rc)
-			e:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-			e:SetType(EFFECT_TYPE_SINGLE)
-			e:SetCode(elist[i])
-			if type(f)=="function" then
-				e:SetValue(function(eff,cc) if not cc then return false end return f(cc,eff) end)
-			else
-				e:SetValue(1)
-			end
-			if cond then
-				e:SetCondition(cond)
-			end
-			if reset then
-				if type(reset)~="number" then reset=0 end
-				e:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
-			end
-			c:RegisterEffect(e)
-			table.insert(effs,e)
-		end
-	end
-	if #effs>0 then
-		return table.unpack(effs)
-	else
-		return false
-	end
-end
-function Card.CannotBeTributedForATributeSummon(c,forced,reset,rc,cond,prop,desc)
-	if not prop then prop=0 end
-	if desc then prop=prop|EFFECT_FLAG_CLIENT_HINT end
-	local e=c:SingleEffect(EFFECT_UNRELEASABLE_SUM,1,reset,rc,nil,cond,prop,desc)
-	c:RegisterEffect(e,forced)
-	return e
-end
-
-function Card.CannotBeSet(c,reset,rc,cond,prop,desc)
-	local rc = rc and rc or c
-    local rct=1
-    if type(reset)=="table" then
-        rct=reset[2]
-        reset=reset[1]
-    end
-	local e=Effect.CreateEffect(rc)
-	e:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e:SetType(EFFECT_TYPE_SINGLE)
-	e:SetCode(EFFECT_CANNOT_SSET)
-	if cond then
-		e:SetCondition(cond)
-	end
-	if reset then
-		if type(reset)~="number" then reset=0 end
-		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
-	end
-	c:RegisterEffect(e)
-end
-
-function Card.SetSummonLimit(c,sumtype,lim,flag)
-	if type(sumtype)~="number" then sumtype=SUMMON_TYPE_SPECIAL end
-	if type(lim)~="number" then lim=1 end
-	local e=Effect.CreateEffect(c)
-	e:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e:SetCondition(function(eff) return eff:GetHandler():IsSummonType(sumtype) end)
-	if not lim or lim==1 then
-		e:SetOperation(
-			function(eff,tp)
-				local e1=Effect.CreateEffect(eff:GetHandler())
-				e1:SetType(EFFECT_TYPE_FIELD)
-				e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-				e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-				if eff:GetHandler():GetSummonPlayer()==tp then
-					e1:SetTargetRange(1,0)
-				else
-					e1:SetTargetRange(0,1)
-				end
-				e1:SetReset(RESET_PHASE+PHASE_END)
-				e1:SetTarget(
-					function(e,card,sump,styp,sumpos,targetp,se)
-						return card:IsCode(c:GetCode()) and styp&sumtype==sumtype
-					end
-				)
-				Duel.RegisterEffect(e1,tp)
-			end
-		)
-	else
-		if not flag then flag=c:GetOriginalCode() end
-		e:SetOperation(
-			function(eff,tp)
-				local p=eff:GetHandler():GetSummonPlayer()
-				Duel.RegisterFlagEffect(p,flag,RESET_PHASE+PHASE_END,0,1)
-				if Duel.PlayerHasFlagEffect(p,flag) then
-					local e1=Effect.CreateEffect(eff:GetHandler())
-					e1:SetType(EFFECT_TYPE_FIELD)
-					e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-					e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-					if p==tp then
-						e1:SetTargetRange(1,0)
-					else
-						e1:SetTargetRange(0,1)
-					end
-					e1:SetReset(RESET_PHASE+PHASE_END)
-					e1:SetTarget(
-						function(e,c,sump,styp,sumpos,targetp,se)
-							return c:IsCode(c:GetCode()) and styp&sumtype==sumtype
-						end
-					)
-					Duel.RegisterEffect(e1,tp)
-				end
-			end
-		)
 	end
 	c:RegisterEffect(e)
 	return e

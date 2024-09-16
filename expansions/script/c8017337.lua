@@ -2,6 +2,7 @@
 --Scripted by: XGlitchy30
 local cid,id=GetID()
 function cid.initial_effect(c)
+	aux.EnablePendulumMod(EFFECT_PANDEPEND_SCALE)
 	aux.AddOrigPandemoniumType(c)
 	local p0=Effect.CreateEffect(c)
 	p0:SetType(EFFECT_TYPE_SINGLE)

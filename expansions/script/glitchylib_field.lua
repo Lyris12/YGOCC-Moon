@@ -1,8 +1,8 @@
-function Card.FieldEffect(c,code,range,selfzones,oppozones,f,val,cond,reset,rc)
+function Card.FieldEffect(c,code,range,selfzones,oppozones,f,val,cond,reset,rc,prop)
 --CONTINUOUS EFFECTS (EFFECT_TYPE_FIELD)
 	if not range then range=c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE end
 	if not selfzones then selfzones=0 end
-	if type(oppozones)=="boolean" and oppozones==true then
+	if oppozones==true then
 		oppozones=selfzones
 	elseif not oppozones then
 		oppozones=0
@@ -16,6 +16,9 @@ function Card.FieldEffect(c,code,range,selfzones,oppozones,f,val,cond,reset,rc)
 	
 	local e=Effect.CreateEffect(rc)
 	e:SetType(EFFECT_TYPE_FIELD)
+	if prop and prop~=0 then
+		e:SetProperty(prop)
+	end
 	e:SetRange(range)
 	e:SetCode(code)
 	if cond then
@@ -30,7 +33,7 @@ function Card.FieldEffect(c,code,range,selfzones,oppozones,f,val,cond,reset,rc)
 	end
 	if reset then
 		if type(reset)~="number" then reset=0 end
-		e:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
+		e:SetReset(RESET_EVENT|RESETS_STANDARD|reset,rct)
 	end
 	--c:RegisterEffect(e)
 	return e
@@ -134,6 +137,11 @@ BATTLE_TIMING_FUNCTIONS_FIELD={
 								end;
 }
 
+function Card.InflictPiercingDamageField(c,range,selfzones,oppozones,f,val,cond,reset,rc)
+	local e=c:FieldEffect(EFFECT_PIERCE,range,selfzones,oppozones,f,val,cond,reset,rc)
+	c:RegisterEffect(e)
+	return e
+end
 function Card.CanAttackDirectlyField(c,range,selfzones,oppozones,f,cond,reset,rc)
 	local e=c:FieldEffect(EFFECT_DIRECT_ATTACK,range,selfzones,oppozones,f,nil,cond,reset,rc)
 	c:RegisterEffect(e)
@@ -141,6 +149,11 @@ function Card.CanAttackDirectlyField(c,range,selfzones,oppozones,f,cond,reset,rc
 end
 function Card.CanAttackWhileInDefensePositionField(c,range,selfzones,oppozones,f,cond,reset,rc)
 	local e=c:FieldEffect(EFFECT_DEFENSE_ATTACK,range,selfzones,oppozones,f,1,cond,reset,rc)
+	c:RegisterEffect(e)
+	return e
+end
+function Card.CannotTargetForAttacksField(c,val,range,selfzones,oppozones,f,cond,reset,rc)
+	local e=c:FieldEffect(EFFECT_CANNOT_SELECT_BATTLE_TARGET,range,selfzones,oppozones,f,val,cond,reset,rc)
 	c:RegisterEffect(e)
 	return e
 end
@@ -208,6 +221,107 @@ function Card.SetMaximumNumberOfAttacksOnMonstersField(c,ct,range,selfzones,oppo
 	return e
 end
 --Protections
+function Card.CannotBeDestroyedByBattleField(c,val,range,selfzones,oppozones,f,cond,prop,reset,rc)
+	val = val and val or 1
+	local e=c:FieldEffect(EFFECT_INDESTRUCTABLE_BATTLE,range,selfzones,oppozones,f,val,cond,reset,rc,prop)
+	c:RegisterEffect(e)
+	return e
+end
+function Card.CannotBeDestroyedByEffectsField(c,val,range,selfzones,oppozones,f,cond,prop,reset,rc)
+	val = val and val or 1
+	local e=c:FieldEffect(EFFECT_INDESTRUCTABLE_EFFECT,range,selfzones,oppozones,f,val,cond,reset,rc,prop)
+	c:RegisterEffect(e)
+	return e
+end
+function Card.CannotBeTargetedByEffectsField(c,val,range,selfzones,oppozones,f,cond,prop,reset,rc)
+	prop = prop and prop or 0
+	val = val and val or 1
+	local e=c:FieldEffect(EFFECT_CANNOT_BE_EFFECT_TARGET,range,selfzones,oppozones,f,val,cond,reset,rc,EFFECT_FLAG_IGNORE_IMMUNE|prop)
+	c:RegisterEffect(e)
+	return e
+end
+function Card.UnaffectedField(c,val,range,selfzones,oppozones,f,cond,prop,reset,rc)
+	if type(val)=="number" then
+		val=aux.UnaffectedProtections[val]
+	end
+	local e=c:FieldEffect(EFFECT_IMMUNE_EFFECT,range,selfzones,oppozones,f,val,cond,reset,rc,prop)
+	c:RegisterEffect(e)
+	return e
+end
+
+--SS Procedures
+function Card.SSProc(c,desc,prop,range,ctlim,cond,tg,op,pos,p,zone)
+	local default_prop = (not pos1 and not p and not zone) and EFFECT_FLAG_UNCOPYABLE or EFFECT_FLAG_UNCOPYABLE|EFFECT_FLAG_SPSUM_PARAM
+	local prop = prop and prop or 0
+	local range = range and range or (c:IsOriginalType(TYPE_EXTRA)) and LOCATION_EXTRA or LOCATION_HAND
+	if p and p==PLAYER_ALL then
+		tg=aux.SelectFieldForSSProc(tg,pos)
+	end
+	---
+	local e1=Effect.CreateEffect(c)
+	if desc then
+		e1:Desc(desc)
+	end
+	e1:SetProperty(default_prop|prop)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_SPSUMMON_PROC)
+	e1:SetRange(range)
+	if ctlim then
+		if type(ctlim)=="boolean" then
+			e1:HOPT(true)
+		elseif type(ctlim)=="table" then
+			if type(ctlim[1])=="boolean" then
+				local shopt=ctlim[2]
+				local oath=ctlim[3]
+				if shopt then
+					e1:SHOPT(oath)
+				else
+					e1:HOPT(oath)
+				end
+			else
+				local flag=#ctlim>2 and ctlim[3] or 0
+				e1:SetCountLimit(ctlim[1],c:GetOriginalCode()+ctlim[2]*100+flag)
+			end
+		else
+			e1:SetCountLimit(ctlim)
+		end
+	end
+	if pos or p then
+		if not pos then pos=POS_FACEUP end
+		if not p then p=0 end
+		e1:SetTargetRange(pos,p)
+	end
+	if zone then
+		e1:SetValue(zone)
+	end
+	if cond then
+		e1:SetCondition(function(e,c) if c==nil then return true end return cond(e,c,e:GetHandlerPlayer()) end)
+	end
+	if tg then
+		e1:SetTarget(tg)
+	end
+	if op then
+		e1:SetOperation(op)
+	end
+	c:RegisterEffect(e1)
+	return e1
+end
+function Auxiliary.SelectFieldForSSProc(f,pos)
+	if not f then f=aux.TRUE end
+	if not pos then pos=POS_FACEUP end
+	return	function(...)
+				local outcome=f(...)
+				local sel=Duel.SelectOption(tp,102,103)
+				if sel==0 then
+					e:SetTargetRange(pos,0)
+				else
+					e:SetTargetRange(pos,1)
+				end
+				return outcome
+			end
+end
+
+--Protections (OUTDATED: DO NOT USE - SOON TO BE DEPRECATED)
 function Card.BattleProtectionField(c,range,selfzones,oppozones,f,cond,reset,rc)
 	local e=c:FieldEffect(EFFECT_INDESTRUCTABLE_BATTLE,range,selfzones,oppozones,f,1,cond,reset,rc)
 	c:RegisterEffect(e)
@@ -352,76 +466,4 @@ function Card.FirstTimeProtectionField(c,each_turn,battle,effect,protection,rang
 	e:SetCountLimit(1)
 	c:RegisterEffect(e)
 	return e
-end
-
---SS Procedures
-function Card.SSProc(c,desc,prop,range,ctlim,cond,tg,op,pos,p,zone)
-	local default_prop = (not pos1 and not p and not zone) and EFFECT_FLAG_UNCOPYABLE or EFFECT_FLAG_UNCOPYABLE|EFFECT_FLAG_SPSUM_PARAM
-	local prop = prop and prop or 0
-	local range = range and range or (c:IsOriginalType(TYPE_EXTRA)) and LOCATION_EXTRA or LOCATION_HAND
-	if p and p==PLAYER_ALL then
-		tg=aux.SelectFieldForSSProc(tg,pos)
-	end
-	---
-	local e1=Effect.CreateEffect(c)
-	if desc then
-		e1:Desc(desc)
-	end
-	e1:SetProperty(default_prop|prop)
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_SPSUMMON_PROC)
-	e1:SetRange(range)
-	if ctlim then
-		if type(ctlim)=="boolean" then
-			e1:HOPT(true)
-		elseif type(ctlim)=="table" then
-			if type(ctlim[1])=="boolean" then
-				local shopt=ctlim[2]
-				local oath=ctlim[3]
-				if shopt then
-					e1:SHOPT(oath)
-				else
-					e1:HOPT(oath)
-				end
-			else
-				local flag=#ctlim>2 and ctlim[3] or 0
-				e1:SetCountLimit(ctlim[1],c:GetOriginalCode()+ctlim[2]*100+flag)
-			end
-		else
-			e1:SetCountLimit(ctlim)
-		end
-	end
-	if pos or p then
-		if not pos then pos=POS_FACEUP end
-		if not p then p=0 end
-		e1:SetTargetRange(pos,p)
-	end
-	if zone then
-		e1:SetValue(zone)
-	end
-	if cond then
-		e1:SetCondition(function(e,c) if c==nil then return true end return cond(e,c,e:GetHandlerPlayer()) end)
-	end
-	if tg then
-		e1:SetTarget(tg)
-	end
-	if op then
-		e1:SetOperation(op)
-	end
-	c:RegisterEffect(e1)
-	return e1
-end
-function Auxiliary.SelectFieldForSSProc(f,pos)
-	if not f then f=aux.TRUE end
-	if not pos then pos=POS_FACEUP end
-	return	function(...)
-				local outcome=f(...)
-				local sel=Duel.SelectOption(tp,102,103)
-				if sel==0 then
-					e:SetTargetRange(pos,0)
-				else
-					e:SetTargetRange(pos,1)
-				end
-				return outcome
-			end
 end

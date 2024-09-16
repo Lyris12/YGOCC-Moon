@@ -4,6 +4,7 @@
 
 local s,id=GetID()
 function s.initial_effect(c)
+	aux.EnablePendulumMod(EFFECT_PENDULUM_SUMMON_WITH_ONE_SCALE)
 	aux.EnablePendulumAttribute(c)
 	--[[You can perform a Pendulum Summon even if there is not a Pendulum Monster Card in your other Pendulum Zone, treating the missing Pendulum Scale as 0.
 	If you do this, you can only Pendulum Summon "Eptamagi" monsters and/or DARK Spellcaster monsters.]]

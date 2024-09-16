@@ -16,6 +16,10 @@ EFFECT_GLITCHY_PREVIOUS_CUSTOM_SETCODE			= 8014
 EFFECT_GLITCHY_ADD_FUSION_CUSTOM_SETCODE		= 8015
 EFFECT_GLITCHY_ADD_LINK_CUSTOM_SETCODE			= 8016
 
+EFFECT_CHANGE_RECOVER							= 1508
+EFFECT_GLITCHY_ALSO_EFFECT_DAMAGE				= 100000300		--If a player takes damage, the damage is also inflicted to the opponent (the original damage the player would have taken).
+																--Made for "Dynastygian Sabotage - Weapons Jam"	
+
 FLAG_UNCOUNTED_NORMAL_SUMMON			= 8000
 FLAG_UNCOUNTED_NORMAL_SET				= 8001
 
@@ -26,8 +30,7 @@ EFFECT_REVERSE_WHEN_IF=48928491
 
 UNIVERSAL_GLITCHY_TOKEN = 1231
 
--------------------------------------------------------------------------------------
--------------------------------TABLES-------------------------------------------------
+--TABLES
 function Auxiliary.FindInTable(tab,a,...)
 	local extras={...}
 	if a then
@@ -53,8 +56,61 @@ function Auxiliary.ClearTable(tab)
 	end
 end
 
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
--------------------------------EFFECTS THAT CAN BE ACTIVATED BY AFFECTING THE CARD USED AS COST, EVEN WHEN THERE ARE NO OTHER VALID TARGETS-------------------------------------
+--DAMAGE CHANGES
+local duel_recover, duel_damage = Duel.Recover, Duel.Damage
+
+Duel.Recover = function(p,v,r,step,...)
+	if Duel.IsPlayerAffectedByEffect(p,EFFECT_CHANGE_RECOVER) then
+		for _,e in ipairs({Duel.IsPlayerAffectedByEffect(p,EFFECT_CHANGE_RECOVER)}) do
+			local val=e:GetValue()
+			if val and (aux.GetValueType(val)=="number" or val(e,r,v)) then
+				if aux.GetValueType(val)~="number" then
+					v=val(e,r,v)
+				end
+			end
+		end
+	end
+	local alsodam=Duel.IsPlayerAffectedByEffect(p,EFFECT_REVERSE_RECOVER) and Duel.IsPlayerAffectedByEffect(p,EFFECT_GLITCHY_ALSO_EFFECT_DAMAGE)
+	local tempdam=step
+	if alsodam then
+		step=true
+	end
+	local rec=duel_recover(p,v,r,step,...)
+	if rec==0 and alsodam then
+		duel_damage(1-p,v,r,true,...)
+		if not tempdam then
+			Duel.RDComplete()
+		end
+	end
+	return rec
+end
+Duel.Damage = function(p,v,r,step,...)
+	if Duel.IsPlayerAffectedByEffect(p,EFFECT_REVERSE_DAMAGE) and Duel.IsPlayerAffectedByEffect(p,EFFECT_CHANGE_RECOVER) then
+		for _,e in ipairs({Duel.IsPlayerAffectedByEffect(p,EFFECT_CHANGE_RECOVER)}) do
+			local val=e:GetValue()
+			if val and (aux.GetValueType(val)=="number" or val(e,r|REASON_RDAMAGE,v)) then
+				if aux.GetValueType(val)~="number" then
+					v=val(e,r|REASON_RDAMAGE,v)
+				end
+			end
+		end
+	end
+	local alsodam=Duel.IsPlayerAffectedByEffect(p,EFFECT_GLITCHY_ALSO_EFFECT_DAMAGE)
+	local tempdam=step
+	if alsodam then
+		step=true
+	end
+	local dam=duel_damage(p,v,r,step,...)
+	if dam>0 and alsodam then
+		duel_damage(1-p,v,r,true,...)
+		if not tempdam then
+			Duel.RDComplete()
+		end
+	end
+	return dam
+end
+
+--EFFECTS THAT CAN BE ACTIVATED BY AFFECTING THE CARD USED AS COST, EVEN WHEN THERE ARE NO OTHER VALID TARGETS
 aux.LocationAfterCostEffects = {
 [EFFECT_CANNOT_SPECIAL_SUMMON]=true;
 [EFFECT_CANNOT_SSET]=true;
@@ -258,6 +314,12 @@ local _SetCountLimit = Effect.SetCountLimit
 Effect.SetCountLimit = function(e,ct,...)
 	local x={...}
 	local flag = #x>0 and x[1] or 0
+	if type(flag)=="table" or #x>1 then
+		local id=type(flag)=="table" and flag[1] or flag
+		local mod=type(flag)=="table" and flag[2] or 0
+		local tempflag = #x>1 and x[2] or 0
+		flag=id+mod*100+tempflag
+	end
 	local owner
 	local etype=e:GetType()
 	if etype&EFFECT_TYPE_XMATERIAL>0 then
@@ -518,39 +580,13 @@ function Auxiliary.RegisterMergedDelayedEventGlitchy(c,code,event,f,flag,range,e
 		EVENT_COUNTER_ID = EVENT_COUNTER_ID + 1
 		aux.EventCounter[EVENT_COUNTER_ID]=0
 	end
-		
-	if range then
-		
-		local ge1
-		for _,ev in ipairs(event) do
-			ge1=Effect.CreateEffect(c)
-			ge1:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
-			ge1:SetCode(ev)
-			ge1:SetRange(range)
-			ge1:SetLabel(code)
-			ge1:SetLabelObject(g)
-			ge1:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy1(ev,flag,f,range,evgcheck,se,operation,simult_check,forced,customevgop,EVENT_COUNTER_ID))
-			Duel.RegisterEffect(ge1,0)
-		end
-		local ge2=ge1:Clone()
-		ge2:SetCode(EVENT_CHAIN_END)
-		ge2:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy2(flag,range,evgcheck,se,operation,forced,EVENT_COUNTER_ID))
-		Duel.RegisterEffect(ge2,0)
-		if simult_check then
-			aux.MustUpdateEventID[c]=false
-			local ge3=Effect.CreateEffect(c)
-			ge3:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
-			ge3:SetCode(EVENT_BREAK_EFFECT)
-			ge3:SetOperation(aux.SignalEventIDUpdate)
-			Duel.RegisterEffect(ge3,0)
-			local ge4=ge3:Clone()
-			ge4:SetCode(EVENT_CHAIN_SOLVED)
-			Duel.RegisterEffect(ge4,0)
-			local ge5=ge3:Clone()
-			ge5:SetCode(EVENT_CHAINING)
-			Duel.RegisterEffect(ge5,0)
-		end
-	else
+	
+	local updateflag=false
+	local private_range=range&LOCATIONS_PRIVATE
+	local public_range=range&(~private_range)
+	
+	if private_range>0 then
+		updateflag=true
 		local mt=getmetatable(c)
 		local ge1
 		for _,ev in ipairs(event) do
@@ -561,14 +597,14 @@ function Auxiliary.RegisterMergedDelayedEventGlitchy(c,code,event,f,flag,range,e
 				ge1:SetCode(ev)
 				ge1:SetLabel(code)
 				ge1:SetLabelObject(g)
-				ge1:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy1(ev,flag,f,nil,evgcheck,se,operation,simult_check,forced,customevgop,EVENT_COUNTER_ID))
+				ge1:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy1(ev,flag,f,nil,evgcheck,nil,operation,simult_check,forced,customevgop,EVENT_COUNTER_ID))
 				Duel.RegisterEffect(ge1,0)
 			end
 		end
 		if ge1 then
 			local ge2=ge1:Clone()
 			ge2:SetCode(EVENT_CHAIN_END)
-			ge2:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy2(flag,nil,evgcheck,se,operation,forced,EVENT_COUNTER_ID))
+			ge2:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy2(flag,nil,evgcheck,nil,operation,forced,EVENT_COUNTER_ID))
 			Duel.RegisterEffect(ge2,0)
 		end
 		if simult_check then
@@ -586,6 +622,40 @@ function Auxiliary.RegisterMergedDelayedEventGlitchy(c,code,event,f,flag,range,e
 			Duel.RegisterEffect(ge5,0)
 		end
 	end
+		
+	if public_range>0 then
+		if updateflag then code=code+100 flag=flag+100 end
+		local ge1
+		for _,ev in ipairs(event) do
+			ge1=Effect.CreateEffect(c)
+			ge1:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
+			ge1:SetCode(ev)
+			--ge1:SetRange(range)
+			ge1:SetLabel(code)
+			ge1:SetLabelObject(g)
+			ge1:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy1(ev,flag,f,public_range,evgcheck,se,operation,simult_check,forced,customevgop,EVENT_COUNTER_ID))
+			Duel.RegisterEffect(ge1,0)
+		end
+		local ge2=ge1:Clone()
+		ge2:SetCode(EVENT_CHAIN_END)
+		ge2:SetOperation(Auxiliary.MergedDelayEventCheckGlitchy2(flag,public_range,evgcheck,se,operation,forced,EVENT_COUNTER_ID))
+		Duel.RegisterEffect(ge2,0)
+		if simult_check then
+			aux.MustUpdateEventID[c]=false
+			local ge3=Effect.CreateEffect(c)
+			ge3:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
+			ge3:SetCode(EVENT_BREAK_EFFECT)
+			ge3:SetOperation(aux.SignalEventIDUpdate)
+			Duel.RegisterEffect(ge3,0)
+			local ge4=ge3:Clone()
+			ge4:SetCode(EVENT_CHAIN_SOLVED)
+			Duel.RegisterEffect(ge4,0)
+			local ge5=ge3:Clone()
+			ge5:SetCode(EVENT_CHAINING)
+			Duel.RegisterEffect(ge5,0)
+		end
+	end
+	
 end
 function Auxiliary.SignalEventIDUpdate(e,tp,eg,ep,ev,re,r,rp)
 	aux.MustUpdateEventID[e:GetOwner()] = true
@@ -617,11 +687,11 @@ function Auxiliary.MergedDelayEventCheckGlitchy1(event,id,f,range,evgcheck,se,op
 				local evg=eg:Filter(f,nil,e,tp,eg,ep,ev,re,r,rp,obj,event)
 				--Debug.Message(#evg)
 				local flagID=id
-				if type(id)=="function" then
-					flagID=id(event)
-				end
 				
 				for tc in aux.Next(evg) do
+					if type(id)=="function" then
+						flagID=id(event,tc,e,tp)
+					end
 					tc:RegisterFlagEffect(flagID,RESET_EVENT+RESETS_STANDARD-RESET_TURN_SET,EFFECT_FLAG_SET_AVAILABLE,1,label)
 					if simult_check then
 						tc:RegisterFlagEffect(simult_check,RESET_PHASE+PHASE_END,EFFECT_FLAG_SET_AVAILABLE,1,EVENT_ID)
@@ -758,25 +828,31 @@ function Auxiliary.MergedDelayEventCheckGlitchy2(id,range,evgcheck,se,operation,
 			end
 end
 
-function Auxiliary.SimultaneousEventGroupCheck(g,simult_check,og)
+function Auxiliary.SimultaneousEventGroupCheck(g,simult_check,og,gcheck)
 	local sg=g:Filter(Card.HasFlagEffect,nil,simult_check)
 	if #sg~=#g or sg:GetClassCount(Card.GetFlagEffectLabel,simult_check)>1 then return false end
 	local val=sg:GetFirst():GetFlagEffectLabel(simult_check)
 	if g:FilterCount(Card.HasFlagEffectLabel,nil,simult_check,val)~=og:FilterCount(Card.HasFlagEffectLabel,nil,simult_check,val) then
 		return false
 	end
-	return true
+	return not gcheck or gcheck(g)
 end
-
-function Auxiliary.SelectSimultaneousEventGroup(g,flag,ct,e,excflag)
+function Auxiliary.SelectSimultaneousEventGroup(g,tp,flag,ct,e,excflag,gcheck)
 	local ct=ct and ct or 1
 	local fid=e and e:GetHandler():GetFieldID() or 0
 	if excflag then
 		g=g:Filter(aux.NOT(Card.HasFlagEffectLabel),nil,excflag,fid)
 	end
-	if #g>1 then
+	if #g==0 then return end
+	if #g==1 then
+		Duel.HintSelection(g)
+		if excflag then
+			g:GetFirst():RegisterFlagEffect(excflag,RESET_CHAIN,0,1,fid)
+		end
+		return g
+	else
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_OPERATECARD)
-		local tg=g:SelectSubGroup(tp,aux.SimultaneousEventGroupCheck,false,ct,#g,flag,g)
+		local tg=g:SelectSubGroup(tp,aux.SimultaneousEventGroupCheck,false,ct,#g,flag,g,gcheck)
 		Duel.HintSelection(tg)
 		if excflag then
 			for tc in aux.Next(tg) do
@@ -784,12 +860,6 @@ function Auxiliary.SelectSimultaneousEventGroup(g,flag,ct,e,excflag)
 			end
 		end
 		return tg
-	else
-		Duel.HintSelection(g)
-		if excflag then
-			g:GetFirst():RegisterFlagEffect(excflag,RESET_CHAIN,0,1,fid)
-		end
-		return g
 	end
 end
 

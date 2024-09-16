@@ -29,6 +29,7 @@ function c97569829.filter1(c,e,tp)
         and Duel.GetLocationCountFromEx(tp,tp,c)>0
 end
 function c97569829.filter2(c,e,tp,mc,rk)
+	if c.rum_limit and not c.rum_limit(mc,e,tp,c) then return false end
     return c:GetRank()==rk and c:IsSetCard(0xd0a1) and mc:IsCanBeXyzMaterial(c)
         and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
 end

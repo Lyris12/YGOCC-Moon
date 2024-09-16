@@ -29,6 +29,7 @@ function s.filter1(c,e,tp,g)
 		and aux.MustMaterialCheck(c,tp,EFFECT_MUST_BE_XMATERIAL)
 end
 function s.filter2(c,e,tp,mc,rk,attr,g)
+	if c.rum_limit and not c.rum_limit(mc,e,tp,c) then return false end
 	if not (c:IsType(TYPE_XYZ) and c:IsSetCard(ARCHE_NUMBER_C) and c:IsAttribute(attr) and c:IsRankAbove(rk) and mc:IsCanBeXyzMaterial(c)
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)) then
 		return false

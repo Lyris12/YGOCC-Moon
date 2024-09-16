@@ -25,6 +25,7 @@ function s.filter11(c,e,tp)
 		and Duel.IsExistingMatchingCard(s.filter12,tp,LOCATION_EXTRA,0,1,nil,e,tp,c,c:GetRank()+1,no)
 end
 function s.filter12(c,e,tp,mc,rk,no)
+	if c.rum_limit and not c.rum_limit(mc,e,tp,c) then return false end
 	return c:IsRankAbove(rk) and c:IsSetCard(ARCHE_NUMBER_C) and aux.GetXyzNumber(c)==no and mc:IsCanBeXyzMaterial(c)
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false) and Duel.GetLocationCountFromEx(tp,tp,mc,c)>0
 end

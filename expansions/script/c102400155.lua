@@ -16,6 +16,7 @@ function s.filter1(c,e,tp)
 		and Duel.IsExistingMatchingCard(s.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,c)
 end
 function s.filter2(c,e,tp,mc)
+	if c.rum_limit and not c.rum_limit(mc,e,tp,c) then return false end
 	return c:IsRace(mc:GetRace()) and c:IsAttribute(mc:GetAttribute())
 		and mc:IsCanBeXyzMaterial(c) and c:IsRank(mc:GetRank()+1)
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
