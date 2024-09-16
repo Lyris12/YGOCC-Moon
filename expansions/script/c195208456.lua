@@ -72,7 +72,7 @@ function s.distg(e,tp,_,_,_,_,_,_,chk)
 	e:SetLabel(Duel.AnnounceType(tp))
 end
 function s.disop(e,tp)
-	if Duel.GetFieldGroupCount(tp,0,LOCATION_DECK)==0 then return end
+	if Duel.GetFieldGroupCount(tp,0,LOCATION_DECK)<1 then return end
 	local tc=Duel.GetDecktopGroup(1-tp,1):GetFirst()
 	Duel.ConfirmDecktop(1-tp,1)
 	if tc:IsType(1<<e:GetLabel()) then Duel.NegateEffect(ev) end
@@ -83,7 +83,7 @@ end
 function s.descon(e,tp)
 	local bc=e:GetHandler():GetBattleTarget()
 	return bc and bc:IsRelateToBattle()
-		and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_ONFIELD,0,1,nil)
+		and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_ONFIELD,0,3,nil)
 end
 function s.destg(e,tp,_,_,_,_,_,_,chk)
 	if chk==0 then return true end
