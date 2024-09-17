@@ -5,7 +5,7 @@ c:EnableReviveLimit()
 	   aux.AddOrigEvoluteType(c)
    aux.AddOrigConjointType(c)
 	aux.EnableConjointAttribute(c,1)
-	 aux.AddEvoluteProc(c,nil,7,aux.AND(cid.filter1,cid.filter2),2,99)  
+	 aux.AddEvoluteProc(c,nil,7,aux.AND(cid.filter1,cid.filter1),2,99)  
 	--discard deck & draw
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(id,1))
@@ -49,7 +49,7 @@ function cid.drop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function cid.filter1(c,ec,tp)
-	return c:IsAttribute(ATTRIBUTE_FIRE)
+	return c:IsAttribute(ATTRIBUTE_FIRE) and c:IsType(TYPE_EFFECT)
 end
 function cid.filter2(c,ec,tp)
 	return c:IsRace(RACE_PLANT) or c:IsRace(RACE_WYRM)
