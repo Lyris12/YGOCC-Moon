@@ -166,7 +166,7 @@ function Glitchy.SpecialSummonOperation(tgcheck,f,loc1,loc2,min,max,exc,sumtype,
 	loc2=loc2 or 0
 	sumtype=sumtype or 0
 	pos=pos or POS_FACEUP
-	if not tgchk then
+	if not tgcheck then
 		min=min or 1
 		max=max or min
 		local locs=loc1|loc2
