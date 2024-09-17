@@ -91,6 +91,8 @@ function Glitchy.SpecialSummonTarget(tgchk,f,loc1,loc2,min,max,exc,sumtype,IsOpp
 	max=max or min
 	sumtype=sumtype or 0
 	pos=pos or POS_FACEUP
+	if ignore_sumcon==nil then ignore_sumcon=false end
+	if ignore_revlim==nil then ignore_revlim=false end
 	local locs=loc1|loc2
 	local EDchk=locs&LOCATION_EXTRA>0
 	local minchk=min==1
@@ -166,6 +168,8 @@ function Glitchy.SpecialSummonOperation(tgcheck,f,loc1,loc2,min,max,exc,sumtype,
 	loc2=loc2 or 0
 	sumtype=sumtype or 0
 	pos=pos or POS_FACEUP
+	if ignore_sumcon==nil then ignore_sumcon=false end
+	if ignore_revlim==nil then ignore_revlim=false end
 	if not tgcheck then
 		min=min or 1
 		max=max or min
@@ -222,6 +226,8 @@ function Glitchy.SpecialSummonOperation(tgcheck,f,loc1,loc2,min,max,exc,sumtype,
 		end
 	else
 		return	function(e,tp,eg,ep,ev,re,r,rp)
+					local sump=IsOpponentSummons and 1-tp or tp
+					local recp=IsOpponentReceives and 1-tp or tp
 					local og=Duel.GetTargetCards()
 					local res,g=xgl.CheckTargetsAtResolution(tgcheck,loc1,loc2,tp,og,f,e,tp)
 					if res then
