@@ -353,6 +353,7 @@ function Auxiliary.IgnoreTimeleapFutReqFilter(c,tl,e,tp,sg)
 	return false
 end
 function Auxiliary.TimeleapExtraFilter(c,f,lc,tp,...)
+	if c:IsLocation(LOCATION_ONFIELD) and not c:IsFaceup() then return false end
 	local flist={...}
 	local check=false
 	if (not f or f(c)) then check=true end
@@ -364,12 +365,14 @@ function Auxiliary.TimeleapExtraFilter(c,f,lc,tp,...)
 	local tef1={c:IsHasEffect(EFFECT_EXTRA_TIMELEAP_MATERIAL,tp)}
 	local ValidSubstitute=false
 	for _,te1 in ipairs(tef1) do
-		local con=te1:GetCondition()
-		if (not con or con(c,ec,1)) then ValidSubstitute=true end
+		local val=te1:GetValue()
+		if (not val or val(te1,c,ec,1)) then ValidSubstitute=true end
 	end
 	if not ValidSubstitute then return false end
-	if c:IsLocation(LOCATION_ONFIELD) and not c:IsFaceup() then return false end
 	return c:IsCanBeTimeleapMaterial(lc) and check
+end
+function Auxiliary.TimeleapMaterialFutureRequirement(c,tl)
+	return c:HasLevel() and c:GetLevel()==tl:GetFuture()-1
 end
 function Auxiliary.TimeleapMaterialFilter(c,filter,e,tp,sg,mg,fg,tl,ct,sumcon,...)
 	sg:AddCard(c)
@@ -381,7 +384,7 @@ function Auxiliary.TimeleapMaterialFilter(c,filter,e,tp,sg,mg,fg,tl,ct,sumcon,..
 		filter=filter[1]
 	end
 	if (not filter or filter(c,e,mg,tl,tp) or aux.IgnoreTimeleapMatReqFilter(c,tl,e,tp,sg))
-	and (override_future_check or (c:HasLevel() and c:GetLevel()==tl:GetFuture()-1) or aux.IgnoreTimeleapFutReqFilter(c,tl,e,tp,sg)) then
+	and (override_future_check or aux.TimeleapMaterialFutureRequirement(c,tl) or aux.IgnoreTimeleapFutReqFilter(c,tl,e,tp,sg)) then
 		chk=true
 	end
 	if #funs>0 then
