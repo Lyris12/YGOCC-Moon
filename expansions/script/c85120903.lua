@@ -5,7 +5,6 @@ function s.initial_effect(c)
 	aux.AddCodeList(c,CARD_MACRO_COSMOS,CARD_HELIOS_DUO_MEGISTUS)
 	c:EnableReviveLimit()
 	aux.AddXyzProcedure(c,s.mfilter,6,2)
-	--This card's original ATK/DEF are equal to the number of banished cards x 400.
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_SET_BASE_ATTACK)
@@ -16,9 +15,7 @@ function s.initial_effect(c)
 	local e2=e1:Clone()
 	e2:SetCode(EFFECT_SET_BASE_DEFENSE)
 	c:RegisterEffect(e2)
-	--This card's name becomes "Helios Duo Megistus" while on the field.
 	aux.EnableChangeCode(c,CARD_HELIOS_DUO_MEGISTUS)
-	--Once per turn (Quick Effect): You can detach 1 material; your opponent cannot activate card effects from the banishment, until the end of this turn.
 	local e4=Effect.CreateEffect(c)
 	e4:Desc(0)
 	e4:SetType(EFFECT_TYPE_QUICK_O)
@@ -30,7 +27,6 @@ function s.initial_effect(c)
 	e4:SetTarget(aux.DummyCost)
 	e4:SetOperation(s.limop)
 	c:RegisterEffect(e4)
-	--If this card is Tributed or banished while you control "Macro Cosmos": You can return this card to the Extra Deck; banish all cards from the GYs.
 	local e5=Effect.CreateEffect(c)
 	e5:Desc(2)
 	e5:SetCategory(CATEGORY_REMOVE)
@@ -50,13 +46,9 @@ end
 function s.mfilter(c)
 	return c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsRace(RACE_PYRO)
 end
-
---E1
 function s.adval(e,c)
 	return Duel.GetFieldGroupCount(0,LOCATION_REMOVED,LOCATION_REMOVED)*400
 end
-
---E4
 function s.limcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckRemoveOverlayCard(tp,1,1,1,REASON_COST) end
 	Duel.RemoveOverlayCard(tp,1,1,1,1,REASON_COST)
@@ -75,8 +67,6 @@ end
 function s.alimit(e,re,tp)
 	return re:GetActivateLocation()&LOCATION_REMOVED>0
 end
-
---E5
 function s.filter(c)
 	return c:IsFaceup() and c:IsCode(CARD_MACRO_COSMOS)
 end

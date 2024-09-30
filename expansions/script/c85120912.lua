@@ -3,7 +3,6 @@
 local s,id,o=GetID()
 function s.initial_effect(c)
 	aux.AddCodeList(c,id,CARD_HELIOS_THE_PRIMORDIAL_SUN,CARD_MACRO_COSMOS)
-	--If you control "Helios - The Primordial Sun": Destroy 1 card your opponent controls in this card's column.
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(0)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
@@ -17,8 +16,6 @@ function s.initial_effect(c)
 	e1:SetOperation(s.activate)
 	e1:SetValue(s.zones)
 	c:RegisterEffect(e1)
-	--[[If this card is currently banished, except the turn it was banished: You can shuffle this card into the Deck, and if you do,
-	Set 1 Spell/Trap that mentions "Helios - The Primordial Sun" or "Macro Cosmos" directly from your Deck, except "Alignment of the Cosmos".]]
 	local e2=Effect.CreateEffect(c)
 	e2:Desc(1)
 	e2:SetCategory(CATEGORY_TODECK)
@@ -29,7 +26,6 @@ function s.initial_effect(c)
 	e2:SetFunctions(s.setcon,nil,s.settg,s.setop)
 	c:RegisterEffect(e2)
 end
---E1
 function s.zones(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsInBackrow() then return 0xff end
 	local zone=0
@@ -66,8 +62,6 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-
---E2
 function s.setcon(e)
 	return Duel.GetTurnCount()~=e:GetHandler():GetTurnID()
 end

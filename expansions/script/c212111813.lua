@@ -2,6 +2,7 @@
 --Kronologistic Paradox
 local s,id,o = GetID()
 function s.initial_effect(c)
+	aux.AddCodeList(c,212111806,212111807,212111811)
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)

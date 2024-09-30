@@ -2,6 +2,7 @@
 --Stars Over Belgrade
 local s,id,o=GetID()
 function s.initial_effect(c)
+	aux.AddCodeList(c,212111811)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)

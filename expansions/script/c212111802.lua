@@ -2,6 +2,8 @@
 --Belgrade Security Force
 local s,id,o=GetID()
 function s.initial_effect(c)
+	aux.AddOrigDriveType(c)
+	aux.AddCodeList(c,212111811)
 	local d1=c:DriveEffect(2,nil,CATEGORY_COIN,nil,nil,nil,aux.NOT(s.qcon),nil,s.deutg,s.deuop)
 	local q1=d1:Clone()
 	q1:SetType(EFFECT_TYPE_QUICK_O)
