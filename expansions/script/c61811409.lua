@@ -1,5 +1,10 @@
---created by Swag, coded by Lyris
---Dread Bastille's Composition
+--[[
+Dread Bastille's Composition
+Composizione della Bastiglia dell'Angoscia
+Card Author: Swag
+Scripted by: Lyris
+]]
+
 local s,id,o=GetID()
 function s.initial_effect(c)
 	local e1=Effect.CreateEffect(c)

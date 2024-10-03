@@ -3,6 +3,7 @@
 local s,id,o=GetID()
 function s.initial_effect(c)
 	aux.AddCodeList(c,CARD_MACRO_COSMOS,CARD_HELIOS_THE_PRIMORDIAL_SUN)
+	--If you control "Macro Cosmos" and "Helios - The Primordial Sun": Inflict 300 damage to your opponent, then destroy all Spell/Traps your opponent controls (if any).
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(0)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)

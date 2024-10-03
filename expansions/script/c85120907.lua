@@ -3,6 +3,7 @@
 local s,id,o=GetID()
 function s.initial_effect(c)
 	aux.AddCodeList(c,id,CARD_HELIOS_THE_PRIMORDIAL_SUN,CARD_MACRO_COSMOS)
+	--If you control "Macro Cosmos" or "Helios - The Primordial Sun": Target 1 card your opponent controls; banish it.
 	local e1=Effect.CreateEffect(c)
 	e1:Desc(0)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
@@ -28,6 +29,8 @@ function s.initial_effect(c)
 	e2:SetOperation(s.thop)
 	c:RegisterEffect(e2)
 end
+
+--E1
 function s.cfilter(c,...)
 	return c:IsFaceup() and ... and c:IsCode(...)
 end
@@ -47,6 +50,8 @@ function s.activate(e,tp)
 		Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)
 	end
 end
+
+--E2
 function s.filter(c)
 	return c:IsCodeOrMentions(CARD_HELIOS_THE_PRIMORDIAL_SUN) and c:IsAbleToHand() and not c:IsCode(id)
 end

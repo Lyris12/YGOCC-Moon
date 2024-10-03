@@ -3,6 +3,7 @@
 local s,id,o = GetID()
 function s.initial_effect(c)
 	aux.AddOrigDriveType(c)
+	aux.AddDriveProc(c,4)
 	aux.AddCodeList(c,212111811)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
