@@ -3,7 +3,7 @@
 local s,id,o = GetID()
 function s.initial_effect(c)
 	c:EnableReviveLimit()
-	aux.AddSynchroMixProcedure(c,nil,nil,nil,aux.NonTuner(nil),1,99,s.mchk)
+	aux.AddSynchroMixProcedure(c,aux.Tuner(nil),nil,nil,aux.NonTuner(nil),1,99,s.mchk)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_CHANGE_LEVEL)
@@ -70,9 +70,10 @@ function s.imval(e,te)
 		return ec:IsFuture(table.unpack(lv))
 	elseif ec:IsType(TYPE_XYZ) then
 		return ec:IsRank(table.unpack(lv))
-	else
+	elseif ec:IsHasLevel() then
 		return ec:IsLevel(table.unpack(lv))
-	else return false end
+	end
+	return false
 end
 function s.cfilter(c)
 	return c:IsType(TYPE_DRIVE) and not c:IsPublic()

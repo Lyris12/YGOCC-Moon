@@ -33,6 +33,14 @@ function s.initial_effect(c)
 	e5:SetOperation(s.ceop)
 	c:RegisterEffect(e5)
 end
+function s.activate(e,tp)
+	local g=Duel.GetMatchingGroup(s.sfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil)
+	if #g<1 or not Duel.SelectEffectYesNo(tp,e:GetHandler(),1190) then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	local sg=g:Select(tp,1,1,nil)
+	Duel.SendtoHand(sg,nil,REASON_EFFECT)
+	Duel.ConfirmCards(1-tp,sg)
+end
 function s.spcon(e)
 	return e:GetHandler():IsEnergy(e:GetHandler():GetLevel())
 end

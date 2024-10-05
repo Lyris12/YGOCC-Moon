@@ -3,14 +3,13 @@
 local s,id,o=GetID()
 function s.initial_effect(c)
 	aux.AddOrigDriveType(c)
+	aux.AddDriveProc(c,12)
 	aux.AddCodeList(c,212111811)
-	local d1=c:DriveEffect(2,nil,CATEGORY_COIN,nil,nil,nil,aux.NOT(s.qcon),nil,s.deutg,s.deuop)
-	local q1=d1:Clone()
+	local q1=c:DriveEffect(2,nil,CATEGORY_COIN,nil,nil,nil,aux.NOT(s.qcon),nil,s.deutg,s.deuop):Clone()
 	q1:SetType(EFFECT_TYPE_QUICK_O)
 	q1:SetCondition(s.qcon)
 	c:RegisterEffect(q1)
-	local d2=c:DriveEffect(-8,nil,CATEGORY_DISABLE,nil,EFFECT_FLAG_CARD_TARGET,nil,aux.AND(s.discon,aux.NOT(s.qcon)),nil,s.distg,s.disop)
-	local q2=d2:Clone()
+	local q2=c:DriveEffect(-8,nil,CATEGORY_DISABLE,nil,EFFECT_FLAG_CARD_TARGET,nil,aux.AND(s.discon,aux.NOT(s.qcon)),nil,s.distg,s.disop):Clone()
 	q2:SetType(EFFECT_TYPE_QUICK_O)
 	q2:SetCondition(aux.AND(s.discon,s.qcon))
 	c:RegisterEffect(q2)
@@ -61,7 +60,7 @@ function s.discon(e,tp)
 	return Duel.IsEnvironment(212111811,tp)
 end
 function s.distg(e,tp,_,_,_,_,_,_,chk,chkc)
-	if chkc then then return chk:IsOnField() and chkc:IsControler(1-tp) and aux.NegateAnyFilter(chkc) end
+	if chkc then return chk:IsOnField() and chkc:IsControler(1-tp) and aux.NegateAnyFilter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(aux.NegateAnyFilter,tp,0,LOCATION_ONFIELD,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	Duel.SelectTarget(tp,aux.NegateAnyFilter,tp,0,LOCATION_ONFIELD,1,1,nil)

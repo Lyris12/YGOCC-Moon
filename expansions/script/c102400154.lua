@@ -52,10 +52,9 @@ function s.cfilter(c,tp)
 	return c:IsSetCard(0xc74) and Duel.GetMZoneCount(tp,c)>0
 end
 function s.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	e:SetLabel(1)
-	if chk==0 then return Duel.CheckReleaseGroupEx(tp,s.cfilter,1,e:GetHandler(),tp) end
+	if chk==0 then return Duel.CheckReleaseGroupEx(tp,s.cfilter,1,REASON_COST,true,e:GetHandler(),tp) end
 	Duel.Hint(HINT_OPSELECTED,0,e:GetDescription())
-	Duel.Release(Duel.SelectReleaseGroupEx(tp,s.cfilter,1,1,e:GetHandler()),REASON_COST)
+	Duel.Release(Duel.SelectReleaseGroupEx(tp,s.cfilter,1,1,REASON_COST,true,e:GetHandler(),tp),REASON_COST)
 end
 function s.xfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x2c74) and c:IsType(TYPE_XYZ)
@@ -64,8 +63,8 @@ function s.spfilter(c,e,tp)
 	return c:IsSetCard(0x1c74) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local ct=-e:GetLabel()
-	if chk==0 then e:SetLabel(0) return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>1 and Duel.GetLocationCount(tp,LOCATION_MZONE)>ct and Duel.IsExistingMatchingCard(s.xfilter,tp,LOCATION_MZONE,0,1,nil)
+	local ct=e:IsCostChecked() and -1 or 0
+	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>1 and Duel.GetLocationCount(tp,LOCATION_MZONE)>ct and Duel.IsExistingMatchingCard(s.xfilter,tp,LOCATION_MZONE,0,1,nil)
 		and Duel.GetOverlayGroup(tp,1,0):IsExists(s.spfilter,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_OVERLAY)
 end

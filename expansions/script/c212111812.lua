@@ -49,7 +49,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local ct=Duel.Remove(rg,POS_FACEUP,REASON_EFFECT)
 	if ct<1 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local sg=tg:Select(tp,1,1,nil)
+	local sg=tg:Select(tp,ct,ct,nil)
 	Duel.HintSelection(sg)
 	Duel.BreakEffect()
 	Duel.Destroy(sg,REASON_EFFECT)
