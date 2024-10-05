@@ -55,7 +55,7 @@ function s.afilter(c,tp)
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	local bc=e:GetLabelObject()
-	if not bc:IsRelateToBattle() or Duel.Destroy(bc,REASON_EFFECT)<1 then return end
+	if not (bc and bc:IsRelateToBattle()) or Duel.Destroy(bc,REASON_EFFECT)<1 then return end
 	local g=Duel.GetMatchingGroup(s.afilter,tp,LOCATION_DECK,0,nil,tp)
 	if Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and #g>0 and Duel.SelectEffectYesNo(tp,e:GetHandler(),aux.Stringid(id,0)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)

@@ -87,7 +87,7 @@ function s.descon(e,tp)
 	return bc and bc:IsRelateToBattle()
 		and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_ONFIELD,0,3,nil)
 end
-function s.destg(e,_,_,_,_,_,_,_,,chk)
+function s.destg(e,_,_,_,_,_,_,_,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,e:GetHandler():GetBattleTarget(),1,0,0)
 end

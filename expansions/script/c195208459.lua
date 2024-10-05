@@ -13,7 +13,7 @@ function s.initial_effect(c)
 	e2:SetTargetRange(LOCATION_MZONE,0)
 	e2:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0xd3f))
 	c:RegisterEffect(e2)
-	local e3=Effect.CreateEffect(c)b
+	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_SZONE)
 	e3:HOPT()
