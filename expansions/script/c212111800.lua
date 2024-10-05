@@ -106,13 +106,15 @@ end
 function s.alim(e,te)
 	return te:IsActiveType(TYPE_MONSTER) and not te:IsActiveType(TYPE_EXTRA+TYPE_DRIVE)
 end
+function s.rfilter(c,tc)
+	return tc:IsSummonType(SUMMON_TYPE_DRIVE) or c:IsType(TYPE_SPELL)
+end
 function s.tdtg(e,tp,_,_,_,_,_,_,chk,chkc)
 	local c=e:GetHandler()
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(1-tp)
-		and (c:IsSummonType(SUMMON_TYPE_DRIVE) or c:IsType(TYPE_SPELL)) end
-	if chk==0 then return Duel.IsExistingTarget(c:IsSummonType(SUMMON_TYPE_DRIVE) or Card.IsType,tp,0,LOCATION_GRAVE,1,nil,TYPE_SPELL) end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(1-tp) and s.rfilter(chkc,c) end
+	if chk==0 then return Duel.IsExistingTarget(s.rfilter,tp,0,LOCATION_GRAVE,1,nil,c) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g=Duel.SelectTarget(tp,c:IsSummonType(SUMMON_TYPE_DRIVE) or Card.IsType,tp,0,LOCATION_GRAVE,1,3,nil,TYPE_SPELL)
+	local g=Duel.SelectTarget(tp,s.rfilter,tp,0,LOCATION_GRAVE,1,3,nil,c)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,#g,0,0)
 end
 function s.tdop()
