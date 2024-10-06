@@ -42,7 +42,7 @@ function s.tpcost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function s.tptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsSetCard,tp,LOCATION_DECK,0,1,nil,0xd3f)
-		and Duel.GetFieldGroupCount(tp,LOCATION_DECK)>1 end
+		and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>1 end
 end
 function s.tpop(e,tp)
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,0))

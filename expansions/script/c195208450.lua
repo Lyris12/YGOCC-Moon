@@ -14,7 +14,7 @@ function s.initial_effect(c)
 	e1:SetOperation(s.spop)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_TRIGGER_F)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e2:SetCode(EVENT_SUMMON_SUCCESS)
 	e2:HOPT()
 	e2:SetDescription(aux.Stringid(id//10,0))
@@ -54,9 +54,9 @@ function s.sptg(e,tp,_,_,_,_,_,_,chk)
 	e:SetLabel(Duel.AnnounceType(tp))
 end
 function s.spop(e,tp)
-	if Duel.GetFieldGroupCount(tp,0,LOCATION_DECK)<1 then return end
-	local tc=Duel.GetDecktopGroup(1-tp,1):GetFirst()
-	Duel.ConfirmDecktop(1-tp,1)
+	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)<1 then return end
+	local tc=Duel.GetDecktopGroup(tp,1):GetFirst()
+	Duel.ConfirmDecktop(tp,1)
 	if not tc:IsType(1<<e:GetLabel()) or Duel.GetLocationCount(tp,LOCATION_MZONE)<1 then return end
 	Duel.SpecialSummon(e:GetHandler(),0,tp,tp,false,false,POS_FACEUP)
 end
@@ -75,8 +75,8 @@ function s.thtg(e,tp,_,_,_,_,_,_,chk)
 end
 function s.thop(e,tp)
 	if Duel.GetFieldGroupCount(tp,0,LOCATION_DECK)<1 then return end
-	local tc=Duel.GetDecktopGroup(1-tp,1):GetFirst()
-	Duel.ConfirmDecktop(1-tp,1)
+	local tc=Duel.GetDecktopGroup(tp,1):GetFirst()
+	Duel.ConfirmDecktop(tp,1)
 	if tc:IsType(1<<e:GetLabel()) then Duel.SendtoHand(tc,nil,REASON_EFFECT) end
 end
 function s.filter(c)

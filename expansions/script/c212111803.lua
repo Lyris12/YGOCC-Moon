@@ -108,15 +108,14 @@ function s.thop(e,tp)
 	Duel.ConfirmCards(1-tp,g)
 end
 function s.scon(e,tp)
-	return e:GetHandler():IsSummonType(SUMMON_TYPE_DRIVE) and s.eucon(_,tp)
+	return e:GetHandler():IsSummonType(SUMMON_TYPE_DRIVE) and Duel.IsEnvironment(212111811,tp)
 end
 function s.sfilter(c,chk)
-	if chk==nil then chk=true end
 	return (c:IsCode(212111811) or aux.IsCodeListed(c,212111811) or chk and c:IsLevelBelow(4)
 		and c:IsType(TYPE_DRIVE)) and c:IsAbleToHand()
 end
 function s.stg(e,tp,_,_,_,_,_,_,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.sfilter,tp,LOCATION_DECK,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.sfilter,tp,LOCATION_DECK,0,1,nil,true) end
 	Duel.SetOperationInfo(0,CATEGORY_DICE,nil,0,tp,1)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
