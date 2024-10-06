@@ -66,9 +66,9 @@ function s.distg(e,tp,_,_,_,_,_,_,chk)
 	e:SetLabel(Duel.AnnounceType(tp))
 end
 function s.disop(e,tp)
-	if Duel.GetFieldGroupCount(tp,0,LOCATION_DECK)<1 then return end
-	local tc=Duel.GetDecktopGroup(1-tp,1):GetFirst()
-	Duel.ConfirmDecktop(1-tp,1)
+	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)<1 then return end
+	local tc=Duel.GetDecktopGroup(tp,1):GetFirst()
+	Duel.ConfirmDecktop(tp,1)
 	if tc:IsType(1<<e:GetLabel()) then Duel.NegateEffect(ev) end
 end
 function s.filter(c)
