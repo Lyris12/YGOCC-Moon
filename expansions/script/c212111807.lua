@@ -33,7 +33,7 @@ function s.mchk(g)
 	return g:IsExists(Card.IsType,1,nil,TYPE_DRIVE)
 end
 function s.descon(e)
-	return c:IsSummonType(SUMMON_TYPE_SYNCHRO)
+	return e:GetHandler():IsSummonType(SUMMON_TYPE_SYNCHRO)
 end
 function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

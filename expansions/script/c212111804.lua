@@ -23,12 +23,12 @@ function s.initial_effect(c)
 	local e4=e2:Clone()
 	e4:SetCode(EVENT_CHAIN_SOLVED)
 	c:RegisterEffect(e4)
-	local e7=c:DriveEffect(-4,1100,CATEGORY_DESTROY,nil,EFFECT_FLAG_CARD_TARGET,nil,aux.NOT(s.qcon),nil,s.destg,s.desop):Clone()
+	local e7=c:DriveEffect(4,1100,CATEGORY_DESTROY,nil,EFFECT_FLAG_CARD_TARGET,nil,s.icon,nil,s.destg,s.desop):Clone()
 	e7:SetType(EFFECT_TYPE_QUICK_O)
 	e7:SetCode(EVENT_FREE_CHAIN)
 	e7:SetCondition(s.qcon)
 	c:RegisterEffect(e7)
-	local e8=c:DriveEffect(-8,1118,CATEGORY_SPECIAL_SUMMON,nil,EFFECT_FLAG_CARD_TARGET,nil,aux.NOT(s.qcon),nil,s.sptg,s.spop):Clone()
+	local e8=c:DriveEffect(8,1118,CATEGORY_SPECIAL_SUMMON,nil,EFFECT_FLAG_CARD_TARGET,nil,s.icon,nil,s.sptg,s.spop):Clone()
 	e8:SetType(EFFECT_TYPE_QUICK_O)
 	e8:SetCode(EVENT_FREE_CHAIN)
 	e8:SetCondition(s.qcon)
@@ -76,6 +76,9 @@ function s.nop(e,tp)
 	end
 	e:GetHandler():UpdateEnergy(n,tp,REASON_EFFECT)
 end
+function s.icon(e,tp)
+	return not Duel.IsPlayerAffectedByEffect(tp,212111811) and e:GetHandler():IsEngaged()
+end
 function s.qcon(e,tp)
 	return Duel.IsPlayerAffectedByEffect(tp,212111811) and e:GetHandler():IsEngaged()
 end
@@ -106,7 +109,7 @@ function s.sptg(e,tp,_,_,_,_,_,_,chk,chkc)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingTarget(s.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,Duel.SelectTarget(tp,s.filter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp))
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,Duel.SelectTarget(tp,s.filter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp),1,0,0)
 end
 function s.spop(e,tp)
 	local tc=Duel.GetFirstTarget()

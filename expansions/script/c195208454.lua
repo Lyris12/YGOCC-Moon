@@ -77,9 +77,9 @@ function s.rvtg(e,tp,_,_,_,_,_,_,chk)
 	e:SetLabel(Duel.AnnounceType(tp))
 end
 function s.rvop(e,tp)
-	if Duel.GetFieldGroupCount(tp,0,LOCATION_DECK)==0 then return end
-	local tc=Duel.GetDecktopGroup(1-tp,1):GetFirst()
-	Duel.ConfirmDecktop(1-tp,1)
+	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)==0 then return end
+	local tc=Duel.GetDecktopGroup(tp,1):GetFirst()
+	Duel.ConfirmDecktop(tp,1)
 	if not tc:IsType(1<<e:GetLabel()) or Duel.GetLocationCount(tp,LOCATION_MZONE)<1 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	Duel.SpecialSummon(Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.filter),tp,LOCATION_GRAVE,0,1,1,nil),0,tp,tp,false,false,POS_FACEUP)
