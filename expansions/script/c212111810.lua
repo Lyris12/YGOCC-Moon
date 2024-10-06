@@ -32,9 +32,9 @@ function s.act(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local tc=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.filter),tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil,tp):GetFirst()
 	if tc and Duel.SendtoHand(tc,nil,REASON_EFFECT)>0 and tc:IsLocation(LOCATION_HAND) and tc:IsCanEngage(tp)
-		and Duel.SelectEffectYesNo(tp,tc,aux.Stringid(id,0)) then
+		and tc:IsType(TYPE_DRIVE) and Duel.SelectEffectYesNo(tp,tc,aux.Stringid(id,0)) then
 		Duel.BreakEffect()
-		tc:Engage(tp)
+		tc:Engage(e,tp)
 	end
 end
 function s.rfilter(c)

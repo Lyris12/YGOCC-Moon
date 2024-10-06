@@ -7,10 +7,12 @@ function s.initial_effect(c)
 	aux.AddCodeList(c,212111811)
 	local q1=c:DriveEffect(2,nil,CATEGORY_COIN,nil,nil,nil,aux.NOT(s.qcon),nil,s.deutg,s.deuop):Clone()
 	q1:SetType(EFFECT_TYPE_QUICK_O)
+	q1:SetCode(EVENT_FREE_CHAIN)
 	q1:SetCondition(s.qcon)
 	c:RegisterEffect(q1)
 	local q2=c:DriveEffect(-8,nil,CATEGORY_DISABLE,nil,EFFECT_FLAG_CARD_TARGET,nil,aux.AND(s.discon,aux.NOT(s.qcon)),nil,s.distg,s.disop):Clone()
 	q2:SetType(EFFECT_TYPE_QUICK_O)
+	q2:SetCode(EVENT_FREE_CHAIN)
 	q2:SetCondition(aux.AND(s.discon,s.qcon))
 	c:RegisterEffect(q2)
 	local e1=Effect.CreateEffect(c)
@@ -46,8 +48,8 @@ s.toss_coin=true
 function s.tnval(e,c)
 	return e:GetHandler():IsControler(c:GetControler())
 end
-function s.qcon(_,tp)
-	return Duel.IsPlayerAffectedByEffect(tp,212111811)
+function s.qcon(e,tp)
+	return Duel.IsPlayerAffectedByEffect(tp,212111811) and e:GetHandler():IsEngaged()
 end
 function s.deutg(e,tp,_,_,_,_,_,_,chk)
 	if chk==0 then return e:GetHandler():IsCanUpdateEnergy(2,tp,REASON_EFFECT) end

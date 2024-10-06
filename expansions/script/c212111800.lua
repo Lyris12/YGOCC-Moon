@@ -68,8 +68,8 @@ end
 function s.negop(_,_,_,_,ev)
 	Duel.NegateActivation(ev)
 end
-function s.qcon(_,tp)
-	return Duel.IsPlayerAffectedByEffect(tp,212111811)
+function s.qcon(e,tp)
+	return Duel.IsPlayerAffectedByEffect(tp,212111811) and e:GetHandler():IsEngaged()
 end
 function s.filter(c)
 	return c:IsSSetable() and (c:IsCode(212111811) or aux.IsCodeListed(c,212111811) and c:IsType(TYPE_SPELL))

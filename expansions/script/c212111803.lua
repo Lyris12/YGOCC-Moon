@@ -73,8 +73,8 @@ function s.ecop(e,tp)
 		c:IncreaseOrDecreaseEnergy(Duel.TossDice(tp,1),tp,REASON_EFFECT,RESET_EVENT+RESETS_STANDARD,c,e)
 	end
 end
-function s.qcon(_,tp)
-	return Duel.IsPlayerAffectedByEffect(tp,212111811)
+function s.qcon(e,tp)
+	return Duel.IsPlayerAffectedByEffect(tp,212111811) and e:GetHandler():IsEngaged()
 end
 function s.destg(e,tp,_,_,_,_,_,_,chk)
 	local ct=Duel.GetFieldGroupCount(tp,0,LOCATION_ONFIELD)
