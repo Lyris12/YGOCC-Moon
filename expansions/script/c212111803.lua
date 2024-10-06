@@ -24,7 +24,7 @@ function s.initial_effect(c)
 	e5:SetCode(EVENT_FREE_CHAIN)
 	e5:SetCondition(s.qcon)
 	c:RegisterEffect(e5)
-	local e6=c:OverDriveEffect(1109,CATEGORY_SEARCH+CATEGORY_TOHAND,nil,nil,nil,s.icon,nil,s.thtg,s.thop)
+	local e6=c:OverDriveEffect(1109,CATEGORY_SEARCH+CATEGORY_TOHAND,nil,nil,nil,s.icon,nil,s.thtg,s.thop):Clone()
 	e6:SetType(EFFECT_TYPE_QUICK_O)
 	e6:SetCode(EVENT_FREE_CHAIN)
 	e6:SetCondition(s.qcon)
@@ -74,7 +74,7 @@ function s.ecop(e,tp)
 	end
 end
 function s.icon(e,tp)
-	return not Duel.IsPlayerAffectedByEffect(tp,212111811) and e:GetHandler():IsEngaged()
+	return not Duel.IsPlayerAffectedByEffect(tp,212111811)
 end
 function s.qcon(e,tp)
 	return Duel.IsPlayerAffectedByEffect(tp,212111811) and e:GetHandler():IsEngaged()

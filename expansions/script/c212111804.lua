@@ -77,7 +77,7 @@ function s.nop(e,tp)
 	e:GetHandler():UpdateEnergy(n,tp,REASON_EFFECT)
 end
 function s.icon(e,tp)
-	return not Duel.IsPlayerAffectedByEffect(tp,212111811) and e:GetHandler():IsEngaged()
+	return not Duel.IsPlayerAffectedByEffect(tp,212111811)
 end
 function s.qcon(e,tp)
 	return Duel.IsPlayerAffectedByEffect(tp,212111811) and e:GetHandler():IsEngaged()
