@@ -7,8 +7,8 @@ function s.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:HOPT()
 	e1:SetCategory(CATEGORY_DESTROY)
-	e1:SetTarget(s.destg)
-	e1:SetOperation(s.desop)
+	e1:SetTarget(s.destg1)
+	e1:SetOperation(s.desop1)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
@@ -16,20 +16,20 @@ function s.initial_effect(c)
 	e2:HOPT()
 	e2:SetCategory(CATEGORY_DESTROY)
 	e2:SetCondition(s.descon)
-	e2:SetTarget(s.destg)
-	e2:SetOperation(s.desop)
+	e2:SetTarget(s.destg2)
+	e2:SetOperation(s.desop2)
 	c:RegisterEffect(e2)
 end
-function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.destg1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0
 		and Duel.GetFieldGroupCount(tp,0,LOCATION_ONFIELD)>0 end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CARDTYPE)
 	e:SetLabel(Duel.AnnounceType(tp))
 end
-function s.desop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetFieldGroupCount(tp,0,LOCATION_DECK)==0 then return end
-	local tc=Duel.GetDecktopGroup(1-tp,1):GetFirst()
-	Duel.ConfirmDecktop(1-tp,1)
+function s.desop1(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)<1 then return end
+	local tc=Duel.GetDecktopGroup(tp,1):GetFirst()
+	Duel.ConfirmDecktop(tp,1)
 	if not tc:IsType(1<<e:GetLabel()) then return end
 	local sg=Duel.GetFieldGroup(tp,0,LOCATION_ONFIELD):Select(tp,1,1,nil)
 	Duel.HintSelection(sg)
@@ -45,7 +45,7 @@ function s.descon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetAttacker()==c and bc~=nil
 		and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_ONFIELD,0,3,nil)
 end
-function s.destg(e,tp,eg,ep,ev,re,r,rp,chk)
+function s.destg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,e:GetLabelObject(),1,0,0)
 end
@@ -53,7 +53,7 @@ function s.afilter(c,tp)
 	local e=c:GetActivateEffect()
 	return c:IsSetCard(0x1d3f) and e and e:IsActivatable(tp,true,true)
 end
-function s.desop(e,tp,eg,ep,ev,re,r,rp)
+function s.desop2(e,tp,eg,ep,ev,re,r,rp)
 	local bc=e:GetLabelObject()
 	if not (bc and bc:IsRelateToBattle()) or Duel.Destroy(bc,REASON_EFFECT)<1 then return end
 	local g=Duel.GetMatchingGroup(s.afilter,tp,LOCATION_DECK,0,nil,tp)

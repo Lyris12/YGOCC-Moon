@@ -76,9 +76,9 @@ sound/custom/genbu_effe02.wav	70aea6c227feb5740ae7e6a8e7d6b6ec
 sound/custom/cerval_eff023.wav	1f810b41ded1377e704a21133bd6c279
 sound/custom/necoarc-nyanyanya.wav	ad95e18e92468a153fea47e65c9c0f53
 update/rename.txt	c4625b442bf8f5c2e7ce4deb512d4671
-update/version.txt	02f50557a832d3e13d8d0720fcbc78a4
+update/version.txt	3bc2cd1864c05afb7e3fecbc4a849d61
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	d7a7cc751fd448f6a5825ae44ef58a8b
+update/filelist.txt	309147a989800afad978ee12e06f3e92
 expansions/cards-new.cdb	8665be41252b75742577059875e9ab21
 expansions/strings.conf	6d5b8bb8df657432b8bfa916b8e841bb
 expansions/lflist.conf	1a496bdb8b95fab2193ba4b4c90796b8
@@ -479,8 +479,8 @@ expansions/script/c28327013.lua	3df2601eccf02aba225d3dd3912159d2
 expansions/script/c249001170.lua	8a25c1955819d55da2efa92a6f1b221d
 expansions/script/c51261803.lua	b6e244eb0f99b538868ab1fdd58848e3
 expansions/script/c40009133.lua	62a047fa0ab5dd899b181dacd69e6ad2
-expansions/script/c195208450.lua	eed3f069d3c206ff5d4081540c61b1d8
-expansions/script/c195208453.lua	36bde937ba5c54c106f2e57a109e255c
+expansions/script/c195208450.lua	79d2fc72f95407e055e8e75a3265c2e9
+expansions/script/c195208453.lua	03964adcd0170c4ca8db82267c5a3fe4
 expansions/script/c23151806.lua	dac98bc1309720283ee0914d2180a37f
 expansions/script/c41854614.lua	e65205accac7061d36e80063a824457e
 expansions/script/c11111027.lua	46f7b490354e9a9bb04dd887d0ef8410
@@ -1543,7 +1543,7 @@ expansions/script/c77222536.lua	d1f33db24788b53d4a2d8f8b77e36c31
 expansions/script/c69002.lua	8ff83484eca2eda7f4793cb4857eef2b
 expansions/script/c100000034.lua	ac595b8220087cd8a1a7aa40b1d9d84e
 expansions/script/c33700763.lua	2820c49d076ffd85887f4ff8e43a3976
-expansions/script/c195208456.lua	dccca88bec510700a800c9d075d78416
+expansions/script/c195208456.lua	7e1da567cb95977afec3d54598b76f82
 expansions/script/c88567309.lua	2dd74d9a590031e376af217f2cc31f3e
 expansions/script/c11111209.lua	5f7b1a42280c4d1b23f4990f3ddec2ff
 expansions/script/c100000306.lua	40808249e5c41efaf7ad40cddbdac505

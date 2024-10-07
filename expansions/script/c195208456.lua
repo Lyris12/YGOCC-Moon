@@ -57,11 +57,12 @@ function s.sdtg(e,tp,_,_,_,_,_,_,chk)
 end
 function s.sdop(e,tp)
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id//10,0))
-	local tc=Duel.SelectMatchingCard(tp,nil,tp,LOCATION_DECK,0,1,5,nil):GetFirst()
-	if not tc then return end
+	local g=Duel.SelectMatchingCard(tp,nil,tp,LOCATION_DECK,0,1,5,nil)
+	if #g<1 then return end
 	Duel.ShuffleDeck(tp)
-	Duel.MoveSequence(tc,SEQ_DECKTOP)
-	Duel.ConfirmDecktop(tp,1)
+	for tc in aux.Next(g) do Duel.MoveSequence(tc,SEQ_DECKTOP) end
+	Duel.ConfirmDecktop(tp,#g)
+	Duel.SortDecktop(tp,tp,#g)
 end
 function s.discon(e,tp,_,_,ev,re,_,rp)
 	return rp==1-tp and Duel.IsChainDisablable(ev) and re:IsHasCategory(CATEGORY_SPECIAL_SUMMON)
