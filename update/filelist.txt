@@ -76,9 +76,9 @@ sound/custom/genbu_effe02.wav	70aea6c227feb5740ae7e6a8e7d6b6ec
 sound/custom/cerval_eff023.wav	1f810b41ded1377e704a21133bd6c279
 sound/custom/necoarc-nyanyanya.wav	ad95e18e92468a153fea47e65c9c0f53
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	13326003dca79e9c1be7f82f7ce70fa6
+update/version.txt	04dee757cb9ec23b325c8832f87a73d1
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	67d7a44abdd44308bb4d9d48c2f849b9
+update/filelist.txt	22658e1b961f4f4c77c982a5e63a56cb
 expansions/cards-new.cdb	19c171e8771cd4b6422a7d3e3b5ed998
 expansions/strings.conf	6d5b8bb8df657432b8bfa916b8e841bb
 expansions/lflist.conf	1a496bdb8b95fab2193ba4b4c90796b8
