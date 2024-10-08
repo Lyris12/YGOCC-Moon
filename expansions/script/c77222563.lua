@@ -56,7 +56,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(s.desfilter,tp,LOCATION_HAND+LOCATION_MZONE+LOCATION_DECK,LOCATION_MZONE,nil)
 	if g:CheckSubGroup(s.vselect,3,3,e,tp) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-		local sg=g:SelectSubGroup(tp,s.vselect,true,3,3,e,tp)
+		local sg=g:SelectSubGroup(tp,s.vselect,false,3,3,e,tp)
 		local atk=0
 		local def=0
 		for tc in aux.Next(sg) do

@@ -32,7 +32,7 @@ function s.initial_effect(c)
 	--If this card is Time Leap Summoned: You can send 1 "Temporius" card from your Deck to the GY.
 	local e4=Effect.CreateEffect(c)
 	e4:SetCategory(CATEGORY_TOGRAVE)
-	e4:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e4:SetProperty(EFFECT_FLAG_DELAY)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
