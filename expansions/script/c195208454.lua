@@ -69,10 +69,13 @@ function s.skop(e,tp)
 	Duel.MoveSequence(tc,SEQ_DECKTOP)
 	Duel.ConfirmDecktop(tp,1)
 end
+function s.filter(c,e,tp)
+	return c:IsSetCard(0xd3f) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+end
 function s.rvtg(e,tp,_,_,_,_,_,_,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0
 		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_GRAVE,0,1,nil) end
+		and Duel.IsExistingMatchingCard(s.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CARDTYPE)
 	e:SetLabel(Duel.AnnounceType(tp))
 end
@@ -82,7 +85,7 @@ function s.rvop(e,tp)
 	Duel.ConfirmDecktop(tp,1)
 	if not tc:IsType(1<<e:GetLabel()) or Duel.GetLocationCount(tp,LOCATION_MZONE)<1 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	Duel.SpecialSummon(Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.filter),tp,LOCATION_GRAVE,0,1,1,nil),0,tp,tp,false,false,POS_FACEUP)
+	Duel.SpecialSummon(Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.filter),tp,LOCATION_GRAVE,0,1,1,nil,e,tp),0,tp,tp,false,false,POS_FACEUP)
 end
 function s.dfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x1d3f)
