@@ -110,7 +110,7 @@ function s.actop(e,tp)
 		local ops={}
 		for i,ef in ipairs(t) do table.insert(ops,{ef:IsActivatable(),ef:GetDescription(),ef}) end
 		te=aux.SelectFromOptions(tp,table.unpack(ops))
-	else te=t[1]:IsActivatable() and t[1] end
+	elseif #t>0 then te=t[1]:IsActivatable(tp) and t[1] end
 	if not te then return end
 	Duel.MoveToField(tc,tp,tp,LOCATION_FZONE,POS_FACEUP,true)
 	te:UseCountLimit(tp,1,true)
