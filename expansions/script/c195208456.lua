@@ -72,7 +72,7 @@ function s.distg(e,tp,_,_,_,_,_,_,chk)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CARDTYPE)
 	e:SetLabel(Duel.AnnounceType(tp))
 end
-function s.disop(e,tp)
+function s.disop(e,tp,_,_,ev)
 	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)<1 then return end
 	local tc=Duel.GetDecktopGroup(tp,1):GetFirst()
 	Duel.ConfirmDecktop(tp,1)
