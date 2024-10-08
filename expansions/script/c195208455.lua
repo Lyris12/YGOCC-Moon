@@ -96,5 +96,5 @@ function s.desop(e,tp)
 	local sg=g:Select(tp,1,1,nil)
 	Duel.BreakEffect()
 	Duel.SendtoHand(sg,nil,REASON_EFFECT)
-	Duel.ConfirmCards(1-tp,g)
+	Duel.ConfirmCards(1-tp,sg)
 end
