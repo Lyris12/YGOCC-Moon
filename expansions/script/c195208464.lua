@@ -46,26 +46,27 @@ function s.checkop(e,tp,eg,ep,ev,re,r,rp)
 	local cid=Duel.GetCurrentChain()
 	if cid>0 and eg:IsExists(s.filter,1,nil,tp) then s[0]=Duel.GetChainInfo(cid,CHAININFO_CHAIN_ID) end
 end
-function s.discon(e,tp,eg,ep,ev,re,r,rp)
+function s.discon(e,tp,_,_,ev,_,_,rp)
 	local ph=Duel.GetCurrentPhase()
 	return (ph==PHASE_MAIN1 or ph==PHASE_MAIN2) and rp==1-tp and Duel.GetChainInfo(0,CHAININFO_CHAIN_ID)==s[0]
 		and Duel.IsChainDisablable(ev)
 end
-function s.distg(e,tp,_,_,_,_,_,_,chk)
+function s.distg(e,tp,_,_,_,re,_,_,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0
-		and eg:IsExists(Card.IsAbleToChangeControler,1,nil) and Duel.GetLocationCount(tp,LOCATION_SZONE,tp,LOCATION_REASON_CONTROL)>0 end
+		and re:GetHandler():IsAbleToChangeControler()
+		and Duel.GetLocationCount(tp,LOCATION_SZONE,tp,LOCATION_REASON_CONTROL)>0 end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CARDTYPE)
 	e:SetLabel(Duel.AnnounceType(tp))
 end
-function s.disop(e,tp)
+function s.disop(e,tp,_,_,ev,re)
+	local ec=re:GetHandler()
 	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)<1 then return end
 	local tc=Duel.GetDecktopGroup(tp,1):GetFirst()
 	Duel.ConfirmDecktop(tp,1)
-	if not (tc:IsType(1<<e:GetLabel()) and Duel.NegateEffect(ev))
-		or Duel.GetLocationCount(tp,LOCATION_SZONE)<1 then return end
+	if not (tc:IsType(1<<e:GetLabel()) and Duel.NegateEffect(ev) and ec:IsRelateToEffect(re))
+		or ec:IsImmuneToEffect(e) or Duel.GetLocationCount(tp,LOCATION_SZONE)<1 then return end
 	local c=e:GetHandler()
-	local ec=eg:GetFirst()
-	if ec:IsImmuneToEffect(e) or not Duel.MoveToField(ec,tp,tp,LOCATION_SZONE,POS_FACEUP,true) then return end
+	if not Duel.MoveToField(ec,tp,tp,LOCATION_SZONE,POS_FACEUP,true) then return end
 	local e1=Effect.CreateEffect(c)
 	e1:SetCode(EFFECT_CHANGE_TYPE)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -112,7 +113,7 @@ function s.actop(e,tp)
 		te=aux.SelectFromOptions(tp,table.unpack(ops))
 	elseif #t>0 then te=t[1]:IsActivatable(tp) and t[1] end
 	if not te then return end
-	Duel.MoveToField(tc,tp,tp,LOCATION_FZONE,POS_FACEUP,true)
+	Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
 	te:UseCountLimit(tp,1,true)
 	local tep=tc:GetControler()
 	local cost=te:GetCost()
