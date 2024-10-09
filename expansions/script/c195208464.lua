@@ -42,7 +42,7 @@ end
 function s.filter(c,tp)
 	return c:IsPreviousLocation(LOCATION_HAND) and c:IsPreviousControler(1-tp) and c:IsReason(REASON_COST)
 end
-function s.checkop(e,tp,eg,ep,ev,re,r,rp)
+function s.checkop(e,tp,eg)
 	local cid=Duel.GetCurrentChain()
 	if cid>0 and eg:IsExists(s.filter,1,nil,tp) then s[0]=Duel.GetChainInfo(cid,CHAININFO_CHAIN_ID) end
 end
@@ -51,9 +51,8 @@ function s.discon(e,tp,_,_,ev,_,_,rp)
 	return (ph==PHASE_MAIN1 or ph==PHASE_MAIN2) and rp==1-tp and Duel.GetChainInfo(0,CHAININFO_CHAIN_ID)==s[0]
 		and Duel.IsChainDisablable(ev)
 end
-function s.distg(e,tp,_,_,_,re,_,_,chk)
+function s.distg(e,tp,_,_,_,_,_,_,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0
-		and re:GetHandler():IsAbleToChangeControler()
 		and Duel.GetLocationCount(tp,LOCATION_SZONE,tp,LOCATION_REASON_CONTROL)>0 end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CARDTYPE)
 	e:SetLabel(Duel.AnnounceType(tp))
@@ -63,11 +62,11 @@ function s.disop(e,tp,_,_,ev,re)
 	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)<1 then return end
 	local tc=Duel.GetDecktopGroup(tp,1):GetFirst()
 	Duel.ConfirmDecktop(tp,1)
-	if not (tc:IsType(1<<e:GetLabel()) and Duel.NegateEffect(ev) and ec:IsRelateToEffect(re))
-		or ec:IsImmuneToEffect(e) or Duel.GetLocationCount(tp,LOCATION_SZONE)<1 then return end
-	local c=e:GetHandler()
+	if not (tc:IsType(1<<e:GetLabel()) and Duel.NegateEffect(ev) and ec:IsRelateToEffect(re)
+		and re:GetHandler():IsAbleToChangeControler()) or ec:IsImmuneToEffect(e)
+		or Duel.GetLocationCount(tp,LOCATION_SZONE,tp,LOCATION_REASON_CONTROL)<1 then return end
 	if not Duel.MoveToField(ec,tp,tp,LOCATION_SZONE,POS_FACEUP,true) then return end
-	local e1=Effect.CreateEffect(c)
+	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetCode(EFFECT_CHANGE_TYPE)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
