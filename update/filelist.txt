@@ -76,10 +76,10 @@ sound/custom/genbu_effe02.wav	70aea6c227feb5740ae7e6a8e7d6b6ec
 sound/custom/cerval_eff023.wav	1f810b41ded1377e704a21133bd6c279
 sound/custom/necoarc-nyanyanya.wav	ad95e18e92468a153fea47e65c9c0f53
 update/rename.txt	c4625b442bf8f5c2e7ce4deb512d4671
-update/version.txt	57cac763eff2598f6ed8e35e4c7467ad
+update/version.txt	3cb6aac6659c727d2c6550d3e31ea81c
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	358f1567a43bd2335475b57e953ae780
-expansions/cards-new.cdb	19c171e8771cd4b6422a7d3e3b5ed998
+update/filelist.txt	25a7ac162057595ade1624422d64c795
+expansions/cards-new.cdb	fa802ebffc203d356c7ba642a68025ba
 expansions/strings.conf	6d5b8bb8df657432b8bfa916b8e841bb
 expansions/lflist.conf	1a496bdb8b95fab2193ba4b4c90796b8
 expansions/script/c10110009.lua	20e14074f511c9596fdde95a536bf96b
@@ -3927,7 +3927,7 @@ expansions/script/c100000244.lua	e7959742e2763d753200e134c699c089
 expansions/script/c33711005.lua	f568f1c5cebd76a369ee782a4007190c
 expansions/script/c99189446.lua	53277814d838499799221c0ab024c769
 expansions/script/c1553160.lua	97caf9a39d6a5897cbb79f98ecc05a79
-expansions/script/c212111810.lua	fd48ce98ed2924258d22056f272998ea
+expansions/script/c212111810.lua	2051bb00a7a64e14f628c7b804670f5e
 expansions/script/c39305.lua	ae2b36adc6a4525df1659b5dbda4fa23
 expansions/script/c91672802.lua	8f360df0c5c35ce800846f7b3a18f127
 expansions/script/c213035.lua	da8c0c040ef7307d298addd1599e07a0
@@ -4068,7 +4068,7 @@ expansions/script/c33700063.lua	39382438df3ecb7701d0f30d9dd302df
 expansions/script/c31231308.lua	487c46fbdc2e9c1ccbcdb614405ddb11
 expansions/script/c33701411.lua	515f754178240da78d411ddefcb51572
 expansions/script/c213150.lua	70216b695ada6207869c8d8e36b8583d
-expansions/script/c212111806.lua	d76135089ef3e130e440e91320b770df
+expansions/script/c212111806.lua	7cddda3e273d55004f0e68abab45b4bd
 expansions/script/c221594315.lua	ee53a641ae7812b586169f3390c77da6
 expansions/script/c212020.lua	378aef6b05a3b37ddb9d95216182818a
 expansions/script/c249000705.lua	81f32bf0f7a4828de050d37f58c292b7

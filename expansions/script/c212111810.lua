@@ -31,11 +31,12 @@ end
 function s.act(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local tc=Duel.SelectMatchingCard(tp,aux.NecroValleyFilter(s.filter),tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil,tp):GetFirst()
-	if tc and Duel.SendtoHand(tc,nil,REASON_EFFECT)>0 and tc:IsLocation(LOCATION_HAND) and tc:IsCanEngage(tp)
-		and tc:IsType(TYPE_DRIVE) and Duel.SelectEffectYesNo(tp,tc,aux.Stringid(id,0)) then
-		Duel.BreakEffect()
-		tc:Engage(e,tp)
-	end
+	if not tc or Duel.SendtoHand(tc,nil,REASON_EFFECT)<1 or not tc:IsLocation(LOCATION_HAND) then return end
+	Duel.ConfirmCards(1-tp,tc)
+	if not (tc:IsCanEngage(tp) and tc:IsType(TYPE_DRIVE)
+		and Duel.SelectEffectYesNo(tp,tc,aux.Stringid(id,0))) then return end
+	Duel.BreakEffect()
+	tc:Engage(e,tp)
 end
 function s.rfilter(c)
 	return c:IsFaceupEx() and c:IsCode(212111811) and c:IsReason(REASON_EFFECT) and not c:IsReason(REASON_REPLACE)

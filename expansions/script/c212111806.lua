@@ -56,7 +56,7 @@ end
 function s.mchk(g)
 	return g:IsExists(Card.IsType,1,nil,TYPE_DRIVE)
 end
-function s.con(e,c)
+function s.con(e)
 	return Duel.GetEngagedCard(e:GetHandler():GetControler())~=nil
 end
 function s.lvval(e,c)
@@ -75,13 +75,13 @@ function s.imval(e,te)
 	end
 	return false
 end
-function s.cfilter(c)
-	return c:IsType(TYPE_DRIVE) and not c:IsPublic()
+function s.cfilter(c,e,tp)
+	return c:IsType(TYPE_DRIVE) and not c:IsPublic() and c:IsCanEngage(tp,false,e)
 end
 function s.ngcost(e,tp,_,_,_,_,_,_,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_HAND,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_HAND,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
-	local g=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_HAND,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_HAND,0,1,1,nil,e,tp)
 	Duel.ConfirmCards(1-tp,g)
 	Duel.SetTargetCard(g)
 end
@@ -106,17 +106,17 @@ function s.cnop(e,tp)
 	for _,i in ipairs{-3,-2,-1,1,2,3} do if tc:IsCanUpdateEnergy(i,tp,REASON_EFFECT) then table.insert(t,i) end end
 	tc:UpdateEnergy(Duel.AnnounceNumber(tp,table.unpack(t)),tp,REASON_EFFECT,RESET_EVENT+RESETS_STANDARD,e:GetHandler(),e)
 end
-function s.cfilter(c,lv)
+function s.nfilter(c,lv)
 	return c:IsFaceup() and (c:IsLevel(lv) or c:IsRank(lv) or c:IsFuture(lv))
 end
 function s.tdcon(e,_,eg)
-	return eg:IsExists(s.cfilter,1,nil,e:GetHandler():GetLevel())
+	return eg:IsExists(s.nfilter,1,nil,e:GetHandler():GetLevel())
 end
 function s.filter(c)
 	return aux.NegateMonsterFilter(c) and c:IsAbleToDeck()
 end
 function s.tdtg(e,_,eg,_,_,_,_,_,chk)
-	local g=eg:Filter(s.cfilter,nil,e:GetHandler():GetLevel())
+	local g=eg:Filter(s.nfilter,nil,e:GetHandler():GetLevel())
 	if chk==0 then return g:IsExists(s.filter,1,nil) end
 	Duel.SetTargetCard(g)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,g:FilterCount(s.filter,nil),0,0)
