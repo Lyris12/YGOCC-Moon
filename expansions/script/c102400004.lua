@@ -55,7 +55,7 @@ function s.regop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,tp)
 end
 function s.splimit(e,c,sump,sumtype,sumpos,targetp,se)
-	return c:IsCode(id) and sumtype&SUMMON_TYPE_LINK==SUMMON_TYPE_LINK
+	return c:IsCode(id) and sumtype&SUMMON_TYPE_SYNCHRO==SUMMON_TYPE_SYNCHRO
 end
 function s.filter(c,e,tp)
 	return c:IsType(TYPE_TUNER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and c:IsLevelBelow(4)
@@ -66,12 +66,39 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_CANNOT_BE_SYNCHRO_MATERIAL)
+	e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_IGNORE_IMMUNE)
+	e1:SetTargetRange(0xff,0xff)
+	e1:SetTarget(aux.TargetBoolFunction(aux.NOT(Card.IsType),TYPE_SYNCHRO))
+	e1:SetValue(s.slim)
+	e1:SetReset(RESET_PHASE+PHASE_END)
+	Duel.RegisterEffect(e1,tp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	Duel.SpecialSummon(Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp),0,tp,tp,false,false,POS_FACEUP)
+	local tc=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp):GetFirst()
+	if not tc then return end
+	if Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP) then
+		local e2=Effect.CreateEffect(c)
+		e2:SetType(EFFECT_TYPE_SINGLE)
+		e2:SetCode(EFFECT_DISABLE)
+		e2:SetReset(RESET_EVENT+RESETS_STANDARD)
+		tc:RegisterEffect(e2,true)
+		local e3=e2:Clone()
+		e3:SetCode(EFFECT_DISABLE_EFFECT)
+		e3:SetValue(RESET_TURN_SET)
+		tc:RegisterEffect(e3,true)
+	end
+	Duel.SpecialSummonComplete()
 end 
+function s.slim(e,c)
+	if not c then return false end
+	return c:IsControler(e:GetHandlerPlayer())
+end
 function s.spfilter(c,e,tp)
-	return c:GetOriginalType()&TYPE_MONSTER~=0 and c:GetOwner()==tp and c:IsCanBeSpecialSummoned(e,0,tp,false,true)
+	return c:GetOriginalType()&TYPE_MONSTER>0 and c:GetOwner()==tp and c:IsCanBeSpecialSummoned(e,0,tp,false,true)
 end
 function s.sttg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_SZONE) and s.spfilter(chkc,e,tp) end
@@ -92,7 +119,7 @@ function s.checkop(e,tp,eg,ep,ev,re,r,rp)
 	else e:SetLabel(0) end
 end
 function s.desfilter(c)
-	return c:GetOriginalType()&TYPE_MONSTER~=0
+	return c:GetOriginalType()&TYPE_MONSTER>0
 end
 function s.desop(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetLabelObject():GetLabel()~=0 then return end
