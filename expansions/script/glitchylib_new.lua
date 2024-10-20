@@ -25,6 +25,7 @@ CATEGORIES_TOKEN 			= 	CATEGORY_SPECIAL_SUMMON|CATEGORY_TOKEN
 
 CATEGORY_FLAG_SELF					= 0x1
 CATEGORY_FLAG_DELAYED_RESOLUTION	= 0x2
+CATEGORY_FLAG_END_OF_MP_TRIGGER		= 0x4
 
 --Operation Info Special Values
 OPINFO_FLAG_HALVE	= 0x1
@@ -88,6 +89,7 @@ WIN_REASON_CUSTOM = 0xff
 --constants aliases
 TYPE_ST			= TYPE_SPELL|TYPE_TRAP
 TYPE_GEMINI		= TYPE_DUAL
+TYPES_NO_LEVEL	= TYPE_XYZ|TYPE_LINK
 
 SUBTYPES_SPELL	= TYPE_CONTINUOUS|TYPE_RITUAL|TYPE_QUICKPLAY|TYPE_FIELD|TYPE_EQUIP
 SUBTYPES_TRAP	= TYPE_CONTINUOUS|TYPE_COUNTER
@@ -1229,7 +1231,7 @@ function Card.HasLowestDEF(c,g,f)
 end
 
 function Card.HasOriginalLevel(c)
-	return not c:IsOriginalType(TYPE_XYZ+TYPE_LINK)
+	return not c:IsOriginalType(TYPES_NO_LEVEL)
 end
 
 function Card.IsOriginalType(c,typ)
@@ -2091,7 +2093,7 @@ function Duel.RegisterHint(p,flag,reset,rct,id,desc,prop,refeff)
 	if not rct then rct=1 end
 	if not prop then prop=0 end
 	local e=Effect.GlobalEffect()
-	e:Desc(desc,id)
+	e:SetDescription(id,desc)
 	e:SetType(EFFECT_TYPE_FIELD)
 	e:SetProperty(EFFECT_FLAG_CLIENT_HINT|EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_PLAYER_TARGET|prop)
 	e:SetCode(EFFECT_FLAG_EFFECT|flag)
@@ -2367,6 +2369,11 @@ end
 function Auxiliary.SearchFilter(f)
 	return	function(c,...)
 				return (not f or f(c,...)) and c:IsAbleToHand()
+			end
+end
+function Auxiliary.SSetFilter(f)
+	return	function(c,...)
+				return (not f or f(c,...)) and c:IsST() and c:IsSSetable()
 			end
 end
 function Auxiliary.ToGYFilter(f,cost)
@@ -3328,6 +3335,10 @@ function Duel.IsBattlePhase(tp)
 	local ph=Duel.GetCurrentPhase()
 	return (not tp or Duel.GetTurnPlayer()==tp) and ph>=PHASE_BATTLE_START and ph<=PHASE_BATTLE
 end
+function Duel.IsStartOfBattlePhase(tp)
+	local ph=Duel.GetCurrentPhase()
+	return (not tp or Duel.GetTurnPlayer()==tp) and ph==PHASE_BATTLE_START
+end
 function Duel.IsEndPhase(tp)
 	return (not tp or Duel.GetTurnPlayer()==tp) and Duel.GetCurrentPhase()==PHASE_END
 end
@@ -3514,6 +3525,11 @@ function Duel.PlaceAsContinuousCard(g,movep,recp,owner,type,desc,...)
 		end
 	end
 	return ct
+end
+
+--Reason
+function Card.IsReasonPlayer(c,p)
+	return c:GetReasonPlayer()==p
 end
 
 --redirect
@@ -4555,6 +4571,16 @@ function Card.CreateNegateEffect(c,negateact,rp,rf,desc,range,ctlim,cond,cost,tg
 end
 
 --FUNCTIONS FOR SPECIAL CARDS
+--[[
+1) (c) 		= The card that owns the Pyro-Clock-related effect
+2) (tp) 	= The player that activated the effect that is currently resolving
+3) (p) 		= If the Pyro-Clock-related effect counts turns of a specific player, input that player as (p)
+4) (phase)	= The phase in which the Pyro-Clock-related effect advances its count
+5) (rct)	= The number of turns that must pass for the Pyro-Clock-related effect to expire
+6) (cond)	= Optional additional condition for the advancement of the turn counter
+7) (op)		= Optional additional operation for the advancement of the turn counter
+8) (...)	= All the Pyro-Clock-related must be passed as extra parameters
+]]
 function Auxiliary.ManagePyroClockInteraction(c,tp,p,phase,rct,cond,op,...)
 	phase=phase and phase or PHASE_END
 	rct=rct and rct or 1

@@ -36,6 +36,12 @@ function Auxiliary.MainPhaseCond(tp,ct)
 				return Duel.IsMainPhase(tp,ct)
 			end
 end
+function Auxiliary.StartOfBattlePhaseCond(tp)
+	return	function(e,p)
+				local tp = (tp==0) and p or (tp==1) and 1-p or nil
+				return Duel.IsStartOfBattlePhase(tp)
+			end
+end
 function Auxiliary.BattlePhaseCond(tp)
 	return	function(e,p)
 				local tp = (tp==0) and p or (tp==1) and 1-p or nil
@@ -209,6 +215,7 @@ end
 --Link Related
 function Auxiliary.ThisCardPointsToCond(f,min)
 	if not f then f=aux.TRUE end
+	min=min and min or 1
 	return	function(e)
 				local tp=e:GetHandlerPlayer()
 				return e:GetHandler():GetLinkedGroup():IsExists(f,min,nil,e,tp)

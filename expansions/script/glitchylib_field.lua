@@ -1,4 +1,4 @@
-function Card.FieldEffect(c,code,range,selfzones,oppozones,f,val,cond,reset,rc,prop)
+function Card.FieldEffect(c,code,range,selfzones,oppozones,f,val,cond,reset,rc,prop,desc)
 --CONTINUOUS EFFECTS (EFFECT_TYPE_FIELD)
 	if not range then range=c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE end
 	if not selfzones then selfzones=0 end
@@ -14,12 +14,13 @@ function Card.FieldEffect(c,code,range,selfzones,oppozones,f,val,cond,reset,rc,p
         reset=reset[1]
     end
 	
+	if not prop then prop=0 end
+	
 	local e=Effect.CreateEffect(rc)
 	e:SetType(EFFECT_TYPE_FIELD)
-	if prop and prop~=0 then
-		e:SetProperty(prop)
+	if range>1 then
+		e:SetRange(range)
 	end
-	e:SetRange(range)
 	e:SetCode(code)
 	if cond then
 		e:SetCondition(cond)
@@ -33,8 +34,21 @@ function Card.FieldEffect(c,code,range,selfzones,oppozones,f,val,cond,reset,rc,p
 	end
 	if reset then
 		if type(reset)~="number" then reset=0 end
-		e:SetReset(RESET_EVENT|RESETS_STANDARD|reset,rct)
+		if range>1 and reset&RESET_EVENT==0 then
+			reset=reset|RESET_EVENT|RESETS_STANDARD
+		end
+		e:SetReset(reset,rct)
 	end
+	
+	if desc then
+		prop=prop|EFFECT_FLAG_CLIENT_HINT
+		e:SetDescription(desc)
+	end
+	
+	if prop~=0 then
+		e:SetProperty(prop)
+	end
+	
 	--c:RegisterEffect(e)
 	return e
 end
@@ -147,6 +161,11 @@ function Card.CanAttackDirectlyField(c,range,selfzones,oppozones,f,cond,reset,rc
 	c:RegisterEffect(e)
 	return e
 end
+function Card.CannotAttackDirectlyField(c,range,selfzones,oppozones,f,cond,reset,rc)
+	local e=c:FieldEffect(EFFECT_CANNOT_DIRECT_ATTACK,range,selfzones,oppozones,f,nil,cond,reset,rc)
+	c:RegisterEffect(e)
+	return e
+end
 function Card.CanAttackWhileInDefensePositionField(c,range,selfzones,oppozones,f,cond,reset,rc)
 	local e=c:FieldEffect(EFFECT_DEFENSE_ATTACK,range,selfzones,oppozones,f,1,cond,reset,rc)
 	c:RegisterEffect(e)
@@ -159,7 +178,11 @@ function Card.CannotTargetForAttacksField(c,val,range,selfzones,oppozones,f,cond
 end
 function Card.MustAttackField(c,range,selfzones,oppozones,f,cond,reset,rc)
 	local e=c:FieldEffect(EFFECT_MUST_ATTACK,range,selfzones,oppozones,f,nil,cond,reset,rc)
-	c:RegisterEffect(e)
+	if range<=1 then
+		Duel.RegisterEffect(e,range)
+	else
+		c:RegisterEffect(e)
+	end
 	return e
 end
 function Card.ArmadesEffectField(c,timing,protection,range,self,oppo,f1,cond,reset,rc)

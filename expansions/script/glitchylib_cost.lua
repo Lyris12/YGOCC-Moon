@@ -493,34 +493,48 @@ function Auxiliary.AttackRestrictionCost(oath,reset,desc)
 				c:RegisterEffect(e1)
 			end
 end
+
+--Scripts the following restriction: "You cannot Special Summon monsters the turn you activate/use this effect, except [f] monsters".
+--"cf" also supports LOCATION constants in order to exclude monsters Special Summoned from a specific location from being counted towards the restriction
 function Auxiliary.SSRestrictionCost(f,oath,reset,id,cf,desc,cost)
 	if id then
-		if not cf then
-			--aux.AddSSCounter(id,f)
-			Duel.AddCustomActivityCounter(id,ACTIVITY_SPSUMMON,f)
+		local donotcount_function = type(cf)=="function" and cf or f
+		if type(cf)=="number" then
+			local new_donotcount_function = function(c,...)
+				return not c:IsSummonLocation(cf) or donotcount_function(c,...)
+			end
+			Duel.AddCustomActivityCounter(id,ACTIVITY_SPSUMMON,new_donotcount_function)
 		else
-			--aux.AddSSCounter(id,cf)
-			Duel.AddCustomActivityCounter(id,ACTIVITY_SPSUMMON,cf)
+			Duel.AddCustomActivityCounter(id,ACTIVITY_SPSUMMON,donotcount_function)
 		end
 	end
 	local prop=EFFECT_FLAG_PLAYER_TARGET
 	if oath then prop=prop|EFFECT_FLAG_OATH end
 	if desc then prop=prop|EFFECT_FLAG_CLIENT_HINT end
-	if not reset then reset=RESET_PHASE+PHASE_END end
+	if not reset then reset=RESET_PHASE|PHASE_END end
 	
 	return	function(e,tp,eg,ep,ev,re,r,rp,chk)
 				if chk==0 then return Duel.GetCustomActivityCount(id,tp,ACTIVITY_SPSUMMON)==0 and (not cost or cost(e,tp,eg,ep,ev,re,r,rp,chk)) end
 				local e1=Effect.CreateEffect(e:GetHandler())
-				if desc then e1:Desc(desc) end
+				if desc then
+					e1:SetDescription(id,desc)
+				end
 				e1:SetType(EFFECT_TYPE_FIELD)
 				e1:SetProperty(prop)
 				e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 				e1:SetReset(reset)
 				e1:SetTargetRange(1,0)
-				e1:SetTarget(	function(eff,c,sump,sumtype,sumpos,targetp,se)
-									return not f(c,eff,sump,sumtype,sumpos,targetp,se)
-								end
-							)
+				if type(cf)~="number" then
+					e1:SetTarget(	function(eff,c,sump,sumtype,sumpos,targetp,se)
+										return not f(c,eff,sump,sumtype,sumpos,targetp,se)
+									end
+								)
+				else
+					e1:SetTarget(	function(eff,c,sump,sumtype,sumpos,targetp,se)
+										return not f(c,eff,sump,sumtype,sumpos,targetp,se) and c:IsLocation(cf)
+									end
+								)
+				end
 				Duel.RegisterEffect(e1,tp)
 				if cost then
 					cost(e,tp,eg,ep,ev,re,r,rp,chk)

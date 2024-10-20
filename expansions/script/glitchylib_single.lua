@@ -52,7 +52,10 @@ function Card.SingleEffect(c,code,val,reset,rc,range,cond,prop,desc)
 		else
 			prop=prop|EFFECT_FLAG_CANNOT_DISABLE
 		end
-		e:SetReset(RESET_EVENT|RESETS_STANDARD|reset,rct)
+		if reset&RESET_EVENT==0 then
+			reset=reset|RESET_EVENT|RESETS_STANDARD
+		end
+		e:SetReset(reset,rct)
 	end
 	
 	if desc then
@@ -983,8 +986,14 @@ end
 
 --Battle Restrictions
 function Card.CannotAttack(c,val,reset,rc,cond,prop,desc)
-	if not desc and reset then
-		desc=STRING_CANNOT_ATTACK
+	if reset then
+		if not desc then
+			desc=STRING_CANNOT_ATTACK
+		end
+		if type(rc)~="table" then
+			if not rc then rc=c end
+			rc={rc,true}
+		end
 	end
 	local e=c:SingleEffect(EFFECT_CANNOT_ATTACK,val,reset,rc,nil,cond,prop,desc)
 	c:RegisterEffect(e)
@@ -1132,14 +1141,30 @@ function Card.ArmadesEffect(c,timing,protection,self,oppo,reset,rc,cond,prop,des
 	return e
 end
 function Card.SetMaximumNumberOfAttacks(c,ct,reset,rc,cond,prop,desc)
-	if not ct or type(ct)~="number" then ct=2 end
-	local e=c:SingleEffect(EFFECT_EXTRA_ATTACK,ct-1,reset,rc,nil,cond,prop,desc)
+	if not ct then
+		ct=1
+	elseif type(ct)=="number" then
+		ct=ct-1
+	end
+	local range
+	if reset then
+		range=LOCATION_MZONE
+	end
+	local e=c:SingleEffect(EFFECT_EXTRA_ATTACK,ct,reset,rc,range,cond,prop,desc)
 	c:RegisterEffect(e)
 	return e
 end
 function Card.SetMaximumNumberOfAttacksOnMonsters(c,ct,reset,rc,cond,prop,desc)
-	if not ct or type(ct)~="number" then ct=2 end
-	local e=c:SingleEffect(EFFECT_EXTRA_ATTACK_MONSTER,ct-1,reset,rc,nil,cond,prop,desc)
+	if not ct then
+		ct=1
+	elseif type(ct)=="number" then
+		ct=ct-1
+	end
+	local range
+	if reset then
+		range=LOCATION_MZONE
+	end
+	local e=c:SingleEffect(EFFECT_EXTRA_ATTACK_MONSTER,ct,reset,rc,range,cond,prop,desc)
 	c:RegisterEffect(e)
 	return e
 end
@@ -1255,6 +1280,61 @@ function Card.CannotBeDestroyedByEffects(c,val,cond,reset,rc,range,prop,desc,for
 	return e
 end
 
+function Card.CannotBeTargetedByEffects(c,val,cond,reset,rc,range,prop,desc,forced,typ)
+	if not typ and c:IsOriginalType(TYPE_EQUIP) and not range then
+		typ = EFFECT_TYPE_EQUIP
+	else
+		typ = typ or EFFECT_TYPE_SINGLE
+	end
+	
+	if typ==EFFECT_TYPE_SINGLE and not reset and not range then
+		range = c:GetOriginalType()&TYPE_FIELD>0 and LOCATION_FZONE or c:GetOriginalType()&TYPE_ST>0 and LOCATION_SZONE or LOCATION_MZONE
+	end
+	
+	local donotdisable=false
+	local rc = rc and rc or c
+    local rct=1
+    if type(reset)=="table" then
+        rct=reset[2]
+        reset=reset[1]
+    end
+	
+	if type(rc)=="table" then
+        donotdisable=rc[2]
+        rc=rc[1]
+    end
+	
+	if not prop then prop=0 end
+	
+	if not val then val=1 end
+	
+	local e=Effect.CreateEffect(rc)
+	e:SetType(typ)
+	if range then
+		prop=prop|EFFECT_FLAG_SINGLE_RANGE
+		e:SetRange(range)
+	end
+	e:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
+	e:SetValue(val)
+	if cond then
+		e:SetCondition(cond)
+	end
+	
+	if reset then
+		if type(reset)~="number" then reset=0 end
+		prop=prop|EFFECT_FLAG_CANNOT_DISABLE
+		e:SetReset(RESET_EVENT|RESETS_STANDARD|reset,rct)
+	end
+	
+	if prop~=0 then
+		e:SetProperty(prop)
+	end
+	
+	c:RegisterEffect(e,forced)
+	
+	return e
+end
+
 --Protections: Immunity
 UNAFFECTED_OTHER		= 0x1
 UNAFFECTED_OPPO			= 0x2
@@ -1333,9 +1413,9 @@ function Card.Unaffected(c,immunity,cond,reset,rc,range,prop,desc,forced,typ)
 		e:SetProperty(prop)
 	end
 	
-	c:RegisterEffect(e,forced)
+	local res=c:RegisterEffect(e,forced)
 	
-	return e
+	return e,res
 end
 
 function Card.CannotBeTributed(c,reset,rc,range,cond,prop,desc)
