@@ -29,7 +29,7 @@ function s.initial_effect(c)
 		Card.GetMutualLinkedGroup=function(c)
 			local g=mg(c)
 			local ct=c:GetFlagEffectLabel(19520843)
-			if ct and c:GetCardTargetCount()+1>=ct) then
+			if ct and c:GetCardTargetCount()+1>=ct then
 				g:Merge(Duel.GetMatchingGroup(s.lfilter,tp,LOCATION_MZONE,0,nil))
 			end
 			return g
@@ -38,7 +38,7 @@ function s.initial_effect(c)
 			return math.max(#mg(c),mc(c))
 		end
 		if not Mextro then Mextro={} end
-		Mextro.MutualLinkFilter=Mextro.Mextro.MutualLinkFilter or function(c)
+		Mextro.MutualLinkFilter=Mextro.MutualLinkFilter or function(c)
 			local ct=c:GetFlagEffectLabel(19520843)
 			return ct and c:GetCardTargetCount()+1>=ct
 		end
