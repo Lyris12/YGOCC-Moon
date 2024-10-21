@@ -13,7 +13,7 @@ function s.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e2:SetTargetRange(LOCATION_ONFIELD,0)
 	e2:SetCondition(s.tgcon)
-	e2:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0xee5))
+	e2:SetTarget(s.tgtg)
 	e2:SetValue(aux.tgoval)
 	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
@@ -33,11 +33,14 @@ end
 function s.tgcon(e)
 	return Duel.IsExistingMatchingCard(s.filter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
 end
+function s.tgtg(e,c)
+	return c:IsSetCard(0xee5) and c:IsType(TYPE_SPELL+TYPE_TRAP)
+end
 function s.xfilter(c)
 	return c:IsFacedown() or not c:IsSetCard(0xee5)
 end
 function s.spcon(e,tp)
-	return Duel.GetCurrentPhase()==PHASE_MAIN1 and not Duel.IsExistingMatchingCard(s.rfilter,tp,LOCATION_MZONE,0,1,nil)
+	return Duel.GetCurrentPhase()==PHASE_MAIN1 and not Duel.IsExistingMatchingCard(s.xfilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function s.cfilter(c)
 	return c:IsFaceupEx() and c:IsSetCard(0xee5) and (c:IsLocation(LOCATION_MZONE) or c:IsType(TYPE_MONSTER))

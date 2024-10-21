@@ -34,7 +34,7 @@ function s.initial_effect(c)
 		return math.max(#mg(c),mc(c))
 	end
 	if not Mextro then Mextro={} end
-	Mextro.MutualLinkFilter=Mextro.Mextro.MutualLinkFilter or function(c)
+	Mextro.MutualLinkFilter=Mextro.MutualLinkFilter or function(c)
 		local ct=c:GetFlagEffectLabel(19520843)
 		return ct and c:GetCardTargetCount()+1>=ct
 	end

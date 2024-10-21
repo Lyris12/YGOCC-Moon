@@ -33,7 +33,7 @@ function s.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 		local sg=g:Select(tp,1,1,nil)
 		Duel.SendtoHand(sg,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,g)
+		Duel.ConfirmCards(1-tp,sg)
 	end
 	Duel.ShuffleDeck(tp)
 	local tc=Duel.GetOperatedGroup():GetFirst()

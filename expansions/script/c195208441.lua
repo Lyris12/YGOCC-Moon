@@ -38,6 +38,7 @@ function s.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(s.cfilter,tp,LOCATION_HAND,0,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local tc=Duel.SelectMatchingCard(tp,s.cfilter,tp,LOCATION_HAND,0,1,1,nil,tp):GetFirst()
+	Duel.ConfirmCards(1-tp,tc)
 	e:SetLabel(tc:GetLevel())
 	Duel.SendtoDeck(tc,nil,SEQ_DECKSHUFFLE,REASON_COST)
 end
