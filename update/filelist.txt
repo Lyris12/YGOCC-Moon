@@ -76,9 +76,9 @@ sound/custom/genbu_effe02.wav	70aea6c227feb5740ae7e6a8e7d6b6ec
 sound/custom/cerval_eff023.wav	1f810b41ded1377e704a21133bd6c279
 sound/custom/necoarc-nyanyanya.wav	ad95e18e92468a153fea47e65c9c0f53
 update/rename.txt	c4625b442bf8f5c2e7ce4deb512d4671
-update/version.txt	3211be2d64424535cbb236b9cff58869
+update/version.txt	e09ae73b5560f9c9d53da80ba6c448ac
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	b79795aec317fa62b8ad34df3bcffb1d
+update/filelist.txt	a40f920d9cab2b18d5c1de4bdde179a9
 expansions/cards-new.cdb	fec0c04ccfb0f5e13c74d4a758c22c76
 expansions/strings.conf	f3b379ae07c862ab722cc3efb29aea50
 expansions/lflist.conf	1a496bdb8b95fab2193ba4b4c90796b8
@@ -4549,7 +4549,7 @@ expansions/script/c10505087.lua	f1a663422881f022bfa0ffa16f0581ca
 expansions/script/glitchylib_new.lua	68077b2976521090e3d5b4c9bc1709ce
 expansions/script/c77709001.lua	62e5598d3b730a3e1b19d604f1c54cad
 expansions/script/c1553155.lua	4bf46c0878a78635e1bb5777d0d96d08
-expansions/script/proc_evolute.lua	0a32785e91d7fa05339d4dc73cda404e
+expansions/script/proc_evolute.lua	bcd215515845de2919ba4a6600008a9b
 expansions/script/c40009928.lua	6f08799a300a30a4d5eac10183113d46
 expansions/script/c33661.lua	021d19a3814251a56b9a9a21f2616d30
 expansions/script/c123366.lua	cb5abc996a7c50634027bb874a1c255f
