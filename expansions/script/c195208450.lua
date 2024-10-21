@@ -77,7 +77,9 @@ function s.thop(e,tp)
 	if Duel.GetFieldGroupCount(tp,0,LOCATION_DECK)<1 then return end
 	local tc=Duel.GetDecktopGroup(tp,1):GetFirst()
 	Duel.ConfirmDecktop(tp,1)
-	if tc:IsType(1<<e:GetLabel()) then Duel.SendtoHand(tc,nil,REASON_EFFECT) end
+	if not tc:IsType(1<<e:GetLabel()) then return end
+	Duel.DisableShuffleCheck()
+	Duel.SendtoHand(tc,nil,REASON_EFFECT)
 end
 function s.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x1d3f)
