@@ -22,7 +22,7 @@ function s.initial_effect(c)
 	e2:SetCondition(s.spcon)
 	e2:SetCost(s.spcost)
 	e2:SetTarget(s.sptg)
-	e2:SetOperation(s/.spop)
+	e2:SetOperation(s.spop)
 	c:RegisterEffect(e2)
 	Duel.AddCustomActivityCounter(id,ACTIVITY_SPSUMMON,aux.FilterBoolFunction(Card.IsSetCard,0xee5))
 	if not s.global_check then

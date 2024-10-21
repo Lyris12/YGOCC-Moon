@@ -81,8 +81,7 @@ function s.spop(e,tp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local tc=Duel.SelectMatchingCard(tp,s.filter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp):GetFirst()
 	if not tc then return end
-	if Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP))
-			and e:GetLabel()&LOCATION_SZONE>0 then
+	if Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP) and e:GetLabel()&LOCATION_SZONE>0 then
 		local e1=Effect.CreateEffect()
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
