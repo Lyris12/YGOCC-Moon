@@ -102,7 +102,7 @@ function s.desop(e,tp)
 		and Duel.IsExistingMatchingCard(s.dfilter,tp,LOCATION_SZONE,0,1,nil)) then return end
 	Duel.BreakEffect()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	Duel.Destroy(Duel.SelectMatchingCard(tp,Card.IsType,tp,LOCATION_ONFIELD,0,1,1,nil),REASON_EFFECT)
+	Duel.Destroy(Duel.SelectMatchingCard(tp,Card.IsType,tp,LOCATION_ONFIELD,0,1,1,nil,TYPE_SPELL+TYPE_TRAP),REASON_EFFECT)
 end
 function s.filter(c,e,tp)
    return c:IsType(TYPE_DRIVE+TYPE_SYNCHRO) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

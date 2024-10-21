@@ -77,7 +77,7 @@ function s.tdcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function s.tdop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(id,0))
-	local tc=Duel.SelectMatchingCard(tp,Card.IsSetCard,tp,LOCATION_DECK,0,1,nil,0xd3f):GetFirst()
+	local tc=Duel.SelectMatchingCard(tp,Card.IsSetCard,tp,LOCATION_DECK,0,1,1,nil,0xd3f):GetFirst()
 	if not tc then return end
 	Duel.ShuffleDeck(tp)
 	Duel.MoveSequence(tc,SEQ_DECKTOP)

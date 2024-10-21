@@ -58,7 +58,7 @@ function s.imval(e,te)
 	local chkp=tp==e:GetOwnerPlayer()
 	if c:IsType(TYPE_DRIVE) then return not (c:IsSetCard(0x44a) and chkp) end
 	if chkp then return false end
-	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return true end
+	if not te:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return true end
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	return not (g and g:IsContains(e:GetHandler()))
 end
