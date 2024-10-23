@@ -1,3 +1,6 @@
+--LIMITS
+MAX_INT32 = 2147483647
+
 --Custom Categories
 CATEGORY_ZONE		  				= 0x1
 CATEGORY_DISABLE_ZONE 				= 0x2

@@ -108,5 +108,8 @@ function s.rcon(e,tp,eg,ep,ev,re,r,rp)
 		and re:GetHandler():IsAttribute(ATTRIBUTE_DARK) and re:GetHandler():IsControler(tp)
 end
 function s.rop(e,tp,eg,ep,ev,re,r,rp)
-	return ev
+	local min,max=ev&0xffff,(ev>>16)&0xffff
+	local ct=min~=max and Duel.AnnounceNumberMinMax(tp,min,math.min(3,max)) or min
+	re:GetHandler():RegisterFlagEffect(id,RESET_CHAIN,0,1,ct)
+	return MAX_INT32
 end

@@ -88,7 +88,7 @@ function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		return c:CheckRemoveOverlayCard(tp,1,REASON_COST)
 	end
-	local ct=c:RemoveOverlayCard(tp,1,c:GetOverlayCount(),REASON_COST)
+	local ct=c:RemoveOverlayCard(tp,1,999,REASON_COST)
 	local val=ct*1000
 	Duel.SetTargetParam(val)
 	Duel.SetCustomOperationInfo(0,CATEGORY_ATKCHANGE,c,1,0,0,val)

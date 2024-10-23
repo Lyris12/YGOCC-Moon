@@ -93,6 +93,39 @@ Auxiliary.XyzLevelFreeGoal = function(g,tp,xyzc,gf)
 	return (not gf or gf(g,tp,xyzc)) and Duel.GetLocationCountFromEx(tp,tp,g,xyzc)>0
 end
 
+--Detaching mats
+local _CardCheckRemoveOverlayCard, _DuelCheckRemoveOverlayCard, _CardRemoveOverlayCard, _DuelRemoveOverlayCard =
+Card.CheckRemoveOverlayCard, Duel.CheckRemoveOverlayCard, Card.RemoveOverlayCard, Duel.RemoveOverlayCard
+
+Card.CheckRemoveOverlayCard = function(c,p,ct,r)
+	aux.RemoveOverlayCard=c
+	local res=_CardCheckRemoveOverlayCard(c,p,ct,r)
+	aux.RemoveOverlayCard=nil
+	return res
+end
+Duel.CheckRemoveOverlayCard = function(p,s,o,ct,r)
+	aux.RemoveOverlayCard={s,o}
+	local res=_DuelCheckRemoveOverlayCard(p,s,o,ct,r)
+	aux.RemoveOverlayCard=nil
+	return res
+end
+Card.RemoveOverlayCard = function(c,p,min,max,r)
+	aux.RemoveOverlayCard=c
+	local ct=_CardRemoveOverlayCard(c,p,min,max,r)
+	if ct==MAX_INT32 and r&REASON_COST>0 and c:HasFlagEffect(CARD_PENTACLE_QUINTET_OF_GREED) then
+		ct=c:GetFlagEffectLabel(CARD_PENTACLE_QUINTET_OF_GREED)
+		c:ResetFlagEffect(CARD_PENTACLE_QUINTET_OF_GREED)
+	end
+	aux.RemoveOverlayCard=nil
+	return ct
+end
+Duel.RemoveOverlayCard = function(p,s,o,min,max,r)
+	aux.RemoveOverlayCard={s,o}
+	local res=_DuelRemoveOverlayCard(p,s,o,min,max,r)
+	aux.RemoveOverlayCard=nil
+	return res
+end
+
 --Regular Xyz Procedure mods
 local _XyzConditionAlter, _XyzTargetAlter = Auxiliary.XyzConditionAlter, Auxiliary.XyzTargetAlter
 

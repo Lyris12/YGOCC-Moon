@@ -181,36 +181,6 @@ Duel.SendtoGrave = function(tg,reason,...)
 end
 
 -------------------------------------------------------------------------------------
--------------------------------DETACH MATERIALS--------------------------------------
-local _CardCheckRemoveOverlayCard, _DuelCheckRemoveOverlayCard, _CardRemoveOverlayCard, _DuelRemoveOverlayCard =
-Card.CheckRemoveOverlayCard, Duel.CheckRemoveOverlayCard, Card.RemoveOverlayCard, Duel.RemoveOverlayCard
-
-Card.CheckRemoveOverlayCard = function(c,p,ct,r)
-	aux.RemoveOverlayCard=c
-	local res=_CardCheckRemoveOverlayCard(c,p,ct,r)
-	aux.RemoveOverlayCard=nil
-	return res
-end
-Duel.CheckRemoveOverlayCard = function(p,s,o,ct,r)
-	aux.RemoveOverlayCard={s,o}
-	local res=_DuelCheckRemoveOverlayCard(p,s,o,ct,r)
-	aux.RemoveOverlayCard=nil
-	return res
-end
-Card.RemoveOverlayCard = function(c,p,min,max,r)
-	aux.RemoveOverlayCard=c
-	local res=_CardRemoveOverlayCard(c,p,min,max,r)
-	aux.RemoveOverlayCard=nil
-	return res
-end
-Duel.RemoveOverlayCard = function(p,s,o,min,max,r)
-	aux.RemoveOverlayCard={s,o}
-	local res=_DuelRemoveOverlayCard(p,s,o,min,max,r)
-	aux.RemoveOverlayCard=nil
-	return res
-end
-
--------------------------------------------------------------------------------------
 -------------------------------PROXY EFFECTS FIX-------------------------------------
 Auxiliary.EffectBeingApplied = nil
 Auxiliary.ProxyEffect = nil
