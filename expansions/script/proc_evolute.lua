@@ -24,79 +24,8 @@ table.insert(aux.CannotBeEDMatCodes,EFFECT_CANNOT_BE_EVOLUTE_MATERIAL)
 TYPE_EXTRA							=TYPE_EXTRA|TYPE_EVOLUTE
 
 --overwrite functions
-local get_rank, get_orig_rank, prev_rank_field, is_rank, is_rank_below, is_rank_above, get_level, get_syn_level, get_rit_level, get_orig_level, is_xyz_level, get_prev_level_field, is_level, is_level_below, is_level_above, get_type, get_orig_type, get_prev_type_field = 
-	Card.GetRank, Card.GetOriginalRank, Card.GetPreviousRankOnField, Card.IsRank, Card.IsRankBelow, Card.IsRankAbove, Card.GetLevel,
-	Card.GetSynchroLevel, Card.GetRitualLevel, Card.GetOriginalLevel, Card.IsXyzLevel, Card.GetPreviousLevelOnField, Card.IsLevel, Card.IsLevelBelow, Card.IsLevelAbove, Card.GetType, Card.GetOriginalType, Card.GetPreviousTypeOnField
+local get_type, get_orig_type, get_prev_type_field = Card.GetType, Card.GetOriginalType, Card.GetPreviousTypeOnField
 
-Card.GetRank=function(c)
-	if Auxiliary.Evolutes[c] then return 0 end
-	return get_rank(c)
-end
-Card.GetOriginalRank=function(c)
-	if Auxiliary.Evolutes[c] and not Auxiliary.Evolutes[c]() then return 0 end
-	return get_orig_rank(c)
-end
-Card.GetPreviousRankOnField=function(c)
-	if Auxiliary.Evolutes[c] and not Auxiliary.Evolutes[c]() then return 0 end
-	return prev_rank_field(c)
-end
-Card.IsRank=function(c,...)
-	if Auxiliary.Evolutes[c] and not Auxiliary.Evolutes[c]() then return false end
-	local funs={...}
-	for key,value in pairs(funs) do
-		if c:GetRank()==value then return true end
-	end
-	return false
-	--return is_rank(c,rk)
-end
-Card.IsRankBelow=function(c,rk)
-	if Auxiliary.Evolutes[c] and not Auxiliary.Evolutes[c]() then return false end
-	return is_rank_below(c,rk)
-end
-Card.IsRankAbove=function(c,rk)
-	if Auxiliary.Evolutes[c] and not Auxiliary.Evolutes[c]() then return false end
-	return is_rank_above(c,rk)
-end
-Card.GetLevel=function(c)
-	if Auxiliary.Evolutes[c] and not Auxiliary.Evolutes[c]() then if c:GetEC()>0 then return 0 else return c:GetOriginalStage() end end
-	return get_level(c)
-end
-Card.GetSynchroLevel=function(c,sc)
-	if Auxiliary.Evolutes[c] and not Auxiliary.Evolutes[c]() then if c:GetEC()>0 then return 0 else return c:GetOriginalStage() end end
-	return get_syn_level(c,sc)
-end
-Card.GetRitualLevel=function(c,rc)
-	if Auxiliary.Evolutes[c] and not Auxiliary.Evolutes[c]() then if c:GetEC()>0 then return 0 else return c:GetOriginalStage() end end
-	return get_rit_level(c,rc)
-end
-Card.GetOriginalLevel=function(c)
-	if Auxiliary.Evolutes[c] and not Auxiliary.Evolutes[c]() then if c:GetEC()>0 then return 0 else return c:GetOriginalStage() end end
-	return get_orig_level(c)
-end
-Card.IsXyzLevel=function(c,xyz,lv)
-	if Auxiliary.Evolutes[c] and not Auxiliary.Evolutes[c]() then if c:GetEC()>0 then return false else return c:GetOriginalStage()==lv end end
-	return is_xyz_level(c,xyz,lv)
-end
-Card.GetPreviousLevelOnField=function(c)
-	if Auxiliary.Evolutes[c] and not Auxiliary.Evolutes[c]() then if c:GetEC()>0 then return 0 else return c:GetOriginalStage() end end
-	return get_prev_level_field(c)
-end
-Card.IsLevel=function(c,...)
-	if Auxiliary.Evolutes[c] and not Auxiliary.Evolutes[c]() then if c:GetEC()>0 then return false end end
-	local funs={...}
-	for key,value in pairs(funs) do
-		if c:GetLevel()==value then return true end
-	end
-	return false
-end
-Card.IsLevelBelow=function(c,lv)
-	if Auxiliary.Evolutes[c] and not Auxiliary.Evolutes[c]() then if c:GetEC()>0 then return false else return c:GetLevel()<=lv end end
-	return is_level_below(c,lv)
-end
-Card.IsLevelAbove=function(c,lv)
-	if Auxiliary.Evolutes[c] and not Auxiliary.Evolutes[c]() then if c:GetEC()>0 then return false else return c:GetLevel()>=lv end end
-	return is_level_above(c,lv)
-end
 Card.GetType=function(c,scard,sumtype,p)
 	local tpe=scard and get_type(c,scard,sumtype,p) or get_type(c)
 	if Auxiliary.Evolutes[c] then
@@ -498,7 +427,8 @@ function Auxiliary.EvoluteOperation(e,tp,eg,ep,ev,re,r,rp,c,smat,mg)
 				op(tc,tp)
 			end
 		else
-			Duel.SendtoGrave(g,REASON_MATERIAL+REASON_EVOLUTE)
+			Duel.Overlay(c,g:Filter(Card.IsType,nil,TYPE_EVOLUTE))
+			Duel.SendtoGrave(g:Filter(aux.NOT(Card.IsType),nil,TYPE_EVOLUTE), REASON_MATERIAL+REASON_EVOLUTE)
 		end
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
