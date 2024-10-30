@@ -109,7 +109,7 @@ dofile("expansions/script/mods_fusion.lua") --Generic Fusion Procedure modificat
 dofile("expansions/script/mods_xyz.lua") --Generic Fusion Procedure modifications
 dofile("expansions/script/mods_pendulum.lua") --Generic Pendulum Procedure modifications
 dofile("expansions/script/mods_link.lua") --Generic Link Procedure modifications
-dofile("expansions/script/mods_archetype.lua") --SetCard modifcations for Custom Archetypes
+-- dofile("expansions/script/mods_archetype.lua") --SetCard modifcations for Custom Archetypes
 
 --fix for Duel.IsSummonCancelable wrong return
 local fix1=Effect.GlobalEffect()
