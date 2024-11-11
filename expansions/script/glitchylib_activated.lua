@@ -183,9 +183,6 @@ function Glitchy.SpecialSummonTarget(tgchk,f,loc1,loc2,min,max,exc,sumtype,IsOpp
 end
 
 function Glitchy.SpecialSummonOperation(spmod,tgcheck,f,loc1,loc2,min,max,exc,sumtype,IsOpponentSummons,IsOpponentReceives,ignore_sumcon,ignore_revlim,pos)
-	if not loc1 and not loc2 then Debug.Message("Undefined locations when calling Glitchy.SpecialSummonOperation") return end
-	loc1=loc1 or 0
-	loc2=loc2 or 0
 	local spfunc,spparams=nil,{}
 	if type(f)=="number" then
 		tgcheck,f,loc1,loc2,min,max,exc,sumtype,IsOpponentSummons,IsOpponentReceives,ignore_sumcon,ignore_revlim,pos = spmod,tgcheck,f,loc1,loc2,min,max,exc,sumtype,IsOpponentSummons,IsOpponentReceives,ignore_sumcon,ignore_revlim
@@ -201,6 +198,9 @@ function Glitchy.SpecialSummonOperation(spmod,tgcheck,f,loc1,loc2,min,max,exc,su
 			spfunc=spmod
 		end
 	end
+	if not loc1 and not loc2 then Debug.Message("Undefined locations when calling Glitchy.SpecialSummonOperation") return end
+	loc1=loc1 or 0
+	loc2=loc2 or 0
 	sumtype=sumtype or 0
 	pos=pos or POS_FACEUP
 	if ignore_sumcon==nil then ignore_sumcon=false end
