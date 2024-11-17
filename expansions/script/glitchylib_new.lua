@@ -2638,9 +2638,11 @@ end
 function Effect.SetSpecificLabel(e,l,pos)
 	if not pos then pos=1 end
 	local tab={e:GetLabel()}
-	if #tab<pos then
-		for i=1,pos-#tab-1 do
-			table.insert(tab,0)
+	if pos==0 or #tab<pos then
+		if pos~=0 then
+			for i=1,pos-#tab-1 do
+				table.insert(tab,0)
+			end
 		end
 		table.insert(tab,l)
 	else
@@ -2653,6 +2655,11 @@ function Effect.GetSpecificLabel(e,pos)
 	local tab={e:GetLabel()}
 	if #tab<pos then return end
 	return tab[pos]
+end
+function Effect.GetLabelCount(e)
+	local tab={e:GetLabel()}
+	if not tab then return 0 end
+	return #tab
 end
 
 --Link Markers
@@ -3355,14 +3362,14 @@ function Duel.GetNextPhaseCount(ph,p)
 	end
 end
 function Duel.GetNextMainPhaseCount(p)
-	if Duel.IsMainPhase() and (not p or Duel.GetTurnPlayer()==tp) then
+	if Duel.IsMainPhase() and (not p or Duel.GetTurnPlayer()==p) then
 		return 2
 	else
 		return 1
 	end
 end
 function Duel.GetNextBattlePhaseCount(p)
-	if Duel.IsBattlePhase() and (not p or Duel.GetTurnPlayer()==tp) then
+	if Duel.IsBattlePhase() and (not p or Duel.GetTurnPlayer()==p) then
 		return 2
 	else
 		return 1
@@ -4583,6 +4590,8 @@ end
 6) (cond)	= Optional additional condition for the advancement of the turn counter
 7) (op)		= Optional additional operation for the advancement of the turn counter
 8) (...)	= All the Pyro-Clock-related must be passed as extra parameters
+
+For activated effects, remember to set their conditions to aux.FALSE and let this function handle them (see Celestial Ruler of the Zodiac)
 ]]
 function Auxiliary.ManagePyroClockInteraction(c,tp,p,phase,rct,cond,op,...)
 	phase=phase and phase or PHASE_END
@@ -4616,9 +4625,10 @@ function Auxiliary.ManagePyroClockInteraction(c,tp,p,phase,rct,cond,op,...)
 			table.insert(aux.EffectsToResetByPyroClock[e1],re)
 		end
 	end
+	return e1
 end
 function Auxiliary.PyroClockOperation(rct,op)
-	return	function(e,tp,eg,ep,ev,re,r,rp)
+	return	function(e,tp,eg,ep,ev,_re,r,rp)
 				local ct=e:GetLabel()
 				ct=ct+1
 				e:SetLabel(ct)
@@ -4627,6 +4637,12 @@ function Auxiliary.PyroClockOperation(rct,op)
 					if aux.EffectsToResetByPyroClock[e] then
 						while #aux.EffectsToResetByPyroClock[e]>0 do
 							local re=aux.EffectsToResetByPyroClock[e][#aux.EffectsToResetByPyroClock[e]]
+							if re:IsHasType(EFFECT_TYPE_CONTINUOUS) then
+								local reop=re:GetOperation()
+								if reop then
+									reop(re,tp,eg,ep,ev,_re,r,rp)
+								end
+							end
 							re:Reset()
 							table.remove(aux.EffectsToResetByPyroClock[e])
 						end

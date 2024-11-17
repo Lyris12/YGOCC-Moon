@@ -2014,6 +2014,7 @@ end
 --EFFECT TABLES
 GLOBAL_EFFECT_RESET	= 92839884
 global_override_reason_effect_check = false
+if not global_manually_resetted_effects_table then global_manually_resetted_effects_table={} end
 if not global_resetted_card_effects_table then global_resetted_card_effects_table={} end
 if not global_resetted_duel_effects_table then global_resetted_duel_effects_table={} end
 
@@ -2021,6 +2022,7 @@ local _Reset = Effect.Reset
 
 Effect.Reset = function(e)
 	if e:GLGetReset()==0 then
+		global_manually_resetted_effects_table[e]=true
 		return _Reset(e)
 	else
 		local reset1={e:GetHandler():IsHasEffect(GLOBAL_EFFECT_RESET)}
@@ -2042,6 +2044,10 @@ Effect.Reset = function(e)
 	end
 end
 function Effect.WasReset(e,c)
+	if global_manually_resetted_effects_table[e]==true then
+		global_manually_resetted_effects_table[e]=nil
+		return true
+	end
 	if e:GLGetReset()==0 then return false end
 	if not c then
 		if e:IsHasProperty(EFFECT_FLAG_FIELD_ONLY) then

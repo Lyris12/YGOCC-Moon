@@ -122,17 +122,19 @@ function Auxiliary.AddOrigDriveType(c)
 	Auxiliary.Customs[c]=true
 	Auxiliary.Drives[c]=true
 end
-function Auxiliary.AddDriveProc(c,energy)
+function Auxiliary.AddDriveProc(c,energy,cannotEngage)
 	if c:IsStatus(STATUS_COPYING_EFFECT) then return end
 	
-	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(DRIVE_STRINGS,0))
-	e1:SetType(EFFECT_TYPE_IGNITION+EFFECT_TYPE_CONTINUOUS)
-	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE)
-	e1:SetRange(LOCATION_HAND)
-	e1:SetCondition(Auxiliary.EngageCondition)
-	e1:SetOperation(Auxiliary.EngageOperation)
-	c:RegisterEffect(e1)
+	if not cannotEngage then
+		local e1=Effect.CreateEffect(c)
+		e1:SetDescription(aux.Stringid(DRIVE_STRINGS,0))
+		e1:SetType(EFFECT_TYPE_IGNITION+EFFECT_TYPE_CONTINUOUS)
+		e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE)
+		e1:SetRange(LOCATION_HAND)
+		e1:SetCondition(Auxiliary.EngageCondition)
+		e1:SetOperation(Auxiliary.EngageOperation)
+		c:RegisterEffect(e1)
+	end
 	local echk=Effect.CreateEffect(c)
 	echk:SetDescription(aux.Stringid(DRIVE_STRINGS,1))
 	echk:SetType(EFFECT_TYPE_IGNITION+EFFECT_TYPE_CONTINUOUS)

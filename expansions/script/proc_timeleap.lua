@@ -646,3 +646,13 @@ function Auxiliary.TimeleapMaterialBanishFacedown()
 		end
 	}
 end
+function Auxiliary.TimeleapMaterialSendtoGrave()
+	return {
+		function(e,tp,eg,ep,ev,re,r,rp,c,g)
+			Duel.SendtoGrave(g,REASON_MATERIAL|REASON_TIMELEAP)
+		end,
+		function(c)
+			return c:IsAbleToGrave()
+		end
+	}
+end
