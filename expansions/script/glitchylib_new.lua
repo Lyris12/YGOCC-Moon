@@ -203,7 +203,13 @@ function Card.Activation(c,oath,timings,cond,cost,tg,op,stop)
 		e1:HOPT(true)
 	end
 	if timings then
-		e1:SetRelevantTimings()
+		if type(timings)=="boolean" then
+			e1:SetRelevantTimings()
+		elseif type(timings)=="table" then
+			e1:SetHintTiming(timings[1],timings[2])
+		else
+			e1:SetHintTiming(timings)
+		end
 	end
 	if cond then
 		e1:SetCondition(cond)
@@ -275,6 +281,17 @@ function Duel.ToHandOrGrave(c,tp,p,cond)
 		return Duel.Search(c,nil,p)
 	elseif opt==1 then
 		return Duel.SendtoGrave(c,REASON_EFFECT)
+	end
+end
+function Duel.ToHandOrSSet(c,tp,p,cond)
+	local b1=c:IsAbleToHand()
+	local b2=c:IsSSetable() and (cond==nil or cond)
+	if not b1 and not b2 then return end
+	local opt=aux.Option(tp,nil,nil,{b1,STRING_ADD_TO_HAND},{b2,STRING_SET})
+	if opt==0 then
+		return Duel.Search(c,nil,p)
+	elseif opt==1 then
+		return Duel.SSet(tp,c)
 	end
 end
 
@@ -522,7 +539,7 @@ function Card.IsCanBeAttachedTo(c,xyzc,e,p,r)
 end
 function Duel.Attach(c,xyz,transfer,e,r,rp)
 	if aux.GetValueType(c)=="Card" then
-		if e and r&REASON_EFFECT>0 and c:IsImmuneToEffect(e) then
+		if not c:IsCanBeAttachedTo(xyz,e,rp,r) or (e and r&REASON_EFFECT>0 and c:IsImmuneToEffect(e)) then
 			return false
 		end
 		local og=c:GetOverlayGroup()
@@ -539,7 +556,7 @@ function Duel.Attach(c,xyz,transfer,e,r,rp)
 	elseif aux.GetValueType(c)=="Group" then
 		for tc in aux.Next(c) do
 			local og=tc:GetOverlayGroup()
-			if not (e and r&REASON_EFFECT>0 and tc:IsImmuneToEffect(e)) then
+			if tc:IsCanBeAttachedTo(xyz,e,rp,r) and not (e and r&REASON_EFFECT>0 and tc:IsImmuneToEffect(e)) then
 				if #og>0 then
 					if transfer then
 						Duel.Overlay(xyz,og)
@@ -620,7 +637,8 @@ function Duel.BanishUntil(g,e,tp,pos,phase,id,phasect,phasenext,rc,r,disregard_t
 		end
 	end
 	if ct>0 then
-		local og=g:Filter(Card.IsLocation,nil,loc):Filter(aux.BecauseOfThisEffect,nil,e)
+		local because=r==REASON_COST and aux.BecauseOfThisCost or aux.BecauseOfThisEffect
+		local og=g:Filter(Card.IsLocation,nil,loc):Filter(because,nil,e)
 		if #og>0 then
 			og:KeepAlive()
 			local turnct,turnct2=phasect-1,phasect
@@ -656,7 +674,7 @@ function Duel.BanishUntil(g,e,tp,pos,phase,id,phasect,phasenext,rc,r,disregard_t
 			else
 				e1:SetCondition(aux.TimingConditionButCountsTurns(counts_turns))
 			end
-			e1:SetOperation(aux.ReturnLabelObjectToFieldOp(id,lingering_effect_to_reset))
+			e1:SetOperation(aux.ReturnLabelObjectToFieldOp(id,lingering_effect_to_reset,r))
 			Duel.RegisterEffect(e1,tp)
 			return ct,e1
 		end
@@ -705,7 +723,7 @@ function Auxiliary.TimingConditionButCountsTurns(counts_turns)
 				return false
 			end
 end
-function Auxiliary.ReturnLabelObjectToFieldOp(id,lingering_effect_to_reset)
+function Auxiliary.ReturnLabelObjectToFieldOp(id,lingering_effect_to_reset,r)
 	return	function(e,tp,eg,ep,ev,re,r,rp)
 				local g=e:GetLabelObject()
 				local ltype=aux.GetValueType(lingering_effect_to_reset)
@@ -744,17 +762,30 @@ function Auxiliary.ReturnLabelObjectToFieldOp(id,lingering_effect_to_reset)
 								rg:Merge(sgs)
 							end
 						end
-						local sgf=sg1:Filter(Card.IsPreviousLocation,nil,LOCATION_FZONE)
+						local sgf=sg1:Filter(Card.IsPreviousLocation,nil,LOCATION_FZONE|LOCATION_HAND|LOCATION_GRAVE)
 						rg:Merge(sgf)
 					end
 				end
 				--Debug.Message(#rg)
+				
+				if ltype=="number" then
+					tc:ResetFlagEffect(lingering_effect_to_reset)
+				elseif ltype=="Effect" then
+					lingering_effect_to_reset:Reset()
+				elseif ltype=="table" then
+					for _,le in ipairs(lingering_effect_to_reset) do
+						le:Reset()
+					end
+				end
+				
+				local tohand,tograve=Group.CreateGroup(),Group.CreateGroup()
 				if #rg>0 then
 					sg:Sub(rg)
 					for tc in aux.Next(rg) do
 						if tc:IsPreviousLocation(LOCATION_FZONE) then
 							Duel.MoveToField(tc,tp,tc:GetPreviousControler(),LOCATION_FZONE,tc:GetPreviousPosition(),true)
-						else
+							
+						elseif tc:IsPreviousLocation(LOCATION_ONFIELD) then
 							local e1
 							if tc:IsInExtra() and tc:IsFaceup() then
 								e1=Effect.CreateEffect(tc)
@@ -769,17 +800,23 @@ function Auxiliary.ReturnLabelObjectToFieldOp(id,lingering_effect_to_reset)
 							--Debug.Message(e:GetOwner())
 							Duel.ReturnToField(tc,tc:GetPreviousPosition(),0xff&(~EXTRA_MONSTER_ZONE))
 							if e1 then e1:Reset() end
-						end
-						if ltype=="number" then
-							tc:ResetFlagEffect(lingering_effect_to_reset)
+							
+						elseif tc:IsPreviousLocation(LOCATION_HAND) then
+							tohand:AddCard(tc)
+							
+						elseif tc:IsPreviousLocation(LOCATION_GRAVE) then
+							tograve:AddCard(tc)
 						end
 					end
 				end
+				if #tohand>0 then
+					Duel.SendtoHand(tohand,nil,r|REASON_RETURN)
+				end
+				if #tograve>0 then
+					Duel.SendtoGrave(tograve,r|REASON_RETURN)
+				end
 				for tc in aux.Next(sg) do
 					Duel.ReturnToField(tc)
-				end
-				if ltype=="Effect" then
-					lingering_effect_to_reset:Reset()
 				end
 				g:DeleteGroup()
 			end
@@ -996,13 +1033,14 @@ function Duel.BounceAndCheck(g,p,r)
 	return ct>0 and cgct>0
 end
 
-function Duel.SendtoGraveAndCheck(g,p,r)
-	if type(g)=="Card" then g=Group.FromCards(g) end
+function Duel.SendtoGraveAndCheck(g,p,r,count)
+	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
 	r = r or REASON_EFFECT
+	count = count or 1
 	local ct=Duel.SendtoGrave(g,r)
-	if ct<=0 then return false end
+	if ct<count then return false end
 	local cg=g:Filter(aux.PLChk,nil,p,LOCATION_GRAVE)
-	return #cg>0
+	return #cg>=count
 end
 
 --RETURN TO DECK
@@ -2296,6 +2334,12 @@ function Auxiliary.FaceupFilter(f,...)
 				return target:IsFaceup() and f(target,table.unpack(ext_params))
 			end
 end
+function Auxiliary.FaceupExFilter(f,...)
+	local ext_params={...}
+	return	function(target)
+				return target:IsFaceupEx() and f(target,table.unpack(ext_params))
+			end
+end
 function Auxiliary.ArchetypeFilter(set,f,...)
 	local ext_params={...}
 	return	function(target)
@@ -2845,6 +2889,18 @@ end
 function Card.IsAttachedTo(c,xyzc)
 	return c:IsLocation(LOCATION_OVERLAY) and xyzc:HasCardAttached(c)
 end
+function Group.CheckRemoveOverlayCard(g,tp,ct,r)
+	return g:IsExists(Card.CheckRemoveOverlayCard,1,nil,tp,ct,r)
+end
+function Group.RemoveOverlayCard(g,tp,min,max,r)
+	local res=0
+	Duel.HintMessage(tp,HINTMSG_REMOVEXYZ)
+	local tg=g:FilterSelect(tp,Card.CheckRemoveOverlayCard,1,1,nil,tp,min,r)
+	if #tg>0 then
+		res=tg:GetFirst():RemoveOverlayCard(tp,min,max,r)
+	end
+	return res
+end
 function Duel.GetXyzMaterialGroup(tp,s,o,xyzf,matf,...)
 	xyzf=xyzf and xyzf or aux.TRUE
 	matf=matf and matf or aux.TRUE
@@ -3248,9 +3304,10 @@ function Duel.SummonOrSet(tp,tc,ignore_limit,min)
 end
 
 --Set Monster/Spell/Trap
-function Card.IsCanBeSet(c,e,tp,ignore_mzone,ignore_szone)
+function Card.IsCanBeSet(c,e,tp,ignore_mzone,ignore_szone,mct)
+	mct = mct and mct or 0
 	if c:IsMonster() then
-		return c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEDOWN_DEFENSE) and (not ignore_mzone or Duel.GetMZoneCount(tp)>0)
+		return c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEDOWN_DEFENSE) and (not ignore_mzone or Duel.GetMZoneCount(tp)>mct)
 	elseif c:IsST() then
 		return c:IsSSetable(ignore_szone)
 	end
@@ -3708,7 +3765,7 @@ function Card.MustWaitOneTurnToActivateAfterBeingSet(c)
 end
 function Duel.SSetAndFastActivation(p,g,e,cond,brk)
 	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
-	if Duel.SSet(p,g)>0 and (not cond or cond(e,p)) then
+	if Duel.SSet(p,g)>0 and (not cond or cond==true or cond(e,p)) then
 		local c=e:GetHandler()
 		local og=g:Filter(aux.AND(Card.MustWaitOneTurnToActivateAfterBeingSet,aux.SetSuccessfullyFilter),nil)
 		if #og>0 and brk then
@@ -4600,9 +4657,15 @@ function Auxiliary.ManagePyroClockInteraction(c,tp,p,phase,rct,cond,op,...)
 	if p then
 		resetp = p==tp and RESET_SELF_TURN or RESET_OPPO_TURN
 	end
+	
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
-	e1:SetCode(EVENT_PHASE|phase)
+	if phase==PHASE_END and not effectDoesAction then
+		e1:SetCode(EVENT_TURN_END)
+	else
+		e1:SetCode(EVENT_PHASE|phase)
+		e1:SetReset(RESET_PHASE|phase|resetp,rct)
+	end
 	e1:OPT()
 	e1:SetCondition(
 		function(_e,_tp)
@@ -4610,11 +4673,8 @@ function Auxiliary.ManagePyroClockInteraction(c,tp,p,phase,rct,cond,op,...)
 		end
 	)
 	e1:SetOperation(aux.PyroClockOperation(rct,op))
-	e1:SetReset(RESET_PHASE|phase|resetp,rct)
-	Duel.RegisterEffect(e1,tp)
-	c:RegisterFlagEffect(CARD_PYRO_CLOCK,RESET_PHASE|phase|resetp,0,rct)
-	local s=getmetatable(c)
-	s[c]=e1
+	
+	local effectDoesAction=false
 	local effs_to_reset={...}
 	if #effs_to_reset>0 then
 		if not aux.EffectsToResetByPyroClock then
@@ -4622,9 +4682,18 @@ function Auxiliary.ManagePyroClockInteraction(c,tp,p,phase,rct,cond,op,...)
 		end
 		aux.EffectsToResetByPyroClock[e1]={}
 		for _,re in ipairs(effs_to_reset) do
+			if not effectDoesAction and re:IsHasType(EFFECT_TYPE_CONTINUOUS) then
+				effectDoesAction=true
+			end
 			table.insert(aux.EffectsToResetByPyroClock[e1],re)
 		end
 	end
+	
+	Duel.RegisterEffect(e1,tp)
+	c:RegisterFlagEffect(CARD_PYRO_CLOCK,RESET_PHASE|phase|resetp,0,rct)
+	local s=getmetatable(c)
+	s[c]=e1
+	
 	return e1
 end
 function Auxiliary.PyroClockOperation(rct,op)
@@ -4650,6 +4719,7 @@ function Auxiliary.PyroClockOperation(rct,op)
 					end
 					if op then op(e,tp,eg,ep,ev,re,r,rp) end
 					e:GetOwner():ResetFlagEffect(CARD_PYRO_CLOCK)
+					e:Reset()
 				end
 			end
 end

@@ -1338,6 +1338,9 @@ end
 --Protections: Immunity
 UNAFFECTED_OTHER		= 0x1
 UNAFFECTED_OPPO			= 0x2
+UNAFFECTED_MONSTER		= 0x4
+UNAFFECTED_SPELL		= 0x8
+UNAFFECTED_TRAP			= 0x10
 UNAFFECTED_OTHER_EQUIP	= 0x100
 
 function Auxiliary.imother(e,te)
@@ -1350,11 +1353,20 @@ function Auxiliary.imothereq(e,te)
 	local owner,affecting_owner=e:GetOwner(),te:GetOwner()
 	return owner~=affecting_owner and affecting_owner~=owner:GetEquipTarget()
 end
+function Auxiliary.imtype(typ)
+	return	function(e,te)
+				return te:IsActiveType(typ)
+			end
+end
 
 Auxiliary.UnaffectedProtections={
 	[UNAFFECTED_OTHER]			= aux.imother;
 	[UNAFFECTED_OPPO]			= aux.imoval;
+	[UNAFFECTED_MONSTER]		= aux.imtype(TYPE_MONSTER);
+	[UNAFFECTED_SPELL]			= aux.imtype(TYPE_SPELL);
+	[UNAFFECTED_TRAP]			= aux.imtype(TYPE_TRAP);
 	[UNAFFECTED_OTHER_EQUIP]	= aux.imothereq;
+	
 }
 
 function Card.Unaffected(c,immunity,cond,reset,rc,range,prop,desc,forced,typ)
@@ -1449,6 +1461,23 @@ function Card.CannotBeTributed(c,reset,rc,range,cond,prop,desc)
 	e5:SetCode(EFFECT_UNRELEASABLE_NONSUM)
 	c:RegisterEffect(e5)
 	return e4,e5
+end
+
+--Special conditions (not effects)
+function Card.TrapCanBeActivatedFromHand(c,cond,desc,stop)
+	local e1=Effect.CreateEffect(c)
+	if desc then
+		e1:SetDescription(desc)
+	end
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_TRAP_ACT_IN_HAND)
+	if cond then
+		e1:SetCondition(cond)
+	end
+	if not stop then
+		c:RegisterEffect(e1)
+	end
+	return e1
 end
 
 --Restriction and Rules

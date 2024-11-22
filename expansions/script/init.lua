@@ -2230,16 +2230,17 @@ if not global_card_effect_table_global_check then
 											end
 										end
 									end
-									aux.PreventCannotApplyConditionCheckLoop=false
-								end
 								
-								if Duel.IsPlayerAffectedByEffect(tp,EFFECT_CANNOT_APPLY) then
-									for _,ce in ipairs({Duel.IsPlayerAffectedByEffect(tp,EFFECT_CANNOT_APPLY)}) do
-										local val=ce:GetValue()
-										if ce~=E and (not val or val(ce,E,tp,c)) then
-											return false
+									if Duel.IsPlayerAffectedByEffect(tp,EFFECT_CANNOT_APPLY) then
+										for _,ce in ipairs({Duel.IsPlayerAffectedByEffect(tp,EFFECT_CANNOT_APPLY)}) do
+											local val=ce:GetValue()
+											if ce~=E and (not val or val(ce,E,tp,c)) then
+												aux.PreventCannotApplyConditionCheckLoop=false
+												return false
+											end
 										end
 									end
+									aux.PreventCannotApplyConditionCheckLoop=false
 								end
 								return not cond or cond(E,...)
 							end
