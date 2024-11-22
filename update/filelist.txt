@@ -1,4 +1,4 @@
-﻿expansions/cards-new.cdb	9b1f89235250c36488b33519ca597ce3
+﻿expansions/cards-new.cdb	2daee75153fd24082b4d01fa183ef9c4
 expansions/lflist.conf	e0f126b23a6ab0603255f0de5f16d945
 expansions/strings.conf	9dce5efb759744e6f5bc92483baf62a8
 expansions/pics/100000000.png	b67e8ff2c7f674f012be790c136b43e5
@@ -311,7 +311,7 @@ expansions/pics/100000330.png	70949ac1244ffea36f59edd70d433e1f
 expansions/pics/100000331.png	c9f4dd39448397b900ce4d2d0c3b0d55
 expansions/pics/100000332.png	e9dc5f726e6b326451f72cbb26889d1f
 expansions/pics/100000333.png	dd1adb89767f3a0efa1856f253ec35bf
-expansions/pics/100000336.png	4fd670c76af4154007e029c364c1912d
+expansions/pics/100000354.png	4fd670c76af4154007e029c364c1912d
 expansions/pics/100000714.jpg	74ec20749932cad0249671d71e6d672b
 expansions/pics/100000736.jpg	c5e9351a52cc037f92fec11b7cf8af3a
 expansions/pics/100000737.jpg	cee58b68cef05bb4ebb462e0bd50d50b
@@ -6759,7 +6759,7 @@ expansions/script/c100000330.lua	98eaa280b9c99b51176240767488a305
 expansions/script/c100000331.lua	f7c37826d70575ba4d560a09c4bd1882
 expansions/script/c100000332.lua	bbc0d975c411669249e414a47556660f
 expansions/script/c100000333.lua	901f699b4f9f0e283ec395a5262c4474
-expansions/script/c100000334.lua	d258649497ffbf961ba809fc65e3f58d
+expansions/script/c100000356.lua	d258649497ffbf961ba809fc65e3f58d
 expansions/script/c100000714.lua	d76fba87c5edb765a2be2d5bd214a793
 expansions/script/c100000736.lua	4b60d073e942c60222e137d3f350e025
 expansions/script/c100000737.lua	21f0e03236994964f5cb4a517edb0523
@@ -12787,6 +12787,6 @@ sound/custom/yata_battle.wav	da8f0e30d6c23c066be364993f3dbc92
 sound/custom/yata_effe01.wav	edf949c75a32c7b91f6029a6e6640ea6
 sound/custom/yata_summon.wav	17b569892284748d19f441e6972d6cce
 update/delete.txt	bcae307f6039207f11b4daa83f17c0ec
-update/filelist.txt	f89987a1d01d5062f100cb9ba7d36748
+update/filelist.txt	f506da547845878ab658fd44360ec90e
 update/rename.txt	c509c33cdee4e36b1cfaaed4315f2886
-update/version.txt	74a2671977f2ad758a4a6b4caddb86c9
+update/version.txt	706cd679779d3e8bb43151d287d7022f
