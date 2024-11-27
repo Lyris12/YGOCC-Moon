@@ -60,7 +60,7 @@ function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		return (e:IsCostChecked() or Duel.GetMZoneCount(tp)>0) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and eg:IsExists(Card.IsCanAddCounter,1,nil,COUNTER_CURSEFLAME,1)
 	end
-	local g=aux.SelectSimultaneousEventGroup(eg,id+100,1)
+	local g=aux.SelectSimultaneousEventGroup(eg,tp,id+100,1,e)
 	Duel.SetTargetCard(g)
 	Duel.SetCardOperationInfo(c,CATEGORY_SPECIAL_SUMMON)
 	Duel.SetOperationInfo(0,CATEGORY_COUNTER,nil,#g,0,COUNTER_CURSEFLAME)

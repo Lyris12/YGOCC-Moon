@@ -121,7 +121,7 @@ end
 function s.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=eg:Filter(Card.IsCanChangeStats,nil,1800,1800)
 	if chk==0 then return #g>0 end
-	local tg=aux.SelectSimultaneousEventGroup(g,id+100)
+	local tg=aux.SelectSimultaneousEventGroup(g,tp,id+100,1,e)
 	Duel.SetTargetCard(tg)
 	Duel.SetCustomOperationInfo(0,CATEGORIES_ATKDEF,tg,#tg,0,0,1800)
 end
