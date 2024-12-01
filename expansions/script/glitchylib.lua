@@ -540,6 +540,8 @@ function Auxiliary.RegisterMergedDelayedEventGlitchy(c,code,event,f,flag,range,e
 			se=aux.AddThisCardInMZoneAlreadyCheck(c)
 		elseif check_if_already_in_location&LOCATION_SZONE>0 then
 			se=aux.AddThisCardInSZoneAlreadyCheck(c)
+		elseif check_if_already_in_location&LOCATION_PZONE>0 then
+			se=aux.AddThisCardInPZoneAlreadyCheck(c)
 		end
 	end
 	
@@ -807,7 +809,7 @@ function Auxiliary.SimultaneousEventGroupCheck(g,simult_check,og,gcheck)
 	end
 	return not gcheck or gcheck(g)
 end
-function Auxiliary.SelectSimultaneousEventGroup(g,tp,flag,ct,e,excflag,gcheck)
+function Auxiliary.SelectSimultaneousEventGroup(g,tp,flag,ct,e,excflag,gcheck,nohint)
 	local ct=ct and ct or 1
 	local fid=e and e:GetHandler():GetFieldID() or 0
 	if excflag then
@@ -815,7 +817,7 @@ function Auxiliary.SelectSimultaneousEventGroup(g,tp,flag,ct,e,excflag,gcheck)
 	end
 	if #g==0 then return end
 	if #g==1 then
-		Duel.HintSelection(g)
+		if not nohint then Duel.HintSelection(g) end
 		if excflag then
 			g:GetFirst():RegisterFlagEffect(excflag,RESET_CHAIN,0,1,fid)
 		end
@@ -823,7 +825,7 @@ function Auxiliary.SelectSimultaneousEventGroup(g,tp,flag,ct,e,excflag,gcheck)
 	else
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_OPERATECARD)
 		local tg=g:SelectSubGroup(tp,aux.SimultaneousEventGroupCheck,false,ct,#g,flag,g,gcheck)
-		Duel.HintSelection(tg)
+		if not nohint then Duel.HintSelection(tg) end
 		if excflag then
 			for tc in aux.Next(tg) do
 				tc:RegisterFlagEffect(excflag,RESET_CHAIN,0,1,fid)

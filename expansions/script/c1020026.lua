@@ -1,41 +1,42 @@
---Galactic Codeman: Aero X
+--[[
+Galactic CODEMAN: Aero X
+Card Author: Jake
+Original script by: ?
+Fixed by: XGlitchy30
+]]
+
 local s,id=GetID()
 function s.initial_effect(c)
-	--synchro summon
 	c:EnableReviveLimit()
-	aux.AddSynchroProcedure(c,aux.Tuner(Card.IsRace,RACE_MACHINE),aux.NonTuner(Card.IsRace,RACE_MACHINE),1)
+	--synchro summon
+	aux.AddSynchroProcedure(c,aux.Filter(Card.IsRace,RACE_MACHINE),aux.NonTuner(Card.IsRace,RACE_MACHINE),1)
 	--Special Summon
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_TODECK)
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e1:SetDescription(id,0)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON|CATEGORY_ATKCHANGE)
+	e1:SetType(EFFECT_TYPE_SINGLE|EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CARD_TARGET)
-	e1:SetCondition(s.spcon)
+	e1:SetProperty(EFFECT_FLAG_DELAY|EFFECT_FLAG_CARD_TARGET)
+	e1:HOPT(true)
+	e1:SetCondition(aux.SynchroSummonedCond)
 	e1:SetTarget(s.sptg)
 	e1:SetOperation(s.spop)
-	e1:SetCountLimit(1,id)
 	c:RegisterEffect(e1)
 	--special summon
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(id,0))
+	e2:SetDescription(id,1)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
+	e2:HOPT(true)
 	e2:SetCondition(s.bancon)
 	e2:SetTarget(s.bantg)
-	e2:SetCost(s.lolcost)
-	e2:SetCountLimit(1,id+100+EFFECT_COUNT_CODE_OATH)
 	e2:SetOperation(s.banop)
 	c:RegisterEffect(e2)
 end
-function s.tunfil(c)
-	return c:IsRace(RACE_MACHINE) and c:GetLevel()==3
-end
-function s.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetSummonType()&SUMMON_TYPE_SYNCHRO==SUMMON_TYPE_SYNCHRO
-end
+--E1
 function s.spfil(c,e,tp)
-	return c:IsType(TYPE_TUNER) and c:IsLevelBelow(4) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(ARCHE_CODEMAN) and c:IsLevelBelow(4) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and s.spfil(chkc,e,tp) end
@@ -44,33 +45,28 @@ function s.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectTarget(tp,s.spfil,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
+	Duel.SetCustomOperationInfo(0,CATEGORY_ATKCHANGE,e:GetHandler(),1,0,0,-2,OPINFO_FLAG_HALVE)
 end
 function s.spop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)>0 then
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_SET_ATTACK_FINAL)
-		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e1:SetValue(math.ceil(e:GetHandler():GetAttack()/2))
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-		e:GetHandler():RegisterEffect(e1)
+	if tc:IsRelateToChain() and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)>0 then
+		local c=e:GetHandler()
+		if c:IsRelateToChain() and c:IsFaceup() then
+			c:HalveATK(true,c)
+		end
 	end
 end
-function s.lolcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	if chk==0 then return c:GetFlagEffect(id)==0 end
-	c:RegisterFlagEffect(id,RESET_EVENT+RESETS_STANDARD+RESET_PHASE+PHASE_END,0,1)
-end
-function s.cfilter(c)
-	return c:IsFaceup() and c:IsRace(RACE_MACHINE)
+
+--E2
+function s.atkcheck(c)
+	return not c:IsAttack(c:GetBaseAttack())
 end
 function s.bancon(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(s.cfilter,tp,LOCATION_MZONE,0,nil)
-	return #g>=2 and g:IsExists(aux.NOT(Card.IsAttack),1,nil,Card.GetBaseAttack)
+	local g=Duel.GetMatchingGroup(aux.FaceupFilter(Card.IsRace,RACE_MACHINE),tp,LOCATION_MZONE,0,nil)
+	return #g>=2 and g:IsExists(s.atkcheck,1,nil)
 end
 function s.banfilter(c,e,tp)
-	return c:IsSetCard(0x1ded) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE)
+	return c:IsSetCard(ARCHE_CODEMAN) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENSE)
 end
 function s.bantg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

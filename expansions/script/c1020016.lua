@@ -1,201 +1,208 @@
---Galactic Codeman: Overlay Zero
+--[[
+Galactic CODEMAN: Overlay Zero
+Card Author: Jake
+Original script by: ?
+Fixed by: XGlitchy30
+]]
+
 local s,id=GetID()
 function s.initial_effect(c)
-	--xyz summon
-	aux.AddXyzProcedure(c,aux.AND(aux.FilterBoolFunction(Card.IsRace,RACE_MACHINE),aux.NOT(aux.FilterBoolFunction(Card.IsLevel,Card.GetLevel))),7,2)
+	if not s.progressive_id then
+		s.progressive_id=id
+	else
+		s.progressive_id=s.progressive_id+2
+	end
 	c:EnableReviveLimit()
-	--pendulum
 	aux.EnablePendulumAttribute(c,false)
+	aux.AddXyzProcedureLevelFree(c,s.mfilter,s.xyzcheck,2,2)
+	aux.AddXyzProcedure(c,s.xyzmaterial,7,2)
+	--control only 1
+	c:SetUniqueOnField(1,0,id,LOCATION_MZONE)
 	--negate
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_FIELD)
-	e3:SetCode(EFFECT_DISABLE)
-	e3:SetRange(LOCATION_PZONE)
-	e3:SetTargetRange(0,LOCATION_MZONE)
-	e3:SetCondition(s.discon)
-	e3:SetTarget(aux.TargetBoolFunction(Card.IsType,TYPE_XYZ))
-	c:RegisterEffect(e3)
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e4:SetCode(EVENT_CHAIN_SOLVING)
-	e4:SetRange(LOCATION_PZONE)
-	e4:SetCondition(s.discon)
-	e4:SetOperation(s.disop)
-	c:RegisterEffect(e4)
+	local p1=Effect.CreateEffect(c)
+	p1:SetType(EFFECT_TYPE_FIELD)
+	p1:SetCode(EFFECT_DISABLE)
+	p1:SetRange(LOCATION_PZONE)
+	p1:SetTargetRange(0,LOCATION_MZONE)
+	p1:SetCondition(s.discon)
+	p1:SetTarget(s.distg)
+	c:RegisterEffect(p1)
 	--rank
-	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_DISABLE+CATEGORY_ATKCHANGE)
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e1:SetRange(LOCATION_PZONE)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
-	e1:SetCondition(s.rkcon)
-	e1:SetTarget(s.rktg)
-	e1:SetOperation(s.rkop)
-	c:RegisterEffect(e1)
+	aux.RegisterMergedDelayedEventGlitchy(c,s.progressive_id,EVENT_SPSUMMON_SUCCESS,s.evfilter,id,LOCATION_PZONE,nil,LOCATION_PZONE,nil,id+100)
+	local p2=Effect.CreateEffect(c)
+	p2:SetDescription(id,0)
+	p2:SetCategory(CATEGORY_DESTROY)
+	p2:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_TRIGGER_O)
+	p2:SetProperty(EFFECT_FLAG_CARD_TARGET|EFFECT_FLAG_DELAY)
+	p2:SetCode(EVENT_CUSTOM+s.progressive_id)
+	p2:SetRange(LOCATION_PZONE)
+	p2:HOPT()
+	p2:SetTarget(s.rktg)
+	p2:SetOperation(s.rkop)
+	c:RegisterEffect(p2)
 	--atk
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE)
-	e4:SetCode(EFFECT_UPDATE_ATTACK)
-	e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e4:SetRange(LOCATION_MZONE)
-	e4:SetValue(s.val)
-	c:RegisterEffect(e4)
-	--disable
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_DISABLE+CATEGORY_ATKCHANGE)
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_UPDATE_ATTACK)
+	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
-	e1:SetTarget(s.target)
-	e1:SetOperation(s.activate)
+	e1:SetValue(s.val)
 	c:RegisterEffect(e1)
+	--disable
+	aux.RegisterMergedDelayedEventGlitchy(c,s.progressive_id+1,EVENT_SPSUMMON_SUCCESS,s.evfilter2,id+200,LOCATION_MZONE,nil,LOCATION_MZONE,nil,id+300)
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(id,1)
+	e2:SetCategory(CATEGORY_DISABLE|CATEGORY_ATKCHANGE)
+	e2:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_TRIGGER_O)
+	e2:SetProperty(EFFECT_FLAG_DELAY)
+	e2:SetCode(EVENT_CUSTOM+s.progressive_id+1)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetCost(aux.DummyCost)
+	e2:SetTarget(s.target)
+	e2:SetOperation(s.activate)
+	c:RegisterEffect(e2)
 	--pendulum place
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
-	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e4:SetCode(EVENT_LEAVE_FIELD_P)
-	e4:SetLabel(0)
-	e4:SetOperation(s.checkop)
-	c:RegisterEffect(e4)
-	local e4b=Effect.CreateEffect(c)
-	e4b:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e4b:SetCode(EVENT_DESTROYED)
-	e4b:SetProperty(EFFECT_FLAG_DELAY)
-	e4b:SetCondition(s.pencon)
-	e4b:SetOperation(s.penop)
-	e4b:SetLabelObject(e4)
-	c:RegisterEffect(e4b)
+	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(id,2)
+	e3:SetType(EFFECT_TYPE_SINGLE|EFFECT_TYPE_TRIGGER_O)
+	e3:SetProperty(EFFECT_FLAG_DELAY)
+	e3:SetCode(EVENT_DESTROYED)
+	e3:SetCondition(s.pencon)
+	e3:SetTarget(s.pentg)
+	e3:SetOperation(s.penop)
+	c:RegisterEffect(e3)
 end
 s.pendulum_level=7
-function s.ovfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0xded) and c:GetRank()==7 and not c:IsCode(1020016)
+
+function s.mfilter(c,xyzc)
+	return c:IsXyzType(TYPE_MONSTER) and c:IsXyzLevel(xyzc,7) and c:IsRace(RACE_MACHINE)
 end
-function s.disfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0xded) and c:IsType(TYPE_MONSTER)
+function s.xyzcheck(g)
+	return g:IsExists(s.atkcheck,1,nil)
 end
+function s.atkcheck(c)
+	return not c:IsAttack(c:GetBaseAttack())
+end
+
+--P1
 function s.discon(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.IsExistingMatchingCard(s.disfilter,tp,LOCATION_ONFIELD,0,1,nil) then return true end
+	return Duel.IsExistingMatchingCard(aux.FaceupFilter(Card.IsSetCard,ARCHE_CODEMAN),tp,LOCATION_MZONE,0,1,nil)
 end
-function s.disop(e,tp,eg,ep,ev,re,r,rp)
-	local p,loc=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_CONTROLER,CHAININFO_TRIGGERING_LOCATION)
-	if re:IsActiveType(TYPE_XYZ) and p~=tp and loc==LOCATION_MZONE then
-		Duel.NegateEffect(ev)
-	end
+function s.distg(e,c)
+	return c:IsType(TYPE_XYZ) and (c:IsType(TYPE_EFFECT) or c:IsOriginalType(TYPE_EFFECT))
 end
-function s.cfilter(c,e)
-	return c:IsFaceup() and c:IsType(TYPE_XYZ) and c:IsRankAbove(1) and c:IsSummonLocation(LOCATION_EXTRA)
-		and c:GetOverlayCount()>0 and c:IsCanBeEffectTarget(e) and c:IsSummonPlayer(e:GetHandler())
+
+--P2
+function s.evfilter(c,_,tp)
+	return c:IsFaceup() and c:IsType(TYPE_XYZ) and c:IsSummonPlayer(1-tp) and c:IsSummonLocation(LOCATION_EXTRA)
 end
-function s.rkcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(s.cfilter,1,nil,e)
+function s.tgcheck(c,e)
+	return c:IsFaceup() and c:IsType(TYPE_XYZ) and c:IsRankAbove(1) and c:GetOverlayCount()>0 and c:IsCanBeEffectTarget(e)
+end
+function s.deschk(c)
+	return c:GetRank()-c:GetOverlayCount()<=0
 end
 function s.rktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
-	if chk==0 then return true end
-	Duel.SetTargetCard(eg:Filter(s.cfilter,nil,e))
+	local g=eg:Filter(s.tgcheck,nil,e)
+	if chk==0 then return #g>0 end
+	local tg=aux.SelectSimultaneousEventGroup(g,tp,id+100,1,e,nil,nil,true)
+	Duel.SetTargetCard(tg)
+	local dg=tg:Filter(s.deschk,nil)
+	if #dg>0 then
+		Duel.SetOperationInfo(0,CATEGORY_DESTROY,dg,#dg,0,0)
+	else
+		Duel.SetPossibleOperationInfo(0,CATEGORY_DESTROY,nil,1,PLAYER_ALL,LOCATION_MZONE)
+	end
 end
 function s.rkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local dg=Group.CreateGroup()
-	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
-	for tc in aux.Next(g) do
-		local prerank=tc:GetRank()
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_UPDATE_RANK)
-		e1:SetValue(-tc:GetOverlayCount())
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-		tc:RegisterEffect(e1)
-		if prerank~=0 and tc:IsRank(0) then dg:AddCard(tc) end
+	local dg=Duel.GetTargetCards():Filter(Card.IsFaceup,nil)
+	local tg=Group.CreateGroup()
+	for tc in aux.Next(dg) do
+		local ct=tc:GetOverlayCount()
+		if ct>0 then
+			local prerank=tc:GetRank()
+			local e1,diff=tc:UpdateRank(-ct,true,{c,true})
+			if not tc:IsImmuneToEffect(e1) and prerank>0 and prerank-ct<=0 and diff<=0 and tc:IsRank(1) then
+				tg:AddCard(tc)
+			end
+		end
 	end
-	Duel.Destroy(dg,REASON_EFFECT)
+	if #tg>0 then
+		Duel.Destroy(tg,REASON_EFFECT)
+	end
 end
+
+--E1
 function s.val(e)
 	local base=e:GetHandler():GetBaseAttack()
 	local g=Duel.GetMatchingGroup(Card.IsFaceup,0,LOCATION_MZONE,LOCATION_MZONE,e:GetHandler())
 	if #g==0 then return 0 end
 	local _,atk=g:GetMinGroup(Card.GetAttack)
-	return (base~=atk) and math.floor(math.abs(base-atk)/2)
+	return math.floor(0.5 + math.abs(base-atk)/2)
 end
-function s.disfilter1(c,tp)
-	return aux.NegateMonsterFilter(c) and c:IsAttackAbove(0) and c:IsSummonPlayer(tp)
+
+--E2
+function s.evfilter2(c,_,tp)
+	return c:IsFaceup() and c:IsSummonPlayer(1-tp) and c:IsAttackAbove(2500)
 end
 function s.disfilter2(c,tp)
-	return aux.NegateMonsterFilter(c) and c:IsSetCard(0x1ded) and c:IsAttackAbove(1)
+	return aux.NegateMonsterFilter(c) and c:IsSetCard(ARCHE_CODEMAN) and c:IsAttackAbove(1)
 end
-function s.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return false end
-	local g=Duel.GetMatchingGroup(s.disfilter2,tp,LOCATION_MZONE,0,e:GetHandler())
-	if chk==0 then return #g>0 and eg:IsExists(s.disfilter1,1,nil,1-tp) end
-	Duel.SetTargetCard(eg)
+function s.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	local g=Duel.GetMatchingGroup(s.disfilter2,tp,LOCATION_MZONE,0,c)
+	if chk==0 then return #g>0 end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	local tg=g:Select(tp,1,1,nil)
-	-- Duel.HintSelection(tg)
+	Duel.HintSelection(tg)
 	local tc=tg:GetFirst()
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_DISABLE)
-	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE)
-	e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-	tc:RegisterEffect(e1)
-	local e2=Effect.CreateEffect(e:GetHandler())
-	e2:SetType(EFFECT_TYPE_SINGLE)
-	e2:SetCode(EFFECT_DISABLE_EFFECT)
-	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_IGNORE_IMMUNE)
-	e2:SetValue(RESET_TURN_SET)
-	e2:SetReset(RESET_EVENT+RESETS_STANDARD)
-	tc:RegisterEffect(e2)
-	Duel.AdjustInstantly()
-	if not tc:IsImmuneToEffect(e1) and not tc:IsImmuneToEffect(e2) then
-		local atk=tc:GetAttack()
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_SET_ATTACK_FINAL)
-		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e1:SetValue(0)
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-		tc:RegisterEffect(e1)
-		if not tc:IsImmuneToEffect(e1) then e:SetLabel(atk) end
+	local _,_,res=Duel.Negate(tc,e,0,false,true,TYPE_MONSTER,nil,EFFECT_FLAG_IGNORE_IMMUNE)
+	
+	local e1,oatk,natk,diff=tc:ChangeATK(0,true,{c,true},nil,nil,EFFECT_FLAG_IGNORE_IMMUNE)
+	if res and natk==0 and diff~=0 then
+		Duel.SetTargetParam(math.abs(diff))
 	else
-		e:SetLabel(0)
+		Duel.SetTargetParam(0)
 	end
+	local sg=aux.SelectSimultaneousEventGroup(eg,tp,id+300,1,e,id+400)
+	Duel.SetTargetCard(sg)
 end
 function s.activate(e,tp,eg,ep,ev,re,r,rp)
+	local val=Duel.GetTargetParam()
+	if val==0 then return end
 	local c=e:GetHandler()
-	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
+	local g=Duel.GetTargetCards():Filter(Card.IsFaceup,nil)
+	local ng=Group.CreateGroup()
 	for tc in aux.Next(g) do
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_UPDATE_ATTACK)
-		e1:SetValue(-e:GetLabel())
-		e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-		tc:RegisterEffect(e1)
-		if not tc:IsDisabled() and tc:IsAttack(0) then
-			local e1=Effect.CreateEffect(c)
-			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetCode(EFFECT_DISABLE)
-			e1:SetReset(RESET_EVENT+RESETS_STANDARD)
-			tc:RegisterEffect(e1)
-			local e2=Effect.CreateEffect(c)
-			e2:SetType(EFFECT_TYPE_SINGLE)
-			e2:SetCode(EFFECT_DISABLE_EFFECT)
-			e2:SetValue(RESET_TURN_SET)
-			e2:SetReset(RESET_EVENT+RESETS_STANDARD)
-			tc:RegisterEffect(e2)
-			Duel.NegateRelatedChain(tc,RESET_TURN_SET)
+		local preatk=tc:GetAttack()
+		local e1,diff=tc:UpdateATK(-val,true,{c,true})
+		if not tc:IsImmuneToEffect(e1) and preatk>0 and tc:IsAttack(0) and diff<=0 and aux.NegateMonsterFilter(tc) and tc:IsCanBeDisabledByEffect(e,true) then
+			ng:AddCard(tc)
 		end
 	end
+	if #ng>0 then
+		Duel.Negate(ng,e,0,false,false,TYPE_MONSTER)
+	end
 end
+
+--E3
 function s.pencon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local bool=e:GetLabelObject():GetLabel()==1
-	return bool and c:IsPreviousLocation(LOCATION_ONFIELD) and tp==c:GetPreviousControler()
+	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsSummonType(SUMMON_TYPE_XYZ) and c:IsFaceup()
+end
+function s.pentg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.CheckPendulumZones(tp) end
+	local c=e:GetHandler()
+	if c:IsInGY() then
+		Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,c,1,tp,0)
+	end
 end
 function s.penop(e,tp,eg,ep,ev,re,r,rp)
-	if (Duel.CheckLocation(tp,LOCATION_PZONE,0) or Duel.CheckLocation(tp,LOCATION_PZONE,1))
-		and Duel.SelectYesNo(tp,1160) then
-		Duel.MoveToField(e:GetHandler(),tp,tp,LOCATION_PZONE,POS_FACEUP,true)
+	if not Duel.CheckPendulumZones(tp) then return false end
+	local c=e:GetHandler()
+	if c:IsRelateToChain() then
+		Duel.MoveToField(c,tp,tp,LOCATION_PZONE,POS_FACEUP,true)
 	end
 end

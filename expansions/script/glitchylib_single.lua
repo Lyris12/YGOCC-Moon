@@ -984,6 +984,27 @@ function Auxiliary.ChangeLevelOperation(subject,lv,reset,rc,range,cond,loc1,loc2
 	return aux.ChangeStatsOperationTemplate(Card.ChangeLevel,subject,lv,reset,rc,range,cond,loc1,loc2,min,max,exc)
 end
 
+function Card.UpdateRank(c,lv,reset,rc,range,cond,prop,desc)
+	local olv=c:GetRank()
+	local e=c:SingleEffect(EFFECT_UPDATE_RANK,lv,reset,rc,range,cond,prop,desc)
+	c:RegisterEffect(e)
+	if reset then
+		return e,c:GetRank()-olv
+	else
+		return e
+	end
+end
+function Card.ChangeRank(c,lv,reset,rc,range,cond,prop,desc)
+	local olv=c:GetRank()
+	local e=c:SingleEffect(EFFECT_CHANGE_RANK,lv,reset,rc,range,cond,prop,desc)
+	c:RegisterEffect(e)
+	if reset then
+		return e,c:GetRank()-olv
+	else
+		return e
+	end
+end
+
 --Battle Restrictions
 function Card.CannotAttack(c,val,reset,rc,cond,prop,desc)
 	if reset then

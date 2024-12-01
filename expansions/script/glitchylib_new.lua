@@ -76,6 +76,7 @@ EXTRA_MONSTER_ZONE=0x60
 
 --resets
 RESETS_REDIRECT_FIELD 			= 0x047e0000
+RESETS_STANDARD_PHASE_END		= RESETS_STANDARD|RESET_PHASE|PHASE_END
 RESETS_STANDARD_DISABLE			= RESETS_STANDARD|RESET_DISABLE
 RESETS_STANDARD_UNION 			= RESETS_STANDARD&(~(RESET_TOFIELD|RESET_LEAVE))
 RESETS_STANDARD_TOFIELD 		= RESETS_STANDARD&(~(RESET_TOFIELD))
@@ -261,15 +262,21 @@ function Effect.Evaluate(e,...)
 end
 
 --Alternative Actions
-function Duel.ToHandOrSpecialSummon(c,e,tp,cond)
+function Duel.ToHandOrSpecialSummon(c,e,tp,cond,sumtyp,toplayer,ign1,ign2,pos)
+	sumtyp=sumtyp and sumtyp or 0
+	toplayer=toplayer and toplayer or tp
+	if not ign1 then ign1=false end
+	if not ign2 then ign2=false end
+	pos=pos and pos or POS_FACEUP
+	
 	local b1=c:IsAbleToHand()
-	local b2=Duel.GetMZoneCount(tp)>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and (cond==nil or cond)
+	local b2=Duel.GetMZoneCount(tp)>0 and c:IsCanBeSpecialSummoned(e,sumtyp,tp,ign1,ign2,pos,toplayer) and (cond==nil or cond)
 	if not b1 and not b2 then return end
 	local opt=aux.Option(tp,nil,nil,{b1,STRING_ADD_TO_HAND},{b2,STRING_SPECIAL_SUMMON})
 	if opt==0 then
 		return Duel.Search(c)
 	elseif opt==1 then
-		return Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+		return Duel.SpecialSummon(c,sumtyp,tp,toplayer,ign1,ign2,pos)
 	end
 end
 function Duel.ToHandOrGrave(c,tp,p,cond)
@@ -903,7 +910,7 @@ function Card.CheckNegateConjunction(c,e1,e2,e3)
 end
 
 TYPE_NEGATE_ALL = TYPE_MONSTER|TYPE_SPELL|TYPE_TRAP
-function Duel.Negate(g,e,reset,notfield,forced,typ,cond)
+function Duel.Negate(g,e,reset,notfield,forced,typ,cond,prop)
 	local rct=1
 	if not reset then
 		reset=0
@@ -912,6 +919,7 @@ function Duel.Negate(g,e,reset,notfield,forced,typ,cond)
 		reset=reset[1]
 	end
 	if not typ then typ=TYPE_NEGATE_ALL end
+	prop=prop and prop or 0
 	
 	local returntype=aux.GetValueType(g)
 	if returntype=="Card" then
@@ -923,7 +931,7 @@ function Duel.Negate(g,e,reset,notfield,forced,typ,cond)
 		Duel.NegateRelatedChain(tc,RESET_TURN_SET)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE|prop)
 		e1:SetCode(EFFECT_DISABLE)
 		if cond then
 			e1:SetCondition(cond)
@@ -932,7 +940,7 @@ function Duel.Negate(g,e,reset,notfield,forced,typ,cond)
 		tc:RegisterEffect(e1,forced)
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_SINGLE)
-		e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE|prop)
 		e2:SetCode(EFFECT_DISABLE_EFFECT)
 		if cond then
 			e2:SetCondition(cond)
@@ -945,7 +953,7 @@ function Duel.Negate(g,e,reset,notfield,forced,typ,cond)
 		if not notfield and typ&TYPE_TRAP>0 and tc:IsType(TYPE_TRAPMONSTER) then
 			local e3=Effect.CreateEffect(c)
 			e3:SetType(EFFECT_TYPE_SINGLE)
-			e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+			e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE|prop)
 			e3:SetCode(EFFECT_DISABLE_TRAPMONSTER)
 			if cond then
 				e3:SetCondition(cond)
@@ -1142,6 +1150,9 @@ end
 function Card.IsCapableOfAttacking(c,tp)
 	if not tp then tp=Duel.GetTurnPlayer() end
 	return not c:IsForbidden() and not c:IsHasEffect(EFFECT_CANNOT_ATTACK) and not c:IsHasEffect(EFFECT_ATTACK_DISABLED) and not Duel.IsPlayerAffectedByEffect(tp,EFFECT_SKIP_BP)
+end
+function Duel.GetBattleMonsters(tp)
+	return Duel.GetBattleMonster(tp),Duel.GetBattleMonster(1-tp)
 end
 
 --Card Filters
@@ -2190,6 +2201,28 @@ function Auxiliary.GetAttributeStrings(v)
 	return pairs(res)
 end
 
+--Filter for "If a [filter] monster is Special Summoned to a zone this card points to"
+--Includes non-trivial handling of self-destructing Burning Abyss monsters
+function Auxiliary.zptgroup(eg,filter,c,tp)
+	local fil=eg:Filter(function(cc)return not filter or filter(cc,tp) end,nil)
+	return (fil&c:GetLinkedGroup()) + eg:Filter(Auxiliary.zptfilter,nil,c)
+end
+function Auxiliary.zptgroupcon(eg,filter,c,tp)
+	local fil=eg:Filter(function(cc)return not filter or filter(cc,tp) end,nil)
+	return #(fil&c:GetLinkedGroup())>0 or eg:IsExists(Auxiliary.zptfilter,1,nil,c)
+end
+function Auxiliary.zptfilter(c,ec)
+	return not c:IsLocation(LOCATION_MZONE) and (ec:GetLinkedZone(c:GetPreviousControler())&(1<<c:GetPreviousSequence()))~=0
+end
+--Condition for "If a [filter] monster is Special Summoned to a zone this card points to"
+--Includes non-trivial handling of self-destructing Burning Abyss monsters
+--Passes tp so you can check control
+function Auxiliary.zptcon(filter)
+	return function(e,tp,eg,ep,ev,re,r,rp)
+		return Auxiliary.zptgroupcon(eg,filter,e:GetHandler(),tp)
+	end
+end
+
 function Group.CheckSameProperty(g,f,...)
 	local chk=nil
 	for tc in aux.Next(g) do
@@ -2663,7 +2696,7 @@ function Effect.SetRelevantTimings(e,extra_timings)
 end
 function Effect.SetRelevantBattleTimings(e,extra_timings)
 	if not extra_timings then extra_timings=0 end
-	return e:SetHintTiming(extra_timings,RELEVANT_BATTLE_TIMINGS|extra_timings)
+	return e:SetHintTiming(RELEVANT_BATTLE_TIMINGS|extra_timings,RELEVANT_BATTLE_TIMINGS|extra_timings)
 end
 
 
@@ -3523,8 +3556,8 @@ end
 function Auxiliary.CheckArchetypeReasonEffect(s,re,setc)
 	local rc=re:GetHandler()
 	local ch=Duel.GetCurrentChain()
-	local cid=Duel.GetChainInfo(ch,CHAININFO_CHAIN_ID)
-	if re:IsActivated() then
+	if ch>0 and re:IsActivated() then
+		local cid=Duel.GetChainInfo(ch,CHAININFO_CHAIN_ID)
 		if rc:IsRelateToChain(ch) then
 			return rc:IsSetCard(setc)
 		else
@@ -3826,12 +3859,11 @@ function Duel.SpecialSummonATK(e,g,styp,sump,tp,ign1,ign2,pos,zone,atk,reset,rc)
 			e1:SetType(EFFECT_TYPE_SINGLE)
 			e1:SetCode(EFFECT_UPDATE_ATTACK)
 			e1:SetValue(atk)
-			e1:SetReset(RESET_EVENT+RESETS_STANDARD+reset)
+			e1:SetReset(RESET_EVENT|RESETS_STANDARD|reset)
 			dg:RegisterEffect(e1)
 		end
 	end
-	Duel.SpecialSummonComplete()
-	return ct
+	return Duel.SpecialSummonComplete()
 end
 function Duel.SpecialSummonNegate(e,g,styp,sump,tp,ign1,ign2,pos,zone,reset,rc)
 	if not zone then zone=0xff end
