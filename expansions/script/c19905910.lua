@@ -112,7 +112,7 @@ function s.activate(e,tp,eg,ep,ev,re,r,rp)
 end
 
 function s.matfilter(c,tp)
-	return c:IsCanBeFusionMaterial() and c:IsAbleToRemove(tp,POS_FACEUP,REASON_EFFECT+REASON_MATERIAL+REASON_FUSION)
+	return c:IsMonster() and c:IsCanBeFusionMaterial() and c:IsAbleToRemove(tp,POS_FACEUP,REASON_EFFECT+REASON_MATERIAL+REASON_FUSION)
 end
 function s.fusfilter(c,e,tp,m,f,chkf)
 	return c:IsType(TYPE_FUSION) and c:IsSetCard(0xd71) and (not f or f(c))
