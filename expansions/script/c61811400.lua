@@ -68,11 +68,11 @@ end
 
 --E2
 function s.cfilter(c,tp,se)
-	if not c:IsSetCard(ARCHE_DREAD_BASTILLE) or not c:IsPreviousSetCard(ARCHE_DREAD_BASTILLE) or c:GetPreviousControler()~=tp or not (se==nil or c:GetReasonEffect()~=se) then return false end
 	local loc=c:GetPreviousLocation()
+	if not c:IsSetCard(ARCHE_DREAD_BASTILLE) or not (loc&LOCATION_ONFIELD==0 or c:IsPreviousSetCard(ARCHE_DREAD_BASTILLE)) or c:GetPreviousControler()~=tp or not (se==nil or c:GetReasonEffect()~=se) then return false end
 	if loc==LOCATION_HAND then
 		return true
-	elseif loc==LOCATION_MZONE then
+	elseif loc&LOCATION_ONFIELD>0 then
 		return c:IsPreviousPosition(POS_FACEUP)
 	end
 	return false
