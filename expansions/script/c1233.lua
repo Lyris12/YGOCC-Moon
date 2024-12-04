@@ -16,15 +16,15 @@ function s.initial_effect(c)
 	end
 end
 function s.regop(e,tp,eg,ep,ev,re,r,rp)
+	Debug.Message('These starting hands will be reshuffled since a card must be added from outside the Decks.')
+	Debug.Message('New hands will be generated so the added card has a chance to appear in them.')
+	local hands=Duel.GetHand(0)+Duel.GetHand(1)
+	Duel.SendtoDeck(hands,nil,SEQ_DECKSHUFFLE,REASON_RULE)
 	Duel.DisableShuffleCheck(true)
 	for p=0,1 do
-		local g=Duel.Group(Card.IsOriginalCode,0,LOCATION_DECK|LOCATION_HAND,0,nil,id)
+		local g=Duel.Group(Card.IsOriginalCode,0,LOCATION_DECK,0,nil,id)
 		if #g>0 then
-			local mustdraw=g:IsExists(Card.IsLocation,1,nil,LOCATION_HAND)
 			Duel.Exile(g,REASON_RULE)
-			if mustdraw then
-				Duel.Draw(p,1,REASON_RULE)
-			end
 		end
 		if Duel.GetDeckCount(p)+Duel.GetHandCount(p)<40 then
 			Debug.Message('Player '..p..' has less than 40 cards in their Main Deck. The Duel cannot proceed.')
@@ -54,5 +54,6 @@ function s.regop(e,tp,eg,ep,ev,re,r,rp)
 		local garnet=Duel.CreateToken(p,91731841)
 		Duel.SendtoDeck(garnet,nil,SEQ_DECKSHUFFLE,REASON_RULE)
 		Duel.ConfirmCards(1-p,garnet)
+		Duel.Draw(p,5,REASON_RULE)
 	end
 end
