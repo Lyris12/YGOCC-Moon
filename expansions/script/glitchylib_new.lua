@@ -29,6 +29,7 @@ CATEGORIES_TOKEN 			= 	CATEGORY_SPECIAL_SUMMON|CATEGORY_TOKEN
 CATEGORY_FLAG_SELF					= 0x1
 CATEGORY_FLAG_DELAYED_RESOLUTION	= 0x2
 CATEGORY_FLAG_END_OF_MP_TRIGGER		= 0x4
+CATEGORY_FLAG_EXTRA_ATTACK_FILTER	= 0x8	--For effect that grant additional attacks against a specific category of monsters only (see Machina-Eyes Zero)
 
 --Operation Info Special Values
 OPINFO_FLAG_HALVE	= 0x1
@@ -246,6 +247,15 @@ function Effect.SetFunctions(e,cond,cost,tg,op,val)
 		e:SetValue(val)
 	end
 end
+function Duel.Highlight(g)
+	if #g>0 then
+		Duel.HintSelection(g)
+		return true
+	else
+		return false
+	end
+end
+
 --[[Effect.Evaluate
 Get the value of an effect. If the effect has a function as value, it calculates the value of the function
 ]]
@@ -964,7 +974,9 @@ function Duel.Negate(g,e,reset,notfield,forced,typ,cond,prop)
 			if res then
 				Duel.AdjustInstantly(tc)
 			end
-			return e1,e2,e3,res
+			if returntype=="Card" then
+				return e1,e2,e3,res
+			end
 		end
 		local res=tc:CheckNegateConjunction(e1,e2)
 		if res then
@@ -994,6 +1006,9 @@ function Duel.NegateInGY(tc,e,reset)
 	e2:SetReset(RESET_EVENT+RESETS_STANDARD_EXC_GRAVE+reset)
 	tc:RegisterEffect(e2)
 	return e1,e2
+end
+function Duel.NegateMonster(g,e,reset,forced,cond,prop)
+	return Duel.Negate(g,e,reset,false,forced,TYPE_MONSTER,cond,prop)
 end
 
 --POSITION
@@ -1025,9 +1040,10 @@ function Duel.Search(g,_,p,brk,r)
 	end
 	return ct,#cg,cg
 end
-function Duel.SearchAndCheck(g,_,p,brk,r)
+function Duel.SearchAndCheck(g,_,p,brk,r,count)
+	count = count or 1
 	local ct,cgct=Duel.Search(g,_,p,brk,r)
-	return ct>0 and cgct>0
+	return ct>=count and cgct>=count
 end
 function Duel.Bounce(g,p,r)
 	if aux.GetValueType(g)=="Card" then g=Group.FromCards(g) end
@@ -1152,6 +1168,7 @@ function Card.IsCapableOfAttacking(c,tp)
 	return not c:IsForbidden() and not c:IsHasEffect(EFFECT_CANNOT_ATTACK) and not c:IsHasEffect(EFFECT_ATTACK_DISABLED) and not Duel.IsPlayerAffectedByEffect(tp,EFFECT_SKIP_BP)
 end
 function Duel.GetBattleMonsters(tp)
+	if not tp then tp=0 end
 	return Duel.GetBattleMonster(tp),Duel.GetBattleMonster(1-tp)
 end
 
@@ -1408,6 +1425,9 @@ function Card.IsRatingBelow(c,rtyp,...)
 	end
 end
 
+function Card.GetTotalStats(c)
+	return c:GetAttack()+c:GetDefense()
+end
 function Card.GetMinStat(c)
 	return math.min(c:GetAttack(),c:GetDefense())
 end
@@ -1421,7 +1441,13 @@ function Card.GetMaxBaseStat(c)
 	return math.max(c:GetBaseAttack(),c:GetBaseDefense())
 end
 function Card.IsStats(c,atk,def)
-	return (not atk or (c:HasAttack() and c:IsAttack(atk))) and (not def or (c:HasDefense() and c:IsDefense(def)))
+	return (not atk or c:IsAttack(atk)) and (not def or c:IsDefense(def))
+end
+function Card.IsBaseStats(c,atk,def)
+	return (not atk or c:GetBaseAttack()==atk) and (not def or c:GetBaseDefense()==def)
+end
+function Card.IsTextStats(c,atk,def)
+	return (not atk or c:GetTextAttack()==atk) and (not def or c:GetTextDefense()==def)
 end
 function Card.IsStat(c,rtyp,...)
 	local x={...}
@@ -1516,7 +1542,7 @@ function Auxiliary.ChainLimitOppo(e,ep,tp)
 end
 
 --Cloned Effects
---not_simultaneous : If true, prevents the original effect and the QE clone from being both  activatable in a certain gamestate
+--not_simultaneous : If true, prevents the original effect and the QE clone from being both activatable in a certain gamestate
 function Effect.QuickEffectClone(e,c,cond,notreg,not_simultaneous)
 	local ex=e:Clone()
 	ex:SetType(EFFECT_TYPE_QUICK_O)
@@ -1529,8 +1555,12 @@ function Effect.QuickEffectClone(e,c,cond,notreg,not_simultaneous)
 		else
 			ex:SetCondition(cond)
 		end
-		if not_simultaneous then
-			e:SetCondition(aux.AND(ogcond,aux.NOT(cond)))
+		if not_simultaneous==nil or not_simultaneous then
+			if ogcond then
+				e:SetCondition(aux.AND(ogcond,aux.NOT(cond)))
+			else
+				e:SetCondition(aux.NOT(cond))
+			end
 		end
 	end
 	if not notreg then
@@ -2421,8 +2451,8 @@ function Auxiliary.AttachFilter2(f)
 end
 function Auxiliary.BanishFilter(f,cost,pos)
 	pos = pos and pos or POS_FACEUP
-	return	function(c,...)
-				return (not f or f(c,...)) and (not cost and c:IsAbleToRemove() or cost and c:IsAbleToRemoveAsCost(pos))
+	return	function(c,_,tp,...)
+				return (not f or f(c,...)) and (not cost and c:IsAbleToRemove(tp,pos) or cost and c:IsAbleToRemoveAsCost(pos))
 			end
 end
 function Auxiliary.ControlFilter(f)
@@ -2538,6 +2568,22 @@ end
 function Card.GetFlagEffectWithSpecificLabel(c,flag,label,reset)
 	flag=flag&MAX_ID
 	local eset={c:IsHasEffect(EFFECT_FLAG_EFFECT|flag)}
+	for i=#eset,1,-1 do
+		local e=eset[i]
+		local x=e:GetLabel()
+		if x==label then
+			if not reset then
+				return e
+			else
+				e:Reset()
+			end
+		end
+	end
+	return
+end
+function Duel.GetFlagEffectWithSpecificLabel(p,flag,label,reset)
+	flag=flag&MAX_ID
+	local eset={Duel.IsPlayerAffectedByEffect(p,EFFECT_FLAG_EFFECT|flag)}
 	for i=#eset,1,-1 do
 		local e=eset[i]
 		local x=e:GetLabel()
@@ -3083,10 +3129,10 @@ function Card.IsInLinkedZone(c,cc)
 	return cc:GetLinkedGroup():IsContains(c)
 end
 function Card.WasInLinkedZone(c,cc)
-	return cc:GetLinkedZone(c:GetPreviousControler())&c:GetPreviousZone()~=0
+	return cc:GetLinkedZone(c:GetPreviousControler())&c:GetPreviousZone(c:GetPreviousControler())~=0
 end
 function Card.HasBeenInLinkedZone(c,cc)
-	return cc:GetLinkedGroup():IsContains(c) or (not c:IsLocation(LOCATION_MZONE) and cc:GetLinkedZone(c:GetPreviousControler())&c:GetPreviousZone()~=0)
+	return cc:GetLinkedGroup():IsContains(c) or (not c:IsLocation(LOCATION_MZONE) and cc:GetLinkedZone(c:GetPreviousControler())&c:GetPreviousZone(c:GetPreviousControler())~=0)
 end
 
 function Duel.GetMZoneCountFromLocation(tp,up,g,c)
@@ -3096,6 +3142,14 @@ function Duel.GetMZoneCountFromLocation(tp,up,g,c)
 		return Duel.GetMZoneCount(tp,g,up)
 	end
 end
+function Duel.GetMZoneCountForMultipleSummons(tp,g,up)
+	local ft=Duel.GetMZoneCount(tp,g,up)
+	if Duel.IsPlayerAffectedByEffect(tp,CARD_BLUEEYES_SPIRIT) then
+		ft=math.min(ft,1)
+	end
+	return ft
+end
+		
 
 function Duel.GetDisabledZones(p)
 	local dis1,dis2=0,0
@@ -3974,7 +4028,7 @@ end
 
 SPSUM_MOD_NEGATE   		= 0x1
 SPSUM_MOD_REDIRECT 		= 0x2
-SPSUM_MOD_CHANGE_ATKDEF	=	0x4
+SPSUM_MOD_CHANGE_ATKDEF	= 0x4
 
 function Duel.SpecialSummonMod(e,g,styp,sump,tp,ign1,ign2,pos,zone,...)
 	local mods={...}

@@ -1537,20 +1537,25 @@ function Card.MustBeSSedByOwnProcedure(c,rc)
 	e:SetCode(EFFECT_SPSUMMON_CONDITION)
 	c:RegisterEffect(e)
 end
-function Card.CannotBeMaterial(c,ed_types,f,reset,rc,range,cond,prop,desc)
+function Card.CannotBeMaterial(c,ed_types,f,reset,rc,range,cond,prop,forced)
 	local rc = rc and rc or c
     local rct=1
     if type(reset)=="table" then
         rct=reset[2]
         reset=reset[1]
     end
+	if not prop then prop=0 end
+	if reset then prop=prop|EFFECT_FLAG_CLIENT_HINT end
+	
 	local effs={}
+	local desclist={733,735,736,737,738,739}
 	local elist={235,236,238,239,624,825}
 	local list={TYPE_FUSION,TYPE_SYNCHRO,TYPE_XYZ,TYPE_LINK,TYPE_BIGBANG,TYPE_TIMELEAP}
 	for i,typ in ipairs(list) do
 		if ed_types&typ==typ then
 			local e=Effect.CreateEffect(rc)
-			e:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+			e:SetDescription(desclist[i])
+			e:SetProperty(EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_UNCOPYABLE|prop)
 			e:SetType(EFFECT_TYPE_SINGLE)
 			e:SetCode(elist[i])
 			if type(f)=="function" then
@@ -1563,9 +1568,9 @@ function Card.CannotBeMaterial(c,ed_types,f,reset,rc,range,cond,prop,desc)
 			end
 			if reset then
 				if type(reset)~="number" then reset=0 end
-				e:SetReset(RESET_EVENT+RESETS_STANDARD+reset,rct)
+				e:SetReset(RESET_EVENT|RESETS_STANDARD|reset,rct)
 			end
-			c:RegisterEffect(e)
+			c:RegisterEffect(e,forced)
 			table.insert(effs,e)
 		end
 	end

@@ -1,3 +1,5 @@
+if EFFECT_ALLOW_EXTRA_XYZ_MATERIAL then return end
+
 EFFECT_ALLOW_EXTRA_XYZ_MATERIAL = 100000253
 
 local add_xyz_proc, add_xyz_proc_nlv, duel_overlay, card_is_xyz_level, duel_check_xyz_mat, duel_select_xyz_mat, _XyzLevelFreeGoal =

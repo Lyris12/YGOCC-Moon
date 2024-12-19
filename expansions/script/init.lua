@@ -25,7 +25,6 @@ TYPE_CUSTOM							=0
 CTYPE_CUSTOM						=0
 
 EVENT_XYZATTACH						=EVENT_CUSTOM+9966607
-EVENT_LP_CHANGE						=EVENT_CUSTOM+68007397
 
 EFFECT_COUNT_SECOND_HOPT			=10000000
 
@@ -157,11 +156,11 @@ end
 
 
 --overwrite functions
-local is_type, card_remcounter, duel_remcounter, effect_set_target_range, effect_set_reset, duel_set_lp, duel_select_target, duel_banish, card_check_remove_overlay_card, is_reason, duel_check_tribute, select_tribute,card_sethighlander,
+local is_type, card_remcounter, duel_remcounter, effect_set_target_range, effect_set_reset, duel_select_target, duel_banish, card_check_remove_overlay_card, is_reason, duel_check_tribute, select_tribute,card_sethighlander,
 	card_is_facedown, card_is_able_to_remove, card_is_able_to_remove_as_cost, card_is_able_to_hand, card_is_can_be_ssed, card_get_level, card_is_xyz_level, card_get_original_level, card_get_previous_level, card_is_level, card_is_level_below, card_is_level_above, card_is_destructable, card_get_syn_level, card_get_rit_level
 	= 
 	
-	Card.IsType, Card.RemoveCounter, Duel.RemoveCounter, Effect.SetTargetRange, Effect.SetReset, Duel.SetLP, Duel.SelectTarget, Duel.Remove, Card.CheckRemoveOverlayCard, Card.IsReason, Duel.CheckTribute, Duel.SelectTribute, Card.SetUniqueOnField,
+	Card.IsType, Card.RemoveCounter, Duel.RemoveCounter, Effect.SetTargetRange, Effect.SetReset, Duel.SelectTarget, Duel.Remove, Card.CheckRemoveOverlayCard, Card.IsReason, Duel.CheckTribute, Duel.SelectTribute, Card.SetUniqueOnField,
 	Card.IsFacedown, Card.IsAbleToRemove, Card.IsAbleToRemoveAsCost, Card.IsAbleToHand, Card.IsCanBeSpecialSummoned, Card.GetLevel, Card.IsXyzLevel, Card.GetOriginalLevel, Card.GetPreviousLevelOnField, Card.IsLevel, Card.IsLevelBelow, Card.IsLevelAbove, Card.IsDestructable, Card.GetSynchroLevel, Card.GetRitualLevel
 
 Card.IsReason=function(c,rs)
@@ -267,18 +266,6 @@ Effect.SetReset=function(e,reset,rct)
 	return effect_set_reset(e,reset,rct)
 end
 
-Duel.SetLP=function(p,setlp,...)
-	local opt={...}
-	local rule,rplayer=nil,0
-	if opt[1] then reason=opt[1] end
-	if opt[2] then rplayer=opt[2] end
-	local prev=Duel.GetLP(p)
-	local event_test=Duel.GetMatchingGroup(aux.TRUE,p,0xff,0xff,nil):GetFirst()
-	duel_set_lp(p,setlp)
-	if not rule and Duel.GetLP(p)~=prev then
-		Duel.RaiseEvent(event_test,EVENT_LP_CHANGE,nil,REASON_EFFECT,rplayer,p,Duel.GetLP(p)-prev)
-	end
-end
 Duel.SelectTarget=function(actp,func,self,loc1,loc2,cmin,cmax,exc,...)
 	local extras={...}
 	if Duel.IsPlayerAffectedByEffect(actp,EFFECT_RANDOM_TARGET) then

@@ -16,10 +16,6 @@ EFFECT_GLITCHY_PREVIOUS_CUSTOM_SETCODE			= 8014
 EFFECT_GLITCHY_ADD_FUSION_CUSTOM_SETCODE		= 8015
 EFFECT_GLITCHY_ADD_LINK_CUSTOM_SETCODE			= 8016
 
-EFFECT_CHANGE_RECOVER							= 1508
-EFFECT_GLITCHY_ALSO_EFFECT_DAMAGE				= 100000300		--If a player takes damage, the damage is also inflicted to the opponent (the original damage the player would have taken).
-																--Made for "Dynastygian Sabotage - Weapons Jam"	
-
 FLAG_UNCOUNTED_NORMAL_SUMMON			= 8000
 FLAG_UNCOUNTED_NORMAL_SET				= 8001
 
@@ -56,8 +52,18 @@ function Auxiliary.ClearTable(tab)
 	end
 end
 
---DAMAGE CHANGES
-local duel_recover, duel_damage = Duel.Recover, Duel.Damage
+--DAMAGE and LP CHANGES
+EFFECT_CHANGE_RECOVER							= 1508
+EFFECT_GLITCHY_ALSO_EFFECT_DAMAGE				= 100000300		--[[If a player takes damage, the damage is also inflicted to the opponent (the original damage the player would have taken).
+																Made for "Dynastygian Sabotage - Weapons Jam"]]
+EFFECT_MODIFY_LP_CHANGE							= 100000362		--[[Modifies the amount of LP changed by Duel.SetLP. Made for "Power Vacuum Blade"]]
+
+EVENT_LP_CHANGE		= EVENT_CUSTOM+68007397
+
+LP_REASON_UPDATE	= 0x1
+LP_REASON_BECOME	= 0x2
+
+local duel_recover, duel_damage, _SetLP = Duel.Recover, Duel.Damage, Duel.SetLP
 
 Duel.Recover = function(p,v,r,step,...)
 	if Duel.IsPlayerAffectedByEffect(p,EFFECT_CHANGE_RECOVER) then
@@ -108,6 +114,24 @@ Duel.Damage = function(p,v,r,step,...)
 		end
 	end
 	return dam
+end
+Duel.SetLP = function(p,val,r,rp)
+	if not r then r=LP_REASON_UPDATE end
+	if not rp then rp=current_triggering_player end
+	local eset={Duel.IsPlayerAffectedByEffect(p,EFFECT_MODIFY_LP_CHANGE)}
+	for _,e in ipairs(eset) do
+		local chk=e:Evaluate(p,val,r,rp,0)
+		if chk then
+			val=e:Evaluate(p,val,r,rp,1)
+			break
+		end
+	end
+	local prev=Duel.GetLP(p)
+	local res = _SetLP(p,val)
+	if not rule and Duel.GetLP(p)~=prev then
+		Duel.RaiseEvent(self_reference_effect:GetHandler(),EVENT_LP_CHANGE,nil,REASON_EFFECT,rp,p,Duel.GetLP(p)-prev)
+	end
+	return res
 end
 
 --EFFECTS THAT CAN BE ACTIVATED BY AFFECTING THE CARD USED AS COST, EVEN WHEN THERE ARE NO OTHER VALID TARGETS
@@ -554,8 +578,8 @@ function Auxiliary.RegisterMergedDelayedEventGlitchy(c,code,event,f,flag,range,e
 	end
 	
 	local updateflag=false
-	local private_range=range&LOCATIONS_PRIVATE
-	local public_range=range&(~private_range)
+	local private_range=not range and 1 or range&LOCATIONS_PRIVATE
+	local public_range=not range and 0 or range&(~private_range)
 	
 	if private_range>0 then
 		updateflag=true
@@ -716,7 +740,8 @@ function Auxiliary.MergedDelayEventCheckGlitchy1(event,id,f,range,evgcheck,se,op
 						end
 						for tc in aux.Next(G) do
 							for _,cid in ipairs(flags) do
-								tc:ResetFlagEffect(cid)
+								--tc:ResetFlagEffect(cid)
+								tc:GetFlagEffectWithSpecificLabel(cid,label,true)
 							end
 						end
 						MERGED_ID = MERGED_ID + 1
@@ -787,7 +812,8 @@ function Auxiliary.MergedDelayEventCheckGlitchy2(id,range,evgcheck,se,operation,
 						for tc in aux.Next(G) do
 							for _,cid in ipairs(flags) do
 								--Debug.Message("RESETTED: "..tostring(cid))
-								tc:ResetFlagEffect(cid)
+								--tc:ResetFlagEffect(cid)
+								tc:GetFlagEffectWithSpecificLabel(cid,label,true)
 							end
 						end
 						MERGED_ID = MERGED_ID + 1

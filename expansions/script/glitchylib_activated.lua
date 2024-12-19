@@ -26,7 +26,7 @@ function Glitchy.CheckTargetsAtResolution(tgcheck,loc1,loc2,tp,g,f,...)
 		return #ogtg==#fg, g
 	else
 		if tgcheck==TGCHECK_THAT_TARGET then
-			g=g:Sub(aux.NOT(xgl.CreateChkc),nil,nil,tp,loc1,loc2,nil,f,...)
+			g=g:Filter(xgl.CreateChkc,nil,nil,tp,loc1,loc2,nil,f,...)
 		end
 		return #g>0, g
 	end
@@ -186,6 +186,8 @@ function Glitchy.SpecialSummonOperation(spmod,tgcheck,f,loc1,loc2,min,max,exc,su
 	local spfunc,spparams=nil,{}
 	if type(f)=="number" then
 		tgcheck,f,loc1,loc2,min,max,exc,sumtype,IsOpponentSummons,IsOpponentReceives,ignore_sumcon,ignore_revlim,pos = spmod,tgcheck,f,loc1,loc2,min,max,exc,sumtype,IsOpponentSummons,IsOpponentReceives,ignore_sumcon,ignore_revlim
+		
+		spmod=nil
 	else
 		if type(spmod)=="table" then
 			spfunc=spmod[1]
@@ -322,8 +324,8 @@ Glitchy.SendtoActions={
 		Duel.Remove(g,pos,REASON_EFFECT)
 	end;
 }
-function Glitchy.SendtoAuxiliaryFunction(destination,f)
-	local destf=xgl.SendtoFilters[destination](f)
+function Glitchy.SendtoAuxiliaryFunction(destination,f,...)
+	local destf=xgl.SendtoFilters[destination](f,false,...)
 	local hint=xgl.SendtoHints[destination]
 	local category=xgl.SendtoCategories[destination]
 	local action=xgl.SendtoActions[destination]
@@ -335,12 +337,12 @@ function Glitchy.SendtoTarget(destination,tgchk,f,loc1,loc2,min,max,exc,...)
 	min=min or 1
 	max=max or min
 	local locs=loc1|loc2
-	local f,hint,category=xgl.SendtoAuxiliaryFunction(destination,f)
+	local f,hint,category=xgl.SendtoAuxiliaryFunction(destination,f,...)
 	if not tgchk then
 		return	function(e,tp,eg,ep,ev,re,r,rp,chk)
 					local exc=exc and e:GetHandler() or nil
 					if chk==0 then
-						return ft>=min and Duel.IsExists(false,f,tp,loc1,loc2,min,exc,e,tp)
+						return Duel.IsExists(false,f,tp,loc1,loc2,min,exc,e,tp)
 					end
 					local players=(loc1*loc2~=0) and PLAYER_ALL or loc1>0 and tp or 1-tp
 					Duel.SetOperationInfo(0,category,nil,min,players,locs)
@@ -370,7 +372,7 @@ function Glitchy.SendtoOperation(destination,tgcheck,f,loc1,loc2,min,max,exc,...
 	local extras={...}
 	loc1=loc1 or 0
 	loc2=loc2 or 0
-	local f,hint,_,CardActionFunction=xgl.SendtoAuxiliaryFunction(destination,f)
+	local f,hint,_,CardActionFunction=xgl.SendtoAuxiliaryFunction(destination,f,...)
 	if not tgcheck then
 		min=min or 1
 		max=max or min
@@ -384,6 +386,7 @@ function Glitchy.SendtoOperation(destination,tgcheck,f,loc1,loc2,min,max,exc,...
 					local exc=exc and e:GetHandler() or nil
 					local g=Duel.Select(hint,false,tp,f,tp,loc1,loc2,min,max,exc,e,tp)
 					if #g>=min then
+						Duel.HintSelection(g:Filter(Card.IsLocation,nil,LOCATION_ONFIELD|LOCATION_GRAVE|LOCATION_REMOVED))
 						CardActionFunction(g,e,tp,table.unpack(extras))
 					end
 				end

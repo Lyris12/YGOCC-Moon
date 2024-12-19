@@ -48,10 +48,11 @@ function Auxiliary.BattlePhaseCond(tp)
 				return Duel.IsBattlePhase(tp)
 			end
 end
-function Auxiliary.MainOrBattlePhaseCond(tp,ct)
+function Auxiliary.MainOrBattlePhaseCond(tp,ct,bp)
 	return	function(e,p)
 				local tp = (tp==0) and p or (tp==1) and 1-p or nil
-				return Duel.IsMainPhase(tp,ct) or Duel.IsBattlePhase(tp)
+				if not bp then bp=tp end
+				return Duel.IsMainPhase(tp,ct) or Duel.IsBattlePhase(bp)
 			end
 end
 function Auxiliary.EndPhaseCond(tp)
