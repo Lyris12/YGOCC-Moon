@@ -1,6 +1,9 @@
 --LIMITS
 MAX_INT32 = 2147483647
 
+--Fix for deprecated constants
+EFFECT_FLAG_COPY_INHERIT = EFFECT_FLAG_COPY
+
 --Custom Categories
 CATEGORY_ZONE		  				= 0x1
 CATEGORY_DISABLE_ZONE 				= 0x2
@@ -1443,6 +1446,9 @@ end
 function Card.IsStats(c,atk,def)
 	return (not atk or c:IsAttack(atk)) and (not def or c:IsDefense(def))
 end
+function Card.GetStats(c)
+	return c:GetAttack(),c:GetDefense()
+end
 function Card.IsBaseStats(c,atk,def)
 	return (not atk or c:GetBaseAttack()==atk) and (not def or c:GetBaseDefense()==def)
 end
@@ -2710,6 +2716,19 @@ function Auxiliary.RegisterGrantEffect(c,range,s,o,tg,...)
 		table.insert(returns,e3)
 	end
 	return table.unpack(returns)
+end
+function Auxiliary.RegisterEquipGrantEffect(c,...)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_EQUIP)
+	e1:SetCode(EFFECT_ADD_TYPE)
+	e1:SetValue(TYPE_EFFECT)
+	c:RegisterEffect(e1)
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_EQUIP)
+	e2:SetCode(EFFECT_REMOVE_TYPE)
+	e2:SetValue(TYPE_NORMAL)
+	c:RegisterEffect(e2)
+	return aux.RegisterGrantEffect(c,LOCATION_SZONE,LOCATION_MZONE,LOCATION_MZONE,function(_e,_c) return _c==_e:GetHandler():GetEquipTarget() end,...)
 end
 
 --Groups

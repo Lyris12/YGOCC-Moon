@@ -48,7 +48,6 @@ function Card.SingleEffect(c,code,val,reset,rc,range,cond,prop,desc)
 		if type(reset)~="number" then reset=0 end
 		if rc==c and not donotdisable then
 			reset = reset|RESET_DISABLE
-			prop=prop|EFFECT_FLAG_COPY_INHERIT
 		else
 			prop=prop|EFFECT_FLAG_CANNOT_DISABLE
 		end
@@ -340,7 +339,6 @@ function Card.UpdateATK(c,atk,reset,rc,range,cond,prop,desc,pause)
 		if type(reset)~="number" then reset=0 end
 		if rc==c and not donotdisable then
 			reset = reset|RESET_DISABLE
-			prop=prop|EFFECT_FLAG_COPY_INHERIT
 		else
 			prop=prop|EFFECT_FLAG_CANNOT_DISABLE
 		end
@@ -401,7 +399,6 @@ function Card.UpdateDEF(c,def,reset,rc,range,cond,prop,desc)
 		if type(reset)~="number" then reset=0 end
 		if rc==c and not donotdisable then
 			reset = reset|RESET_DISABLE
-			prop=prop|EFFECT_FLAG_COPY_INHERIT
 		else
 			prop=prop|EFFECT_FLAG_CANNOT_DISABLE
 		end
@@ -470,7 +467,6 @@ function Card.UpdateATKDEF(c,atk,def,reset,rc,range,cond,prop,desc)
 		if type(reset)~="number" then reset=0 end
 		if rc==c and not donotdisable then
 			reset = reset|RESET_DISABLE
-			prop=prop|EFFECT_FLAG_COPY_INHERIT
 		else
 			prop=prop|EFFECT_FLAG_CANNOT_DISABLE
 		end
@@ -630,7 +626,6 @@ function Card.ChangeATK(c,atk,reset,rc,range,cond,prop,desc)
 		if type(reset)~="number" then reset=0 end
 		if rc==c and not donotdisable then
 			reset = reset|RESET_DISABLE
-			prop=prop|EFFECT_FLAG_COPY_INHERIT
 		else
 			prop=prop|EFFECT_FLAG_CANNOT_DISABLE
 		end
@@ -691,7 +686,6 @@ function Card.ChangeDEF(c,def,reset,rc,range,cond,prop,desc)
 		if type(reset)~="number" then reset=0 end
 		if rc==c and not donotdisable then
 			reset = reset|RESET_DISABLE
-			prop=prop|EFFECT_FLAG_COPY_INHERIT
 		else
 			prop=prop|EFFECT_FLAG_CANNOT_DISABLE
 		end
@@ -762,7 +756,6 @@ function Card.ChangeATKDEF(c,atk,def,reset,rc,range,cond,prop,desc)
 		if type(reset)~="number" then reset=0 end
 		if rc==c and not donotdisable then
 			reset = reset|RESET_DISABLE
-			prop=prop|EFFECT_FLAG_COPY_INHERIT
 		else
 			prop=prop|EFFECT_FLAG_CANNOT_DISABLE
 		end
