@@ -21,9 +21,14 @@ function s.initial_effect(c)
 	e1:SetRange(LOCATION_SZONE)
 	e1:HOPT()
 	e1:SetRelevantTimings()
+	e1:SetCondition(s.tdcon)
 	e1:SetTarget(s.tdtg)
 	e1:SetOperation(s.tdop)
 	c:RegisterEffect(e1)
+	local e1a=e1:Clone()
+	e1a:SetType(EFFECT_TYPE_IGNITION)
+	e1a:SetCondition(aux.NOT(s.tdcon))
+	c:RegisterEffect(e1a)
 	--If this card is in your GY, except the turn it is sent there: You can target 1 other "Curseflame" card in your GY; shuffle both it and this card into the Deck.
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(id,1)
@@ -47,6 +52,9 @@ function s.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 --E1
+function s.tdcon(e)
+	return e:GetHandler():IsType(TYPE_TRAP)
+end
 function s.tdfilter(c)
 	return c:IsSetCard(ARCHE_CURSEFLAME) and c:IsAbleToDeck()
 end

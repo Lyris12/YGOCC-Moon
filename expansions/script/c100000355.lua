@@ -137,26 +137,29 @@ function s.targ(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetPossibleOperationInfo(0,CATEGORY_EQUIP,tc,1,tp,0)
 end
 function s.op(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToChain() then
-		local ftchk=Duel.GetLocationCount(tp,LOCATION_SZONE)>0
-		local g=Duel.Group(s.eqtofilter,tp,LOCATION_MZONE,0,nil)
-		local b1=tc:IsAbleToHand()
-		local b2=aux.NecroValleyFilter(tc) and ftchk and g:IsExists(s.eqcheck,1,nil,tc,tp)
-		if not b1 and not b2 then return end
-		local opt=aux.Option(tp,nil,nil,{b1,STRING_ADD_TO_HAND},{b2,STRING_EQUIP})
-		if opt==0 then
-			Duel.Search(tc)
-		elseif opt==1 then
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
-			local eqg=g:FilterSelect(tp,s.eqcheck,1,1,nil,tc,tp)
-			local eqc=eqg:GetFirst()
-			Duel.HintSelection(eqg)
-			if tc:IsType(TYPE_EQUIP) then
-				Duel.Equip(tp,tc,eqc)
-			else
-				Duel.EquipToOtherCardAndRegisterLimit(e,tp,tc,eqc)
-			end
-		end	
+	local c=e:GetHandler()
+	if c:IsRelateToChain() and Duel.SendtoGraveAndCheck(c,nil,REASON_EFFECT|REASON_RETURN) then
+		local tc=Duel.GetFirstTarget()
+		if tc:IsRelateToChain() and aux.NecroValleyFilter(tc) then
+			local ftchk=Duel.GetLocationCount(tp,LOCATION_SZONE)>0
+			local g=Duel.Group(s.eqtofilter,tp,LOCATION_MZONE,0,nil)
+			local b1=tc:IsAbleToHand()
+			local b2=ftchk and g:IsExists(s.eqcheck,1,nil,tc,tp)
+			if not b1 and not b2 then return end
+			local opt=aux.Option(tp,nil,nil,{b1,STRING_ADD_TO_HAND},{b2,STRING_EQUIP})
+			if opt==0 then
+				Duel.Search(tc)
+			elseif opt==1 then
+				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
+				local eqg=g:FilterSelect(tp,s.eqcheck,1,1,nil,tc,tp)
+				local eqc=eqg:GetFirst()
+				Duel.HintSelection(eqg)
+				if tc:IsType(TYPE_EQUIP) then
+					Duel.Equip(tp,tc,eqc)
+				else
+					Duel.EquipToOtherCardAndRegisterLimit(e,tp,tc,eqc)
+				end
+			end	
+		end
 	end
 end

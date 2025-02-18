@@ -11,6 +11,7 @@ EFFECT_IGNORE_TIMELEAP_CONDITION			=100000136
 EFFECT_IGNORE_TIMELEAP_MATERIAL_REQ			=100000137
 EFFECT_IGNORE_TIMELEAP_FUTURE_REQ			=100000138
 EFFECT_TIMELEAP_CUSTOM_MATERIAL_OPERATION	=100000139
+EFFECT_UPDATE_FUTURE						=100000377
 
 TYPE_TIMELEAP						=0x10000000000
 TYPE_CUSTOM							=TYPE_CUSTOM|TYPE_TIMELEAP
@@ -601,11 +602,18 @@ end
 function Card.GetFuture(c)
 	if not Auxiliary.Timeleaps[c] then return 0 end
 	local te=c:IsHasEffect(EFFECT_FUTURE)
-	if type(te:GetValue())=='function' then
-		return te:GetValue()(te,c)
-	else
-		return te:GetValue()
+	local ct=te:Evaluate(c)
+	
+	local eset={c:IsHasEffect(EFFECT_UPDATE_FUTURE)}
+	if #eset>0 then
+		table.sort(eset,aux.EffectSort)
+		for _,e in ipairs(eset) do
+			local val=e:Evaluate(c)
+			ct=ct+val
+		end
 	end
+	
+	return math.max(1,ct)
 end
 function Card.IsFuture(c,...)
 	if not Auxiliary.Timeleaps[c] then return false end

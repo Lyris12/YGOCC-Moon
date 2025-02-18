@@ -1349,17 +1349,20 @@ function Card.GetRating(c)
 	end
 	return list
 end
-function Card.GetRatingAuto(c)
-	if c:HasLevel() then
+function Card.GetRatingAuto(c,typf)
+	if c:HasLevel() and (not typf or typf&RATING_LEVEL>0) then
 		return c:GetLevel(),0
 	end
-	if c:IsOriginalType(TYPE_XYZ) then
+	if c:IsOriginalType(TYPE_XYZ) and (not typf or typf&RATING_RANK>0) then
 		return c:GetRank(),TYPE_XYZ
 	end
-	if c:IsOriginalType(TYPE_LINK) then
+	if c:IsOriginalType(TYPE_LINK) and (not typf or typf&RATING_LINK>0) then
 		return c:GetLink(),TYPE_LINK
 	end
-	return 0,nil
+	if c:IsOriginalType(TYPE_TIMELEAP) and (not typf or typf&RATING_FUTURE>0) then
+		return c:GetFuture(),TYPE_TIMELEAP
+	end
+	return 0,0
 end
 function Card.GetOriginalRating(c)
 	local list={false,false,false}
@@ -1374,17 +1377,20 @@ function Card.GetOriginalRating(c)
 	end
 	return list
 end
-function Card.GetOriginalRatingAuto(c)
-	if c:HasLevel(true) then
+function Card.GetOriginalRatingAuto(c,typf)
+	if c:HasLevel(true) and (not typf or typf&RATING_LEVEL>0)  then
 		return c:GetOriginalLevel(),0
 	end
-	if c:IsOriginalType(TYPE_XYZ) then
+	if c:IsOriginalType(TYPE_XYZ) and (not typf or typf&RATING_RANK>0)  then
 		return c:GetOriginalRank(),TYPE_XYZ
 	end
-	if c:IsOriginalType(TYPE_LINK) then
+	if c:IsOriginalType(TYPE_LINK) and (not typf or typf&RATING_LINK>0)  then
 		return c:GetOriginalLink(),TYPE_LINK
 	end
-	return 0,nil
+	if c:IsOriginalType(TYPE_TIMELEAP) and (not typf or typf&RATING_FUTURE>0) then
+		return c:GetFuture(),TYPE_TIMELEAP
+	end
+	return 0,0
 end
 	
 function Card.IsRating(c,rtyp,...)
@@ -1442,6 +1448,12 @@ function Card.GetMinBaseStat(c)
 end
 function Card.GetMaxBaseStat(c)
 	return math.max(c:GetBaseAttack(),c:GetBaseDefense())
+end
+function Card.GetMinTextStat(c)
+	return math.min(c:GetTextAttack(),c:GetTextDefense())
+end
+function Card.GetMaxTextStat(c)
+	return math.max(c:GetTextAttack(),c:GetTextDefense())
 end
 function Card.IsStats(c,atk,def)
 	return (not atk or c:IsAttack(atk)) and (not def or c:IsDefense(def))
@@ -1520,6 +1532,13 @@ end
 
 function Card.GetResidence(c)
 	return c:GetControler(),c:GetLocation(),c:GetSequence(),c:GetPosition()
+end
+function Card.GetLocationSimple(c)
+	if c:IsOnField() then
+		return LOCATION_ONFIELD
+	else
+		return c:GetLocation()
+	end
 end
 
 --Chain Info
@@ -1730,9 +1749,12 @@ function Auxiliary.RegisterMaxxCEffect(c,id,p,range,event,cond,outchainop,inchai
 		flagrct=flagreset[2]
 		flagreset=flagreset[1]
 	end
+	if type(event)~="table" then event={event} end
+	
+	
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD|EFFECT_TYPE_CONTINUOUS)
-	e2:SetCode(event)
+	e2:SetCode(event[1])
 	e2:SetProperty(EFFECT_FLAG_DELAY)
 	e2:SetCondition(aux.OutsideChainMaxxCCondition(cond))
 	e2:SetOperation(outchainop)
@@ -1751,47 +1773,64 @@ function Auxiliary.RegisterMaxxCEffect(c,id,p,range,event,cond,outchainop,inchai
 		e2:SetRange(range)
 		c:RegisterEffect(e2)
 	end
-	--
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_CONTINUOUS|EFFECT_TYPE_FIELD)
-	e3:SetCode(event)
-	e3:SetCondition(aux.InsideChainMaxxCCondition(cond))
-	e3:SetOperation(aux.RegisterMaxxCFlag(id,flaglabel,flagreset,flagrct))
-	if label then
-		e3:SetLabel(label)
-	end
-	if labelobj then
-		e3:SetLabelObject(labelobj)
-	end
-	if reset then
-		e3:SetReset(reset,rct)
-	end
-	if p then
-		Duel.RegisterEffect(e3,p)
-	else
-		e3:SetRange(range)
-		c:RegisterEffect(e3)
+	if #event>1 then
+		for i=2,#event do
+			local cl=e2:Clone()
+			cl:SetCode(event[i])
+			c:RegisterEffect(cl)
+		end
 	end
 	--
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_CONTINUOUS|EFFECT_TYPE_FIELD)
-	e4:SetCode(EVENT_CHAIN_SOLVED)
-	e4:SetCondition(aux.MaxxCFlagCondition(id,cond))
-	e4:SetOperation(aux.ResolvedChainMaxxCOperation(id,inchainop))
-	if label then
-		e4:SetLabel(label)
-	end
-	if labelobj then
-		e4:SetLabelObject(labelobj)
-	end
-	if reset then
-		e4:SetReset(reset,rct)
-	end
-	if p then
-		Duel.RegisterEffect(e4,p)
-	else
-		e4:SetRange(range)
-		c:RegisterEffect(e4)
+	if inchainop then
+		local e3=Effect.CreateEffect(c)
+		e3:SetType(EFFECT_TYPE_CONTINUOUS|EFFECT_TYPE_FIELD)
+		e3:SetCode(event[1])
+		e3:SetCondition(aux.InsideChainMaxxCCondition(cond))
+		e3:SetOperation(aux.RegisterMaxxCFlag(id,flaglabel,flagreset,flagrct))
+		if label then
+			e3:SetLabel(label)
+		end
+		if labelobj then
+			e3:SetLabelObject(labelobj)
+		end
+		if reset then
+			e3:SetReset(reset,rct)
+		end
+		if p then
+			Duel.RegisterEffect(e3,p)
+		else
+			e3:SetRange(range)
+			c:RegisterEffect(e3)
+		end
+		--
+		if #event>1 then
+			for i=2,#event do
+				local cl=e3:Clone()
+				cl:SetCode(event[i])
+				c:RegisterEffect(cl)
+			end
+		end
+		--
+		local e4=Effect.CreateEffect(c)
+		e4:SetType(EFFECT_TYPE_CONTINUOUS|EFFECT_TYPE_FIELD)
+		e4:SetCode(EVENT_CHAIN_SOLVED)
+		e4:SetCondition(aux.MaxxCFlagCondition(id,cond))
+		e4:SetOperation(aux.ResolvedChainMaxxCOperation(id,inchainop))
+		if label then
+			e4:SetLabel(label)
+		end
+		if labelobj then
+			e4:SetLabelObject(labelobj)
+		end
+		if reset then
+			e4:SetReset(reset,rct)
+		end
+		if p then
+			Duel.RegisterEffect(e4,p)
+		else
+			e4:SetRange(range)
+			c:RegisterEffect(e4)
+		end
 	end
 	
 	return e2,e3,e4
@@ -1812,9 +1851,18 @@ function Auxiliary.RegisterMaxxCFlag(id,flaglabel,reset,rct)
 	return	function(e,tp,eg,ep,ev,re,r,rp)
 				local lab=0
 				if flaglabel then
-					lab=flaglabel(e,tp,eg,ep,ev,re,r,rp)
+					lab={flaglabel(e,tp,eg,ep,ev,re,r,rp)}
 				end
-				Duel.RegisterFlagEffect(tp,id,resets,0,rct,lab)
+				if type(lab)=="table" then
+					if #lab==1 then
+						Duel.RegisterFlagEffect(tp,id,resets,0,rct,lab[1])
+					else
+						local fe=Duel.RegisterFlagEffect(tp,id,resets,0,rct,0)
+						fe:SetLabel(table.unpack(lab))
+					end
+				else
+					Duel.RegisterFlagEffect(tp,id,resets,0,rct,lab)
+				end
 			end
 end
 function Auxiliary.MaxxCFlagCondition(id)
@@ -1982,7 +2030,7 @@ function Duel.DistributeCounters(tp,ctype,n,g,id)
 					end
 				end
 			end
-			local n=Duel.AnnounceNumber(tp,table.unpack(nums))
+			local n=#nums>1 and Duel.AnnounceNumber(tp,table.unpack(nums)) or nums[1]
 			if tc:AddCounter(ctype,n) then
 				cardct=cardct+1
 			end
@@ -2268,81 +2316,6 @@ function Group.CheckSameProperty(g,f,...)
 	return true, chk
 end
 
-function Auxiliary.SelectUnselectLoop(c,sg,mg,e,tp,minc,maxc,rescon)
-	local res=not rescon
-	if #sg>=maxc then return false end
-	sg:AddCard(c)
-	if rescon then
-		local stop
-		res,stop=rescon(sg,e,tp,mg,c)
-		if stop then
-			sg:RemoveCard(c)
-			return false
-		end
-	end
-	if #sg<minc then
-		res=mg:IsExists(Auxiliary.SelectUnselectLoop,1,sg,sg,mg,e,tp,minc,maxc,rescon)
-	elseif #sg<maxc and not res then
-		res=mg:IsExists(Auxiliary.SelectUnselectLoop,1,sg,sg,mg,e,tp,minc,maxc,rescon)
-	end
-	sg:RemoveCard(c)
-	return res
-end
---sg: This group is initially empty and is gradually filled with cards from g.
---mg: This is a clone of the sample group (g) but it does not contain the cards that failed the loop check
---rescon: The condition that must be satisfied by the cards in the temporary checked group (sg). If the "stop" condition is fulfilled, the card is immediately removed from "sg" and fails the loop check
-function Auxiliary.SelectUnselectGroup(g,e,tp,minc,maxc,rescon,chk,seltp,hintmsg,finishcon,breakcon,cancelable)
-	local minc=minc or 1
-	local maxc=maxc or #g
-	if chk==0 then
-		if #g<minc then return false end
-		local eg=g:Clone()
-		for c in aux.Next(g) do
-			if Auxiliary.SelectUnselectLoop(c,Group.CreateGroup(),eg,e,tp,minc,maxc,rescon) then return true end
-			eg:RemoveCard(c)
-		end
-		return false
-	end
-	local hintmsg=hintmsg or 0
-	local sg=Group.CreateGroup()
-	while true do
-		local finishable = #sg>=minc and (not finishcon or finishcon(sg,e,tp,g))
-		local mg=g:Filter(Auxiliary.SelectUnselectLoop,sg,sg,g,e,tp,minc,maxc,rescon)
-		if (breakcon and breakcon(sg,e,tp,mg)) or #mg<=0 or #sg>=maxc then break end
-		Duel.Hint(HINT_SELECTMSG,seltp,hintmsg)
-		local tc=mg:SelectUnselect(sg,seltp,finishable,finishable or (cancelable and #sg==0),minc,maxc)
-		if not tc then break end
-		if sg:IsContains(tc) then
-			sg:RemoveCard(tc)
-		else
-			sg:AddCard(tc)
-		end
-	end
-	return sg
-end
---check for Free Monster Zones
-function Auxiliary.ChkfMMZ(sumcount)
-	sumcount=sumcount or 1
-	return	function(g,e,tp,mg)
-				return Duel.GetMZoneCount(tp,g)>=sumcount
-			end
-end
-function Auxiliary.ChkfMMZRel(sumcount,reason)
-	sumcount=sumcount or 1
-	reason=reason or REASON_COST
-	return	function(g,e,tp,mg)
-				return Duel.GetMZoneCount(tp,g)>=sumcount and Duel.CheckReleaseGroupEx(tp,Auxiliary.IsInGroup,#g,reason,false,nil,g)
-			end
-end
-function Auxiliary.dncheckbrk(g,e,tp,mg,c)
-	local res=g:GetClassCount(Card.GetCode)==#g
-	return res, not res
-end
-function Auxiliary.ogdncheckbrk(g,e,tp,mg,c)
-	local res=g:GetClassCount(Card.GetOriginalCodeRule)==#g
-	return res, not res
-end
-
 --Excavate
 function Auxiliary.excthfilter(c,tp)
 	if not Duel.IsPlayerCanSendtoHand(tp,c) then return false end
@@ -2577,7 +2550,7 @@ function Card.GetFlagEffectWithSpecificLabel(c,flag,label,reset)
 	for i=#eset,1,-1 do
 		local e=eset[i]
 		local x=e:GetLabel()
-		if x==label then
+		if not label or x==label then
 			if not reset then
 				return e
 			else
@@ -2593,7 +2566,7 @@ function Duel.GetFlagEffectWithSpecificLabel(p,flag,label,reset)
 	for i=#eset,1,-1 do
 		local e=eset[i]
 		local x=e:GetLabel()
-		if x==label then
+		if not label or x==label then
 			if not reset then
 				return e
 			else
@@ -2637,11 +2610,15 @@ function Duel.UpdateFlagEffectLabel(p,id,ct)
 	if not ct then ct=1 end
 	return Duel.SetFlagEffectLabel(p,id,Duel.GetFlagEffectLabel(p,id)+ct)
 end
-function Card.HasFlagEffectLabel(c,id,val)
-	if not c:HasFlagEffect(id) then return false end
+function Card.HasFlagEffectLabel(c,id,...)
+	local vals={...}
+	if #vals==0 or not c:HasFlagEffect(id) then return false end
+	local eset={c:GetFlagEffectLabel(id)}
 	for _,label in ipairs({c:GetFlagEffectLabel(id)}) do
-		if label==val then
-			return true
+		for _,val in ipairs(vals) do
+			if label==val then
+				return true
+			end
 		end
 	end
 	return false
@@ -2664,11 +2641,14 @@ function Card.HasFlagEffectLabelHigher(c,id,val)
 	end
 	return false
 end
-function Duel.PlayerHasFlagEffectLabel(tp,id,val)
-	if Duel.GetFlagEffect(tp,id)==0 then return false end
+function Duel.PlayerHasFlagEffectLabel(tp,id,...)
+	local vals={...}
+	if #vals==0 or Duel.GetFlagEffect(tp,id)==0 then return false end
 	for _,label in ipairs({Duel.GetFlagEffectLabel(tp,id)}) do
-		if label==val then
-			return true
+		for _,val in ipairs(vals) do
+			if label==val then
+				return true
+			end
 		end
 	end
 	return false
@@ -4045,9 +4025,10 @@ function Duel.SpecialSummonATKDEF(e,g,styp,sump,tp,ign1,ign2,pos,zone,atk,def,re
 	return Duel.SpecialSummonComplete()
 end
 
-SPSUM_MOD_NEGATE   		= 0x1
-SPSUM_MOD_REDIRECT 		= 0x2
-SPSUM_MOD_CHANGE_ATKDEF	= 0x4
+SPSUM_MOD_NEGATE   					= 0x1
+SPSUM_MOD_REDIRECT 					= 0x2
+SPSUM_MOD_CHANGE_ATKDEF				= 0x4
+SPSUM_MOD_CHANGE_ORIGINAL_ATKDEF	= 0x8
 
 function Duel.SpecialSummonMod(e,g,styp,sump,tp,ign1,ign2,pos,zone,...)
 	local mods={...}
@@ -4064,6 +4045,8 @@ function Duel.SpecialSummonMod(e,g,styp,sump,tp,ign1,ign2,pos,zone,...)
 			mods[i][1]={EFFECT_LEAVE_FIELD_REDIRECT}
 		elseif obj==SPSUM_MOD_CHANGE_ATKDEF then
 			mods[i][1]={EFFECT_SET_ATTACK_FINAL,EFFECT_SET_DEFENSE_FINAL}
+		elseif obj==SPSUM_MOD_CHANGE_ORIGINAL_ATKDEF then
+			mods[i][1]={EFFECT_SET_BASE_ATTACK,EFFECT_SET_BASE_DEFENSE}
 		end
 	end
 	
@@ -4103,7 +4086,7 @@ function Duel.SpecialSummonMod(e,g,styp,sump,tp,ign1,ign2,pos,zone,...)
 							val=LOCATION_REMOVED
 							e1:SetDescription(STRING_BANISH_REDIRECT)
 						end
-					elseif cd==EFFECT_SET_ATTACK_FINAL or cd==EFFECT_SET_DEFENSE_FINAL then
+					elseif cd==EFFECT_SET_ATTACK_FINAL or cd==EFFECT_SET_DEFENSE_FINAL or cd==EFFECT_SET_BASE_ATTACK or cd==EFFECT_SET_BASE_DEFENSE then
 						if selfchk then
 							reset=reset|RESET_DISABLE
 						end
@@ -4832,12 +4815,15 @@ end
 --ARCHETYPAL FUNCTIONS
 
 ----ILLUSION MONSTERS
-function Auxiliary.AddIllusionBattleEffect(c)
+function Auxiliary.AddIllusionBattleEffect(c,cond)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
+	if cond then
+		e1:SetCondition(cond)
+	end
 	e1:SetTarget(aux.IllusionBattleEffectTarget)
 	e1:SetValue(1)
 	c:RegisterEffect(e1)

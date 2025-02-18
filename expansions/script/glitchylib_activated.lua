@@ -80,6 +80,10 @@ function Glitchy.SearchOperation(f,loc,min,max,exc)
 				end
 			end
 end
+function Effect.SetSearchFunctions(e,f,loc,min,max,exc)
+	e:SetTarget(xgl.SearchTarget(f,loc,min,exc))
+	e:SetOperation(xgl.SearchOperation(f,loc,min,max,exc))
+end
 
 --Special Summon effect template
 function Glitchy.SpecialSummonFilter(f,sumtype,sump,recp,ignore_sumcon,ignore_revlim,pos)
@@ -321,6 +325,7 @@ Glitchy.SendtoActions={
 		Duel.SendtoHand(g,p,REASON_EFFECT)
 	end;
 	[LOCATION_REMOVED]=function(g,e,tp,pos)
+		pos = pos or POS_FACEUP
 		Duel.Remove(g,pos,REASON_EFFECT)
 	end;
 }
@@ -401,6 +406,10 @@ function Glitchy.SendtoOperation(destination,tgcheck,f,loc1,loc2,min,max,exc,...
 				end
 	end
 end
+function Effect.SetSendtoFunctions(e,destination,tgcheck,f,loc1,loc2,min,max,exc,...)
+	e:SetTarget(xgl.SendtoTarget(destination,tgcheck,f,loc1,loc2,min,max,exc,...))
+	e:SetOperation(xgl.SendtoOperation(destination,tgcheck,f,loc1,loc2,min,max,exc,...))
+end
 
 --Template for effects that Set Spells/Traps
 function Glitchy.SSetTarget(tgchk,f,loc1,loc2,min,max,exc)
@@ -444,12 +453,13 @@ function Glitchy.SSetTarget(tgchk,f,loc1,loc2,min,max,exc)
 end
 
 function Glitchy.SSetOperation(setmod,tgcheck,f,loc1,loc2,min,max,exc)
-	if not loc1 and not loc2 then Debug.Message("Undefined locations when calling Glitchy.SpecialSummonOperation") return end
+	if not loc1 and not loc2 then Debug.Message("Undefined locations when calling Glitchy.SSetOperation") return end
 	loc1=loc1 or 0
 	loc2=loc2 or 0
 	local setfunc,setparams=nil,{}
 	if type(f)=="number" then
 		tgcheck,f,loc1,loc2,min,max,exc = setmod,tgcheck,f,loc1,loc2,min,max
+		setmod=nil
 	else
 		if type(setmod)=="table" then
 			setfunc=setmod[1]
@@ -498,6 +508,10 @@ function Glitchy.SSetOperation(setmod,tgcheck,f,loc1,loc2,min,max,exc)
 				end
 	end
 end
+function Effect.SetSSetFunctions(e,setmod,tgcheck,f,loc1,loc2,min,max,exc)
+	e:SetTarget(xgl.SSetTarget(tgcheck,f,loc1,loc2,min,max,exc))
+	e:SetOperation(xgl.SSetOperation(setmod,tgcheck,f,loc1,loc2,min,max,exc))
+end
 
 --Special Summon self template: Special Summon "this card"
 --[[Parameters
@@ -517,7 +531,7 @@ function Glitchy.SpecialSummonSelfOperation(redirect)
 				local c=e:GetHandler()
 				if c:IsRelateToChain() then
 					if redirect then
-						Duel.SpecialSummonRedirect(redirect,e,c,0,tp,tp,false,false,POS_FACEUP)
+						Duel.SpecialSummonRedirect(e,c,0,tp,tp,false,false,POS_FACEUP,nil,redirect)
 					else
 						Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
 					end

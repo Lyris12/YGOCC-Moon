@@ -75,6 +75,7 @@ dofile("expansions/script/glitchylib_cond.lua") --Glitchy's Conditions
 dofile("expansions/script/glitchylib_cost.lua") --Glitchy's Costs
 dofile("expansions/script/glitchylib_tgop.lua") --Glitchy's Target+Operations (will be deprecated once all scripts that use these functions are updated)
 dofile("expansions/script/glitchylib_activated.lua") --Glitchy's shortcuts for common activated effects
+dofile("expansions/script/glitchylib_subgroup.lua") --Glitchy's shortcuts for subgroup selection and checking
 
 dofile("expansions/script/proc_evolute.lua") --Evolutes				0 x 1 0000 0000
 dofile("expansions/script/proc_pandemonium.lua") --Pandemoniums		0 x 2 0000 0000

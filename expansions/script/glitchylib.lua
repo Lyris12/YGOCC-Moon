@@ -34,9 +34,9 @@ function Auxiliary.FindInTable(tab,a,...)
 	end
 	
 	for _,param in ipairs(extras) do
-		for _,elem in ipairs(tab) do
+		for pos,elem in ipairs(tab) do
 			if elem==param then
-				return true
+				return pos
 			end
 		end
 	end
@@ -50,6 +50,27 @@ function Auxiliary.ClearTable(tab)
 			table.remove(tab)
 		end
 	end
+end
+function Auxiliary.ClearTableRecursive(tab)
+	for k,v in pairs(tab) do
+		if type(v)=="table" then
+			aux.ClearTableRecursive(v)
+		end
+		tab[k]=nil
+	end
+end
+
+--SORTING
+function Effect.IsInitialSingle(e)
+	return e:IsHasType(EFFECT_TYPE_SINGLE) and e:IsHasProperty(EFFECT_FLAG_SINGLE_RANGE) and e:IsHasProperty(EFFECT_FLAG_INITIAL)
+end
+function Auxiliary.EffectSort(e1,e2)
+	local isSingle1 = e1:IsInitialSingle() and 1 or 0
+	local isSingle2 = e2:IsInitialSingle() and 1 or 0
+	if isSingle1 ~= isSingle2 then
+		return isSingle1 > isSingle2
+	end
+	return e1:GetFieldID() < e2:GetFieldID()
 end
 
 --DAMAGE and LP CHANGES

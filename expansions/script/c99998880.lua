@@ -67,16 +67,16 @@ function s.spcon(e,tp,eg,ep,ev,re,r,rp)
 	if not re then return false end
 	local rc=re:GetHandler()
 	if not (rc and rc:IsOwner(tp)) then return false end
-	local ch=Duel.GetCurrentChain()
-	local cid,code1,code2=Duel.GetChainInfo(ch,CHAININFO_CHAIN_ID,CHAININFO_TRIGGERING_CODE,CHAININFO_TRIGGERING_CODE2)
 	if re:IsActivated() then
+		local ch=Duel.GetCurrentChain()
+		local cid,code1,code2=Duel.GetChainInfo(ch,CHAININFO_CHAIN_ID,CHAININFO_TRIGGERING_CODE,CHAININFO_TRIGGERING_CODE2)
 		if rc:IsRelateToChain(ch) then
-			return rc:IsSetCard(setc) and not rc:IsCode(id)
+			return rc:IsSetCard(ARCHE_VOIDICTATOR) and not rc:IsCode(id)
 		else
 			return s.TriggeringSetcode[cid] and code1~=id and (not code2 or code2~=id)
 		end
 	else
-		return rc:IsSetCard(setc) and not rc:IsCode(id)
+		return rc:IsSetCard(ARCHE_VOIDICTATOR) and not rc:IsCode(id)
 	end
 end
 function s.spfilter(c,e,tp)
