@@ -1263,9 +1263,6 @@ function Card.IsCanChangeLevel(c,lv,e,tp,r)
 end
 
 --
-function Card.HasRank(c)
-	return c:IsOriginalType(TYPE_XYZ)
-end
 function Auxiliary.GetCappedDefense(c)
 	local x=c:GetDefense()
 	if x>MAX_PARAMETER then
@@ -2384,9 +2381,15 @@ function Auxiliary.FaceupExFilter(f,...)
 end
 function Auxiliary.ArchetypeFilter(set,f,...)
 	local ext_params={...}
-	return	function(target)
-				return target:IsSetCard(set) and (not f or f(target,table.unpack(ext_params)))
-			end
+	if type(set)=="table" then
+		return	function(target)
+					return target:IsSetCard(table.unpack(set)) and (not f or f(target,table.unpack(ext_params)))
+				end
+	else
+		return	function(target)
+					return target:IsSetCard(set) and (not f or f(target,table.unpack(ext_params)))
+				end
+	end
 end
 function Auxiliary.MonsterFilter(typ,f,...)
 	local ext_params={...}
@@ -2663,7 +2666,7 @@ function Auxiliary.FixNegativeLabel(n)
 end
 
 --Gain Effect
-function Auxiliary.GainEffectType(c,oc,reset)
+function Auxiliary.GainEffectType(c,oc,reset,desc)
 	if not oc then oc=c end
 	if not reset then
 		reset=RESET_EVENT|RESETS_STANDARD
@@ -2673,6 +2676,10 @@ function Auxiliary.GainEffectType(c,oc,reset)
 	if not c:IsType(TYPE_EFFECT) then
 		local e=Effect.CreateEffect(oc)
 		e:SetType(EFFECT_TYPE_SINGLE)
+		if desc then
+			e:SetDescription(desc)
+			e:SetProperty(EFFECT_FLAG_CLIENT_HINT)
+		end
 		e:SetCode(EFFECT_ADD_TYPE)
 		e:SetValue(TYPE_EFFECT)
 		e:SetReset(reset)
@@ -3002,8 +3009,10 @@ function Duel.GetXyzMaterialGroupCount(tp,s,o,xyzf,matf,...)
 end
 
 function Card.GetPreviousXyzHolder(c)
-	local e=c:IsHasEffect(EFFECT_REMEMBER_XYZ_HOLDER)
-	if e then
+	local code=c:IsLocation(LOCATION_OVERLAY) and EFFECT_REMEMBER_PREVIOUS_XYZ_HOLDER or EFFECT_REMEMBER_XYZ_HOLDER
+	local eset={c:GetEffects(function(_e) return _e:GetCode()==code end)}
+	if #eset>0 then
+		local e=eset[1]
 		local xyzc=e:GetLabelObject()
 		return xyzc
 	end
@@ -4193,9 +4202,13 @@ function Auxiliary.AlreadyInRangeCondition(e,re,se)
 				return se==nil or re~=se
 			end
 end
-function Auxiliary.AlreadyInRangeEventCondition(f)
+function Auxiliary.AlreadyInRangeEventCondition(f,excloc)
 	return	function(e,tp,eg,ep,ev,re,r,rp)
-				return not eg:IsContains(e:GetHandler()) and eg:IsExists(aux.AlreadyInRangeFilter(e,f),1,nil,e,tp,eg,ep,ev,re,r,rp)
+				local c=e:GetHandler()
+				if not excloc or not c:IsLocation(excloc) then
+					f=aux.AlreadyInRangeFilter(e,f)
+				end
+				return not eg:IsContains(c) and eg:IsExists(f,1,nil,e,tp,eg,ep,ev,re,r,rp)
 			end
 end
 function Auxiliary.AlreadyInRangeFilter(e,f)

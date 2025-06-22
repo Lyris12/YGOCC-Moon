@@ -1,6 +1,7 @@
 if EFFECT_ALLOW_EXTRA_XYZ_MATERIAL then return end
 
-EFFECT_ALLOW_EXTRA_XYZ_MATERIAL = 100000253
+EFFECT_ALLOW_EXTRA_XYZ_MATERIAL 	= 100000253
+EFFECT_REMEMBER_PREVIOUS_XYZ_HOLDER	= 100000417
 
 local add_xyz_proc, add_xyz_proc_nlv, duel_overlay, card_is_xyz_level, duel_check_xyz_mat, duel_select_xyz_mat, _XyzLevelFreeGoal =
 Auxiliary.AddXyzProcedure, Auxiliary.AddXyzProcedureLevelFree, Duel.Overlay, Card.IsXyzLevel, Duel.CheckXyzMaterial, Duel.SelectXyzMaterial, Auxiliary.XyzLevelFreeGoal
@@ -36,17 +37,29 @@ Duel.Overlay=function(xyz,mat)
 		mg:Merge(mat)
 	end
 	for mc in aux.Next(mg) do
-		if not mc:IsHasEffect(EFFECT_REMEMBER_XYZ_HOLDER) then
+		local eset={mc:GetEffects(function (_e) return _e:GetCode()==EFFECT_REMEMBER_XYZ_HOLDER end)}
+		if #eset==0 then
 			local e1=Effect.CreateEffect(mc)
 			e1:SetType(EFFECT_TYPE_SINGLE)
 			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_IGNORE_IMMUNE|EFFECT_FLAG_SET_AVAILABLE|EFFECT_FLAG_UNCOPYABLE)
 			e1:SetCode(EFFECT_REMEMBER_XYZ_HOLDER)
 			e1:SetLabelObject(xyz)
-			mc:RegisterEffect(e1)
+			mc:RegisterEffect(e1,true)
 		else
-			local ef={mc:IsHasEffect(EFFECT_REMEMBER_XYZ_HOLDER)}
-			local e1=ef[1]
-			e1:SetLabelObject(xyz)
+			local e0=eset[1]
+			local eset2={mc:GetEffects(function (_e) return _e:GetCode()==EFFECT_REMEMBER_PREVIOUS_XYZ_HOLDER end)}
+			if #eset2==0 then
+				local e1=Effect.CreateEffect(mc)
+				e1:SetType(EFFECT_TYPE_SINGLE)
+				e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE|EFFECT_FLAG_IGNORE_IMMUNE|EFFECT_FLAG_SET_AVAILABLE|EFFECT_FLAG_UNCOPYABLE)
+				e1:SetCode(EFFECT_REMEMBER_PREVIOUS_XYZ_HOLDER)
+				e1:SetLabelObject(e0:GetLabelObject())
+				mc:RegisterEffect(e1,true)
+			else
+				local e2=eset2[1]
+				e2:SetLabelObject(e0:GetLabelObject())
+			end
+			e0:SetLabelObject(xyz)
 		end
 	end
 end

@@ -53,9 +53,10 @@ function Auxiliary.SelectUnselectGroup(g,e,tp,minc,maxc,rescon,chk,seltp,hintmsg
 end
 
 --[[Differently from the regular SelectUnselectLoop, now rescon can also be used to define a razor filter that will restrict which members of (mg) can be added to the current subgroup]]
-function Glitchy.SelectUnselectLoop(c,sg,mg,e,tp,minc,maxc,rescon)
-	local res=not rescon
+function Glitchy.SelectUnselectLoop(c,sg,mg,e,tp,minc,maxc,rescon,firstElementFilter,firstElementIndex)
 	if #sg>=maxc then return false end
+	if firstElementFilter and firstElementIndex<=#firstElementFilter and not firstElementFilter[firstElementIndex](c,e,tp) then return false end
+	local res=not rescon
 	local mg2=mg:Clone()
 	sg:AddCard(c)
 	local razor
@@ -79,9 +80,11 @@ function Glitchy.SelectUnselectLoop(c,sg,mg,e,tp,minc,maxc,rescon)
 	end
 	
 	if #sg<minc then
-		res=mg2:IsExists(Glitchy.SelectUnselectLoop,1,sg,sg,mg2,e,tp,minc,maxc,rescon)
+		if firstElementIndex then firstElementIndex=firstElementIndex+1 end
+		res=mg2:IsExists(Glitchy.SelectUnselectLoop,1,sg,sg,mg2,e,tp,minc,maxc,rescon,firstElementFilter,firstElementIndex)
 	elseif #sg<maxc and not res then
-		res=mg2:IsExists(Glitchy.SelectUnselectLoop,1,sg,sg,mg2,e,tp,minc,maxc,rescon)
+		if firstElementIndex then firstElementIndex=firstElementIndex+1 end
+		res=mg2:IsExists(Glitchy.SelectUnselectLoop,1,sg,sg,mg2,e,tp,minc,maxc,rescon,firstElementFilter,firstElementIndex)
 	end
 	sg:RemoveCard(c)
 	return res
@@ -159,6 +162,13 @@ function Glitchy.SelectUnselectGroup(customLargeGroupThreshold,g,e,tp,minc,maxc,
 					eg:RemoveCard(c)
 				end
 				return false
+			elseif typ=="table" then
+				local fg=g:Filter(firstElementFilter[1],nil,e,tp)
+				for c in aux.Next(fg) do
+					if Glitchy.SelectUnselectLoop(c,Group.CreateGroup(),eg,e,tp,minc,maxc,rescon,firstElementFilter,2) then return true end
+					eg:RemoveCard(c)
+				end
+				return false
 			elseif typ=="Card" then
 				if Glitchy.SelectUnselectLoop(firstElementFilter,Group.CreateGroup(),eg,e,tp,minc,maxc,rescon) then return true end
 				eg:RemoveCard(firstElementFilter)
@@ -177,17 +187,26 @@ function Glitchy.SelectUnselectGroup(customLargeGroupThreshold,g,e,tp,minc,maxc,
 	local history={}
 	local deltas={}
 	local g2=g:Clone()
+	local firstElementIndex=1
 	while true do
 		local finishable = #sg>=minc and (not finishcon or finishcon(sg,e,tp,g2))
 		local mg=g2:Filter(Glitchy.SelectUnselectLoop,sg,sg,g2,e,tp,minc,maxc,rescon)
 		if (breakcon and breakcon(sg,e,tp,mg)) or #mg<=0 or #sg>=maxc then break end
 		local selg=mg
-		if firstElementFilter and #sg==0 then
+		if firstElementFilter then
 			local typ=aux.GetValueType(firstElementFilter)
 			if typ=="function" then
-				selg=mg:Filter(firstElementFilter,nil,e,tp)
+				if #sg==0 then
+					selg=mg:Filter(firstElementFilter,nil,e,tp)
+				end
+			elseif typ=="table" then
+				if #sg<#firstElementFilter then
+					selg=mg:Filter(firstElementFilter[firstElementIndex],nil,e,tp)
+				end
 			elseif typ=="Card" then
-				selg=Group.FromCards(firstElementFilter)
+				if #sg==0 then
+					selg=Group.FromCards(firstElementFilter)
+				end
 			end
 		end
 		Duel.Hint(HINT_SELECTMSG,seltp,hintmsg)
@@ -195,6 +214,7 @@ function Glitchy.SelectUnselectGroup(customLargeGroupThreshold,g,e,tp,minc,maxc,
 		if not tc then break end
 		if sg:IsContains(tc) then
 			while true do
+				firstElementIndex = firstElementIndex - 1
 				local tc2=table.remove(history)
 				sg:RemoveCard(tc2)
 				local lastDelta = table.remove(deltas)
@@ -205,7 +225,7 @@ function Glitchy.SelectUnselectGroup(customLargeGroupThreshold,g,e,tp,minc,maxc,
 			end
 		else
 			sg:AddCard(tc)
-			
+			firstElementIndex = firstElementIndex + 1
 			if rescon then
 				local delta = { added = Group.CreateGroup(), removed = Group.CreateGroup() }	--delta.added just for futureproofing
 				table.insert(deltas, delta)
@@ -248,6 +268,11 @@ end
 function Auxiliary.ogdncheckbrk(g,e,tp,mg,c)
 	local res=g:GetClassCount(Card.GetOriginalCodeRule)==#g
 	return res, not res
+end
+function Glitchy.ogdncheck(g,e,tp,mg,c)
+    local valid = g:GetClassCount(Card.GetOriginalCodeRule)==#g
+    local razor = {aux.NOT(Card.IsOriginalCodeRule),c:GetCode()}
+    return valid,false,razor
 end
 
 function Glitchy.dloccheck(g,e,tp,mg,c)

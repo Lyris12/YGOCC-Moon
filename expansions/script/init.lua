@@ -2094,7 +2094,7 @@ Auxiliary.SpSummonProcGCard = nil
 Auxiliary.PreventCannotApplyConditionCheckLoop = false
 FLAG_SPSUMMON_PROC = 62613309
 
-function Card.GetEffects(c)
+function Card.GetEffects(c,f)
 	local eset=global_card_effect_table[c]
 	if not eset then return {} end
 	local ct=#eset
@@ -2104,7 +2104,18 @@ function Card.GetEffects(c)
 			table.remove(global_card_effect_table[c],i)
 		end
 	end
-	return global_card_effect_table[c]
+	if not f then
+		return global_card_effect_table[c]
+	else
+		local output={}
+		eset=global_card_effect_table[c]
+		for _,e in ipairs(eset) do
+			if f(e) then
+				table.insert(output,e)
+			end
+		end
+		return table.unpack(output)
+	end
 end
 function Duel.GetEffects(p)
 	local eset=global_duel_effect_table[p]
@@ -2276,29 +2287,29 @@ if not global_card_effect_table_global_check then
 					end)
 				end
 				
-				local val=e:GetValue()
-				if not val then
-					e:SetValue(function(E,C)
-						aux.SpSummonProcCard=C
-						aux.SpSummonProcGCard=nil
-						local sumtype,zones=nil,0xff
-						return sumtype,zones
-					end)
-				elseif type(val)=="number" then
-					e:SetValue(function(E,C)
-						aux.SpSummonProcCard=C
-						aux.SpSummonProcGCard=nil
-						local sumtype,zones=val,0xff
-						return sumtype,zones
-					end)
-				elseif type(val)=="function" then
-					e:SetValue(function(E,C,...)
-						aux.SpSummonProcCard=C
-						aux.SpSummonProcGCard=nil
-						local sumtype,zones=val(E,C,...)
-						return sumtype,zones
-					end)
-				end
+				-- local val=e:GetValue()
+				-- if not val then
+					-- e:SetValue(function(E,C)
+						-- aux.SpSummonProcCard=C
+						-- aux.SpSummonProcGCard=nil
+						-- local sumtype,zones=nil,0xff
+						-- return sumtype,zones
+					-- end)
+				-- elseif type(val)=="number" then
+					-- e:SetValue(function(E,C)
+						-- aux.SpSummonProcCard=C
+						-- aux.SpSummonProcGCard=nil
+						-- local sumtype,zones=val,0xff
+						-- return sumtype,zones
+					-- end)
+				-- elseif type(val)=="function" then
+					-- e:SetValue(function(E,C,...)
+						-- aux.SpSummonProcCard=C
+						-- aux.SpSummonProcGCard=nil
+						-- local sumtype,zones=val(E,C,...)
+						-- return sumtype,zones
+					-- end)
+				-- end
 			
 			elseif code==EFFECT_SPSUMMON_PROC_G then
 				local op=e:GetOperation()
@@ -2356,14 +2367,14 @@ if not global_card_effect_table_global_check then
 				end
 				e:SetTargetRange(s,o)
 				
-			elseif code==EFFECT_UPDATE_ATTACK or code==EFFECT_SET_ATTACK or code==EFFECT_SET_ATTACK_FINAL or code==EFFECT_SWAP_AD then
-				if e:IsHasType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_XMATERIAL) then
+			elseif (code>=EFFECT_UPDATE_ATTACK and code<=EFFECT_SET_BASE_ATTACK) or code==EFFECT_SWAP_AD or code==EFFECT_SWAP_BASE_AD or code==EFFECT_SET_BASE_ATTACK_FINAL then
+				if e:IsHasType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_XMATERIAL) then 
 					if e:IsHasType(EFFECT_TYPE_SINGLE) and self:IsHasEffect(EFFECT_GLITCHY_CANNOT_CHANGE_ATK) then
 						for _,ce in ipairs({self:IsHasEffect(EFFECT_GLITCHY_CANNOT_CHANGE_ATK)}) do
 							if ce and aux.GetValueType(ce)=="Effect" and ce.GetLabel then
 								local val=ce:GetValue()
 								if not val or val(ce,e,REASON_EFFECT) then
-									e:Reset()
+									--e:Reset()
 									return false
 								end
 							end
@@ -2371,13 +2382,11 @@ if not global_card_effect_table_global_check then
 					end
 					local cond=e:GetCondition()
 					local newcond =	function(e,...)
-										if code==EFFECT_UPDATE_ATTACK or code==EFFECT_SET_ATTACK or code==EFFECT_SET_ATTACK_FINAL or code==EFFECT_SWAP_AD then
-											for _,ce in ipairs({e:GetHandler():IsHasEffect(EFFECT_GLITCHY_CANNOT_CHANGE_ATK)}) do
-												if ce and aux.GetValueType(ce)=="Effect" and ce.GetLabel then
-													local val=ce:GetValue()
-													if not val or val(ce,e,REASON_EFFECT) then
-														return false
-													end
+										for _,ce in ipairs({e:GetHandler():IsHasEffect(EFFECT_GLITCHY_CANNOT_CHANGE_ATK)}) do
+											if ce and aux.GetValueType(ce)=="Effect" and ce.GetLabel then
+												local val=ce:GetValue()
+												if not val or val(ce,e,REASON_EFFECT) then
+													return false
 												end
 											end
 										end
@@ -2387,13 +2396,11 @@ if not global_card_effect_table_global_check then
 				elseif e:IsHasType(EFFECT_TYPE_EQUIP) then
 					local cond=e:GetCondition()
 					local newcond =	function(e,...)
-										if code==EFFECT_UPDATE_ATTACK or code==EFFECT_SET_ATTACK or code==EFFECT_SET_ATTACK_FINAL or code==EFFECT_SWAP_AD then
-											for _,ce in ipairs({e:GetHandler():GetEquipTarget():IsHasEffect(EFFECT_GLITCHY_CANNOT_CHANGE_ATK)}) do
-												if ce and aux.GetValueType(ce)=="Effect" and ce.GetLabel then
-													local val=ce:GetValue()
-													if not val or val(ce,e,REASON_EFFECT) then
-														return false
-													end
+										for _,ce in ipairs({e:GetHandler():GetEquipTarget():IsHasEffect(EFFECT_GLITCHY_CANNOT_CHANGE_ATK)}) do
+											if ce and aux.GetValueType(ce)=="Effect" and ce.GetLabel then
+												local val=ce:GetValue()
+												if not val or val(ce,e,REASON_EFFECT) then
+													return false
 												end
 											end
 										end
@@ -2403,13 +2410,67 @@ if not global_card_effect_table_global_check then
 				elseif e:IsHasType(EFFECT_TYPE_FIELD) then
 					local tg=e:GetTarget()
 					local newtarg =	function(e,c,...)
-										if code==EFFECT_UPDATE_ATTACK or code==EFFECT_SET_ATTACK or code==EFFECT_SET_ATTACK_FINAL or code==EFFECT_SWAP_AD then
-											for _,ce in ipairs({c:IsHasEffect(EFFECT_GLITCHY_CANNOT_CHANGE_ATK)}) do
-												if ce and aux.GetValueType(ce)=="Effect" and ce.GetLabel then
-													local val=ce:GetValue()
-													if not val or val(ce,e,REASON_EFFECT) then
-														return false
-													end
+										for _,ce in ipairs({c:IsHasEffect(EFFECT_GLITCHY_CANNOT_CHANGE_ATK)}) do
+											if ce and aux.GetValueType(ce)=="Effect" and ce.GetLabel then
+												local val=ce:GetValue()
+												if not val or val(ce,e,REASON_EFFECT) then
+													return false
+												end
+											end
+										end
+										return not tg or tg(e,c,...)
+									end
+					e:SetTarget(newtarg)
+				end
+			
+			elseif (code>=EFFECT_UPDATE_DEFENSE and code<=EFFECT_SET_BASE_DEFENSE) or code==EFFECT_SWAP_AD or code==EFFECT_SWAP_BASE_AD or code==EFFECT_SET_BASE_DEFENSE_FINAL then
+				if e:IsHasType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_XMATERIAL) then 
+					if e:IsHasType(EFFECT_TYPE_SINGLE) and self:IsHasEffect(EFFECT_GLITCHY_CANNOT_CHANGE_DEF) then
+						for _,ce in ipairs({self:IsHasEffect(EFFECT_GLITCHY_CANNOT_CHANGE_DEF)}) do
+							if ce and aux.GetValueType(ce)=="Effect" and ce.GetLabel then
+								local val=ce:GetValue()
+								if not val or val(ce,e,REASON_EFFECT) then
+									--e:Reset()
+									return false
+								end
+							end
+						end
+					end
+					local cond=e:GetCondition()
+					local newcond =	function(e,...)
+										for _,ce in ipairs({e:GetHandler():IsHasEffect(EFFECT_GLITCHY_CANNOT_CHANGE_DEF)}) do
+											if ce and aux.GetValueType(ce)=="Effect" and ce.GetLabel then
+												local val=ce:GetValue()
+												if not val or val(ce,e,REASON_EFFECT) then
+													return false
+												end
+											end
+										end
+										return not cond or cond(e,...)
+									end
+					e:SetCondition(newcond)
+				elseif e:IsHasType(EFFECT_TYPE_EQUIP) then
+					local cond=e:GetCondition()
+					local newcond =	function(e,...)
+										for _,ce in ipairs({e:GetHandler():GetEquipTarget():IsHasEffect(EFFECT_GLITCHY_CANNOT_CHANGE_DEF)}) do
+											if ce and aux.GetValueType(ce)=="Effect" and ce.GetLabel then
+												local val=ce:GetValue()
+												if not val or val(ce,e,REASON_EFFECT) then
+													return false
+												end
+											end
+										end
+										return not cond or cond(e,...)
+									end
+					e:SetCondition(newcond)
+				elseif e:IsHasType(EFFECT_TYPE_FIELD) then
+					local tg=e:GetTarget()
+					local newtarg =	function(e,c,...)
+										for _,ce in ipairs({c:IsHasEffect(EFFECT_GLITCHY_CANNOT_CHANGE_DEF)}) do
+											if ce and aux.GetValueType(ce)=="Effect" and ce.GetLabel then
+												local val=ce:GetValue()
+												if not val or val(ce,e,REASON_EFFECT) then
+													return false
 												end
 											end
 										end

@@ -349,7 +349,7 @@ function Auxiliary.RevealSelfCost(reset,rct)
 		return	function(e,tp,eg,ep,ev,re,r,rp,chk)
 				local c=e:GetHandler()
 				if chk==0 then return not c:IsPublic() end
-				Duel.ConfirmCards(1-tp,c)
+				if not c:IsLocation(LOCATION_HAND) then Duel.ConfirmCards(1-tp,c) end
 			end
 	else
 		if not rct then rct=1 end
@@ -535,14 +535,14 @@ OPTIONAL PARAMS:
 ]]
 function Auxiliary.SSRestrictionCost(f,oath,reset,id,cf,desc,...)
 	local x={...}
-	local cost	= #x>0 and x[#x] or nil
-	local other	= #x>1 and x[#x-1] or nil
+	local other	= #x>0 and x[1] or nil
+	local cost	= #x>1 and x[2] or nil
 	
 	if id then
 		local donotcount_function = type(cf)=="function" and cf or f
 		if type(cf)=="number" then
 			local new_donotcount_function = function(c,...)
-				return not c:IsSummonLocation(cf) or donotcount_function(c,...)
+				return not c:IsSummonLocation(cf) or (donotcount_function and donotcount_function(c,...))
 			end
 			Duel.AddCustomActivityCounter(id,ACTIVITY_SPSUMMON,new_donotcount_function)
 		else
@@ -552,27 +552,37 @@ function Auxiliary.SSRestrictionCost(f,oath,reset,id,cf,desc,...)
 	local prop=EFFECT_FLAG_PLAYER_TARGET
 	if oath then prop=prop|EFFECT_FLAG_OATH end
 	if desc then prop=prop|EFFECT_FLAG_CLIENT_HINT end
-	if not reset then reset=RESET_PHASE|PHASE_END end
+	
+	local rct=1
+	if not reset then
+		reset=RESET_PHASE|PHASE_END
+	elseif type(reset)=="table" then
+		rct=reset[2]
+		reset=reset[1]
+	end
 	
 	return	function(e,tp,eg,ep,ev,re,r,rp,chk)
 				if chk==0 then return Duel.GetCustomActivityCount(id,tp,ACTIVITY_SPSUMMON)==0 and (not cost or cost(e,tp,eg,ep,ev,re,r,rp,chk)) end
-				local e1=Effect.CreateEffect(e:GetHandler())
+				local c=e:GetHandler()
+				local e1=Effect.CreateEffect(c)
 				if desc then
 					e1:SetDescription(id,desc)
 				end
 				e1:SetType(EFFECT_TYPE_FIELD)
 				e1:SetProperty(prop)
 				e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-				e1:SetReset(reset)
+				if reset~=0 then
+					e1:SetReset(reset,rct)
+				end
 				e1:SetTargetRange(1,0)
 				if type(cf)~="number" then
 					e1:SetTarget(	function(eff,c,sump,sumtype,sumpos,targetp,se)
-										return not f(c,eff,sump,sumtype,sumpos,targetp,se) and (not other or se~=e)
+										return (not f or not f(c,eff,sump,sumtype,sumpos,targetp,se)) and (not other or se~=e)
 									end
 								)
 				else
 					e1:SetTarget(	function(eff,c,sump,sumtype,sumpos,targetp,se)
-										return not f(c,eff,sump,sumtype,sumpos,targetp,se) and c:IsLocation(cf) and (not other or se~=e)
+										return (not f or not f(c,eff,sump,sumtype,sumpos,targetp,se)) and c:IsLocation(cf) and (not other or se~=e)
 									end
 								)
 				end

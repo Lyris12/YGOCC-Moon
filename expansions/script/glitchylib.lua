@@ -15,6 +15,7 @@ EFFECT_GLITCHY_ADD_ORIGINAL_CUSTOM_SETCODE		= 8013
 EFFECT_GLITCHY_PREVIOUS_CUSTOM_SETCODE			= 8014
 EFFECT_GLITCHY_ADD_FUSION_CUSTOM_SETCODE		= 8015
 EFFECT_GLITCHY_ADD_LINK_CUSTOM_SETCODE			= 8016
+EFFECT_GLITCHY_CANNOT_CHANGE_DEF				= 8017
 
 FLAG_UNCOUNTED_NORMAL_SUMMON			= 8000
 FLAG_UNCOUNTED_NORMAL_SET				= 8001
@@ -377,8 +378,35 @@ Effect.SetCountLimit = function(e,ct,...)
 	end
 end
 
+--CUSTOM ARCHETYPES
+CustomArchetypes = {}
+
+function Auxiliary.RegisterCustomArchetype(id,...)
+	local setcodes={...}
+	for _,setc in ipairs(setcodes) do
+		if not CustomArchetypes[setc] then
+			CustomArchetypes[setc]={}
+		end
+		if not CustomArchetypes[setc][id] then
+			CustomArchetypes[setc][id]=true
+		end
+	end
+end
+function Card.IsCustomArchetype(c,...)
+	local codes={c:GetCode()}
+	local setcodes={...}
+	for _,setcode in ipairs(setcodes) do
+		for _,code in ipairs(codes) do
+			if CustomArchetypes[setcode][code] then
+				return true
+			end
+		end
+	end
+	return false
+end
+
 -------------------------------------------------------------------------------------
--------------------------------CUSTOM ARCHETYPES-------------------------------------
+-------------------------------CUSTOM ARCHETYPES (deprecated)-------------------------------------
 function Auxiliary.IsCustomSetCardTemplate(effect_code,c,hex,...)
 	if not c:IsHasEffect(effect_code) then return false end
 	
